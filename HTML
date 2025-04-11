@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snow Cone Math Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Snow Cone Math Stand!</h1>
+        <p>Answer math problems to build the perfect snow cone!</p>
+    </header>
+    
+    <section id="game-container">
+        <div id="problem-container">
+            <p id="math-problem">Loading...</p>
+        </div>
+        
+        <div id="answer-container">
+            <input type="number" id="answer-input" placeholder="Your answer">
+            <button onclick="checkAnswer()">Check Answer</button>
+        </div>
+        
+        <div id="result-container">
+            <p id="result-message"></p>
+        </div>
+        
+        <div id="snow-cone">
+            <h2>Your Snow Cone:</h2>
+            <div id="cone"></div>
+        </div>
+    </section>
+    
+    <footer>
+        <p>Good luck, and keep serving those snow cones!</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
