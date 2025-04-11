@@ -1,0 +1,64 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #e0f7fa;
+    text-align: center;
+    color: #333;
+}
+
+header {
+    background-color: #00796b;
+    color: white;
+    padding: 20px;
+    font-size: 24px;
+}
+
+h1 {
+    margin: 0;
+}
+
+#game-container {
+    margin: 20px;
+}
+
+#math-problem {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+input[type="number"] {
+    padding: 10px;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+button {
+    padding: 10px;
+    font-size: 18px;
+    background-color: #00796b;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #004d40;
+}
+
+#snow-cone {
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+#cone {
+    background-color: #ffeb3b;
+    width: 100px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: 50% 50% 0 0;
+}
+
+#result-container {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
