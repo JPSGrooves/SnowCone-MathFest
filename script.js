@@ -1,53 +1,54 @@
 let num1 = 5;
 let num2 = 3;
 let correctAnswer = num1 + num2;
-let userAnswer = '';
+let currentAnswer = [];
 
 const scoop = document.getElementById('scoop');
+const question = document.getElementById('question');
+const answerDisplay = document.getElementById('answerDisplay');
 const correctSound = document.getElementById('correctSound');
 const incorrectSound = document.getElementById('incorrectSound');
-const submitButton = document.getElementById('submitButton');
-const clearButton = document.getElementById('clearButton');
-const answerDisplay = document.getElementById('answerDisplay');
-const questionText = document.getElementById('question');
 
-// Show the question
-questionText.textContent = `${num1} + ${num2} = ?`;
-
-function updateAnswerDisplay() {
-  answerDisplay.textContent = userAnswer === '' ? '0' : userAnswer;
+function appendNumber(num) {
+  if (currentAnswer.length === 0 && num === 0) return; // prevent leading 0
+  currentAnswer.push(num);
+  updateDisplay();
 }
 
-// Handle key presses
-document.querySelectorAll('.key').forEach(key => {
-  key.addEventListener('click', () => {
-    const value = key.dataset.key;
-    if (value !== undefined) {
-      userAnswer += value;
-      updateAnswerDisplay();
-    }
-  });
-});
+function clearAnswer() {
+  currentAnswer = [];
+  updateDisplay();
+}
 
-// Clear button
-clearButton.addEventListener('click', () => {
-  userAnswer = '';
-  updateAnswerDisplay();
-});
+function updateDisplay() {
+  answerDisplay.textContent = currentAnswer.length === 0 ? '0' : currentAnswer.join('');
+}
 
-// Submit button
-submitButton.addEventListener('click', () => {
-  if (parseInt(userAnswer) === correctAnswer) {
+function checkAnswer() {
+  const userAnswer = parseInt(currentAnswer.join(""), 10);
+
+  if (userAnswer === correctAnswer) {
+    scoop.style.display = 'block';
     scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff';
-    correctSound.play().catch(e => console.log(e));
+    correctSound.play().catch(err => console.log('Audio error:', err));
     setTimeout(() => {
       alert("Correct! Enjoy your snow cone!");
-      userAnswer = '';
-      updateAnswerDisplay();
+      loadNewQuestion();
     }, 500);
   } else {
-    scoop.style.boxShadow = 'none';
-    incorrectSound.play().catch(e => console.log(e));
+    incorrectSound.play().catch(err => console.log('Audio error:', err));
     alert("Oops! Try again.");
+    clearAnswer();
   }
-});
+}
+
+function loadNewQuestion() {
+  scoop.style.display = 'none';
+  num1 = Math.floor(Math.random() * 10);
+  num2 = Math.floor(Math.random() * 10);
+  correctAnswer = num1 + num2;
+  question.textContent = `${num1} + ${num2} = ?`;
+  clearAnswer();
+}
+
+loadNewQuestion();
