@@ -31,6 +31,7 @@ body {
   left: 0;
   box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
   z-index: 2;
+  display: none;
 }
 
 .snow-cone {
@@ -49,7 +50,7 @@ body {
 
 .text {
   position: absolute;
-  bottom: 65px; /* was 40px */
+  bottom: 85px; /* moved up from 65px */
   color: black;
   font-size: 20px;
   text-align: center;
@@ -63,42 +64,36 @@ body {
   text-align: center;
 }
 
-#question {
-  margin-bottom: 10px;
-  font-size: 28px;
-}
-
 .answer-display {
-  font-size: 32px;
-  color: #39ff14;
-  text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14;
-  margin-bottom: 20px;
+  font-size: 36px;
+  color: #ff00cc;
+  margin: 10px 0;
 }
 
 .keypad {
   display: grid;
-  grid-template-columns: repeat(3, 80px);
-  grid-gap: 10px;
+  grid-template-columns: repeat(3, 50px);
+  gap: 10px;
   justify-content: center;
+  margin-top: 10px;
 }
 
-.key {
-  background-color: #ff00cc;
-  font-size: 24px;
-  padding: 15px;
-  border: none;
+.keypad button {
+  font-size: 20px;
+  padding: 10px;
+  background-color: #222;
   color: white;
+  border: 2px solid #ff00cc;
   cursor: pointer;
-  border-radius: 10px;
-  box-shadow: 0 0 5px #ff00cc;
-  transition: background 0.2s;
+  border-radius: 5px;
 }
 
-.key:hover {
-  background-color: #6600ff;
+.keypad button:hover {
+  background-color: #ff00cc;
 }
 
-.scoop {
-  ...
-  display: none; /* Hide scoop by default */
+.wide-button {
+  grid-column: span 1;
+  font-size: 14px;
+  padding: 8px 5px;
 }
