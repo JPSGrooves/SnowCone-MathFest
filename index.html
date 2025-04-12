@@ -4,7 +4,107 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Math Fest Snow Cone</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      font-family: Comic Sans MS, cursive, sans-serif;
+      color: white;
+    }
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .snow-cone-wrapper {
+      position: relative;
+      width: 150px;
+      height: 225px;
+      margin-bottom: 20px;
+    }
+
+    .scoop {
+      width: 150px;
+      height: 75px;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-radius: 75px 75px 0 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      z-index: 2;
+      display: none;
+    }
+
+    .snow-cone {
+      position: absolute;
+      bottom: 0;
+      width: 150px;
+      height: 150px;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      background: linear-gradient(to bottom, #ffff99, #ffee00);
+      box-shadow: 0 0 10px #fff, 0 0 20px yellow;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .text {
+      position: absolute;
+      bottom: 95px;
+      color: black;
+      font-size: 20px;
+      text-align: center;
+      line-height: 1.2;
+      z-index: 3;
+    }
+
+    .question-box {
+      margin-top: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .answer-display {
+      font-size: 36px;
+      color: #ff00cc;
+      margin: 10px 0;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .keypad button {
+      font-size: 20px;
+      padding: 12px;
+      background-color: #ff00cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ff00cc;
+    }
+
+    .keypad button:hover {
+      background-color: #e600b8;
+    }
+
+    .wide-button {
+      font-size: 14px;
+      padding: 12px;
+    }
+  </style>
 </head>
 <body>
   <div class="game-container">
@@ -38,6 +138,51 @@
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <script>
+    let num1 = 5;
+    let num2 = 3;
+    let correctAnswer = num1 + num2;
+    let currentAnswer = [];
+
+    const scoop = document.getElementById('scoop');
+    const question = document.getElementById('question');
+    const answerDisplay = document.getElementById('answerDisplay');
+    const correctSound = document.getElementById('correctSound');
+    const incorrectSound = document.getElementById('incorrectSound');
+
+    function appendNumber(num) {
+      // Allow 0 to be entered as first value, only if it's the only number (for 0+0 fix)
+      if (currentAnswer.length === 1 && currentAnswer[0] === 0) return;
+      currentAnswer.push(num);
+      updateDisplay();
+    }
+
+    function clearAnswer() {
+      currentAnswer = [];
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      answerDisplay.textContent = currentAnswer.length === 0 ? '0' : currentAnswer.join('');
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseInt(currentAnswer.join("") || "0", 10);
+      if (userAnswer === correctAnswer) {
+        scoop.style.display = 'block';
+        scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff';
+        correctSound.play().catch(err => console.log('Audio error:', err));
+        setTimeout(() => {
+          alert("Correct! Enjoy your snow cone!");
+          loadNewQuestion();
+        }, 500);
+      } else {
+        incorrectSound.play().catch(err => console.log('Audio error:', err));
+        alert("Oops! Try again.");
+        clearAnswer();
+      }
+    }
+
+    function loadNewQuestion() {
+      scoop.style.display = 'none';
+      num1 = Math.floor(Math.random()
