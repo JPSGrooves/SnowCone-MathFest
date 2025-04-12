@@ -20,16 +20,10 @@
       height: 100vh;
     }
 
-    .snow-cone {
+    .snow-cone-wrapper {
       position: relative;
       width: 150px;
-      height: 200px;
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: linear-gradient(to bottom, #ffff99, #ffee00);
-      box-shadow: 0 0 10px #fff, 0 0 20px yellow;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 225px;
     }
 
     .scoop {
@@ -38,26 +32,44 @@
       background: linear-gradient(to right, #ff00cc, #6600ff);
       border-radius: 75px 75px 0 0;
       position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 0;
+      left: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      z-index: 2;
+    }
+
+    .snow-cone {
+      position: absolute;
+      bottom: 0;
+      width: 150px;
+      height: 150px;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      background: linear-gradient(to bottom, #ffff99, #ffee00);
+      box-shadow: 0 0 10px #fff, 0 0 20px yellow;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
     }
 
     .text {
       position: absolute;
+      bottom: 40px;
       color: black;
       font-size: 20px;
       text-align: center;
       line-height: 1.2;
+      z-index: 3;
     }
   </style>
 </head>
 <body>
   <div class="game-container">
-    <div class="snow-cone">
+    <div class="snow-cone-wrapper">
       <div class="scoop"></div>
-      <div class="text">Math<br>Fest</div>
+      <div class="snow-cone">
+        <div class="text">Math<br>Fest</div>
+      </div>
     </div>
   </div>
 </body>
