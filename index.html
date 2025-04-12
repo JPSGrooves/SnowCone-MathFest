@@ -8,7 +8,7 @@
     body {
       background: black;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       text-align: center;
       padding: 20px;
       overflow-x: hidden;
@@ -202,16 +202,16 @@
 </div>
 
 <!-- Modal Popup -->
-<div id="rulesModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: 'Comic Sans MS', cursive, sans-serif; z-index:9999; display:flex; justify-content:center; align-items:center;">
+<div id="rulesModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; display:flex; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🌈 Whoa, Math Traveler 🌈</h2>
+    <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
     <p style="font-size:16px; line-height:1.5;">
       Welcome to the fest, where math is funky and cones are fresh.<br><br>
       ➕➖ Add & Subtract: <strong>+3 points</strong><br>
       ✖️➗ Multiply & Divide: <strong>+6 points</strong><br>
       💀 Hard Mode: <strong>+15 points</strong><br>
       😵 Any wrong answer: <strong>-3 points</strong><br><br>
-      🎉 Hit 60 seconds with 50+ points = Confetti fiesta, dude.
+      🍧 Hit 60 seconds with 50+ points = Confetti fiesta, dude.
     </p>
     <button onclick="hideRules()" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
@@ -230,6 +230,10 @@
   let secondsElapsed = 0;
   let timerInterval = null;
   let confettiTriggered = false;
+
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const ctx = confettiCanvas.getContext('2d');
+  let confettiPieces = [];
 
   function showRules() {
     document.getElementById('rulesModal').style.display = 'flex';
@@ -391,5 +395,6 @@
 
   generateProblem();
 </script>
+
 </body>
 </html>
