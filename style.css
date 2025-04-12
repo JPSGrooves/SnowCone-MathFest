@@ -50,7 +50,7 @@ body {
 
 .text {
   position: absolute;
-  bottom: 90px;
+  bottom: 85px;
   color: black;
   font-size: 20px;
   text-align: center;
@@ -81,19 +81,18 @@ body {
 .keypad button {
   font-size: 20px;
   padding: 10px;
-  background-color: #222;
+  background-color: #ff00cc;
   color: white;
-  border: 2px solid #ff00cc;
+  border: none;
   cursor: pointer;
   border-radius: 5px;
 }
 
 .keypad button:hover {
-  background-color: #ff00cc;
+  background-color: #ff33dd;
 }
 
 .wide-button {
-  grid-column: span 1;
   font-size: 14px;
   padding: 8px 5px;
 }
