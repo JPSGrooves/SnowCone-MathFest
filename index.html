@@ -105,27 +105,29 @@
       padding: 8px 5px;
     }
 
-    /* Function buttons above keypad */
-    .function-buttons {
+    .extra-buttons {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-right: 10px; /* Space between function buttons and keypad */
       justify-content: center;
+      align-items: center;
+      position: absolute;
+      left: -70px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    .function-button {
-      font-size: 18px;
+    .extra-buttons button {
+      font-size: 20px;
       padding: 10px;
       background-color: #222;
       color: white;
       border: 2px solid #ff00cc;
       cursor: pointer;
       border-radius: 5px;
-      text-align: center;
+      margin-bottom: 10px;
     }
 
-    .function-button:hover {
+    .extra-buttons button:hover {
       background-color: #ff00cc;
     }
   </style>
@@ -142,28 +144,26 @@
     <div class="question-box">
       <div id="question">5 + 3 = ?</div>
       <div id="answerDisplay" class="answer-display">0</div>
-      
-      <!-- New Function Buttons Column Left of Keypad -->
-      <div class="function-buttons">
-        <button class="function-button" id="plus-minus">+/-</button>
-        <button class="function-button" id="multiply-divide">X-/</button>
-      </div>
+    </div>
 
-      <!-- The Keypad -->
-      <div class="keypad">
-        <button onclick="appendNumber(1)">1</button>
-        <button onclick="appendNumber(2)">2</button>
-        <button onclick="appendNumber(3)">3</button>
-        <button onclick="appendNumber(4)">4</button>
-        <button onclick="appendNumber(5)">5</button>
-        <button onclick="appendNumber(6)">6</button>
-        <button onclick="appendNumber(7)">7</button>
-        <button onclick="appendNumber(8)">8</button>
-        <button onclick="appendNumber(9)">9</button>
-        <button class="wide-button" onclick="clearAnswer()">Clear</button>
-        <button onclick="appendNumber(0)">0</button>
-        <button class="wide-button" onclick="checkAnswer()">Enter</button>
-      </div>
+    <div class="extra-buttons">
+      <button id="plusMinus">±</button>
+      <button id="xMinus">X-/</button>
+    </div>
+
+    <div class="keypad">
+      <button onclick="appendNumber(1)">1</button>
+      <button onclick="appendNumber(2)">2</button>
+      <button onclick="appendNumber(3)">3</button>
+      <button onclick="appendNumber(4)">4</button>
+      <button onclick="appendNumber(5)">5</button>
+      <button onclick="appendNumber(6)">6</button>
+      <button onclick="appendNumber(7)">7</button>
+      <button onclick="appendNumber(8)">8</button>
+      <button onclick="appendNumber(9)">9</button>
+      <button class="wide-button" onclick="clearAnswer()">Clear</button>
+      <button onclick="appendNumber(0)">0</button>
+      <button class="wide-button" onclick="checkAnswer()">Enter</button>
     </div>
   </div>
 
