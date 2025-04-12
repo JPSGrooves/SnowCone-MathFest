@@ -67,46 +67,59 @@
     .question-box {
       margin-top: 20px;
       font-size: 24px;
-      text-align: center;
+      color: white; /* Math problem in white */
     }
 
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-gap: 10px;
-      margin-top: 20px;
+    .answer-box {
+      margin-top: 10px;
+      font-size: 36px;
+      color: #ff00cc; /* Neon answer color */
     }
 
-    .key {
+    input {
       font-size: 24px;
-      padding: 20px;
+      padding: 5px;
+      margin-top: 10px;
+    }
+
+    .button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
       background-color: #ff00cc;
-      color: white;
       border: none;
+      color: white;
       cursor: pointer;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #ff00cc;
     }
 
-    .key:hover {
+    .button:hover {
       background-color: #6600ff;
-      box-shadow: 0 0 15px #6600ff;
-    }
-
-    #clear, #enter {
-      grid-column: span 3;
-      font-size: 24px;
     }
 
     .hidden {
       visibility: hidden;
     }
 
-    .input-display {
-      font-size: 32px;
-      margin-bottom: 20px;
-      color: #ff00cc;
-      font-weight: bold;
+    /* New Keypad Styling */
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .keypad button {
+      font-size: 20px;
+      padding: 15px;
+      background-color: #6600ff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .keypad button:hover {
+      background-color: #ff00cc;
     }
   </style>
 </head>
@@ -119,27 +132,30 @@
       </div>
     </div>
 
+    <!-- Math problem -->
     <div id="questionBox" class="question-box">
-      <div class="input-display" id="inputDisplay">0</div>
       <span id="question">5 + 3 = ?</span>
     </div>
 
+    <!-- Answer Box (with neon) -->
+    <div class="answer-box">
+      <span id="answer">0</span>
+    </div>
+
+    <!-- Keypad -->
     <div class="keypad">
-      <!-- Number keys -->
-      <button class="key" onclick="addToInput(1)">1</button>
-      <button class="key" onclick="addToInput(2)">2</button>
-      <button class="key" onclick="addToInput(3)">3</button>
-      <button class="key" onclick="addToInput(4)">4</button>
-      <button class="key" onclick="addToInput(5)">5</button>
-      <button class="key" onclick="addToInput(6)">6</button>
-      <button class="key" onclick="addToInput(7)">7</button>
-      <button class="key" onclick="addToInput(8)">8</button>
-      <button class="key" onclick="addToInput(9)">9</button>
-      <button class="key" onclick="addToInput(0)">0</button>
-      
-      <!-- Action keys -->
-      <button id="clear" class="key" onclick="clearInput()">Clear</button>
-      <button id="enter" class="key" onclick="submitAnswer()">Enter</button>
+      <button onclick="appendNumber(1)">1</button>
+      <button onclick="appendNumber(2)">2</button>
+      <button onclick="appendNumber(3)">3</button>
+      <button onclick="appendNumber(4)">4</button>
+      <button onclick="appendNumber(5)">5</button>
+      <button onclick="appendNumber(6)">6</button>
+      <button onclick="appendNumber(7)">7</button>
+      <button onclick="appendNumber(8)">8</button>
+      <button onclick="appendNumber(9)">9</button>
+      <button onclick="clearAnswer()">C</button>
+      <button onclick="appendNumber(0)">0</button>
+      <button onclick="submitAnswer()">Submit</button>
     </div>
   </div>
 
@@ -155,44 +171,39 @@
 
     // Get DOM elements
     const scoop = document.getElementById('scoop');
-    const inputDisplay = document.getElementById('inputDisplay');
+    const answerDisplay = document.getElementById('answer');
+    const questionBox = document.getElementById('questionBox');
     const correctSound = document.getElementById('correctSound');
     const incorrectSound = document.getElementById('incorrectSound');
-    const submitButton = document.getElementById('enter');
 
-    let currentInput = '';
-
-    // Add number to input display
-    function addToInput(number) {
-      currentInput += number;
-      inputDisplay.textContent = currentInput;
+    // Append numbers to the answer display
+    function appendNumber(number) {
+      answerDisplay.textContent += number;
     }
 
-    // Clear input display
-    function clearInput() {
-      currentInput = '';
-      inputDisplay.textContent = '0';
+    // Clear the answer
+    function clearAnswer() {
+      answerDisplay.textContent = '0';
     }
 
-    // Check if the answer is correct
+    // Check the answer
     function submitAnswer() {
-      const userAnswer = parseInt(currentInput);
+      const userAnswer = parseInt(answerDisplay.textContent);
 
       if (userAnswer === correctAnswer) {
         scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff'; // Glow effect on correct answer
-        correctSound.play().catch(error => console.log('Audio error: ', error)); // Play the correct guitar sound
+        correctSound.play();
         setTimeout(() => {
           alert("Correct! Enjoy your snow cone!");
         }, 500); // After a short delay, show the correct message
       } else {
         scoop.style.boxShadow = 'none'; // Reset glow on wrong answer
-        incorrectSound.play().catch(error => console.log('Audio error: ', error)); // Play the incorrect guitar sound
+        incorrectSound.play();
         alert("Oops! Try again.");
       }
 
-      // Clear input after submit
-      currentInput = '';
-      inputDisplay.textContent = '0';
+      // Reset answer display
+      answerDisplay.textContent = '0';
     }
   </script>
 </body>
