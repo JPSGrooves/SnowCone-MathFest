@@ -106,7 +106,7 @@
     <div id="questionBox" class="question-box">
       <span id="question">5 + 3 = ?</span>
       <input type="number" id="answerInput" />
-      <button class="button" onclick="checkAnswer()">Submit</button>
+      <button class="button" id="submitButton">Submit</button>
     </div>
   </div>
 
@@ -126,6 +126,7 @@
     const questionBox = document.getElementById('questionBox');
     const correctSound = document.getElementById('correctSound');
     const incorrectSound = document.getElementById('incorrectSound');
+    const submitButton = document.getElementById('submitButton');
 
     // Check if answer is correct
     function checkAnswer() {
@@ -147,9 +148,9 @@
       answerInput.value = '';
     }
 
-    // Test if audio plays on page load
-    window.addEventListener('load', () => {
-      correctSound.play().catch(error => console.log('Audio error: ', error));  // Test sound
+    // Add event listener to play sound on button click
+    submitButton.addEventListener('click', function() {
+      checkAnswer();
     });
   </script>
 </body>
