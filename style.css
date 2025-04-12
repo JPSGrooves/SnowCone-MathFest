@@ -1,64 +1,47 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #e0f7fa;
-    text-align: center;
-    color: #333;
+  margin: 0;
+  background-color: #0d0d0d;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-header {
-    background-color: #00796b;
-    color: white;
-    padding: 20px;
-    font-size: 24px;
+.game-container {
+  text-align: center;
+  position: relative;
 }
 
-h1 {
-    margin: 0;
+.snow-cone {
+  width: 100px;
+  height: 140px;
+  margin: 20px auto;
+  background: radial-gradient(circle at 50% 20%, #ff00cc, #6600ff);
+  border-bottom: 40px solid #222;
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+  box-shadow: 0 0 15px #ff00cc, 0 0 25px #6600ff;
+  transition: all 0.3s ease;
 }
 
-#game-container {
-    margin: 20px;
+.snow-cone.dark {
+  background: #111;
+  box-shadow: none;
 }
 
-#math-problem {
-    font-size: 32px;
-    font-weight: bold;
+.hand {
+  position: absolute;
+  top: 40px;
+  left: -200px;
+  width: 150px;
+  height: 100px;
+  background: linear-gradient(to right, #00ffff, #ff00ff);
+  opacity: 0.8;
+  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  box-shadow: 0 0 20px #0ff, 0 0 40px #f0f;
+  transition: all 0.6s ease;
 }
 
-input[type="number"] {
-    padding: 10px;
-    font-size: 18px;
-    margin-right: 10px;
-}
-
-button {
-    padding: 10px;
-    font-size: 18px;
-    background-color: #00796b;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #004d40;
-}
-
-#snow-cone {
-    margin-top: 20px;
-    font-size: 20px;
-}
-
-#cone {
-    background-color: #ffeb3b;
-    width: 100px;
-    height: 200px;
-    margin: 0 auto;
-    border-radius: 50% 50% 0 0;
-}
-
-#result-container {
-    margin-top: 20px;
-    font-size: 20px;
-    font-weight: bold;
+.hand.slide-in {
+  left: 150px;
 }
