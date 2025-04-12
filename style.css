@@ -1,0 +1,101 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  font-family: Comic Sans MS, cursive, sans-serif;
+  color: white;
+}
+
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.snow-cone-wrapper {
+  position: relative;
+  width: 150px;
+  height: 225px;
+  margin-bottom: 20px;
+}
+
+.scoop {
+  width: 150px;
+  height: 75px;
+  background: linear-gradient(to right, #ff00cc, #6600ff);
+  border-radius: 75px 75px 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+  z-index: 2;
+}
+
+.snow-cone {
+  position: absolute;
+  bottom: 0;
+  width: 150px;
+  height: 150px;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  background: linear-gradient(to bottom, #ffff99, #ffee00);
+  box-shadow: 0 0 10px #fff, 0 0 20px yellow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.text {
+  position: absolute;
+  bottom: 40px;
+  color: black;
+  font-size: 20px;
+  text-align: center;
+  line-height: 1.2;
+  z-index: 3;
+}
+
+.question-box {
+  margin-top: 20px;
+  font-size: 24px;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.key {
+  font-size: 24px;
+  padding: 20px;
+  background-color: #ff00cc;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.key:hover {
+  background-color: #6600ff;
+}
+
+.button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #ff00cc;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #6600ff;
+}
+
+.hidden {
+  visibility: hidden;
+}
