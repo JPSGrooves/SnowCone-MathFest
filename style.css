@@ -97,3 +97,8 @@ body {
 .key:hover {
   background-color: #6600ff;
 }
+
+.scoop {
+  ...
+  display: none; /* Hide scoop by default */
+}
