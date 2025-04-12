@@ -111,8 +111,8 @@
   </div>
 
   <!-- Guitar sound effects -->
-  <audio id="correctSound" src="guitar-correct.mp3"></audio>
-  <audio id="incorrectSound" src="guitar-error.mp3"></audio>
+  <audio id="correctSound" src="guitar-correct.mp3" preload="auto"></audio>
+  <audio id="incorrectSound" src="guitar-error.mp3" preload="auto"></audio>
 
   <script>
     // Math question variables
@@ -133,19 +133,24 @@
 
       if (userAnswer === correctAnswer) {
         scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff'; // Glow effect on correct answer
-        correctSound.play(); // Play the correct guitar sound
+        correctSound.play().catch(error => console.log('Audio error: ', error)); // Play the correct guitar sound
         setTimeout(() => {
           alert("Correct! Enjoy your snow cone!");
         }, 500); // After a short delay, show the correct message
       } else {
         scoop.style.boxShadow = 'none'; // Reset glow on wrong answer
-        incorrectSound.play(); // Play the incorrect guitar sound
+        incorrectSound.play().catch(error => console.log('Audio error: ', error)); // Play the incorrect guitar sound
         alert("Oops! Try again.");
       }
 
       // Clear input after submit
       answerInput.value = '';
     }
+
+    // Test if audio plays on page load
+    window.addEventListener('load', () => {
+      correctSound.play().catch(error => console.log('Audio error: ', error));  // Test sound
+    });
   </script>
 </body>
 </html>
