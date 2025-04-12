@@ -60,22 +60,25 @@ body {
 .question-box {
   margin-top: 20px;
   font-size: 24px;
+  text-align: center;
 }
 
 .keypad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-gap: 10px;
   margin-top: 20px;
 }
 
 .key {
+  background-color: #ff00cc;
   font-size: 24px;
   padding: 20px;
-  background-color: #ff00cc;
   border: none;
   color: white;
   cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 0 0 5px #ff00cc;
 }
 
 .key:hover {
@@ -94,8 +97,4 @@ body {
 
 .button:hover {
   background-color: #6600ff;
-}
-
-.hidden {
-  visibility: hidden;
 }
