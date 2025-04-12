@@ -63,38 +63,37 @@ body {
   text-align: center;
 }
 
+#question {
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.answer-display {
+  font-size: 32px;
+  color: #39ff14;
+  text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14;
+  margin-bottom: 20px;
+}
+
 .keypad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 80px);
   grid-gap: 10px;
-  margin-top: 20px;
+  justify-content: center;
 }
 
 .key {
   background-color: #ff00cc;
   font-size: 24px;
-  padding: 20px;
+  padding: 15px;
   border: none;
   color: white;
   cursor: pointer;
   border-radius: 10px;
   box-shadow: 0 0 5px #ff00cc;
+  transition: background 0.2s;
 }
 
 .key:hover {
-  background-color: #6600ff;
-}
-
-.button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #ff00cc;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-.button:hover {
   background-color: #6600ff;
 }
