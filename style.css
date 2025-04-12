@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   background: black;
-  font-family: 'Comic Neue', cursive, sans-serif;
+  font-family: Comic Sans MS, cursive, sans-serif;
   color: white;
 }
 
@@ -50,7 +50,7 @@ body {
 
 .text {
   position: absolute;
-  bottom: 85px; /* moved up from 65px */
+  bottom: 90px;
   color: black;
   font-size: 20px;
   text-align: center;
@@ -72,42 +72,28 @@ body {
 
 .keypad {
   display: grid;
-  grid-template-columns: repeat(3, 60px);
+  grid-template-columns: repeat(3, 50px);
   gap: 10px;
   justify-content: center;
   margin-top: 10px;
 }
 
 .keypad button {
-  font-size: 18px;
-  padding: 12px;
-  background-color: #ff00cc;
+  font-size: 20px;
+  padding: 10px;
+  background-color: #222;
   color: white;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 0 10px #ff00cc, 0 0 20px #6600ff;
+  border: 2px solid #ff00cc;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  border-radius: 5px;
 }
 
 .keypad button:hover {
-  background-color: #ff66dd;
-  transform: scale(1.05);
+  background-color: #ff00cc;
 }
 
-.keypad button:active {
-  background-color: #cc0099;
-  transform: scale(0.95);
-}
-
-.keypad button:nth-child(10) {
-  grid-column: 1;
-}
-
-.keypad button:nth-child(11) {
-  grid-column: 2;
-}
-
-.keypad button:nth-child(12) {
-  grid-column: 3;
+.wide-button {
+  grid-column: span 1;
+  font-size: 14px;
+  padding: 8px 5px;
 }
