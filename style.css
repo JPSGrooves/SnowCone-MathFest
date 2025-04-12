@@ -1,78 +1,45 @@
 body {
-  margin: 0;
-  background-color: #0d0d0d;
-  font-family: sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  font-family: Comic Sans MS, cursive, sans-serif;
   color: white;
 }
 
 .game-container {
-  text-align: center;
-  position: relative;
-}
-
-.snow-cone {
-  width: 150px;
-  height: 200px;
-  margin: 20px auto;
-  position: relative;
-  clip-path: polygon(0% 0%, 100% 0%, 50% 100%); /* Downward triangle */
-  background: linear-gradient(to bottom, #ffff00, #ffcc00); /* Neon yellow gradient */
-  border: 5px solid #ff00cc; /* Neon pink outline */
-  box-shadow: 0 0 15px #ff00cc, 0 0 25px #6600ff; /* Neon glow effect */
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
 }
 
-.snow-cone .text {
-  font-family: 'Comic Sans MS', sans-serif;
-  font-size: 24px;
-  color: black; /* Black color for the text */
-  text-align: center;
-  font-weight: bold;
-  position: absolute;
-  top: 25px; /* Position text inside the cone */
-  left: 50%; /* Center it horizontally */
-  transform: translateX(-50%); /* Adjust so it's truly centered */
-  z-index: 1; /* Make sure text is above cone */
-  background: rgba(255, 255, 255, 0.5); /* Temporary background color to ensure visibility */
-  padding: 5px;
+.snow-cone {
+  position: relative;
+  width: 150px;
+  height: 200px;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  background: linear-gradient(to bottom, #ffff99, #ffee00);
+  box-shadow: 0 0 10px #fff, 0 0 20px yellow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.snow-cone .scoop {
+/* THE SCOOP */
+.scoop {
   width: 150px;
   height: 75px;
-  background: linear-gradient(to right, #ff00cc, #6600ff); /* Neon gradient */
-  border-radius: 75px 75px 0 0; /* Top half-circle */
+  background: linear-gradient(to right, #ff00cc, #6600ff);
+  border-radius: 75px 75px 0 0;
   position: absolute;
-  bottom: 100%; /* Place on top of cone */
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
 }
 
-.hand {
+/* MATH FEST TEXT */
+.text {
   position: absolute;
-  top: 40px;
-  left: -200px;
-  width: 150px;
-  height: 100px;
-  background: linear-gradient(to right, #00ffff, #ff00ff);
-  opacity: 0.8;
-  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
-  box-shadow: 0 0 20px #0ff, 0 0 40px #f0f;
-  transition: all 0.6s ease;
-}
-
-.hand.slide-in {
-  left: 150px;
-}
-
-.snow-cone .scoop {
-  outline: 2px solid limegreen;
+  color: black;
+  font-size: 20px;
+  text-align: center;
+  line-height: 1.2;
 }
