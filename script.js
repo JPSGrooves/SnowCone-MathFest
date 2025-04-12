@@ -1,6 +1,6 @@
-let num1 = 5;
-let num2 = 3;
-let correctAnswer = num1 + num2;
+let num1 = 0;
+let num2 = 0;
+let correctAnswer = 0;
 let currentAnswer = [];
 
 const scoop = document.getElementById('scoop');
@@ -10,8 +10,12 @@ const correctSound = document.getElementById('correctSound');
 const incorrectSound = document.getElementById('incorrectSound');
 
 function appendNumber(num) {
-  if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return; // prevent leading 0 unless 0 is correct answer
-  currentAnswer.push(num);
+  if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return;
+  if (currentAnswer.length === 1 && currentAnswer[0] === 0 && num !== 0) {
+    currentAnswer[0] = num; // replace leading zero with typed number
+  } else {
+    currentAnswer.push(num);
+  }
   updateDisplay();
 }
 
@@ -33,15 +37,14 @@ function checkAnswer() {
   if (userAnswer === correctAnswer) {
     scoop.style.display = 'block';
     scoop.classList.remove('pop');
-    void scoop.offsetWidth; // re-trigger animation
+    void scoop.offsetWidth;
     scoop.classList.add('pop');
-    correctSound.play().catch(err => console.log(err));
+    correctSound.play().catch(() => {});
     setTimeout(() => {
-      alert("Correct!");
       loadNewQuestion();
     }, 600);
   } else {
-    incorrectSound.play().catch(err => console.log(err));
+    incorrectSound.play().catch(() => {});
     alert("Oops! Try again.");
     clearAnswer();
   }
