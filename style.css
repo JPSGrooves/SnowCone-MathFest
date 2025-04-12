@@ -19,7 +19,7 @@ body {
   height: 200px;
   margin: 20px auto;
   position: relative;
-  clip-path: polygon(50% 0%, 100% 100%, 0% 100%); /* Downward triangle */
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%); /* Flip the triangle */
   border: 5px solid transparent;
   border-bottom: 5px solid #ff00cc; /* Full neon outline */
   background: black;
@@ -47,9 +47,4 @@ body {
   opacity: 0.8;
   clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
   box-shadow: 0 0 20px #0ff, 0 0 40px #f0f;
-  transition: all 0.6s ease;
-}
-
-.hand.slide-in {
-  left: 150px;
-}
+  transition: all 0.6
