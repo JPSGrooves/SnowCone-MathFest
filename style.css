@@ -19,9 +19,9 @@ body {
   height: 200px;
   margin: 20px auto;
   position: relative;
-  clip-path: polygon(50% 0%, 100% 100%, 0% 100%); /* Triangle shape */
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%); /* Downward triangle */
   border: 5px solid transparent;
-  border-top: 5px solid #ff00cc; /* Neon outline for visibility */
+  border-bottom: 5px solid #ff00cc; /* Full neon outline */
   background: black;
   box-shadow: 0 0 15px #ff00cc, 0 0 25px #6600ff; /* Neon glow effect */
 }
@@ -32,7 +32,7 @@ body {
   background: linear-gradient(to right, #ff00cc, #6600ff); /* Neon scoop color */
   border-radius: 50%;
   position: absolute;
-  top: -35px; /* Align scoop properly on top of the triangle */
+  top: -35px; /* Position scoop on top and flush with the triangle */
   left: 0;
   box-shadow: 0 0 20px #ff00cc, 0 0 40px #6600ff;
 }
