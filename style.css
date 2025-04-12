@@ -47,12 +47,13 @@ body {
 .snow-cone .scoop {
   width: 150px;
   height: 75px;
-  background: linear-gradient(to right, #ff00cc, #6600ff); /* Neon scoop color */
-  border-radius: 75px 75px 0 0; /* Makes it a top half-circle */
+  background: linear-gradient(to right, #ff00cc, #6600ff); /* Neon gradient */
+  border-radius: 75px 75px 0 0; /* Top half-circle */
   position: absolute;
-  bottom: 100%; /* Sit directly on top of the cone */
-  left: 0;
-  box-shadow: 0 0 20px #ff00cc, 0 0 40px #6600ff;
+  bottom: 100%; /* Place on top of cone */
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
 }
 
 .hand {
