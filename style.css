@@ -35,7 +35,9 @@ body {
   color: black; /* Black color for the text */
   text-align: center;
   font-weight: bold;
-  z-index: 1;
+  position: absolute;
+  top: 40px; /* Adjust position so it's on top of the cone */
+  z-index: 1; /* Ensure the text is above the cone */
 }
 
 .snow-cone .scoop {
