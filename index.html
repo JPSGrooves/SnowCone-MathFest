@@ -53,8 +53,9 @@
       z-index: 1;
     }
 
-    .cone-text {
+    .cone-text a {
       color: black;
+      text-decoration: none;
       font-size: 20px;
       line-height: 1.2;
       z-index: 3;
@@ -153,231 +154,242 @@
 </head>
 <body>
 
-  <canvas id="confettiCanvas" class="confetti"></canvas>
+<canvas id="confettiCanvas" class="confetti"></canvas>
 
-  <div class="game-container">
-    <div class="score-bar">
-      <div class="score">Score: <span id="score">0</span></div>
-      <div id="timer">Time: 0s</div>
-      <button class="reset-button" onclick="resetScore()">Reset Score</button>
-    </div>
+<div class="game-container">
+  <div class="score-bar">
+    <div class="score">Score: <span id="score">0</span></div>
+    <div id="timer">Time: 0s</div>
+    <button class="reset-button" onclick="resetScore()">Reset Score</button>
+  </div>
 
-    <div class="snow-cone-wrapper">
-      <div id="scoop" class="scoop"></div>
-      <div class="snow-cone">
-        <div class="cone-text">
-          <a href="#" onclick="showRules()" style="text-decoration: none; color: black;">
-            Math<br>Fest
-          </a>
-        </div>
+  <div class="snow-cone-wrapper">
+    <div id="scoop" class="scoop"></div>
+    <div class="snow-cone">
+      <div class="cone-text">
+        <a href="#" onclick="showRules()">Math<br>Fest</a>
       </div>
     </div>
+  </div>
 
-    <div class="math-problem" id="problem">0 + 0 = 🍧</div>
-    <div class="answer-display" id="answerDisplay">0</div>
+  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
+  <div class="answer-display" id="answerDisplay">0</div>
 
-    <div class="mode-buttons">
-      <button onclick="setMode('addsub')">+/-</button>
-      <button onclick="setMode('multdiv')">X-/</button>
-      <button onclick="setMode('hard')">Hard<br>Mode</button>
-    </div>
+  <div class="mode-buttons">
+    <button onclick="setMode('addsub')">+/-</button>
+    <button onclick="setMode('multdiv')">X-/</button>
+    <button onclick="setMode('hard')">Hard<br>Mode</button>
+  </div>
 
-    <div class="keypad">
-      <button onclick="appendNumber(7)">7</button>
-      <button onclick="appendNumber(8)">8</button>
-      <button onclick="appendNumber(9)">9</button>
-      <button onclick="submitAnswer()">Enter</button>
+  <div class="keypad">
+    <button onclick="appendNumber(7)">7</button>
+    <button onclick="appendNumber(8)">8</button>
+    <button onclick="appendNumber(9)">9</button>
+    <button onclick="submitAnswer()">Enter</button>
+    <button onclick="appendNumber(4)">4</button>
+    <button onclick="appendNumber(5)">5</button>
+    <button onclick="appendNumber(6)">6</button>
+    <button onclick="clearAnswer()">Clear</button>
+    <button onclick="appendNumber(1)">1</button>
+    <button onclick="appendNumber(2)">2</button>
+    <button onclick="appendNumber(3)">3</button>
+    <button onclick="toggleNegative()">-</button>
+    <div></div>
+    <button onclick="appendNumber(0)">0</button>
+    <div></div>
+    <div></div>
+  </div>
+</div>
 
-      <button onclick="appendNumber(4)">4</button>
-      <button onclick="appendNumber(5)">5</button>
-      <button onclick="appendNumber(6)">6</button>
-      <button onclick="clearAnswer()">Clear</button>
+<!-- Modal Popup -->
+<div id="rulesModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: 'Comic Sans MS', cursive, sans-serif; z-index:9999; display:flex; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🌈 Whoa, Math Traveler 🌈</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br><br>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br>
+      💀 Hard Mode: <strong>+15 points</strong><br>
+      😵 Any wrong answer: <strong>-3 points</strong><br><br>
+      🎉 Hit 60 seconds with 50+ points = Confetti fiesta, dude.
+    </p>
+    <button onclick="hideRules()" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+  </div>
+</div>
 
-      <button onclick="appendNumber(1)">1</button>
-      <button onclick="appendNumber(2)">2</button>
-      <button onclick="appendNumber(3)">3</button>
-      <button onclick="toggleNegative()">-</button>
+<audio id="correctSound" src="correct.mp3"></audio>
+<audio id="incorrectSound" src="incorrect.mp3"></audio>
 
-      <div></div>
-      <button onclick="appendNumber(0)">0</button>
-      <div></div>
-      <div></div>
-    </div>
+<script>
+  let currentAnswer = '';
+  let correctAnswer = 0;
+  let mode = 'addsub';
+  let score = 0;
+  let currentProblemType = '+';
+  let timerStarted = false;
+  let secondsElapsed = 0;
+  let timerInterval = null;
+  let confettiTriggered = false;
 
-  <audio id="correctSound" src="correct.mp3"></audio>
-  <audio id="incorrectSound" src="incorrect.mp3"></audio>
+  function showRules() {
+    document.getElementById('rulesModal').style.display = 'flex';
+  }
 
-  <script>
-    let currentAnswer = '';
-    let correctAnswer = 0;
-    let mode = 'addsub';
-    let score = 0;
-    let currentProblemType = '+';
+  function hideRules() {
+    document.getElementById('rulesModal').style.display = 'none';
+  }
 
-    let timerStarted = false;
-    let secondsElapsed = 0;
-    let timerInterval = null;
-    let confettiTriggered = false;
+  function randomInt(max) {
+    return Math.floor(Math.random() * (max + 1));
+  }
 
-    const confettiCanvas = document.getElementById('confettiCanvas');
-    const ctx = confettiCanvas.getContext('2d');
-    let confettiPieces = [];
+  function generateProblem() {
+    let a, b, c, op1, op2;
 
-    function randomInt(max) {
-      return Math.floor(Math.random() * (max + 1));
-    }
-
-    function generateProblem() {
-      let a, b, c, op1, op2;
-
-      if (mode === 'addsub') {
+    if (mode === 'addsub') {
+      a = randomInt(9);
+      b = randomInt(9);
+      op1 = Math.random() > 0.5 ? '+' : '-';
+      if (op1 === '-' && b > a) [a, b] = [b, a];
+      correctAnswer = op1 === '+' ? a + b : a - b;
+      document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
+      currentProblemType = op1;
+    } else if (mode === 'multdiv') {
+      if (Math.random() > 0.5) {
         a = randomInt(9);
         b = randomInt(9);
-        op1 = Math.random() > 0.5 ? '+' : '-';
-        if (op1 === '-' && b > a) [a, b] = [b, a];
-        correctAnswer = op1 === '+' ? a + b : a - b;
-        document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
-        currentProblemType = op1;
-      }
-
-      else if (mode === 'multdiv') {
-        if (Math.random() > 0.5) {
-          a = randomInt(9);
-          b = randomInt(9);
-          op1 = '×';
-          correctAnswer = a * b;
-        } else {
-          b = randomInt(8) + 1;
-          correctAnswer = randomInt(9);
-          a = b * correctAnswer;
-          op1 = '÷';
-        }
-        document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
-        currentProblemType = op1;
-      }
-
-      else if (mode === 'hard') {
-        a = randomInt(9);
-        b = randomInt(9);
-        c = randomInt(8) + 1;
-        op1 = Math.random() > 0.5 ? '+' : '-';
-        op2 = Math.random() > 0.5 ? '×' : '÷';
-        let inner = op1 === '+' ? a + b : a - b;
-        correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
-        document.getElementById('problem').textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-        currentProblemType = 'hard';
-      }
-
-      currentAnswer = '';
-      updateDisplay();
-      document.getElementById('scoop').style.display = 'none';
-    }
-
-    function appendNumber(num) {
-      currentAnswer += num;
-      updateDisplay();
-    }
-
-    function toggleNegative() {
-      if (currentAnswer.startsWith('-')) {
-        currentAnswer = currentAnswer.slice(1);
+        op1 = '×';
+        correctAnswer = a * b;
       } else {
-        currentAnswer = '-' + currentAnswer;
+        b = randomInt(8) + 1;
+        correctAnswer = randomInt(9);
+        a = b * correctAnswer;
+        op1 = '÷';
       }
-      updateDisplay();
+      document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
+      currentProblemType = op1;
+    } else if (mode === 'hard') {
+      a = randomInt(9);
+      b = randomInt(9);
+      c = randomInt(8) + 1;
+      op1 = Math.random() > 0.5 ? '+' : '-';
+      op2 = Math.random() > 0.5 ? '×' : '÷';
+      let inner = op1 === '+' ? a + b : a - b;
+      correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
+      document.getElementById('problem').textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+      currentProblemType = 'hard';
     }
 
-    function clearAnswer() {
-      currentAnswer = '';
-      updateDisplay();
-    }
+    currentAnswer = '';
+    updateDisplay();
+    document.getElementById('scoop').style.display = 'none';
+  }
 
-    function updateDisplay() {
-      document.getElementById('answerDisplay').textContent = currentAnswer || '0';
-    }
+  function appendNumber(num) {
+    currentAnswer += num;
+    updateDisplay();
+  }
 
-    function submitAnswer() {
-      const answer = parseInt(currentAnswer);
-      if (answer === correctAnswer) {
-        startTimer();
-        let points = 3;
-        if (currentProblemType === '×' || currentProblemType === '÷') points = 6;
-        if (currentProblemType === 'hard') points = 12;
-        score += points;
-        document.getElementById('score').textContent = score;
-        document.getElementById('scoop').style.display = 'block';
-        document.getElementById('correctSound').play().catch(() => {});
-        setTimeout(generateProblem, 800);
-      } else {
-        score -= 3;
-        document.getElementById('score').textContent = score;
-        document.getElementById('incorrectSound').play().catch(() => {});
-        alert("Oops! Try again.");
-        clearAnswer();
-      }
+  function toggleNegative() {
+    if (currentAnswer.startsWith('-')) {
+      currentAnswer = currentAnswer.slice(1);
+    } else {
+      currentAnswer = '-' + currentAnswer;
     }
+    updateDisplay();
+  }
 
-    function startTimer() {
-      if (!timerStarted) {
-        timerStarted = true;
-        timerInterval = setInterval(() => {
-          secondsElapsed++;
-          document.getElementById('timer').textContent = `Time: ${secondsElapsed}s`;
-          if (secondsElapsed >= 60 && score > 50 && !confettiTriggered) {
-            launchConfetti();
-            confettiTriggered = true;
-          }
-        }, 1000);
-      }
-    }
+  function clearAnswer() {
+    currentAnswer = '';
+    updateDisplay();
+  }
 
-    function resetScore() {
-      score = 0;
+  function updateDisplay() {
+    document.getElementById('answerDisplay').textContent = currentAnswer || '0';
+  }
+
+  function submitAnswer() {
+    const answer = parseInt(currentAnswer);
+    if (answer === correctAnswer) {
+      startTimer();
+      let points = 3;
+      if (currentProblemType === '×' || currentProblemType === '÷') points = 6;
+      if (currentProblemType === 'hard') points = 15;
+      score += points;
       document.getElementById('score').textContent = score;
-      clearInterval(timerInterval);
-      timerStarted = false;
-      secondsElapsed = 0;
-      confettiTriggered = false;
-      document.getElementById('timer').textContent = 'Time: 0s';
+      document.getElementById('scoop').style.display = 'block';
+      document.getElementById('correctSound').play().catch(() => {});
+      setTimeout(generateProblem, 800);
+    } else {
+      score -= 3;
+      document.getElementById('score').textContent = score;
+      document.getElementById('incorrectSound').play().catch(() => {});
+      alert("Oops! Try again.");
+      clearAnswer();
     }
+  }
 
-    function setMode(newMode) {
-      mode = newMode;
-      generateProblem();
+  function startTimer() {
+    if (!timerStarted) {
+      timerStarted = true;
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById('timer').textContent = `Time: ${secondsElapsed}s`;
+        if (secondsElapsed >= 60 && score > 50 && !confettiTriggered) {
+          launchConfetti();
+          confettiTriggered = true;
+        }
+      }, 1000);
     }
+  }
 
-    function launchConfetti() {
-      const colors = ['#ff00cc', '#00ff88', '#00ccff', '#ffee00'];
-      for (let i = 0; i < 100; i++) {
-        confettiPieces.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * -50,
-          size: Math.random() * 10 + 5,
-          speedY: Math.random() * 3 + 2,
-          color: colors[Math.floor(Math.random() * colors.length)]
-        });
-      }
-      animateConfetti();
-    }
+  function resetScore() {
+    score = 0;
+    document.getElementById('score').textContent = score;
+    clearInterval(timerInterval);
+    timerStarted = false;
+    secondsElapsed = 0;
+    confettiTriggered = false;
+    document.getElementById('timer').textContent = 'Time: 0s';
+  }
 
-    function animateConfetti() {
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      confettiPieces.forEach(piece => {
-        ctx.fillStyle = piece.color;
-        ctx.beginPath();
-        ctx.arc(piece.x, piece.y, piece.size, 0, Math.PI * 2);
-        ctx.fill();
-        piece.y += piece.speedY;
-      });
-      confettiPieces = confettiPieces.filter(p => p.y < window.innerHeight);
-      if (confettiPieces.length > 0) {
-        requestAnimationFrame(animateConfetti);
-      }
-    }
-
+  function setMode(newMode) {
+    mode = newMode;
     generateProblem();
-  </script>
+  }
+
+  function launchConfetti() {
+    const colors = ['#ff00cc', '#00ff88', '#00ccff', '#ffee00'];
+    for (let i = 0; i < 100; i++) {
+      confettiPieces.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * -50,
+        size: Math.random() * 10 + 5,
+        speedY: Math.random() * 3 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+    animateConfetti();
+  }
+
+  function animateConfetti() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    confettiPieces.forEach(piece => {
+      ctx.fillStyle = piece.color;
+      ctx.beginPath();
+      ctx.arc(piece.x, piece.y, piece.size, 0, Math.PI * 2);
+      ctx.fill();
+      piece.y += piece.speedY;
+    });
+    confettiPieces = confettiPieces.filter(p => p.y < window.innerHeight);
+    if (confettiPieces.length > 0) {
+      requestAnimationFrame(animateConfetti);
+    }
+  }
+
+  generateProblem();
+</script>
 </body>
 </html>
