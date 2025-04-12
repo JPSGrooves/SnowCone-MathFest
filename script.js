@@ -10,7 +10,7 @@ const correctSound = document.getElementById('correctSound');
 const incorrectSound = document.getElementById('incorrectSound');
 
 function appendNumber(num) {
-  if (currentAnswer.length === 0 && num === 0) return; // prevent leading 0
+  if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return; // prevent unwanted leading 0
   currentAnswer.push(num);
   updateDisplay();
 }
@@ -25,7 +25,7 @@ function updateDisplay() {
 }
 
 function checkAnswer() {
-  const userAnswer = parseInt(currentAnswer.join(""), 10);
+  const userAnswer = currentAnswer.length === 0 ? 0 : parseInt(currentAnswer.join(""), 10);
 
   if (userAnswer === correctAnswer) {
     scoop.style.display = 'block';
