@@ -72,3 +72,7 @@ body {
 .hand.slide-in {
   left: 150px;
 }
+
+.snow-cone .scoop {
+  outline: 2px solid limegreen;
+}
