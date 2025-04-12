@@ -123,9 +123,9 @@
 
     .keypad {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
-      max-width: 240px;
+      max-width: 320px;
       margin: auto;
     }
 
@@ -138,11 +138,6 @@
       border-radius: 8px;
       box-shadow: 0 0 10px #ff00cc;
       cursor: pointer;
-    }
-
-    .wide-button {
-      font-size: 16px;
-      padding: 10px 0;
     }
 
     canvas.confetti {
@@ -187,15 +182,16 @@
       <button onclick="appendNumber(1)">1</button>
       <button onclick="appendNumber(2)">2</button>
       <button onclick="appendNumber(3)">3</button>
+      <button onclick="toggleNegative()">-</button>
       <button onclick="appendNumber(4)">4</button>
       <button onclick="appendNumber(5)">5</button>
       <button onclick="appendNumber(6)">6</button>
+      <button onclick="clearAnswer()">Clear</button>
       <button onclick="appendNumber(7)">7</button>
       <button onclick="appendNumber(8)">8</button>
       <button onclick="appendNumber(9)">9</button>
-      <button class="wide-button" onclick="clearAnswer()">Clear</button>
+      <button onclick="submitAnswer()">Enter</button>
       <button onclick="appendNumber(0)">0</button>
-      <button class="wide-button" onclick="submitAnswer()">Enter</button>
     </div>
   </div>
 
@@ -269,10 +265,15 @@
     }
 
     function appendNumber(num) {
-      if (currentAnswer === '0') {
-        currentAnswer = '' + num;
+      currentAnswer += num;
+      updateDisplay();
+    }
+
+    function toggleNegative() {
+      if (currentAnswer.startsWith('-')) {
+        currentAnswer = currentAnswer.slice(1);
       } else {
-        currentAnswer += num;
+        currentAnswer = '-' + currentAnswer;
       }
       updateDisplay();
     }
@@ -290,19 +291,17 @@
       const answer = parseInt(currentAnswer);
       if (answer === correctAnswer) {
         startTimer();
-        let points = 1;
-        if (currentProblemType === '×' || currentProblemType === '÷') points = 3;
-        if (currentProblemType === 'hard') points = 6;
+        let points = 3;
+        if (currentProblemType === '×' || currentProblemType === '÷') points = 6;
+        if (currentProblemType === 'hard') points = 20;
         score += points;
         document.getElementById('score').textContent = score;
         document.getElementById('scoop').style.display = 'block';
         document.getElementById('correctSound').play().catch(() => {});
         setTimeout(generateProblem, 800);
       } else {
-        if (currentProblemType === 'hard') {
-          score -= 6;
-          document.getElementById('score').textContent = score;
-        }
+        score -= 3;
+        document.getElementById('score').textContent = score;
         document.getElementById('incorrectSound').play().catch(() => {});
         alert("Oops! Try again.");
         clearAnswer();
