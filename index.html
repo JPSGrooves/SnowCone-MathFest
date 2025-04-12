@@ -130,6 +130,11 @@
     .extra-buttons button:hover {
       background-color: #ff00cc;
     }
+
+    /* Fix position of the new buttons */
+    .extra-buttons button:first-child {
+      margin-bottom: 0;
+    }
   </style>
 </head>
 <body>
@@ -142,7 +147,7 @@
     </div>
 
     <div class="question-box">
-      <div id="question">5 + 3 = ?</div>
+      <div id="question">5 + 3 = 🧋</div>
       <div id="answerDisplay" class="answer-display">0</div>
     </div>
 
@@ -228,10 +233,10 @@
 
       if (currentMode === "addition") {
         correctAnswer = num1 + num2;
-        question.textContent = `${num1} + ${num2} = ?`;
+        question.textContent = `${num1} + ${num2} = 🧋`; // Snow cone emoji
       } else if (currentMode === "multiplication") {
         correctAnswer = num1 * num2;
-        question.textContent = `${num1} × ${num2} = ?`;
+        question.textContent = `${num1} × ${num2} = 🧋`; // Snow cone emoji
       }
 
       clearAnswer();
