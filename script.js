@@ -10,7 +10,7 @@ const correctSound = document.getElementById('correctSound');
 const incorrectSound = document.getElementById('incorrectSound');
 
 function appendNumber(num) {
-  if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return; // prevent unwanted leading 0
+  if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return; // Prevent leading 0 unless correct answer is 0
   currentAnswer.push(num);
   updateDisplay();
 }
@@ -21,11 +21,15 @@ function clearAnswer() {
 }
 
 function updateDisplay() {
-  answerDisplay.textContent = currentAnswer.length === 0 ? '0' : currentAnswer.join('');
+  if (currentAnswer.length === 0) {
+    answerDisplay.textContent = "0";
+  } else {
+    answerDisplay.textContent = currentAnswer.join('');
+  }
 }
 
 function checkAnswer() {
-  const userAnswer = currentAnswer.length === 0 ? 0 : parseInt(currentAnswer.join(""), 10);
+  const userAnswer = parseInt(currentAnswer.join("") || "0", 10);
 
   if (userAnswer === correctAnswer) {
     scoop.style.display = 'block';
