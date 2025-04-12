@@ -105,36 +105,29 @@
       padding: 8px 5px;
     }
 
-    .extra-buttons {
+    .operation-buttons {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       position: absolute;
-      left: -70px;
-      top: 50%;
-      transform: translateY(-50%);
+      left: 60px;
+      top: 10px;
+      gap: 5px;
     }
 
-    .extra-buttons button {
+    .operation-buttons button {
       font-size: 20px;
-      padding: 10px;
       background-color: #222;
       color: white;
       border: 2px solid #ff00cc;
       cursor: pointer;
+      padding: 10px;
       border-radius: 5px;
-      margin-bottom: 10px;
     }
 
-    .extra-buttons button:hover {
+    .operation-buttons button:hover {
       background-color: #ff00cc;
     }
 
-    /* Fix position of the new buttons */
-    .extra-buttons button:first-child {
-      margin-bottom: 0;
-    }
   </style>
 </head>
 <body>
@@ -146,29 +139,28 @@
       </div>
     </div>
 
+    <div class="operation-buttons">
+      <button onclick="setAdditionSubtractionMode()">+/-</button>
+      <button onclick="setMultiplicationDivisionMode()">X-/</button>
+    </div>
+
     <div class="question-box">
-      <div id="question">5 + 3 = 🦆</div> <!-- Correct snow cone emoji here -->
+      <div id="question">5 + 3 = 🍧</div>
       <div id="answerDisplay" class="answer-display">0</div>
-    </div>
-
-    <div class="extra-buttons">
-      <button id="plusMinus">±</button>
-      <button id="xMinus">X-/</button>
-    </div>
-
-    <div class="keypad">
-      <button onclick="appendNumber(1)">1</button>
-      <button onclick="appendNumber(2)">2</button>
-      <button onclick="appendNumber(3)">3</button>
-      <button onclick="appendNumber(4)">4</button>
-      <button onclick="appendNumber(5)">5</button>
-      <button onclick="appendNumber(6)">6</button>
-      <button onclick="appendNumber(7)">7</button>
-      <button onclick="appendNumber(8)">8</button>
-      <button onclick="appendNumber(9)">9</button>
-      <button class="wide-button" onclick="clearAnswer()">Clear</button>
-      <button onclick="appendNumber(0)">0</button>
-      <button class="wide-button" onclick="checkAnswer()">Enter</button>
+      <div class="keypad">
+        <button onclick="appendNumber(1)">1</button>
+        <button onclick="appendNumber(2)">2</button>
+        <button onclick="appendNumber(3)">3</button>
+        <button onclick="appendNumber(4)">4</button>
+        <button onclick="appendNumber(5)">5</button>
+        <button onclick="appendNumber(6)">6</button>
+        <button onclick="appendNumber(7)">7</button>
+        <button onclick="appendNumber(8)">8</button>
+        <button onclick="appendNumber(9)">9</button>
+        <button class="wide-button" onclick="clearAnswer()">Clear</button>
+        <button onclick="appendNumber(0)">0</button>
+        <button class="wide-button" onclick="checkAnswer()">Enter</button>
+      </div>
     </div>
   </div>
 
@@ -181,15 +173,13 @@
     let num2 = 3;
     let correctAnswer = num1 + num2;
     let currentAnswer = [];
-    let currentMode = "addition"; // "addition" or "multiplication"
+    let isAdditionSubtractionMode = true; // By default, we are in addition/subtraction mode
 
     const scoop = document.getElementById('scoop');
     const question = document.getElementById('question');
     const answerDisplay = document.getElementById('answerDisplay');
     const correctSound = document.getElementById('correctSound');
     const incorrectSound = document.getElementById('incorrectSound');
-    const plusMinusButton = document.getElementById('plusMinus');
-    const xMinusButton = document.getElementById('xMinus');
 
     function appendNumber(num) {
       if (currentAnswer.length === 0 && num === 0) return; // prevent leading 0
@@ -226,35 +216,29 @@
 
     function loadNewQuestion() {
       scoop.style.display = 'none';
-
-      // Random number generation
       num1 = Math.floor(Math.random() * 10);
       num2 = Math.floor(Math.random() * 10);
-
-      if (currentMode === "addition") {
+      if (isAdditionSubtractionMode) {
         correctAnswer = num1 + num2;
-        question.textContent = `${num1} + ${num2} = 🦆`; // Snow cone emoji here
-      } else if (currentMode === "multiplication") {
+        question.textContent = `${num1} + ${num2} = 🍧`;
+      } else {
         correctAnswer = num1 * num2;
-        question.textContent = `${num1} × ${num2} = 🦆`; // Snow cone emoji here
+        question.textContent = `${num1} x ${num2} = 🍧`;
       }
-
       clearAnswer();
     }
 
-    // Switch to addition and subtraction mode
-    plusMinusButton.onclick = () => {
-      currentMode = "addition";
+    function setAdditionSubtractionMode() {
+      isAdditionSubtractionMode = true;
       loadNewQuestion();
-    };
+    }
 
-    // Switch to multiplication and division mode
-    xMinusButton.onclick = () => {
-      currentMode = "multiplication";
+    function setMultiplicationDivisionMode() {
+      isAdditionSubtractionMode = false;
       loadNewQuestion();
-    };
+    }
 
-    loadNewQuestion(); // Start with the first question
+    loadNewQuestion();
   </script>
 </body>
 </html>
