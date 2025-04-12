@@ -57,7 +57,7 @@
 
     .text {
       position: absolute;
-      bottom: 95px;
+      bottom: 85px;
       color: black;
       font-size: 20px;
       text-align: center;
@@ -79,7 +79,7 @@
 
     .keypad {
       display: grid;
-      grid-template-columns: repeat(3, 60px);
+      grid-template-columns: repeat(3, 50px);
       gap: 10px;
       justify-content: center;
       margin-top: 10px;
@@ -87,22 +87,22 @@
 
     .keypad button {
       font-size: 20px;
-      padding: 12px;
-      background-color: #ff00cc;
+      padding: 10px;
+      background-color: #222;
       color: white;
-      border: none;
+      border: 2px solid #ff00cc;
       cursor: pointer;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ff00cc;
+      border-radius: 5px;
     }
 
     .keypad button:hover {
-      background-color: #e600b8;
+      background-color: #ff00cc;
     }
 
     .wide-button {
+      grid-column: span 1;
       font-size: 14px;
-      padding: 12px;
+      padding: 8px 5px;
     }
   </style>
 </head>
@@ -139,60 +139,67 @@
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
   <script>
-  let num1 = 5;
-  let num2 = 3;
-  let correctAnswer = num1 + num2;
-  let currentAnswer = '';
+    let num1, num2, correctAnswer, operation;
+    let currentAnswer = [];
 
-  const scoop = document.getElementById('scoop');
-  const question = document.getElementById('question');
-  const answerDisplay = document.getElementById('answerDisplay');
-  const correctSound = document.getElementById('correctSound');
-  const incorrectSound = document.getElementById('incorrectSound');
+    const scoop = document.getElementById('scoop');
+    const question = document.getElementById('question');
+    const answerDisplay = document.getElementById('answerDisplay');
+    const correctSound = document.getElementById('correctSound');
+    const incorrectSound = document.getElementById('incorrectSound');
 
-  function appendNumber(num) {
-    if (currentAnswer === '0') {
-      currentAnswer = num.toString(); // Replace if current is just '0'
-    } else {
-      currentAnswer += num.toString();
+    function appendNumber(num) {
+      if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return;
+      currentAnswer.push(num);
+      updateDisplay();
     }
-    updateDisplay();
-  }
 
-  function clearAnswer() {
-    currentAnswer = '';
-    updateDisplay();
-  }
-
-  function updateDisplay() {
-    answerDisplay.textContent = currentAnswer === '' ? '0' : currentAnswer;
-  }
-
-  function checkAnswer() {
-    const userAnswer = parseInt(currentAnswer === '' ? '0' : currentAnswer, 10);
-    if (userAnswer === correctAnswer) {
-      scoop.style.display = 'block';
-      scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff';
-      correctSound.play().catch(err => console.log('Audio error:', err));
-      setTimeout(() => {
-        alert("Correct! Enjoy your snow cone!");
-        loadNewQuestion();
-      }, 500);
-    } else {
-      incorrectSound.play().catch(err => console.log('Audio error:', err));
-      alert("Oops! Try again.");
-      clearAnswer();
+    function clearAnswer() {
+      currentAnswer = [];
+      updateDisplay();
     }
-  }
 
-  function loadNewQuestion() {
-    scoop.style.display = 'none';
-    num1 = Math.floor(Math.random() * 10);
-    num2 = Math.floor(Math.random() * 10);
-    correctAnswer = num1 + num2;
-    question.textContent = `${num1} + ${num2} = ?`;
-    clearAnswer();
-  }
+    function updateDisplay() {
+      answerDisplay.textContent = currentAnswer.length === 0 ? '0' : currentAnswer.join('');
+    }
 
-  loadNewQuestion();
-</script>
+    function checkAnswer() {
+      const userAnswer = parseInt(currentAnswer.join(""), 10);
+
+      if (userAnswer === correctAnswer) {
+        scoop.style.display = 'block';
+        scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff';
+        correctSound.play().catch(err => console.log('Audio error:', err));
+        setTimeout(() => {
+          loadNewQuestion();
+        }, 600);
+      } else {
+        incorrectSound.play().catch(err => console.log('Audio error:', err));
+        alert("Oops! Try again.");
+        clearAnswer();
+      }
+    }
+
+    function loadNewQuestion() {
+      scoop.style.display = 'none';
+      currentAnswer = [];
+
+      const isAddition = Math.random() > 0.5;
+      operation = isAddition ? '+' : '-';
+
+      num1 = Math.floor(Math.random() * 10);
+      num2 = Math.floor(Math.random() * 10);
+
+      if (!isAddition && num2 > num1) {
+        [num1, num2] = [num2, num1]; // prevent negative result
+      }
+
+      correctAnswer = operation === '+' ? num1 + num2 : num1 - num2;
+      question.textContent = `${num1} ${operation} ${num2} = ?`;
+      updateDisplay();
+    }
+
+    loadNewQuestion();
+  </script>
+</body>
+</html>
