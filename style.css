@@ -36,8 +36,12 @@ body {
   text-align: center;
   font-weight: bold;
   position: absolute;
-  top: 40px; /* Adjust position so it's on top of the cone */
-  z-index: 1; /* Ensure the text is above the cone */
+  top: 25px; /* Position text inside the cone */
+  left: 50%; /* Center it horizontally */
+  transform: translateX(-50%); /* Adjust so it's truly centered */
+  z-index: 1; /* Make sure text is above cone */
+  background: rgba(255, 255, 255, 0.5); /* Temporary background color to ensure visibility */
+  padding: 5px;
 }
 
 .snow-cone .scoop {
