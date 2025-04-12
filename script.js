@@ -10,7 +10,7 @@ const correctSound = document.getElementById('correctSound');
 const incorrectSound = document.getElementById('incorrectSound');
 
 function appendNumber(num) {
-  if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return; // Prevent leading 0 unless correct answer is 0
+  if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return; // prevent leading 0 unless 0 is correct answer
   currentAnswer.push(num);
   updateDisplay();
 }
@@ -30,17 +30,18 @@ function updateDisplay() {
 
 function checkAnswer() {
   const userAnswer = parseInt(currentAnswer.join("") || "0", 10);
-
   if (userAnswer === correctAnswer) {
     scoop.style.display = 'block';
-    scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff';
-    correctSound.play().catch(err => console.log('Audio error:', err));
+    scoop.classList.remove('pop');
+    void scoop.offsetWidth; // re-trigger animation
+    scoop.classList.add('pop');
+    correctSound.play().catch(err => console.log(err));
     setTimeout(() => {
-      alert("Correct! Enjoy your snow cone!");
+      alert("Correct!");
       loadNewQuestion();
-    }, 500);
+    }, 600);
   } else {
-    incorrectSound.play().catch(err => console.log('Audio error:', err));
+    incorrectSound.play().catch(err => console.log(err));
     alert("Oops! Try again.");
     clearAnswer();
   }
