@@ -93,7 +93,16 @@ body {
 }
 
 .wide-button {
-  grid-column: span 1;
-  font-size: 14px;
-  padding: 8px 5px;
+  font-size: 16px;
+  padding: 10px;
 }
+.keypad button:nth-child(10) {
+  grid-column: 1;
+}
+.keypad button:nth-child(11) {
+  grid-column: 2;
+}
+.keypad button:nth-child(12) {
+  grid-column: 3;
+}
+
