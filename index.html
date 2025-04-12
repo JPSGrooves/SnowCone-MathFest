@@ -2,126 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Fest Snow Cone</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: black;
-      font-family: Comic Sans MS, cursive, sans-serif;
-      color: white;
-    }
-
-    .game-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
-    }
-
-    .snow-cone-wrapper {
-      position: relative;
-      width: 150px;
-      height: 225px;
-      margin-bottom: 20px;
-    }
-
-    .scoop {
-      width: 150px;
-      height: 75px;
-      background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-radius: 75px 75px 0 0;
-      position: absolute;
-      top: 0;
-      left: 0;
-      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
-      z-index: 2;
-    }
-
-    .snow-cone {
-      position: absolute;
-      bottom: 0;
-      width: 150px;
-      height: 150px;
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: linear-gradient(to bottom, #ffff99, #ffee00);
-      box-shadow: 0 0 10px #fff, 0 0 20px yellow;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-    }
-
-    .text {
-      position: absolute;
-      bottom: 40px;
-      color: black;
-      font-size: 20px;
-      text-align: center;
-      line-height: 1.2;
-      z-index: 3;
-    }
-
-    .question-box {
-      margin-top: 20px;
-      font-size: 24px;
-      color: white; /* Math problem in white */
-    }
-
-    .answer-box {
-      margin-top: 10px;
-      font-size: 36px;
-      color: #ff00cc; /* Neon answer color */
-    }
-
-    input {
-      font-size: 24px;
-      padding: 5px;
-      margin-top: 10px;
-    }
-
-    .button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #ff00cc;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-
-    .button:hover {
-      background-color: #6600ff;
-    }
-
-    .hidden {
-      visibility: hidden;
-    }
-
-    /* New Keypad Styling */
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .keypad button {
-      font-size: 20px;
-      padding: 15px;
-      background-color: #6600ff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .keypad button:hover {
-      background-color: #ff00cc;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="game-container">
@@ -132,79 +15,28 @@
       </div>
     </div>
 
-    <!-- Math problem -->
     <div id="questionBox" class="question-box">
       <span id="question">5 + 3 = ?</span>
-    </div>
-
-    <!-- Answer Box (with neon) -->
-    <div class="answer-box">
-      <span id="answer">0</span>
-    </div>
-
-    <!-- Keypad -->
-    <div class="keypad">
-      <button onclick="appendNumber(1)">1</button>
-      <button onclick="appendNumber(2)">2</button>
-      <button onclick="appendNumber(3)">3</button>
-      <button onclick="appendNumber(4)">4</button>
-      <button onclick="appendNumber(5)">5</button>
-      <button onclick="appendNumber(6)">6</button>
-      <button onclick="appendNumber(7)">7</button>
-      <button onclick="appendNumber(8)">8</button>
-      <button onclick="appendNumber(9)">9</button>
-      <button onclick="clearAnswer()">C</button>
-      <button onclick="appendNumber(0)">0</button>
-      <button onclick="submitAnswer()">Submit</button>
+      <div class="keypad">
+        <!-- Keypad buttons -->
+        <button class="key" id="key0">0</button>
+        <button class="key" id="key1">1</button>
+        <button class="key" id="key2">2</button>
+        <button class="key" id="key3">3</button>
+        <button class="key" id="key4">4</button>
+        <button class="key" id="key5">5</button>
+        <button class="key" id="key6">6</button>
+        <button class="key" id="key7">7</button>
+        <button class="key" id="key8">8</button>
+        <button class="key" id="key9">9</button>
+        <button class="key" id="keyClear">Clear</button>
+      </div>
+      <button class="button" id="submitButton">Submit</button>
     </div>
   </div>
 
-  <!-- Guitar sound effects -->
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
-
-  <script>
-    // Math question variables
-    let num1 = 5;
-    let num2 = 3;
-    let correctAnswer = num1 + num2;
-
-    // Get DOM elements
-    const scoop = document.getElementById('scoop');
-    const answerDisplay = document.getElementById('answer');
-    const questionBox = document.getElementById('questionBox');
-    const correctSound = document.getElementById('correctSound');
-    const incorrectSound = document.getElementById('incorrectSound');
-
-    // Append numbers to the answer display
-    function appendNumber(number) {
-      answerDisplay.textContent += number;
-    }
-
-    // Clear the answer
-    function clearAnswer() {
-      answerDisplay.textContent = '0';
-    }
-
-    // Check the answer
-    function submitAnswer() {
-      const userAnswer = parseInt(answerDisplay.textContent);
-
-      if (userAnswer === correctAnswer) {
-        scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff'; // Glow effect on correct answer
-        correctSound.play();
-        setTimeout(() => {
-          alert("Correct! Enjoy your snow cone!");
-        }, 500); // After a short delay, show the correct message
-      } else {
-        scoop.style.boxShadow = 'none'; // Reset glow on wrong answer
-        incorrectSound.play();
-        alert("Oops! Try again.");
-      }
-
-      // Reset answer display
-      answerDisplay.textContent = '0';
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
