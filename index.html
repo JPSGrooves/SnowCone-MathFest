@@ -16,7 +16,9 @@
     </div>
 
     <div id="questionBox" class="question-box">
-      <span id="question">5 + 3 = ?</span>
+      <div id="question">5 + 3 = ?</div>
+      <div id="answerDisplay" class="answer-display">0</div>
+
       <div class="keypad">
         <button class="key" data-key="1">1</button>
         <button class="key" data-key="2">2</button>
@@ -27,13 +29,13 @@
         <button class="key" data-key="7">7</button>
         <button class="key" data-key="8">8</button>
         <button class="key" data-key="9">9</button>
+        <button class="key" id="clearButton">Clear</button>
         <button class="key" data-key="0">0</button>
+        <button class="key" id="submitButton">Submit</button>
       </div>
-      <button class="button" id="submitButton">Submit</button>
     </div>
   </div>
 
-  <!-- Guitar sound effects -->
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
