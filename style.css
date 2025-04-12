@@ -24,6 +24,18 @@ body {
   border: 5px solid #ff00cc; /* Neon pink outline */
   box-shadow: 0 0 15px #ff00cc, 0 0 25px #6600ff; /* Neon glow effect */
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.snow-cone .text {
+  font-family: 'Comic Sans MS', sans-serif;
+  font-size: 24px;
+  color: black; /* Black color for the text */
+  text-align: center;
+  font-weight: bold;
+  z-index: 1;
 }
 
 .snow-cone .scoop {
@@ -35,3 +47,21 @@ body {
   top: -35px; /* Position scoop on top and flush with the triangle */
   left: 0;
   box-shadow: 0 0 20px #ff00cc, 0 0 40px #6600ff;
+}
+
+.hand {
+  position: absolute;
+  top: 40px;
+  left: -200px;
+  width: 150px;
+  height: 100px;
+  background: linear-gradient(to right, #00ffff, #ff00ff);
+  opacity: 0.8;
+  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  box-shadow: 0 0 20px #0ff, 0 0 40px #f0f;
+  transition: all 0.6s ease;
+}
+
+.hand.slide-in {
+  left: 150px;
+}
