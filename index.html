@@ -15,27 +15,27 @@
       </div>
     </div>
 
-    <div id="questionBox" class="question-box">
+    <div class="question-box">
       <div id="question">5 + 3 = ?</div>
       <div id="answerDisplay" class="answer-display">0</div>
-
       <div class="keypad">
-        <button class="key" data-key="1">1</button>
-        <button class="key" data-key="2">2</button>
-        <button class="key" data-key="3">3</button>
-        <button class="key" data-key="4">4</button>
-        <button class="key" data-key="5">5</button>
-        <button class="key" data-key="6">6</button>
-        <button class="key" data-key="7">7</button>
-        <button class="key" data-key="8">8</button>
-        <button class="key" data-key="9">9</button>
-        <button class="key small-text" id="clearButton">Clear</button>
-        <button class="key" data-key="0">0</button>
-        <button class="key small-text" id="submitButton">Enter</button>
+        <button onclick="appendNumber(1)">1</button>
+        <button onclick="appendNumber(2)">2</button>
+        <button onclick="appendNumber(3)">3</button>
+        <button onclick="appendNumber(4)">4</button>
+        <button onclick="appendNumber(5)">5</button>
+        <button onclick="appendNumber(6)">6</button>
+        <button onclick="appendNumber(7)">7</button>
+        <button onclick="appendNumber(8)">8</button>
+        <button onclick="appendNumber(9)">9</button>
+        <button class="wide-button" onclick="clearAnswer()">Clear</button>
+        <button onclick="appendNumber(0)">0</button>
+        <button class="wide-button" onclick="checkAnswer()">Enter</button>
       </div>
     </div>
   </div>
 
+  <!-- Sounds -->
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
