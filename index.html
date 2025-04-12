@@ -2,194 +2,175 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snow Cone Math Game</title>
   <style>
     body {
       background-color: black;
       color: white;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 20px;
     }
 
-    .cone {
-      width: 0;
-      height: 0;
-      border-left: 40px solid transparent;
-      border-right: 40px solid transparent;
-      border-top: 60px solid #000;
-      margin: 30px auto 0;
-      position: relative;
-      box-shadow: 0 0 10px #ff00cc;
-    }
-
-    .scoop {
-      width: 80px;
-      height: 40px;
-      background-color: #ff00cc;
-      border-radius: 50% 50% 0 0;
-      position: absolute;
-      top: -40px;
-      left: -40px;
-      display: none;
-      box-shadow: 0 0 10px #ff00cc, 0 0 20px #ff00cc;
+    .score {
+      margin: 10px 0;
+      font-size: 20px;
+      color: #00ffff;
     }
 
     .problem {
-      font-size: 2em;
-      margin: 20px 0 10px;
+      font-size: 30px;
+      margin: 20px;
+    }
+
+    .snowcone {
+      font-size: 50px;
+      margin-bottom: 10px;
     }
 
     .answer {
-      font-size: 1.5em;
-      margin-bottom: 20px;
-      color: #ff00cc;
+      font-size: 30px;
+      color: hotpink;
     }
 
     .keypad, .mode-buttons {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
-      max-width: 240px;
-      margin: 10px auto;
+      margin-top: 10px;
     }
 
-    .mode-buttons {
-      margin-bottom: 20px;
-    }
-
-    button {
-      width: 70px;
-      height: 50px;
-      font-size: 1.2em;
+    .button, .mode-button, .reset-button {
+      width: 60px;
+      height: 60px;
+      margin: 5px;
+      font-size: 20px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       color: white;
-      text-shadow: 0 0 5px white;
+      cursor: pointer;
     }
 
-    .keypad button {
-      background-color: #ff00cc;
-      box-shadow: 0 0 10px #ff00cc;
+    .button {
+      background-color: hotpink;
     }
 
     .mode-button {
-      background-color: #00ff88;
-      box-shadow: 0 0 10px #00ff88;
+      background-color: limegreen;
     }
 
-    .score {
-      margin-top: 20px;
-      font-size: 1.2em;
+    .reset-button {
+      background-color: deepskyblue;
     }
 
-    .score button {
-      margin-left: 10px;
-      font-size: 0.9em;
-      padding: 5px 10px;
-      background-color: #00ccff;
-      box-shadow: 0 0 10px #00ccff;
-      border: none;
-      border-radius: 10px;
-      color: white;
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="score" id="score">Score: 0</div>
+    <div class="snowcone">🍧</div>
+    <div class="problem" id="problem"></div>
+    <div class="answer" id="answer">0</div>
 
-  <div class="cone">
-    <div class="scoop" id="scoop"></div>
-  </div>
+    <div class="top-row">
+      <button class="mode-button" onclick="setMode('addsub')">+/-</button>
+      <button class="mode-button" onclick="setMode('multdiv')">X-/</button>
+    </div>
 
-  <div class="problem" id="problem"></div>
-  <div class="answer" id="answer">0</div>
+    <div class="keypad" id="keypad">
+      <button class="button" onclick="press(1)">1</button>
+      <button class="button" onclick="press(2)">2</button>
+      <button class="button" onclick="press(3)">3</button>
+      <button class="button" onclick="press(4)">4</button>
+      <button class="button" onclick="press(5)">5</button>
+      <button class="button" onclick="press(6)">6</button>
+      <button class="button" onclick="press(7)">7</button>
+      <button class="button" onclick="press(8)">8</button>
+      <button class="button" onclick="press(9)">9</button>
+      <button class="button" onclick="press(0)">0</button>
+      <button class="button" onclick="clearAnswer()">Clear</button>
+      <button class="button" onclick="submitAnswer()">Enter</button>
+    </div>
 
-  <div class="mode-buttons">
-    <button class="mode-button" onclick="setMode('addsub')">+/-</button>
-    <button class="mode-button" onclick="setMode('multdiv')">X-/</button>
-  </div>
-
-  <div class="keypad">
-    <button onclick="appendNumber(1)">1</button>
-    <button onclick="appendNumber(2)">2</button>
-    <button onclick="appendNumber(3)">3</button>
-    <button onclick="appendNumber(4)">4</button>
-    <button onclick="appendNumber(5)">5</button>
-    <button onclick="appendNumber(6)">6</button>
-    <button onclick="appendNumber(7)">7</button>
-    <button onclick="appendNumber(8)">8</button>
-    <button onclick="appendNumber(9)">9</button>
-    <button onclick="appendNumber(0)">0</button>
-    <button onclick="clearAnswer()">Clear</button>
-    <button onclick="submitAnswer()">Enter</button>
-  </div>
-
-  <div class="score">
-    Score: <span id="score">0</span>
-    <button onclick="resetScore()">Reset</button>
+    <button class="reset-button" onclick="resetScore()">Reset</button>
   </div>
 
   <script>
     let currentAnswer = '';
-    let correctAnswer = 0;
-    let mode = 'addsub';
+    let currentProblem = {};
     let score = 0;
+    let mode = 'addsub';
 
-    function randomInt(max) {
-      return Math.floor(Math.random() * (max + 1));
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function generateProblem() {
-      let a = randomInt(9);
-      let b = randomInt(9);
-      let op = '+';
-
+      let a = getRandomInt(0, 10);
+      let b = getRandomInt(0, 10);
+      let operator;
       if (mode === 'addsub') {
-        op = Math.random() > 0.5 ? '+' : '-';
-        if (op === '-' && b > a) [a, b] = [b, a];
-        correctAnswer = op === '+' ? a + b : a - b;
+        operator = Math.random() < 0.5 ? '+' : '-';
+        if (operator === '-' && a < b) [a, b] = [b, a];
       } else {
-        op = Math.random() > 0.5 ? '×' : '÷';
-        if (op === '×') {
-          correctAnswer = a * b;
+        operator = Math.random() < 0.5 ? '×' : '÷';
+        if (operator === '×') {
+          a = getRandomInt(0, 10);
+          b = getRandomInt(0, 10);
         } else {
-          b = randomInt(8) + 1;
-          correctAnswer = randomInt(9);
-          a = b * correctAnswer;
+          b = getRandomInt(1, 10);
+          a = b * getRandomInt(0, 10);
         }
       }
 
-      document.getElementById('problem').innerHTML = `${a} ${op} 🍧`;
-      currentAnswer = '';
-      document.getElementById('answer').textContent = '0';
-      document.getElementById('scoop').style.display = 'none';
+      currentProblem = { a, b, operator };
+      document.getElementById('problem').innerText = `${a} ${operator} ${b} = 🍧`;
+      currentAnswer = '0';
+      document.getElementById('answer').innerText = currentAnswer;
     }
 
-    function appendNumber(num) {
+    function press(num) {
       if (currentAnswer === '0') {
-        currentAnswer = '' + num;
+        currentAnswer = String(num);
       } else {
-        currentAnswer += num;
+        currentAnswer += String(num);
       }
-      document.getElementById('answer').textContent = currentAnswer;
+      document.getElementById('answer').innerText = currentAnswer;
     }
 
     function clearAnswer() {
-      currentAnswer = '';
-      document.getElementById('answer').textContent = '0';
+      currentAnswer = '0';
+      document.getElementById('answer').innerText = currentAnswer;
     }
 
     function submitAnswer() {
-      if (parseInt(currentAnswer || '0') === correctAnswer) {
-        document.getElementById('scoop').style.display = 'block';
-        score++;
-        document.getElementById('score').textContent = score;
-        setTimeout(generateProblem, 1000);
-      } else {
-        clearAnswer();
+      let correct;
+      const { a, b, operator } = currentProblem;
+      switch (operator) {
+        case '+': correct = a + b; break;
+        case '-': correct = a - b; break;
+        case '×': correct = a * b; break;
+        case '÷': correct = b !== 0 ? a / b : 0; break;
       }
+      if (parseInt(currentAnswer) === correct) {
+        score++;
+      } else {
+        score--;
+      }
+      document.getElementById('score').innerText = `Score: ${score}`;
+      generateProblem();
     }
 
     function setMode(newMode) {
@@ -199,11 +180,11 @@
 
     function resetScore() {
       score = 0;
-      document.getElementById('score').textContent = score;
+      document.getElementById('score').innerText = `Score: ${score}`;
+      generateProblem();
     }
 
     generateProblem();
   </script>
-
 </body>
 </html>
