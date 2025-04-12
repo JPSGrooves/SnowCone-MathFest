@@ -176,12 +176,15 @@
     let num2 = 3;
     let correctAnswer = num1 + num2;
     let currentAnswer = [];
+    let currentMode = "addition"; // "addition" or "multiplication"
 
     const scoop = document.getElementById('scoop');
     const question = document.getElementById('question');
     const answerDisplay = document.getElementById('answerDisplay');
     const correctSound = document.getElementById('correctSound');
     const incorrectSound = document.getElementById('incorrectSound');
+    const plusMinusButton = document.getElementById('plusMinus');
+    const xMinusButton = document.getElementById('xMinus');
 
     function appendNumber(num) {
       if (currentAnswer.length === 0 && num === 0) return; // prevent leading 0
@@ -218,14 +221,35 @@
 
     function loadNewQuestion() {
       scoop.style.display = 'none';
+
+      // Random number generation
       num1 = Math.floor(Math.random() * 10);
       num2 = Math.floor(Math.random() * 10);
-      correctAnswer = num1 + num2;
-      question.textContent = `${num1} + ${num2} = ?`;
+
+      if (currentMode === "addition") {
+        correctAnswer = num1 + num2;
+        question.textContent = `${num1} + ${num2} = ?`;
+      } else if (currentMode === "multiplication") {
+        correctAnswer = num1 * num2;
+        question.textContent = `${num1} × ${num2} = ?`;
+      }
+
       clearAnswer();
     }
 
-    loadNewQuestion();
+    // Switch to addition and subtraction mode
+    plusMinusButton.onclick = () => {
+      currentMode = "addition";
+      loadNewQuestion();
+    };
+
+    // Switch to multiplication and division mode
+    xMinusButton.onclick = () => {
+      currentMode = "multiplication";
+      loadNewQuestion();
+    };
+
+    loadNewQuestion(); // Start with the first question
   </script>
 </body>
 </html>
