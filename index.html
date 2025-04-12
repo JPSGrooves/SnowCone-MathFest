@@ -107,11 +107,10 @@
 
     .operation-buttons {
       display: flex;
-      flex-direction: column;
-      position: absolute;
-      left: 60px;
-      top: 10px;
-      gap: 5px;
+      flex-direction: row;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px; /* Adjust to move below the math problem */
     }
 
     .operation-buttons button {
@@ -122,10 +121,12 @@
       cursor: pointer;
       padding: 10px;
       border-radius: 5px;
+      transition: all 0.3s ease-in-out;
     }
 
     .operation-buttons button:hover {
       background-color: #ff00cc;
+      box-shadow: 0 0 10px #ff00cc, 0 0 20px #6600ff;
     }
 
   </style>
@@ -139,28 +140,30 @@
       </div>
     </div>
 
+    <div class="question-box">
+      <div id="question">5 + 3 = 🍧</div>
+      <div id="answerDisplay" class="answer-display">0</div>
+    </div>
+
+    <!-- Operation Buttons below the math problem -->
     <div class="operation-buttons">
       <button onclick="setAdditionSubtractionMode()">+/-</button>
       <button onclick="setMultiplicationDivisionMode()">X-/</button>
     </div>
 
-    <div class="question-box">
-      <div id="question">5 + 3 = 🍧</div>
-      <div id="answerDisplay" class="answer-display">0</div>
-      <div class="keypad">
-        <button onclick="appendNumber(1)">1</button>
-        <button onclick="appendNumber(2)">2</button>
-        <button onclick="appendNumber(3)">3</button>
-        <button onclick="appendNumber(4)">4</button>
-        <button onclick="appendNumber(5)">5</button>
-        <button onclick="appendNumber(6)">6</button>
-        <button onclick="appendNumber(7)">7</button>
-        <button onclick="appendNumber(8)">8</button>
-        <button onclick="appendNumber(9)">9</button>
-        <button class="wide-button" onclick="clearAnswer()">Clear</button>
-        <button onclick="appendNumber(0)">0</button>
-        <button class="wide-button" onclick="checkAnswer()">Enter</button>
-      </div>
+    <div class="keypad">
+      <button onclick="appendNumber(1)">1</button>
+      <button onclick="appendNumber(2)">2</button>
+      <button onclick="appendNumber(3)">3</button>
+      <button onclick="appendNumber(4)">4</button>
+      <button onclick="appendNumber(5)">5</button>
+      <button onclick="appendNumber(6)">6</button>
+      <button onclick="appendNumber(7)">7</button>
+      <button onclick="appendNumber(8)">8</button>
+      <button onclick="appendNumber(9)">9</button>
+      <button class="wide-button" onclick="clearAnswer()">Clear</button>
+      <button onclick="appendNumber(0)">0</button>
+      <button class="wide-button" onclick="checkAnswer()">Enter</button>
     </div>
   </div>
 
