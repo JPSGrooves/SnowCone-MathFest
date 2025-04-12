@@ -57,7 +57,7 @@
 
     .text {
       position: absolute;
-      bottom: 90px;
+      bottom: 65px;
       color: black;
       font-size: 20px;
       text-align: center;
@@ -79,7 +79,7 @@
 
     .keypad {
       display: grid;
-      grid-template-columns: repeat(3, 60px);
+      grid-template-columns: repeat(3, 50px);
       gap: 10px;
       justify-content: center;
       margin-top: 10px;
@@ -88,22 +88,45 @@
     .keypad button {
       font-size: 20px;
       padding: 10px;
-      background-color: #ff00cc;
+      background-color: #222;
       color: white;
-      border: none;
+      border: 2px solid #ff00cc;
       cursor: pointer;
-      border-radius: 8px;
-      box-shadow: 0 0 5px #ff00cc, 0 0 10px #ff00cc;
-      transition: transform 0.1s ease;
+      border-radius: 5px;
     }
 
     .keypad button:hover {
-      background-color: #ff33cc;
-      transform: scale(1.05);
+      background-color: #ff00cc;
     }
 
-    .keypad button:active {
-      transform: scale(0.95);
+    .wide-button {
+      grid-column: span 1;
+      font-size: 14px;
+      padding: 8px 5px;
+    }
+
+    /* Function buttons above keypad */
+    .function-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-right: 10px; /* Space between function buttons and keypad */
+      justify-content: center;
+    }
+
+    .function-button {
+      font-size: 18px;
+      padding: 10px;
+      background-color: #222;
+      color: white;
+      border: 2px solid #ff00cc;
+      cursor: pointer;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .function-button:hover {
+      background-color: #ff00cc;
     }
   </style>
 </head>
@@ -117,8 +140,16 @@
     </div>
 
     <div class="question-box">
-      <div id="question">0 + 0 = ?</div>
+      <div id="question">5 + 3 = ?</div>
       <div id="answerDisplay" class="answer-display">0</div>
+      
+      <!-- New Function Buttons Column Left of Keypad -->
+      <div class="function-buttons">
+        <button class="function-button" id="plus-minus">+/-</button>
+        <button class="function-button" id="multiply-divide">X-/</button>
+      </div>
+
+      <!-- The Keypad -->
       <div class="keypad">
         <button onclick="appendNumber(1)">1</button>
         <button onclick="appendNumber(2)">2</button>
@@ -129,21 +160,21 @@
         <button onclick="appendNumber(7)">7</button>
         <button onclick="appendNumber(8)">8</button>
         <button onclick="appendNumber(9)">9</button>
-        <button onclick="clearAnswer()">Clear</button>
+        <button class="wide-button" onclick="clearAnswer()">Clear</button>
         <button onclick="appendNumber(0)">0</button>
-        <button onclick="checkAnswer()">Enter</button>
+        <button class="wide-button" onclick="checkAnswer()">Enter</button>
       </div>
     </div>
   </div>
 
+  <!-- Guitar sound effects -->
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
   <script>
-    let num1 = 0;
-    let num2 = 0;
-    let operation = '+';
-    let correctAnswer = 0;
+    let num1 = 5;
+    let num2 = 3;
+    let correctAnswer = num1 + num2;
     let currentAnswer = [];
 
     const scoop = document.getElementById('scoop');
@@ -153,12 +184,8 @@
     const incorrectSound = document.getElementById('incorrectSound');
 
     function appendNumber(num) {
-      // allow 0 as a valid single digit answer
-      if (currentAnswer.length === 0 && num === 0) {
-        currentAnswer.push(0);
-      } else if (!(currentAnswer.length === 1 && currentAnswer[0] === 0)) {
-        currentAnswer.push(num);
-      }
+      if (currentAnswer.length === 0 && num === 0) return; // prevent leading 0
+      currentAnswer.push(num);
       updateDisplay();
     }
 
@@ -191,19 +218,11 @@
 
     function loadNewQuestion() {
       scoop.style.display = 'none';
-      currentAnswer = [];
-
       num1 = Math.floor(Math.random() * 10);
       num2 = Math.floor(Math.random() * 10);
-      operation = Math.random() < 0.5 ? '+' : '-';
-
-      if (operation === '-' && num2 > num1) {
-        [num1, num2] = [num2, num1]; // prevent negative answers
-      }
-
-      correctAnswer = operation === '+' ? num1 + num2 : num1 - num2;
-      question.textContent = `${num1} ${operation} ${num2} = 🍧`;
-      updateDisplay();
+      correctAnswer = num1 + num2;
+      question.textContent = `${num1} + ${num2} = ?`;
+      clearAnswer();
     }
 
     loadNewQuestion();
