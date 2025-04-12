@@ -6,6 +6,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  color: white; /* White font for the text */
 }
 
 .game-container {
@@ -14,12 +15,15 @@ body {
 }
 
 .snow-cone {
-  width: 100px;
-  height: 140px;
+  width: 150px;
+  height: 200px;
   margin: 20px auto;
-  background: radial-gradient(circle at 50% 20%, #ff00cc, #6600ff);
-  border-bottom: 40px solid #222;
-  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+  background: transparent;
+  border-left: 75px solid transparent;
+  border-right: 75px solid transparent;
+  border-bottom: 120px solid black; /* Black center for the triangle */
+  position: relative;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
   box-shadow: 0 0 15px #ff00cc, 0 0 25px #6600ff;
   transition: all 0.3s ease;
 }
@@ -27,6 +31,17 @@ body {
 .snow-cone.dark {
   background: #111;
   box-shadow: none;
+}
+
+.snow-cone .scoop {
+  width: 150px;
+  height: 75px;
+  background: linear-gradient(to right, #ff00cc, #6600ff); /* Neon colors */
+  border-radius: 50%;
+  position: absolute;
+  top: -40px; /* Position the scoop above the flat part of the triangle */
+  left: 0;
+  box-shadow: 0 0 20px #ff00cc, 0 0 40px #6600ff;
 }
 
 .hand {
