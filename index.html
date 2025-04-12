@@ -67,30 +67,46 @@
     .question-box {
       margin-top: 20px;
       font-size: 24px;
+      text-align: center;
     }
 
-    input {
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+      margin-top: 20px;
+    }
+
+    .key {
       font-size: 24px;
-      padding: 5px;
-      margin-top: 10px;
-    }
-
-    .button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 20px;
       background-color: #ff00cc;
-      border: none;
       color: white;
+      border: none;
       cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ff00cc;
     }
 
-    .button:hover {
+    .key:hover {
       background-color: #6600ff;
+      box-shadow: 0 0 15px #6600ff;
+    }
+
+    #clear, #enter {
+      grid-column: span 3;
+      font-size: 24px;
     }
 
     .hidden {
       visibility: hidden;
+    }
+
+    .input-display {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #ff00cc;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -104,15 +120,32 @@
     </div>
 
     <div id="questionBox" class="question-box">
+      <div class="input-display" id="inputDisplay">0</div>
       <span id="question">5 + 3 = ?</span>
-      <input type="number" id="answerInput" />
-      <button class="button" id="submitButton">Submit</button>
+    </div>
+
+    <div class="keypad">
+      <!-- Number keys -->
+      <button class="key" onclick="addToInput(1)">1</button>
+      <button class="key" onclick="addToInput(2)">2</button>
+      <button class="key" onclick="addToInput(3)">3</button>
+      <button class="key" onclick="addToInput(4)">4</button>
+      <button class="key" onclick="addToInput(5)">5</button>
+      <button class="key" onclick="addToInput(6)">6</button>
+      <button class="key" onclick="addToInput(7)">7</button>
+      <button class="key" onclick="addToInput(8)">8</button>
+      <button class="key" onclick="addToInput(9)">9</button>
+      <button class="key" onclick="addToInput(0)">0</button>
+      
+      <!-- Action keys -->
+      <button id="clear" class="key" onclick="clearInput()">Clear</button>
+      <button id="enter" class="key" onclick="submitAnswer()">Enter</button>
     </div>
   </div>
 
   <!-- Guitar sound effects -->
-<audio id="correctSound" src="correct.mp3" preload="auto"></audio>
-<audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="guitar-correct.mp3" preload="auto"></audio>
+  <audio id="incorrectSound" src="guitar-error.mp3" preload="auto"></audio>
 
   <script>
     // Math question variables
@@ -122,15 +155,28 @@
 
     // Get DOM elements
     const scoop = document.getElementById('scoop');
-    const answerInput = document.getElementById('answerInput');
-    const questionBox = document.getElementById('questionBox');
+    const inputDisplay = document.getElementById('inputDisplay');
     const correctSound = document.getElementById('correctSound');
     const incorrectSound = document.getElementById('incorrectSound');
-    const submitButton = document.getElementById('submitButton');
+    const submitButton = document.getElementById('enter');
 
-    // Check if answer is correct
-    function checkAnswer() {
-      const userAnswer = parseInt(answerInput.value);
+    let currentInput = '';
+
+    // Add number to input display
+    function addToInput(number) {
+      currentInput += number;
+      inputDisplay.textContent = currentInput;
+    }
+
+    // Clear input display
+    function clearInput() {
+      currentInput = '';
+      inputDisplay.textContent = '0';
+    }
+
+    // Check if the answer is correct
+    function submitAnswer() {
+      const userAnswer = parseInt(currentInput);
 
       if (userAnswer === correctAnswer) {
         scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff'; // Glow effect on correct answer
@@ -145,13 +191,9 @@
       }
 
       // Clear input after submit
-      answerInput.value = '';
+      currentInput = '';
+      inputDisplay.textContent = '0';
     }
-
-    // Add event listener to play sound on button click
-    submitButton.addEventListener('click', function() {
-      checkAnswer();
-    });
   </script>
 </body>
 </html>
