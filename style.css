@@ -23,6 +23,18 @@ body {
   background: white; /* White background for the triangle */
   border: 5px solid #ff00cc; /* Neon outline around the entire cone */
   box-shadow: 0 0 15px #ff00cc, 0 0 25px #6600ff; /* Neon glow effect */
+  overflow: hidden; /* Make sure symbols don't spill outside the cone */
+}
+
+.snow-cone::before {
+  content: '@#$%^&*!'; /* List of random symbols */
+  position: absolute;
+  top: 10px; /* Positioning symbols at the top of the cone */
+  left: 10px;
+  font-size: 24px;
+  color: #ff00cc; /* Neon color for the symbols */
+  opacity: 0.8;
+  animation: moveSymbols 3s linear infinite; /* Animate symbols */
 }
 
 .snow-cone .scoop {
@@ -31,6 +43,4 @@ body {
   background: linear-gradient(to right, #ff00cc, #6600ff); /* Neon scoop color */
   border-radius: 50%;
   position: absolute;
-  top: -35px; /* Position scoop on top and flush with the triangle */
-  left: 0;
-  box-shadow: 0
+  top: -35px; /* Position scoop on*
