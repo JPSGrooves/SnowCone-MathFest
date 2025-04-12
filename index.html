@@ -3,203 +3,193 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Math Fest Snow Cone</title>
+  <title>Snow Cone Math Game</title>
   <style>
     body {
+      background-color: black;
+      color: white;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
       margin: 0;
       padding: 0;
-      background: black;
-      font-family: Comic Sans MS, cursive, sans-serif;
-      color: white;
     }
 
     .game-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
-      justify-content: center;
+      padding: 20px;
     }
 
-    .snow-cone-wrapper {
-      position: relative;
-      width: 150px;
-      height: 225px;
+    .problem {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .answer {
+      font-size: 28px;
       margin-bottom: 20px;
     }
 
-    .scoop {
-      width: 150px;
-      height: 75px;
-      background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-radius: 75px 75px 0 0;
-      position: absolute;
-      top: 0;
-      left: 0;
-      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
-      z-index: 2;
-      display: none;
-    }
-
-    .snow-cone {
-      position: absolute;
-      bottom: 0;
-      width: 150px;
-      height: 150px;
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: linear-gradient(to bottom, #ffff99, #ffee00);
-      box-shadow: 0 0 10px #fff, 0 0 20px yellow;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-    }
-
-    .text {
-      position: absolute;
-      bottom: 75px;
-      color: black;
-      font-size: 20px;
-      text-align: center;
-      line-height: 1.2;
-      z-index: 3;
-    }
-
-    .question-box {
-      margin-top: 10px;
-      font-size: 24px;
-      text-align: center;
-    }
-
-    .answer-display {
-      font-size: 36px;
-      color: #ff00cc;
-      margin: 10px 0;
-    }
-
-    .controls-container {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
       gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .key {
+      background-color: #ff00cc;
+      border: none;
+      color: white;
+      font-size: 24px;
+      padding: 15px 0;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ff00cc;
+      cursor: pointer;
+    }
+
+    .key.wide {
+      grid-column: span 3;
     }
 
     .mode-buttons {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 30px;
+      position: absolute;
+      left: 10px;
+      top: 120px;
     }
 
-    .mode-buttons button {
+    .mode-button {
+      background-color: #00ff88;
+      border: none;
+      color: black;
       font-size: 18px;
       padding: 10px;
-      width: 60px;
-      background-color: #00ff88;
-      color: black;
-      border: 2px solid #00ff88;
       border-radius: 8px;
+      margin-bottom: 10px;
       box-shadow: 0 0 10px #00ff88;
       cursor: pointer;
+      width: 70px;
     }
 
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 60px);
-      gap: 10px;
-      justify-content: center;
-      margin-top: 30px;
-    }
-
-    .keypad button {
-      font-size: 20px;
-      padding: 10px;
-      background-color: #ff00cc;
-      color: white;
-      border: 2px solid #ff00cc;
-      border-radius: 8px;
+    .cone {
+      width: 0;
+      height: 0;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-top: 60px solid #000;
+      margin: 30px auto 0;
+      position: relative;
       box-shadow: 0 0 10px #ff00cc;
-      cursor: pointer;
-      height: 60px;
     }
 
-    .keypad button:hover {
-      background-color: #ff33dd;
+    .scoop {
+      width: 80px;
+      height: 40px;
+      background-color: #ff00cc;
+      border-radius: 50% 50% 0 0;
+      position: absolute;
+      top: -40px;
+      left: -40px;
+      display: none;
+      box-shadow: 0 0 10px #ff00cc, 0 0 20px #ff00cc;
     }
 
-    .wide-button {
-      grid-column: span 1;
+    .score-reset-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 90%;
+      max-width: 400px;
+      margin-bottom: 10px;
+    }
+
+    .reset-button {
+      padding: 5px 10px;
       font-size: 16px;
-      padding: 10px;
+      background-color: #333;
+      color: white;
+      border: 1px solid #00ff88;
+      border-radius: 5px;
+      cursor: pointer;
     }
+
   </style>
 </head>
 <body>
   <div class="game-container">
-    <div class="snow-cone-wrapper">
-      <div id="scoop" class="scoop"></div>
-      <div class="snow-cone">
-        <div class="text">Math<br>Fest</div>
-      </div>
+    <div class="score-reset-container">
+      <div id="scoreDisplay" style="font-size: 20px; color: #00ff88;">Score: 0</div>
+      <button class="reset-button" onclick="resetScore()">Reset Score</button>
+    </div>
+    
+    <div class="problem"><span id="num1"></span> <span id="operator"></span> <span id="num2"></span> = 🍧</div>
+    <div class="answer" id="userAnswer">0</div>
+
+    <div class="mode-buttons">
+      <button class="mode-button" onclick="setMode('add-sub')">+/-</button>
+      <button class="mode-button" onclick="setMode('mul-div')">X-/</button>
     </div>
 
-    <div class="question-box">
-      <div id="question">5 + 3 = 🍧</div>
-      <div id="answerDisplay" class="answer-display">0</div>
+    <div class="keypad">
+      <button class="key" onclick="appendNumber(1)">1</button>
+      <button class="key" onclick="appendNumber(2)">2</button>
+      <button class="key" onclick="appendNumber(3)">3</button>
+      <button class="key" onclick="appendNumber(4)">4</button>
+      <button class="key" onclick="appendNumber(5)">5</button>
+      <button class="key" onclick="appendNumber(6)">6</button>
+      <button class="key" onclick="appendNumber(7)">7</button>
+      <button class="key" onclick="appendNumber(8)">8</button>
+      <button class="key" onclick="appendNumber(9)">9</button>
+      <button class="key" onclick="clearAnswer()">Clear</button>
+      <button class="key" onclick="appendNumber(0)">0</button>
+      <button class="key" onclick="checkAnswer()">Enter</button>
     </div>
 
-    <div class="controls-container">
-      <div class="mode-buttons">
-        <button onclick="setMode('addSub')">+/-</button>
-        <button onclick="setMode('mulDiv')">X-/</button>
-      </div>
-
-      <div class="keypad">
-        <button onclick="appendNumber(1)">1</button>
-        <button onclick="appendNumber(2)">2</button>
-        <button onclick="appendNumber(3)">3</button>
-        <button onclick="appendNumber(4)">4</button>
-        <button onclick="appendNumber(5)">5</button>
-        <button onclick="appendNumber(6)">6</button>
-        <button onclick="appendNumber(7)">7</button>
-        <button onclick="appendNumber(8)">8</button>
-        <button onclick="appendNumber(9)">9</button>
-        <button class="wide-button" onclick="clearAnswer()">Clear</button>
-        <button onclick="appendNumber(0)">0</button>
-        <button class="wide-button" onclick="checkAnswer()">Enter</button>
-      </div>
+    <div class="cone">
+      <div class="scoop" id="scoop"></div>
     </div>
   </div>
 
-  <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
-  <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="correct.mp3"></audio>
+  <audio id="incorrectSound" src="incorrect.mp3"></audio>
 
   <script>
-    let num1 = 5;
-    let num2 = 3;
-    let correctAnswer = num1 + num2;
-    let currentAnswer = [];
-    let mode = 'addSub';
+    let currentAnswer = [0];
+    let correctAnswer = 0;
+    let score = 0;
+    let mode = 'add-sub';
 
-    const scoop = document.getElementById('scoop');
-    const question = document.getElementById('question');
-    const answerDisplay = document.getElementById('answerDisplay');
-    const correctSound = document.getElementById('correctSound');
-    const incorrectSound = document.getElementById('incorrectSound');
+    const scoop = document.getElementById("scoop");
 
     function appendNumber(num) {
-      if (currentAnswer.length === 0 && num === 0 && correctAnswer !== 0) return;
-      currentAnswer.push(num);
-      updateDisplay();
+      if (currentAnswer.length === 1 && currentAnswer[0] === 0) {
+        currentAnswer = [num];
+      } else {
+        currentAnswer.push(num);
+      }
+      updateAnswerDisplay();
     }
 
     function clearAnswer() {
-      currentAnswer = [];
-      updateDisplay();
+      currentAnswer = [0];
+      updateAnswerDisplay();
     }
 
-    function updateDisplay() {
-      answerDisplay.textContent = currentAnswer.length === 0 ? '0' : currentAnswer.join('');
+    function updateAnswerDisplay() {
+      document.getElementById("userAnswer").textContent = parseInt(currentAnswer.join(""), 10);
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById("scoreDisplay").textContent = `Score: ${score}`;
+    }
+
+    function resetScore() {
+      score = 0;
+      updateScoreDisplay();
     }
 
     function checkAnswer() {
@@ -207,47 +197,21 @@
       if (userAnswer === correctAnswer) {
         scoop.style.display = 'block';
         scoop.style.boxShadow = '0 0 20px #ff00cc, 0 0 40px #6600ff';
-        correctSound.play().catch(err => console.log('Audio error:', err));
+        document.getElementById("correctSound").play().catch(() => {});
+        score++;
+        updateScoreDisplay();
         setTimeout(() => {
           loadNewQuestion();
         }, 500);
       } else {
-        incorrectSound.play().catch(err => console.log('Audio error:', err));
+        document.getElementById("incorrectSound").play().catch(() => {});
         alert("Oops! Try again.");
         clearAnswer();
       }
     }
 
-    function loadNewQuestion() {
-      scoop.style.display = 'none';
-      currentAnswer = [];
-      if (mode === 'addSub') {
-        const isAddition = Math.random() > 0.5;
-        num1 = Math.floor(Math.random() * 10);
-        num2 = Math.floor(Math.random() * 10);
-        if (isAddition) {
-          correctAnswer = num1 + num2;
-          question.textContent = `${num1} + ${num2} = 🍧`;
-        } else {
-          if (num2 > num1) [num1, num2] = [num2, num1];
-          correctAnswer = num1 - num2;
-          question.textContent = `${num1} - ${num2} = 🍧`;
-        }
-      } else if (mode === 'mulDiv') {
-        const isMultiplication = Math.random() > 0.5;
-        if (isMultiplication) {
-          num1 = Math.floor(Math.random() * 10);
-          num2 = Math.floor(Math.random() * 10);
-          correctAnswer = num1 * num2;
-          question.textContent = `${num1} × ${num2} = 🍧`;
-        } else {
-          num2 = Math.floor(Math.random() * 9) + 1;
-          correctAnswer = Math.floor(Math.random() * 10);
-          num1 = correctAnswer * num2;
-          question.textContent = `${num1} ÷ ${num2} = 🍧`;
-        }
-      }
-      updateDisplay();
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * (max + 1));
     }
 
     function setMode(newMode) {
@@ -255,7 +219,46 @@
       loadNewQuestion();
     }
 
+    function loadNewQuestion() {
+      scoop.style.display = 'none';
+      let num1, num2, operator;
+
+      if (mode === 'add-sub') {
+        if (Math.random() > 0.5) {
+          num1 = getRandomInt(9);
+          num2 = getRandomInt(9);
+          operator = "+";
+          correctAnswer = num1 + num2;
+        } else {
+          num1 = getRandomInt(9);
+          num2 = getRandomInt(num1);
+          operator = "-";
+          correctAnswer = num1 - num2;
+        }
+      } else {
+        if (Math.random() > 0.5) {
+          num1 = getRandomInt(9);
+          num2 = getRandomInt(9);
+          operator = "×";
+          correctAnswer = num1 * num2;
+        } else {
+          num2 = getRandomInt(8) + 1;
+          correctAnswer = getRandomInt(9);
+          num1 = num2 * correctAnswer;
+          operator = "÷";
+        }
+      }
+
+      document.getElementById("num1").textContent = num1;
+      document.getElementById("num2").textContent = num2;
+      document.getElementById("operator").textContent = operator;
+
+      currentAnswer = [0];
+      updateAnswerDisplay();
+    }
+
     loadNewQuestion();
+    updateScoreDisplay();
   </script>
 </body>
 </html>
