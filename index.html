@@ -310,31 +310,64 @@
   // Function to close the modal and start the game
   document.getElementById('closeModalBtn').addEventListener('click', () => {
     document.getElementById('rulesModal').style.display = 'none';
+    generateProblem();  // Start game by generating the first problem
   });
 
-  // Buttons for appending numbers and submitting answers
+  // Append a number to the current answer
   function appendNumber(num) {
     currentAnswer += num;
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 
+  // Clear the current answer input
   function clearAnswer() {
     currentAnswer = '';
     document.getElementById("answerDisplay").textContent = '0';
   }
 
+  // Submit the answer and check if it’s correct
   function submitAnswer() {
-    if (currentAnswer == correctAnswer) {
-      score += 3;
+    if (parseFloat(currentAnswer) === correctAnswer) {
+      score += 3;  // Increment score for correct answer
       document.getElementById("score").textContent = score;
+      scoop.style.display = "block";
       startGame();
-      // Generate new problem after answer submission
+      generateProblem();
     } else {
-      score -= 3;
+      score -= 3;  // Decrease score for incorrect answer
       document.getElementById("score").textContent = score;
       alert("Incorrect! Try again.");
       clearAnswer();
     }
+  }
+
+  // Generate math problem based on current mode
+  function generateProblem() {
+    let a, b;
+    if (mode === 'addsub') {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      correctAnswer = a + b;
+      document.getElementById("problem").textContent = `${a} + ${b} = 🍧`;
+    } else if (mode === 'multdiv') {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      correctAnswer = a * b;
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    } else {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      correctAnswer = a * b;
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    }
+    currentAnswer = '';
+    document.getElementById("answerDisplay").textContent = '0';
+  }
+
+  // Change modes based on button clicked
+  function setMode(newMode) {
+    mode = newMode;
+    generateProblem();
   }
 </script>
 
