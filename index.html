@@ -151,16 +151,17 @@
 <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
 <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
 <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
-      ➕➖ Add &amp; Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply &amp; Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Any wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, the round ends.
-    </p>
+          Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+          ➕➖ Add &amp; Subtract: <strong>+3 points</strong><br/>
+          ✖️➗ Multiply &amp; Divide: <strong>+6 points</strong><br/>
+          💀 Hard Mode: <strong>+15 points</strong><br/>
+          😵 Any wrong answer: <strong>-3 points</strong><br/><br/>
+          🍧 The song is 1:45 long — when it ends, the round ends.
+        </p>
 <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
 </div>
 </div>
+
 <canvas class="confetti" id="confettiCanvas"></canvas>
 <div class="game-container" id="gameContainer">
 <div class="score-bar">
@@ -232,7 +233,7 @@ function closeStoryModeModal() {
 
 function setMode(newMode) {
   mode = newMode;
-  generateProblem();
+  showScoop(() => generateProblem());
   checkMilestones();
 }
 
@@ -278,11 +279,7 @@ function submitAnswer() {
         document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
-          alert(`🍧 The band just jammed their final chord, traveler.
-
-You chilled out and scored ${score} points.
-
-That's cosmic. Until the next fest... ✌️🍧🌀`);
+          alert(`🍧 Time's up! You scored ${score} points!`);
         }
       }, 1000);
     }
@@ -357,23 +354,8 @@ function generateProblem() {
 
 function resetScore() {
   score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  clearInterval(timerInterval);
   document.getElementById("score").textContent = "0";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("timer").textContent = "Time: 0s";
-  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
-  document.getElementById("gameContainer").classList.remove("flash");
-  document.getElementById("scoop").style.display = "none";
-  window.fiftyTriggered = false;
-  window.hundredTriggered = false;
-}
-  score = 0;
-  document.getElementById("score").textContent = "0";
-  generateProblem();
+  showScoop(() => generateProblem());
   checkMilestones();
 }
 
@@ -447,26 +429,19 @@ function launchConfetti() {
 }
 
 window.onload = () => {
-  generateProblem();
+  showScoop(() => generateProblem());
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-      generateProblem();
-    });
-  }
-});
-window.onload = () => {
   const modal = document.getElementById("rulesModal");
-  const closeModalBtn = document.getElementById("closeModalBtn");
-  if (modal && closeModalBtn) {
-    closeModalBtn.addEventListener("click", () => {
+  const closeBtn = document.getElementById("closeModalBtn");
+  if (closeBtn && modal) {
+    closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
       generateProblem();
     });
   }
-};
+});
 </script>
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
 <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
