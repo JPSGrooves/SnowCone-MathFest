@@ -267,9 +267,24 @@
       incorrectTrack.muted = isMuted;
     }
 
-    function submitAnswer() {
+    let timerStarted = false;
+let secondsElapsed = 0;
+let timerInterval;
+
+function submitAnswer() {
       let userAnswer = parseFloat(currentAnswer);
       if (userAnswer === correctAnswer) {
+    if (!timerStarted) {
+      timerStarted = true;
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+        if (secondsElapsed >= 105) {
+          clearInterval(timerInterval);
+          alert(`🍧 Time's up! You scored ${score} points!`);
+        }
+      }, 1000);
+    }
         if (!isMuted) {
           try {
             correctTrack.pause();
@@ -343,19 +358,6 @@
 
     window.onload = () => {
   generateProblem();
-  checkMilestones();
-  document.getElementById("backgroundMusic1").currentTime = 0;
-  document.getElementById("backgroundMusic1").play();
-
-  let secondsElapsed = 0;
-  let timerInterval = setInterval(() => {
-    secondsElapsed++;
-    document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
-    if (secondsElapsed >= 105) { // 1:45 = 105 seconds
-      clearInterval(timerInterval);
-      alert(`🍧 Time's up! You scored ${score} points!`);
-    }
-  }, 1000);
 };
 function checkMilestones() {
   if (score >= 50 && !window.fiftyTriggered) {
