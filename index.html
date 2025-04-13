@@ -192,9 +192,7 @@ Scoop</button></div>
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
-<script>window.onload = function() {
-
-
+<script>
 let score = 0;
 let currentAnswer = "";
 let correctAnswer = 0;
@@ -341,21 +339,6 @@ function generateProblem() {
 
 function resetScore() {
   score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  clearInterval(timerInterval);
-  document.getElementById("score").textContent = "0";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("timer").textContent = "Time: 0s";
-  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
-  document.getElementById("gameContainer").classList.remove("flash");
-  window.fiftyTriggered = false;
-  window.hundredTriggered = false;
-  generateProblem();
-}
-  score = 0;
   document.getElementById("score").textContent = "0";
   showScoop(() => generateProblem());
   checkMilestones();
@@ -430,10 +413,10 @@ function launchConfetti() {
   })();
 }
 
-
-
-
-};</script>
+window.onload = () => {
+  showScoop(() => generateProblem());
+};
+</script>
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
 <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
 <h2 style="color:#ffee00;">🌌 Yo, Cone Traveler 🌌</h2>
