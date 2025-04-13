@@ -230,7 +230,9 @@
 </div>
 
 <!-- Audio -->
-<audio id="backgroundMusic" src="quikserveST- All.mp3" preload="auto"></audio>
+<audio id="backgroundMusic1" src="quikserveST- All1.mp3" preload="auto"></audio>
+<audio id="backgroundMusic2" src="quikserveST- All2.mp3" preload="auto"></audio>
+<audio id="backgroundMusic3" src="quikserveST- All3.mp3" preload="auto"></audio>
 <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
 <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
@@ -247,25 +249,36 @@
   let isMuted = false;
   let fiftyTriggered = false;
   let hundredTriggered = false;
-  const music = document.getElementById("backgroundMusic");
+  const music1 = document.getElementById("backgroundMusic1");
+  const music2 = document.getElementById("backgroundMusic2");
+  const music3 = document.getElementById("backgroundMusic3");
+  const correctTrack = document.getElementById("correctSound");
+  const incorrectTrack = document.getElementById("incorrectSound");
 
   const scoop = document.getElementById("scoop");
   const cone = document.getElementById("cone");
   const gameContainer = document.getElementById("gameContainer");
 
-  function hideRules() {
-    document.getElementById("rulesModal").style.display = "none";
-    generateProblem();
+  // Function to pick a random song and play it
+  function playRandomSong() {
+    const songs = [music1, music2, music3];
+    const randomSong = songs[Math.floor(Math.random() * songs.length)];
+    randomSong.play();
+    randomSong.onended = () => {
+      endGame();
+    };
   }
 
+  // Volume adjustments for correct/incorrect sounds
+  correctTrack.volume = 0.75;
+  incorrectTrack.volume = 0.75;
+
+  // Start the game and play the first song
   function startGame() {
     if (!timerStarted) {
       timerStarted = true;
-      music.play();
+      playRandomSong();
       startTimer();
-      music.onended = () => {
-        endGame();
-      };
     }
   }
 
@@ -287,174 +300,11 @@
 
   function toggleMute() {
     isMuted = !isMuted;
-    music.muted = isMuted;
-    document.getElementById("correctSound").muted = isMuted;
-    document.getElementById("incorrectSound").muted = isMuted;
-  }
-
-  function appendNumber(num) {
-    currentAnswer += num;
-    updateDisplay();
-  }
-
-  function appendDecimal() {
-    if (!currentAnswer.includes('.')) {
-      currentAnswer += currentAnswer === '' ? '0.' : '.';
-      updateDisplay();
-    }
-  }
-
-  function toggleNegative() {
-    currentAnswer = currentAnswer.startsWith('-') ? currentAnswer.slice(1) : '-' + currentAnswer;
-    updateDisplay();
-  }
-
-  function clearAnswer() {
-    currentAnswer = '';
-    updateDisplay();
-  }
-
-  function updateDisplay() {
-    document.getElementById("answerDisplay").textContent = currentAnswer || '0';
-  }
-
-  function submitAnswer() {
-    if (gameEnded) return;
-
-    const answer = parseFloat(currentAnswer);
-    if (!timerStarted) startGame();
-
-    if (answer === correctAnswer) {
-      let points = 3;
-      if (currentProblemType === '×' || currentProblemType === '÷') points = 6;
-      if (currentProblemType === 'hard') points = 15;
-      score += points;
-      document.getElementById("score").textContent = score;
-      scoop.style.display = "block";
-      if (!isMuted) document.getElementById("correctSound").play().catch(() => {});
-
-      if (score >= 50 && !fiftyTriggered) {
-        fiftyTriggered = true;
-        launchConfetti();
-      }
-
-      if (score >= 100 && !hundredTriggered) {
-        hundredTriggered = true;
-        cone.style.boxShadow = '0 0 30px #ffee00, 0 0 60px #ff00cc';
-        gameContainer.classList.add('flash');
-        setTimeout(() => gameContainer.classList.remove('flash'), 600);
-        alert("🍧 You hit 100, cosmic cone crusader. That’s some serious math mojo.");
-      }
-
-      setTimeout(generateProblem, 700);
-    } else {
-      score -= 3;
-      document.getElementById("score").textContent = score;
-      if (!isMuted) document.getElementById("incorrectSound").play().catch(() => {});
-      alert("Oops! Try again.");
-      clearAnswer();
-    }
-  }
-
-  function resetScore() {
-    location.reload();
-  }
-
-  function setMode(newMode) {
-    if (!gameEnded) {
-      mode = newMode;
-      generateProblem();
-    }
-  }
-
-  function generateProblem() {
-    let a, b, c, op1, op2;
-    if (mode === 'addsub') {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
-      op1 = Math.random() > 0.5 ? '+' : '-';
-      if (op1 === '-' && b > a) [a, b] = [b, a];
-      correctAnswer = op1 === '+' ? a + b : a - b;
-      currentProblemType = op1;
-      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-    } else if (mode === 'multdiv') {
-      if (Math.random() > 0.5) {
-        a = Math.floor(Math.random() * 10);
-        b = Math.floor(Math.random() * 10);
-        correctAnswer = a * b;
-        currentProblemType = '×';
-        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-      } else {
-        b = Math.floor(Math.random() * 9) + 1;
-        correctAnswer = Math.floor(Math.random() * 10);
-        a = b * correctAnswer;
-        currentProblemType = '÷';
-        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-      }
-    } else {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
-      c = Math.floor(Math.random() * 9) + 1;
-      op1 = Math.random() > 0.5 ? '+' : '-';
-      op2 = Math.random() > 0.5 ? '×' : '÷';
-      let inner = op1 === '+' ? a + b : a - b;
-      correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
-      currentProblemType = 'hard';
-      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-    }
-
-    currentAnswer = '';
-    updateDisplay();
-    scoop.style.display = "none";
-  }
-
-  function launchConfetti() {
-    const canvas = document.getElementById('confettiCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    let confetti = [];
-
-    for (let i = 0; i < 100; i++) {
-      confetti.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * -canvas.height,
-        r: Math.random() * 6 + 4,
-        d: Math.random() * 10 + 10,
-        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-        tilt: Math.floor(Math.random() * 10) - 10,
-        tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
-        tiltAngle: 0
-      });
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach((c, i) => {
-        ctx.beginPath();
-        ctx.lineWidth = c.r;
-        ctx.strokeStyle = c.color;
-        ctx.moveTo(c.x + c.tilt + (c.r / 2), c.y);
-        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + (c.r / 2));
-        ctx.stroke();
-      });
-      update();
-    }
-
-    function update() {
-      for (let i = 0; i < confetti.length; i++) {
-        confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
-        confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
-        confetti[i].x += Math.sin(0.01);
-        confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
-      }
-    }
-
-    (function loop() {
-      draw();
-      requestAnimationFrame(loop);
-    })();
+    music1.muted = isMuted;
+    music2.muted = isMuted;
+    music3.muted = isMuted;
+    correctTrack.muted = isMuted;
+    incorrectTrack.muted = isMuted;
   }
 </script>
 
