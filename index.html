@@ -35,7 +35,7 @@
       left: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      display: none;
+      display: none; /* Initially hidden */
     }
 
     .snow-cone {
@@ -230,9 +230,9 @@
   </div>
 
   <!-- Audio Elements -->
-  <audio id="backgroundMusic1" src="quikserveST- All.mp3" preload="auto"></audio>
-  <audio id="backgroundMusic2" src="quikserveST- All1.mp3" preload="auto"></audio>
-  <audio id="backgroundMusic3" src="quikserveST- All2.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic1" src="quikserveST- All1.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic2" src="quikserveST- All2.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic3" src="quikserveST- All3.mp3" preload="auto"></audio>
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
@@ -347,7 +347,10 @@
         }
         score += (currentProblemType === 'hard' ? 15 : (currentProblemType === '×' || currentProblemType === '÷' ? 6 : 3));
         document.getElementById("score").textContent = score;
+        
+        // Show the scoop when the answer is correct
         scoop.style.display = "block";
+        
         // Hide the scoop shortly after to mimic the original animation behavior
         setTimeout(() => {
           scoop.style.display = "none";
