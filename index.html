@@ -73,7 +73,7 @@
 <!-- SFX -->
 <audio id="correctSound" src="correct.mp3"></audio>
 <audio id="incorrectSound" src="incorrect.mp3"></audio>
-
+  
 <script>
   const trackList = [
     'quikserveST- drums.mp3',
@@ -85,68 +85,57 @@
     'quikserveST- Melody Pad.mp3'
   ];
 
-  let audioElements = [];
+  let audioElements = trackList.map(src => {
+    const audio = new Audio(src);
+    audio.preload = 'auto';
+    audio.loop = false;
+    return audio;
+  });
+
   let currentTrackIndex = 0;
+  let loopCount = 0;
   let forward = true;
-  let trackLoopCount = 0;
+  let score = 0;
+  let currentAnswer = '';
+  let correctAnswer = 0;
+  let currentProblemType = '+';
+  let mode = 'addsub';
   let timerStarted = false;
   let secondsElapsed = 0;
   let timerInterval = null;
-  let confettiTriggered = false;
   let gameEnded = false;
   let isMuted = false;
-  let currentAnswer = '';
-  let correctAnswer = 0;
-  let mode = 'addsub';
-  let score = 0;
-  let currentProblemType = '+';
-  let cone = document.getElementById('cone');
-  let scoop = document.getElementById('scoop');
-  let trackDisplay = document.getElementById('nowPlaying');
-  let trackNameEl = document.getElementById('trackName');
+  let confettiTriggered = false;
 
+  const trackDisplay = document.getElementById('nowPlaying');
+  const trackNameEl = document.getElementById('trackName');
+  const scoop = document.getElementById('scoop');
+  const cone = document.getElementById('cone');
   const confettiCanvas = document.getElementById('confettiCanvas');
   const ctx = confettiCanvas.getContext('2d');
   let confettiPieces = [];
-
-  trackList.forEach(name => {
-    const audio = new Audio(name);
-    audio.loop = false;
-    audio.volume = 1;
-    audioElements.push(audio);
-  });
 
   function showNowPlaying(name) {
     trackDisplay.style.display = 'block';
     trackNameEl.textContent = name.replace('quikserveST- ', '').replace('.mp3', '');
   }
 
-  function pulseCone() {
-    cone.style.transition = 'transform 0.3s ease';
-    cone.style.transform = 'scale(1.05)';
-    setTimeout(() => cone.style.transform = 'scale(1)', 200);
-  }
-
-  function flashCone() {
-    cone.style.boxShadow = '0 0 20px #ffee00, 0 0 40px #ff00cc';
-    setTimeout(() => cone.style.boxShadow = '', 1000);
-  }
-
   function playNextTrack() {
     if (currentTrackIndex < 0 || currentTrackIndex >= audioElements.length) return;
 
-    const track = audioElements[currentTrackIndex];
-    track.currentTime = 0;
+    const currentAudio = audioElements[currentTrackIndex];
     showNowPlaying(trackList[currentTrackIndex]);
-    track.play();
 
-    track.onended = () => {
-      trackLoopCount++;
-      if (trackLoopCount < 4) {
-        track.currentTime = 0;
-        track.play();
+    currentAudio.currentTime = 0;
+    currentAudio.play();
+
+    currentAudio.onended = () => {
+      loopCount++;
+      if (loopCount < 2) {
+        currentAudio.currentTime = 0;
+        currentAudio.play();
       } else {
-        trackLoopCount = 0;
+        loopCount = 0;
         if (forward) {
           currentTrackIndex++;
           if (currentTrackIndex >= audioElements.length) {
@@ -173,13 +162,28 @@
     }
   }
 
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      secondsElapsed++;
+      document.getElementById('timer').textContent = `Time: ${secondsElapsed}s`;
+      if (secondsElapsed >= 60 && score > 50 && !confettiTriggered) {
+        launchConfetti(2);
+        confettiTriggered = true;
+      }
+    }, 1000);
+  }
+
   function endGameSetlist() {
     gameEnded = true;
     clearInterval(timerInterval);
-    document.getElementById('timer').textContent = `Set complete!`;
+    document.getElementById('timer').textContent = 'Set complete!';
     setTimeout(() => {
       alert(`🍧 Whoa, the band just played their last chord.\nYou scored ${score} points this set.\nThat was one righteous math jam.\nCome back for the next set when you're feelin’ the numbers.`);
-    }, 200);
+    }, 400);
+  }
+
+  function resetScore() {
+    location.reload();
   }
 
   function toggleMute() {
@@ -250,19 +254,46 @@
     }
   }
 
-  function startTimer() {
-    timerInterval = setInterval(() => {
-      secondsElapsed++;
-      document.getElementById('timer').textContent = `Time: ${secondsElapsed}s`;
-      if (secondsElapsed >= 60 && score > 50 && !confettiTriggered) {
-        launchConfetti();
-        confettiTriggered = true;
-      }
-    }, 1000);
-  }
+  function generateProblem() {
+    let a, b, c, op1, op2;
 
-  function resetScore() {
-    location.reload();
+    if (mode === 'addsub') {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      op1 = Math.random() > 0.5 ? '+' : '-';
+      if (op1 === '-' && b > a) [a, b] = [b, a];
+      correctAnswer = op1 === '+' ? a + b : a - b;
+      currentProblemType = op1;
+      document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
+    } else if (mode === 'multdiv') {
+      if (Math.random() > 0.5) {
+        a = Math.floor(Math.random() * 10);
+        b = Math.floor(Math.random() * 10);
+        correctAnswer = a * b;
+        currentProblemType = '×';
+        document.getElementById('problem').textContent = `${a} × ${b} = 🍧`;
+      } else {
+        b = Math.floor(Math.random() * 9) + 1;
+        correctAnswer = Math.floor(Math.random() * 10);
+        a = b * correctAnswer;
+        currentProblemType = '÷';
+        document.getElementById('problem').textContent = `${a} ÷ ${b} = 🍧`;
+      }
+    } else {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      c = Math.floor(Math.random() * 9) + 1;
+      op1 = Math.random() > 0.5 ? '+' : '-';
+      op2 = Math.random() > 0.5 ? '×' : '÷';
+      const inner = op1 === '+' ? a + b : a - b;
+      correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
+      currentProblemType = 'hard';
+      document.getElementById('problem').textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+    }
+
+    currentAnswer = '';
+    updateDisplay();
+    scoop.style.display = 'none';
   }
 
   function setMode(newMode) {
@@ -271,50 +302,15 @@
     generateProblem();
   }
 
-  function randomInt(max) {
-    return Math.floor(Math.random() * (max + 1));
+  function pulseCone() {
+    cone.style.transition = 'transform 0.2s ease';
+    cone.style.transform = 'scale(1.05)';
+    setTimeout(() => cone.style.transform = 'scale(1)', 200);
   }
 
-  function generateProblem() {
-    let a, b, c, op1, op2;
-
-    if (mode === 'addsub') {
-      a = randomInt(9);
-      b = randomInt(9);
-      op1 = Math.random() > 0.5 ? '+' : '-';
-      if (op1 === '-' && b > a) [a, b] = [b, a];
-      correctAnswer = op1 === '+' ? a + b : a - b;
-      document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
-      currentProblemType = op1;
-    } else if (mode === 'multdiv') {
-      if (Math.random() > 0.5) {
-        a = randomInt(9);
-        b = randomInt(9);
-        op1 = '×';
-        correctAnswer = a * b;
-      } else {
-        b = randomInt(8) + 1;
-        correctAnswer = randomInt(9);
-        a = b * correctAnswer;
-        op1 = '÷';
-      }
-      document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
-      currentProblemType = op1;
-    } else if (mode === 'hard') {
-      a = randomInt(9);
-      b = randomInt(9);
-      c = randomInt(8) + 1;
-      op1 = Math.random() > 0.5 ? '+' : '-';
-      op2 = Math.random() > 0.5 ? '×' : '÷';
-      let inner = op1 === '+' ? a + b : a - b;
-      correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
-      document.getElementById('problem').textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-      currentProblemType = 'hard';
-    }
-
-    currentAnswer = '';
-    updateDisplay();
-    scoop.style.display = 'none';
+  function flashCone() {
+    cone.style.boxShadow = '0 0 25px #ffee00, 0 0 60px #ff00cc';
+    setTimeout(() => cone.style.boxShadow = '', 1000);
   }
 
   function showRules() {
@@ -323,12 +319,12 @@
 
   function hideRules() {
     document.getElementById('rulesModal').style.display = 'none';
-    generateProblem(); // fix: game starts after instructions close
+    generateProblem(); // show first problem after rules
   }
 
-  function launchConfetti(multiplier = 1) {
+  function launchConfetti(mult = 1) {
     const colors = ['#ff00cc', '#00ff88', '#00ccff', '#ffee00'];
-    for (let i = 0; i < 100 * multiplier; i++) {
+    for (let i = 0; i < 100 * mult; i++) {
       confettiPieces.push({
         x: Math.random() * window.innerWidth,
         y: Math.random() * -50,
@@ -344,12 +340,12 @@
     confettiCanvas.width = window.innerWidth;
     confettiCanvas.height = window.innerHeight;
     ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    confettiPieces.forEach(piece => {
-      ctx.fillStyle = piece.color;
+    confettiPieces.forEach(p => {
+      ctx.fillStyle = p.color;
       ctx.beginPath();
-      ctx.arc(piece.x, piece.y, piece.size, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fill();
-      piece.y += piece.speedY;
+      p.y += p.speedY;
     });
     confettiPieces = confettiPieces.filter(p => p.y < window.innerHeight);
     if (confettiPieces.length > 0) {
