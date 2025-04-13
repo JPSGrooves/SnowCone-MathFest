@@ -273,7 +273,7 @@
   correctTrack.volume = 0.75;
   incorrectTrack.volume = 0.75;
 
-  // Start the game and play the first song
+  // Start the game after first answer
   function startGame() {
     if (!timerStarted) {
       timerStarted = true;
@@ -310,9 +310,32 @@
   // Function to close the modal and start the game
   document.getElementById('closeModalBtn').addEventListener('click', () => {
     document.getElementById('rulesModal').style.display = 'none';
-    startGame();
   });
 
+  // Buttons for appending numbers and submitting answers
+  function appendNumber(num) {
+    currentAnswer += num;
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+
+  function clearAnswer() {
+    currentAnswer = '';
+    document.getElementById("answerDisplay").textContent = '0';
+  }
+
+  function submitAnswer() {
+    if (currentAnswer == correctAnswer) {
+      score += 3;
+      document.getElementById("score").textContent = score;
+      startGame();
+      // Generate new problem after answer submission
+    } else {
+      score -= 3;
+      document.getElementById("score").textContent = score;
+      alert("Incorrect! Try again.");
+      clearAnswer();
+    }
+  }
 </script>
 
 </body>
