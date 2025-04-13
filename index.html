@@ -1,12 +1,11 @@
 
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Math Fest Snow Cone</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Math Fest Snow Cone</title>
+  <style>
     body {
       background: black;
       color: white;
@@ -147,52 +146,51 @@
   </style>
 </head>
 <body>
-<canvas class="confetti" id="confettiCanvas"></canvas>
-<div class="game-container" id="gameContainer">
-<div class="score-bar">
-<div class="score">Score: <span id="score">0</span></div>
-<div id="timer">Time: 0s</div>
-<button class="reset-button" onclick="resetScore()">Reset Score</button>
-</div>
-<div class="snow-cone-wrapper">
-<div class="scoop" id="scoop"></div>
-<div class="snow-cone" id="cone">
-<div class="cone-text">
-<a href="#" onclick="generateProblem()">Math<br/>Fest</a>
-</div>
-</div>
-</div>
-<div class="math-problem" id="problem">0 + 0 = 🍧</div>
-<div class="answer-display" id="answerDisplay">0</div>
-<div class="mode-buttons">
-<button onclick="setMode('addsub')">+/-</button>
-<button onclick="setMode('multdiv')">X-/</button>
-<button onclick="setMode('hard')">Hard<br/>Mode</button>
-<button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full
-Scoop</button></div>
-<div class="keypad">
-<button onclick="appendNumber(7)">7</button>
-<button onclick="appendNumber(8)">8</button>
-<button onclick="appendNumber(9)">9</button>
-<button onclick="submitAnswer()">Enter</button>
-<button onclick="appendNumber(4)">4</button>
-<button onclick="appendNumber(5)">5</button>
-<button onclick="appendNumber(6)">6</button>
-<button onclick="clearAnswer()">Clear</button>
-<button onclick="appendNumber(1)">1</button>
-<button onclick="appendNumber(2)">2</button>
-<button onclick="appendNumber(3)">3</button>
-<button onclick="toggleNegative()">-</button>
-<button onclick="appendDecimal()">.</button>
-<button onclick="appendNumber(0)">0</button>
-<button onclick="toggleMute()">Mute</button>
-<div></div>
-</div>
-</div>
-<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
-<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
-<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
-<script>
+  <canvas id="confettiCanvas" class="confetti"></canvas>
+  <div class="game-container" id="gameContainer">
+    <div class="score-bar">
+      <div class="score">Score: <span id="score">0</span></div>
+      <div id="timer">Time: 0s</div>
+      <button class="reset-button" onclick="resetScore()">Reset Score</button>
+    </div>
+    <div class="snow-cone-wrapper">
+      <div id="scoop" class="scoop"></div>
+      <div class="snow-cone" id="cone">
+        <div class="cone-text">
+          <a href="#" onclick="generateProblem()">Math<br>Fest</a>
+        </div>
+      </div>
+    </div>
+    <div class="math-problem" id="problem">0 + 0 = 🍧</div>
+    <div class="answer-display" id="answerDisplay">0</div>
+    <div class="mode-buttons">
+      <button onclick="setMode('addsub')">+/-</button>
+      <button onclick="setMode('multdiv')">X-/</button>
+      <button onclick="setMode('hard')">Hard<br>Mode</button>
+    </div>
+    <div class="keypad">
+      <button onclick="appendNumber(7)">7</button>
+      <button onclick="appendNumber(8)">8</button>
+      <button onclick="appendNumber(9)">9</button>
+      <button onclick="submitAnswer()">Enter</button>
+      <button onclick="appendNumber(4)">4</button>
+      <button onclick="appendNumber(5)">5</button>
+      <button onclick="appendNumber(6)">6</button>
+      <button onclick="clearAnswer()">Clear</button>
+      <button onclick="appendNumber(1)">1</button>
+      <button onclick="appendNumber(2)">2</button>
+      <button onclick="appendNumber(3)">3</button>
+      <button onclick="toggleNegative()">-</button>
+      <button onclick="appendDecimal()">.</button>
+      <button onclick="appendNumber(0)">0</button>
+      <button onclick="toggleMute()">Mute</button>
+      <div></div>
+    </div>
+  </div>
+  <audio id="backgroundMusic1" src="quikserveST- All.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+  <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
+  <script>
 
 let score = 0;
 let currentAnswer = "";
@@ -219,7 +217,7 @@ function closeStoryModeModal() {
 
 function setMode(newMode) {
   mode = newMode;
-  showScoop(() => generateProblem());
+  generateProblem();
   checkMilestones();
 }
 
@@ -340,8 +338,22 @@ function generateProblem() {
 
 function resetScore() {
   score = 0;
+  currentAnswer = "";
   document.getElementById("score").textContent = "0";
-  showScoop(() => generateProblem());
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("problem").textContent = "0 + 0 = 🍧";
+  clearInterval(timerInterval);
+  secondsElapsed = 0;
+  document.getElementById("timer").textContent = "Time: 0s";
+  timerStarted = false;
+  window.fiftyTriggered = false;
+  window.hundredTriggered = false;
+  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+  generateProblem();
+}
+  score = 0;
+  document.getElementById("score").textContent = "0";
+  generateProblem();
   checkMilestones();
 }
 
@@ -415,21 +427,9 @@ function launchConfetti() {
 }
 
 window.onload = () => {
-  showScoop(() => generateProblem());
+  generateProblem();
 };
 
 </script>
-<div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-<div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
-<h2 style="color:#ffee00;">🌌 Yo, Cone Traveler 🌌</h2>
-<p style="font-size:16px; line-height:1.6; color:#ffffff;">
-        You ever wonder what’s inside a snow cone?<br/><br/>
-        Like... the <em>real</em> inside?<br/>
-        Let’s just say it’s deeper than syrup and ice.<br/><br/>
-        You ready to go on a journey to the center of the snow cone?
-      </p>
-<button onclick="closeStoryModeModal()" style="margin:10px 5px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to QuikServe</button>
-<button disabled="" style="margin:10px 5px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:not-allowed;">Bet!</button>
-</div>
-</div></body>
+</body>
 </html>
