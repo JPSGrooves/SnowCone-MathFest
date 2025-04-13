@@ -269,13 +269,19 @@
 
     // Function to pick a random music track and play it.
     function playRandomSong() {
-      // Ensure the first song is played, if available
-      if (music1.paused || music1.currentTime === 0) {
+      const songs = [music1, music2, music3];
+      const randomSong = songs[Math.floor(Math.random() * songs.length)];
+
+      // If it's the first song, ensure it plays
+      if (randomSong === music1 && music1.paused) {
         music1.play();
-        music1.onended = () => {
-          playRandomSong();
-        };
+      } else if (randomSong !== music1 && randomSong.paused) {
+        randomSong.play();
       }
+
+      randomSong.onended = () => {
+        playRandomSong(); // Start next song after the current ends
+      };
     }
 
     // Start the music and timer on first correct answer.
