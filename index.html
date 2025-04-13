@@ -225,7 +225,7 @@
       😵 Any wrong answer: <strong>-3 points</strong><br><br>
       🍧 The song is 1:45 long — when it ends, the round ends.
     </p>
-    <button onclick="hideRules()" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
 
@@ -306,6 +306,13 @@
     correctTrack.muted = isMuted;
     incorrectTrack.muted = isMuted;
   }
+
+  // Function to close the modal and start the game
+  document.getElementById('closeModalBtn').addEventListener('click', () => {
+    document.getElementById('rulesModal').style.display = 'none';
+    startGame();
+  });
+
 </script>
 
 </body>
