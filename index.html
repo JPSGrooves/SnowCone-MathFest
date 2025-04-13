@@ -32,7 +32,7 @@
       left: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      display: none; /* Initially hidden */
+      display: none;
     }
     .snow-cone {
       position: absolute;
@@ -154,7 +154,6 @@
       <div id="timer">Time: 0s</div>
       <button class="reset-button" onclick="resetScore()">Reset Score</button>
     </div>
-
     <div class="snow-cone-wrapper">
       <!-- The scoop element -->
       <div id="scoop" class="scoop"></div>
@@ -164,16 +163,13 @@
         </div>
       </div>
     </div>
-
     <div class="math-problem" id="problem">0 + 0 = 🍧</div>
     <div class="answer-display" id="answerDisplay">0</div>
-
     <div class="mode-buttons">
       <button onclick="setMode('addsub')">+/-</button>
       <button onclick="setMode('multdiv')">X-/</button>
       <button onclick="setMode('hard')">Hard<br>Mode</button>
     </div>
-
     <div class="keypad">
       <button onclick="appendNumber(7)">7</button>
       <button onclick="appendNumber(8)">8</button>
@@ -186,7 +182,7 @@
       <button onclick="appendNumber(1)">1</button>
       <button onclick="appendNumber(2)">2</button>
       <button onclick="appendNumber(3)">3</button>
-      <!-- Negative button -->
+      <!-- Negative Button -->
       <button onclick="toggleNegative()">-</button>
       <button onclick="appendDecimal()">.</button>
       <button onclick="appendNumber(0)">0</button>
@@ -211,7 +207,7 @@
     </div>
   </div>
 
-  <!-- Audio Elements: Using a single background music track -->
+  <!-- Audio Elements -->
   <audio id="backgroundMusic1" src="quikserveST- All.mp3" preload="auto"></audio>
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
@@ -235,9 +231,9 @@
     const music1 = document.getElementById("backgroundMusic1");
     const correctTrack = document.getElementById("correctSound");
     const incorrectTrack = document.getElementById("incorrectSound");
-    // Set sound effect volumes to 50%
-    correctTrack.volume = 0.50;
-    incorrectTrack.volume = 0.50;
+    // Set correct and incorrect sound volumes to 50%
+    correctTrack.volume = 0.5;
+    incorrectTrack.volume = 0.5;
 
     // DOM Elements
     const scoop = document.getElementById("scoop");
@@ -245,7 +241,7 @@
     const gameContainer = document.getElementById("gameContainer");
 
     // Function to play the background music.
-    // When the track ends (after 1:45), end the game.
+    // When the song ends (after 1:45), the game ends.
     function playMusic() {
       music1.currentTime = 0;
       music1.play();
@@ -254,7 +250,7 @@
       };
     }
 
-    // Start the game by starting music and timer.
+    // Start game: start music and timer on first correct answer.
     function startGame() {
       if (!timerStarted) {
         timerStarted = true;
@@ -286,13 +282,13 @@
       incorrectTrack.muted = isMuted;
     }
 
-    // Close the modal and generate the first problem.
+    // Close modal and generate first problem.
     document.getElementById("closeModalBtn").addEventListener("click", () => {
       document.getElementById("rulesModal").style.display = "none";
       generateProblem();
     });
 
-    // Keypad input functions.
+    // Keypad functions
     function appendNumber(num) {
       currentAnswer += num;
       document.getElementById("answerDisplay").textContent = currentAnswer;
@@ -319,7 +315,7 @@
       document.getElementById("answerDisplay").textContent = "0";
     }
 
-    // Dedicated function to show the scoop.
+    // Dedicated function for scoop animation.
     function showScoop(callback) {
       scoop.style.display = "block";
       setTimeout(() => {
@@ -330,7 +326,7 @@
       }, 700);
     }
 
-    // Submit the answer.
+    // Submit answer.
     function submitAnswer() {
       let userAnswer = parseFloat(currentAnswer);
       if (userAnswer === correctAnswer) {
@@ -340,17 +336,13 @@
         }
         score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
         document.getElementById("score").textContent = score;
-        
-        // Show the scoop and then generate next problem.
         showScoop(() => {
           generateProblem();
         });
-        
         if (score >= 50 && !fiftyTriggered) {
           fiftyTriggered = true;
           launchConfetti();
         }
-        
         if (score >= 100 && !hundredTriggered) {
           hundredTriggered = true;
           cone.style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
@@ -371,12 +363,10 @@
       }
     }
 
-    // Generate a math problem based on the selected mode.
+    // Generate a math problem.
     function generateProblem() {
       let a, b, c, op1, op2;
-      // Hide the scoop just in case.
       scoop.style.display = "none";
-      
       if (mode === "addsub") {
         a = Math.floor(Math.random() * 10);
         b = Math.floor(Math.random() * 10);
@@ -452,9 +442,9 @@
       function update() {
         for (let i = 0; i < confetti.length; i++) {
           confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
-          confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
+          confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r/2) / 2;
           confetti[i].x += Math.sin(0.01);
-          confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
+          confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i/3)) * 15;
         }
       }
       (function loop() {
