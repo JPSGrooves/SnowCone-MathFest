@@ -32,7 +32,7 @@
       left: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      display: none; /* Hidden by default */
+      display: none; /* Initially hidden */
     }
     .snow-cone {
       position: absolute;
@@ -156,7 +156,7 @@
     </div>
 
     <div class="snow-cone-wrapper">
-      <!-- The scoop element. It should cover the top of the cone when visible -->
+      <!-- The scoop element -->
       <div id="scoop" class="scoop"></div>
       <div class="snow-cone" id="cone">
         <div class="cone-text">
@@ -186,7 +186,7 @@
       <button onclick="appendNumber(1)">1</button>
       <button onclick="appendNumber(2)">2</button>
       <button onclick="appendNumber(3)">3</button>
-      <!-- Negative button; toggles the negative sign -->
+      <!-- Negative button -->
       <button onclick="toggleNegative()">-</button>
       <button onclick="appendDecimal()">.</button>
       <button onclick="appendNumber(0)">0</button>
@@ -211,7 +211,7 @@
     </div>
   </div>
 
-  <!-- Audio Elements: Using only one background music track -->
+  <!-- Audio Elements: Using a single background music track -->
   <audio id="backgroundMusic1" src="quikserveST- All.mp3" preload="auto"></audio>
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
@@ -219,10 +219,10 @@
   <script>
     // Global Variables
     let score = 0;
-    let currentAnswer = '';
+    let currentAnswer = "";
     let correctAnswer = 0;
-    let currentProblemType = '+';
-    let mode = 'addsub';
+    let currentProblemType = "+";
+    let mode = "addsub";
     let timerStarted = false;
     let secondsElapsed = 0;
     let timerInterval = null;
@@ -235,26 +235,26 @@
     const music1 = document.getElementById("backgroundMusic1");
     const correctTrack = document.getElementById("correctSound");
     const incorrectTrack = document.getElementById("incorrectSound");
-    // Set sound effect volumes to 75%
-    correctTrack.volume = 0.75;
-    incorrectTrack.volume = 0.75;
+    // Set sound effect volumes to 50%
+    correctTrack.volume = 0.50;
+    incorrectTrack.volume = 0.50;
 
     // DOM Elements
     const scoop = document.getElementById("scoop");
     const cone = document.getElementById("cone");
     const gameContainer = document.getElementById("gameContainer");
 
-    // Function to play the background music (always the same track)
+    // Function to play the background music.
+    // When the track ends (after 1:45), end the game.
     function playMusic() {
-      music1.currentTime = 0; // restart song
+      music1.currentTime = 0;
       music1.play();
       music1.onended = () => {
-        // Loop the song
-        playMusic();
+        endGame();
       };
     }
 
-    // Start game on first correct answer: start music and timer.
+    // Start the game by starting music and timer.
     function startGame() {
       if (!timerStarted) {
         timerStarted = true;
@@ -273,7 +273,7 @@
     function endGame() {
       clearInterval(timerInterval);
       gameEnded = true;
-      document.getElementById('timer').textContent = 'Set complete!';
+      document.getElementById("timer").textContent = "Set complete!";
       setTimeout(() => {
         alert(`🍧 Whoa, the band just played their last chord.\nYou scored ${score} points this set.\nThat was one righteous math jam.\nCome back for the next set when you're feelin’ the numbers.`);
       }, 500);
@@ -287,44 +287,41 @@
     }
 
     // Close the modal and generate the first problem.
-    document.getElementById('closeModalBtn').addEventListener('click', () => {
-      document.getElementById('rulesModal').style.display = 'none';
+    document.getElementById("closeModalBtn").addEventListener("click", () => {
+      document.getElementById("rulesModal").style.display = "none";
       generateProblem();
     });
 
-    // Keypad input functions
+    // Keypad input functions.
     function appendNumber(num) {
       currentAnswer += num;
       document.getElementById("answerDisplay").textContent = currentAnswer;
     }
 
     function appendDecimal() {
-      if (!currentAnswer.includes('.')) {
-        currentAnswer += (currentAnswer === '' ? '0.' : '.');
+      if (!currentAnswer.includes(".")) {
+        currentAnswer += (currentAnswer === "" ? "0." : ".");
         document.getElementById("answerDisplay").textContent = currentAnswer;
       }
     }
 
     function toggleNegative() {
-      // Toggle negative sign: if answer already starts with '-', remove it; otherwise, add it.
-      if (currentAnswer.startsWith('-')) {
+      if (currentAnswer.startsWith("-")) {
         currentAnswer = currentAnswer.slice(1);
       } else {
-        currentAnswer = '-' + currentAnswer;
+        currentAnswer = "-" + currentAnswer;
       }
       document.getElementById("answerDisplay").textContent = currentAnswer;
     }
 
     function clearAnswer() {
-      currentAnswer = '';
-      document.getElementById("answerDisplay").textContent = '0';
+      currentAnswer = "";
+      document.getElementById("answerDisplay").textContent = "0";
     }
 
-    // SHOW SCOOP: This function handles making the scoop visible for a fixed time.
+    // Dedicated function to show the scoop.
     function showScoop(callback) {
-      // Immediately display the scoop.
       scoop.style.display = "block";
-      // After 700ms, hide it and then run the callback (to generate the next problem).
       setTimeout(() => {
         scoop.style.display = "none";
         if (typeof callback === "function") {
@@ -333,7 +330,7 @@
       }, 700);
     }
 
-    // Submit answer; if correct, show the scoop (via showScoop), play sound, update score, etc.
+    // Submit the answer.
     function submitAnswer() {
       let userAnswer = parseFloat(currentAnswer);
       if (userAnswer === correctAnswer) {
@@ -341,25 +338,24 @@
           correctTrack.currentTime = 0;
           correctTrack.play();
         }
-        score += (currentProblemType === 'hard' ? 15 : (currentProblemType === '×' || currentProblemType === '÷' ? 6 : 3));
+        score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
         document.getElementById("score").textContent = score;
-        // Show the scoop and then, once it's hidden, generate the next problem.
+        
+        // Show the scoop and then generate next problem.
         showScoop(() => {
           generateProblem();
         });
-        // Trigger confetti at 50 points.
+        
         if (score >= 50 && !fiftyTriggered) {
           fiftyTriggered = true;
           launchConfetti();
         }
-        // 100 point celebration.
+        
         if (score >= 100 && !hundredTriggered) {
           hundredTriggered = true;
-          cone.style.boxShadow = '0 0 30px #ffee00, 0 0 60px #ff00cc';
-          gameContainer.classList.add('flash');
-          setTimeout(() => {
-            gameContainer.classList.remove('flash');
-          }, 600);
+          cone.style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
+          gameContainer.classList.add("flash");
+          setTimeout(() => gameContainer.classList.remove("flash"), 600);
           alert("🍧 You hit 100 points! That's some serious math mojo!");
         }
         startGame();
@@ -375,59 +371,57 @@
       }
     }
 
-    // Generate a math problem based on mode.
+    // Generate a math problem based on the selected mode.
     function generateProblem() {
       let a, b, c, op1, op2;
-      // Always hide the scoop when starting a new problem.
+      // Hide the scoop just in case.
       scoop.style.display = "none";
       
-      if (mode === 'addsub') {
+      if (mode === "addsub") {
         a = Math.floor(Math.random() * 10);
         b = Math.floor(Math.random() * 10);
-        op1 = Math.random() > 0.5 ? '+' : '-';
-        if (op1 === '-' && b > a) [a, b] = [b, a];
-        correctAnswer = op1 === '+' ? a + b : a - b;
+        op1 = Math.random() > 0.5 ? "+" : "-";
+        if (op1 === "-" && b > a) [a, b] = [b, a];
+        correctAnswer = op1 === "+" ? a + b : a - b;
         currentProblemType = op1;
         document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-      } else if (mode === 'multdiv') {
+      } else if (mode === "multdiv") {
         if (Math.random() > 0.5) {
           a = Math.floor(Math.random() * 10);
           b = Math.floor(Math.random() * 10);
           correctAnswer = a * b;
-          currentProblemType = '×';
+          currentProblemType = "×";
           document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
         } else {
           b = Math.floor(Math.random() * 9) + 1;
           correctAnswer = Math.floor(Math.random() * 10);
           a = b * correctAnswer;
-          currentProblemType = '÷';
+          currentProblemType = "÷";
           document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
         }
-      } else if (mode === 'hard') {
+      } else if (mode === "hard") {
         a = Math.floor(Math.random() * 10);
         b = Math.floor(Math.random() * 10);
         c = Math.floor(Math.random() * 9) + 1;
-        op1 = Math.random() > 0.5 ? '+' : '-';
-        op2 = Math.random() > 0.5 ? '×' : '÷';
-        let inner = op1 === '+' ? a + b : a - b;
-        correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
-        currentProblemType = 'hard';
+        op1 = Math.random() > 0.5 ? "+" : "-";
+        op2 = Math.random() > 0.5 ? "×" : "÷";
+        let inner = op1 === "+" ? a + b : a - b;
+        correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+        currentProblemType = "hard";
         document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
       }
-      currentAnswer = '';
-      document.getElementById("answerDisplay").textContent = '0';
+      currentAnswer = "";
+      document.getElementById("answerDisplay").textContent = "0";
     }
 
-    // Change mode and generate a new problem.
     function setMode(newMode) {
       mode = newMode;
       generateProblem();
     }
 
-    // Launch confetti animation.
     function launchConfetti() {
-      const canvas = document.getElementById('confettiCanvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.getElementById("confettiCanvas");
+      const ctx = canvas.getContext("2d");
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       let confetti = [];
@@ -439,7 +433,7 @@
           d: Math.random() * 10 + 10,
           color: `hsl(${Math.random() * 360}, 100%, 50%)`,
           tilt: Math.floor(Math.random() * 10) - 10,
-          tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
+          tiltAngleIncremental: Math.random() * 0.07 + 0.05,
           tiltAngle: 0
         });
       }
@@ -449,8 +443,8 @@
           ctx.beginPath();
           ctx.lineWidth = c.r;
           ctx.strokeStyle = c.color;
-          ctx.moveTo(c.x + c.tilt + (c.r / 2), c.y);
-          ctx.lineTo(c.x + c.tilt, c.y + c.tilt + (c.r / 2));
+          ctx.moveTo(c.x + c.tilt + c.r/2, c.y);
+          ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r/2);
           ctx.stroke();
         });
         update();
