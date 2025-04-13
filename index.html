@@ -221,6 +221,22 @@
 <audio id="incorrectSound" src="incorrect.mp3"></audio>
 
 <script>
+  // Music setlist
+  const trackList = [
+    'quikserveST- drums.mp3',
+    'quikserveST- drumsbass.mp3',
+    'quikserveST- drumsbasspiano.mp3',
+    'quikserveST- Melody 1.mp3',
+    'quikserveST- Melody 2.mp3',
+    'quikserveST- Melody Arp.mp3',
+    'quikserveST- Melody Pad.mp3'
+  ];
+
+  let audioElements = [];
+  let currentTrackIndex = 0;
+  let forward = true;
+
+  // Game logic vars
   let currentAnswer = '';
   let correctAnswer = 0;
   let mode = 'addsub';
@@ -230,17 +246,124 @@
   let secondsElapsed = 0;
   let timerInterval = null;
   let confettiTriggered = false;
+  let gameEnded = false;
 
   const confettiCanvas = document.getElementById('confettiCanvas');
   const ctx = confettiCanvas.getContext('2d');
   let confettiPieces = [];
 
-  function showRules() {
-    document.getElementById('rulesModal').style.display = 'flex';
+  // Initialize audio
+  trackList.forEach(name => {
+    const audio = new Audio(name);
+    audio.loop = false;
+    audio.volume = 1.0;
+    audioElements.push(audio);
+  });
+
+  function playNextTrack() {
+    if (currentTrackIndex < 0 || currentTrackIndex >= audioElements.length) return;
+
+    const track = audioElements[currentTrackIndex];
+    track.play();
+
+    track.onended = () => {
+      if (forward) {
+        currentTrackIndex++;
+        if (currentTrackIndex >= audioElements.length) {
+          forward = false;
+          currentTrackIndex = audioElements.length - 1;
+          playNextTrack(); // start reverse immediately
+        } else {
+          playNextTrack();
+        }
+      } else {
+        currentTrackIndex--;
+        if (currentTrackIndex < 0) {
+          endGameSetlist();
+        } else {
+          playNextTrack();
+        }
+      }
+    };
   }
 
-  function hideRules() {
-    document.getElementById('rulesModal').style.display = 'none';
+  function startSetlist() {
+    if (!timerStarted) {
+      timerStarted = true;
+      startTimer();
+      playNextTrack();
+    }
+  }
+
+  function endGameSetlist() {
+    gameEnded = true;
+    clearInterval(timerInterval);
+    document.getElementById('timer').textContent = `Set complete!`;
+
+    setTimeout(() => {
+      alert(`🍧 Whoa, the band just played their last chord. You scored ${score} points this set.\nThat was one righteous math jam.\nCome back for the next set when you're feelin’ the numbers.`);
+    }, 200);
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      secondsElapsed++;
+      document.getElementById('timer').textContent = `Time: ${secondsElapsed}s`;
+
+      if (secondsElapsed >= 60 && score > 50 && !confettiTriggered) {
+        launchConfetti();
+        confettiTriggered = true;
+      }
+    }, 1000);
+  }
+
+  function appendNumber(num) {
+    currentAnswer += num;
+    updateDisplay();
+  }
+
+  function toggleNegative() {
+    if (currentAnswer.startsWith('-')) {
+      currentAnswer = currentAnswer.slice(1);
+    } else {
+      currentAnswer = '-' + currentAnswer;
+    }
+    updateDisplay();
+  }
+
+  function clearAnswer() {
+    currentAnswer = '';
+    updateDisplay();
+  }
+
+  function updateDisplay() {
+    document.getElementById('answerDisplay').textContent = currentAnswer || '0';
+  }
+
+  function submitAnswer() {
+    if (gameEnded) return;
+
+    const answer = parseInt(currentAnswer);
+    if (!timerStarted) {
+      startSetlist();
+    }
+
+    if (answer === correctAnswer) {
+      let points = 3;
+      if (currentProblemType === '×' || currentProblemType === '÷') points = 6;
+      if (currentProblemType === 'hard') points = 15;
+      score += points;
+      document.getElementById('score').textContent = score;
+      document.getElementById('scoop').style.display = 'block';
+      document.getElementById('correctSound').play().catch(() => {});
+      setTimeout(generateProblem, 800);
+    } else {
+      score -= 3;
+      document.getElementById('score').textContent = score;
+      document.getElementById('incorrectSound').play().catch(() => {});
+      alert("Oops! Try again.");
+      clearAnswer();
+    }
   }
 
   function randomInt(max) {
@@ -289,75 +412,12 @@
     document.getElementById('scoop').style.display = 'none';
   }
 
-  function appendNumber(num) {
-    currentAnswer += num;
-    updateDisplay();
-  }
-
-  function toggleNegative() {
-    if (currentAnswer.startsWith('-')) {
-      currentAnswer = currentAnswer.slice(1);
-    } else {
-      currentAnswer = '-' + currentAnswer;
-    }
-    updateDisplay();
-  }
-
-  function clearAnswer() {
-    currentAnswer = '';
-    updateDisplay();
-  }
-
-  function updateDisplay() {
-    document.getElementById('answerDisplay').textContent = currentAnswer || '0';
-  }
-
-  function submitAnswer() {
-    const answer = parseInt(currentAnswer);
-    if (answer === correctAnswer) {
-      startTimer();
-      let points = 3;
-      if (currentProblemType === '×' || currentProblemType === '÷') points = 6;
-      if (currentProblemType === 'hard') points = 15;
-      score += points;
-      document.getElementById('score').textContent = score;
-      document.getElementById('scoop').style.display = 'block';
-      document.getElementById('correctSound').play().catch(() => {});
-      setTimeout(generateProblem, 800);
-    } else {
-      score -= 3;
-      document.getElementById('score').textContent = score;
-      document.getElementById('incorrectSound').play().catch(() => {});
-      alert("Oops! Try again.");
-      clearAnswer();
-    }
-  }
-
-  function startTimer() {
-    if (!timerStarted) {
-      timerStarted = true;
-      timerInterval = setInterval(() => {
-        secondsElapsed++;
-        document.getElementById('timer').textContent = `Time: ${secondsElapsed}s`;
-        if (secondsElapsed >= 60 && score > 50 && !confettiTriggered) {
-          launchConfetti();
-          confettiTriggered = true;
-        }
-      }, 1000);
-    }
-  }
-
   function resetScore() {
-    score = 0;
-    document.getElementById('score').textContent = score;
-    clearInterval(timerInterval);
-    timerStarted = false;
-    secondsElapsed = 0;
-    confettiTriggered = false;
-    document.getElementById('timer').textContent = 'Time: 0s';
+    location.reload(); // full reset to restart music & timer
   }
 
   function setMode(newMode) {
+    if (gameEnded) return;
     mode = newMode;
     generateProblem();
   }
@@ -395,6 +455,7 @@
 
   generateProblem();
 </script>
+
 
 </body>
 </html>
