@@ -348,10 +348,10 @@
         score += (currentProblemType === 'hard' ? 15 : (currentProblemType === '×' || currentProblemType === '÷' ? 6 : 3));
         document.getElementById("score").textContent = score;
         
-        // **Show the scoop when the answer is correct**
+        // Show the scoop immediately when the answer is correct
         scoop.style.display = "block";
         
-        // **Hide the scoop after 700ms** to mimic the original behavior
+        // Hide the scoop after 700ms to mimic the original animation behavior
         setTimeout(() => {
           scoop.style.display = "none";
         }, 700);
