@@ -161,7 +161,6 @@
 <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
 </div>
 </div>
-
 <canvas class="confetti" id="confettiCanvas"></canvas>
 <div class="game-container" id="gameContainer">
 <div class="score-bar">
@@ -354,6 +353,21 @@ function generateProblem() {
 
 function resetScore() {
   score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  clearInterval(timerInterval);
+  document.getElementById("score").textContent = "0";
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("timer").textContent = "Time: 0s";
+  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+  document.getElementById("gameContainer").classList.remove("flash");
+  document.getElementById("scoop").style.display = "none";
+  window.fiftyTriggered = false;
+  window.hundredTriggered = false;
+}
+  score = 0;
   document.getElementById("score").textContent = "0";
   showScoop(() => generateProblem());
   checkMilestones();
@@ -361,7 +375,7 @@ function resetScore() {
 
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
+  // scoop only appears on correct answer
   setTimeout(() => {
     scoop.style.display = "none";
     if (typeof callback === "function") {
@@ -432,10 +446,18 @@ window.onload = () => {
   showScoop(() => generateProblem());
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+  if (closeBtn && modal) {
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      generateProblem();
+    });
+  }
+});
+window.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
-  if (closeBtn && modal) {
+  if (modal) modal.style.display = "flex";
+  if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
       generateProblem();
