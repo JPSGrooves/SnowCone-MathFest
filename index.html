@@ -32,7 +32,7 @@
       left: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      display: none; /* Initially hidden */
+      display: none; /* Hidden by default */
     }
     .snow-cone {
       position: absolute;
@@ -156,7 +156,7 @@
     </div>
 
     <div class="snow-cone-wrapper">
-      <!-- Scoop: This element is shown when the answer is correct -->
+      <!-- The scoop element. It should cover the top of the cone when visible -->
       <div id="scoop" class="scoop"></div>
       <div class="snow-cone" id="cone">
         <div class="cone-text">
@@ -186,7 +186,7 @@
       <button onclick="appendNumber(1)">1</button>
       <button onclick="appendNumber(2)">2</button>
       <button onclick="appendNumber(3)">3</button>
-      <!-- Negative button: toggles the minus sign -->
+      <!-- Negative button; toggles the negative sign -->
       <button onclick="toggleNegative()">-</button>
       <button onclick="appendDecimal()">.</button>
       <button onclick="appendNumber(0)">0</button>
@@ -195,7 +195,7 @@
     </div>
   </div>
 
-  <!-- Modal (rules) -->
+  <!-- Modal -->
   <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
     <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
       <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
@@ -211,7 +211,7 @@
     </div>
   </div>
 
-  <!-- Audio Elements (only one track used now) -->
+  <!-- Audio Elements: Using only one background music track -->
   <audio id="backgroundMusic1" src="quikserveST- All.mp3" preload="auto"></audio>
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
@@ -231,32 +231,30 @@
     let fiftyTriggered = false;
     let hundredTriggered = false;
 
-    // Audio References (only one background track)
+    // Audio References
     const music1 = document.getElementById("backgroundMusic1");
     const correctTrack = document.getElementById("correctSound");
     const incorrectTrack = document.getElementById("incorrectSound");
-    
-    // Set volumes (75% for sound effects)
+    // Set sound effect volumes to 75%
     correctTrack.volume = 0.75;
     incorrectTrack.volume = 0.75;
-    
+
     // DOM Elements
     const scoop = document.getElementById("scoop");
     const cone = document.getElementById("cone");
     const gameContainer = document.getElementById("gameContainer");
 
-    // Function to play background music (always the first track)
+    // Function to play the background music (always the same track)
     function playMusic() {
-      music1.currentTime = 0; // restart the song
+      music1.currentTime = 0; // restart song
       music1.play();
       music1.onended = () => {
-        // Once finished, you can either stop or restart the track.
-        // For a continuous loop, uncomment the next line:
+        // Loop the song
         playMusic();
       };
     }
 
-    // Start the game: start music and timer on first correct answer.
+    // Start game on first correct answer: start music and timer.
     function startGame() {
       if (!timerStarted) {
         timerStarted = true;
@@ -288,13 +286,13 @@
       incorrectTrack.muted = isMuted;
     }
 
-    // Close modal, then generate the first problem.
+    // Close the modal and generate the first problem.
     document.getElementById('closeModalBtn').addEventListener('click', () => {
       document.getElementById('rulesModal').style.display = 'none';
       generateProblem();
     });
 
-    // Functions for keypad input.
+    // Keypad input functions
     function appendNumber(num) {
       currentAnswer += num;
       document.getElementById("answerDisplay").textContent = currentAnswer;
@@ -308,7 +306,7 @@
     }
 
     function toggleNegative() {
-      // Toggle the negative sign on the current answer.
+      // Toggle negative sign: if answer already starts with '-', remove it; otherwise, add it.
       if (currentAnswer.startsWith('-')) {
         currentAnswer = currentAnswer.slice(1);
       } else {
@@ -322,7 +320,20 @@
       document.getElementById("answerDisplay").textContent = '0';
     }
 
-    // Submit answer function.
+    // SHOW SCOOP: This function handles making the scoop visible for a fixed time.
+    function showScoop(callback) {
+      // Immediately display the scoop.
+      scoop.style.display = "block";
+      // After 700ms, hide it and then run the callback (to generate the next problem).
+      setTimeout(() => {
+        scoop.style.display = "none";
+        if (typeof callback === "function") {
+          callback();
+        }
+      }, 700);
+    }
+
+    // Submit answer; if correct, show the scoop (via showScoop), play sound, update score, etc.
     function submitAnswer() {
       let userAnswer = parseFloat(currentAnswer);
       if (userAnswer === correctAnswer) {
@@ -330,35 +341,28 @@
           correctTrack.currentTime = 0;
           correctTrack.play();
         }
-        // Increase score based on problem type.
         score += (currentProblemType === 'hard' ? 15 : (currentProblemType === '×' || currentProblemType === '÷' ? 6 : 3));
         document.getElementById("score").textContent = score;
-        
-        // Show the scoop immediately when the answer is correct.
-        scoop.style.display = "block";
-        
-        // Hide the scoop after 700ms.
-        setTimeout(() => { 
-          scoop.style.display = "none"; 
-        }, 700);
-        
+        // Show the scoop and then, once it's hidden, generate the next problem.
+        showScoop(() => {
+          generateProblem();
+        });
         // Trigger confetti at 50 points.
         if (score >= 50 && !fiftyTriggered) {
           fiftyTriggered = true;
           launchConfetti();
         }
-        
         // 100 point celebration.
         if (score >= 100 && !hundredTriggered) {
           hundredTriggered = true;
           cone.style.boxShadow = '0 0 30px #ffee00, 0 0 60px #ff00cc';
           gameContainer.classList.add('flash');
-          setTimeout(() => { gameContainer.classList.remove('flash'); }, 600);
+          setTimeout(() => {
+            gameContainer.classList.remove('flash');
+          }, 600);
           alert("🍧 You hit 100 points! That's some serious math mojo!");
         }
-        
         startGame();
-        generateProblem();
       } else {
         if (!isMuted) {
           incorrectTrack.currentTime = 0;
@@ -371,10 +375,10 @@
       }
     }
 
-    // Generate a math problem.
+    // Generate a math problem based on mode.
     function generateProblem() {
       let a, b, c, op1, op2;
-      // Always hide the scoop when a new problem is generated.
+      // Always hide the scoop when starting a new problem.
       scoop.style.display = "none";
       
       if (mode === 'addsub') {
@@ -410,12 +414,11 @@
         currentProblemType = 'hard';
         document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
       }
-      
       currentAnswer = '';
       document.getElementById("answerDisplay").textContent = '0';
     }
 
-    // Set game mode.
+    // Change mode and generate a new problem.
     function setMode(newMode) {
       mode = newMode;
       generateProblem();
