@@ -231,6 +231,7 @@
     function setMode(newMode) {
       mode = newMode;
       generateProblem();
+  checkMilestones();
     }
 
     function appendNumber(num) {
@@ -281,6 +282,7 @@
         score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
         document.getElementById("score").textContent = score;
         generateProblem();
+  checkMilestones();
       } else {
         if (!isMuted) {
           incorrectTrack.currentTime = 0;
@@ -336,11 +338,82 @@
       score = 0;
       document.getElementById("score").textContent = "0";
       generateProblem();
+  checkMilestones();
     }
 
     window.onload = () => {
-      generateProblem();
-    };
+  generateProblem();
+  checkMilestones();
+  document.getElementById("backgroundMusic1").currentTime = 0;
+  document.getElementById("backgroundMusic1").play();
+
+  let secondsElapsed = 0;
+  let timerInterval = setInterval(() => {
+    secondsElapsed++;
+    document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+    if (secondsElapsed >= 105) { // 1:45 = 105 seconds
+      clearInterval(timerInterval);
+      alert(`🍧 Time's up! You scored ${score} points!`);
+    }
+  }, 1000);
+};
+function checkMilestones() {
+  if (score >= 50 && !window.fiftyTriggered) {
+    window.fiftyTriggered = true;
+    launchConfetti();
+  }
+  if (score >= 100 && !window.hundredTriggered) {
+    window.hundredTriggered = true;
+    document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
+    document.getElementById("gameContainer").classList.add("flash");
+    setTimeout(() => document.getElementById("gameContainer").classList.remove("flash"), 600);
+    alert("🍧 You hit 100 points! That's some serious math mojo!");
+  }
+}
+
+function launchConfetti() {
+  const canvas = document.getElementById("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let confetti = [];
+  for (let i = 0; i < 100; i++) {
+    confetti.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 10 + 10,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      tilt: Math.floor(Math.random() * 10) - 10,
+      tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+      tiltAngle: 0
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt + c.r/2, c.y);
+      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r/2);
+      ctx.stroke();
+    });
+    update();
+  }
+  function update() {
+    for (let i = 0; i < confetti.length; i++) {
+      confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
+      confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r/2) / 2;
+      confetti[i].x += Math.sin(0.01);
+      confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i/3)) * 15;
+    }
+  }
+  (function loop() {
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
 </script>
 </body>
 </html>
