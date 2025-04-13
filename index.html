@@ -218,7 +218,7 @@ function closeStoryModeModal() {
 
 function setMode(newMode) {
   mode = newMode;
-  showScoop(() => generateProblem());
+  generateProblem();
   checkMilestones();
 }
 
@@ -339,8 +339,24 @@ function generateProblem() {
 
 function resetScore() {
   score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  clearInterval(timerInterval);
   document.getElementById("score").textContent = "0";
-  showScoop(() => generateProblem());
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("timer").textContent = "Time: 0s";
+  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+  document.getElementById("gameContainer").classList.remove("flash");
+  window.fiftyTriggered = false;
+  window.hundredTriggered = false;
+  document.getElementById("scoop").style.display = "none";
+  generateProblem();
+}
+  score = 0;
+  document.getElementById("score").textContent = "0";
+  generateProblem();
   checkMilestones();
 }
 
@@ -414,7 +430,7 @@ function launchConfetti() {
 }
 
 window.onload = () => {
-  showScoop(() => generateProblem());
+  generateProblem();
 };
 </script>
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
