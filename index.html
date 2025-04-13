@@ -1,3 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Math Fest Snow Cone</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .game-container {
+      max-width: 400px;
+      margin: auto;
+    }
+
+    .snow-cone-wrapper {
+      position: relative;
+      width: 150px;
+      height: 225px;
+      margin: 30px auto 10px;
+    }
+
+    .scoop {
+      width: 150px;
+      height: 75px;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-radius: 75px 75px 0 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      z-index: 2;
+      display: none;
+    }
+
+    .snow-cone {
+      position: absolute;
+      bottom: 0;
+      width: 150px;
+      height: 150px;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      background: linear-gradient(to bottom, #ffff99, #ffee00);
+      box-shadow: 0 0 10px #fff, 0 0 20px yellow;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .cone-text a {
+      color: black;
+      text-decoration: none;
+      font-size: 20px;
+      line-height: 1.2;
+      z-index: 3;
+    }
+
+    .score-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .score {
+      font-size: 20px;
+      color: #00ff88;
+    }
+
+    #timer {
+      font-size: 16px;
+      color: #00ccff;
+    }
+
+    .reset-button {
+      background-color: #00ccff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #00ccff;
+      cursor: pointer;
+    }
+
+    .math-problem {
+      font-size: 28px;
+      margin: 15px 0 10px;
+    }
+
+    .answer-display {
+      font-size: 36px;
+      color: #ff00cc;
+      margin-bottom: 20px;
+    }
+
+    .mode-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .mode-buttons button {
+      background-color: #00ff88;
+      color: black;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #00ff88;
+      cursor: pointer;
+      width: 80px;
+      height: 50px;
+      line-height: 1.1;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 320px;
+      margin: auto;
+    }
+
+    .keypad button {
+      background-color: #ff00cc;
+      border: none;
+      color: white;
+      font-size: 20px;
+      padding: 15px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ff00cc;
+      cursor: pointer;
+    }
+
+    canvas.confetti {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+    }
+  </style>
+</head>
 <body>
 
 <canvas id="confettiCanvas" class="confetti"></canvas>
@@ -9,17 +161,13 @@
     <button class="reset-button" onclick="resetScore()">Reset Score</button>
   </div>
 
-  <div class="snow-cone-wrapper" id="coneWrapper">
+  <div class="snow-cone-wrapper">
     <div id="scoop" class="scoop"></div>
     <div class="snow-cone" id="cone">
       <div class="cone-text">
         <a href="#" onclick="showRules()">Math<br>Fest</a>
       </div>
     </div>
-  </div>
-
-  <div id="nowPlaying" style="color:#00ccff; font-size:14px; margin-bottom:10px; display:none;">
-    🎧 Now Playing: <span id="trackName">—</span>
   </div>
 
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
@@ -54,7 +202,7 @@
   </div>
 </div>
 
-<!-- Instructions Modal -->
+<!-- Modal -->
 <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
     <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
@@ -64,37 +212,18 @@
       ✖️➗ Multiply & Divide: <strong>+6 points</strong><br>
       💀 Hard Mode: <strong>+15 points</strong><br>
       😵 Any wrong answer: <strong>-3 points</strong><br><br>
-      🍧 Hit 60 seconds with 50+ points = Confetti fiesta, dude.
+      🍧 The song is 1:45 long — when it ends, the round ends.
     </p>
     <button onclick="hideRules()" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
 
-<!-- SFX -->
-<audio id="correctSound" src="correct.mp3"></audio>
-<audio id="incorrectSound" src="incorrect.mp3"></audio>
-  
+<!-- Audio -->
+<audio id="backgroundMusic" src="quikserveST- All.mp3" preload="auto"></audio>
+<audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+<audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
+
 <script>
-  const trackList = [
-    'quikserveST- drums.mp3',
-    'quikserveST- drumsbass.mp3',
-    'quikserveST- drumsbasspiano.mp3',
-    'quikserveST- Melody 1.mp3',
-    'quikserveST- Melody 2.mp3',
-    'quikserveST- Melody Arp.mp3',
-    'quikserveST- Melody Pad.mp3'
-  ];
-
-  let audioElements = trackList.map(src => {
-    const audio = new Audio(src);
-    audio.preload = 'auto';
-    audio.loop = false;
-    return audio;
-  });
-
-  let currentTrackIndex = 0;
-  let loopCount = 0;
-  let forward = true;
   let score = 0;
   let currentAnswer = '';
   let correctAnswer = 0;
@@ -105,92 +234,45 @@
   let timerInterval = null;
   let gameEnded = false;
   let isMuted = false;
-  let confettiTriggered = false;
+  const music = document.getElementById("backgroundMusic");
 
-  const trackDisplay = document.getElementById('nowPlaying');
-  const trackNameEl = document.getElementById('trackName');
-  const scoop = document.getElementById('scoop');
-  const cone = document.getElementById('cone');
-  const confettiCanvas = document.getElementById('confettiCanvas');
-  const ctx = confettiCanvas.getContext('2d');
-  let confettiPieces = [];
-
-  function showNowPlaying(name) {
-    trackDisplay.style.display = 'block';
-    trackNameEl.textContent = name.replace('quikserveST- ', '').replace('.mp3', '');
+  function hideRules() {
+    document.getElementById("rulesModal").style.display = "none";
+    generateProblem();
   }
 
-  function playNextTrack() {
-    if (currentTrackIndex < 0 || currentTrackIndex >= audioElements.length) return;
-
-    const currentAudio = audioElements[currentTrackIndex];
-    showNowPlaying(trackList[currentTrackIndex]);
-
-    currentAudio.currentTime = 0;
-    currentAudio.play();
-
-    currentAudio.onended = () => {
-      loopCount++;
-      if (loopCount < 2) {
-        currentAudio.currentTime = 0;
-        currentAudio.play();
-      } else {
-        loopCount = 0;
-        if (forward) {
-          currentTrackIndex++;
-          if (currentTrackIndex >= audioElements.length) {
-            forward = false;
-            currentTrackIndex = audioElements.length - 1;
-          }
-        } else {
-          currentTrackIndex--;
-          if (currentTrackIndex < 0) {
-            endGameSetlist();
-            return;
-          }
-        }
-        playNextTrack();
-      }
-    };
-  }
-
-  function startSetlist() {
+  function startGame() {
     if (!timerStarted) {
       timerStarted = true;
+      music.play();
       startTimer();
-      playNextTrack();
+      music.onended = () => {
+        endGame();
+      };
     }
+  }
+
+  function endGame() {
+    clearInterval(timerInterval);
+    gameEnded = true;
+    document.getElementById('timer').textContent = 'Set complete!';
+    setTimeout(() => {
+      alert(`🍧 Whoa, the band just played their last chord.\nYou scored ${score} points this set.\nThat was one righteous math jam.\nCome back for the next set when you're feelin’ the numbers.`);
+    }, 500);
   }
 
   function startTimer() {
     timerInterval = setInterval(() => {
       secondsElapsed++;
-      document.getElementById('timer').textContent = `Time: ${secondsElapsed}s`;
-      if (secondsElapsed >= 60 && score > 50 && !confettiTriggered) {
-        launchConfetti(2);
-        confettiTriggered = true;
-      }
+      document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
     }, 1000);
-  }
-
-  function endGameSetlist() {
-    gameEnded = true;
-    clearInterval(timerInterval);
-    document.getElementById('timer').textContent = 'Set complete!';
-    setTimeout(() => {
-      alert(`🍧 Whoa, the band just played their last chord.\nYou scored ${score} points this set.\nThat was one righteous math jam.\nCome back for the next set when you're feelin’ the numbers.`);
-    }, 400);
-  }
-
-  function resetScore() {
-    location.reload();
   }
 
   function toggleMute() {
     isMuted = !isMuted;
-    audioElements.forEach(a => a.muted = isMuted);
-    document.getElementById('correctSound').muted = isMuted;
-    document.getElementById('incorrectSound').muted = isMuted;
+    music.muted = isMuted;
+    document.getElementById("correctSound").muted = isMuted;
+    document.getElementById("incorrectSound").muted = isMuted;
   }
 
   function appendNumber(num) {
@@ -206,11 +288,7 @@
   }
 
   function toggleNegative() {
-    if (currentAnswer.startsWith('-')) {
-      currentAnswer = currentAnswer.slice(1);
-    } else {
-      currentAnswer = '-' + currentAnswer;
-    }
+    currentAnswer = currentAnswer.startsWith('-') ? currentAnswer.slice(1) : '-' + currentAnswer;
     updateDisplay();
   }
 
@@ -220,43 +298,45 @@
   }
 
   function updateDisplay() {
-    document.getElementById('answerDisplay').textContent = currentAnswer || '0';
+    document.getElementById("answerDisplay").textContent = currentAnswer || '0';
   }
 
   function submitAnswer() {
     if (gameEnded) return;
-
     const answer = parseFloat(currentAnswer);
-    if (!timerStarted) {
-      startSetlist();
-    }
+    if (!timerStarted) startGame();
 
     if (answer === correctAnswer) {
-      pulseCone();
       let points = 3;
       if (currentProblemType === '×' || currentProblemType === '÷') points = 6;
       if (currentProblemType === 'hard') points = 15;
       score += points;
-      document.getElementById('score').textContent = score;
-      scoop.style.display = 'block';
-      if (!isMuted) document.getElementById('correctSound').play().catch(() => {});
-      if (score >= 100) {
-        flashCone();
-        launchConfetti(2);
-      }
-      setTimeout(generateProblem, 800);
+      document.getElementById("score").textContent = score;
+      document.getElementById("scoop").style.display = "block";
+      if (!isMuted) document.getElementById("correctSound").play().catch(() => {});
+      setTimeout(generateProblem, 700);
     } else {
       score -= 3;
-      document.getElementById('score').textContent = score;
-      if (!isMuted) document.getElementById('incorrectSound').play().catch(() => {});
+      document.getElementById("score").textContent = score;
+      if (!isMuted) document.getElementById("incorrectSound").play().catch(() => {});
       alert("Oops! Try again.");
       clearAnswer();
     }
   }
 
+  function resetScore() {
+    location.reload();
+  }
+
+  function setMode(newMode) {
+    if (!gameEnded) {
+      mode = newMode;
+      generateProblem();
+    }
+  }
+
   function generateProblem() {
     let a, b, c, op1, op2;
-
     if (mode === 'addsub') {
       a = Math.floor(Math.random() * 10);
       b = Math.floor(Math.random() * 10);
@@ -264,20 +344,20 @@
       if (op1 === '-' && b > a) [a, b] = [b, a];
       correctAnswer = op1 === '+' ? a + b : a - b;
       currentProblemType = op1;
-      document.getElementById('problem').textContent = `${a} ${op1} ${b} = 🍧`;
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
     } else if (mode === 'multdiv') {
       if (Math.random() > 0.5) {
         a = Math.floor(Math.random() * 10);
         b = Math.floor(Math.random() * 10);
         correctAnswer = a * b;
         currentProblemType = '×';
-        document.getElementById('problem').textContent = `${a} × ${b} = 🍧`;
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
       } else {
         b = Math.floor(Math.random() * 9) + 1;
         correctAnswer = Math.floor(Math.random() * 10);
         a = b * correctAnswer;
         currentProblemType = '÷';
-        document.getElementById('problem').textContent = `${a} ÷ ${b} = 🍧`;
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
       }
     } else {
       a = Math.floor(Math.random() * 10);
@@ -285,73 +365,17 @@
       c = Math.floor(Math.random() * 9) + 1;
       op1 = Math.random() > 0.5 ? '+' : '-';
       op2 = Math.random() > 0.5 ? '×' : '÷';
-      const inner = op1 === '+' ? a + b : a - b;
+      let inner = op1 === '+' ? a + b : a - b;
       correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
       currentProblemType = 'hard';
-      document.getElementById('problem').textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
     }
 
     currentAnswer = '';
     updateDisplay();
-    scoop.style.display = 'none';
-  }
-
-  function setMode(newMode) {
-    if (gameEnded) return;
-    mode = newMode;
-    generateProblem();
-  }
-
-  function pulseCone() {
-    cone.style.transition = 'transform 0.2s ease';
-    cone.style.transform = 'scale(1.05)';
-    setTimeout(() => cone.style.transform = 'scale(1)', 200);
-  }
-
-  function flashCone() {
-    cone.style.boxShadow = '0 0 25px #ffee00, 0 0 60px #ff00cc';
-    setTimeout(() => cone.style.boxShadow = '', 1000);
-  }
-
-  function showRules() {
-    document.getElementById('rulesModal').style.display = 'flex';
-  }
-
-  function hideRules() {
-    document.getElementById('rulesModal').style.display = 'none';
-    generateProblem(); // show first problem after rules
-  }
-
-  function launchConfetti(mult = 1) {
-    const colors = ['#ff00cc', '#00ff88', '#00ccff', '#ffee00'];
-    for (let i = 0; i < 100 * mult; i++) {
-      confettiPieces.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * -50,
-        size: Math.random() * 10 + 5,
-        speedY: Math.random() * 3 + 2,
-        color: colors[Math.floor(Math.random() * colors.length)]
-      });
-    }
-    animateConfetti();
-  }
-
-  function animateConfetti() {
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
-    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    confettiPieces.forEach(p => {
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
-      p.y += p.speedY;
-    });
-    confettiPieces = confettiPieces.filter(p => p.y < window.innerHeight);
-    if (confettiPieces.length > 0) {
-      requestAnimationFrame(animateConfetti);
-    }
+    document.getElementById("scoop").style.display = "none";
   }
 </script>
+
 </body>
 </html>
