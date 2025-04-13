@@ -231,8 +231,8 @@
 
   <!-- Audio Elements -->
   <audio id="backgroundMusic1" src="quikserveST- All.mp3" preload="auto"></audio>
-  <audio id="backgroundMusic2" src="quikserveST- All2.mp3" preload="auto"></audio>
-  <audio id="backgroundMusic3" src="quikserveST- All3.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic2" src="quikserveST- All1.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic3" src="quikserveST- All2.mp3" preload="auto"></audio>
   <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
   <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
@@ -492,6 +492,16 @@
     // Reset the game (reload the page)
     function resetScore() {
       location.reload();
+    }
+
+    // Toggle the negative sign on the current answer
+    function toggleNegative() {
+      if (currentAnswer.startsWith('-')) {
+        currentAnswer = currentAnswer.slice(1); // Remove the negative sign
+      } else {
+        currentAnswer = '-' + currentAnswer; // Add the negative sign
+      }
+      document.getElementById("answerDisplay").textContent = currentAnswer;
     }
   </script>
 
