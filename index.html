@@ -161,7 +161,6 @@
 <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
 </div>
 </div>
-
 <canvas class="confetti" id="confettiCanvas"></canvas>
 <div class="game-container" id="gameContainer">
 <div class="score-bar">
@@ -233,7 +232,7 @@ function closeStoryModeModal() {
 
 function setMode(newMode) {
   mode = newMode;
-  showScoop(() => generateProblem());
+  generateProblem();
   checkMilestones();
 }
 
@@ -279,7 +278,11 @@ function submitAnswer() {
         document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
-          alert(`🍧 Time's up! You scored ${score} points!`);
+          alert(`🍧 The band just jammed their final chord, traveler.
+
+You chilled out and scored ${score} points.
+
+That's cosmic. Until the next fest... ✌️🍧🌀`);
         }
       }, 1000);
     }
@@ -354,8 +357,24 @@ function generateProblem() {
 
 function resetScore() {
   score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  clearInterval(timerInterval);
   document.getElementById("score").textContent = "0";
-  showScoop(() => generateProblem());
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("timer").textContent = "Time: 0s";
+  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+  document.getElementById("gameContainer").classList.remove("flash");
+  document.getElementById("scoop").style.display = "none";
+  window.fiftyTriggered = false;
+  window.hundredTriggered = false;
+  document.getElementById("rulesModal").style.display = "flex";
+}
+  score = 0;
+  document.getElementById("score").textContent = "0";
+  generateProblem();
   checkMilestones();
 }
 
@@ -429,7 +448,7 @@ function launchConfetti() {
 }
 
 window.onload = () => {
-  showScoop(() => generateProblem());
+  generateProblem();
 };
 
 document.addEventListener("DOMContentLoaded", () => {
