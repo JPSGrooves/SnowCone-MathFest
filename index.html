@@ -161,7 +161,6 @@
 <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
 </div>
 </div>
-
 <canvas class="confetti" id="confettiCanvas"></canvas>
 <div class="game-container" id="gameContainer">
 <div class="score-bar">
@@ -448,9 +447,27 @@ window.onload = () => {
   generateProblem();
 };
 
-document.getElementById("closeModalBtn").addEventListener("click", () => {
   document.getElementById("rulesModal").style.display = "none";
   generateProblem();
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const modalBtn = document.getElementById("closeModalBtn");
+  if (modalBtn) {
+    modalBtn.addEventListener("click", () => {
+      document.getElementById("rulesModal").style.display = "none";
+      score = 0;
+      currentAnswer = "";
+      correctAnswer = 0;
+      timerStarted = false;
+      secondsElapsed = 0;
+      document.getElementById("score").textContent = "0";
+      document.getElementById("answerDisplay").textContent = "0";
+      document.getElementById("timer").textContent = "Time: 0s";
+      window.fiftyTriggered = false;
+      window.hundredTriggered = false;
+      generateProblem();
+    });
+  }
 });
 </script>
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
