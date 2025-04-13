@@ -218,7 +218,7 @@ function closeStoryModeModal() {
 
 function setMode(newMode) {
   mode = newMode;
-  generateProblem();
+  showScoop(() => generateProblem());
   checkMilestones();
 }
 
@@ -283,8 +283,10 @@ function submitAnswer() {
     document.getElementById("score").textContent = score;
 
     showScoop(() => {
+      showScoop(() => {
       generateProblem();
       checkMilestones();
+    });
     });
   } else {
     if (!isMuted) {
@@ -356,7 +358,7 @@ function resetScore() {
 }
   score = 0;
   document.getElementById("score").textContent = "0";
-  generateProblem();
+  showScoop(() => generateProblem());
   checkMilestones();
 }
 
@@ -430,7 +432,7 @@ function launchConfetti() {
 }
 
 window.onload = () => {
-  generateProblem();
+  showScoop(() => generateProblem());
 };
 </script>
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
