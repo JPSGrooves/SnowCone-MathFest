@@ -12,19 +12,16 @@
       text-align: center;
       padding: 20px;
     }
-
     .game-container {
       max-width: 400px;
       margin: auto;
     }
-
     .snow-cone-wrapper {
       position: relative;
       width: 150px;
       height: 225px;
       margin: 30px auto 10px;
     }
-
     .scoop {
       width: 150px;
       height: 75px;
@@ -37,7 +34,6 @@
       z-index: 2;
       display: none;
     }
-
     .snow-cone {
       position: absolute;
       bottom: 0;
@@ -52,7 +48,6 @@
       z-index: 1;
       transition: box-shadow 0.3s ease;
     }
-
     .cone-text a {
       color: black;
       text-decoration: none;
@@ -60,24 +55,20 @@
       line-height: 1.2;
       z-index: 3;
     }
-
     .score-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }
-
     .score {
       font-size: 20px;
       color: #00ff88;
     }
-
     #timer {
       font-size: 16px;
       color: #00ccff;
     }
-
     .reset-button {
       background-color: #00ccff;
       color: white;
@@ -88,25 +79,21 @@
       box-shadow: 0 0 10px #00ccff;
       cursor: pointer;
     }
-
     .math-problem {
       font-size: 28px;
       margin: 15px 0 10px;
     }
-
     .answer-display {
       font-size: 36px;
       color: #ff00cc;
       margin-bottom: 20px;
     }
-
     .mode-buttons {
       display: flex;
       justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
     }
-
     .mode-buttons button {
       background-color: #00ff88;
       color: black;
@@ -120,7 +107,6 @@
       height: 50px;
       line-height: 1.1;
     }
-
     .keypad {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -128,7 +114,6 @@
       max-width: 320px;
       margin: auto;
     }
-
     .keypad button {
       background-color: #ff00cc;
       border: none;
@@ -139,7 +124,6 @@
       box-shadow: 0 0 10px #ff00cc;
       cursor: pointer;
     }
-
     canvas.confetti {
       position: fixed;
       pointer-events: none;
@@ -149,11 +133,9 @@
       height: 100vh;
       z-index: 9999;
     }
-
     .flash {
       animation: flashEffect 0.5s ease-in-out;
     }
-
     @keyframes flashEffect {
       0% { background: black; }
       50% { background: #ffee00; }
@@ -163,213 +145,279 @@
 </head>
 <body>
 
-<canvas id="confettiCanvas" class="confetti"></canvas>
+  <canvas id="confettiCanvas" class="confetti"></canvas>
 
-<div class="game-container" id="gameContainer">
-  <div class="score-bar">
-    <div class="score">Score: <span id="score">0</span></div>
-    <div id="timer">Time: 0s</div>
-    <button class="reset-button" onclick="resetScore()">Reset Score</button>
-  </div>
+  <div class="game-container" id="gameContainer">
+    <div class="score-bar">
+      <div class="score">Score: <span id="score">0</span></div>
+      <div id="timer">Time: 0s</div>
+      <button class="reset-button" onclick="resetScore()">Reset Score</button>
+    </div>
 
-  <div class="snow-cone-wrapper">
-    <div id="scoop" class="scoop"></div>
-    <div class="snow-cone" id="cone">
-      <div class="cone-text">
-        <a href="#" onclick="showRules()">Math<br>Fest</a>
+    <div class="snow-cone-wrapper">
+      <div id="scoop" class="scoop"></div>
+      <div class="snow-cone" id="cone">
+        <div class="cone-text">
+          <a href="#" onclick="showRules()">Math<br>Fest</a>
+        </div>
       </div>
+    </div>
+
+    <div class="math-problem" id="problem">0 + 0 = 🍧</div>
+    <div class="answer-display" id="answerDisplay">0</div>
+
+    <div class="mode-buttons">
+      <button onclick="setMode('addsub')">+/-</button>
+      <button onclick="setMode('multdiv')">X-/</button>
+      <button onclick="setMode('hard')">Hard<br>Mode</button>
+    </div>
+
+    <div class="keypad">
+      <button onclick="appendNumber(7)">7</button>
+      <button onclick="appendNumber(8)">8</button>
+      <button onclick="appendNumber(9)">9</button>
+      <button onclick="submitAnswer()">Enter</button>
+
+      <button onclick="appendNumber(4)">4</button>
+      <button onclick="appendNumber(5)">5</button>
+      <button onclick="appendNumber(6)">6</button>
+      <button onclick="clearAnswer()">Clear</button>
+
+      <button onclick="appendNumber(1)">1</button>
+      <button onclick="appendNumber(2)">2</button>
+      <button onclick="appendNumber(3)">3</button>
+      <button onclick="toggleNegative()">-</button>
+
+      <button onclick="appendDecimal()">.</button>
+      <button onclick="appendNumber(0)">0</button>
+      <button onclick="toggleMute()">Mute</button>
+      <div></div>
     </div>
   </div>
 
-  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
-  <div class="answer-display" id="answerDisplay">0</div>
-
-  <div class="mode-buttons">
-    <button onclick="setMode('addsub')">+/-</button>
-    <button onclick="setMode('multdiv')">X-/</button>
-    <button onclick="setMode('hard')">Hard<br>Mode</button>
+  <!-- Modal -->
+  <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+      <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
+      <p style="font-size:16px; line-height:1.5;">
+        Welcome to the fest, where math is funky and cones are fresh.<br><br>
+        ➕➖ Add & Subtract: <strong>+3 points</strong><br>
+        ✖️➗ Multiply & Divide: <strong>+6 points</strong><br>
+        💀 Hard Mode: <strong>+15 points</strong><br>
+        😵 Any wrong answer: <strong>-3 points</strong><br><br>
+        🍧 The song is 1:45 long — when it ends, the round ends.
+      </p>
+      <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+    </div>
   </div>
 
-  <div class="keypad">
-    <button onclick="appendNumber(7)">7</button>
-    <button onclick="appendNumber(8)">8</button>
-    <button onclick="appendNumber(9)">9</button>
-    <button onclick="submitAnswer()">Enter</button>
+  <!-- Audio Elements -->
+  <!-- Note: We are using three music tracks (with filenames quikserveST- All1.mp3, All2.mp3, All3.mp3).
+       If you prefer to use quikserveST- All.mp3 for one of them, update the corresponding src attribute. -->
+  <audio id="backgroundMusic1" src="quikserveST- All.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic2" src="quikserveST- All1.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic3" src="quikserveST- All2.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+  <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
 
-    <button onclick="appendNumber(4)">4</button>
-    <button onclick="appendNumber(5)">5</button>
-    <button onclick="appendNumber(6)">6</button>
-    <button onclick="clearAnswer()">Clear</button>
+  <script>
+    // Global Variables
+    let score = 0;
+    let currentAnswer = '';
+    let correctAnswer = 0;
+    let currentProblemType = '+';
+    let mode = 'addsub';
+    let timerStarted = false;
+    let secondsElapsed = 0;
+    let timerInterval = null;
+    let gameEnded = false;
+    let isMuted = false;
+    let fiftyTriggered = false;
+    let hundredTriggered = false;
 
-    <button onclick="appendNumber(1)">1</button>
-    <button onclick="appendNumber(2)">2</button>
-    <button onclick="appendNumber(3)">3</button>
-    <button onclick="toggleNegative()">-</button>
+    // Audio References
+    const music1 = document.getElementById("backgroundMusic1");
+    const music2 = document.getElementById("backgroundMusic2");
+    const music3 = document.getElementById("backgroundMusic3");
+    const correctTrack = document.getElementById("correctSound");
+    const incorrectTrack = document.getElementById("incorrectSound");
 
-    <button onclick="appendDecimal()">.</button>
-    <button onclick="appendNumber(0)">0</button>
-    <button onclick="toggleMute()">Mute</button>
-    <div></div>
-  </div>
-</div>
+    // Set volumes for the feedback sounds (75% volume)
+    correctTrack.volume = 0.75;
+    incorrectTrack.volume = 0.75;
 
-<!-- Modal -->
-<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br><br>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br>
-      💀 Hard Mode: <strong>+15 points</strong><br>
-      😵 Any wrong answer: <strong>-3 points</strong><br><br>
-      🍧 The song is 1:45 long — when it ends, the round ends.
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
-  </div>
-</div>
+    // DOM Elements
+    const scoop = document.getElementById("scoop");
+    const cone = document.getElementById("cone");
+    const gameContainer = document.getElementById("gameContainer");
 
-<!-- Audio -->
-<audio id="backgroundMusic1" src="quikserveST- All1.mp3" preload="auto"></audio>
-<audio id="backgroundMusic2" src="quikserveST- All2.mp3" preload="auto"></audio>
-<audio id="backgroundMusic3" src="quikserveST- All3.mp3" preload="auto"></audio>
-<audio id="correctSound" src="correct.mp3" preload="auto"></audio>
-<audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
-
-<script>
-  let score = 0;
-  let currentAnswer = '';
-  let correctAnswer = 0;
-  let currentProblemType = '+';
-  let mode = 'addsub';
-  let timerStarted = false;
-  let secondsElapsed = 0;
-  let timerInterval = null;
-  let gameEnded = false;
-  let isMuted = false;
-  let fiftyTriggered = false;
-  let hundredTriggered = false;
-  const music1 = document.getElementById("backgroundMusic1");
-  const music2 = document.getElementById("backgroundMusic2");
-  const music3 = document.getElementById("backgroundMusic3");
-  const correctTrack = document.getElementById("correctSound");
-  const incorrectTrack = document.getElementById("incorrectSound");
-
-  const scoop = document.getElementById("scoop");
-  const cone = document.getElementById("cone");
-  const gameContainer = document.getElementById("gameContainer");
-
-  // Function to pick a random song and play it
-  function playRandomSong() {
-    const songs = [music1, music2, music3];
-    const randomSong = songs[Math.floor(Math.random() * songs.length)];
-    randomSong.play();
-    randomSong.onended = () => {
-      endGame();
-    };
-  }
-
-  // Volume adjustments for correct/incorrect sounds
-  correctTrack.volume = 0.75;
-  incorrectTrack.volume = 0.75;
-
-  // Start the game after first answer
-  function startGame() {
-    if (!timerStarted) {
-      timerStarted = true;
-      playRandomSong();
-      startTimer();
+    // Function to pick a random music track and play it.
+    // When the track ends, it calls endGame().
+    function playRandomSong() {
+      const songs = [music1, music2, music3];
+      const randomSong = songs[Math.floor(Math.random() * songs.length)];
+      randomSong.currentTime = 0; // restart the track
+      randomSong.play();
+      randomSong.onended = () => {
+        endGame();
+      };
     }
-  }
 
-  function endGame() {
-    clearInterval(timerInterval);
-    gameEnded = true;
-    document.getElementById('timer').textContent = 'Set complete!';
-    setTimeout(() => {
-      alert(`🍧 Whoa, the band just played their last chord.\nYou scored ${score} points this set.\nThat was one righteous math jam.\nCome back for the next set when you're feelin’ the numbers.`);
-    }, 500);
-  }
+    // Start the music and timer on first correct answer.
+    function startGame() {
+      if (!timerStarted) {
+        timerStarted = true;
+        playRandomSong();
+        startTimer();
+      }
+    }
 
-  function startTimer() {
-    timerInterval = setInterval(() => {
-      secondsElapsed++;
-      document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
-    }, 1000);
-  }
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+      }, 1000);
+    }
 
-  function toggleMute() {
-    isMuted = !isMuted;
-    music1.muted = isMuted;
-    music2.muted = isMuted;
-    music3.muted = isMuted;
-    correctTrack.muted = isMuted;
-    incorrectTrack.muted = isMuted;
-  }
+    function endGame() {
+      clearInterval(timerInterval);
+      gameEnded = true;
+      document.getElementById('timer').textContent = 'Set complete!';
+      setTimeout(() => {
+        alert(`🍧 Whoa, the band just played their last chord.\nYou scored ${score} points this set.\nThat was one righteous math jam.\nCome back for the next set when you're feelin’ the numbers.`);
+      }, 500);
+    }
 
-  // Function to close the modal and start the game
-  document.getElementById('closeModalBtn').addEventListener('click', () => {
-    document.getElementById('rulesModal').style.display = 'none';
-    generateProblem();  // Start game by generating the first problem
-  });
+    function toggleMute() {
+      isMuted = !isMuted;
+      music1.muted = isMuted;
+      music2.muted = isMuted;
+      music3.muted = isMuted;
+      correctTrack.muted = isMuted;
+      incorrectTrack.muted = isMuted;
+    }
 
-  // Append a number to the current answer
-  function appendNumber(num) {
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-
-  // Clear the current answer input
-  function clearAnswer() {
-    currentAnswer = '';
-    document.getElementById("answerDisplay").textContent = '0';
-  }
-
-  // Submit the answer and check if it’s correct
-  function submitAnswer() {
-    if (parseFloat(currentAnswer) === correctAnswer) {
-      score += 3;  // Increment score for correct answer
-      document.getElementById("score").textContent = score;
-      scoop.style.display = "block";
-      startGame();
+    // When closing the modal, simply hide it and generate the first problem.
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      document.getElementById('rulesModal').style.display = 'none';
       generateProblem();
-    } else {
-      score -= 3;  // Decrease score for incorrect answer
-      document.getElementById("score").textContent = score;
-      alert("Incorrect! Try again.");
-      clearAnswer();
-    }
-  }
+    });
 
-  // Generate math problem based on current mode
-  function generateProblem() {
-    let a, b;
-    if (mode === 'addsub') {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
-      correctAnswer = a + b;
-      document.getElementById("problem").textContent = `${a} + ${b} = 🍧`;
-    } else if (mode === 'multdiv') {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
-      correctAnswer = a * b;
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-    } else {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
-      correctAnswer = a * b;
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    // Input Functions
+    function appendNumber(num) {
+      currentAnswer += num;
+      document.getElementById("answerDisplay").textContent = currentAnswer;
     }
-    currentAnswer = '';
-    document.getElementById("answerDisplay").textContent = '0';
-  }
 
-  // Change modes based on button clicked
-  function setMode(newMode) {
-    mode = newMode;
-    generateProblem();
-  }
-</script>
+    function appendDecimal() {
+      if (!currentAnswer.includes('.')) {
+        currentAnswer += currentAnswer === '' ? '0.' : '.';
+        document.getElementById("answerDisplay").textContent = currentAnswer;
+      }
+    }
+
+    function toggleNegative() {
+      currentAnswer = currentAnswer.startsWith('-') ? currentAnswer.slice(1) : '-' + currentAnswer;
+      document.getElementById("answerDisplay").textContent = currentAnswer;
+    }
+
+    function clearAnswer() {
+      currentAnswer = '';
+      document.getElementById("answerDisplay").textContent = '0';
+    }
+
+    // Submit answer and check correctness.
+    function submitAnswer() {
+      let userAnswer = parseFloat(currentAnswer);
+      if (userAnswer === correctAnswer) {
+        // Play correct sound
+        if (!isMuted) {
+          correctTrack.currentTime = 0;
+          correctTrack.play();
+        }
+        score += (currentProblemType === 'hard' ? 15 : (currentProblemType === '×' || currentProblemType === '÷' ? 6 : 3));
+        document.getElementById("score").textContent = score;
+        scoop.style.display = "block";
+        // Hide the scoop shortly after to mimic the original animation behavior
+        setTimeout(() => {
+          scoop.style.display = "none";
+        }, 700);
+        // Start the game if not already started (music/timer)
+        startGame();
+        generateProblem();
+      } else {
+        // Play incorrect sound
+        if (!isMuted) {
+          incorrectTrack.currentTime = 0;
+          incorrectTrack.play();
+        }
+        score -= 3;
+        document.getElementById("score").textContent = score;
+        alert("Incorrect! Try again.");
+        clearAnswer();
+      }
+    }
+
+    // Generate a math problem based on the selected mode.
+    function generateProblem() {
+      let a, b, c, op1, op2;
+      // Hide the scoop on each new problem.
+      scoop.style.display = "none";
+      
+      if (mode === 'addsub') {
+        a = Math.floor(Math.random() * 10);
+        b = Math.floor(Math.random() * 10);
+        // Randomly decide between addition and subtraction.
+        op1 = Math.random() > 0.5 ? '+' : '-';
+        // Ensure non-negative results for subtraction.
+        if (op1 === '-' && b > a) [a, b] = [b, a];
+        correctAnswer = op1 === '+' ? a + b : a - b;
+        currentProblemType = op1;
+        document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+      } else if (mode === 'multdiv') {
+        // Randomly choose between multiplication and division.
+        if (Math.random() > 0.5) {
+          a = Math.floor(Math.random() * 10);
+          b = Math.floor(Math.random() * 10);
+          correctAnswer = a * b;
+          currentProblemType = '×';
+          document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+        } else {
+          b = Math.floor(Math.random() * 9) + 1;
+          correctAnswer = Math.floor(Math.random() * 10);
+          a = b * correctAnswer;
+          currentProblemType = '÷';
+          document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+        }
+      } else if (mode === 'hard') {
+        // Hard mode: combine two operations.
+        a = Math.floor(Math.random() * 10);
+        b = Math.floor(Math.random() * 10);
+        c = Math.floor(Math.random() * 9) + 1;
+        op1 = Math.random() > 0.5 ? '+' : '-';
+        op2 = Math.random() > 0.5 ? '×' : '÷';
+        let inner = op1 === '+' ? a + b : a - b;
+        correctAnswer = op2 === '×' ? inner * c : Math.floor(inner / c);
+        currentProblemType = 'hard';
+        document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+      }
+      
+      // Reset the answer display.
+      currentAnswer = '';
+      document.getElementById("answerDisplay").textContent = '0';
+    }
+
+    // Change game mode and generate a new problem.
+    function setMode(newMode) {
+      mode = newMode;
+      generateProblem();
+    }
+
+    // Reset the game (reload the page)
+    function resetScore() {
+      location.reload();
+    }
+  </script>
 
 </body>
 </html>
