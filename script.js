@@ -1,5 +1,3 @@
-// script.js - core game logic for Snowcone Math
-
 let score = 0;
 let currentAnswer = "";
 let correctAnswer = 0;
@@ -200,8 +198,8 @@ function launchConfetti() {
       ctx.beginPath();
       ctx.lineWidth = c.r;
       ctx.strokeStyle = c.color;
-      ctx.moveTo(c.x + c.tilt + c.r/2, c.y);
-      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r/2);
+      ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
       ctx.stroke();
     });
     update();
@@ -209,9 +207,9 @@ function launchConfetti() {
   function update() {
     for (let i = 0; i < confetti.length; i++) {
       confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
-      confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r/2) / 2;
+      confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
       confetti[i].x += Math.sin(0.01);
-      confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i/3)) * 15;
+      confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
     }
   }
   (function loop() {
