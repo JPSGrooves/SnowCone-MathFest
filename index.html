@@ -366,7 +366,6 @@ function resetScore() {
   document.getElementById("scoop").style.display = "none";
   window.fiftyTriggered = false;
   window.hundredTriggered = false;
-  document.getElementById("rulesModal").style.display = "flex";
 }
   score = 0;
   document.getElementById("score").textContent = "0";
@@ -447,14 +446,11 @@ window.onload = () => {
   generateProblem();
 };
 
-  document.getElementById("rulesModal").style.display = "none";
   generateProblem();
 });
 document.addEventListener("DOMContentLoaded", () => {
-  const modalBtn = document.getElementById("closeModalBtn");
   if (modalBtn) {
     modalBtn.addEventListener("click", () => {
-      document.getElementById("rulesModal").style.display = "none";
       score = 0;
       currentAnswer = "";
       correctAnswer = 0;
@@ -469,6 +465,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+window.onload = () => {
+  const modal = document.getElementById("rulesModal");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  if (modal && closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      generateProblem();
+    });
+  } else {
+    generateProblem();
+  }
+};
 </script>
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
 <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
