@@ -230,7 +230,7 @@
 
     function setMode(newMode) {
       mode = newMode;
-      generateProblem();
+      showScoop(() => generateProblem());
   checkMilestones();
     }
 
@@ -275,10 +275,19 @@ function submitAnswer() {
       let userAnswer = parseFloat(currentAnswer);
       if (userAnswer === correctAnswer) {
     if (!timerStarted) {
-      timerStarted = true;
-      timerInterval = setInterval(() => {
-        secondsElapsed++;
-        document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+    timerStarted = true;
+    const music = document.getElementById("backgroundMusic1");
+    music.currentTime = 0;
+    music.play().catch(e => console.warn("Music play failed:", e));
+    timerInterval = setInterval(() => {
+      secondsElapsed++;
+      document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+      if (secondsElapsed >= 105) {
+        clearInterval(timerInterval);
+        alert(`🍧 Time's up! You scored ${score} points!`);
+      }
+    }, 1000);
+  }s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
           alert(`🍧 Time's up! You scored ${score} points!`);
@@ -296,7 +305,7 @@ function submitAnswer() {
         }
         score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
         document.getElementById("score").textContent = score;
-        generateProblem();
+        showScoop(() => generateProblem());
   checkMilestones();
       } else {
         if (!isMuted) {
@@ -352,12 +361,12 @@ function submitAnswer() {
     function resetScore() {
       score = 0;
       document.getElementById("score").textContent = "0";
-      generateProblem();
+      showScoop(() => generateProblem());
   checkMilestones();
     }
 
     window.onload = () => {
-  generateProblem();
+  showScoop(() => generateProblem());
 };
 function checkMilestones() {
   if (score >= 50 && !window.fiftyTriggered) {
@@ -415,6 +424,16 @@ function launchConfetti() {
     draw();
     requestAnimationFrame(loop);
   })();
+}
+function showScoop(callback) {
+  const scoop = document.getElementById("scoop");
+  scoop.style.display = "block";
+  setTimeout(() => {
+    scoop.style.display = "none";
+    if (typeof callback === "function") {
+      callback();
+    }
+  }, 700);
 }
 </script>
 </body>
