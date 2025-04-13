@@ -1,3 +1,5 @@
+// script.js - core game logic for Snowcone Math
+
 let score = 0;
 let currentAnswer = "";
 let correctAnswer = 0;
@@ -40,9 +42,7 @@ function appendDecimal() {
 }
 
 function toggleNegative() {
-  currentAnswer = currentAnswer.startsWith("-")
-    ? currentAnswer.slice(1)
-    : "-" + currentAnswer;
+  currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
   document.getElementById("answerDisplay").textContent = currentAnswer;
 }
 
