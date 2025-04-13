@@ -50,6 +50,7 @@
       align-items: center;
       justify-content: center;
       z-index: 1;
+      transition: box-shadow 0.3s ease;
     }
 
     .cone-text a {
@@ -148,13 +149,23 @@
       height: 100vh;
       z-index: 9999;
     }
+
+    .flash {
+      animation: flashEffect 0.5s ease-in-out;
+    }
+
+    @keyframes flashEffect {
+      0% { background: black; }
+      50% { background: #ffee00; }
+      100% { background: black; }
+    }
   </style>
 </head>
 <body>
 
 <canvas id="confettiCanvas" class="confetti"></canvas>
 
-<div class="game-container">
+<div class="game-container" id="gameContainer">
   <div class="score-bar">
     <div class="score">Score: <span id="score">0</span></div>
     <div id="timer">Time: 0s</div>
@@ -234,7 +245,13 @@
   let timerInterval = null;
   let gameEnded = false;
   let isMuted = false;
+  let fiftyTriggered = false;
+  let hundredTriggered = false;
   const music = document.getElementById("backgroundMusic");
+
+  const scoop = document.getElementById("scoop");
+  const cone = document.getElementById("cone");
+  const gameContainer = document.getElementById("gameContainer");
 
   function hideRules() {
     document.getElementById("rulesModal").style.display = "none";
@@ -303,6 +320,7 @@
 
   function submitAnswer() {
     if (gameEnded) return;
+
     const answer = parseFloat(currentAnswer);
     if (!timerStarted) startGame();
 
@@ -312,8 +330,22 @@
       if (currentProblemType === 'hard') points = 15;
       score += points;
       document.getElementById("score").textContent = score;
-      document.getElementById("scoop").style.display = "block";
+      scoop.style.display = "block";
       if (!isMuted) document.getElementById("correctSound").play().catch(() => {});
+
+      if (score >= 50 && !fiftyTriggered) {
+        fiftyTriggered = true;
+        launchConfetti();
+      }
+
+      if (score >= 100 && !hundredTriggered) {
+        hundredTriggered = true;
+        cone.style.boxShadow = '0 0 30px #ffee00, 0 0 60px #ff00cc';
+        gameContainer.classList.add('flash');
+        setTimeout(() => gameContainer.classList.remove('flash'), 600);
+        alert("🍧 You hit 100, cosmic cone crusader. That’s some serious math mojo.");
+      }
+
       setTimeout(generateProblem, 700);
     } else {
       score -= 3;
@@ -373,7 +405,56 @@
 
     currentAnswer = '';
     updateDisplay();
-    document.getElementById("scoop").style.display = "none";
+    scoop.style.display = "none";
+  }
+
+  function launchConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
+
+    for (let i = 0; i < 100; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 10 + 10,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        tilt: Math.floor(Math.random() * 10) - 10,
+        tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
+        tiltAngle: 0
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((c, i) => {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt + (c.r / 2), c.y);
+        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + (c.r / 2));
+        ctx.stroke();
+      });
+      update();
+    }
+
+    function update() {
+      for (let i = 0; i < confetti.length; i++) {
+        confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
+        confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
+        confetti[i].x += Math.sin(0.01);
+        confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
+      }
+    }
+
+    (function loop() {
+      draw();
+      requestAnimationFrame(loop);
+    })();
   }
 </script>
 
