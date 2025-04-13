@@ -1,0 +1,137 @@
+body {
+  background: black;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+.game-container {
+  max-width: 400px;
+  margin: auto;
+}
+.snow-cone-wrapper {
+  position: relative;
+  width: 150px;
+  height: 225px;
+  margin: 30px auto 10px;
+}
+.scoop {
+  width: 150px;
+  height: 75px;
+  background: linear-gradient(to right, #ff00cc, #6600ff);
+  border-radius: 75px 75px 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+  z-index: 2;
+  display: none;
+}
+.snow-cone {
+  position: absolute;
+  bottom: 0;
+  width: 150px;
+  height: 150px;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  background: linear-gradient(to bottom, #ffff99, #ffee00);
+  box-shadow: 0 0 10px #fff, 0 0 20px yellow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: box-shadow 0.3s ease;
+}
+.cone-text a {
+  color: black;
+  text-decoration: none;
+  font-size: 20px;
+  line-height: 1.2;
+  z-index: 3;
+}
+.score-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.score {
+  font-size: 20px;
+  color: #00ff88;
+}
+#timer {
+  font-size: 16px;
+  color: #00ccff;
+}
+.reset-button {
+  background-color: #00ccff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px #00ccff;
+  cursor: pointer;
+}
+.math-problem {
+  font-size: 28px;
+  margin: 15px 0 10px;
+}
+.answer-display {
+  font-size: 36px;
+  color: #ff00cc;
+  margin-bottom: 20px;
+}
+.mode-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.mode-buttons button {
+  background-color: #00ff88;
+  color: black;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px #00ff88;
+  cursor: pointer;
+  width: 80px;
+  height: 50px;
+  line-height: 1.1;
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  max-width: 320px;
+  margin: auto;
+}
+.keypad button {
+  background-color: #ff00cc;
+  border: none;
+  color: white;
+  font-size: 20px;
+  padding: 15px 0;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #ff00cc;
+  cursor: pointer;
+}
+canvas.confetti {
+  position: fixed;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+}
+.flash {
+  animation: flashEffect 0.5s ease-in-out;
+}
+@keyframes flashEffect {
+  0% { background: black; }
+  50% { background: #ffee00; }
+  100% { background: black; }
+}
