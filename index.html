@@ -473,6 +473,14 @@ document.addEventListener("DOMContentLoaded", () => {
   window.closeStoryModeModal = () => {
     document.getElementById("storyModeModal").style.display = "none";
   };
+    // 👇 Expose these to the global scope so HTML can call them
+  window.appendNumber = appendNumber;
+  window.appendDecimal = appendDecimal;
+  window.toggleNegative = toggleNegative;
+  window.clearAnswer = clearAnswer;
+  window.submitAnswer = submitAnswer;
+  window.toggleMute = toggleMute;
+  window.setMode = setMode;
 });
 </script>
 
