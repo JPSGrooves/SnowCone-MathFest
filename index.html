@@ -147,6 +147,7 @@
   </style>
 </head>
 <body>
+
 <!-- Opening Modal -->
 <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
@@ -156,7 +157,7 @@
       ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
       ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
       💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Any wrong answer: <strong>-3 points</strong><br/><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
       🍧 The song is 1:45 long — when it ends, the round ends.
     </p>
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
@@ -164,14 +165,12 @@
 </div>
 
 <canvas class="confetti" id="confettiCanvas"></canvas>
-
 <div class="game-container" id="gameContainer">
   <div class="score-bar">
     <div class="score">Score: <span id="score">0</span></div>
     <div id="timer">Time: 0s</div>
     <button class="reset-button" onclick="resetScore()">Reset Score</button>
   </div>
-
   <div class="snow-cone-wrapper">
     <div class="scoop" id="scoop"></div>
     <div class="snow-cone" id="cone">
@@ -180,17 +179,15 @@
       </div>
     </div>
   </div>
-
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
   <div class="answer-display" id="answerDisplay">0</div>
-
   <div class="mode-buttons">
     <button onclick="setMode('addsub')">+/-</button>
     <button onclick="setMode('multdiv')">X-/</button>
     <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line;">Full<br>Scoop</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full
+Scoop</button>
   </div>
-
   <div class="keypad">
     <button onclick="appendNumber(7)">7</button>
     <button onclick="appendNumber(8)">8</button>
@@ -210,10 +207,10 @@
     <div></div>
   </div>
 </div>
-
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -229,6 +226,36 @@ const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
 correctTrack.volume = 0.5;
 incorrectTrack.volume = 0.5;
+
+function resetScore() {
+  // Reset variables
+  score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  window.fiftyTriggered = false;
+  window.hundredTriggered = false;
+
+  // Reset UI
+  document.getElementById("score").textContent = "0";
+  document.getElementById("timer").textContent = "Time: 0s";
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+
+  // Stop music and timer
+  clearInterval(timerInterval);
+  const music = document.getElementById("backgroundMusic1");
+  music.pause();
+  music.currentTime = 0;
+
+  // Show the modal again
+  document.getElementById("rulesModal").style.display = "flex";
+
+  // Clear problem and scoop
+  document.getElementById("problem").textContent = "0 + 0 = 🍧";
+  document.getElementById("scoop").style.display = "none";
+}
 
 function openStoryModeModal() {
   document.getElementById("storyModeModal").style.display = "flex";
@@ -271,7 +298,6 @@ function toggleMute() {
   correctTrack.muted = isMuted;
   incorrectTrack.muted = isMuted;
 }
-
 function submitAnswer() {
   let userAnswer = parseFloat(currentAnswer);
   if (userAnswer === correctAnswer) {
@@ -285,15 +311,19 @@ function submitAnswer() {
         document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
-          alert(`🍧 Time's up! You scored ${score} points!`);
+          alert(`🍧 Time's up, traveler! You scored ${score} points.\nTake a breath, grab a cone, and play again.`);
         }
       }, 1000);
     }
 
     if (!isMuted) {
-      correctTrack.pause();
-      correctTrack.currentTime = 0;
-      correctTrack.play().catch(e => console.warn("Play failed", e));
+      try {
+        correctTrack.pause();
+        correctTrack.currentTime = 0;
+        correctTrack.play().catch(e => console.warn("Play failed", e));
+      } catch (e) {
+        console.warn("Error playing sound", e);
+      }
     }
 
     score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
@@ -354,18 +384,14 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-function resetScore() {
-  score = 0;
-  document.getElementById("score").textContent = "0";
-  generateProblem();
-}
-
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
   scoop.style.display = "block";
   setTimeout(() => {
     scoop.style.display = "none";
-    if (typeof callback === "function") callback();
+    if (typeof callback === "function") {
+      callback();
+    }
   }, 700);
 }
 
@@ -427,11 +453,14 @@ function launchConfetti() {
   })();
 }
 
+window.onload = () => {
+  document.getElementById("rulesModal").style.display = "flex";
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
-  if (modal && closeBtn) {
-    modal.style.display = "flex";
+  if (closeBtn && modal) {
     closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
       generateProblem();
