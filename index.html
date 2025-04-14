@@ -146,72 +146,7 @@
     }
   </style>
 </head>
-<body>
-
-<!-- Opening Modal -->
-<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, the round ends.
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
-  </div>
-</div>
-
-<canvas class="confetti" id="confettiCanvas"></canvas>
-
-<div class="game-container" id="gameContainer">
-  <div class="score-bar">
-    <div class="score">Score: <span id="score">0</span></div>
-    <div id="timer">Time: 0s</div>
-    <button class="reset-button" onclick="resetScore()">Reset Score</button>
-  </div>
-
-  <div class="snow-cone-wrapper">
-    <div class="scoop" id="scoop"></div>
-    <div class="snow-cone" id="cone">
-      <div class="cone-text">
-        <a href="#" onclick="generateProblem()">Math<br/>Fest</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
-  <div class="answer-display" id="answerDisplay">0</div>
-
-  <div class="mode-buttons">
-    <button onclick="setMode('addsub')">+/-</button>
-    <button onclick="setMode('multdiv')">X-/</button>
-    <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
-  </div>
-
-  <div class="keypad">
-    <button onclick="appendNumber(7)">7</button>
-    <button onclick="appendNumber(8)">8</button>
-    <button onclick="appendNumber(9)">9</button>
-    <button onclick="submitAnswer()">Enter</button>
-    <button onclick="appendNumber(4)">4</button>
-    <button onclick="appendNumber(5)">5</button>
-    <button onclick="appendNumber(6)">6</button>
-    <button onclick="clearAnswer()">Clear</button>
-    <button onclick="appendNumber(1)">1</button>
-    <button onclick="appendNumber(2)">2</button>
-    <button onclick="appendNumber(3)">3</button>
-    <button onclick="toggleNegative()">-</button>
-    <button onclick="appendDecimal()">.</button>
-    <button onclick="appendNumber(0)">0</button>
-    <button onclick="toggleMute()">Mute</button>
-    <div></div>
-  </div>
-</div>
-
+<!-- everything above this stays unchanged -->
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
@@ -260,6 +195,37 @@ function resetScore() {
   document.getElementById("scoop").style.display = "none";
 }
 
+// ⌨️ Keypad functions - unlocked for post-timer fun
+function appendNumber(num) {
+  currentAnswer += num;
+  document.getElementById("answerDisplay").textContent = currentAnswer;
+}
+
+function appendDecimal() {
+  if (!currentAnswer.includes(".")) {
+    currentAnswer += (currentAnswer === "" ? "0." : ".");
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+}
+
+function toggleNegative() {
+  currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
+  document.getElementById("answerDisplay").textContent = currentAnswer;
+}
+
+function clearAnswer() {
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  document.getElementById("backgroundMusic1").muted = isMuted;
+  correctTrack.muted = isMuted;
+  incorrectTrack.muted = isMuted;
+}
+
+// 🎯 Score is blocked after timer ends
 function submitAnswer() {
   if (gameEnded) {
     alert("⏱️ Time’s up! Score is frozen. Keep jamming if you want.");
