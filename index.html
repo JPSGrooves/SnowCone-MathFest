@@ -20,9 +20,12 @@
     }
     .snow-cone-wrapper {
       position: relative;
-      width: 150px;
+      width: 100%;
       height: 225px;
       margin: 30px auto 10px;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
     }
     .scoop {
       width: 150px;
@@ -37,8 +40,6 @@
       display: none;
     }
     .snow-cone {
-      position: absolute;
-      bottom: 0;
       width: 150px;
       height: 150px;
       clip-path: polygon(50% 100%, 0 0, 100% 0);
@@ -47,7 +48,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1;
+      position: relative;
       transition: box-shadow 0.3s ease;
     }
     .cone-text a {
@@ -56,6 +57,19 @@
       font-size: 20px;
       line-height: 1.2;
       z-index: 3;
+      position: relative;
+      top: -10px; /* Adjusted upward */
+    }
+    .side-cone {
+      transform: scale(0.5);
+      background: linear-gradient(to bottom, #99ccff, #0077ff);
+    }
+    .spin {
+      animation: spin 2s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: scale(0.5) rotate(0deg); }
+      100% { transform: scale(0.5) rotate(360deg); }
     }
     .score-bar {
       display: flex;
@@ -147,24 +161,8 @@
   </style>
 </head>
 <body>
-<!-- Opening Modal -->
-<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, your score freezes.
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
-  </div>
-</div>
 
 <canvas class="confetti" id="confettiCanvas"></canvas>
-
 <div class="game-container" id="gameContainer">
   <div class="score-bar">
     <div class="score">Score: <span id="score">0</span></div>
@@ -173,14 +171,25 @@
   </div>
 
   <div class="snow-cone-wrapper">
+    <div class="snow-cone side-cone" id="leftCone">
+      <div class="cone-text">
+        <a href="#" onclick="showInfo('snow')">snow</a>
+      </div>
+    </div>
+
     <div class="scoop" id="scoop"></div>
     <div class="snow-cone" id="cone">
       <div class="cone-text">
-        <a href="#" onclick="generateProblem()">Math<br/>Fest</a>
+        <a href="#" onclick="showInfo('main')">Math<br/>Fest</a>
+      </div>
+    </div>
+
+    <div class="snow-cone side-cone" id="rightCone">
+      <div class="cone-text">
+        <a href="#" onclick="showInfo('cone')">cone</a>
       </div>
     </div>
   </div>
-
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
   <div class="answer-display" id="answerDisplay">0</div>
 
@@ -188,8 +197,7 @@
     <button onclick="setMode('addsub')">+/-</button>
     <button onclick="setMode('multdiv')">X-/</button>
     <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full
-Scoop</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line;">Full<br>Scoop</button>
   </div>
 
   <div class="keypad">
@@ -215,6 +223,7 @@ Scoop</button>
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -225,96 +234,63 @@ let isMuted = false;
 let timerStarted = false;
 let secondsElapsed = 0;
 let timerInterval = null;
-let gameEnded = false;
+let gameActive = true;
+let fiftyTriggered = false;
+let seventyFiveTriggered = false;
+let hundredTriggered = false;
 
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
+const scoop = document.getElementById("scoop");
+const cone = document.getElementById("cone");
+const music = document.getElementById("backgroundMusic1");
+
 correctTrack.volume = 0.5;
 incorrectTrack.volume = 0.5;
 
-function resetScore() {
-  score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  gameEnded = false;
-  window.fiftyTriggered = false;
-  window.hundredTriggered = false;
-
-  document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "Time: 0s";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
-
-  clearInterval(timerInterval);
-  const music = document.getElementById("backgroundMusic1");
-  music.pause();
-  music.currentTime = 0;
-
-  document.getElementById("rulesModal").style.display = "flex";
-
-  document.getElementById("problem").textContent = "0 + 0 = 🍧";
-  document.getElementById("scoop").style.display = "none";
-}
-
-function openStoryModeModal() {
-  document.getElementById("storyModeModal").style.display = "flex";
-}
-function closeStoryModeModal() {
-  document.getElementById("storyModeModal").style.display = "none";
-}
-
-function setMode(newMode) {
-  mode = newMode;
-  generateProblem();
-}
-
-function appendNumber(num) {
-  if (!gameEnded) {
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-}
-function appendDecimal() {
-  if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += (currentAnswer === "" ? "0." : ".");
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-}
-function toggleNegative() {
-  if (!gameEnded) {
-    currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-}
-function clearAnswer() {
-  if (!gameEnded) {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-}
 function toggleMute() {
   isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
+  music.muted = isMuted;
   correctTrack.muted = isMuted;
   incorrectTrack.muted = isMuted;
 }
+
+function resetScore() {
+  score = 0;
+  secondsElapsed = 0;
+  timerStarted = false;
+  gameActive = true;
+  fiftyTriggered = false;
+  seventyFiveTriggered = false;
+  hundredTriggered = false;
+  document.getElementById("score").textContent = score;
+  document.getElementById("timer").textContent = "Time: 0s";
+  document.getElementById("answerDisplay").textContent = "0";
+  music.pause();
+  music.currentTime = 0;
+  clearInterval(timerInterval);
+  scoop.style.display = "none";
+  cone.style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+  document.getElementById("rulesModal").style.display = "flex";
+}
 function submitAnswer() {
-  if (gameEnded) return;
+  if (!gameActive) return;
   let userAnswer = parseFloat(currentAnswer);
   if (userAnswer === correctAnswer) {
     if (!timerStarted) {
       timerStarted = true;
-      const music = document.getElementById("backgroundMusic1");
       music.currentTime = 0;
-      music.play().catch(e => console.warn("Music play failed:", e));
+      music.play();
       timerInterval = setInterval(() => {
         secondsElapsed++;
         document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
-          gameEnded = true;
+          gameActive = false;
+          stopCelebrations();
+          if (score >= 100) {
+            scoop.style.display = "block";
+          }
           alert(`🍧 Time's up, traveler! You scored ${score} points.\nTake a breath, grab a cone, and play again.`);
         }
       }, 1000);
@@ -323,10 +299,11 @@ function submitAnswer() {
     if (!isMuted) {
       correctTrack.pause();
       correctTrack.currentTime = 0;
-      correctTrack.play().catch(e => console.warn("Sound error:", e));
+      correctTrack.play();
     }
 
-    score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
+    const points = currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3);
+    score += points;
     document.getElementById("score").textContent = score;
 
     showScoop(() => {
@@ -385,7 +362,6 @@ function generateProblem() {
 }
 
 function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
   scoop.style.display = "block";
   setTimeout(() => {
     scoop.style.display = "none";
@@ -396,84 +372,82 @@ function showScoop(callback) {
 function checkMilestones() {
   if (score >= 25 && !window.twentyFiveTriggered) {
     window.twentyFiveTriggered = true;
-    launchConfetti();
+    alert("🌈 Keep scooping! 25 points down!");
   }
-  if (score >= 50 && !window.fiftyTriggered) {
-    window.fiftyTriggered = true;
+  if (score >= 50 && !fiftyTriggered) {
+    fiftyTriggered = true;
     launchConfetti();
+    document.querySelectorAll('.side-cone').forEach(cone => {
+      cone.classList.add('spin');
+    });
   }
-  if (score >= 75 && !window.seventyFiveTriggered) {
-    window.seventyFiveTriggered = true;
+  if (score >= 75 && !seventyFiveTriggered) {
+    seventyFiveTriggered = true;
     launchConfetti();
-    launchConfetti();
+    launchConfetti(); // double confetti
   }
-  if (score >= 100 && !window.hundredTriggered) {
-    window.hundredTriggered = true;
+  if (score >= 100 && !hundredTriggered) {
+    hundredTriggered = true;
     document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
     document.getElementById("gameContainer").classList.add("flash");
     setTimeout(() => document.getElementById("gameContainer").classList.remove("flash"), 600);
+    launchConfetti();
+    launchConfetti();
   }
 }
 
-function launchConfetti() {
-  const canvas = document.getElementById("confettiCanvas");
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let confetti = [];
-  for (let i = 0; i < 100; i++) {
-    confetti.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 6 + 4,
-      d: Math.random() * 10 + 10,
-      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-      tilt: Math.floor(Math.random() * 10) - 10,
-      tiltAngleIncremental: Math.random() * 0.07 + 0.05,
-      tiltAngle: 0
-    });
-  }
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    confetti.forEach(c => {
-      ctx.beginPath();
-      ctx.lineWidth = c.r;
-      ctx.strokeStyle = c.color;
-      ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-      ctx.stroke();
-    });
-    update();
-  }
-  function update() {
-    for (let i = 0; i < confetti.length; i++) {
-      confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
-      confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
-      confetti[i].x += Math.sin(0.01);
-      confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
-    }
-  }
-  (function loop() {
-    draw();
-    requestAnimationFrame(loop);
-  })();
+function stopCelebrations() {
+  document.querySelectorAll('.side-cone').forEach(cone => {
+    cone.classList.remove('spin');
+  });
 }
 
-// Startup logic
+function clearAnswer() {
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
+
+function appendNumber(num) {
+  currentAnswer += num;
+  document.getElementById("answerDisplay").textContent = currentAnswer;
+}
+
+function appendDecimal() {
+  if (!currentAnswer.includes(".")) {
+    currentAnswer += (currentAnswer === "" ? "0." : ".");
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+}
+
+function toggleNegative() {
+  currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
+  document.getElementById("answerDisplay").textContent = currentAnswer;
+}
+
 window.onload = () => {
   document.getElementById("rulesModal").style.display = "flex";
 };
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-  if (closeBtn && modal) {
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-      generateProblem();
-    });
-  }
+
+document.getElementById("closeModalBtn").addEventListener("click", () => {
+  document.getElementById("rulesModal").style.display = "none";
+  generateProblem();
 });
 </script>
+<!-- Opening Modal -->
+<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+      💀 Hard Mode: <strong>+15 points</strong><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+      🍧 The song is 1:45 long — when it ends, the round ends.
+    </p>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+  </div>
+</div>
 
 <!-- Story Mode Modal -->
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
@@ -489,6 +463,23 @@ document.addEventListener("DOMContentLoaded", () => {
     <button disabled style="margin:10px 5px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:not-allowed;">Bet!</button>
   </div>
 </div>
+
+<!-- Cone Info Modal -->
+<div id="coneInfoModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
+    <h2 style="color:#ffee00;">💜 From the Truck 💜</h2>
+    <p style="font-size:16px; line-height:1.6;">
+      This is a passion project for math, snow cones, and music lovers everywhere.<br/><br/>
+      Come back any time for a funky scoop of numeracy.
+    </p>
+    <button onclick="document.getElementById('coneInfoModal').style.display='none'" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Right on</button>
+  </div>
+</div>
+
+<!-- Audio Elements -->
+<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
+<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
+<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 
 </body>
 </html>
