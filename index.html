@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Math Fest Snow Cone</title>
   <style>
@@ -146,263 +146,333 @@
     }
   </style>
 </head>
-<!-- everything above this stays unchanged -->
+<body>
+<!-- Rules Modal -->
+<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+      💀 Hard Mode: <strong>+15 points</strong><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+      🍧 The song is 1:45 long — when it ends, the round ends.
+    </p>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+  </div>
+</div>
+
+<canvas class="confetti" id="confettiCanvas"></canvas>
+
+<div class="game-container" id="gameContainer">
+  <div class="score-bar">
+    <div class="score">Score: <span id="score">0</span></div>
+    <div id="timer">Time: 0s</div>
+    <button class="reset-button" onclick="resetScore()">Reset Score</button>
+  </div>
+
+  <div class="snow-cone-wrapper">
+    <div class="scoop" id="scoop"></div>
+    <div class="snow-cone" id="cone">
+      <div class="cone-text">
+        <a href="#" onclick="generateProblem()">Math<br/>Fest</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
+  <div class="answer-display" id="answerDisplay">0</div>
+
+  <div class="mode-buttons">
+    <button onclick="setMode('addsub')">+/-</button>
+    <button onclick="setMode('multdiv')">X-/</button>
+    <button onclick="setMode('hard')">Hard<br/>Mode</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
+  </div>
+
+  <div class="keypad">
+    <button onclick="appendNumber(7)">7</button>
+    <button onclick="appendNumber(8)">8</button>
+    <button onclick="appendNumber(9)">9</button>
+    <button onclick="submitAnswer()">Enter</button>
+    <button onclick="appendNumber(4)">4</button>
+    <button onclick="appendNumber(5)">5</button>
+    <button onclick="appendNumber(6)">6</button>
+    <button onclick="clearAnswer()">Clear</button>
+    <button onclick="appendNumber(1)">1</button>
+    <button onclick="appendNumber(2)">2</button>
+    <button onclick="appendNumber(3)">3</button>
+    <button onclick="toggleNegative()">-</button>
+    <button onclick="appendDecimal()">.</button>
+    <button onclick="appendNumber(0)">0</button>
+    <button onclick="toggleMute()">Mute</button>
+    <div></div>
+  </div>
+</div>
+
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 
+<!-- Begin full safe script wrapper -->
 <script>
-let score = 0;
-let currentAnswer = "";
-let correctAnswer = 0;
-let currentProblemType = "+";
-let mode = "addsub";
-let isMuted = false;
-let timerStarted = false;
-let secondsElapsed = 0;
-let timerInterval = null;
-let gameEnded = false;
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOM fully loaded, game is initializing...");
 
-const correctTrack = document.getElementById("correctSound");
-const incorrectTrack = document.getElementById("incorrectSound");
-correctTrack.volume = 0.5;
-incorrectTrack.volume = 0.5;
+  let score = 0;
+  let currentAnswer = "";
+  let correctAnswer = 0;
+  let currentProblemType = "+";
+  let mode = "addsub";
+  let isMuted = false;
+  let timerStarted = false;
+  let secondsElapsed = 0;
+  let timerInterval = null;
+  let gameEnded = false;
 
-function resetScore() {
-  score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  gameEnded = false;
-  window.twentyFiveTriggered = false;
-  window.fiftyTriggered = false;
-  window.seventyFiveTriggered = false;
-  window.hundredTriggered = false;
+  const correctTrack = document.getElementById("correctSound");
+  const incorrectTrack = document.getElementById("incorrectSound");
+  correctTrack.volume = 0.5;
+  incorrectTrack.volume = 0.5;
+  function resetScore() {
+    score = 0;
+    currentAnswer = "";
+    correctAnswer = 0;
+    timerStarted = false;
+    secondsElapsed = 0;
+    gameEnded = false;
+    window.twentyFiveTriggered = false;
+    window.fiftyTriggered = false;
+    window.seventyFiveTriggered = false;
+    window.hundredTriggered = false;
 
-  document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "Time: 0s";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+    document.getElementById("score").textContent = "0";
+    document.getElementById("timer").textContent = "Time: 0s";
+    document.getElementById("answerDisplay").textContent = "0";
+    document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
 
-  clearInterval(timerInterval);
-  const music = document.getElementById("backgroundMusic1");
-  music.pause();
-  music.currentTime = 0;
+    clearInterval(timerInterval);
+    const music = document.getElementById("backgroundMusic1");
+    music.pause();
+    music.currentTime = 0;
 
-  document.getElementById("rulesModal").style.display = "flex";
-  document.getElementById("problem").textContent = "0 + 0 = 🍧";
-  document.getElementById("scoop").style.display = "none";
-}
+    document.getElementById("rulesModal").style.display = "flex";
+    document.getElementById("problem").textContent = "0 + 0 = 🍧";
+    document.getElementById("scoop").style.display = "none";
+  }
 
-// ⌨️ Keypad functions - unlocked for post-timer fun
-function appendNumber(num) {
-  currentAnswer += num;
-  document.getElementById("answerDisplay").textContent = currentAnswer;
-}
+  function submitAnswer() {
+    if (gameEnded) {
+      alert("⏱️ Time’s up! Score is frozen. Keep jamming if you want.");
+      return;
+    }
 
-function appendDecimal() {
-  if (!currentAnswer.includes(".")) {
-    currentAnswer += (currentAnswer === "" ? "0." : ".");
+    let userAnswer = parseFloat(currentAnswer);
+    if (userAnswer === correctAnswer) {
+      if (!timerStarted) {
+        timerStarted = true;
+        const music = document.getElementById("backgroundMusic1");
+        music.currentTime = 0;
+        music.play().catch(e => console.warn("Music play failed:", e));
+        timerInterval = setInterval(() => {
+          secondsElapsed++;
+          document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+          if (secondsElapsed >= 105) {
+            clearInterval(timerInterval);
+            gameEnded = true;
+            alert(`🍧 Time's up, traveler! You scored ${score} points.\nTake a breath, grab a cone, and play again.`);
+          }
+        }, 1000);
+      }
+
+      if (!isMuted) {
+        correctTrack.pause();
+        correctTrack.currentTime = 0;
+        correctTrack.play().catch(e => console.warn("Play failed", e));
+      }
+
+      score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
+      document.getElementById("score").textContent = score;
+
+      showScoop(() => {
+        generateProblem();
+        checkMilestones();
+      });
+    } else {
+      if (!isMuted) {
+        incorrectTrack.currentTime = 0;
+        incorrectTrack.play();
+      }
+      score -= 3;
+      document.getElementById("score").textContent = score;
+      alert("Incorrect! Try again.");
+      clearAnswer();
+    }
+  }
+
+  function appendNumber(num) {
+    currentAnswer += num;
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
-}
 
-function toggleNegative() {
-  currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
-  document.getElementById("answerDisplay").textContent = currentAnswer;
-}
-
-function clearAnswer() {
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
-}
-
-function toggleMute() {
-  isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  correctTrack.muted = isMuted;
-  incorrectTrack.muted = isMuted;
-}
-
-// 🎯 Score is blocked after timer ends
-function submitAnswer() {
-  if (gameEnded) {
-    alert("⏱️ Time’s up! Score is frozen. Keep jamming if you want.");
-    return;
+  function appendDecimal() {
+    if (!currentAnswer.includes(".")) {
+      currentAnswer += (currentAnswer === "" ? "0." : ".");
+      document.getElementById("answerDisplay").textContent = currentAnswer;
+    }
   }
 
-  let userAnswer = parseFloat(currentAnswer);
-  if (userAnswer === correctAnswer) {
-    if (!timerStarted) {
-      timerStarted = true;
-      const music = document.getElementById("backgroundMusic1");
-      music.currentTime = 0;
-      music.play().catch(e => console.warn("Music play failed:", e));
-      timerInterval = setInterval(() => {
-        secondsElapsed++;
-        document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
-        if (secondsElapsed >= 105) {
-          clearInterval(timerInterval);
-          gameEnded = true;
-          alert(`🍧 Time's up, traveler! You scored ${score} points.\nTake a breath, grab a cone, and play again.`);
-        }
-      }, 1000);
-    }
-
-    if (!isMuted) {
-      correctTrack.pause();
-      correctTrack.currentTime = 0;
-      correctTrack.play().catch(e => console.warn("Play failed", e));
-    }
-
-    score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
-    document.getElementById("score").textContent = score;
-
-    showScoop(() => {
-      generateProblem();
-      checkMilestones();
-    });
-  } else {
-    if (!isMuted) {
-      incorrectTrack.currentTime = 0;
-      incorrectTrack.play();
-    }
-    score -= 3;
-    document.getElementById("score").textContent = score;
-    alert("Incorrect! Try again.");
-    clearAnswer();
+  function toggleNegative() {
+    currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
+    document.getElementById("answerDisplay").textContent = currentAnswer;
   }
-}
-</script>
-<script>
-function generateProblem() {
-  let a, b, c, op1, op2;
-  if (mode === "addsub") {
-    a = Math.floor(Math.random() * 10);
-    b = Math.floor(Math.random() * 10);
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    if (op1 === "-" && b > a) [a, b] = [b, a];
-    correctAnswer = op1 === "+" ? a + b : a - b;
-    currentProblemType = op1;
-    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-  } else if (mode === "multdiv") {
-    if (Math.random() > 0.5) {
+
+  function clearAnswer() {
+    currentAnswer = "";
+    document.getElementById("answerDisplay").textContent = "0";
+  }
+
+  function toggleMute() {
+    isMuted = !isMuted;
+    document.getElementById("backgroundMusic1").muted = isMuted;
+    correctTrack.muted = isMuted;
+    incorrectTrack.muted = isMuted;
+  }
+
+  function setMode(newMode) {
+    mode = newMode;
+    generateProblem();
+  }
+
+  function generateProblem() {
+    let a, b, c, op1, op2;
+    if (mode === "addsub") {
       a = Math.floor(Math.random() * 10);
       b = Math.floor(Math.random() * 10);
-      correctAnswer = a * b;
-      currentProblemType = "×";
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-    } else {
-      b = Math.floor(Math.random() * 9) + 1;
-      correctAnswer = Math.floor(Math.random() * 10);
-      a = b * correctAnswer;
-      currentProblemType = "÷";
-      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      if (op1 === "-" && b > a) [a, b] = [b, a];
+      correctAnswer = op1 === "+" ? a + b : a - b;
+      currentProblemType = op1;
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+    } else if (mode === "multdiv") {
+      if (Math.random() > 0.5) {
+        a = Math.floor(Math.random() * 10);
+        b = Math.floor(Math.random() * 10);
+        correctAnswer = a * b;
+        currentProblemType = "×";
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      } else {
+        b = Math.floor(Math.random() * 9) + 1;
+        correctAnswer = Math.floor(Math.random() * 10);
+        a = b * correctAnswer;
+        currentProblemType = "÷";
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      }
+    } else if (mode === "hard") {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      c = Math.floor(Math.random() * 9) + 1;
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      op2 = Math.random() > 0.5 ? "×" : "÷";
+      let inner = op1 === "+" ? a + b : a - b;
+      correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+      currentProblemType = "hard";
+      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
     }
-  } else if (mode === "hard") {
-    a = Math.floor(Math.random() * 10);
-    b = Math.floor(Math.random() * 10);
-    c = Math.floor(Math.random() * 9) + 1;
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    op2 = Math.random() > 0.5 ? "×" : "÷";
-    let inner = op1 === "+" ? a + b : a - b;
-    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+    currentAnswer = "";
+    document.getElementById("answerDisplay").textContent = "0";
   }
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
-}
 
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
-}
+  function showScoop(callback) {
+    const scoop = document.getElementById("scoop");
+    scoop.style.display = "block";
+    setTimeout(() => {
+      scoop.style.display = "none";
+      if (typeof callback === "function") callback();
+    }, 700);
+  }
 
-function checkMilestones() {
-  if (score >= 25 && !window.twentyFiveTriggered) {
-    window.twentyFiveTriggered = true;
-    launchConfetti();
-  }
-  if (score >= 50 && !window.fiftyTriggered) {
-    window.fiftyTriggered = true;
-    launchConfetti();
-  }
-  if (score >= 75 && !window.seventyFiveTriggered) {
-    window.seventyFiveTriggered = true;
-    launchConfetti();
-    launchConfetti();
-  }
-  if (score >= 100 && !window.hundredTriggered) {
-    window.hundredTriggered = true;
-    document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
-    document.getElementById("gameContainer").classList.add("flash");
-    setTimeout(() => document.getElementById("gameContainer").classList.remove("flash"), 600);
-  }
-}
-
-function launchConfetti() {
-  const canvas = document.getElementById("confettiCanvas");
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let confetti = [];
-  for (let i = 0; i < 100; i++) {
-    confetti.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 6 + 4,
-      d: Math.random() * 10 + 10,
-      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-      tilt: Math.floor(Math.random() * 10) - 10,
-      tiltAngleIncremental: Math.random() * 0.07 + 0.05,
-      tiltAngle: 0
-    });
-  }
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    confetti.forEach(c => {
-      ctx.beginPath();
-      ctx.lineWidth = c.r;
-      ctx.strokeStyle = c.color;
-      ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-      ctx.stroke();
-    });
-    update();
-  }
-  function update() {
-    for (let i = 0; i < confetti.length; i++) {
-      confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
-      confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
-      confetti[i].x += Math.sin(0.01);
-      confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
+  function checkMilestones() {
+    if (score >= 25 && !window.twentyFiveTriggered) {
+      window.twentyFiveTriggered = true;
+      launchConfetti();
+    }
+    if (score >= 50 && !window.fiftyTriggered) {
+      window.fiftyTriggered = true;
+      launchConfetti();
+    }
+    if (score >= 75 && !window.seventyFiveTriggered) {
+      window.seventyFiveTriggered = true;
+      launchConfetti();
+      launchConfetti();
+    }
+    if (score >= 100 && !window.hundredTriggered) {
+      window.hundredTriggered = true;
+      document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
+      document.getElementById("gameContainer").classList.add("flash");
+      setTimeout(() => document.getElementById("gameContainer").classList.remove("flash"), 600);
     }
   }
-  (function loop() {
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
 
-window.onload = () => {
+  function launchConfetti() {
+    const canvas = document.getElementById("confettiCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let confetti = [];
+    for (let i = 0; i < 100; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 10 + 10,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        tilt: Math.floor(Math.random() * 10) - 10,
+        tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+        tiltAngle: 0
+      });
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+        ctx.stroke();
+      });
+      update();
+    }
+    function update() {
+      for (let i = 0; i < confetti.length; i++) {
+        confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
+        confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
+        confetti[i].x += Math.sin(0.01);
+        confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
+      }
+    }
+    (function loop() {
+      draw();
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  // Init modal & problem
   document.getElementById("rulesModal").style.display = "flex";
-};
+  document.getElementById("closeModalBtn").addEventListener("click", () => {
+    document.getElementById("rulesModal").style.display = "none";
+    generateProblem();
+  });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-  if (closeBtn && modal) {
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-      generateProblem();
-    });
-  }
+  // Story mode buttons
+  window.openStoryModeModal = () => {
+    document.getElementById("storyModeModal").style.display = "flex";
+  };
+  window.closeStoryModeModal = () => {
+    document.getElementById("storyModeModal").style.display = "none";
+  };
 });
 </script>
 
@@ -423,3 +493,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
+ 
