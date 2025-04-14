@@ -12,6 +12,10 @@
       text-align: center;
       padding: 20px;
     }
+     @keyframes pulseGlow {
+      0% { text-shadow: 0 0 5px #ffee00; transform: scale(1); }
+      100% { text-shadow: 0 0 20px #ffee00; transform: scale(1.1); }
+    }
     .game-container {
       max-width: 400px;
       margin: auto;
@@ -179,6 +183,10 @@
         <a href="#" onclick="generateProblem()">Math<br/>Fest</a>
       </div>
     </div>
+  </div>
+
+  <div class="cone-text" style="text-align:center; padding:2rem;">
+    <a href="#" onclick="openHighScoreModal()" style="font-size:32px; color:#ffee00; text-decoration:none;">Math<br/>Fest</a>
   </div>
 
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
@@ -473,6 +481,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// paste openHighScoreModal, closeHighScoreModal, promptHighScoreEntry(score), launchConfetti from earlier
+// add this line where game ends (e.g., timer ends or in submitAnswer)
+if (!gameEndedHighScoreSubmitted) {
+  promptHighScoreEntry(score);
+  gameEndedHighScoreSubmitted = true;
+}
+let gameEndedHighScoreSubmitted = false;
+
 </script>
 
 <!-- Story Mode Modal -->
@@ -490,5 +507,17 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 </div>
 
+<div id="highScoreModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:9999; color:white; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ffee00; padding:20px; max-width:320px; width:90%; box-shadow:0 0 20px #ffee00; text-align:left;">
+    <h2 style="text-align:center; color:#00ff88;">🎉 High Scores 🎉</h2>
+    <div id="topBanner" style="text-align:center; font-size:18px; font-weight:bold; color:#ffee00; display:none; animation:pulseGlow 1s infinite alternate;">🏆 New Record!</div>
+    <pre id="highScoreList" style="font-size:16px; line-height:1.6; white-space:pre-wrap; color:#fff; padding:10px 0;"></pre>
+    <div style="text-align:center">
+      <button onclick="closeHighScoreModal()" style="padding:8px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+<audio id="highScoreSound" src="QuikserveST-highscore.mp3" preload="auto"></audio>  
+  
 </body>
 </html>
