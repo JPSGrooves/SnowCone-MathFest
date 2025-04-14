@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     generateProblem();
   }
-
+  window.resetScore = resetScore;
   function submitAnswer() {
     if (gameEnded) {
       showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
