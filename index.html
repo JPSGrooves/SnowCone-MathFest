@@ -110,6 +110,42 @@
       height: 50px;
       line-height: 1.1;
     }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 320px;
+      margin: auto;
+    }
+    .keypad button {
+      background-color: #ff00cc;
+      border: none;
+      color: white;
+      font-size: 20px;
+      padding: 15px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ff00cc;
+      cursor: pointer;
+    }
+    canvas.confetti {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+    }
+    .flash {
+      animation: flashEffect 0.5s ease-in-out;
+    }
+    @keyframes flashEffect {
+      0% { background: black; }
+      50% { background: #ffee00; }
+      100% { background: black; }
+    }
+  </style>
+</head>
 <body>
 
 <!-- Opening Modal -->
@@ -129,6 +165,7 @@
 </div>
 
 <canvas class="confetti" id="confettiCanvas"></canvas>
+
 <div class="game-container" id="gameContainer">
   <div class="score-bar">
     <div class="score">Score: <span id="score">0</span></div>
@@ -189,7 +226,7 @@ let isMuted = false;
 let timerStarted = false;
 let secondsElapsed = 0;
 let timerInterval = null;
-let gameEnded = false; // Added to stop score after timer ends
+let gameEnded = false;
 
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
@@ -203,7 +240,9 @@ function resetScore() {
   timerStarted = false;
   secondsElapsed = 0;
   gameEnded = false;
+  window.twentyFiveTriggered = false;
   window.fiftyTriggered = false;
+  window.seventyFiveTriggered = false;
   window.hundredTriggered = false;
 
   document.getElementById("score").textContent = "0";
@@ -217,60 +256,10 @@ function resetScore() {
   music.currentTime = 0;
 
   document.getElementById("rulesModal").style.display = "flex";
-
   document.getElementById("problem").textContent = "0 + 0 = 🍧";
   document.getElementById("scoop").style.display = "none";
 }
 
-function openStoryModeModal() {
-  document.getElementById("storyModeModal").style.display = "flex";
-}
-
-function closeStoryModeModal() {
-  document.getElementById("storyModeModal").style.display = "none";
-}
-
-function setMode(newMode) {
-  mode = newMode;
-  generateProblem();
-}
-
-function appendNumber(num) {
-  if (!gameEnded) {
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-}
-
-function appendDecimal() {
-  if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += (currentAnswer === "" ? "0." : ".");
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-}
-
-function toggleNegative() {
-  if (!gameEnded) {
-    currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-}
-
-function clearAnswer() {
-  if (!gameEnded) {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-}
-
-function toggleMute() {
-  isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  correctTrack.muted = isMuted;
-  incorrectTrack.muted = isMuted;
-}
-
-// Modified submitAnswer() function
 function submitAnswer() {
   if (gameEnded) {
     alert("⏱️ Time’s up! Score is frozen. Keep jamming if you want.");
@@ -289,20 +278,16 @@ function submitAnswer() {
         document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
-          gameEnded = true;  // Freeze the score once timer ends
+          gameEnded = true;
           alert(`🍧 Time's up, traveler! You scored ${score} points.\nTake a breath, grab a cone, and play again.`);
         }
       }, 1000);
     }
 
     if (!isMuted) {
-      try {
-        correctTrack.pause();
-        correctTrack.currentTime = 0;
-        correctTrack.play().catch(e => console.warn("Play failed", e));
-      } catch (e) {
-        console.warn("Error playing sound", e);
-      }
+      correctTrack.pause();
+      correctTrack.currentTime = 0;
+      correctTrack.play().catch(e => console.warn("Play failed", e));
     }
 
     score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
@@ -323,6 +308,8 @@ function submitAnswer() {
     clearAnswer();
   }
 }
+</script>
+<script>
 function generateProblem() {
   let a, b, c, op1, op2;
   if (mode === "addsub") {
@@ -367,9 +354,7 @@ function showScoop(callback) {
   scoop.style.display = "block";
   setTimeout(() => {
     scoop.style.display = "none";
-    if (typeof callback === "function") {
-      callback();
-    }
+    if (typeof callback === "function") callback();
   }, 700);
 }
 
@@ -385,7 +370,7 @@ function checkMilestones() {
   if (score >= 75 && !window.seventyFiveTriggered) {
     window.seventyFiveTriggered = true;
     launchConfetti();
-    launchConfetti(); // double confetti
+    launchConfetti();
   }
   if (score >= 100 && !window.hundredTriggered) {
     window.hundredTriggered = true;
