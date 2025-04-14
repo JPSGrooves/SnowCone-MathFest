@@ -110,61 +110,25 @@
       height: 50px;
       line-height: 1.1;
     }
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      max-width: 320px;
-      margin: auto;
-    }
-    .keypad button {
-      background-color: #ff00cc;
-      border: none;
-      color: white;
-      font-size: 20px;
-      padding: 15px 0;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #ff00cc;
-      cursor: pointer;
-    }
-    canvas.confetti {
-      position: fixed;
-      pointer-events: none;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 9999;
-    }
-    .flash {
-      animation: flashEffect 0.5s ease-in-out;
-    }
-    @keyframes flashEffect {
-      0% { background: black; }
-      50% { background: #ffee00; }
-      100% { background: black; }
-    }
-  </style>
-</head>
 <body>
+
 <!-- Opening Modal -->
 <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
+    <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
     <p style="font-size:16px; line-height:1.5;">
       Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
       ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
       ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
       💀 Hard Mode: <strong>+15 points</strong><br/>
       😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, your score freezes.
+      🍧 The song is 1:45 long — when it ends, the round ends.
     </p>
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
 
 <canvas class="confetti" id="confettiCanvas"></canvas>
-
 <div class="game-container" id="gameContainer">
   <div class="score-bar">
     <div class="score">Score: <span id="score">0</span></div>
@@ -188,8 +152,7 @@
     <button onclick="setMode('addsub')">+/-</button>
     <button onclick="setMode('multdiv')">X-/</button>
     <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full
-Scoop</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
   </div>
 
   <div class="keypad">
@@ -215,6 +178,7 @@ Scoop</button>
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -225,7 +189,7 @@ let isMuted = false;
 let timerStarted = false;
 let secondsElapsed = 0;
 let timerInterval = null;
-let gameEnded = false;
+let gameEnded = false; // Added to stop score after timer ends
 
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
@@ -261,6 +225,7 @@ function resetScore() {
 function openStoryModeModal() {
   document.getElementById("storyModeModal").style.display = "flex";
 }
+
 function closeStoryModeModal() {
   document.getElementById("storyModeModal").style.display = "none";
 }
@@ -276,32 +241,42 @@ function appendNumber(num) {
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 }
+
 function appendDecimal() {
   if (!gameEnded && !currentAnswer.includes(".")) {
     currentAnswer += (currentAnswer === "" ? "0." : ".");
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 }
+
 function toggleNegative() {
   if (!gameEnded) {
     currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 }
+
 function clearAnswer() {
   if (!gameEnded) {
     currentAnswer = "";
     document.getElementById("answerDisplay").textContent = "0";
   }
 }
+
 function toggleMute() {
   isMuted = !isMuted;
   document.getElementById("backgroundMusic1").muted = isMuted;
   correctTrack.muted = isMuted;
   incorrectTrack.muted = isMuted;
 }
+
+// Modified submitAnswer() function
 function submitAnswer() {
-  if (gameEnded) return;
+  if (gameEnded) {
+    alert("⏱️ Time’s up! Score is frozen. Keep jamming if you want.");
+    return;
+  }
+
   let userAnswer = parseFloat(currentAnswer);
   if (userAnswer === correctAnswer) {
     if (!timerStarted) {
@@ -314,16 +289,20 @@ function submitAnswer() {
         document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
-          gameEnded = true;
+          gameEnded = true;  // Freeze the score once timer ends
           alert(`🍧 Time's up, traveler! You scored ${score} points.\nTake a breath, grab a cone, and play again.`);
         }
       }, 1000);
     }
 
     if (!isMuted) {
-      correctTrack.pause();
-      correctTrack.currentTime = 0;
-      correctTrack.play().catch(e => console.warn("Sound error:", e));
+      try {
+        correctTrack.pause();
+        correctTrack.currentTime = 0;
+        correctTrack.play().catch(e => console.warn("Play failed", e));
+      } catch (e) {
+        console.warn("Error playing sound", e);
+      }
     }
 
     score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
@@ -344,7 +323,6 @@ function submitAnswer() {
     clearAnswer();
   }
 }
-
 function generateProblem() {
   let a, b, c, op1, op2;
   if (mode === "addsub") {
@@ -389,7 +367,9 @@ function showScoop(callback) {
   scoop.style.display = "block";
   setTimeout(() => {
     scoop.style.display = "none";
-    if (typeof callback === "function") callback();
+    if (typeof callback === "function") {
+      callback();
+    }
   }, 700);
 }
 
@@ -405,7 +385,7 @@ function checkMilestones() {
   if (score >= 75 && !window.seventyFiveTriggered) {
     window.seventyFiveTriggered = true;
     launchConfetti();
-    launchConfetti();
+    launchConfetti(); // double confetti
   }
   if (score >= 100 && !window.hundredTriggered) {
     window.hundredTriggered = true;
@@ -459,10 +439,10 @@ function launchConfetti() {
   })();
 }
 
-// Startup logic
 window.onload = () => {
   document.getElementById("rulesModal").style.display = "flex";
 };
+
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
