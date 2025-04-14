@@ -147,7 +147,8 @@
   </style>
 </head>
 <body>
-<!-- Rules Modal -->
+
+<!-- RULES MODAL -->
 <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
     <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
@@ -214,12 +215,8 @@
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
-
-<!-- Begin full safe script wrapper -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("✅ DOM fully loaded, game is initializing...");
-
   let score = 0;
   let currentAnswer = "";
   let correctAnswer = 0;
@@ -235,6 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const incorrectTrack = document.getElementById("incorrectSound");
   correctTrack.volume = 0.5;
   incorrectTrack.volume = 0.5;
+
   function resetScore() {
     score = 0;
     currentAnswer = "";
@@ -251,20 +249,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("timer").textContent = "Time: 0s";
     document.getElementById("answerDisplay").textContent = "0";
     document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+    document.getElementById("scoop").style.display = "none";
+    document.getElementById("problem").textContent = "0 + 0 = 🍧";
+    document.getElementById("rulesModal").style.display = "flex";
 
     clearInterval(timerInterval);
     const music = document.getElementById("backgroundMusic1");
     music.pause();
     music.currentTime = 0;
 
-    document.getElementById("rulesModal").style.display = "flex";
-    document.getElementById("problem").textContent = "0 + 0 = 🍧";
-    document.getElementById("scoop").style.display = "none";
+    generateProblem();
   }
 
   function submitAnswer() {
     if (gameEnded) {
-      alert("⏱️ Time’s up! Score is frozen. Keep jamming if you want.");
+      showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
       return;
     }
 
@@ -281,7 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (secondsElapsed >= 105) {
             clearInterval(timerInterval);
             gameEnded = true;
-            alert(`🍧 Time's up, traveler! You scored ${score} points.\nTake a breath, grab a cone, and play again.`);
+            showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`);
           }
         }, 1000);
       }
@@ -306,7 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       score -= 3;
       document.getElementById("score").textContent = score;
-      alert("Incorrect! Try again.");
+      showPopup("⛔ Incorrect!", "Try again.");
       clearAnswer();
     }
   }
@@ -459,21 +458,30 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
   }
 
-  // Init modal & problem
+  function showPopup(title, message) {
+    document.getElementById("popupTitle").textContent = title;
+    document.getElementById("popupMessage").textContent = message;
+    document.getElementById("popupModal").style.display = "flex";
+  }
+
+  function closePopup() {
+    document.getElementById("popupModal").style.display = "none";
+  }
+
   document.getElementById("rulesModal").style.display = "flex";
   document.getElementById("closeModalBtn").addEventListener("click", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
 
-  // Story mode buttons
   window.openStoryModeModal = () => {
     document.getElementById("storyModeModal").style.display = "flex";
   };
   window.closeStoryModeModal = () => {
     document.getElementById("storyModeModal").style.display = "none";
   };
-    // 👇 Expose these to the global scope so HTML can call them
+
+  // Expose global for button onclicks
   window.appendNumber = appendNumber;
   window.appendDecimal = appendDecimal;
   window.toggleNegative = toggleNegative;
@@ -483,6 +491,15 @@ document.addEventListener("DOMContentLoaded", () => {
   window.setMode = setMode;
 });
 </script>
+
+<!-- Neon-Style Popup Modal -->
+<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
+    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
+    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+    <button onclick="closePopup()" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+  </div>
+</div>
 
 <!-- Story Mode Modal -->
 <div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
@@ -501,5 +518,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
- 
