@@ -638,17 +638,23 @@ function laserBeams(canvas) {
 
   function update() {
     beams.forEach(b => {
-      b.height += 20;
+      b.height += 15; // was 20 — now slowed by 25%
     });
     beams = beams.filter(b => b.height < b.maxHeight);
   }
 
-  (function loop() {
-    if (beams.length === 0) return;
+  function loop() {
+    if (beams.length === 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // clean up lingering dot
+      return;
+    }
     draw();
     requestAnimationFrame(loop);
-  })();
+  }
+
+  loop();
 }
+
 
 function glowPulse() {
   document.body.classList.add("flash");
