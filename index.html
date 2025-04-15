@@ -216,7 +216,7 @@
   <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
     <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
     <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
-    <button onclick="closePopup()" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
   </div>
 </div>
 
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (secondsElapsed >= 105) {
             clearInterval(timerInterval);
             gameEnded = true;
-            showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`);
+            showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`, false, true);
           }
         }, 1000);
       }
@@ -329,15 +329,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       score -= 3;
       document.getElementById("score").textContent = score;
-      showPopup("⛔ Incorrect!", "Try again.", true); // 👈 auto-close!
+      showPopup("⛔ Incorrect!", "Try again.", true);
       clearAnswer();
     }
   }
 
-  function showPopup(title, message, autoClose = false) {
+  function showPopup(title, message, autoClose = false, endOfGame = false) {
     document.getElementById("popupTitle").textContent = title;
     document.getElementById("popupMessage").textContent = message;
     document.getElementById("popupModal").style.display = "flex";
+
+    const btn = document.getElementById("popupButton");
+    if (endOfGame) {
+      btn.textContent = "Play Again";
+      btn.onclick = resetScore;
+    } else {
+      btn.textContent = "Got it!";
+      btn.onclick = closePopup;
+    }
 
     if (autoClose) {
       setTimeout(() => {
@@ -498,21 +507,14 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
   }
 
-  // Startup
+  // Startup modal
   document.getElementById("rulesModal").style.display = "flex";
   document.getElementById("closeModalBtn").addEventListener("click", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
 
-  window.openStoryModeModal = () => {
-    document.getElementById("storyModeModal").style.display = "flex";
-  };
-  window.closeStoryModeModal = () => {
-    document.getElementById("storyModeModal").style.display = "none";
-  };
-
-  // Global functions
+  // Global bindings
   window.appendNumber = appendNumber;
   window.appendDecimal = appendDecimal;
   window.toggleNegative = toggleNegative;
@@ -520,6 +522,12 @@ document.addEventListener("DOMContentLoaded", () => {
   window.submitAnswer = submitAnswer;
   window.toggleMute = toggleMute;
   window.setMode = setMode;
+  window.openStoryModeModal = () => {
+    document.getElementById("storyModeModal").style.display = "flex";
+  };
+  window.closeStoryModeModal = () => {
+    document.getElementById("storyModeModal").style.display = "none";
+  };
 });
 </script>
 </body>
