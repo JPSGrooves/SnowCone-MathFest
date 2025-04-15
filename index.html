@@ -270,6 +270,50 @@ function resetScore() {
   generateProblem();
 }
 
+function submitAnswer() {
+  if (gameEnded) return;
+  let userAnswer = parseFloat(currentAnswer);
+  if (userAnswer === correctAnswer) {
+    if (!timerStarted) {
+      timerStarted = true;
+      const music = document.getElementById("backgroundMusic1");
+      music.currentTime = 0;
+      music.play().catch(e => console.warn("Music play failed:", e));
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+        if (secondsElapsed >= 105) {
+          clearInterval(timerInterval);
+          gameEnded = true;
+          showCelebration(100); // final pass
+        }
+      }, 1000);
+    }
+
+    if (!isMuted) {
+      correctTrack.pause();
+      correctTrack.currentTime = 0;
+      correctTrack.play().catch(e => console.warn("Play failed", e));
+    }
+
+    score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
+    document.getElementById("score").textContent = score;
+
+    showScoop(() => {
+      generateProblem();
+      checkMilestones();
+    });
+  } else {
+    if (!isMuted) {
+      incorrectTrack.currentTime = 0;
+      incorrectTrack.play();
+    }
+    score -= 3;
+    document.getElementById("score").textContent = score;
+    clearAnswer();
+  }
+}
+
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
   if (score >= 25 && !window.twentyFiveTriggered) {
@@ -299,154 +343,103 @@ function checkMilestones() {
   }
 }
 
-function sparkleShower(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let sparkles = [];
-  for (let i = 0; i < 100; i++) {
-    sparkles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 2 + 1,
-      d: Math.random() * 1 + 0.5,
-      alpha: 1
-    });
-  }
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sparkles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-    });
-    update();
-  }
-  function update() {
-    for (let p of sparkles) {
-      p.y += p.d;
-      p.alpha -= 0.005;
+function showScoop(callback) {
+  const scoop = document.getElementById("scoop");
+  scoop.style.display = "block";
+  setTimeout(() => {
+    scoop.style.display = "none";
+    if (typeof callback === "function") callback();
+  }, 700);
+}
+
+function generateProblem() {
+  let a, b, c, op1, op2;
+  if (mode === "addsub") {
+    a = Math.floor(Math.random() * 10);
+    b = Math.floor(Math.random() * 10);
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    if (op1 === "-" && b > a) [a, b] = [b, a];
+    correctAnswer = op1 === "+" ? a + b : a - b;
+    currentProblemType = op1;
+    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+  } else if (mode === "multdiv") {
+    if (Math.random() > 0.5) {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      correctAnswer = a * b;
+      currentProblemType = "×";
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    } else {
+      b = Math.floor(Math.random() * 9) + 1;
+      correctAnswer = Math.floor(Math.random() * 10);
+      a = b * correctAnswer;
+      currentProblemType = "÷";
+      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
     }
-    sparkles = sparkles.filter(p => p.alpha > 0);
+  } else if (mode === "hard") {
+    a = Math.floor(Math.random() * 10);
+    b = Math.floor(Math.random() * 10);
+    c = Math.floor(Math.random() * 9) + 1;
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    op2 = Math.random() > 0.5 ? "×" : "÷";
+    let inner = op1 === "+" ? a + b : a - b;
+    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
-  (function loop() {
-    if (sparkles.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
 }
 
-function glowPulse() {
-  document.body.classList.add("flash");
-  setTimeout(() => document.body.classList.remove("flash"), 800);
-}
-
-function fireworkBurst(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let bursts = [];
-  for (let i = 0; i < 30; i++) {
-    let angle = Math.random() * 2 * Math.PI;
-    let speed = Math.random() * 5 + 2;
-    bursts.push({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      life: 60,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
-    });
-  }
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bursts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-    update();
-  }
-  function update() {
-    bursts.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.life -= 1;
-    });
-    bursts = bursts.filter(p => p.life > 0);
-  }
-  (function loop() {
-    if (bursts.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-function laserBeams(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const origin = document.getElementById("answerDisplay").getBoundingClientRect();
-  const originX = origin.left + origin.width / 2;
-  const originY = origin.top + origin.height / 2;
-
-  let beams = [];
-  for (let i = 0; i < 6; i++) {
-    beams.push({
-      x: originX + i * 15 - 45,
-      y: originY,
-      height: 0,
-      maxHeight: window.innerHeight,
-      color: `hsl(${Math.random() * 360}, 100%, 50%)`
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    beams.forEach(b => {
-      ctx.beginPath();
-      ctx.moveTo(b.x, b.y);
-      ctx.lineTo(b.x, b.y - b.height);
-      ctx.strokeStyle = b.color;
-      ctx.lineWidth = 4;
-      ctx.stroke();
-    });
-    update();
-  }
-
-  function update() {
-    beams.forEach(b => {
-      b.height += 20;
-    });
-    beams = beams.filter(b => b.height < b.maxHeight);
-  }
-
-  (function loop() {
-    if (beams.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-window.onload = () => {
-  document.getElementById("rulesModal").style.display = "flex";
-};
+// Celebration effects: sparkleShower, glowPulse, fireworkBurst, laserBeams (already in last chunk)
 
 document.getElementById("closeModalBtn").addEventListener("click", () => {
   document.getElementById("rulesModal").style.display = "none";
   generateProblem();
 });
+
+// 🔓 EXPOSE FUNCTIONS
 window.generateProblem = generateProblem;
 window.submitAnswer = submitAnswer;
-window.appendNumber = appendNumber;
-window.appendDecimal = appendDecimal;
-window.toggleNegative = toggleNegative;
-window.clearAnswer = clearAnswer;
-window.setMode = setMode;
-window.toggleMute = toggleMute;
-window.resetScore = resetScore;  
+window.appendNumber = function(num) {
+  if (!gameEnded) {
+    currentAnswer += num;
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+window.appendDecimal = function() {
+  if (!gameEnded && !currentAnswer.includes(".")) {
+    currentAnswer += (currentAnswer === "" ? "0." : ".");
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+window.toggleNegative = function() {
+  if (!gameEnded) {
+    currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+window.clearAnswer = function() {
+  if (!gameEnded) {
+    currentAnswer = "";
+    document.getElementById("answerDisplay").textContent = "0";
+  }
+};
+window.setMode = function(newMode) {
+  mode = newMode;
+  generateProblem();
+};
+window.toggleMute = function() {
+  isMuted = !isMuted;
+  document.getElementById("backgroundMusic1").muted = isMuted;
+  correctTrack.muted = isMuted;
+  incorrectTrack.muted = isMuted;
+  sound25.muted = isMuted;
+  sound50.muted = isMuted;
+  sound75.muted = isMuted;
+  sound100.muted = isMuted;
+};
+window.resetScore = resetScore;
 </script>
 </body>
 </html>
