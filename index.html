@@ -233,7 +233,6 @@ let gameEnded = false;
 
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
-
 const sound25 = document.getElementById("milestone25");
 const sound50 = document.getElementById("milestone50");
 const sound75 = document.getElementById("milestone75");
@@ -267,11 +266,16 @@ function resetScore() {
   music.currentTime = 0;
 
   document.getElementById("rulesModal").style.display = "flex";
+  closePopup();
   generateProblem();
 }
 
 function submitAnswer() {
-  if (gameEnded) return;
+  if (gameEnded) {
+    showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
+    return;
+  }
+
   let userAnswer = parseFloat(currentAnswer);
   if (userAnswer === correctAnswer) {
     if (!timerStarted) {
@@ -285,7 +289,7 @@ function submitAnswer() {
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
           gameEnded = true;
-          showCelebration(100); // final pass
+          showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`, false, true);
         }
       }, 1000);
     }
@@ -310,6 +314,7 @@ function submitAnswer() {
     }
     score -= 3;
     document.getElementById("score").textContent = score;
+    showPopup("⛔ Incorrect!", "Try again.", true);
     clearAnswer();
   }
 }
@@ -352,6 +357,31 @@ function showScoop(callback) {
   }, 700);
 }
 
+function showPopup(title, message, autoClose = false, endOfGame = false) {
+  document.getElementById("popupTitle").textContent = title;
+  document.getElementById("popupMessage").textContent = message;
+  document.getElementById("popupModal").style.display = "flex";
+
+  const btn = document.getElementById("popupButton");
+  if (endOfGame) {
+    btn.textContent = "Play Again";
+    btn.onclick = resetScore;
+  } else {
+    btn.textContent = "Got it!";
+    btn.onclick = closePopup;
+  }
+
+  if (autoClose) {
+    setTimeout(() => {
+      closePopup();
+    }, 1500);
+  }
+}
+
+function closePopup() {
+  document.getElementById("popupModal").style.display = "none";
+}
+
 function generateProblem() {
   let a, b, c, op1, op2;
   if (mode === "addsub") {
@@ -391,14 +421,15 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-// Celebration effects: sparkleShower, glowPulse, fireworkBurst, laserBeams (already in last chunk)
+// Celebration effects (sparkleShower, glowPulse, fireworkBurst, laserBeams)
+// [ALREADY DEFINED EARLIER — leave as-is]
 
 document.getElementById("closeModalBtn").addEventListener("click", () => {
   document.getElementById("rulesModal").style.display = "none";
   generateProblem();
 });
 
-// 🔓 EXPOSE FUNCTIONS
+// EXPOSE ALL FUNCTIONS TO BUTTONS
 window.generateProblem = generateProblem;
 window.submitAnswer = submitAnswer;
 window.appendNumber = function(num) {
