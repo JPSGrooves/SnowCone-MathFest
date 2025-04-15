@@ -330,30 +330,31 @@ function submitAnswer() {
 
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
+
   if (score >= 25 && !window.twentyFiveTriggered) {
     window.twentyFiveTriggered = true;
     if (!isMuted) sound25.play();
     sparkleShower(canvas);
   }
+
   if (score >= 50 && !window.fiftyTriggered) {
     window.fiftyTriggered = true;
     if (!isMuted) sound50.play();
     launchConfetti();
   }
+
   if (score >= 75 && !window.seventyFiveTriggered) {
     window.seventyFiveTriggered = true;
     if (!isMuted) sound75.play();
-    launchConfetti();
-    glowPulse();
+    launchConfetti(); // no pulse
   }
+
   if (score >= 100 && !window.hundredTriggered) {
     window.hundredTriggered = true;
     if (!isMuted) sound100.play();
     document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
-    document.getElementById("gameContainer").classList.add("flash");
     laserBeams(canvas);
     fireworkBurst(canvas);
-    setTimeout(() => document.getElementById("gameContainer").classList.remove("flash"), 600);
   }
 }
 
@@ -638,14 +639,14 @@ function laserBeams(canvas) {
 
   function update() {
     beams.forEach(b => {
-      b.height += 15; // was 20 — now slowed by 25%
+      b.height += 10; // slowed to 50% (was 20 originally, then 15, now 10)
     });
     beams = beams.filter(b => b.height < b.maxHeight);
   }
 
   function loop() {
     if (beams.length === 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // clean up lingering dot
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
     draw();
