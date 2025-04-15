@@ -147,7 +147,6 @@
   </style>
 </head>
 <body>
-
 <!-- RULES MODAL -->
 <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
@@ -212,6 +211,30 @@
   </div>
 </div>
 
+<!-- POPUP MODAL -->
+<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
+    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
+    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+    <button onclick="closePopup()" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+  </div>
+</div>
+
+<!-- STORY MODE MODAL -->
+<div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
+    <h2 style="color:#ffee00;">🌌 Yo, Cone Traveler 🌌</h2>
+    <p style="font-size:16px; line-height:1.6; color:#ffffff;">
+      You ever wonder what’s inside a snow cone?<br/><br/>
+      Like... the <em>real</em> inside?<br/>
+      Let’s just say it’s deeper than syrup and ice.<br/><br/>
+      You ready to go on a journey to the center of the snow cone?
+    </p>
+    <button onclick="closeStoryModeModal()" style="margin:10px 5px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to QuikServe</button>
+    <button disabled style="margin:10px 5px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:not-allowed;">Bet!</button>
+  </div>
+</div>
+
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
@@ -261,6 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
     generateProblem();
   }
   window.resetScore = resetScore;
+
   function submitAnswer() {
     if (gameEnded) {
       showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
@@ -305,9 +329,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       score -= 3;
       document.getElementById("score").textContent = score;
-      showPopup("⛔ Incorrect!", "Try again.");
+      showPopup("⛔ Incorrect!", "Try again.", true); // 👈 auto-close!
       clearAnswer();
     }
+  }
+
+  function showPopup(title, message, autoClose = false) {
+    document.getElementById("popupTitle").textContent = title;
+    document.getElementById("popupMessage").textContent = message;
+    document.getElementById("popupModal").style.display = "flex";
+
+    if (autoClose) {
+      setTimeout(() => {
+        closePopup();
+      }, 1500);
+    }
+  }
+
+  function closePopup() {
+    document.getElementById("popupModal").style.display = "none";
   }
 
   function appendNumber(num) {
@@ -458,16 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
   }
 
-  function showPopup(title, message) {
-    document.getElementById("popupTitle").textContent = title;
-    document.getElementById("popupMessage").textContent = message;
-    document.getElementById("popupModal").style.display = "flex";
-  }
-
-  function closePopup() {
-    document.getElementById("popupModal").style.display = "none";
-  }
-
+  // Startup
   document.getElementById("rulesModal").style.display = "flex";
   document.getElementById("closeModalBtn").addEventListener("click", () => {
     document.getElementById("rulesModal").style.display = "none";
@@ -481,7 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("storyModeModal").style.display = "none";
   };
 
-  // Expose global for button onclicks
+  // Global functions
   window.appendNumber = appendNumber;
   window.appendDecimal = appendDecimal;
   window.toggleNegative = toggleNegative;
@@ -491,30 +522,5 @@ document.addEventListener("DOMContentLoaded", () => {
   window.setMode = setMode;
 });
 </script>
-
-<!-- Neon-Style Popup Modal -->
-<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
-    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
-    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
-    <button onclick="closePopup()" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
-  </div>
-</div>
-
-<!-- Story Mode Modal -->
-<div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
-    <h2 style="color:#ffee00;">🌌 Yo, Cone Traveler 🌌</h2>
-    <p style="font-size:16px; line-height:1.6; color:#ffffff;">
-      You ever wonder what’s inside a snow cone?<br/><br/>
-      Like... the <em>real</em> inside?<br/>
-      Let’s just say it’s deeper than syrup and ice.<br/><br/>
-      You ready to go on a journey to the center of the snow cone?
-    </p>
-    <button onclick="closeStoryModeModal()" style="margin:10px 5px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to QuikServe</button>
-    <button disabled style="margin:10px 5px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:not-allowed;">Bet!</button>
-  </div>
-</div>
-
 </body>
 </html>
