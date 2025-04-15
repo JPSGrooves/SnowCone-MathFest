@@ -166,6 +166,15 @@
 <canvas class="confetti" id="confettiCanvas"></canvas>
 <canvas class="confetti" id="celebrationCanvas"></canvas>
 
+<!-- POPUP MODAL -->
+<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
+    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
+    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+  </div>
+</div>
+
 <!-- MILESTONE SOUNDS -->
 <audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
 <audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
