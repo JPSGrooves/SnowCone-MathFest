@@ -157,13 +157,23 @@
       ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
       💀 Hard Mode: <strong>+15 points</strong><br/>
       😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, the round ends.
+      🍧 The song is 1:45 long — when it ends, your score freezes.
     </p>
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
 
 <canvas class="confetti" id="confettiCanvas"></canvas>
+<canvas class="confetti" id="celebrationCanvas"></canvas>
+
+<!-- MILESTONE SOUNDS -->
+<audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
+<audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
+<audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
+<audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
+<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
+<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
+<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 
 <div class="game-container" id="gameContainer">
   <div class="score-bar">
@@ -183,14 +193,13 @@
 
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
   <div class="answer-display" id="answerDisplay">0</div>
-
   <div class="mode-buttons">
     <button onclick="setMode('addsub')">+/-</button>
     <button onclick="setMode('multdiv')">X-/</button>
     <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full
+Scoop</button>
   </div>
-
   <div class="keypad">
     <button onclick="appendNumber(7)">7</button>
     <button onclick="appendNumber(8)">8</button>
@@ -210,329 +219,224 @@
     <div></div>
   </div>
 </div>
-
-<!-- POPUP MODAL -->
-<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
-    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
-    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
-    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
-  </div>
-</div>
-
-<!-- STORY MODE MODAL -->
-<div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
-    <h2 style="color:#ffee00;">🌌 Yo, Cone Traveler 🌌</h2>
-    <p style="font-size:16px; line-height:1.6; color:#ffffff;">
-      You ever wonder what’s inside a snow cone?<br/><br/>
-      Like... the <em>real</em> inside?<br/>
-      Let’s just say it’s deeper than syrup and ice.<br/><br/>
-      You ready to go on a journey to the center of the snow cone?
-    </p>
-    <button onclick="closeStoryModeModal()" style="margin:10px 5px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to QuikServe</button>
-    <button disabled style="margin:10px 5px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:not-allowed;">Bet!</button>
-  </div>
-</div>
-
-<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
-<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
-<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  let score = 0;
-  let currentAnswer = "";
-  let correctAnswer = 0;
-  let currentProblemType = "+";
-  let mode = "addsub";
-  let isMuted = false;
-  let timerStarted = false;
-  let secondsElapsed = 0;
-  let timerInterval = null;
-  let gameEnded = false;
+let score = 0;
+let currentAnswer = "";
+let correctAnswer = 0;
+let currentProblemType = "+";
+let mode = "addsub";
+let isMuted = false;
+let timerStarted = false;
+let secondsElapsed = 0;
+let timerInterval = null;
+let gameEnded = false;
 
-  const correctTrack = document.getElementById("correctSound");
-  const incorrectTrack = document.getElementById("incorrectSound");
-  correctTrack.volume = 0.5;
-  incorrectTrack.volume = 0.5;
+const correctTrack = document.getElementById("correctSound");
+const incorrectTrack = document.getElementById("incorrectSound");
 
-  function resetScore() {
-    // Fix: Make sure all modals are hidden
-    document.getElementById("rulesModal").style.display = "none";
-    document.getElementById("popupModal").style.display = "none";
+const sound25 = document.getElementById("milestone25");
+const sound50 = document.getElementById("milestone50");
+const sound75 = document.getElementById("milestone75");
+const sound100 = document.getElementById("milestone100");
 
-    score = 0;
-    currentAnswer = "";
-    correctAnswer = 0;
-    timerStarted = false;
-    secondsElapsed = 0;
-    gameEnded = false;
-    window.twentyFiveTriggered = false;
-    window.fiftyTriggered = false;
-    window.seventyFiveTriggered = false;
-    window.hundredTriggered = false;
+correctTrack.volume = 0.5;
+incorrectTrack.volume = 0.5;
 
-    document.getElementById("score").textContent = "0";
-    document.getElementById("timer").textContent = "Time: 0s";
-    document.getElementById("answerDisplay").textContent = "0";
-    document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
-    document.getElementById("scoop").style.display = "none";
-    document.getElementById("problem").textContent = "0 + 0 = 🍧";
+function resetScore() {
+  score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  gameEnded = false;
+  window.twentyFiveTriggered = false;
+  window.fiftyTriggered = false;
+  window.seventyFiveTriggered = false;
+  window.hundredTriggered = false;
 
-    clearInterval(timerInterval);
-    const music = document.getElementById("backgroundMusic1");
-    music.pause();
-    music.currentTime = 0;
+  document.getElementById("score").textContent = "0";
+  document.getElementById("timer").textContent = "Time: 0s";
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
+  document.getElementById("scoop").style.display = "none";
+  document.getElementById("problem").textContent = "0 + 0 = 🍧";
 
-    document.getElementById("rulesModal").style.display = "flex";
-    generateProblem();
-  }
-  window.resetScore = resetScore;
+  clearInterval(timerInterval);
+  const music = document.getElementById("backgroundMusic1");
+  music.pause();
+  music.currentTime = 0;
 
-  function submitAnswer() {
-    if (gameEnded) {
-      showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
-      return;
-    }
-
-    let userAnswer = parseFloat(currentAnswer);
-    if (userAnswer === correctAnswer) {
-      if (!timerStarted) {
-        timerStarted = true;
-        const music = document.getElementById("backgroundMusic1");
-        music.currentTime = 0;
-        music.play().catch(e => console.warn("Music play failed:", e));
-        timerInterval = setInterval(() => {
-          secondsElapsed++;
-          document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
-          if (secondsElapsed >= 105) {
-            clearInterval(timerInterval);
-            gameEnded = true;
-            showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`, false, true);
-          }
-        }, 1000);
-      }
-
-      if (!isMuted) {
-        correctTrack.pause();
-        correctTrack.currentTime = 0;
-        correctTrack.play().catch(e => console.warn("Play failed", e));
-      }
-
-      score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
-      document.getElementById("score").textContent = score;
-
-      showScoop(() => {
-        generateProblem();
-        checkMilestones();
-      });
-    } else {
-      if (!isMuted) {
-        incorrectTrack.currentTime = 0;
-        incorrectTrack.play();
-      }
-      score -= 3;
-      document.getElementById("score").textContent = score;
-      showPopup("⛔ Incorrect!", "Try again.", true);
-      clearAnswer();
-    }
-  }
-
-  function showPopup(title, message, autoClose = false, endOfGame = false) {
-    document.getElementById("popupTitle").textContent = title;
-    document.getElementById("popupMessage").textContent = message;
-    document.getElementById("popupModal").style.display = "flex";
-
-    const btn = document.getElementById("popupButton");
-    if (endOfGame) {
-      btn.textContent = "Play Again";
-      btn.onclick = resetScore;
-    } else {
-      btn.textContent = "Got it!";
-      btn.onclick = closePopup;
-    }
-
-    if (autoClose) {
-      setTimeout(() => {
-        closePopup();
-      }, 1500);
-    }
-  }
-
-  function closePopup() {
-    document.getElementById("popupModal").style.display = "none";
-  }
-
-  function appendNumber(num) {
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-
-  function appendDecimal() {
-    if (!currentAnswer.includes(".")) {
-      currentAnswer += (currentAnswer === "" ? "0." : ".");
-      document.getElementById("answerDisplay").textContent = currentAnswer;
-    }
-  }
-
-  function toggleNegative() {
-    currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-
-  function clearAnswer() {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-
-  function toggleMute() {
-    isMuted = !isMuted;
-    document.getElementById("backgroundMusic1").muted = isMuted;
-    correctTrack.muted = isMuted;
-    incorrectTrack.muted = isMuted;
-  }
-
-  function setMode(newMode) {
-    mode = newMode;
-    generateProblem();
-  }
-
-  function generateProblem() {
-    let a, b, c, op1, op2;
-    if (mode === "addsub") {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
-      op1 = Math.random() > 0.5 ? "+" : "-";
-      if (op1 === "-" && b > a) [a, b] = [b, a];
-      correctAnswer = op1 === "+" ? a + b : a - b;
-      currentProblemType = op1;
-      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-    } else if (mode === "multdiv") {
-      if (Math.random() > 0.5) {
-        a = Math.floor(Math.random() * 10);
-        b = Math.floor(Math.random() * 10);
-        correctAnswer = a * b;
-        currentProblemType = "×";
-        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-      } else {
-        b = Math.floor(Math.random() * 9) + 1;
-        correctAnswer = Math.floor(Math.random() * 10);
-        a = b * correctAnswer;
-        currentProblemType = "÷";
-        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-      }
-    } else if (mode === "hard") {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
-      c = Math.floor(Math.random() * 9) + 1;
-      op1 = Math.random() > 0.5 ? "+" : "-";
-      op2 = Math.random() > 0.5 ? "×" : "÷";
-      let inner = op1 === "+" ? a + b : a - b;
-      correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
-      currentProblemType = "hard";
-      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-    }
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-
-  function showScoop(callback) {
-    const scoop = document.getElementById("scoop");
-    scoop.style.display = "block";
-    setTimeout(() => {
-      scoop.style.display = "none";
-      if (typeof callback === "function") callback();
-    }, 700);
-  }
-
-  function checkMilestones() {
-    if (score >= 25 && !window.twentyFiveTriggered) {
-      window.twentyFiveTriggered = true;
-      launchConfetti();
-    }
-    if (score >= 50 && !window.fiftyTriggered) {
-      window.fiftyTriggered = true;
-      launchConfetti();
-    }
-    if (score >= 75 && !window.seventyFiveTriggered) {
-      window.seventyFiveTriggered = true;
-      launchConfetti();
-      launchConfetti();
-    }
-    if (score >= 100 && !window.hundredTriggered) {
-      window.hundredTriggered = true;
-      document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
-      document.getElementById("gameContainer").classList.add("flash");
-      setTimeout(() => document.getElementById("gameContainer").classList.remove("flash"), 600);
-    }
-  }
-
-  function launchConfetti() {
-    const canvas = document.getElementById("confettiCanvas");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    let confetti = [];
-    for (let i = 0; i < 100; i++) {
-      confetti.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * -canvas.height,
-        r: Math.random() * 6 + 4,
-        d: Math.random() * 10 + 10,
-        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-        tilt: Math.floor(Math.random() * 10) - 10,
-        tiltAngleIncremental: Math.random() * 0.07 + 0.05,
-        tiltAngle: 0
-      });
-    }
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach(c => {
-        ctx.beginPath();
-        ctx.lineWidth = c.r;
-        ctx.strokeStyle = c.color;
-        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-        ctx.stroke();
-      });
-      update();
-    }
-    function update() {
-      for (let i = 0; i < confetti.length; i++) {
-        confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
-        confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
-        confetti[i].x += Math.sin(0.01);
-        confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
-      }
-    }
-    (function loop() {
-      draw();
-      requestAnimationFrame(loop);
-    })();
-  }
-
-  // Launch modal and bind story mode triggers
   document.getElementById("rulesModal").style.display = "flex";
-  document.getElementById("closeModalBtn").addEventListener("click", () => {
-    document.getElementById("rulesModal").style.display = "none";
-    generateProblem();
-  });
+  generateProblem();
+}
 
-  window.openStoryModeModal = () => {
-    document.getElementById("storyModeModal").style.display = "flex";
-  };
-  window.closeStoryModeModal = () => {
-    document.getElementById("storyModeModal").style.display = "none";
-  };
+function checkMilestones() {
+  const canvas = document.getElementById("celebrationCanvas");
+  if (score >= 25 && !window.twentyFiveTriggered) {
+    window.twentyFiveTriggered = true;
+    if (!isMuted) sound25.play();
+    sparkleShower(canvas);
+  }
+  if (score >= 50 && !window.fiftyTriggered) {
+    window.fiftyTriggered = true;
+    if (!isMuted) sound50.play();
+    launchConfetti();
+  }
+  if (score >= 75 && !window.seventyFiveTriggered) {
+    window.seventyFiveTriggered = true;
+    if (!isMuted) sound75.play();
+    launchConfetti();
+    glowPulse();
+  }
+  if (score >= 100 && !window.hundredTriggered) {
+    window.hundredTriggered = true;
+    if (!isMuted) sound100.play();
+    document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
+    document.getElementById("gameContainer").classList.add("flash");
+    laserBeams(canvas);
+    fireworkBurst(canvas);
+    setTimeout(() => document.getElementById("gameContainer").classList.remove("flash"), 600);
+  }
+}
 
-  // Button global hookups
-  window.appendNumber = appendNumber;
-  window.appendDecimal = appendDecimal;
-  window.toggleNegative = toggleNegative;
-  window.clearAnswer = clearAnswer;
-  window.submitAnswer = submitAnswer;
-  window.toggleMute = toggleMute;
-  window.setMode = setMode;
+function sparkleShower(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let sparkles = [];
+  for (let i = 0; i < 100; i++) {
+    sparkles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 2 + 1,
+      d: Math.random() * 1 + 0.5,
+      alpha: 1
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sparkles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fill();
+    });
+    update();
+  }
+  function update() {
+    for (let p of sparkles) {
+      p.y += p.d;
+      p.alpha -= 0.005;
+    }
+    sparkles = sparkles.filter(p => p.alpha > 0);
+  }
+  (function loop() {
+    if (sparkles.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+function glowPulse() {
+  document.body.classList.add("flash");
+  setTimeout(() => document.body.classList.remove("flash"), 800);
+}
+
+function fireworkBurst(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let bursts = [];
+  for (let i = 0; i < 30; i++) {
+    let angle = Math.random() * 2 * Math.PI;
+    let speed = Math.random() * 5 + 2;
+    bursts.push({
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      life: 60,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bursts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+    update();
+  }
+  function update() {
+    bursts.forEach(p => {
+      p.x += p.dx;
+      p.y += p.dy;
+      p.life -= 1;
+    });
+    bursts = bursts.filter(p => p.life > 0);
+  }
+  (function loop() {
+    if (bursts.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+function laserBeams(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const origin = document.getElementById("answerDisplay").getBoundingClientRect();
+  const originX = origin.left + origin.width / 2;
+  const originY = origin.top + origin.height / 2;
+
+  let beams = [];
+  for (let i = 0; i < 6; i++) {
+    beams.push({
+      x: originX + i * 15 - 45,
+      y: originY,
+      height: 0,
+      maxHeight: window.innerHeight,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    beams.forEach(b => {
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x, b.y - b.height);
+      ctx.strokeStyle = b.color;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    });
+    update();
+  }
+
+  function update() {
+    beams.forEach(b => {
+      b.height += 20;
+    });
+    beams = beams.filter(b => b.height < b.maxHeight);
+  }
+
+  (function loop() {
+    if (beams.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+window.onload = () => {
+  document.getElementById("rulesModal").style.display = "flex";
+};
+
+document.getElementById("closeModalBtn").addEventListener("click", () => {
+  document.getElementById("rulesModal").style.display = "none";
+  generateProblem();
 });
 </script>
 </body>
