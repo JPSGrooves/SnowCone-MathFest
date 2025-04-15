@@ -257,6 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
   incorrectTrack.volume = 0.5;
 
   function resetScore() {
+    // Fix: Make sure all modals are hidden
+    document.getElementById("rulesModal").style.display = "none";
+    document.getElementById("popupModal").style.display = "none";
+
     score = 0;
     currentAnswer = "";
     correctAnswer = 0;
@@ -274,13 +278,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
     document.getElementById("scoop").style.display = "none";
     document.getElementById("problem").textContent = "0 + 0 = 🍧";
-    document.getElementById("rulesModal").style.display = "flex";
 
     clearInterval(timerInterval);
     const music = document.getElementById("backgroundMusic1");
     music.pause();
     music.currentTime = 0;
 
+    document.getElementById("rulesModal").style.display = "flex";
     generateProblem();
   }
   window.resetScore = resetScore;
@@ -507,14 +511,21 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
   }
 
-  // Startup modal
+  // Launch modal and bind story mode triggers
   document.getElementById("rulesModal").style.display = "flex";
   document.getElementById("closeModalBtn").addEventListener("click", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
 
-  // Global bindings
+  window.openStoryModeModal = () => {
+    document.getElementById("storyModeModal").style.display = "flex";
+  };
+  window.closeStoryModeModal = () => {
+    document.getElementById("storyModeModal").style.display = "none";
+  };
+
+  // Button global hookups
   window.appendNumber = appendNumber;
   window.appendDecimal = appendDecimal;
   window.toggleNegative = toggleNegative;
@@ -522,12 +533,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.submitAnswer = submitAnswer;
   window.toggleMute = toggleMute;
   window.setMode = setMode;
-  window.openStoryModeModal = () => {
-    document.getElementById("storyModeModal").style.display = "flex";
-  };
-  window.closeStoryModeModal = () => {
-    document.getElementById("storyModeModal").style.display = "none";
-  };
 });
 </script>
 </body>
