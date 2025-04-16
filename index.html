@@ -15,7 +15,7 @@
     .game-container {
       max-width: 600px;
       margin: auto;
-      transform: scale(0.95);
+      transform: scale(0.90); /* 5% smaller */
       transform-origin: top center;
     }
     .title-image {
@@ -39,12 +39,12 @@
     .score-label {
       font-size: 20px;
       margin-bottom: 5px;
-      color: #00ff88; /* green */
+      color: #00ff88;
     }
     .timer-label {
       font-size: 20px;
       margin-bottom: 5px;
-      color: #00ccff; /* blue */
+      color: #00ccff;
     }
     .score {
       font-size: 26px;
@@ -86,7 +86,7 @@
       background: linear-gradient(to right, #ff00cc, #6600ff);
       border-radius: 75px 75px 0 0;
       position: absolute;
-      top: -20px; /* lowered scoop to clear title */
+      top: -20px;
       left: 5px;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
@@ -104,6 +104,18 @@
       height: auto;
       z-index: 1;
       pointer-events: none;
+    }
+
+    /* Clone cone override size */
+    .clone-cone .scoop {
+      width: 60px;
+      height: 32px;
+      left: 35px;
+      top: -15px;
+    }
+
+    .clone-cone .cone-img {
+      width: 65px;
     }
 
     .left-spin {
@@ -228,7 +240,7 @@
 
   <div class="cone-zone">
     <!-- Left Clone Cone -->
-    <div class="cone-wrapper" id="leftCone">
+    <div class="cone-wrapper clone-cone" id="leftCone">
       <div class="scoop"></div>
       <img src="cone.png" class="cone-img" />
     </div>
@@ -240,7 +252,7 @@
     </div>
 
     <!-- Right Clone Cone -->
-    <div class="cone-wrapper" id="rightCone">
+    <div class="cone-wrapper clone-cone" id="rightCone">
       <div class="scoop"></div>
       <img src="cone.png" class="cone-img" />
     </div>
@@ -492,6 +504,95 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+function sparkleShower(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let sparkles = [];
+  for (let i = 0; i < 100; i++) {
+    sparkles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 2 + 1,
+      d: Math.random() * 1 + 0.5,
+      alpha: 1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sparkles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    for (let p of sparkles) {
+      p.y += p.d;
+      p.alpha -= 0.005;
+    }
+    sparkles = sparkles.filter(p => p.alpha > 0);
+  }
+
+  (function loop() {
+    if (sparkles.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+function fireworkBurst(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let bursts = [];
+  for (let i = 0; i < 30; i++) {
+    let angle = Math.random() * 2 * Math.PI;
+    let speed = Math.random() * 5 + 2;
+    bursts.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      life: 60,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bursts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    bursts.forEach(p => {
+      p.x += p.dx;
+      p.y += p.dy;
+      p.life -= 1;
+    });
+    bursts = bursts.filter(p => p.life > 0);
+  }
+
+  (function loop() {
+    if (bursts.length === 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -541,8 +642,6 @@ document.addEventListener("DOMContentLoaded", () => {
     generateProblem();
   });
 });
-
-// celebration functions should already exist from prior chunks
 </script>
 </body>
 </html>
