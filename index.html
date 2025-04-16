@@ -43,16 +43,26 @@
       height: 150px;
       clip-path: polygon(50% 100%, 0 0, 100% 0);
       background: linear-gradient(to bottom, #ffff99, #ffee00);
-      box-shadow: 
-        0 0 20px #ffee00,
-        0 0 40px #ffee00,
-        0 0 60px #ff00cc,
-        0 0 80px #ff00cc;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1;
       transition: box-shadow 0.3s ease;
+    }
+    .snow-cone::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      background: black;
+      box-shadow:
+        0 0 15px #ffee00,
+        0 0 30px #ff00cc,
+        0 0 45px #ff00cc;
+      z-index: -1;
     }
     .cone-text a {
       color: black;
