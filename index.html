@@ -353,10 +353,10 @@ function checkMilestones() {
     window.hundredTriggered = true;
     if (!isMuted) sound100.play();
     document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
-    laserBeams(canvas);
-    fireworkBurst(canvas);
-  }
+    fireworkBurst(canvas); // 💥 First burst
+    setTimeout(() => fireworkBurst(canvas), 500); // 💥💥 Second burst
 }
+
 
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
