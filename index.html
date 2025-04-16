@@ -13,7 +13,7 @@
       padding: 20px;
     }
     .game-container {
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
       transform: scale(0.95);
       transform-origin: top center;
@@ -22,7 +22,7 @@
       width: 100%;
       max-width: 500px;
       height: auto;
-      margin: 0 auto 10px;
+      margin: 0 auto 20px;
       display: block;
     }
     .layout-row {
@@ -30,20 +30,29 @@
       justify-content: space-between;
       align-items: flex-start;
       padding: 0 10px;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
     .score-block, .timer-block {
       text-align: center;
       width: 90px;
     }
-    .score-label, .timer-label {
+    .score-label {
       font-size: 20px;
       margin-bottom: 5px;
-      color: #ffee00;
+      color: #00ff88; /* green */
     }
-    .score, #timer {
+    .timer-label {
+      font-size: 20px;
+      margin-bottom: 5px;
+      color: #00ccff; /* blue */
+    }
+    .score {
       font-size: 26px;
       color: #00ff88;
+    }
+    #timer {
+      font-size: 26px;
+      color: #00ccff;
     }
     .reset-button {
       background-color: #00ccff;
@@ -56,24 +65,37 @@
       cursor: pointer;
       margin-top: 10px;
     }
-    .snow-cone-wrapper {
+
+    .cone-zone {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      margin-top: 10px;
+      gap: 30px;
+    }
+
+    .cone-wrapper {
       position: relative;
       width: 130px;
       height: 210px;
-      margin: 10px auto;
     }
+
     .scoop {
-      width: 120px; /* slightly narrower */
+      width: 120px;
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
       border-radius: 75px 75px 0 0;
       position: absolute;
-      top: -25px;
-      left: 5px; /* recenters narrower scoop */
+      top: -20px; /* lowered scoop to clear title */
+      left: 5px;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
+    }
+
+    .main-scoop {
       display: none;
     }
+
     .cone-img {
       position: absolute;
       bottom: 0;
@@ -83,15 +105,36 @@
       z-index: 1;
       pointer-events: none;
     }
+
+    .left-spin {
+      animation: spinLeft 6s linear infinite;
+    }
+
+    .right-spin {
+      animation: spinRight 6s linear infinite;
+    }
+
+    @keyframes spinLeft {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinRight {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+
     .math-problem {
       font-size: 28px;
       margin: 15px 0 10px;
     }
+
     .answer-display {
       font-size: 36px;
       color: #ff00cc;
       margin-bottom: 20px;
     }
+
     .mode-buttons {
       display: flex;
       justify-content: center;
@@ -99,6 +142,7 @@
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
+
     .mode-buttons button {
       background-color: #00ff88;
       color: black;
@@ -112,6 +156,7 @@
       height: 50px;
       line-height: 1.1;
     }
+
     .keypad {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -119,6 +164,7 @@
       max-width: 320px;
       margin: auto;
     }
+
     .keypad button {
       background-color: #ff00cc;
       border: none;
@@ -129,6 +175,7 @@
       box-shadow: 0 0 10px #ff00cc;
       cursor: pointer;
     }
+
     canvas.confetti {
       position: fixed;
       pointer-events: none;
@@ -173,14 +220,29 @@
       <button class="reset-button" onclick="resetScore()">Reset Score</button>
     </div>
 
-    <div class="snow-cone-wrapper">
-      <div class="scoop" id="scoop"></div>
-      <img src="cone.png" id="coneImg" class="cone-img" />
-    </div>
-
     <div class="timer-block">
       <div class="timer-label">Time</div>
       <div id="timer">0s</div>
+    </div>
+  </div>
+
+  <div class="cone-zone">
+    <!-- Left Clone Cone -->
+    <div class="cone-wrapper" id="leftCone">
+      <div class="scoop"></div>
+      <img src="cone.png" class="cone-img" />
+    </div>
+
+    <!-- Main Game Cone -->
+    <div class="cone-wrapper" id="mainCone">
+      <div class="scoop main-scoop" id="scoop"></div>
+      <img src="cone.png" id="coneImg" class="cone-img" />
+    </div>
+
+    <!-- Right Clone Cone -->
+    <div class="cone-wrapper" id="rightCone">
+      <div class="scoop"></div>
+      <img src="cone.png" class="cone-img" />
     </div>
   </div>
 
@@ -270,6 +332,9 @@ function resetScore() {
   document.getElementById("answerDisplay").textContent = "0";
   document.getElementById("scoop").style.display = "none";
   document.getElementById("problem").textContent = "";
+
+  document.getElementById("leftCone").classList.remove("left-spin");
+  document.getElementById("rightCone").classList.remove("right-spin");
 
   clearInterval(timerInterval);
   const music = document.getElementById("backgroundMusic1");
@@ -366,6 +431,8 @@ function checkMilestones() {
     if (!isMuted) sound100.play();
     fireworkBurst(canvas);
     setTimeout(() => fireworkBurst(canvas), 500);
+    document.getElementById("leftCone").classList.add("left-spin");
+    document.getElementById("rightCone").classList.add("right-spin");
   }
 }
 
@@ -474,6 +541,8 @@ document.addEventListener("DOMContentLoaded", () => {
     generateProblem();
   });
 });
+
+// celebration functions should already exist from prior chunks
 </script>
 </body>
 </html>
