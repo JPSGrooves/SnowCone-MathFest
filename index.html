@@ -16,7 +16,7 @@
     .game-container {
       max-width: 600px;
       margin: auto;
-      transform: scale(0.90); /* Slight scale for mobile */
+      transform: scale(0.90); /* Still optimized for mobile */
       transform-origin: top center;
     }
 
@@ -24,7 +24,7 @@
       width: 100%;
       max-width: 500px;
       height: auto;
-      margin: 0 auto 20px;
+      margin: 0 auto 10px;
       display: block;
     }
 
@@ -32,16 +32,16 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 0 10px;
-      margin-bottom: 10px;
-      margin-top: 5px;
+      padding: 0 50px; /* tighter left/right */
+      margin-bottom: 0;
+      margin-top: -10px; /* bring score/timer up */
     }
 
     .score-block, .timer-block {
       text-align: center;
       width: 90px;
       position: relative;
-      top: 10px; /* shift down toward scoop sides */
+      top: 10px;
     }
 
     .score-label {
@@ -82,9 +82,9 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      gap: 100px; /* Even space between clone cones and center */
-      margin-top: 20px;
-      margin-bottom: 10px;
+      gap: 50px; /* was 100px — now closer in */
+      margin-top: 10px;
+      margin-bottom: 0;
     }
 
     .cone-wrapper {
@@ -98,7 +98,7 @@
     }
 
     .scoop {
-      width: 120px;
+      width: 130px;
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
       border-radius: 75px 75px 0 0;
@@ -149,20 +149,20 @@
 
     .math-problem {
       font-size: 28px;
-      margin: 15px 0 10px;
+      margin: 5px 0 5px; /* tighter spacing */
     }
 
     .answer-display {
       font-size: 36px;
       color: #ff00cc;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .mode-buttons {
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
 
