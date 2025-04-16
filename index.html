@@ -419,10 +419,20 @@ function generateProblem() {
 }
 
 function fireworkBurst(canvas) {
+  console.log("🎆 Firework triggered"); // test log
   const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    console.error("⚠️ Canvas context not found");
+    return;
+  }
+
+  // Force visibility and proper z-index
   canvas.style.display = 'block';
+  canvas.style.zIndex = '9999';
+  canvas.style.pointerEvents = 'none';
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
   let bursts = [];
   for (let i = 0; i < 30; i++) {
     let angle = Math.random() * 2 * Math.PI;
@@ -459,6 +469,7 @@ function fireworkBurst(canvas) {
 
   (function loop() {
     if (bursts.length === 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       canvas.style.display = 'none';
       return;
     }
