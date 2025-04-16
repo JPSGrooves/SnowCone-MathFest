@@ -20,33 +20,46 @@
     }
     .title-image {
       width: 100%;
-      max-width: 500px;
+      max-width: 400px;
       height: auto;
-      margin-bottom: 10px;
+      margin: 0 auto 10px;
+      display: block;
     }
     .layout-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      padding: 0 10px;
+      margin-bottom: 5px;
     }
     .score {
-      font-size: 20px;
+      font-size: 18px;
       color: #00ff88;
-      width: 80px;
+      width: 90px;
       text-align: left;
     }
     #timer {
       font-size: 16px;
       color: #00ccff;
-      width: 80px;
+      width: 90px;
       text-align: right;
+    }
+    .reset-button {
+      background-color: #00ccff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #00ccff;
+      cursor: pointer;
+      margin-top: 5px;
     }
     .snow-cone-wrapper {
       position: relative;
       width: 130px;
       height: 210px;
-      margin: 0 auto;
+      margin: 10px auto;
     }
     .scoop {
       width: 130px;
@@ -71,7 +84,7 @@
     }
     .math-problem {
       font-size: 28px;
-      margin: 20px 0 10px;
+      margin: 15px 0 10px;
     }
     .answer-display {
       font-size: 36px;
@@ -128,26 +141,27 @@
 </head>
 <body>
 
-<!-- TITLE -->
-<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image">
-<!-- POPUP MODAL -->
-<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
-    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
-    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
-    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+<!-- RULES MODAL -->
+<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+      💀 Hard Mode: <strong>+15 points</strong><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+      🍧 The song is 1:45 long — when it ends, your score freezes.
+    </p>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
 
-<!-- AUDIO -->
-<audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
-<audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
-<audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
-<audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
-<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
-<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
-<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+<canvas class="confetti" id="confettiCanvas"></canvas>
+<canvas class="confetti" id="celebrationCanvas"></canvas>
 
+<!-- TITLE -->
+<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image">
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
 
@@ -159,6 +173,8 @@
     </div>
     <div id="timer">Time: 0s</div>
   </div>
+
+  <button class="reset-button" onclick="resetScore()">Reset Score</button>
 
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
   <div class="answer-display" id="answerDisplay">0</div>
@@ -189,6 +205,24 @@
     <div></div>
   </div>
 </div>
+
+<!-- POPUP MODAL -->
+<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
+    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
+    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+  </div>
+</div>
+
+<!-- AUDIO -->
+<audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
+<audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
+<audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
+<audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
+<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
+<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
+<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -235,6 +269,8 @@ function resetScore() {
   music.currentTime = 0;
 
   document.getElementById("popupModal").style.display = "none";
+  document.getElementById("rulesModal").style.display = "flex";
+
   generateProblem();
 }
 
@@ -325,22 +361,6 @@ function checkMilestones() {
   }
 }
 
-function showPopup(title, message, autoClose = false, endOfGame = false) {
-  document.getElementById("popupTitle").textContent = title;
-  document.getElementById("popupMessage").textContent = message;
-  document.getElementById("popupModal").style.display = "flex";
-
-  const btn = document.getElementById("popupButton");
-  btn.textContent = endOfGame ? "Play Again" : "Got it!";
-  btn.onclick = endOfGame ? resetScore : closePopup;
-
-  if (autoClose) setTimeout(closePopup, 1500);
-}
-
-function closePopup() {
-  document.getElementById("popupModal").style.display = "none";
-}
-
 function generateProblem() {
   let a, b, c, op1, op2;
   if (mode === "addsub") {
@@ -381,11 +401,23 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-document.getElementById("closeModalBtn")?.addEventListener("click", () => {
-  document.getElementById("rulesModal")?.style.display = "none";
-  generateProblem();
-});
+function showPopup(title, message, autoClose = false, endOfGame = false) {
+  document.getElementById("popupTitle").textContent = title;
+  document.getElementById("popupMessage").textContent = message;
+  document.getElementById("popupModal").style.display = "flex";
 
+  const btn = document.getElementById("popupButton");
+  btn.textContent = endOfGame ? "Play Again" : "Got it!";
+  btn.onclick = endOfGame ? resetScore : closePopup;
+
+  if (autoClose) setTimeout(closePopup, 1500);
+}
+
+function closePopup() {
+  document.getElementById("popupModal").style.display = "none";
+}
+
+// Button hooks
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -428,7 +460,13 @@ window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
 
-// sparkleShower and fireworkBurst remain unchanged
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("rulesModal").style.display = "flex";
+  document.getElementById("closeModalBtn").addEventListener("click", () => {
+    document.getElementById("rulesModal").style.display = "none";
+    generateProblem();
+  });
+});
 </script>
 </body>
 </html>
