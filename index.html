@@ -525,6 +525,46 @@ window.toggleMute = () => {
   sound100.muted = isMuted;
 };
 window.resetScore = resetScore;
+function sparkleShower(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let sparkles = [];
+  for (let i = 0; i < 100; i++) {
+    sparkles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 2 + 1,
+      d: Math.random() * 1 + 0.5,
+      alpha: 1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sparkles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    for (let p of sparkles) {
+      p.y += p.d;
+      p.alpha -= 0.005;
+    }
+    sparkles = sparkles.filter(p => p.alpha > 0);
+  }
+
+  (function loop() {
+    if (sparkles.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
 </script>
 </body>
 </html>
