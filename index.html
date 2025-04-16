@@ -638,7 +638,7 @@ function laserBeams(canvas) {
 
   function update() {
     beams.forEach(b => {
-      b.height += 10; // laser speed (50% of original)
+      b.height += 11; // 10% faster than last version (was 10)
     });
   }
 
@@ -650,13 +650,12 @@ function laserBeams(canvas) {
       draw();
       requestAnimationFrame(loop);
     } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // clean laser exit
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // prevent ghost lines
     }
   }
 
   loop();
 }
-
 
 function glowPulse() {
   document.body.classList.add("flash");
