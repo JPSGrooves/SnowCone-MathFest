@@ -158,7 +158,6 @@
 
 <canvas class="confetti" id="confettiCanvas"></canvas>
 <canvas class="confetti" id="celebrationCanvas"></canvas>
-
 <!-- POPUP MODAL -->
 <div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
@@ -224,10 +223,7 @@ Scoop</button>
     <div></div>
   </div>
 </div>
-
-<!-- CHUNK 2 END -->
 <script>
-// === Game State ===
 let score = 0;
 let currentAnswer = "";
 let correctAnswer = 0;
@@ -239,19 +235,18 @@ let secondsElapsed = 0;
 let timerInterval = null;
 let gameEnded = false;
 
-// === Audio ===
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
 const sound25 = document.getElementById("milestone25");
 const sound50 = document.getElementById("milestone50");
 const sound75 = document.getElementById("milestone75");
 const sound100 = document.getElementById("milestone100");
+
 correctTrack.volume = 0.5;
 incorrectTrack.volume = 0.5;
 
-// === Reset Game ===
 function resetScore() {
-  score = 99; // Dev shortcut — change to 0 for final
+  score = 99; // dev mode — change to 0 for final
   currentAnswer = "";
   correctAnswer = 0;
   timerStarted = false;
@@ -279,7 +274,6 @@ function resetScore() {
   generateProblem();
 }
 
-// === Answer Submission ===
 function submitAnswer() {
   if (gameEnded) {
     showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
@@ -329,7 +323,6 @@ function submitAnswer() {
   }
 }
 
-// === Celebration Logic ===
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
 
@@ -360,7 +353,6 @@ function checkMilestones() {
   }
 }
 
-// === UI Helpers ===
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
   scoop.style.display = "block";
@@ -386,7 +378,6 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-// === PROBLEM GENERATOR (Now fixed!) ===
 function generateProblem() {
   let a, b, c, op1, op2;
   if (mode === "addsub") {
@@ -427,7 +418,56 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-// === FUNCTION HOOKS ===
+function fireworkBurst(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.style.display = 'block';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let bursts = [];
+  for (let i = 0; i < 30; i++) {
+    let angle = Math.random() * 2 * Math.PI;
+    let speed = Math.random() * 5 + 2;
+    bursts.push({
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      life: 60,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bursts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    bursts.forEach(p => {
+      p.x += p.dx;
+      p.y += p.dy;
+      p.life -= 1;
+    });
+    bursts = bursts.filter(p => p.life > 0);
+  }
+
+  (function loop() {
+    if (bursts.length === 0) {
+      canvas.style.display = 'none';
+      return;
+    }
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+// Button + Keyboard Hooks
 document.getElementById("closeModalBtn").addEventListener("click", () => {
   document.getElementById("rulesModal").style.display = "none";
   generateProblem();
@@ -474,52 +514,6 @@ window.toggleMute = () => {
   sound100.muted = isMuted;
 };
 window.resetScore = resetScore;
-function fireworkBurst(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.style.display = 'block'; // force visible
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let bursts = [];
-  for (let i = 0; i < 30; i++) {
-    let angle = Math.random() * 2 * Math.PI;
-    let speed = Math.random() * 5 + 2;
-    bursts.push({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      life: 60,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bursts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    bursts.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.life -= 1;
-    });
-    bursts = bursts.filter(p => p.life > 0);
-  }
-
-  (function loop() {
-    if (bursts.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
 </script>
 </body>
 </html>
