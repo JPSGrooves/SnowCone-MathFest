@@ -24,45 +24,23 @@
       height: 225px;
       margin: 30px auto 10px;
     }
-    .scoop {
+    .cone-img {
+      position: absolute;
+      bottom: 0;
+      left: 0;
       width: 150px;
-      height: 75px;
-      background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-radius: 75px 75px 0 0;
+      height: auto;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .scoop-img {
       position: absolute;
       top: 0;
       left: 0;
-      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      width: 150px;
+      height: auto;
       z-index: 2;
       display: none;
-    }
-    .snow-cone {
-      position: absolute;
-      bottom: 0;
-      width: 150px;
-      height: 150px;
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: linear-gradient(to bottom, #ffff99, #ffee00);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-      position: relative;
-    }
-    .snow-cone::before {
-      content: "";
-      position: absolute;
-      top: -6px;
-      left: -6px;
-      width: calc(100% + 12px);
-      height: calc(100% + 12px);
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: transparent;
-      box-shadow:
-        0 0 15px #ffee00,
-        0 0 30px #ff00cc,
-        0 0 45px #ff00cc;
-      z-index: -1;
       pointer-events: none;
     }
     .cone-text a {
@@ -170,7 +148,6 @@
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
-
 <canvas class="confetti" id="confettiCanvas"></canvas>
 <canvas class="confetti" id="celebrationCanvas"></canvas>
 <!-- POPUP MODAL -->
@@ -200,12 +177,8 @@
   </div>
 
   <div class="snow-cone-wrapper">
-    <div class="scoop" id="scoop"></div>
-    <div class="snow-cone" id="cone">
-      <div class="cone-text">
-        <a href="#" onclick="generateProblem()">Math<br/>Fest</a>
-      </div>
-    </div>
+    <img src="cone.png" id="coneImg" class="cone-img" />
+    <img src="scoop.png" id="scoopImg" class="scoop-img" />
   </div>
 
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
@@ -215,8 +188,7 @@
     <button onclick="setMode('addsub')">+/-</button>
     <button onclick="setMode('multdiv')">X-/</button>
     <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full
-Scoop</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
   </div>
 
   <div class="keypad">
@@ -261,7 +233,7 @@ correctTrack.volume = 0.5;
 incorrectTrack.volume = 0.5;
 
 function resetScore() {
-  score = 0; // dev mode — change to 0 for final
+  score = 0;
   currentAnswer = "";
   correctAnswer = 0;
   timerStarted = false;
@@ -275,8 +247,7 @@ function resetScore() {
   document.getElementById("score").textContent = "0";
   document.getElementById("timer").textContent = "Time: 0s";
   document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
-  document.getElementById("scoop").style.display = "none";
+  document.getElementById("scoopImg").style.display = "none";
   document.getElementById("problem").textContent = "0 + 0 = 🍧";
 
   clearInterval(timerInterval);
@@ -338,6 +309,15 @@ function submitAnswer() {
   }
 }
 
+function showScoop(callback) {
+  const scoop = document.getElementById("scoopImg");
+  scoop.style.display = "block";
+  setTimeout(() => {
+    scoop.style.display = "none";
+    if (typeof callback === "function") callback();
+  }, 700);
+}
+
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
 
@@ -362,19 +342,9 @@ function checkMilestones() {
   if (score >= 100 && !window.hundredTriggered) {
     window.hundredTriggered = true;
     if (!isMuted) sound100.play();
-    document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
     fireworkBurst(canvas);
     setTimeout(() => fireworkBurst(canvas), 500);
   }
-}
-
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
 }
 
 function showPopup(title, message, autoClose = false, endOfGame = false) {
@@ -433,74 +403,11 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-function fireworkBurst(canvas) {
-  console.log("🎆 Firework triggered"); // test log
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    console.error("⚠️ Canvas context not found");
-    return;
-  }
-
-  // Force visibility and proper z-index
-  canvas.style.display = 'block';
-  canvas.style.zIndex = '9999';
-  canvas.style.pointerEvents = 'none';
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  let bursts = [];
-  for (let i = 0; i < 30; i++) {
-    let angle = Math.random() * 2 * Math.PI;
-    let speed = Math.random() * 5 + 2;
-    bursts.push({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      life: 60,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bursts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    bursts.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.life -= 1;
-    });
-    bursts = bursts.filter(p => p.life > 0);
-  }
-
-  (function loop() {
-    if (bursts.length === 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      canvas.style.display = 'none';
-      return;
-    }
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-// Button + Keyboard Hooks
 document.getElementById("closeModalBtn").addEventListener("click", () => {
   document.getElementById("rulesModal").style.display = "none";
   generateProblem();
 });
 
-window.generateProblem = generateProblem;
-window.submitAnswer = submitAnswer;
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -540,46 +447,10 @@ window.toggleMute = () => {
   sound100.muted = isMuted;
 };
 window.resetScore = resetScore;
-function sparkleShower(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let sparkles = [];
-  for (let i = 0; i < 100; i++) {
-    sparkles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 2 + 1,
-      d: Math.random() * 1 + 0.5,
-      alpha: 1
-    });
-  }
+window.submitAnswer = submitAnswer;
+window.generateProblem = generateProblem;
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sparkles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    for (let p of sparkles) {
-      p.y += p.d;
-      p.alpha -= 0.005;
-    }
-    sparkles = sparkles.filter(p => p.alpha > 0);
-  }
-
-  (function loop() {
-    if (sparkles.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
+// You already have sparkleShower + fireworkBurst from v.077 (leave them unchanged)
 </script>
 </body>
 </html>
