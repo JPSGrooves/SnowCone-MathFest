@@ -12,12 +12,14 @@
       text-align: center;
       padding: 20px;
     }
+
     .game-container {
       max-width: 600px;
       margin: auto;
-      transform: scale(0.90); /* 5% smaller */
+      transform: scale(0.90); /* Slight scale for mobile */
       transform-origin: top center;
     }
+
     .title-image {
       width: 100%;
       max-width: 500px;
@@ -25,35 +27,45 @@
       margin: 0 auto 20px;
       display: block;
     }
+
     .layout-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       padding: 0 10px;
       margin-bottom: 10px;
+      margin-top: 5px;
     }
+
     .score-block, .timer-block {
       text-align: center;
       width: 90px;
+      position: relative;
+      top: 10px; /* shift down toward scoop sides */
     }
+
     .score-label {
       font-size: 20px;
       margin-bottom: 5px;
       color: #00ff88;
     }
+
     .timer-label {
       font-size: 20px;
       margin-bottom: 5px;
       color: #00ccff;
     }
+
     .score {
       font-size: 26px;
       color: #00ff88;
     }
+
     #timer {
       font-size: 26px;
       color: #00ccff;
     }
+
     .reset-button {
       background-color: #00ccff;
       color: white;
@@ -70,14 +82,19 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      margin-top: 10px;
-      gap: 30px;
+      gap: 100px; /* Even space between clone cones and center */
+      margin-top: 20px;
+      margin-bottom: 10px;
     }
 
     .cone-wrapper {
       position: relative;
       width: 130px;
       height: 210px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
     }
 
     .scoop {
@@ -85,11 +102,10 @@
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
       border-radius: 75px 75px 0 0;
-      position: absolute;
-      top: -20px;
-      left: 5px;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
+      position: relative;
+      top: -5px;
     }
 
     .main-scoop {
@@ -97,21 +113,16 @@
     }
 
     .cone-img {
-      position: absolute;
-      bottom: 0;
-      left: 0;
       width: 130px;
       height: auto;
       z-index: 1;
       pointer-events: none;
     }
 
-    /* Clone cone override size */
     .clone-cone .scoop {
       width: 60px;
       height: 32px;
-      left: 35px;
-      top: -15px;
+      top: 0;
     }
 
     .clone-cone .cone-img {
@@ -245,7 +256,7 @@
       <img src="cone.png" class="cone-img" />
     </div>
 
-    <!-- Main Game Cone -->
+    <!-- Main Cone -->
     <div class="cone-wrapper" id="mainCone">
       <div class="scoop main-scoop" id="scoop"></div>
       <img src="cone.png" id="coneImg" class="cone-img" />
