@@ -20,7 +20,7 @@
     }
     .title-image {
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
       height: auto;
       margin: 0 auto 10px;
       display: block;
@@ -28,21 +28,24 @@
     .layout-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       padding: 0 10px;
       margin-bottom: 5px;
     }
-    .score {
-      font-size: 18px;
-      color: #00ff88;
-      width: 90px;
+    .score-block {
       text-align: left;
+      margin-right: 10px;
+    }
+    .score {
+      font-size: 22px;
+      color: #00ff88;
+      margin-bottom: 6px;
     }
     #timer {
-      font-size: 16px;
+      font-size: 20px;
       color: #00ccff;
-      width: 90px;
       text-align: right;
+      margin-left: 10px;
     }
     .reset-button {
       background-color: #00ccff;
@@ -67,7 +70,7 @@
       background: linear-gradient(to right, #ff00cc, #6600ff);
       border-radius: 75px 75px 0 0;
       position: absolute;
-      top: -30px;
+      top: -25px; /* lowered from -30px */
       left: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
@@ -141,40 +144,24 @@
 </head>
 <body>
 
-<!-- RULES MODAL -->
-<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, your score freezes.
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
-  </div>
-</div>
-
-<canvas class="confetti" id="confettiCanvas"></canvas>
-<canvas class="confetti" id="celebrationCanvas"></canvas>
-
 <!-- TITLE -->
 <img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image">
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
 
   <div class="layout-row">
-    <div class="score">Score: <span id="score">0</span></div>
+    <div class="score-block">
+      <div class="score">Score: <span id="score">0</span></div>
+      <button class="reset-button" onclick="resetScore()">Reset Score</button>
+    </div>
+
     <div class="snow-cone-wrapper">
       <div class="scoop" id="scoop"></div>
       <img src="cone.png" id="coneImg" class="cone-img" />
     </div>
+
     <div id="timer">Time: 0s</div>
   </div>
-
-  <button class="reset-button" onclick="resetScore()">Reset Score</button>
 
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
   <div class="answer-display" id="answerDisplay">0</div>
@@ -417,7 +404,6 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-// Button hooks
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
