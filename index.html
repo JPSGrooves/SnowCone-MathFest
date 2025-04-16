@@ -136,14 +136,6 @@
       height: 100vh;
       z-index: 9999;
     }
-    .flash {
-      animation: flashEffect 0.5s ease-in-out;
-    }
-    @keyframes flashEffect {
-      0% { background: black; }
-      50% { background: #ffee00; }
-      100% { background: black; }
-    }
   </style>
 </head>
 <body>
@@ -160,7 +152,13 @@
       😵 Wrong answer: <strong>-3 points</strong><br/><br/>
       🍧 The song is 1:45 long — when it ends, your score freezes.
     </p>
-    <button id="closeModalBtn" style="margin-top:
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+  </div>
+</div>
+
+<canvas class="confetti" id="confettiCanvas"></canvas>
+<canvas class="confetti" id="celebrationCanvas"></canvas>
+
 <!-- POPUP MODAL -->
 <div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
@@ -226,7 +224,10 @@ Scoop</button>
     <div></div>
   </div>
 </div>
+
+<!-- CHUNK 2 END -->
 <script>
+// === Game State ===
 let score = 0;
 let currentAnswer = "";
 let correctAnswer = 0;
@@ -238,18 +239,19 @@ let secondsElapsed = 0;
 let timerInterval = null;
 let gameEnded = false;
 
+// === Audio ===
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
 const sound25 = document.getElementById("milestone25");
 const sound50 = document.getElementById("milestone50");
 const sound75 = document.getElementById("milestone75");
 const sound100 = document.getElementById("milestone100");
-
 correctTrack.volume = 0.5;
 incorrectTrack.volume = 0.5;
 
+// === Reset Game ===
 function resetScore() {
-  score = 99; // for testing — change to 0 for release
+  score = 99; // Dev shortcut — change to 0 for final
   currentAnswer = "";
   correctAnswer = 0;
   timerStarted = false;
@@ -268,14 +270,16 @@ function resetScore() {
   document.getElementById("problem").textContent = "0 + 0 = 🍧";
 
   clearInterval(timerInterval);
-  document.getElementById("backgroundMusic1").pause();
-  document.getElementById("backgroundMusic1").currentTime = 0;
+  const music = document.getElementById("backgroundMusic1");
+  music.pause();
+  music.currentTime = 0;
 
   document.getElementById("rulesModal").style.display = "flex";
   closePopup();
   generateProblem();
 }
 
+// === Answer Submission ===
 function submitAnswer() {
   if (gameEnded) {
     showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
@@ -325,6 +329,7 @@ function submitAnswer() {
   }
 }
 
+// === Celebration Logic ===
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
 
@@ -333,16 +338,19 @@ function checkMilestones() {
     if (!isMuted) sound25.play();
     sparkleShower(canvas);
   }
+
   if (score >= 50 && !window.fiftyTriggered) {
     window.fiftyTriggered = true;
     if (!isMuted) sound50.play();
     launchConfetti();
   }
+
   if (score >= 75 && !window.seventyFiveTriggered) {
     window.seventyFiveTriggered = true;
     if (!isMuted) sound75.play();
     launchConfetti();
   }
+
   if (score >= 100 && !window.hundredTriggered) {
     window.hundredTriggered = true;
     if (!isMuted) sound100.play();
@@ -352,6 +360,7 @@ function checkMilestones() {
   }
 }
 
+// === UI Helpers ===
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
   scoop.style.display = "block";
@@ -377,6 +386,7 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+// === PROBLEM GENERATOR (Now fixed!) ===
 function generateProblem() {
   let a, b, c, op1, op2;
   if (mode === "addsub") {
@@ -386,17 +396,20 @@ function generateProblem() {
     if (op1 === "-" && b > a) [a, b] = [b, a];
     correctAnswer = op1 === "+" ? a + b : a - b;
     currentProblemType = op1;
+    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
   } else if (mode === "multdiv") {
     if (Math.random() > 0.5) {
       a = Math.floor(Math.random() * 10);
       b = Math.floor(Math.random() * 10);
       correctAnswer = a * b;
       currentProblemType = "×";
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
     } else {
       b = Math.floor(Math.random() * 9) + 1;
       correctAnswer = Math.floor(Math.random() * 10);
       a = b * correctAnswer;
       currentProblemType = "÷";
+      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
     }
   } else if (mode === "hard") {
     a = Math.floor(Math.random() * 10);
@@ -408,16 +421,13 @@ function generateProblem() {
     correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
     currentProblemType = "hard";
     document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-    return;
   }
-  document.getElementById("problem").textContent = `${a} ${currentProblemType} ${b} = 🍧`;
+
   currentAnswer = "";
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-// 🪄 Expose Functions to Buttons
+// === FUNCTION HOOKS ===
 document.getElementById("closeModalBtn").addEventListener("click", () => {
   document.getElementById("rulesModal").style.display = "none";
   generateProblem();
@@ -433,7 +443,7 @@ window.appendNumber = num => {
 };
 window.appendDecimal = () => {
   if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += (currentAnswer === "" ? "0." : ".");
+    currentAnswer += currentAnswer === "" ? "0." : ".";
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
