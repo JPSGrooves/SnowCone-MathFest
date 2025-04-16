@@ -20,6 +20,14 @@
       transform-origin: top center;
     }
 
+    .title-image {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      margin: 0 auto 10px;
+      display: block;
+    }
+
     .layout-row {
       display: flex;
       justify-content: space-between;
@@ -28,10 +36,21 @@
       padding: 0 20px;
     }
 
-    .score-block, .timer-block {
-      width: 90px;
+    .score-block {
+      text-align: left;
+      width: auto;
+      margin-left: -10px; /* align "S" with title */
+    }
+
+    .reset-block {
       text-align: center;
-      font-size: 18px;
+      width: 110px;
+    }
+
+    .timer-block {
+      text-align: right;
+      width: auto;
+      margin-right: -10px; /* align "e" with title */
     }
 
     .score-label {
@@ -56,23 +75,16 @@
       color: #00ccff;
     }
 
-    .reset-block {
-      text-align: center;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
     .reset-button {
       background-color: #00ccff;
       color: white;
       border: none;
-      padding: 6px 20px;
-      font-size: 16px;
+      padding: 6px 12px;
+      font-size: 14px;
       border-radius: 6px;
       box-shadow: 0 0 10px #00ccff;
       cursor: pointer;
-      position: relative;
-      z-index: 1;
+      margin-top: 20px;
     }
 
     .cone-zone {
@@ -95,17 +107,17 @@
     }
 
     .scoop {
-      width: 60px;
-      height: 32px;
+      width: 130px;
+      height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-top-left-radius: 50px;
-      border-top-right-radius: 50px;
+      border-top-left-radius: 100px;
+      border-top-right-radius: 100px;
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      position: absolute;
-      top: -40px;
+      position: relative;
+      top: -5px;
     }
 
     .main-scoop {
@@ -158,14 +170,6 @@
       font-size: 36px;
       color: #ff00cc;
       margin-bottom: 10px;
-    }
-
-    .title-image {
-      width: 100%;
-      max-width: 500px;
-      height: auto;
-      margin: 10px auto 20px;
-      display: block;
     }
 
     .mode-buttons {
@@ -221,6 +225,9 @@
   </style>
 </head>
 <body>
+
+<!-- TITLE -->
+<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image">
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
 
@@ -230,32 +237,16 @@
       <div class="score"><span id="score">0</span></div>
     </div>
 
+    <div class="reset-block">
+      <button class="reset-button" onclick="resetScore()">Reset</button>
+    </div>
+
     <div class="timer-block">
       <div class="timer-label">Time</div>
       <div id="timer">0s</div>
     </div>
   </div>
 
-  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
-  <div class="answer-display" id="answerDisplay">0</div>
-
-  <!-- TITLE PNG (moved here) -->
-  <img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" />
-
-  <!-- MODE BUTTONS -->
-  <div class="mode-buttons">
-    <button onclick="setMode('addsub')">+/-</button>
-    <button onclick="setMode('multdiv')">X-/</button>
-    <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
-  </div>
-
-  <!-- RESET BUTTON ABOVE CONE -->
-  <div class="reset-block">
-    <button class="reset-button" onclick="resetScore()">Reset Score</button>
-  </div>
-
-  <!-- CONE ZONE -->
   <div class="cone-zone">
     <!-- Left Clone Cone -->
     <div class="cone-wrapper clone-cone" id="leftCone">
@@ -274,6 +265,16 @@
       <div class="scoop"></div>
       <img src="cone.png" class="cone-img" />
     </div>
+  </div>
+
+  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
+  <div class="answer-display" id="answerDisplay">0</div>
+
+  <div class="mode-buttons">
+    <button onclick="setMode('addsub')">+/-</button>
+    <button onclick="setMode('multdiv')">X-/</button>
+    <button onclick="setMode('hard')">Hard<br/>Mode</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
   </div>
 
   <div class="keypad">
