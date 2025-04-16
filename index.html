@@ -32,20 +32,18 @@
       padding: 0 10px;
       margin-bottom: 5px;
     }
-    .score-block {
-      text-align: left;
-      margin-right: 10px;
+    .score-block, .timer-block {
+      text-align: center;
+      width: 90px;
     }
-    .score {
-      font-size: 22px;
-      color: #00ff88;
-      margin-bottom: 6px;
-    }
-    #timer {
+    .score-label, .timer-label {
       font-size: 20px;
-      color: #00ccff;
-      text-align: right;
-      margin-left: 10px;
+      margin-bottom: 5px;
+      color: #ffee00;
+    }
+    .score, #timer {
+      font-size: 26px;
+      color: #00ff88;
     }
     .reset-button {
       background-color: #00ccff;
@@ -56,7 +54,7 @@
       border-radius: 6px;
       box-shadow: 0 0 10px #00ccff;
       cursor: pointer;
-      margin-top: 5px;
+      margin-top: 10px;
     }
     .snow-cone-wrapper {
       position: relative;
@@ -65,13 +63,13 @@
       margin: 10px auto;
     }
     .scoop {
-      width: 130px;
+      width: 120px; /* slightly narrower */
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
       border-radius: 75px 75px 0 0;
       position: absolute;
-      top: -25px; /* lowered from -30px */
-      left: 0;
+      top: -25px;
+      left: 5px; /* recenters narrower scoop */
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       display: none;
@@ -146,12 +144,32 @@
 
 <!-- TITLE -->
 <img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image">
+
+<!-- RULES MODAL -->
+<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+      💀 Hard Mode: <strong>+15 points</strong><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+      🍧 The song is 1:45 long — when it ends, your score freezes.
+    </p>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+  </div>
+</div>
+
+<canvas class="confetti" id="confettiCanvas"></canvas>
+<canvas class="confetti" id="celebrationCanvas"></canvas>
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
 
   <div class="layout-row">
     <div class="score-block">
-      <div class="score">Score: <span id="score">0</span></div>
+      <div class="score-label">Score</div>
+      <div class="score"><span id="score">0</span></div>
       <button class="reset-button" onclick="resetScore()">Reset Score</button>
     </div>
 
@@ -160,7 +178,10 @@
       <img src="cone.png" id="coneImg" class="cone-img" />
     </div>
 
-    <div id="timer">Time: 0s</div>
+    <div class="timer-block">
+      <div class="timer-label">Time</div>
+      <div id="timer">0s</div>
+    </div>
   </div>
 
   <div class="math-problem" id="problem">0 + 0 = 🍧</div>
@@ -245,10 +266,10 @@ function resetScore() {
   window.hundredTriggered = false;
 
   document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "Time: 0s";
+  document.getElementById("timer").textContent = "0s";
   document.getElementById("answerDisplay").textContent = "0";
   document.getElementById("scoop").style.display = "none";
-  document.getElementById("problem").textContent = "0 + 0 = 🍧";
+  document.getElementById("problem").textContent = "";
 
   clearInterval(timerInterval);
   const music = document.getElementById("backgroundMusic1");
@@ -276,7 +297,7 @@ function submitAnswer() {
       music.play().catch(e => console.warn("Music play failed:", e));
       timerInterval = setInterval(() => {
         secondsElapsed++;
-        document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
+        document.getElementById("timer").textContent = `${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
           gameEnded = true;
@@ -351,7 +372,7 @@ function checkMilestones() {
 function generateProblem() {
   let a, b, c, op1, op2;
   if (mode === "addsub") {
-    a = Math.floor(Math.random() * 10);
+    a = Math.floor(Math.random() * 10) + 1;
     b = Math.floor(Math.random() * 10);
     op1 = Math.random() > 0.5 ? "+" : "-";
     if (op1 === "-" && b > a) [a, b] = [b, a];
@@ -360,14 +381,14 @@ function generateProblem() {
     document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
   } else if (mode === "multdiv") {
     if (Math.random() > 0.5) {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
+      a = Math.floor(Math.random() * 10) + 1;
+      b = Math.floor(Math.random() * 10) + 1;
       correctAnswer = a * b;
       currentProblemType = "×";
       document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
     } else {
       b = Math.floor(Math.random() * 9) + 1;
-      correctAnswer = Math.floor(Math.random() * 10);
+      correctAnswer = Math.floor(Math.random() * 10) + 1;
       a = b * correctAnswer;
       currentProblemType = "÷";
       document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
