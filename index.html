@@ -16,7 +16,7 @@
     .game-container {
       max-width: 600px;
       margin: auto;
-      transform: scale(0.90); /* Still optimized for mobile */
+      transform: scale(0.90);
       transform-origin: top center;
     }
 
@@ -32,16 +32,25 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 0 50px; /* tighter left/right */
-      margin-bottom: 0;
-      margin-top: -10px; /* bring score/timer up */
+      margin: -5px 0 5px 0;
+      padding: 0 20px;
     }
 
-    .score-block, .timer-block {
+    .score-block {
+      text-align: left;
+      width: auto;
+      margin-left: -10px; /* align "S" with title */
+    }
+
+    .reset-block {
       text-align: center;
-      width: 90px;
-      position: relative;
-      top: 10px;
+      width: 110px;
+    }
+
+    .timer-block {
+      text-align: right;
+      width: auto;
+      margin-right: -10px; /* align "e" with title */
     }
 
     .score-label {
@@ -75,14 +84,14 @@
       border-radius: 6px;
       box-shadow: 0 0 10px #00ccff;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 20px;
     }
 
     .cone-zone {
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      gap: 50px; /* was 100px — now closer in */
+      gap: 50px;
       margin-top: 10px;
       margin-bottom: 0;
     }
@@ -101,7 +110,10 @@
       width: 130px;
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-radius: 75px 75px 0 0;
+      border-top-left-radius: 100px;
+      border-top-right-radius: 100px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: relative;
@@ -123,6 +135,8 @@
       width: 60px;
       height: 32px;
       top: 0;
+      border-top-left-radius: 50px;
+      border-top-right-radius: 50px;
     }
 
     .clone-cone .cone-img {
@@ -149,7 +163,7 @@
 
     .math-problem {
       font-size: 28px;
-      margin: 5px 0 5px; /* tighter spacing */
+      margin: 5px 0 5px;
     }
 
     .answer-display {
@@ -214,25 +228,6 @@
 
 <!-- TITLE -->
 <img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image">
-
-<!-- RULES MODAL -->
-<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, your score freezes.
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
-  </div>
-</div>
-
-<canvas class="confetti" id="confettiCanvas"></canvas>
-<canvas class="confetti" id="celebrationCanvas"></canvas>
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
 
@@ -240,7 +235,10 @@
     <div class="score-block">
       <div class="score-label">Score</div>
       <div class="score"><span id="score">0</span></div>
-      <button class="reset-button" onclick="resetScore()">Reset Score</button>
+    </div>
+
+    <div class="reset-block">
+      <button class="reset-button" onclick="resetScore()">Reset</button>
     </div>
 
     <div class="timer-block">
