@@ -476,6 +476,7 @@ window.toggleMute = () => {
 window.resetScore = resetScore;
 function fireworkBurst(canvas) {
   const ctx = canvas.getContext("2d");
+  canvas.style.display = 'block'; // force visible
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   let bursts = [];
