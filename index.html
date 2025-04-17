@@ -97,8 +97,9 @@
       border-radius: 65px 65px 0 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      position: relative;
-      top: -5px;
+      position: absolute;
+      bottom: 100%; /* aligns flush with top of cone */
+      left: 0;
     }
 
     .main-scoop {
@@ -279,6 +280,22 @@
     <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
     <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
     <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+  </div>
+</div>
+
+<!-- RULES MODAL -->
+<div id="rulesModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+      💀 Hard Mode: <strong>+15 points</strong><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+      🍧 The song is 1:45 long — when it ends, your score freezes.
+    </p>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
 
@@ -489,6 +506,7 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+// Input functions
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -537,6 +555,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
+
+  // Failsafe to ensure problem shows even if modal skipped
+  setTimeout(() => {
+    if (!document.getElementById("problem").textContent.includes("=")) {
+      generateProblem();
+    }
+  }, 500);
 });
 </script>
 </body>
