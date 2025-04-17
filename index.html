@@ -34,19 +34,17 @@
       justify-content: space-between;
       align-items: flex-start;
       margin: -5px 0 5px 0;
-      padding: 0 20px;
+      padding: 0 50px; /* wider for new alignment */
     }
 
     .score-block {
-      text-align: left;
+      text-align: center;
       width: auto;
-      margin-left: -10px;
     }
 
     .timer-block {
-      text-align: right;
+      text-align: center;
       width: auto;
-      margin-right: -10px;
     }
 
     .score-label {
@@ -98,7 +96,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: absolute;
-      bottom: 100%; /* aligns flush with top of cone */
+      bottom: 100%;
       left: 0;
     }
 
@@ -116,7 +114,9 @@
     .clone-cone .scoop {
       width: 60px;
       height: 32px;
-      top: 0;
+      position: absolute;
+      bottom: 100%;
+      left: 2.5px; /* perfectly center align on 65px wide cone */
       border-radius: 32px 32px 0 0;
     }
 
@@ -506,7 +506,6 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-// Input functions
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -556,7 +555,7 @@ document.addEventListener("DOMContentLoaded", () => {
     generateProblem();
   });
 
-  // Failsafe to ensure problem shows even if modal skipped
+  // failsafe init
   setTimeout(() => {
     if (!document.getElementById("problem").textContent.includes("=")) {
       generateProblem();
