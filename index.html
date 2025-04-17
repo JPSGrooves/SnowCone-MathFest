@@ -34,15 +34,10 @@
       justify-content: space-between;
       align-items: flex-start;
       margin: -5px 0 5px 0;
-      padding: 0 50px; /* wider for new alignment */
+      padding: 0 50px;
     }
 
-    .score-block {
-      text-align: center;
-      width: auto;
-    }
-
-    .timer-block {
+    .score-block, .timer-block {
       text-align: center;
       width: auto;
     }
@@ -96,7 +91,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: absolute;
-      bottom: 100%;
+      bottom: 94%; /* lowered for main alignment */
       left: 0;
     }
 
@@ -115,8 +110,8 @@
       width: 60px;
       height: 32px;
       position: absolute;
-      bottom: 100%;
-      left: 2.5px; /* perfectly center align on 65px wide cone */
+      left: 4px;  /* slight shift to right */
+      bottom: 91%;  /* dropped to align with cone top */
       border-radius: 32px 32px 0 0;
     }
 
@@ -555,7 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
     generateProblem();
   });
 
-  // failsafe init
+  // backup trigger for problem init
   setTimeout(() => {
     if (!document.getElementById("problem").textContent.includes("=")) {
       generateProblem();
