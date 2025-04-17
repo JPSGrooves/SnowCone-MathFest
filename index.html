@@ -91,7 +91,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: absolute;
-      bottom: 94%; /* lowered for main alignment */
+      bottom: 76px; /* lowered by ~18px */
       left: 0;
     }
 
@@ -110,8 +110,8 @@
       width: 60px;
       height: 32px;
       position: absolute;
-      left: 4px;  /* slight shift to right */
-      bottom: 91%;  /* dropped to align with cone top */
+      bottom: 40px; /* lowered ~72px from original */
+      left: 5px;    /* shifted ~4px right */
       border-radius: 32px 32px 0 0;
     }
 
@@ -501,6 +501,7 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+// Inputs
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -543,6 +544,7 @@ window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
 
+// On load
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("rulesModal").style.display = "flex";
   document.getElementById("closeModalBtn").addEventListener("click", () => {
@@ -550,7 +552,6 @@ document.addEventListener("DOMContentLoaded", () => {
     generateProblem();
   });
 
-  // backup trigger for problem init
   setTimeout(() => {
     if (!document.getElementById("problem").textContent.includes("=")) {
       generateProblem();
