@@ -91,7 +91,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: absolute;
-      bottom: 130px; /* flat edge aligned with cone top */
+      bottom: 148px; /* raised 18px from previous 130px */
       left: 0;
     }
 
@@ -110,8 +110,8 @@
       width: 60px;
       height: 32px;
       position: absolute;
-      bottom: 65px; /* aligned with 65px tall cone top */
-      left: 2.5px;
+      bottom: 75px;  /* up 10px from previous 65px */
+      left: 22.5px;  /* 2.5 + 20px shift to the right */
       border-radius: 32px 32px 0 0;
     }
 
@@ -196,7 +196,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 10000; /* max priority */
+      z-index: 9999;
       display: block;
     }
   </style>
@@ -284,7 +284,7 @@
 </div>
 
 <!-- RULES MODAL -->
-<div id="rulesModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
     <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
     <p style="font-size:16px; line-height:1.5;">
@@ -410,9 +410,17 @@ function submitAnswer() {
   }
 }
 
+function showScoop(callback) {
+  const scoop = document.getElementById("scoop");
+  scoop.style.display = "block";
+  setTimeout(() => {
+    scoop.style.display = "none";
+    if (typeof callback === "function") callback();
+  }, 700);
+}
+
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
-
   if (score >= 25 && !window.twentyFiveTriggered) {
     window.twentyFiveTriggered = true;
     if (!isMuted) sound25.play();
@@ -441,11 +449,51 @@ function checkMilestones() {
   }
 }
 
+function sparkleShower(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let sparkles = [];
+  for (let i = 0; i < 100; i++) {
+    sparkles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 2 + 1,
+      d: Math.random() * 1 + 0.5,
+      alpha: 1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sparkles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    for (let p of sparkles) {
+      p.y += p.d;
+      p.alpha -= 0.005;
+    }
+    sparkles = sparkles.filter(p => p.alpha > 0);
+  }
+
+  (function loop() {
+    if (sparkles.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
 function fireworkBurst(canvas) {
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-
   let bursts = [];
   for (let i = 0; i < 30; i++) {
     let angle = Math.random() * 2 * Math.PI;
@@ -488,58 +536,6 @@ function fireworkBurst(canvas) {
     draw();
     requestAnimationFrame(loop);
   })();
-}
-
-function sparkleShower(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  let sparkles = [];
-  for (let i = 0; i < 100; i++) {
-    sparkles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 2 + 1,
-      d: Math.random() * 1 + 0.5,
-      alpha: 1
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sparkles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    for (let p of sparkles) {
-      p.y += p.d;
-      p.alpha -= 0.005;
-    }
-    sparkles = sparkles.filter(p => p.alpha > 0);
-  }
-
-  (function loop() {
-    if (sparkles.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-// Utility & Event Setup
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
 }
 
 function showPopup(title, message, autoClose = false, endOfGame = false) {
