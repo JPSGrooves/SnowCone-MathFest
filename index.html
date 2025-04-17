@@ -91,7 +91,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: absolute;
-      bottom: 76px; /* lowered by ~18px */
+      bottom: 130px; /* flat edge aligned with cone top */
       left: 0;
     }
 
@@ -110,8 +110,8 @@
       width: 60px;
       height: 32px;
       position: absolute;
-      bottom: 40px; /* lowered ~72px from original */
-      left: 5px;    /* shifted ~4px right */
+      bottom: 65px; /* aligned with 65px tall cone top */
+      left: 2.5px;
       border-radius: 32px 32px 0 0;
     }
 
@@ -196,11 +196,16 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 9999;
+      z-index: 10000; /* max priority */
+      display: block;
     }
   </style>
 </head>
 <body>
+
+<!-- Celebration Canvases -->
+<canvas id="confettiCanvas" class="confetti"></canvas>
+<canvas id="celebrationCanvas" class="confetti"></canvas>
 
 <!-- TITLE (clickable for reset) -->
 <img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
@@ -405,15 +410,6 @@ function submitAnswer() {
   }
 }
 
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
-}
-
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
 
@@ -445,44 +441,105 @@ function checkMilestones() {
   }
 }
 
-function generateProblem() {
-  let a, b, c, op1, op2;
-  if (mode === "addsub") {
-    a = Math.floor(Math.random() * 10) + 1;
-    b = Math.floor(Math.random() * 10);
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    if (op1 === "-" && b > a) [a, b] = [b, a];
-    correctAnswer = op1 === "+" ? a + b : a - b;
-    currentProblemType = op1;
-    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-  } else if (mode === "multdiv") {
-    if (Math.random() > 0.5) {
-      a = Math.floor(Math.random() * 10) + 1;
-      b = Math.floor(Math.random() * 10) + 1;
-      correctAnswer = a * b;
-      currentProblemType = "×";
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-    } else {
-      b = Math.floor(Math.random() * 9) + 1;
-      correctAnswer = Math.floor(Math.random() * 10) + 1;
-      a = b * correctAnswer;
-      currentProblemType = "÷";
-      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-    }
-  } else if (mode === "hard") {
-    a = Math.floor(Math.random() * 10);
-    b = Math.floor(Math.random() * 10);
-    c = Math.floor(Math.random() * 9) + 1;
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    op2 = Math.random() > 0.5 ? "×" : "÷";
-    let inner = op1 === "+" ? a + b : a - b;
-    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+function fireworkBurst(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let bursts = [];
+  for (let i = 0; i < 30; i++) {
+    let angle = Math.random() * 2 * Math.PI;
+    let speed = Math.random() * 5 + 2;
+    bursts.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      life: 60,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
   }
 
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bursts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    bursts.forEach(p => {
+      p.x += p.dx;
+      p.y += p.dy;
+      p.life -= 1;
+    });
+    bursts = bursts.filter(p => p.life > 0);
+  }
+
+  (function loop() {
+    if (bursts.length === 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+function sparkleShower(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let sparkles = [];
+  for (let i = 0; i < 100; i++) {
+    sparkles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 2 + 1,
+      d: Math.random() * 1 + 0.5,
+      alpha: 1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sparkles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    for (let p of sparkles) {
+      p.y += p.d;
+      p.alpha -= 0.005;
+    }
+    sparkles = sparkles.filter(p => p.alpha > 0);
+  }
+
+  (function loop() {
+    if (sparkles.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+// Utility & Event Setup
+function showScoop(callback) {
+  const scoop = document.getElementById("scoop");
+  scoop.style.display = "block";
+  setTimeout(() => {
+    scoop.style.display = "none";
+    if (typeof callback === "function") callback();
+  }, 700);
 }
 
 function showPopup(title, message, autoClose = false, endOfGame = false) {
@@ -501,7 +558,6 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-// Inputs
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -544,7 +600,6 @@ window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
 
-// On load
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("rulesModal").style.display = "flex";
   document.getElementById("closeModalBtn").addEventListener("click", () => {
