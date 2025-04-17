@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -25,6 +26,7 @@
       height: auto;
       margin: 0 auto 10px;
       display: block;
+      cursor: pointer;
     }
 
     .layout-row {
@@ -38,18 +40,13 @@
     .score-block {
       text-align: left;
       width: auto;
-      margin-left: -10px; /* align "S" with title */
-    }
-
-    .reset-block {
-      text-align: center;
-      width: 110px;
+      margin-left: -10px;
     }
 
     .timer-block {
       text-align: right;
       width: auto;
-      margin-right: -10px; /* align "e" with title */
+      margin-right: -10px;
     }
 
     .score-label {
@@ -72,18 +69,6 @@
     #timer {
       font-size: 26px;
       color: #00ccff;
-    }
-
-    .reset-button {
-      background-color: #00ccff;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      font-size: 14px;
-      border-radius: 6px;
-      box-shadow: 0 0 10px #00ccff;
-      cursor: pointer;
-      margin-top: 20px;
     }
 
     .cone-zone {
@@ -109,10 +94,7 @@
       width: 130px;
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-top-left-radius: 100px;
-      border-top-right-radius: 100px;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
+      border-radius: 65px 65px 0 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: relative;
@@ -134,8 +116,7 @@
       width: 60px;
       height: 32px;
       top: 0;
-      border-top-left-radius: 50px;
-      border-top-right-radius: 50px;
+      border-radius: 32px 32px 0 0;
     }
 
     .clone-cone .cone-img {
@@ -225,19 +206,15 @@
 </head>
 <body>
 
-<!-- TITLE -->
-<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image">
+<!-- TITLE (clickable for reset) -->
+<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
+
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
-
   <div class="layout-row">
     <div class="score-block">
       <div class="score-label">Score</div>
       <div class="score"><span id="score">0</span></div>
-    </div>
-
-    <div class="reset-block">
-      <button class="reset-button" onclick="resetScore()">Reset</button>
     </div>
 
     <div class="timer-block">
@@ -510,95 +487,6 @@ function showPopup(title, message, autoClose = false, endOfGame = false) {
 
 function closePopup() {
   document.getElementById("popupModal").style.display = "none";
-}
-
-function sparkleShower(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let sparkles = [];
-  for (let i = 0; i < 100; i++) {
-    sparkles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 2 + 1,
-      d: Math.random() * 1 + 0.5,
-      alpha: 1
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sparkles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    for (let p of sparkles) {
-      p.y += p.d;
-      p.alpha -= 0.005;
-    }
-    sparkles = sparkles.filter(p => p.alpha > 0);
-  }
-
-  (function loop() {
-    if (sparkles.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-function fireworkBurst(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let bursts = [];
-  for (let i = 0; i < 30; i++) {
-    let angle = Math.random() * 2 * Math.PI;
-    let speed = Math.random() * 5 + 2;
-    bursts.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      life: 60,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bursts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    bursts.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.life -= 1;
-    });
-    bursts = bursts.filter(p => p.life > 0);
-  }
-
-  (function loop() {
-    if (bursts.length === 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      return;
-    }
-    draw();
-    requestAnimationFrame(loop);
-  })();
 }
 
 window.appendNumber = num => {
