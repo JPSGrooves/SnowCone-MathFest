@@ -91,7 +91,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: absolute;
-      bottom: 148px; /* raised 18px from previous 130px */
+      bottom: 148px;
       left: 0;
     }
 
@@ -110,8 +110,8 @@
       width: 60px;
       height: 32px;
       position: absolute;
-      bottom: 75px;  /* up 10px from previous 65px */
-      left: 22.5px;  /* 2.5 + 20px shift to the right */
+      bottom: 75px;
+      left: 22.5px;
       border-radius: 32px 32px 0 0;
     }
 
@@ -203,12 +203,27 @@
 </head>
 <body>
 
-<!-- Celebration Canvases -->
 <canvas id="confettiCanvas" class="confetti"></canvas>
 <canvas id="celebrationCanvas" class="confetti"></canvas>
 
-<!-- TITLE (clickable for reset) -->
+<!-- TITLE -->
 <img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
+
+<!-- RULES MODAL -->
+<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+      💀 Hard Mode: <strong>+15 points</strong><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+      🍧 The song is 1:45 long — when it ends, your score freezes.
+    </p>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+  </div>
+</div>
 
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
@@ -280,22 +295,6 @@
     <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
     <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
     <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
-  </div>
-</div>
-
-<!-- RULES MODAL -->
-<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, your score freezes.
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
 
@@ -410,17 +409,9 @@ function submitAnswer() {
   }
 }
 
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
-}
-
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
+
   if (score >= 25 && !window.twentyFiveTriggered) {
     window.twentyFiveTriggered = true;
     if (!isMuted) sound25.play();
@@ -430,13 +421,13 @@ function checkMilestones() {
   if (score >= 50 && !window.fiftyTriggered) {
     window.fiftyTriggered = true;
     if (!isMuted) sound50.play();
-    launchConfetti();
+    sparkleShower(canvas);
   }
 
   if (score >= 75 && !window.seventyFiveTriggered) {
     window.seventyFiveTriggered = true;
     if (!isMuted) sound75.play();
-    launchConfetti();
+    sparkleShower(canvas);
   }
 
   if (score >= 100 && !window.hundredTriggered) {
@@ -447,6 +438,15 @@ function checkMilestones() {
     document.getElementById("leftCone").classList.add("left-spin");
     document.getElementById("rightCone").classList.add("right-spin");
   }
+}
+
+function showScoop(callback) {
+  const scoop = document.getElementById("scoop");
+  scoop.style.display = "block";
+  setTimeout(() => {
+    scoop.style.display = "none";
+    if (typeof callback === "function") callback();
+  }, 700);
 }
 
 function sparkleShower(canvas) {
@@ -554,6 +554,46 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+function generateProblem() {
+  let a, b, c, op1, op2;
+  if (mode === "addsub") {
+    a = Math.floor(Math.random() * 10);
+    b = Math.floor(Math.random() * 10);
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    if (op1 === "-" && b > a) [a, b] = [b, a];
+    correctAnswer = op1 === "+" ? a + b : a - b;
+    currentProblemType = op1;
+    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+  } else if (mode === "multdiv") {
+    if (Math.random() > 0.5) {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      correctAnswer = a * b;
+      currentProblemType = "×";
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    } else {
+      b = Math.floor(Math.random() * 9) + 1;
+      correctAnswer = Math.floor(Math.random() * 10);
+      a = b * correctAnswer;
+      currentProblemType = "÷";
+      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+    }
+  } else {
+    a = Math.floor(Math.random() * 10);
+    b = Math.floor(Math.random() * 10);
+    c = Math.floor(Math.random() * 9) + 1;
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    op2 = Math.random() > 0.5 ? "×" : "÷";
+    let inner = op1 === "+" ? a + b : a - b;
+    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+  }
+
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
+
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -602,12 +642,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
-
-  setTimeout(() => {
-    if (!document.getElementById("problem").textContent.includes("=")) {
-      generateProblem();
-    }
-  }, 500);
 });
 </script>
 </body>
