@@ -91,7 +91,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: absolute;
-      bottom: 148px;
+      bottom: 155px; /* up from 148 */
       left: 0;
     }
 
@@ -110,8 +110,8 @@
       width: 60px;
       height: 32px;
       position: absolute;
-      bottom: 75px;
-      left: 22.5px;
+      bottom: 58%;  /* responsive upward */
+      left: 28%;    /* responsive horizontal nudge */
       border-radius: 32px 32px 0 0;
     }
 
@@ -440,15 +440,6 @@ function checkMilestones() {
   }
 }
 
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
-}
-
 function sparkleShower(canvas) {
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -594,6 +585,7 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
+// Inputs
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -642,6 +634,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
+
+  setTimeout(() => {
+    if (!document.getElementById("problem").textContent.includes("=")) {
+      generateProblem();
+    }
+  }, 500);
 });
 </script>
 </body>
