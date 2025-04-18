@@ -90,9 +90,8 @@
       border-radius: 65px 65px 0 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      position: absolute;
-      bottom: 155px; /* up from 148 */
-      left: 0;
+      position: relative;
+      top: -5px; /* Restored vertical alignment from v.077.4 */
     }
 
     .main-scoop {
@@ -109,10 +108,10 @@
     .clone-cone .scoop {
       width: 60px;
       height: 32px;
-      position: absolute;
-      bottom: 58%;  /* responsive upward */
-      left: 28%;    /* responsive horizontal nudge */
-      border-radius: 32px 32px 0 0;
+      top: 0;
+      border-top-left-radius: 50px;
+      border-top-right-radius: 50px;
+      position: relative;
     }
 
     .clone-cone .cone-img {
@@ -546,10 +545,12 @@ function closePopup() {
 }
 
 function generateProblem() {
-  let a, b, c, op1, op2;
+  let a = Math.floor(Math.random() * 10);
+  let b = Math.floor(Math.random() * 10);
+  let c = Math.floor(Math.random() * 9) + 1;
+  let op1, op2;
+
   if (mode === "addsub") {
-    a = Math.floor(Math.random() * 10);
-    b = Math.floor(Math.random() * 10);
     op1 = Math.random() > 0.5 ? "+" : "-";
     if (op1 === "-" && b > a) [a, b] = [b, a];
     correctAnswer = op1 === "+" ? a + b : a - b;
@@ -557,8 +558,6 @@ function generateProblem() {
     document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
   } else if (mode === "multdiv") {
     if (Math.random() > 0.5) {
-      a = Math.floor(Math.random() * 10);
-      b = Math.floor(Math.random() * 10);
       correctAnswer = a * b;
       currentProblemType = "×";
       document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
@@ -570,9 +569,6 @@ function generateProblem() {
       document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
     }
   } else {
-    a = Math.floor(Math.random() * 10);
-    b = Math.floor(Math.random() * 10);
-    c = Math.floor(Math.random() * 9) + 1;
     op1 = Math.random() > 0.5 ? "+" : "-";
     op2 = Math.random() > 0.5 ? "×" : "÷";
     let inner = op1 === "+" ? a + b : a - b;
@@ -585,7 +581,6 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-// Inputs
 window.appendNumber = num => {
   if (!gameEnded) {
     currentAnswer += num;
@@ -634,12 +629,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
-
-  setTimeout(() => {
-    if (!document.getElementById("problem").textContent.includes("=")) {
-      generateProblem();
-    }
-  }, 500);
 });
 </script>
 </body>
