@@ -85,10 +85,13 @@
 
     .scoop {
       width: 130px;
-      height: auto;
-      position: relative;
-      top: -5px;
+      height: 65px;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-radius: 65px 65px 0 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
+      position: relative;
+      top: -5px; /* Restored vertical alignment from v.077.4 */
     }
 
     .main-scoop {
@@ -244,7 +247,7 @@
 
     <!-- Main Cone -->
     <div class="cone-wrapper" id="mainCone">
-      <img src="scoop.png" class="scoop main-scoop" id="scoop" />
+      <div class="scoop main-scoop" id="scoop"></div>
       <img src="cone.png" id="coneImg" class="cone-img" />
     </div>
 
@@ -587,6 +590,7 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
+// FINALIZED INPUT FIXES
 window.appendNumber = num => {
   if (!gameEnded) {
     if (currentAnswer === "0") currentAnswer = "";
