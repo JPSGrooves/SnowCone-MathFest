@@ -87,17 +87,19 @@
       width: 130px;
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-radius: 65px 65px 0 0;
+      border-top-left-radius: 100% 100%;
+      border-top-right-radius: 100% 100%;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: relative;
-      top: -5px; /* Restored vertical alignment from v.077.4 */
+      top: -5px;
     }
 
     .main-scoop {
       display: none;
     }
-
     .cone-img {
       width: 130px;
       height: auto;
