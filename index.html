@@ -607,10 +607,12 @@ window.appendDecimal = () => {
 };
 
 window.toggleNegative = () => {
-  if (!gameEnded && currentAnswer !== "") {
-    currentAnswer = currentAnswer.startsWith("-")
-      ? currentAnswer.slice(1)
-      : "-" + currentAnswer;
+  if (!gameEnded) {
+    // grab whatever's in the display (or "0" if blank)
+    const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
+    // parse it, flip the sign, and convert back to a string
+    const negated = -parseFloat(display);
+    currentAnswer = String(negated);
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
