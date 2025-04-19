@@ -237,6 +237,22 @@
       height: 32px;
       border-radius: 32px 32px 0 0 !important;
     }
+    /* wipe out all rounding first */
+    .scoop {
+      border-radius: 0 !important;
+      clip-path: none !important;
+    }
+    
+    /* main scoop: perfect semicircle (130×65) */
+    #scoop {
+      /* horizontal radii / vertical radii */
+      border-radius: 65px 65px 0 0 / 65px 65px 0 0 !important;
+    }
+    
+    /* clones keep their own semicircle (60×32) */
+    .clone-cone .scoop {
+      border-radius: 32px 32px 0 0 / 32px 32px 0 0 !important;
+    }
 
   </style>
 </head>
