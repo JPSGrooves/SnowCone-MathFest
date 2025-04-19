@@ -247,7 +247,15 @@
     }
     /* clones stay untouched by this rule */
     /* ────────────────────────────────────────── */
-
+    #scoop {
+      /* keep your 130×65 box */
+      width: 130px;
+      height: 65px;
+    
+      /* pinch horizontally to 40% (of 130px = 52px), 
+         but stretch vertically to 120% (of 65px = 78px) */
+      border-radius: 40% 40% 0 0 / 120% 120% 0 0 !important;
+    }
 
   </style>
 </head>
