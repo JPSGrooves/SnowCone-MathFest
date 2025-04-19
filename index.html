@@ -84,17 +84,19 @@
     }
 
     .scoop {
-      width: 130px;           /* twice the height */
-      height: 65px;           /* radius */
+      width: 130px;
+      height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      /* make the top edge a perfect half‑circle */
-      border-radius: 50% 50% 0 0;
+      /* perfect half‑circle: radius = height */
+      border-top-left-radius: 65px !important;
+      border-top-right-radius: 65px !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       position: relative;
       top: -5px;
       z-index: 2;
     }
-
 
     .main-scoop {
       display: none;
