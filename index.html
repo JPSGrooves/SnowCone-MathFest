@@ -84,11 +84,14 @@
     }
 
     .scoop {
-      width: 150px;
-      height: 75px;
+      width: 130px;
+      height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      /* horizontal radii 50% (half the width), vertical radii 100% (full height) */
-      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      border-radius: 65px 65px 0 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      z-index: 2;
+      position: relative;
+      top: -5px; /* Restored vertical alignment from v.077.4 */
     }
 
     .main-scoop {
