@@ -237,21 +237,19 @@
       height: 32px;
       border-radius: 32px 32px 0 0 !important;
     }
-    /* wipe out all rounding first */
+    /* remove any border‑radius first */
     .scoop {
       border-radius: 0 !important;
-      clip-path: none !important;
     }
     
-    /* main scoop: perfect semicircle (130×65) */
+    /* main scoop: half‑ellipse at top center */
     #scoop {
-      /* horizontal radii / vertical radii */
-      border-radius: 65px 65px 0 0 / 65px 65px 0 0 !important;
+      clip-path: ellipse(65px 65px at 50% 0%) !important;
     }
     
-    /* clones keep their own semicircle (60×32) */
+    /* clones: smaller half‑ellipse */
     .clone-cone .scoop {
-      border-radius: 32px 32px 0 0 / 32px 32px 0 0 !important;
+      clip-path: ellipse(32px 32px at 50% 0%) !important;
     }
 
   </style>
