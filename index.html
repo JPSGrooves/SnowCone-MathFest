@@ -218,6 +218,26 @@
       z-index: 9999;
       display: block;
     }
+        /* 1) Blow away any inherited rounding on all scoops */
+    .scoop {
+      border-radius: 0 !important;
+    }
+    
+    /* 2) Main scoop = perfect half‑circle (height = 65px) */
+    #scoop {
+      /* ensure these px values match your width/height */
+      width: 130px;
+      height: 65px;
+      border-radius: 65px 65px 0 0 !important;
+    }
+    
+    /* 3) Clone scoops keep their smaller half‑circles */
+    .clone-cone .scoop {
+      width: 60px;
+      height: 32px;
+      border-radius: 32px 32px 0 0 !important;
+    }
+
   </style>
 </head>
 <body>
