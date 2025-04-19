@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Math Fest Snow Cone v.08</title>
+  <title>Math Fest Snow Cone</title>
   <style>
     body {
       background: black;
@@ -12,66 +12,23 @@
       text-align: center;
       padding: 20px;
     }
+
     .game-container {
       max-width: 600px;
       margin: auto;
       transform: scale(0.90);
       transform-origin: top center;
     }
-    .menu-button {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: #ff00cc;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-    #menuModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.9);
-      color: white;
-      z-index: 1001;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    #menuModal button {
-      background: #00ff88;
-      color: black;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 5px;
-      font-size: 16px;
+
+    .title-image {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+      margin: 0 auto 10px;
+      display: block;
       cursor: pointer;
     }
-    #menuModal .close {
-      background: #ff00cc;
-      color: white;
-    }
-    #diffBanner {
-      position: fixed;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ffee00;
-      color: black;
-      padding: 6px 12px;
-      border-radius: 4px;
-      display: none;
-      font-weight: bold;
-      z-index: 1000;
-    }
+
     .layout-row {
       display: flex;
       justify-content: space-between;
@@ -79,19 +36,34 @@
       margin: -5px 0 5px 0;
       padding: 0 50px;
     }
+
     .score-block, .timer-block {
       text-align: center;
       width: auto;
     }
-    .score-label, .timer-label {
+
+    .score-label {
       font-size: 20px;
       margin-bottom: 5px;
+      color: #00ff88;
     }
-    .score-label { color: #00ff88; }
-    .timer-label { color: #00ccff; }
-    .score, #timer {
+
+    .timer-label {
+      font-size: 20px;
+      margin-bottom: 5px;
+      color: #00ccff;
+    }
+
+    .score {
       font-size: 26px;
+      color: #00ff88;
     }
+
+    #timer {
+      font-size: 26px;
+      color: #00ccff;
+    }
+
     .cone-zone {
       display: flex;
       justify-content: center;
@@ -100,6 +72,7 @@
       margin-top: 10px;
       margin-bottom: 0;
     }
+
     .cone-wrapper {
       position: relative;
       width: 130px;
@@ -109,6 +82,7 @@
       align-items: center;
       justify-content: flex-end;
     }
+
     .scoop {
       width: 130px;
       height: 65px;
@@ -118,31 +92,61 @@
       z-index: 2;
       position: relative;
       top: -5px;
+    }
+
+    .main-scoop {
       display: none;
     }
-    .clone-cone .scoop {
-      width: 60px;
-      height: 32px;
-      border-top-left-radius: 50px;
-      border-top-right-radius: 50px;
-      top: 0;
-    }
+
     .cone-img {
       width: 130px;
       height: auto;
       z-index: 1;
       pointer-events: none;
     }
-    .clone-cone .cone-img { width: 65px; }
+
+    .clone-cone .scoop {
+      width: 60px;
+      height: 32px;
+      top: 0;
+      border-top-left-radius: 50px;
+      border-top-right-radius: 50px;
+      position: relative;
+    }
+
+    .clone-cone .cone-img {
+      width: 65px;
+    }
+
+    .left-spin {
+      animation: spinLeft 6s linear infinite;
+    }
+
+    .right-spin {
+      animation: spinRight 6s linear infinite;
+    }
+
+    @keyframes spinLeft {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinRight {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+
     .math-problem {
       font-size: 28px;
       margin: 5px 0 5px;
     }
+
     .answer-display {
       font-size: 36px;
       color: #ff00cc;
       margin-bottom: 10px;
     }
+
     .mode-buttons {
       display: flex;
       justify-content: center;
@@ -150,6 +154,7 @@
       margin-bottom: 10px;
       flex-wrap: wrap;
     }
+
     .mode-buttons button {
       background-color: #00ff88;
       color: black;
@@ -163,6 +168,7 @@
       height: 50px;
       line-height: 1.1;
     }
+
     .keypad {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -170,6 +176,7 @@
       max-width: 320px;
       margin: auto;
     }
+
     .keypad button {
       background-color: #ff00cc;
       border: none;
@@ -180,6 +187,7 @@
       box-shadow: 0 0 10px #ff00cc;
       cursor: pointer;
     }
+
     canvas.confetti {
       position: fixed;
       pointer-events: none;
@@ -187,29 +195,42 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 999;
-      display: none;
+      z-index: 9999;
+      display: block;
     }
   </style>
 </head>
 <body>
+<canvas id="confettiCanvas" class="confetti"></canvas>
+<canvas id="celebrationCanvas" class="confetti"></canvas>
 
-<button class="menu-button" id="menuBtn">☰ Menu</button>
-<div id="menuModal">
-  <button id="hsBtn">High Score</button>
-  <button id="listenBtn">Listen</button>
-  <button id="tipsBtn">Tips</button>
-  <button class="close" id="closeMenu">Close</button>
+<!-- TITLE -->
+<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
+
+<!-- RULES MODAL -->
+<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
+    <p style="font-size:16px; line-height:1.5;">
+      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+      💀 Hard Mode: <strong>+15 points</strong><br/>
+      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+      🎯 Score-based difficulty kicks in with <strong>DOUBLE POINTS</strong>!
+    </p>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
+  </div>
 </div>
 
-<canvas id="confettiCanvas" class="confetti"></canvas>
-
+<!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
   <div class="layout-row">
     <div class="score-block">
       <div class="score-label">Score</div>
       <div class="score"><span id="score">0</span></div>
     </div>
+
     <div class="timer-block">
       <div class="timer-label">Time</div>
       <div id="timer">0s</div>
@@ -217,14 +238,19 @@
   </div>
 
   <div class="cone-zone">
+    <!-- Left Clone Cone -->
     <div class="cone-wrapper clone-cone" id="leftCone">
       <div class="scoop"></div>
       <img src="cone.png" class="cone-img" />
     </div>
+
+    <!-- Main Cone -->
     <div class="cone-wrapper" id="mainCone">
-      <div class="scoop" id="scoop"></div>
-      <img src="cone.png" class="cone-img" id="coneImg" />
+      <div class="scoop main-scoop" id="scoop"></div>
+      <img src="cone.png" id="coneImg" class="cone-img" />
     </div>
+
+    <!-- Right Clone Cone -->
     <div class="cone-wrapper clone-cone" id="rightCone">
       <div class="scoop"></div>
       <img src="cone.png" class="cone-img" />
@@ -236,8 +262,9 @@
 
   <div class="mode-buttons">
     <button onclick="setMode('addsub')">+/-</button>
-    <button onclick="setMode('multdiv')">× ÷</button>
-    <button onclick="setMode('hard')">Hard Mode</button>
+    <button onclick="setMode('multdiv')">X-/</button>
+    <button onclick="setMode('hard')">Hard<br/>Mode</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
   </div>
 
   <div class="keypad">
@@ -259,95 +286,298 @@
     <div></div>
   </div>
 </div>
-<!-- Audio -->
-<audio id="backgroundMusic1" preload="auto" src="quikserveST-All.mp3"></audio>
-<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
-<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+
+<!-- POPUP MODAL -->
+<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
+    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
+    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+  </div>
+</div>
+
+<!-- STORY MODE MODAL -->
+<div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
+    <h2 style="color:#ffee00;">🌌 Yo, Cone Traveler 🌌</h2>
+    <p style="font-size:16px; line-height:1.6; color:#ffffff;">
+      You ever wonder what’s inside a snow cone?<br/><br/>
+      Like... the <em>real</em> inside?<br/>
+      Let’s just say it’s deeper than syrup and ice.<br/><br/>
+      You ready to go on a journey to the center of the snow cone?
+    </p>
+    <button onclick="closeStoryModeModal()" style="margin:10px 5px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to QuikServe</button>
+    <button disabled style="margin:10px 5px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:not-allowed;">Bet!</button>
+  </div>
+</div>
+<!-- AUDIO -->
 <audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
 <audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
 <audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
 <audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
-<audio id="milestone150" preload="auto" src="QuikServe points150.mp3"></audio>
-<audio id="milestone200" preload="auto" src="QuikServe points200.mp3"></audio>
-<audio id="milestone350" preload="auto" src="QuikServe points350.mp3"></audio>
+<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
+<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
+<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 
 <script>
-// JavaScript Game Logic
-let score = 0, currentAnswer = "", correctAnswer = 0, mode = "addsub", isMuted = false, timerStarted = false, seconds = 0, timerInt = null, triggered = {};
+let score = 0;
+let currentAnswer = "";
+let correctAnswer = 0;
+let currentProblemType = "+";
+let mode = "addsub";
+let isMuted = false;
+let timerStarted = false;
+let secondsElapsed = 0;
+let timerInterval = null;
+let gameEnded = false;
 
-const scoreEl = document.getElementById("score"),
-      timerEl = document.getElementById("timer"),
-      scoopEl = document.getElementById("scoop"),
-      problemEl = document.getElementById("problem"),
-      answerEl = document.getElementById("answerDisplay"),
-      confettiCan = document.getElementById("confettiCanvas"),
-      menuModal = document.getElementById("menuModal"),
-      bgMusic = document.getElementById("backgroundMusic1"),
-      sounds = {correct: document.getElementById("correctSound"), incorrect: document.getElementById("incorrectSound"), 25: document.getElementById("milestone25"), 50: document.getElementById("milestone50"), 75: document.getElementById("milestone75"), 100: document.getElementById("milestone100"), 150: document.getElementById("milestone150"), 200: document.getElementById("milestone200"), 350: document.getElementById("milestone350")};
+const correctTrack = document.getElementById("correctSound");
+const incorrectTrack = document.getElementById("incorrectSound");
+const sound25 = document.getElementById("milestone25");
+const sound50 = document.getElementById("milestone50");
+const sound75 = document.getElementById("milestone75");
+const sound100 = document.getElementById("milestone100");
 
-Object.values(sounds).forEach(s => s.volume = 0.5);
+correctTrack.volume = 0.5;
+incorrectTrack.volume = 0.5;
 
-// Menu logic
-menuBtn.onclick = () => menuModal.style.display = "flex";
-closeMenu.onclick = () => menuModal.style.display = "none";
-hsBtn.onclick = () => alert("High Score UI coming soon!");
-listenBtn.onclick = () => alert("Music preview UI coming soon!");
-tipsBtn.onclick = () => alert("Math tips and donation UI coming soon!");
+function resetScore() {
+  score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  gameEnded = false;
+  window.twentyFiveTriggered = false;
+  window.fiftyTriggered = false;
+  window.seventyFiveTriggered = false;
+  window.hundredTriggered = false;
 
-// Problem generation
-function generateProblem(){
-  let a = Math.floor(Math.random()*10), b = Math.floor(Math.random()*10), c = Math.floor(Math.random()*9)+1, op1, op2;
-  if(mode==="addsub"){
-    op1=Math.random()>0.5?"+":"-"; correctAnswer=op1==="+"?a+b:a-b; problemEl.textContent=`${a} ${op1} ${b} = 🍧`;
-  } else if(mode==="multdiv"){
-    if(Math.random()>0.5){ correctAnswer=a*b; problemEl.textContent=`${a} × ${b} = 🍧`; }
-    else{ b=Math.floor(Math.random()*9)+1; correctAnswer=Math.floor(Math.random()*10); a=b*correctAnswer; problemEl.textContent=`${a} ÷ ${b} = 🍧`; }
-  } else{
-    op1=Math.random()>0.5?"+":"-"; op2=Math.random()>0.5?"×":"÷"; let inner=op1==="+"?a+b:a-b;
-    correctAnswer=op2==="×"?inner*c:Math.floor(inner/c); problemEl.textContent=`(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+  document.getElementById("score").textContent = "0";
+  document.getElementById("timer").textContent = "0s";
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("scoop").style.display = "none";
+  document.getElementById("problem").textContent = "";
+
+  document.getElementById("leftCone").classList.remove("left-spin");
+  document.getElementById("rightCone").classList.remove("right-spin");
+
+  clearInterval(timerInterval);
+  document.getElementById("backgroundMusic1").pause();
+  document.getElementById("backgroundMusic1").currentTime = 0;
+
+  document.getElementById("popupModal").style.display = "none";
+  document.getElementById("rulesModal").style.display = "flex";
+
+  generateProblem();
+}
+
+function submitAnswer() {
+  if (gameEnded) {
+    showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
+    return;
   }
-  currentAnswer=""; answerEl.textContent="0";
+
+  let userAnswer = parseFloat(currentAnswer);
+  if (userAnswer === correctAnswer) {
+    if (!timerStarted) {
+      timerStarted = true;
+      const music = document.getElementById("backgroundMusic1");
+      music.currentTime = 0;
+      music.play().catch(e => console.warn("Music play failed:", e));
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById("timer").textContent = `${secondsElapsed}s`;
+        if (secondsElapsed >= 105) {
+          clearInterval(timerInterval);
+          gameEnded = true;
+          showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`, false, true);
+        }
+      }, 1000);
+    }
+
+    if (!isMuted) {
+      correctTrack.pause();
+      correctTrack.currentTime = 0;
+      correctTrack.play().catch(e => console.warn("Play failed", e));
+    }
+
+    let points = (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
+
+    if (score >= 50) points *= 2; // Double points after 50
+
+    score += points;
+    document.getElementById("score").textContent = score;
+
+    showScoop(() => {
+      generateProblem();
+      checkMilestones();
+    });
+  } else {
+    if (!isMuted) {
+      incorrectTrack.currentTime = 0;
+      incorrectTrack.play();
+    }
+    score -= 3;
+    document.getElementById("score").textContent = score;
+    showPopup("⛔ Incorrect!", "Try again.", true);
+    clearAnswer();
+  }
 }
 
-// Submit answer
-function submitAnswer(){
-  let ua=parseFloat(currentAnswer);
-  if(ua===correctAnswer){
-    if(!timerStarted){ timerStarted=true; bgMusic.play(); timerInt=setInterval(()=>{seconds++; timerEl.textContent=`${seconds}s`; if(seconds>=105){clearInterval(timerInt); alert(`🍧 Time's up! Score: ${score}`);}},1000); }
-    if(!isMuted){sounds.correct.play();}
-    score+=mode==="hard"?15:(mode==="multdiv"?6:3); scoreEl.textContent=score;
-    scoopEl.style.display="block"; setTimeout(()=>{scoopEl.style.display="none"; generateProblem(); checkMilestones();},700);
-  } else { if(!isMuted){sounds.incorrect.play();} score-=3; scoreEl.textContent=score; alert("Incorrect!"); clearAnswer(); }
+function generateProblem() {
+  let a, b, c, op1, op2;
+
+  if (mode === "addsub" && score >= 50) {
+    a = Math.floor(Math.random() * 1000);
+    b = Math.floor(Math.random() * 1000);
+    c = Math.floor(Math.random() * 1000);
+    correctAnswer = a + b + c;
+    currentProblemType = "+";
+    document.getElementById("problem").textContent = `${a} + ${b} + ${c} = 🍧`;
+
+  } else if (mode === "multdiv" && score >= 75) {
+    let nums = [10 + Math.floor(Math.random() * 11), 1 + Math.floor(Math.random() * 10)];
+    if (Math.random() > 0.5) {
+      correctAnswer = nums[0] * nums[1];
+      currentProblemType = "×";
+      document.getElementById("problem").textContent = `${nums[0]} × ${nums[1]} = 🍧`;
+    } else {
+      correctAnswer = nums[1];
+      let product = nums[0] * nums[1];
+      currentProblemType = "÷";
+      document.getElementById("problem").textContent = `${product} ÷ ${nums[0]} = 🍧`;
+    }
+
+  } else if (mode === "hard" && score >= 100) {
+    a = Math.floor(Math.random() * 11);
+    b = Math.floor(Math.random() * 11);
+    c = Math.floor(Math.random() * 11);
+    d = Math.floor(Math.random() * 11);
+    op1 = Math.random() > 0.5 ? "×" : "÷";
+    op2 = Math.random() > 0.5 ? "+" : "-";
+    op3 = Math.random() > 0.5 ? "×" : "÷";
+    let left = (op1 === "×") ? a * b : Math.floor(a / (b || 1));
+    let right = (op2 === "+") ? c + d : c - d;
+    correctAnswer = (op3 === "×") ? left * right : Math.floor(left / (right || 1));
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op3} (${c} ${op2} ${d}) = 🍧`;
+
+  } else {
+    a = Math.floor(Math.random() * 10);
+    b = Math.floor(Math.random() * 10);
+    if (mode === "addsub") {
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      if (op1 === "-" && b > a) [a, b] = [b, a];
+      correctAnswer = op1 === "+" ? a + b : a - b;
+      currentProblemType = op1;
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+    } else if (mode === "multdiv") {
+      if (Math.random() > 0.5) {
+        correctAnswer = a * b;
+        currentProblemType = "×";
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      } else {
+        b = Math.floor(Math.random() * 9) + 1;
+        correctAnswer = Math.floor(Math.random() * 10);
+        a = b * correctAnswer;
+        currentProblemType = "÷";
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      }
+    } else {
+      c = Math.floor(Math.random() * 9) + 1;
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      op2 = Math.random() > 0.5 ? "×" : "÷";
+      let inner = op1 === "+" ? a + b : a - b;
+      correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+      currentProblemType = "hard";
+      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+    }
+  }
+
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
 }
 
-// Check milestones
-function checkMilestones(){
-  [25,50,75,100,150,200,350].forEach(n=>{if(score>=n&&!triggered[n]){triggered[n]=true; if(!isMuted)sounds[n].play(); launchConfetti();}});
+function showScoop(callback) {
+  const scoop = document.getElementById("scoop");
+  scoop.style.display = "block";
+  setTimeout(() => {
+    scoop.style.display = "none";
+    if (typeof callback === "function") callback();
+  }, 700);
 }
 
-// Confetti effect
-function launchConfetti(){ confettiCan.style.display="block"; setTimeout(()=>{confettiCan.style.display="none";},2000); }
+function showPopup(title, message, autoClose = false, endOfGame = false) {
+  document.getElementById("popupTitle").textContent = title;
+  document.getElementById("popupMessage").textContent = message;
+  document.getElementById("popupModal").style.display = "flex";
 
-// Answer helpers
-function appendNumber(n){ currentAnswer+=n; answerEl.textContent=currentAnswer; }
-function appendDecimal(){ if(!currentAnswer.includes(".")){currentAnswer+=currentAnswer===""?"0.":"."; answerEl.textContent=currentAnswer;} }
-function toggleNegative(){ currentAnswer=currentAnswer.startsWith("-")?currentAnswer.slice(1):"-"+(currentAnswer||"0"); answerEl.textContent=currentAnswer; }
-function clearAnswer(){ currentAnswer=""; answerEl.textContent="0"; }
-function toggleMute(){ isMuted=!isMuted; bgMusic.muted=Object.values(sounds).forEach(s=>s.muted=isMuted); }
-function setMode(m){ mode=m; generateProblem(); }
+  const btn = document.getElementById("popupButton");
+  btn.textContent = endOfGame ? "Play Again" : "Got it!";
+  btn.onclick = endOfGame ? resetScore : closePopup;
 
-// Initialize
-window.onload = generateProblem;
+  if (autoClose) setTimeout(closePopup, 1500);
+}
 
-// Expose functions
-window.appendNumber=appendNumber;
-window.appendDecimal=appendDecimal;
-window.toggleNegative=toggleNegative;
-window.clearAnswer=clearAnswer;
-window.submitAnswer=submitAnswer;
-window.toggleMute=toggleMute;
-window.setMode=setMode;
+function closePopup() {
+  document.getElementById("popupModal").style.display = "none";
+}
+
+window.appendNumber = num => {
+  if (!gameEnded) {
+    if (currentAnswer === "0") currentAnswer = "";
+    currentAnswer += num;
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+
+window.appendDecimal = () => {
+  if (!gameEnded && !currentAnswer.includes(".")) {
+    currentAnswer += currentAnswer === "" ? "0." : ".";
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+
+window.toggleNegative = () => {
+  if (!gameEnded) {
+    const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
+    const negated = -parseFloat(display);
+    currentAnswer = String(negated);
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+
+window.clearAnswer = () => {
+  if (!gameEnded) {
+    currentAnswer = "";
+    document.getElementById("answerDisplay").textContent = "0";
+  }
+};
+
+window.setMode = newMode => {
+  mode = newMode;
+  generateProblem();
+};
+
+window.toggleMute = () => {
+  isMuted = !isMuted;
+  [correctTrack, incorrectTrack, sound25, sound50, sound75, sound100, document.getElementById("backgroundMusic1")].forEach(track => {
+    if (track) track.muted = isMuted;
+  });
+};
+
+window.resetScore = resetScore;
+window.submitAnswer = submitAnswer;
+window.generateProblem = generateProblem;
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("rulesModal").style.display = "flex";
+  document.getElementById("closeModalBtn").addEventListener("click", () => {
+    document.getElementById("rulesModal").style.display = "none";
+    generateProblem();
+  });
+});
 </script>
-
 </body>
 </html>
