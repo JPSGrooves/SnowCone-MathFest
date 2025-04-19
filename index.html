@@ -3,58 +3,231 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SnowCone MathFest v.08</title>
+  <title>Math Fest Snow Cone v.08</title>
   <style>
-    body { background:black; color:white; font-family:Arial,Helvetica,sans-serif; text-align:center; padding:20px; }
-    .game-container { max-width:400px; margin:auto; transform:scale(0.95); transform-origin:top center; }
-    .score-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-    .score { font-size:20px; color:#00ff88; }
-    #timer { font-size:16px; color:#00ccff; }
-    .menu-button { position:fixed; top:20px; left:20px; background:#ff00cc; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; z-index:1000; }
-    /* central cone + scoop */
-    .snow-cone-wrapper { position:relative; width:150px; height:225px; margin:30px auto 10px; }
-    .scoop { width:150px; height:75px; background:linear-gradient(to right,#ff00cc,#6600ff); border-radius:75px 75px 0 0; position:absolute; top:0; left:0; box-shadow:0 0 15px #ff00cc,0 0 30px #6600ff; z-index:2; display:none; }
-    .snow-cone { position:absolute; bottom:0; width:150px; height:150px; clip-path:polygon(50% 100%,0 0,100% 0); background:linear-gradient(to bottom,#ffff99,#ffee00); box-shadow:0 0 10px #fff,0 0 20px yellow; display:flex; align-items:center; justify-content:center; z-index:1; }
-    .cone-text a { color:black; text-decoration:none; font-size:20px; line-height:1.2; }
-    .math-problem { font-size:28px; margin:15px 0 10px; }
-    .answer-display { font-size:36px; color:#ff00cc; margin-bottom:20px; }
-    .mode-buttons { display:flex; justify-content:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
-    .mode-buttons button { background:#00ff88; color:black; border:none; padding:10px; font-size:16px; border-radius:6px; box-shadow:0 0 10px #00ff88; cursor:pointer; width:80px; height:50px; line-height:1.1; }
-    .keypad { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:320px; margin:auto; }
-    .keypad button { background:#ff00cc; border:none; color:white; font-size:20px; padding:15px 0; border-radius:8px; box-shadow:0 0 10px #ff00cc; cursor:pointer; }
-    /* Confetti canvas */
-    canvas.confetti { position:fixed; pointer-events:none; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none; }
-    /* Menu modal */
-    #menuModal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); color:white; z-index:1001; justify-content:center; align-items:center; flex-direction:column; }
-    #menuModal button { background:#00ff88; color:black; border:none; padding:10px 20px; margin:5px; border-radius:5px; font-size:16px; cursor:pointer; }
-    #menuModal .close { background:#ff00cc; color:white; }
-    /* Difficulty banner */
-    #diffBanner { position:fixed; top:60px; left:50%; transform:translateX(-50%); background:#ffee00; color:black; padding:6px 12px; border-radius:4px; display:none; font-weight:bold; z-index:1000; }
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .game-container {
+      max-width: 600px;
+      margin: auto;
+      transform: scale(0.90);
+      transform-origin: top center;
+    }
+    .menu-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #ff00cc;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #menuModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      z-index: 1001;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    #menuModal button {
+      background: #00ff88;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #menuModal .close {
+      background: #ff00cc;
+      color: white;
+    }
+    #diffBanner {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffee00;
+      color: black;
+      padding: 6px 12px;
+      border-radius: 4px;
+      display: none;
+      font-weight: bold;
+      z-index: 1000;
+    }
+    .layout-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: -5px 0 5px 0;
+      padding: 0 50px;
+    }
+    .score-block, .timer-block {
+      text-align: center;
+      width: auto;
+    }
+    .score-label, .timer-label {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+    .score-label { color: #00ff88; }
+    .timer-label { color: #00ccff; }
+    .score, #timer {
+      font-size: 26px;
+    }
+    .cone-zone {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 50px;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    .cone-wrapper {
+      position: relative;
+      width: 130px;
+      height: 210px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .scoop {
+      width: 130px;
+      height: 65px;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-radius: 65px 65px 0 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      z-index: 2;
+      position: relative;
+      top: -5px;
+      display: none;
+    }
+    .clone-cone .scoop {
+      width: 60px;
+      height: 32px;
+      border-top-left-radius: 50px;
+      border-top-right-radius: 50px;
+      top: 0;
+    }
+    .cone-img {
+      width: 130px;
+      height: auto;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .clone-cone .cone-img { width: 65px; }
+    .math-problem {
+      font-size: 28px;
+      margin: 5px 0 5px;
+    }
+    .answer-display {
+      font-size: 36px;
+      color: #ff00cc;
+      margin-bottom: 10px;
+    }
+    .mode-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .mode-buttons button {
+      background-color: #00ff88;
+      color: black;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #00ff88;
+      cursor: pointer;
+      width: 80px;
+      height: 50px;
+      line-height: 1.1;
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 320px;
+      margin: auto;
+    }
+    .keypad button {
+      background-color: #ff00cc;
+      border: none;
+      color: white;
+      font-size: 20px;
+      padding: 15px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ff00cc;
+      cursor: pointer;
+    }
+    canvas.confetti {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999;
+      display: none;
+    }
   </style>
 </head>
 <body>
 
 <button class="menu-button" id="menuBtn">☰ Menu</button>
-<div id="menuModal" class="flex">
+<div id="menuModal">
   <button id="hsBtn">High Score</button>
   <button id="listenBtn">Listen</button>
   <button id="tipsBtn">Tips</button>
   <button class="close" id="closeMenu">Close</button>
 </div>
-<div id="diffBanner">Level Up!</div>
 
 <canvas id="confettiCanvas" class="confetti"></canvas>
 
-<div class="game-container">
-  <div class="score-bar">
-    <div class="score">Score: <span id="score">0</span></div>
-    <div id="timer">Time: 0s</div>
+<div class="game-container" id="gameContainer">
+  <div class="layout-row">
+    <div class="score-block">
+      <div class="score-label">Score</div>
+      <div class="score"><span id="score">0</span></div>
+    </div>
+    <div class="timer-block">
+      <div class="timer-label">Time</div>
+      <div id="timer">0s</div>
+    </div>
   </div>
 
-  <div class="snow-cone-wrapper">
-    <div class="scoop" id="scoop"></div>
-    <div class="snow-cone" id="cone">
-      <div class="cone-text"><a href="#" onclick="generateProblem()">Math<br/>Fest</a></div>
+  <div class="cone-zone">
+    <div class="cone-wrapper clone-cone" id="leftCone">
+      <div class="scoop"></div>
+      <img src="cone.png" class="cone-img" />
+    </div>
+    <div class="cone-wrapper" id="mainCone">
+      <div class="scoop" id="scoop"></div>
+      <img src="cone.png" class="cone-img" id="coneImg" />
+    </div>
+    <div class="cone-wrapper clone-cone" id="rightCone">
+      <div class="scoop"></div>
+      <img src="cone.png" class="cone-img" />
     </div>
   </div>
 
@@ -63,8 +236,8 @@
 
   <div class="mode-buttons">
     <button onclick="setMode('addsub')">+/-</button>
-    <button onclick="setMode('multdiv')">X-/</button>
-    <button onclick="setMode('hard')">Hard<br/>Mode</button>
+    <button onclick="setMode('multdiv')">× ÷</button>
+    <button onclick="setMode('hard')">Hard Mode</button>
   </div>
 
   <div class="keypad">
@@ -83,206 +256,98 @@
     <button onclick="appendDecimal()">.</button>
     <button onclick="appendNumber(0)">0</button>
     <button onclick="toggleMute()">Mute</button>
+    <div></div>
   </div>
 </div>
-
 <!-- Audio -->
-<audio id="backgroundMusic1" src="quikserveST-All.mp3" preload="auto"></audio>
-<audio id="correctSound" src="correct.mp3" preload="auto"></audio>
-<audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
-<audio id="milestone25" src="QuikServe points25.mp3" preload="auto"></audio>
-<audio id="milestone50" src="QuikServe points50.mp3" preload="auto"></audio>
-<audio id="milestone75" src="QuikServe points75.mp3" preload="auto"></audio>
-<audio id="milestone100" src="QuikServe points100.mp3" preload="auto"></audio>
-<audio id="milestone150" src="QuikServe points150.mp3" preload="auto"></audio>
-<audio id="milestone200" src="QuikServe points200.mp3" preload="auto"></audio>
-<audio id="milestone350" src="QuikServe points350.mp3" preload="auto"></audio>
+<audio id="backgroundMusic1" preload="auto" src="quikserveST-All.mp3"></audio>
+<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
+<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+<audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
+<audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
+<audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
+<audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
+<audio id="milestone150" preload="auto" src="QuikServe points150.mp3"></audio>
+<audio id="milestone200" preload="auto" src="QuikServe points200.mp3"></audio>
+<audio id="milestone350" preload="auto" src="QuikServe points350.mp3"></audio>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  // State
-  let score = 0, currentAnswer="", correctAnswer=0, mode="addsub";
-  let isMuted=false, timerStarted=false, seconds=0, timerInt=null;
-  let triggered = {};
+// JavaScript Game Logic
+let score = 0, currentAnswer = "", correctAnswer = 0, mode = "addsub", isMuted = false, timerStarted = false, seconds = 0, timerInt = null, triggered = {};
 
-  // Elements
-  const scoreEl = document.getElementById("score"),
-        timerEl = document.getElementById("timer"),
-        scoopEl = document.getElementById("scoop"),
-        problemEl = document.getElementById("problem"),
-        answerEl = document.getElementById("answerDisplay"),
-        diffBanner = document.getElementById("diffBanner"),
-        confettiCan = document.getElementById("confettiCanvas"),
-        menuModal = document.getElementById("menuModal");
+const scoreEl = document.getElementById("score"),
+      timerEl = document.getElementById("timer"),
+      scoopEl = document.getElementById("scoop"),
+      problemEl = document.getElementById("problem"),
+      answerEl = document.getElementById("answerDisplay"),
+      confettiCan = document.getElementById("confettiCanvas"),
+      menuModal = document.getElementById("menuModal"),
+      bgMusic = document.getElementById("backgroundMusic1"),
+      sounds = {correct: document.getElementById("correctSound"), incorrect: document.getElementById("incorrectSound"), 25: document.getElementById("milestone25"), 50: document.getElementById("milestone50"), 75: document.getElementById("milestone75"), 100: document.getElementById("milestone100"), 150: document.getElementById("milestone150"), 200: document.getElementById("milestone200"), 350: document.getElementById("milestone350")};
 
-  const bgMusic = document.getElementById("backgroundMusic1"),
-        sounds = {
-          correct: document.getElementById("correctSound"),
-          incorrect: document.getElementById("incorrectSound"),
-          25: document.getElementById("milestone25"),
-          50: document.getElementById("milestone50"),
-          75: document.getElementById("milestone75"),
-          100: document.getElementById("milestone100"),
-          150: document.getElementById("milestone150"),
-          200: document.getElementById("milestone200"),
-          350: document.getElementById("milestone350")
-        };
+Object.values(sounds).forEach(s => s.volume = 0.5);
 
-  // Preload volumes
-  Object.values(sounds).forEach(s=>s.volume=0.5);
+// Menu logic
+menuBtn.onclick = () => menuModal.style.display = "flex";
+closeMenu.onclick = () => menuModal.style.display = "none";
+hsBtn.onclick = () => alert("High Score UI coming soon!");
+listenBtn.onclick = () => alert("Music preview UI coming soon!");
+tipsBtn.onclick = () => alert("Math tips and donation UI coming soon!");
 
-  // High-score stub
-  const highScores = [];
-
-  // Menu
-  document.getElementById("menuBtn").onclick = ()=> menuModal.style.display="flex";
-  document.getElementById("closeMenu").onclick = ()=> menuModal.style.display="none";
-  document.getElementById("hsBtn").onclick = ()=> alert("High Score UI stub");
-  document.getElementById("listenBtn").onclick = ()=> alert("Listen UI stub");
-  document.getElementById("tipsBtn").onclick = ()=> alert("Tips UI stub");
-
-  // Utility: show diff banner
-  function showBanner(text){
-    diffBanner.textContent=text; diffBanner.style.display="block";
-    setTimeout(()=> diffBanner.style.display="none",1500);
+// Problem generation
+function generateProblem(){
+  let a = Math.floor(Math.random()*10), b = Math.floor(Math.random()*10), c = Math.floor(Math.random()*9)+1, op1, op2;
+  if(mode==="addsub"){
+    op1=Math.random()>0.5?"+":"-"; correctAnswer=op1==="+"?a+b:a-b; problemEl.textContent=`${a} ${op1} ${b} = 🍧`;
+  } else if(mode==="multdiv"){
+    if(Math.random()>0.5){ correctAnswer=a*b; problemEl.textContent=`${a} × ${b} = 🍧`; }
+    else{ b=Math.floor(Math.random()*9)+1; correctAnswer=Math.floor(Math.random()*10); a=b*correctAnswer; problemEl.textContent=`${a} ÷ ${b} = 🍧`; }
+  } else{
+    op1=Math.random()>0.5?"+":"-"; op2=Math.random()>0.5?"×":"÷"; let inner=op1==="+"?a+b:a-b;
+    correctAnswer=op2==="×"?inner*c:Math.floor(inner/c); problemEl.textContent=`(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
+  currentAnswer=""; answerEl.textContent="0";
+}
 
-  // Confetti effect (simple)
-  function launchConfetti(){
-    const ctx = confettiCan.getContext("2d");
-    confettiCan.style.display="block";
-    confettiCan.width=window.innerWidth; confettiCan.height=window.innerHeight;
-    let pieces = Array.from({length:100},()=>({
-      x:Math.random()*confettiCan.width,
-      y:Math.random()*-confettiCan.height,
-      r:Math.random()*6+4,
-      d:Math.random()*10+10,
-      tilt:Math.random()*10-10,
-      color:`hsl(${Math.random()*360},100%,50%)`
-    }));
-    function draw(){
-      ctx.clearRect(0,0,confettiCan.width,confettiCan.height);
-      pieces.forEach(p=>{
-        ctx.beginPath();
-        ctx.lineWidth=p.r; ctx.strokeStyle=p.color;
-        ctx.moveTo(p.x+p.tilt,p.y);
-        ctx.lineTo(p.x+p.tilt,p.y+p.r);
-        ctx.stroke();
-      });
-      pieces.forEach(p=>{ p.y+= (Math.cos(0.01+p.d)+3+p.r/2)/2; p.x+=Math.sin(0.01); });
-      pieces = pieces.filter(p=>p.y<confettiCan.height);
-      if(pieces.length) requestAnimationFrame(draw);
-      else confettiCan.style.display="none";
-    }
-    draw();
-  }
+// Submit answer
+function submitAnswer(){
+  let ua=parseFloat(currentAnswer);
+  if(ua===correctAnswer){
+    if(!timerStarted){ timerStarted=true; bgMusic.play(); timerInt=setInterval(()=>{seconds++; timerEl.textContent=`${seconds}s`; if(seconds>=105){clearInterval(timerInt); alert(`🍧 Time's up! Score: ${score}`);}},1000); }
+    if(!isMuted){sounds.correct.play();}
+    score+=mode==="hard"?15:(mode==="multdiv"?6:3); scoreEl.textContent=score;
+    scoopEl.style.display="block"; setTimeout(()=>{scoopEl.style.display="none"; generateProblem(); checkMilestones();},700);
+  } else { if(!isMuted){sounds.incorrect.play();} score-=3; scoreEl.textContent=score; alert("Incorrect!"); clearAnswer(); }
+}
 
-  // Difficulty ramp
-  setTimeout(()=>{ setMode("multdiv"); showBanner("Now: × ÷"); }, 30000);
-  setTimeout(()=>{ setMode("hard"); showBanner("Now: Hard Mode"); }, 60000);
+// Check milestones
+function checkMilestones(){
+  [25,50,75,100,150,200,350].forEach(n=>{if(score>=n&&!triggered[n]){triggered[n]=true; if(!isMuted)sounds[n].play(); launchConfetti();}});
+}
 
-  // Generate problem
-  window.generateProblem = ()=>{
-    let a=Math.floor(Math.random()*10),
-        b=Math.floor(Math.random()*10),
-        c=Math.floor(Math.random()*9)+1;
-    if(mode==="addsub"){
-      let op=Math.random()>0.5?"+":"-";
-      if(op==="-"&&b>a)[a,b]=[b,a];
-      correctAnswer = op==="+"? a+b : a-b;
-      problemEl.textContent=`${a} ${op} ${b} = 🍧`;
-    } else if(mode==="multdiv"){
-      if(Math.random()>0.5){
-        correctAnswer = a*b; problemEl.textContent=`${a} × ${b} = 🍧`;
-      } else {
-        b=Math.floor(Math.random()*9)+1;
-        correctAnswer=Math.floor(Math.random()*10);
-        a=b*correctAnswer;
-        problemEl.textContent=`${a} ÷ ${b} = 🍧`;
-      }
-    } else {
-      let op1=Math.random()>0.5?"+":"-",
-          op2=Math.random()>0.5?"×":"÷";
-      let inner=op1==="+"? a+b : a-b;
-      correctAnswer=op2==="×"? inner*c : Math.floor(inner/c);
-      problemEl.textContent=`(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-    }
-    currentAnswer=""; answerEl.textContent="0";
-  };
+// Confetti effect
+function launchConfetti(){ confettiCan.style.display="block"; setTimeout(()=>{confettiCan.style.display="none";},2000); }
 
-  // Submit answer
-  window.submitAnswer = ()=>{
-    let ua=parseFloat(currentAnswer);
-    if(ua===correctAnswer){
-      if(!timerStarted){
-        timerStarted=true;
-        bgMusic.currentTime=0; bgMusic.play();
-        timerInt=setInterval(()=>{
-          seconds++; timerEl.textContent=`Time: ${seconds}s`;
-          if(seconds>=105){
-            clearInterval(timerInt); endGame();
-          }
-        },1000);
-      }
-      if(!isMuted){
-        sounds.correct.pause(); sounds.correct.currentTime=0; sounds.correct.play();
-      }
-      score += (mode==="hard"?15 : (mode==="multdiv"?6:3));
-      scoreEl.textContent=score;
-      showScoop(()=>{
-        generateProblem(); checkMilestones();
-      });
-    } else {
-      if(!isMuted){ sounds.incorrect.currentTime=0; sounds.incorrect.play(); }
-      score-=3; scoreEl.textContent=score;
-      alert("Incorrect! Try again.");
-      clearAnswer();
-    }
-  };
+// Answer helpers
+function appendNumber(n){ currentAnswer+=n; answerEl.textContent=currentAnswer; }
+function appendDecimal(){ if(!currentAnswer.includes(".")){currentAnswer+=currentAnswer===""?"0.":"."; answerEl.textContent=currentAnswer;} }
+function toggleNegative(){ currentAnswer=currentAnswer.startsWith("-")?currentAnswer.slice(1):"-"+(currentAnswer||"0"); answerEl.textContent=currentAnswer; }
+function clearAnswer(){ currentAnswer=""; answerEl.textContent="0"; }
+function toggleMute(){ isMuted=!isMuted; bgMusic.muted=Object.values(sounds).forEach(s=>s.muted=isMuted); }
+function setMode(m){ mode=m; generateProblem(); }
 
-  function showScoop(cb){
-    scoopEl.style.display="block";
-    setTimeout(()=>{ scoopEl.style.display="none"; if(cb)cb(); },700);
-  }
+// Initialize
+window.onload = generateProblem;
 
-  // Milestone checks
-  function checkMilestones(){
-    [25,50,75,100,150,200,350].forEach(n=>{
-      if(score>=n && !triggered[n]){
-        triggered[n]=true;
-        if(!isMuted){ sounds[n].pause(); sounds[n].currentTime=0; sounds[n].play(); }
-        launchConfetti();
-      }
-    });
-  }
-
-  // End game
-  function endGame(){
-    scoopEl.style.display="none";
-    alert(`🍧 Time's up! You scored ${score} points.`);
-    recordHighScore(score);
-  }
-
-  // High score stub
-  function recordHighScore(s){
-    let initials=prompt("Enter 3-letter initials:","AAA")||"AAA";
-    initials=initials.toUpperCase().slice(0,3);
-    highScores.push({initials,score:s,date:new Date().toLocaleDateString()});
-    console.log("High Scores:",highScores);
-  }
-
-  // Answer helpers
-  window.appendNumber = n=> { currentAnswer+=(currentAnswer==="0"?"":"" )+n; answerEl.textContent=currentAnswer; };
-  window.appendDecimal = ()=>{ if(!currentAnswer.includes(".")){ currentAnswer+= (currentAnswer===""?"0.":"."); answerEl.textContent=currentAnswer;} };
-  window.toggleNegative = ()=>{ currentAnswer=currentAnswer.startsWith("-")?currentAnswer.slice(1):"-"+(currentAnswer||"0"); answerEl.textContent=currentAnswer; };
-  window.clearAnswer = ()=>{ currentAnswer=""; answerEl.textContent="0"; };
-  window.toggleMute = ()=>{ isMuted=!isMuted; bgMusic.muted=sounds.correct.muted=sounds.incorrect.muted=isMuted; };
-
-  window.setMode = m=>{ mode=m; generateProblem(); };
-
-  // Kick off
-  generateProblem();
-});
+// Expose functions
+window.appendNumber=appendNumber;
+window.appendDecimal=appendDecimal;
+window.toggleNegative=toggleNegative;
+window.clearAnswer=clearAnswer;
+window.submitAnswer=submitAnswer;
+window.toggleMute=toggleMute;
+window.setMode=setMode;
 </script>
+
 </body>
 </html>
