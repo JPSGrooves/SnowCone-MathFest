@@ -1,3 +1,4 @@
+<!-- Chunk 1 of 5 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,149 +13,91 @@
       text-align: center;
       padding: 20px;
     }
-
     .game-container {
-      max-width: 600px;
+      max-width: 400px;
       margin: auto;
-      transform: scale(0.90);
+      transform: scale(0.95);
       transform-origin: top center;
     }
-
-    .title-image {
-      width: 100%;
-      max-width: 500px;
-      height: auto;
-      margin: 0 auto 10px;
-      display: block;
-      cursor: pointer;
-    }
-
-    .layout-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin: -5px 0 5px 0;
-      padding: 0 50px;
-    }
-
-    .score-block, .timer-block {
-      text-align: center;
-      width: auto;
-    }
-
-    .score-label {
-      font-size: 20px;
-      margin-bottom: 5px;
-      color: #00ff88;
-    }
-
-    .timer-label {
-      font-size: 20px;
-      margin-bottom: 5px;
-      color: #00ccff;
-    }
-
-    .score {
-      font-size: 26px;
-      color: #00ff88;
-    }
-
-    #timer {
-      font-size: 26px;
-      color: #00ccff;
-    }
-
-    .cone-zone {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      gap: 50px;
-      margin-top: 10px;
-      margin-bottom: 0;
-    }
-
-    .cone-wrapper {
+    .snow-cone-wrapper {
       position: relative;
-      width: 130px;
-      height: 210px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
+      width: 150px;
+      height: 225px;
+      margin: 30px auto 10px;
     }
-
     .scoop {
-      width: 130px;
-      height: 65px;
+      width: 150px;
+      height: 75px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      border-radius: 65px 65px 0 0;
+      border-radius: 75px 75px 0 0;
+      position: absolute;
+      top: 0;
+      left: 0;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
-      position: relative;
-      top: -5px; /* Restored vertical alignment from v.077.4 */
-    }
-
-    .main-scoop {
       display: none;
     }
-
-    .cone-img {
-      width: 130px;
-      height: auto;
+    .snow-cone {
+      position: absolute;
+      bottom: 0;
+      width: 150px;
+      height: 150px;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      background: linear-gradient(to bottom, #ffff99, #ffee00);
+      box-shadow: 0 0 10px #fff, 0 0 20px yellow;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 1;
-      pointer-events: none;
+      transition: box-shadow 0.3s ease;
     }
-
-    .clone-cone .scoop {
-      width: 60px;
-      height: 32px;
-      top: 0;
-      border-top-left-radius: 50px;
-      border-top-right-radius: 50px;
-      position: relative;
+    .cone-text a {
+      color: black;
+      text-decoration: none;
+      font-size: 20px;
+      line-height: 1.2;
+      z-index: 3;
     }
-
-    .clone-cone .cone-img {
-      width: 65px;
+    .score-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
-
-    .left-spin {
-      animation: spinLeft 6s linear infinite;
+    .score {
+      font-size: 20px;
+      color: #00ff88;
     }
-
-    .right-spin {
-      animation: spinRight 6s linear infinite;
+    #timer {
+      font-size: 16px;
+      color: #00ccff;
     }
-
-    @keyframes spinLeft {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+    .reset-button {
+      background-color: #00ccff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px #00ccff;
+      cursor: pointer;
     }
-
-    @keyframes spinRight {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(-360deg); }
-    }
-
     .math-problem {
       font-size: 28px;
-      margin: 5px 0 5px;
+      margin: 15px 0 10px;
     }
-
     .answer-display {
       font-size: 36px;
       color: #ff00cc;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
-
     .mode-buttons {
       display: flex;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
     }
-
     .mode-buttons button {
       background-color: #00ff88;
       color: black;
@@ -168,7 +111,6 @@
       height: 50px;
       line-height: 1.1;
     }
-
     .keypad {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -176,7 +118,6 @@
       max-width: 320px;
       margin: auto;
     }
-
     .keypad button {
       background-color: #ff00cc;
       border: none;
@@ -187,7 +128,6 @@
       box-shadow: 0 0 10px #ff00cc;
       cursor: pointer;
     }
-
     canvas.confetti {
       position: fixed;
       pointer-events: none;
@@ -196,115 +136,93 @@
       width: 100vw;
       height: 100vh;
       z-index: 9999;
-      display: block;
     }
   </style>
 </head>
 <body>
-
-<canvas id="confettiCanvas" class="confetti"></canvas>
-<canvas id="celebrationCanvas" class="confetti"></canvas>
-
-<!-- TITLE -->
-<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
-
-<!-- RULES MODAL -->
-<div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
-      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, your score freezes.
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
-  </div>
-</div>
-
-<!-- GAME CONTAINER -->
-<div class="game-container" id="gameContainer">
-  <div class="layout-row">
-    <div class="score-block">
-      <div class="score-label">Score</div>
-      <div class="score"><span id="score">0</span></div>
-    </div>
-
-    <div class="timer-block">
-      <div class="timer-label">Time</div>
-      <div id="timer">0s</div>
+<!-- Chunk 2 of 5 -->
+  <!-- RULES MODAL -->
+  <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
+      <h2 style="color:#ffee00;">🍧 Whoa, Math Traveler 🍧</h2>
+      <p style="font-size:16px; line-height:1.5;">
+        Welcome to the fest, where math is funky and cones are fresh.<br/><br/>
+        ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
+        ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
+        💀 Hard Mode: <strong>+15 points</strong><br/>
+        😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+        🍧 The song is 1:45 long — when it ends, the round ends.
+      </p>
+      <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
     </div>
   </div>
 
-  <div class="cone-zone">
-    <!-- Left Clone Cone -->
-    <div class="cone-wrapper clone-cone" id="leftCone">
-      <div class="scoop"></div>
-      <img src="cone.png" class="cone-img" />
-    </div>
-
-    <!-- Main Cone -->
-    <div class="cone-wrapper" id="mainCone">
-      <div class="scoop main-scoop" id="scoop"></div>
-      <img src="cone.png" id="coneImg" class="cone-img" />
-    </div>
-
-    <!-- Right Clone Cone -->
-    <div class="cone-wrapper clone-cone" id="rightCone">
-      <div class="scoop"></div>
-      <img src="cone.png" class="cone-img" />
+  <!-- POPUP MODAL -->
+  <div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
+      <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
+      <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+      <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
     </div>
   </div>
 
-  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
-  <div class="answer-display" id="answerDisplay">0</div>
+  <!-- AUDIO -->
+  <audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
+  <audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
+  <audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
+  <audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
+  <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
+  <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
+  <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 
-  <div class="mode-buttons">
-    <button onclick="setMode('addsub')">+/-</button>
-    <button onclick="setMode('multdiv')">X-/</button>
-    <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
+  <!-- GAME CONTAINER -->
+  <div class="game-container" id="gameContainer">
+    <div class="score-bar">
+      <div class="score">Score: <span id="score">0</span></div>
+      <div id="timer">Time: 0s</div>
+      <button class="reset-button" onclick="resetScore()">Reset Score</button>
+    </div>
+
+    <div class="snow-cone-wrapper">
+      <div class="scoop" id="scoop"></div>
+      <div class="snow-cone" id="cone">
+        <div class="cone-text">
+          <a href="#" onclick="generateProblem()">Math<br/>Fest</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="math-problem" id="problem">0 + 0 = 🍧</div>
+    <div class="answer-display" id="answerDisplay">0</div>
+
+    <div class="mode-buttons">
+      <button onclick="setMode('addsub')">+/-</button>
+      <button onclick="setMode('multdiv')">X-/</button>
+      <button onclick="setMode('hard')">Hard<br/>Mode</button>
+      <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full
+      Scoop</button>
+    </div>
+
+    <div class="keypad">
+      <button onclick="appendNumber(7)">7</button>
+      <button onclick="appendNumber(8)">8</button>
+      <button onclick="appendNumber(9)">9</button>
+      <button onclick="submitAnswer()">Enter</button>
+      <button onclick="appendNumber(4)">4</button>
+      <button onclick="appendNumber(5)">5</button>
+      <button onclick="appendNumber(6)">6</button>
+      <button onclick="clearAnswer()">Clear</button>
+      <button onclick="appendNumber(1)">1</button>
+      <button onclick="appendNumber(2)">2</button>
+      <button onclick="appendNumber(3)">3</button>
+      <button onclick="toggleNegative()">-</button>
+      <button onclick="appendDecimal()">.</button>
+      <button onclick="appendNumber(0)">0</button>
+      <button onclick="toggleMute()">Mute</button>
+      <div></div>
+    </div>
   </div>
-
-  <div class="keypad">
-    <button onclick="appendNumber(7)">7</button>
-    <button onclick="appendNumber(8)">8</button>
-    <button onclick="appendNumber(9)">9</button>
-    <button onclick="submitAnswer()">Enter</button>
-    <button onclick="appendNumber(4)">4</button>
-    <button onclick="appendNumber(5)">5</button>
-    <button onclick="appendNumber(6)">6</button>
-    <button onclick="clearAnswer()">Clear</button>
-    <button onclick="appendNumber(1)">1</button>
-    <button onclick="appendNumber(2)">2</button>
-    <button onclick="appendNumber(3)">3</button>
-    <button onclick="toggleNegative()">-</button>
-    <button onclick="appendDecimal()">.</button>
-    <button onclick="appendNumber(0)">0</button>
-    <button onclick="toggleMute()">Mute</button>
-    <div></div>
-  </div>
-</div>
-
-<!-- POPUP MODAL -->
-<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
-    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
-    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
-    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
-  </div>
-</div>
-
-<!-- AUDIO -->
-<audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
-<audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
-<audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
-<audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
-<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
-<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
-<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+<!-- Chunk 3 of 5 -->
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -340,22 +258,19 @@ function resetScore() {
   window.hundredTriggered = false;
 
   document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "0s";
+  document.getElementById("timer").textContent = "Time: 0s";
   document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("cone").style.boxShadow = "0 0 10px #fff, 0 0 20px yellow";
   document.getElementById("scoop").style.display = "none";
-  document.getElementById("problem").textContent = "";
-
-  document.getElementById("leftCone").classList.remove("left-spin");
-  document.getElementById("rightCone").classList.remove("right-spin");
+  document.getElementById("problem").textContent = "0 + 0 = 🍧";
 
   clearInterval(timerInterval);
   const music = document.getElementById("backgroundMusic1");
   music.pause();
   music.currentTime = 0;
 
-  document.getElementById("popupModal").style.display = "none";
   document.getElementById("rulesModal").style.display = "flex";
-
+  closePopup();
   generateProblem();
 }
 
@@ -374,7 +289,7 @@ function submitAnswer() {
       music.play().catch(e => console.warn("Music play failed:", e));
       timerInterval = setInterval(() => {
         secondsElapsed++;
-        document.getElementById("timer").textContent = `${secondsElapsed}s`;
+        document.getElementById("timer").textContent = `Time: ${secondsElapsed}s`;
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
           gameEnded = true;
@@ -407,6 +322,45 @@ function submitAnswer() {
     clearAnswer();
   }
 }
+<!-- Chunk 4 of 5 -->
+function generateProblem() {
+  let a, b, c, op1, op2;
+  if (mode === "addsub") {
+    a = Math.floor(Math.random() * 10);
+    b = Math.floor(Math.random() * 10);
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    if (op1 === "-" && b > a) [a, b] = [b, a];
+    correctAnswer = op1 === "+" ? a + b : a - b;
+    currentProblemType = op1;
+    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+  } else if (mode === "multdiv") {
+    if (Math.random() > 0.5) {
+      a = Math.floor(Math.random() * 10);
+      b = Math.floor(Math.random() * 10);
+      correctAnswer = a * b;
+      currentProblemType = "×";
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    } else {
+      b = Math.floor(Math.random() * 9) + 1;
+      correctAnswer = Math.floor(Math.random() * 10);
+      a = b * correctAnswer;
+      currentProblemType = "÷";
+      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+    }
+  } else if (mode === "hard") {
+    a = Math.floor(Math.random() * 10);
+    b = Math.floor(Math.random() * 10);
+    c = Math.floor(Math.random() * 9) + 1;
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    op2 = Math.random() > 0.5 ? "×" : "÷";
+    let inner = op1 === "+" ? a + b : a - b;
+    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+  }
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
 
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
@@ -429,23 +383,66 @@ function checkMilestones() {
   if (score >= 50 && !window.fiftyTriggered) {
     window.fiftyTriggered = true;
     if (!isMuted) sound50.play();
-    sparkleShower(canvas);
+    launchConfetti();
   }
 
   if (score >= 75 && !window.seventyFiveTriggered) {
     window.seventyFiveTriggered = true;
     if (!isMuted) sound75.play();
-    sparkleShower(canvas);
+    launchConfetti();
   }
 
   if (score >= 100 && !window.hundredTriggered) {
     window.hundredTriggered = true;
     if (!isMuted) sound100.play();
+    document.getElementById("cone").style.boxShadow = "0 0 30px #ffee00, 0 0 60px #ff00cc";
     fireworkBurst(canvas);
     setTimeout(() => fireworkBurst(canvas), 500);
-    document.getElementById("leftCone").classList.add("left-spin");
-    document.getElementById("rightCone").classList.add("right-spin");
   }
+}
+
+function launchConfetti() {
+  const canvas = document.getElementById("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let confetti = [];
+  for (let i = 0; i < 100; i++) {
+    confetti.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 10 + 10,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      tilt: Math.floor(Math.random() * 10) - 10,
+      tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+      tiltAngle: 0
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+      ctx.stroke();
+    });
+    update();
+  }
+  function update() {
+    for (let i = 0; i < confetti.length; i++) {
+      confetti[i].tiltAngle += confetti[i].tiltAngleIncremental;
+      confetti[i].y += (Math.cos(0.01 + confetti[i].d) + 3 + confetti[i].r / 2) / 2;
+      confetti[i].x += Math.sin(0.01);
+      confetti[i].tilt = Math.sin(confetti[i].tiltAngle - (i / 3)) * 15;
+    }
+  }
+  (function loop() {
+    draw();
+    requestAnimationFrame(loop);
+  })();
 }
 
 function sparkleShower(canvas) {
@@ -491,15 +488,19 @@ function sparkleShower(canvas) {
 
 function fireworkBurst(canvas) {
   const ctx = canvas.getContext("2d");
+  canvas.style.display = 'block';
+  canvas.style.zIndex = '9999';
+  canvas.style.pointerEvents = 'none';
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
   let bursts = [];
   for (let i = 0; i < 30; i++) {
     let angle = Math.random() * 2 * Math.PI;
     let speed = Math.random() * 5 + 2;
     bursts.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
       dx: Math.cos(angle) * speed,
       dy: Math.sin(angle) * speed,
       life: 60,
@@ -530,105 +531,50 @@ function fireworkBurst(canvas) {
   (function loop() {
     if (bursts.length === 0) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
       return;
     }
     draw();
     requestAnimationFrame(loop);
   })();
 }
+<!-- Chunk 5 of 5 -->
+// Button + Keyboard Hooks
+document.getElementById("closeModalBtn").addEventListener("click", () => {
+  document.getElementById("rulesModal").style.display = "none";
+  generateProblem();
+});
 
-function showPopup(title, message, autoClose = false, endOfGame = false) {
-  document.getElementById("popupTitle").textContent = title;
-  document.getElementById("popupMessage").textContent = message;
-  document.getElementById("popupModal").style.display = "flex";
-
-  const btn = document.getElementById("popupButton");
-  btn.textContent = endOfGame ? "Play Again" : "Got it!";
-  btn.onclick = endOfGame ? resetScore : closePopup;
-
-  if (autoClose) setTimeout(closePopup, 1500);
-}
-
-function closePopup() {
-  document.getElementById("popupModal").style.display = "none";
-}
-
-function generateProblem() {
-  let a = Math.floor(Math.random() * 10);
-  let b = Math.floor(Math.random() * 10);
-  let c = Math.floor(Math.random() * 9) + 1;
-  let op1, op2;
-
-  if (mode === "addsub") {
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    if (op1 === "-" && b > a) [a, b] = [b, a];
-    correctAnswer = op1 === "+" ? a + b : a - b;
-    currentProblemType = op1;
-    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-  } else if (mode === "multdiv") {
-    if (Math.random() > 0.5) {
-      correctAnswer = a * b;
-      currentProblemType = "×";
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-    } else {
-      b = Math.floor(Math.random() * 9) + 1;
-      correctAnswer = Math.floor(Math.random() * 10);
-      a = b * correctAnswer;
-      currentProblemType = "÷";
-      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-    }
-  } else {
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    op2 = Math.random() > 0.5 ? "×" : "÷";
-    let inner = op1 === "+" ? a + b : a - b;
-    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-  }
-
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
-}
-
-// FINALIZED INPUT FIXES
+window.generateProblem = generateProblem;
+window.submitAnswer = submitAnswer;
 window.appendNumber = num => {
   if (!gameEnded) {
-    if (currentAnswer === "0") currentAnswer = "";
     currentAnswer += num;
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
-
 window.appendDecimal = () => {
   if (!gameEnded && !currentAnswer.includes(".")) {
     currentAnswer += currentAnswer === "" ? "0." : ".";
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
-
 window.toggleNegative = () => {
   if (!gameEnded) {
-    // grab whatever's in the display (or "0" if blank)
-    const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
-    // parse it, flip the sign, and convert back to a string
-    const negated = -parseFloat(display);
-    currentAnswer = String(negated);
+    currentAnswer = currentAnswer.startsWith("-") ? currentAnswer.slice(1) : "-" + currentAnswer;
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
-
 window.clearAnswer = () => {
   if (!gameEnded) {
     currentAnswer = "";
     document.getElementById("answerDisplay").textContent = "0";
   }
 };
-
 window.setMode = newMode => {
   mode = newMode;
   generateProblem();
 };
-
 window.toggleMute = () => {
   isMuted = !isMuted;
   document.getElementById("backgroundMusic1").muted = isMuted;
@@ -639,24 +585,7 @@ window.toggleMute = () => {
   sound75.muted = isMuted;
   sound100.muted = isMuted;
 };
-
 window.resetScore = resetScore;
-window.submitAnswer = submitAnswer;
-window.generateProblem = generateProblem;
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("rulesModal").style.display = "flex";
-  document.getElementById("closeModalBtn").addEventListener("click", () => {
-    document.getElementById("rulesModal").style.display = "none";
-    generateProblem();
-  });
-
-  setTimeout(() => {
-    if (!document.getElementById("problem").textContent.includes("=")) {
-      generateProblem();
-    }
-  }, 500);
-});
 </script>
 </body>
 </html>
