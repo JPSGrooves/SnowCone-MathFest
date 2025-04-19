@@ -83,19 +83,35 @@
       justify-content: flex-end;
     }
 
+    /* 1) Base scoop: just size & glow, no rounding */
     .scoop {
       width: 130px;
       height: 65px;
       background: linear-gradient(to right, #ff00cc, #6600ff);
-      /* perfect half‑circle: radius = height */
-      border-top-left-radius: 65px !important;
-      border-top-right-radius: 65px !important;
-      border-bottom-left-radius: 0 !important;
-      border-bottom-right-radius: 0 !important;
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       position: relative;
       top: -5px;
       z-index: 2;
+      /* no border‑radius here */
+    }
+    
+    /* 2) Main scoop = perfect half‑circle */
+    #scoop {
+      /* exactly half‑circle: radius = height */
+      border-top-left-radius: 65px;
+      border-top-right-radius: 65px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    /* 3) Clone scoops keep their smaller radius */
+    .clone-cone .scoop {
+      width: 60px;
+      height: 32px;
+      border-top-left-radius: 32px;
+      border-top-right-radius: 32px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
 
     .main-scoop {
