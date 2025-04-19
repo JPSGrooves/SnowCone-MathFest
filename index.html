@@ -237,20 +237,17 @@
       height: 32px;
       border-radius: 32px 32px 0 0 !important;
     }
-    /* remove any border‑radius first */
-    .scoop {
-      border-radius: 0 !important;
-    }
-    
-    /* main scoop: half‑ellipse at top center */
+    /* ─── hack #3: percent slash half‑circle ─── */
     #scoop {
-      clip-path: ellipse(65px 65px at 50% 0%) !important;
+      width: 130px;
+      height: 65px;
+      /* horizontal radius = 50% of width (65px),
+         vertical radius = 100% of height (65px) */
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0 !important;
     }
-    
-    /* clones: smaller half‑ellipse */
-    .clone-cone .scoop {
-      clip-path: ellipse(32px 32px at 50% 0%) !important;
-    }
+    /* clones stay untouched by this rule */
+    /* ────────────────────────────────────────── */
+
 
   </style>
 </head>
