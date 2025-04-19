@@ -91,7 +91,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: relative;
-      top: -5px;
+      top: -5px; /* Restored vertical alignment from v.077.4 */
     }
 
     .main-scoop {
@@ -201,6 +201,7 @@
   </style>
 </head>
 <body>
+
 <canvas id="confettiCanvas" class="confetti"></canvas>
 <canvas id="celebrationCanvas" class="confetti"></canvas>
 
@@ -217,7 +218,7 @@
       ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
       💀 Hard Mode: <strong>+15 points</strong><br/>
       😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🎯 Score-based difficulty kicks in with <strong>DOUBLE POINTS</strong>!
+      🍧 The song is 1:45 long — when it ends, your score freezes.
     </p>
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
@@ -296,20 +297,6 @@
   </div>
 </div>
 
-<!-- STORY MODE MODAL -->
-<div id="storyModeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:320px; box-shadow:0 0 20px #00ff88; text-align:center;">
-    <h2 style="color:#ffee00;">🌌 Yo, Cone Traveler 🌌</h2>
-    <p style="font-size:16px; line-height:1.6; color:#ffffff;">
-      You ever wonder what’s inside a snow cone?<br/><br/>
-      Like... the <em>real</em> inside?<br/>
-      Let’s just say it’s deeper than syrup and ice.<br/><br/>
-      You ready to go on a journey to the center of the snow cone?
-    </p>
-    <button onclick="closeStoryModeModal()" style="margin:10px 5px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to QuikServe</button>
-    <button disabled style="margin:10px 5px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:not-allowed;">Bet!</button>
-  </div>
-</div>
 <!-- AUDIO -->
 <audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
 <audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
@@ -318,7 +305,6 @@
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
-
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -363,8 +349,9 @@ function resetScore() {
   document.getElementById("rightCone").classList.remove("right-spin");
 
   clearInterval(timerInterval);
-  document.getElementById("backgroundMusic1").pause();
-  document.getElementById("backgroundMusic1").currentTime = 0;
+  const music = document.getElementById("backgroundMusic1");
+  music.pause();
+  music.currentTime = 0;
 
   document.getElementById("popupModal").style.display = "none";
   document.getElementById("rulesModal").style.display = "flex";
@@ -402,11 +389,7 @@ function submitAnswer() {
       correctTrack.play().catch(e => console.warn("Play failed", e));
     }
 
-    let points = (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
-
-    if (score >= 50) points *= 2; // Double points after 50
-
-    score += points;
+    score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
     document.getElementById("score").textContent = score;
 
     showScoop(() => {
@@ -425,80 +408,6 @@ function submitAnswer() {
   }
 }
 
-function generateProblem() {
-  let a, b, c, op1, op2;
-
-  if (mode === "addsub" && score >= 50) {
-    a = Math.floor(Math.random() * 1000);
-    b = Math.floor(Math.random() * 1000);
-    c = Math.floor(Math.random() * 1000);
-    correctAnswer = a + b + c;
-    currentProblemType = "+";
-    document.getElementById("problem").textContent = `${a} + ${b} + ${c} = 🍧`;
-
-  } else if (mode === "multdiv" && score >= 75) {
-    let nums = [10 + Math.floor(Math.random() * 11), 1 + Math.floor(Math.random() * 10)];
-    if (Math.random() > 0.5) {
-      correctAnswer = nums[0] * nums[1];
-      currentProblemType = "×";
-      document.getElementById("problem").textContent = `${nums[0]} × ${nums[1]} = 🍧`;
-    } else {
-      correctAnswer = nums[1];
-      let product = nums[0] * nums[1];
-      currentProblemType = "÷";
-      document.getElementById("problem").textContent = `${product} ÷ ${nums[0]} = 🍧`;
-    }
-
-  } else if (mode === "hard" && score >= 100) {
-    a = Math.floor(Math.random() * 11);
-    b = Math.floor(Math.random() * 11);
-    c = Math.floor(Math.random() * 11);
-    d = Math.floor(Math.random() * 11);
-    op1 = Math.random() > 0.5 ? "×" : "÷";
-    op2 = Math.random() > 0.5 ? "+" : "-";
-    op3 = Math.random() > 0.5 ? "×" : "÷";
-    let left = (op1 === "×") ? a * b : Math.floor(a / (b || 1));
-    let right = (op2 === "+") ? c + d : c - d;
-    correctAnswer = (op3 === "×") ? left * right : Math.floor(left / (right || 1));
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op3} (${c} ${op2} ${d}) = 🍧`;
-
-  } else {
-    a = Math.floor(Math.random() * 10);
-    b = Math.floor(Math.random() * 10);
-    if (mode === "addsub") {
-      op1 = Math.random() > 0.5 ? "+" : "-";
-      if (op1 === "-" && b > a) [a, b] = [b, a];
-      correctAnswer = op1 === "+" ? a + b : a - b;
-      currentProblemType = op1;
-      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-    } else if (mode === "multdiv") {
-      if (Math.random() > 0.5) {
-        correctAnswer = a * b;
-        currentProblemType = "×";
-        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-      } else {
-        b = Math.floor(Math.random() * 9) + 1;
-        correctAnswer = Math.floor(Math.random() * 10);
-        a = b * correctAnswer;
-        currentProblemType = "÷";
-        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-      }
-    } else {
-      c = Math.floor(Math.random() * 9) + 1;
-      op1 = Math.random() > 0.5 ? "+" : "-";
-      op2 = Math.random() > 0.5 ? "×" : "÷";
-      let inner = op1 === "+" ? a + b : a - b;
-      correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
-      currentProblemType = "hard";
-      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-    }
-  }
-
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
-}
-
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
   scoop.style.display = "block";
@@ -506,6 +415,126 @@ function showScoop(callback) {
     scoop.style.display = "none";
     if (typeof callback === "function") callback();
   }, 700);
+}
+
+function checkMilestones() {
+  const canvas = document.getElementById("celebrationCanvas");
+
+  if (score >= 25 && !window.twentyFiveTriggered) {
+    window.twentyFiveTriggered = true;
+    if (!isMuted) sound25.play();
+    sparkleShower(canvas);
+  }
+
+  if (score >= 50 && !window.fiftyTriggered) {
+    window.fiftyTriggered = true;
+    if (!isMuted) sound50.play();
+    sparkleShower(canvas);
+  }
+
+  if (score >= 75 && !window.seventyFiveTriggered) {
+    window.seventyFiveTriggered = true;
+    if (!isMuted) sound75.play();
+    sparkleShower(canvas);
+  }
+
+  if (score >= 100 && !window.hundredTriggered) {
+    window.hundredTriggered = true;
+    if (!isMuted) sound100.play();
+    fireworkBurst(canvas);
+    setTimeout(() => fireworkBurst(canvas), 500);
+    document.getElementById("leftCone").classList.add("left-spin");
+    document.getElementById("rightCone").classList.add("right-spin");
+  }
+}
+
+function sparkleShower(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let sparkles = [];
+  for (let i = 0; i < 100; i++) {
+    sparkles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * -canvas.height,
+      r: Math.random() * 2 + 1,
+      d: Math.random() * 1 + 0.5,
+      alpha: 1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sparkles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    for (let p of sparkles) {
+      p.y += p.d;
+      p.alpha -= 0.005;
+    }
+    sparkles = sparkles.filter(p => p.alpha > 0);
+  }
+
+  (function loop() {
+    if (sparkles.length === 0) return;
+    draw();
+    requestAnimationFrame(loop);
+  })();
+}
+
+function fireworkBurst(canvas) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let bursts = [];
+  for (let i = 0; i < 30; i++) {
+    let angle = Math.random() * 2 * Math.PI;
+    let speed = Math.random() * 5 + 2;
+    bursts.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      dx: Math.cos(angle) * speed,
+      dy: Math.sin(angle) * speed,
+      life: 60,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    bursts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    bursts.forEach(p => {
+      p.x += p.dx;
+      p.y += p.dy;
+      p.life -= 1;
+    });
+    bursts = bursts.filter(p => p.life > 0);
+  }
+
+  (function loop() {
+    if (bursts.length === 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+    draw();
+    requestAnimationFrame(loop);
+  })();
 }
 
 function showPopup(title, message, autoClose = false, endOfGame = false) {
@@ -524,6 +553,44 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+function generateProblem() {
+  let a = Math.floor(Math.random() * 10);
+  let b = Math.floor(Math.random() * 10);
+  let c = Math.floor(Math.random() * 9) + 1;
+  let op1, op2;
+
+  if (mode === "addsub") {
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    if (op1 === "-" && b > a) [a, b] = [b, a];
+    correctAnswer = op1 === "+" ? a + b : a - b;
+    currentProblemType = op1;
+    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+  } else if (mode === "multdiv") {
+    if (Math.random() > 0.5) {
+      correctAnswer = a * b;
+      currentProblemType = "×";
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    } else {
+      b = Math.floor(Math.random() * 9) + 1;
+      correctAnswer = Math.floor(Math.random() * 10);
+      a = b * correctAnswer;
+      currentProblemType = "÷";
+      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+    }
+  } else {
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    op2 = Math.random() > 0.5 ? "×" : "÷";
+    let inner = op1 === "+" ? a + b : a - b;
+    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+  }
+
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
+
+// FINALIZED INPUT FIXES
 window.appendNumber = num => {
   if (!gameEnded) {
     if (currentAnswer === "0") currentAnswer = "";
@@ -541,7 +608,9 @@ window.appendDecimal = () => {
 
 window.toggleNegative = () => {
   if (!gameEnded) {
+    // grab whatever's in the display (or "0" if blank)
     const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
+    // parse it, flip the sign, and convert back to a string
     const negated = -parseFloat(display);
     currentAnswer = String(negated);
     document.getElementById("answerDisplay").textContent = currentAnswer;
@@ -562,9 +631,13 @@ window.setMode = newMode => {
 
 window.toggleMute = () => {
   isMuted = !isMuted;
-  [correctTrack, incorrectTrack, sound25, sound50, sound75, sound100, document.getElementById("backgroundMusic1")].forEach(track => {
-    if (track) track.muted = isMuted;
-  });
+  document.getElementById("backgroundMusic1").muted = isMuted;
+  correctTrack.muted = isMuted;
+  incorrectTrack.muted = isMuted;
+  sound25.muted = isMuted;
+  sound50.muted = isMuted;
+  sound75.muted = isMuted;
+  sound100.muted = isMuted;
 };
 
 window.resetScore = resetScore;
@@ -577,6 +650,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("rulesModal").style.display = "none";
     generateProblem();
   });
+
+  setTimeout(() => {
+    if (!document.getElementById("problem").textContent.includes("=")) {
+      generateProblem();
+    }
+  }, 500);
 });
 </script>
 </body>
