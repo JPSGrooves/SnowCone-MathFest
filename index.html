@@ -669,6 +669,38 @@ window.toggleMute = () => {
   document.getElementById("milestone100").muted = isMuted;
 };
 
+function resetScore() {
+  score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  gameEnded = false;
+  window.twentyFiveTriggered = false;
+  window.fiftyTriggered = false;
+  window.seventyFiveTriggered = false;
+  window.hundredTriggered = false;
+
+  document.getElementById("score").textContent = "0";
+  document.getElementById("timer").textContent = "0s";
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("scoop").style.display = "none";
+  document.getElementById("problem").textContent = "0 + 0 = 🍧";
+
+  document.getElementById("leftCone").classList.remove("left-spin");
+  document.getElementById("rightCone").classList.remove("right-spin");
+
+  clearInterval(timerInterval);
+  const music = document.getElementById("backgroundMusic1");
+  music.pause();
+  music.currentTime = 0;
+
+  // 💥 THIS is the line that re-opens the modal
+  document.getElementById("rulesModal").style.display = "flex";
+
+  generateProblem();
+}  
+
 window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
