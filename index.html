@@ -664,26 +664,20 @@ window.generateProblem = generateProblem;
 
 // FINAL MODAL LOGIC FIX
 
-document.addEventListener("DOMContentLoaded", () => {
+window.onload = () => {
   const modal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
 
-  if (!modal || !closeBtn) {
-    console.error("❌ Modal or close button not found.");
-    return;
-  }
-
-  modal.style.display = "flex";
-
-  closeBtn.onclick = () => {
-    modal.style.display = "none";
-    try {
+  if (modal && closeBtn) {
+    modal.style.display = "flex";
+    closeBtn.onclick = () => {
+      modal.style.display = "none";
       generateProblem();
-    } catch (err) {
-      console.error("🔥 Error in generateProblem:", err);
-    }
-  };
-});
+    };
+  } else {
+    console.warn("😵 Modal or close button not found!");
+  }
+};
 </script>
 </body>
 </html>
