@@ -606,56 +606,136 @@ function closePopup() {
 }
 
 // INPUT CONTROLS
+// PATCH: Handle '0' as valid input and ramp difficulty with detailed rules
+
 window.appendNumber = num => {
   if (!gameEnded) {
-    if (currentAnswer === "0") currentAnswer = "";
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.appendDecimal = () => {
-  if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += currentAnswer === "" ? "0." : ".";
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.toggleNegative = () => {
-  if (!gameEnded) {
-    if (currentAnswer === "") {
-      currentAnswer = "-";
-    } else if (currentAnswer === "-") {
-      currentAnswer = "";
+    if (currentAnswer === "0") {
+      currentAnswer = num.toString();
     } else {
-      currentAnswer = String(parseFloat(currentAnswer) * -1);
+      currentAnswer += num;
     }
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
 
-window.clearAnswer = () => {
-  if (!gameEnded) {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
+function generateProblem() {
+  let a, b, c, d, op1, op2, op3;
+  const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
+  const range = 10;
+
+  if (mode === "addsub") {
+    if (score <= 100) {
+      a = Math.floor(Math.random() * range) * randomSign();
+      b = Math.floor(Math.random() * range) * randomSign();
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      correctAnswer = op1 === "+" ? a + b : a - b;
+      currentProblemType = op1;
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+    } else {
+      a = Math.floor(Math.random() * range) * randomSign();
+      b = Math.floor(Math.random() * range) * randomSign();
+      c = Math.floor(Math.random() * range) * randomSign();
+      const ops = ["+", "-"];
+      op1 = ops[Math.floor(Math.random() * 2)];
+      op2 = ops[Math.floor(Math.random() * 2)];
+      correctAnswer = eval(`${a} ${op1} ${b} ${op2} ${c}`);
+      currentProblemType = `${op1}${op2}`;
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} ${op2} ${c} = 🍧`;
+    }
+
+  } else if (mode === "multdiv") {
+    if (score <= 100) {
+      if (Math.random() > 0.5) {
+        a = Math.floor(Math.random() * 10);
+        b = Math.floor(Math.random() * 10);
+        correctAnswer = a * b;
+        currentProblemType = "×";
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      } else {
+        b = Math.floor(Math.random() * 9 + 1);
+        correctAnswer = Math.floor(Math.random() * 10);
+        a = b * correctAnswer;
+        currentProblemType = "÷";
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      }
+    } else {
+      while (true) {
+        a = Math.floor(Math.random() * 90 + 10);
+        b = Math.floor(Math.random() * 90 + 10);
+        if (Math.random() > 0.5) {
+          correctAnswer = a * b;
+          currentProblemType = "×";
+          document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+          break;
+        } else {
+          b = Math.floor(Math.random() * 10 + 1);
+          correctAnswer = Math.floor(Math.random() * 13);
+          a = b * correctAnswer;
+          if (a >= 10) {
+            currentProblemType = "÷";
+            document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+            break;
+          }
+        }
+      }
+    }
+
+  } else if (mode === "hard") {
+    if (score <= 100) {
+      while (true) {
+        a = Math.floor(Math.random() * 10);
+        b = Math.floor(Math.random() * 10);
+        c = Math.floor(Math.random() * 9 + 1);
+        op1 = Math.random() > 0.5 ? "+" : "-";
+        op2 = Math.random() > 0.5 ? "×" : "÷";
+
+        let inner = op1 === "+" ? a + b : a - b;
+
+        if (op2 === "×") {
+          correctAnswer = inner * c;
+          break;
+        } else {
+          if (inner % c === 0) {
+            correctAnswer = inner / c;
+            break;
+          }
+        }
+      }
+      currentProblemType = "hard";
+      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+    } else {
+      while (true) {
+        a = Math.floor(Math.random() * 10 + 1);
+        b = Math.floor(Math.random() * 10 + 1);
+        c = Math.floor(Math.random() * 10);
+        d = Math.floor(Math.random() * 10);
+        op1 = Math.random() > 0.5 ? "×" : "÷";
+        op2 = Math.random() > 0.5 ? "+" : "-";
+        op3 = Math.random() > 0.5 ? "×" : "÷";
+
+        let left = op1 === "×" ? a * b : (b !== 0 && a % b === 0 ? a / b : null);
+        let right = op2 === "+" ? c + d : c - d;
+
+        if (left !== null && right !== 0) {
+          if (op3 === "×") {
+            correctAnswer = left * right;
+            break;
+          } else if (right !== 0 && left % right === 0) {
+            correctAnswer = left / right;
+            break;
+          }
+        }
+      }
+      currentProblemType = "hard";
+      document.getElementById("problem").textContent = `((${a} ${op1} ${b}) ${op3} (${c} ${op2} ${d})) = 🍧`;
+    }
   }
-};
 
-window.setMode = newMode => {
-  mode = newMode;
-  generateProblem();
-};
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
 
-window.toggleMute = () => {
-  isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  correctTrack.muted = isMuted;
-  incorrectTrack.muted = isMuted;
-  sound25.muted = isMuted;
-  sound50.muted = isMuted;
-  sound75.muted = isMuted;
-  sound100.muted = isMuted;
-};
 
 window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
