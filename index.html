@@ -304,6 +304,12 @@ let secondsElapsed = 0;
 let timerInterval = null;
 let gameEnded = false;
 
+const correctTrack = document.getElementById("correctSound");
+const incorrectTrack = document.getElementById("incorrectSound");
+correctTrack.volume = 0.5;
+incorrectTrack.volume = 0.5;
+
+
 function generateProblem() {
   let a, b, c, d, op1, op2;
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
