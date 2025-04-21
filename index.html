@@ -39,6 +39,7 @@
 
     .score-block, .timer-block {
       text-align: center;
+      width: auto;
     }
 
     .score-label {
@@ -69,6 +70,7 @@
       align-items: flex-end;
       gap: 50px;
       margin-top: 10px;
+      margin-bottom: 0;
     }
 
     .cone-wrapper {
@@ -136,7 +138,7 @@
 
     .math-problem {
       font-size: 28px;
-      margin: 5px 0;
+      margin: 5px 0 5px;
     }
 
     .answer-display {
@@ -220,6 +222,7 @@
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
+
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
   <div class="layout-row">
@@ -227,7 +230,6 @@
       <div class="score-label">Score</div>
       <div class="score"><span id="score">0</span></div>
     </div>
-
     <div class="timer-block">
       <div class="timer-label">Time</div>
       <div id="timer">0s</div>
@@ -235,19 +237,16 @@
   </div>
 
   <div class="cone-zone">
-    <!-- Left Clone Cone -->
     <div class="cone-wrapper clone-cone" id="leftCone">
       <div class="scoop"></div>
       <img src="cone.png" class="cone-img" />
     </div>
 
-    <!-- Main Cone -->
     <div class="cone-wrapper" id="mainCone">
       <div class="scoop main-scoop" id="scoop"></div>
       <img src="cone.png" id="coneImg" class="cone-img" />
     </div>
 
-    <!-- Right Clone Cone -->
     <div class="cone-wrapper clone-cone" id="rightCone">
       <div class="scoop"></div>
       <img src="cone.png" class="cone-img" />
@@ -261,7 +260,7 @@
     <button onclick="setMode('addsub')">+/-</button>
     <button onclick="setMode('multdiv')">X-/</button>
     <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Full Scoop</button>
+    <button onclick="openStoryModeModal()" style="white-space: pre-line;">Full Scoop</button>
   </div>
 
   <div class="keypad">
@@ -284,16 +283,7 @@
   </div>
 </div>
 
-<!-- POPUP MODAL -->
-<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
-    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
-    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
-    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
-  </div>
-</div>
-
-<!-- AUDIO -->
+<!-- AUDIO ELEMENTS -->
 <audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
 <audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
 <audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
@@ -301,6 +291,7 @@
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -313,376 +304,104 @@ let secondsElapsed = 0;
 let timerInterval = null;
 let gameEnded = false;
 
-const correctTrack = document.getElementById("correctSound");
-const incorrectTrack = document.getElementById("incorrectSound");
-const sound25 = document.getElementById("milestone25");
-const sound50 = document.getElementById("milestone50");
-const sound75 = document.getElementById("milestone75");
-const sound100 = document.getElementById("milestone100");
-
-correctTrack.volume = 0.5;
-incorrectTrack.volume = 0.5;
-
-function resetScore() {
-  score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  gameEnded = false;
-  window.twentyFiveTriggered = false;
-  window.fiftyTriggered = false;
-  window.seventyFiveTriggered = false;
-  window.hundredTriggered = false;
-
-  document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "0s";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("scoop").style.display = "none";
-  document.getElementById("problem").textContent = "";
-
-  document.getElementById("leftCone").classList.remove("left-spin");
-  document.getElementById("rightCone").classList.remove("right-spin");
-
-  clearInterval(timerInterval);
-  const music = document.getElementById("backgroundMusic1");
-  music.pause();
-  music.currentTime = 0;
-
-  document.getElementById("popupModal").style.display = "none";
-  document.getElementById("rulesModal").style.display = "flex";
-
-  generateProblem();
-}
-
-function submitAnswer() {
-  if (gameEnded) {
-    showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
-    return;
-  }
-
-  let userAnswer = parseFloat(currentAnswer);
-  if (userAnswer === correctAnswer) {
-    if (!timerStarted) {
-      timerStarted = true;
-      const music = document.getElementById("backgroundMusic1");
-      music.currentTime = 0;
-      music.play().catch(e => console.warn("Music play failed:", e));
-      timerInterval = setInterval(() => {
-        secondsElapsed++;
-        document.getElementById("timer").textContent = `${secondsElapsed}s`;
-        if (secondsElapsed >= 105) {
-          clearInterval(timerInterval);
-          gameEnded = true;
-          showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`, false, true);
-        }
-      }, 1000);
-    }
-
-    if (!isMuted) {
-      correctTrack.pause();
-      correctTrack.currentTime = 0;
-      correctTrack.play().catch(e => console.warn("Play failed", e));
-    }
-
-    score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
-    document.getElementById("score").textContent = score;
-
-    showScoop(() => {
-      generateProblem();
-      checkMilestones();
-    });
-  } else {
-    if (!isMuted) {
-      incorrectTrack.currentTime = 0;
-      incorrectTrack.play();
-    }
-    score -= 3;
-    document.getElementById("score").textContent = score;
-    showPopup("⛔ Incorrect!", "Try again.", true);
-    clearAnswer();
-  }
-}
-
 function generateProblem() {
-  let a, b, c, op1, op2;
+  let a, b, c, d, op1, op2;
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
+  const isRamp = score >= 100;
 
   if (mode === "addsub") {
-    a = Math.floor(Math.random() * 10) * randomSign();
-    b = Math.floor(Math.random() * 10) * randomSign();
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    correctAnswer = op1 === "+" ? a + b : a - b;
-    currentProblemType = op1;
-    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-
-  } else if (mode === "multdiv") {
-    if (Math.random() > 0.5) {
+    if (isRamp) {
       a = Math.floor(Math.random() * 10) * randomSign();
       b = Math.floor(Math.random() * 10) * randomSign();
-      correctAnswer = a * b;
-      currentProblemType = "×";
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      c = Math.floor(Math.random() * 10) * randomSign();
+      correctAnswer = a + b + c;
+      currentProblemType = "+";
+      document.getElementById("problem").textContent = `${a} + ${b} + ${c} = 🍧`;
     } else {
-      b = Math.floor(Math.random() * 9 + 1) * randomSign();
-      correctAnswer = Math.floor(Math.random() * 10) * randomSign();
-      a = b * correctAnswer;
-      currentProblemType = "÷";
-      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      a = Math.floor(Math.random() * 10) * randomSign();
+      b = Math.floor(Math.random() * 10) * randomSign();
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      correctAnswer = op1 === "+" ? a + b : a - b;
+      currentProblemType = op1;
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
     }
-
+  } else if (mode === "multdiv") {
+    if (isRamp) {
+      // Multiplication: double digits
+      if (Math.random() > 0.5) {
+        a = Math.floor(Math.random() * 90 + 10) * randomSign(); // 10-99
+        b = Math.floor(Math.random() * 90 + 10) * randomSign(); // 10-99
+        correctAnswer = a * b;
+        currentProblemType = "×";
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      } else {
+        // Division: double-digit whole number results only
+        correctAnswer = Math.floor(Math.random() * 90 + 10); // 10-99
+        b = Math.floor(Math.random() * 9 + 1) * randomSign();
+        a = correctAnswer * b;
+        currentProblemType = "÷";
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      }
+    } else {
+      if (Math.random() > 0.5) {
+        a = Math.floor(Math.random() * 10) * randomSign();
+        b = Math.floor(Math.random() * 10) * randomSign();
+        correctAnswer = a * b;
+        currentProblemType = "×";
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      } else {
+        b = Math.floor(Math.random() * 9 + 1) * randomSign();
+        correctAnswer = Math.floor(Math.random() * 10) * randomSign();
+        a = b * correctAnswer;
+        currentProblemType = "÷";
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      }
+    }
   } else if (mode === "hard") {
     while (true) {
       a = Math.floor(Math.random() * 10) * randomSign();
       b = Math.floor(Math.random() * 10) * randomSign();
-      c = Math.floor(Math.random() * 9 + 1) * randomSign();
+      c = Math.floor(Math.random() * 10) * randomSign();
+      d = Math.floor(Math.random() * 10) * randomSign();
       op1 = Math.random() > 0.5 ? "+" : "-";
       op2 = Math.random() > 0.5 ? "×" : "÷";
 
-      let inner = op1 === "+" ? a + b : a - b;
-
-      if (op2 === "×") {
-        correctAnswer = inner * c;
+      if (isRamp) {
+        // Hard mode ramp: (a op b) op2 (c op d)
+        let left = op1 === "+" ? a + b : a - b;
+        let right = Math.random() > 0.5 ? c + d : c - d;
+        if (op2 === "×") {
+          correctAnswer = left * right;
+        } else {
+          if (right === 0 || left % right !== 0) continue;
+          correctAnswer = left / right;
+        }
+        currentProblemType = "hard";
+        document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} (${c} ${op1} ${d}) = 🍧`;
         break;
       } else {
-        if (inner % c === 0) {
-          correctAnswer = inner / c;
+        // Pre-ramp classic: (a + b) × c or ÷ c
+        let inner = op1 === "+" ? a + b : a - b;
+        if (op2 === "×") {
+          correctAnswer = inner * c;
+          currentProblemType = "hard";
+          document.getElementById("problem").textContent = `(${a} ${op1} ${b}) × ${c} = 🍧`;
           break;
+        } else {
+          if (c !== 0 && inner % c === 0) {
+            correctAnswer = inner / c;
+            currentProblemType = "hard";
+            document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ÷ ${c} = 🍧`;
+            break;
+          }
         }
       }
     }
-
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
 
   currentAnswer = "";
   document.getElementById("answerDisplay").textContent = "0";
 }
-
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
-}
-
-function checkMilestones() {
-  const canvas = document.getElementById("celebrationCanvas");
-
-  if (score >= 25 && !window.twentyFiveTriggered) {
-    window.twentyFiveTriggered = true;
-    if (!isMuted) sound25.play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 50 && !window.fiftyTriggered) {
-    window.fiftyTriggered = true;
-    if (!isMuted) sound50.play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 75 && !window.seventyFiveTriggered) {
-    window.seventyFiveTriggered = true;
-    if (!isMuted) sound75.play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 100 && !window.hundredTriggered) {
-    window.hundredTriggered = true;
-    if (!isMuted) sound100.play();
-    fireworkBurst(canvas);
-    setTimeout(() => fireworkBurst(canvas), 500);
-    document.getElementById("leftCone").classList.add("left-spin");
-    document.getElementById("rightCone").classList.add("right-spin");
-  }
-}
-
-function sparkleShower(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let sparkles = [];
-  for (let i = 0; i < 100; i++) {
-    sparkles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 2 + 1,
-      d: Math.random() * 1 + 0.5,
-      alpha: 1
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sparkles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    for (let p of sparkles) {
-      p.y += p.d;
-      p.alpha -= 0.005;
-    }
-    sparkles = sparkles.filter(p => p.alpha > 0);
-  }
-
-  (function loop() {
-    if (sparkles.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-function fireworkBurst(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let bursts = [];
-  for (let i = 0; i < 30; i++) {
-    let angle = Math.random() * 2 * Math.PI;
-    let speed = Math.random() * 5 + 2;
-    bursts.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      life: 60,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bursts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    bursts.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.life -= 1;
-    });
-    bursts = bursts.filter(p => p.life > 0);
-  }
-
-  (function loop() {
-    if (bursts.length === 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      return;
-    }
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-function showPopup(title, message, autoClose = false, endOfGame = false) {
-  document.getElementById("popupTitle").textContent = title;
-  document.getElementById("popupMessage").textContent = message;
-  document.getElementById("popupModal").style.display = "flex";
-
-  const btn = document.getElementById("popupButton");
-  btn.textContent = endOfGame ? "Play Again" : "Got it!";
-  btn.onclick = endOfGame ? resetScore : closePopup;
-
-  if (autoClose) setTimeout(closePopup, 1500);
-}
-
-function closePopup() {
-  document.getElementById("popupModal").style.display = "none";
-}
-
-// INPUT CONTROLS
-window.appendNumber = num => {
-  if (!gameEnded) {
-    if (currentAnswer === "0") currentAnswer = "";
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.appendDecimal = () => {
-  if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += currentAnswer === "" ? "0." : ".";
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.toggleNegative = () => {
-  if (!gameEnded) {
-    if (currentAnswer === "") {
-      currentAnswer = "-";
-    } else if (currentAnswer === "-") {
-      currentAnswer = "";
-    } else {
-      currentAnswer = String(parseFloat(currentAnswer) * -1);
-    }
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.clearAnswer = () => {
-  if (!gameEnded) {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-};
-
-window.setMode = newMode => {
-  mode = newMode;
-  generateProblem();
-};
-
-window.toggleMute = () => {
-  isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  correctTrack.muted = isMuted;
-  incorrectTrack.muted = isMuted;
-  sound25.muted = isMuted;
-  sound50.muted = isMuted;
-  sound75.muted = isMuted;
-  sound100.muted = isMuted;
-};
-
-window.resetScore = resetScore;
-window.submitAnswer = submitAnswer;
-window.generateProblem = generateProblem;
-
-// FINAL MODAL LOGIC FIX
-
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-
-  if (!modal || !closeBtn) {
-    console.error("❌ Modal or close button not found.");
-    return;
-  }
-
-  modal.style.display = "flex";
-
-  closeBtn.onclick = () => {
-    modal.style.display = "none";
-    try {
-      generateProblem();
-    } catch (err) {
-      console.error("🔥 Error in generateProblem:", err);
-    }
-  };
-});
 </script>
 </body>
 </html>
