@@ -623,9 +623,13 @@ window.appendDecimal = () => {
 
 window.toggleNegative = () => {
   if (!gameEnded) {
-    const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
-    const negated = -parseFloat(display);
-    currentAnswer = String(negated);
+    if (currentAnswer === "") {
+      currentAnswer = "-";
+    } else if (currentAnswer === "-") {
+      currentAnswer = "";
+    } else {
+      currentAnswer = String(parseFloat(currentAnswer) * -1);
+    }
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
@@ -657,7 +661,8 @@ window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
 
-// 🧊 FINAL FIXED MODAL INIT
+// FINAL MODAL LOGIC FIX
+
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
