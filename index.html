@@ -355,8 +355,6 @@ function resetScore() {
   generateProblem();
 }
 
-// ✅ FINAL FIX: .079 – Enable Enter to Submit 0 and Add Score Ramps
-
 function submitAnswer() {
   if (gameEnded) {
     showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
@@ -432,7 +430,6 @@ function generateProblem() {
       currentProblemType = "ramp";
       document.getElementById("problem").textContent = `${a} ${op1} ${b} ${op2} ${c} = 🍧`;
     }
-
   } else if (mode === "multdiv") {
     if (!isRamp) {
       if (Math.random() > 0.5) {
@@ -463,7 +460,6 @@ function generateProblem() {
         document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
       }
     }
-
   } else if (mode === "hard") {
     if (!isRamp) {
       while (true) {
@@ -515,169 +511,18 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sparkles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    for (let p of sparkles) {
-      p.y += p.d;
-      p.alpha -= 0.005;
-    }
-    sparkles = sparkles.filter(p => p.alpha > 0);
-  }
-
-  (function loop() {
-    if (sparkles.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-function fireworkBurst(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let bursts = [];
-  for (let i = 0; i < 30; i++) {
-    let angle = Math.random() * 2 * Math.PI;
-    let speed = Math.random() * 5 + 2;
-    bursts.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      life: 60,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bursts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    bursts.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.life -= 1;
-    });
-    bursts = bursts.filter(p => p.life > 0);
-  }
-
-  (function loop() {
-    if (bursts.length === 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      return;
-    }
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-function showPopup(title, message, autoClose = false, endOfGame = false) {
-  document.getElementById("popupTitle").textContent = title;
-  document.getElementById("popupMessage").textContent = message;
-  document.getElementById("popupModal").style.display = "flex";
-
-  const btn = document.getElementById("popupButton");
-  btn.textContent = endOfGame ? "Play Again" : "Got it!";
-  btn.onclick = endOfGame ? resetScore : closePopup;
-
-  if (autoClose) setTimeout(closePopup, 1500);
-}
-
-function closePopup() {
-  document.getElementById("popupModal").style.display = "none";
-}
-
-// INPUT CONTROLS
-window.appendNumber = num => {
-  if (!gameEnded) {
-    if (currentAnswer === "0") currentAnswer = "";
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.appendDecimal = () => {
-  if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += currentAnswer === "" ? "0." : ".";
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.toggleNegative = () => {
-  if (!gameEnded) {
-    if (currentAnswer === "") {
-      currentAnswer = "-";
-    } else if (currentAnswer === "-") {
-      currentAnswer = "";
-    } else {
-      currentAnswer = String(parseFloat(currentAnswer) * -1);
-    }
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.clearAnswer = () => {
-  if (!gameEnded) {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-};
-
-window.setMode = newMode => {
-  mode = newMode;
-  generateProblem();
-};
-
-window.toggleMute = () => {
-  isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  correctTrack.muted = isMuted;
-  incorrectTrack.muted = isMuted;
-  sound25.muted = isMuted;
-  sound50.muted = isMuted;
-  sound75.muted = isMuted;
-  sound100.muted = isMuted;
-};
-
-window.resetScore = resetScore;
-window.submitAnswer = submitAnswer;
-window.generateProblem = generateProblem;
-
-// FINAL MODAL LOGIC FIX
-
-window.onload = () => {
+document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
 
   if (modal && closeBtn) {
     modal.style.display = "flex";
-    closeBtn.onclick = () => {
+    closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
       generateProblem();
-    };
-  } else {
-    console.warn("😵 Modal or close button not found!");
+    });
   }
-};
+});
 </script>
 </body>
 </html>
