@@ -355,13 +355,17 @@ function resetScore() {
   generateProblem();
 }
 
+// ✅ FINAL FIX: .079 – Enable Enter to Submit 0 and Add Score Ramps
+
 function submitAnswer() {
   if (gameEnded) {
     showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
     return;
   }
 
-  let userAnswer = parseFloat(currentAnswer);
+  let userAnswer = currentAnswer.trim() === "" ? 0 : parseFloat(currentAnswer);
+  if (isNaN(userAnswer)) userAnswer = 0;
+
   if (userAnswer === correctAnswer) {
     if (!timerStarted) {
       timerStarted = true;
@@ -405,115 +409,112 @@ function submitAnswer() {
 }
 
 function generateProblem() {
-  let a, b, c, op1, op2;
+  let a, b, c, d, op1, op2, op3;
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
+  const isRamp = score >= 100;
 
   if (mode === "addsub") {
-    a = Math.floor(Math.random() * 10) * randomSign();
-    b = Math.floor(Math.random() * 10) * randomSign();
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    correctAnswer = op1 === "+" ? a + b : a - b;
-    currentProblemType = op1;
-    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-
-  } else if (mode === "multdiv") {
-    if (Math.random() > 0.5) {
+    if (!isRamp) {
       a = Math.floor(Math.random() * 10) * randomSign();
       b = Math.floor(Math.random() * 10) * randomSign();
-      correctAnswer = a * b;
-      currentProblemType = "×";
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      correctAnswer = op1 === "+" ? a + b : a - b;
+      currentProblemType = op1;
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
     } else {
-      b = Math.floor(Math.random() * 9 + 1) * randomSign();
-      correctAnswer = Math.floor(Math.random() * 10) * randomSign();
-      a = b * correctAnswer;
-      currentProblemType = "÷";
-      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      a = Math.floor(Math.random() * 10) * randomSign();
+      b = Math.floor(Math.random() * 10) * randomSign();
+      c = Math.floor(Math.random() * 10) * randomSign();
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      op2 = Math.random() > 0.5 ? "+" : "-";
+      let part1 = op1 === "+" ? a + b : a - b;
+      correctAnswer = op2 === "+" ? part1 + c : part1 - c;
+      currentProblemType = "ramp";
+      document.getElementById("problem").textContent = `${a} ${op1} ${b} ${op2} ${c} = 🍧`;
+    }
+
+  } else if (mode === "multdiv") {
+    if (!isRamp) {
+      if (Math.random() > 0.5) {
+        a = Math.floor(Math.random() * 10) * randomSign();
+        b = Math.floor(Math.random() * 10) * randomSign();
+        correctAnswer = a * b;
+        currentProblemType = "×";
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      } else {
+        b = Math.floor(Math.random() * 9 + 1) * randomSign();
+        correctAnswer = Math.floor(Math.random() * 10) * randomSign();
+        a = b * correctAnswer;
+        currentProblemType = "÷";
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      }
+    } else {
+      if (Math.random() > 0.5) {
+        a = Math.floor(Math.random() * 90 + 10) * randomSign();
+        b = Math.floor(Math.random() * 90 + 10) * randomSign();
+        correctAnswer = a * b;
+        currentProblemType = "×";
+        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+      } else {
+        b = Math.floor(Math.random() * 9 + 1) * randomSign();
+        correctAnswer = Math.floor(Math.random() * 90 + 10) * randomSign();
+        a = b * correctAnswer;
+        currentProblemType = "÷";
+        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+      }
     }
 
   } else if (mode === "hard") {
-    while (true) {
-      a = Math.floor(Math.random() * 10) * randomSign();
-      b = Math.floor(Math.random() * 10) * randomSign();
-      c = Math.floor(Math.random() * 9 + 1) * randomSign();
-      op1 = Math.random() > 0.5 ? "+" : "-";
-      op2 = Math.random() > 0.5 ? "×" : "÷";
-
-      let inner = op1 === "+" ? a + b : a - b;
-
-      if (op2 === "×") {
-        correctAnswer = inner * c;
-        break;
-      } else {
-        if (inner % c === 0) {
+    if (!isRamp) {
+      while (true) {
+        a = Math.floor(Math.random() * 10) * randomSign();
+        b = Math.floor(Math.random() * 10) * randomSign();
+        c = Math.floor(Math.random() * 9 + 1) * randomSign();
+        op1 = Math.random() > 0.5 ? "+" : "-";
+        op2 = Math.random() > 0.5 ? "×" : "÷";
+        let inner = op1 === "+" ? a + b : a - b;
+        if (op2 === "×") {
+          correctAnswer = inner * c;
+          break;
+        } else if (inner % c === 0) {
           correctAnswer = inner / c;
           break;
         }
       }
-    }
+      currentProblemType = "hard";
+      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+    } else {
+      while (true) {
+        a = Math.floor(Math.random() * 10 + 1) * randomSign();
+        b = Math.floor(Math.random() * 10 + 1) * randomSign();
+        c = Math.floor(Math.random() * 10 + 1) * randomSign();
+        d = Math.floor(Math.random() * 10 + 1) * randomSign();
+        op1 = Math.random() > 0.5 ? "×" : "÷";
+        op2 = Math.random() > 0.5 ? "+" : "-";
+        op3 = Math.random() > 0.5 ? "×" : "÷";
 
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+        let part1 = op1 === "×" ? a * b : (b !== 0 && a % b === 0 ? a / b : null);
+        let part2 = op2 === "+" ? c + d : c - d;
+
+        if (part1 !== null) {
+          if (op3 === "×") {
+            correctAnswer = part1 * part2;
+            break;
+          } else if (part2 !== 0 && part1 % part2 === 0) {
+            correctAnswer = part1 / part2;
+            break;
+          }
+        }
+      }
+      currentProblemType = "hard";
+      document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op3} (${c} ${op2} ${d}) = 🍧`;
+    }
   }
 
-  currentAnswer = "";
+  currentAnswer = "0";
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
-}
-
-function checkMilestones() {
-  const canvas = document.getElementById("celebrationCanvas");
-
-  if (score >= 25 && !window.twentyFiveTriggered) {
-    window.twentyFiveTriggered = true;
-    if (!isMuted) sound25.play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 50 && !window.fiftyTriggered) {
-    window.fiftyTriggered = true;
-    if (!isMuted) sound50.play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 75 && !window.seventyFiveTriggered) {
-    window.seventyFiveTriggered = true;
-    if (!isMuted) sound75.play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 100 && !window.hundredTriggered) {
-    window.hundredTriggered = true;
-    if (!isMuted) sound100.play();
-    fireworkBurst(canvas);
-    setTimeout(() => fireworkBurst(canvas), 500);
-    document.getElementById("leftCone").classList.add("left-spin");
-    document.getElementById("rightCone").classList.add("right-spin");
-  }
-}
-
-function sparkleShower(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let sparkles = [];
-  for (let i = 0; i < 100; i++) {
-    sparkles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 2 + 1,
-      d: Math.random() * 1 + 0.5,
-      alpha: 1
-    });
-  }
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
