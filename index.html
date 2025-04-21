@@ -409,6 +409,7 @@ function generateProblem() {
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
 
   if (mode === "addsub") {
+    // 👇 Simple 2-variable add/sub no matter the score
     a = Math.floor(Math.random() * 100) * randomSign();
     b = Math.floor(Math.random() * 100) * randomSign();
     op1 = Math.random() > 0.5 ? "+" : "-";
@@ -417,21 +418,23 @@ function generateProblem() {
     document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
 
   } else if (mode === "multdiv") {
+    // 👇 Simple mult/div with whole number results — no ramp yet
     if (Math.random() > 0.5) {
-      a = Math.floor(Math.random() * 90 + 10) * randomSign();
-      b = Math.floor(Math.random() * 90 + 10) * randomSign();
+      a = Math.floor(Math.random() * 10) * randomSign();
+      b = Math.floor(Math.random() * 10) * randomSign();
       correctAnswer = a * b;
       currentProblemType = "×";
       document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
     } else {
-      correctAnswer = Math.floor(Math.random() * 90 + 10) * randomSign();
-      b = Math.floor(Math.random() * 9 + 1) * randomSign();
+      correctAnswer = Math.floor(Math.random() * 10) * randomSign();
+      b = Math.floor(Math.random() * 9 + 1) * randomSign(); // Avoid zero
       a = correctAnswer * b;
       currentProblemType = "÷";
       document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
     }
 
   } else if (mode === "hard") {
+    // 👇 Hard Mode = (X +/- X) ×/÷ X — already working beautifully
     a = Math.floor(Math.random() * 10) * randomSign();
     b = Math.floor(Math.random() * 10) * randomSign();
     c = Math.floor(Math.random() * 10 + 1) * randomSign();
@@ -446,6 +449,7 @@ function generateProblem() {
   currentAnswer = "";
   document.getElementById("answerDisplay").textContent = "0";
 }
+
 
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
