@@ -409,13 +409,14 @@ function generateProblem() {
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
 
   if (mode === "addsub") {
-    // 👇 Simple 2-variable add/sub no matter the score
-    a = Math.floor(Math.random() * 100) * randomSign();
-    b = Math.floor(Math.random() * 100) * randomSign();
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    correctAnswer = op1 === "+" ? a + b : a - b;
-    currentProblemType = op1;
-    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+  // 🧒 Single-digit problems, negative numbers allowed
+  a = Math.floor(Math.random() * 10) * randomSign();
+  b = Math.floor(Math.random() * 10) * randomSign();
+  op1 = Math.random() > 0.5 ? "+" : "-";
+  correctAnswer = op1 === "+" ? a + b : a - b;
+  currentProblemType = op1;
+  document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+}
 
   } else if (mode === "multdiv") {
     // 👇 Simple mult/div with whole number results — no ramp yet
