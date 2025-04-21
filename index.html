@@ -435,10 +435,10 @@ function generateProblem() {
     }
 
   } else if (mode === "hard") {
+  while (true) {
     a = Math.floor(Math.random() * 10) * randomSign();
     b = Math.floor(Math.random() * 10) * randomSign();
     c = Math.floor(Math.random() * 9 + 1) * randomSign(); // avoid 0
-
     op1 = Math.random() > 0.5 ? "+" : "-";
     op2 = Math.random() > 0.5 ? "×" : "÷";
 
@@ -446,19 +446,21 @@ function generateProblem() {
 
     if (op2 === "×") {
       correctAnswer = inner * c;
+      break; // ✅ valid equation, move on
     } else {
-      // ✅ Create clean division for hard mode too
-      correctAnswer = inner * c;
-      inner = correctAnswer;
+      // Ensure clean division only
+      if (inner % c === 0) {
+        correctAnswer = inner / c;
+        break; // ✅ clean division, valid
+      }
+      // ❌ Otherwise, retry new numbers
     }
-
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
 
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
+  currentProblemType = "hard";
+  document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
 }
+
 
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
