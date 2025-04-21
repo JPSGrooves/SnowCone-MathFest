@@ -409,45 +409,49 @@ function generateProblem() {
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
 
   if (mode === "addsub") {
-  // 🧒 Single-digit problems, negative numbers allowed
-  a = Math.floor(Math.random() * 10) * randomSign();
-  b = Math.floor(Math.random() * 10) * randomSign();
-  op1 = Math.random() > 0.5 ? "+" : "-";
-  correctAnswer = op1 === "+" ? a + b : a - b;
-  currentProblemType = op1;
-  document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-
+    // 🧒 Single-digit problems with negative support
+    a = Math.floor(Math.random() * 10) * randomSign();
+    b = Math.floor(Math.random() * 10) * randomSign();
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    correctAnswer = op1 === "+" ? a + b : a - b;
+    currentProblemType = op1;
+    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
 
   } else if (mode === "multdiv") {
-    // 👇 Simple mult/div with whole number results — no ramp yet
     if (Math.random() > 0.5) {
+      // 🟢 Multiplication with negatives
       a = Math.floor(Math.random() * 10) * randomSign();
       b = Math.floor(Math.random() * 10) * randomSign();
       correctAnswer = a * b;
       currentProblemType = "×";
       document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
     } else {
-      b = Math.floor(Math.random() * 9 + 1) * randomSign(); // non-zero
+      // ✅ Division that ALWAYS results in a whole number
+      b = Math.floor(Math.random() * 9 + 1) * randomSign(); // avoid zero
       correctAnswer = Math.floor(Math.random() * 10) * randomSign();
-      a = b * correctAnswer; // ensures a ÷ b = whole number
+      a = b * correctAnswer;
       currentProblemType = "÷";
       document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
     }
 
   } else if (mode === "hard") {
-    // 👇 Hard Mode = (X +/- X) ×/÷ X — already working beautifully
     a = Math.floor(Math.random() * 10) * randomSign();
     b = Math.floor(Math.random() * 10) * randomSign();
-    c = Math.floor(Math.random() * 10 + 1) * randomSign();
+    c = Math.floor(Math.random() * 9 + 1) * randomSign(); // avoid 0
+
     op1 = Math.random() > 0.5 ? "+" : "-";
     op2 = Math.random() > 0.5 ? "×" : "÷";
+
     let inner = op1 === "+" ? a + b : a - b;
+
     if (op2 === "×") {
       correctAnswer = inner * c;
     } else {
+      // ✅ Create clean division for hard mode too
       correctAnswer = inner * c;
       inner = correctAnswer;
     }
+
     currentProblemType = "hard";
     document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
@@ -455,7 +459,6 @@ function generateProblem() {
   currentAnswer = "";
   document.getElementById("answerDisplay").textContent = "0";
 }
-
 
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
