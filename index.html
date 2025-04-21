@@ -460,8 +460,6 @@ function generateProblem() {
   document.getElementById("answerDisplay").textContent = "0";
 }
 
-// CONTINUATION OF v.079 CHUNK 3 — Celebration, Input, Popups, Modal
-
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
   scoop.style.display = "block";
@@ -479,16 +477,19 @@ function checkMilestones() {
     if (!isMuted) sound25.play();
     sparkleShower(canvas);
   }
+
   if (score >= 50 && !window.fiftyTriggered) {
     window.fiftyTriggered = true;
     if (!isMuted) sound50.play();
     sparkleShower(canvas);
   }
+
   if (score >= 75 && !window.seventyFiveTriggered) {
     window.seventyFiveTriggered = true;
     if (!isMuted) sound75.play();
     sparkleShower(canvas);
   }
+
   if (score >= 100 && !window.hundredTriggered) {
     window.hundredTriggered = true;
     if (!isMuted) sound100.play();
@@ -513,6 +514,7 @@ function sparkleShower(canvas) {
       alpha: 1
     });
   }
+
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     sparkles.forEach(p => {
@@ -523,6 +525,7 @@ function sparkleShower(canvas) {
     });
     update();
   }
+
   function update() {
     for (let p of sparkles) {
       p.y += p.d;
@@ -530,6 +533,7 @@ function sparkleShower(canvas) {
     }
     sparkles = sparkles.filter(p => p.alpha > 0);
   }
+
   (function loop() {
     if (sparkles.length === 0) return;
     draw();
@@ -554,6 +558,7 @@ function fireworkBurst(canvas) {
       color: `hsl(${Math.random() * 360}, 100%, 60%)`
     });
   }
+
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     bursts.forEach(p => {
@@ -564,6 +569,7 @@ function fireworkBurst(canvas) {
     });
     update();
   }
+
   function update() {
     bursts.forEach(p => {
       p.x += p.dx;
@@ -572,6 +578,7 @@ function fireworkBurst(canvas) {
     });
     bursts = bursts.filter(p => p.life > 0);
   }
+
   (function loop() {
     if (bursts.length === 0) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -586,9 +593,11 @@ function showPopup(title, message, autoClose = false, endOfGame = false) {
   document.getElementById("popupTitle").textContent = title;
   document.getElementById("popupMessage").textContent = message;
   document.getElementById("popupModal").style.display = "flex";
+
   const btn = document.getElementById("popupButton");
   btn.textContent = endOfGame ? "Play Again" : "Got it!";
   btn.onclick = endOfGame ? resetScore : closePopup;
+
   if (autoClose) setTimeout(closePopup, 1500);
 }
 
@@ -596,6 +605,7 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+// INPUT CONTROLS
 window.appendNumber = num => {
   if (!gameEnded) {
     if (currentAnswer === "0") currentAnswer = "";
@@ -613,53 +623,16 @@ window.appendDecimal = () => {
 
 window.toggleNegative = () => {
   if (!gameEnded) {
-    const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
-    const negated = -parseFloat(display);
-    currentAnswer = String(negated);
+    if (currentAnswer === "") {
+      currentAnswer = "-";
+    } else if (currentAnswer === "-") {
+      currentAnswer = "";
+    } else {
+      currentAnswer = String(parseFloat(currentAnswer) * -1);
+    }
     document.getElementById("answerDisplay").textContent = currentAnswer;
   }
 };
-
-window.clearAnswer = () => {
-  if (!gameEnded) {
-    currentAnswer = "0";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-};
-
-window.setMode = newMode => {
-  mode = newMode;
-  generateProblem();
-};
-
-window.toggleMute = () => {
-  isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  correctTrack.muted = isMuted;
-  incorrectTrack.muted = isMuted;
-  sound25.muted = isMuted;
-  sound50.muted = isMuted;
-  sound75.muted = isMuted;
-  sound100.muted = isMuted;
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-  if (!modal || !closeBtn) {
-    console.error("❌ Modal or close button not found.");
-    return;
-  }
-  modal.style.display = "flex";
-  closeBtn.onclick = () => {
-    modal.style.display = "none";
-    try {
-      generateProblem();
-    } catch (err) {
-      console.error("🔥 Error in generateProblem:", err);
-    }
-  };
-});
 
 window.clearAnswer = () => {
   if (!gameEnded) {
