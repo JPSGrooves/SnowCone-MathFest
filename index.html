@@ -427,9 +427,9 @@ function generateProblem() {
       currentProblemType = "×";
       document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
     } else {
+      b = Math.floor(Math.random() * 9 + 1) * randomSign(); // non-zero
       correctAnswer = Math.floor(Math.random() * 10) * randomSign();
-      b = Math.floor(Math.random() * 9 + 1) * randomSign(); // Avoid zero
-      a = correctAnswer * b;
+      a = b * correctAnswer; // ensures a ÷ b = whole number
       currentProblemType = "÷";
       document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
     }
@@ -442,7 +442,12 @@ function generateProblem() {
     op1 = Math.random() > 0.5 ? "+" : "-";
     op2 = Math.random() > 0.5 ? "×" : "÷";
     let inner = op1 === "+" ? a + b : a - b;
-    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+    if (op2 === "×") {
+      correctAnswer = inner * c;
+    } else {
+      correctAnswer = inner * c;
+      inner = correctAnswer;
+    }
     currentProblemType = "hard";
     document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
