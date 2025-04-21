@@ -554,37 +554,51 @@ function closePopup() {
 }
 
 function generateProblem() {
-  let a = Math.floor(Math.random() * 10);
-  let b = Math.floor(Math.random() * 10);
-  let c = Math.floor(Math.random() * 9) + 1;
-  let op1, op2;
+  let a, b, c, op1, op2;
+  const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
 
   if (mode === "addsub") {
+    a = Math.floor(Math.random() * 100) * randomSign();
+    b = Math.floor(Math.random() * 100) * randomSign();
     op1 = Math.random() > 0.5 ? "+" : "-";
-    if (op1 === "-" && b > a) [a, b] = [b, a];
     correctAnswer = op1 === "+" ? a + b : a - b;
     currentProblemType = op1;
     document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+
   } else if (mode === "multdiv") {
     if (Math.random() > 0.5) {
+      a = Math.floor(Math.random() * 90 + 10) * randomSign();  // double digit
+      b = Math.floor(Math.random() * 90 + 10) * randomSign();  // double digit
       correctAnswer = a * b;
       currentProblemType = "×";
       document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
     } else {
-      b = Math.floor(Math.random() * 9) + 1;
-      correctAnswer = Math.floor(Math.random() * 10);
-      a = b * correctAnswer;
+      // Division: generate clean problem with negative options
+      correctAnswer = Math.floor(Math.random() * 90 + 10) * randomSign();
+      b = Math.floor(Math.random() * 9 + 1) * randomSign();  // avoid 0
+      a = correctAnswer * b;
       currentProblemType = "÷";
       document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
     }
-  } else {
+
+  } else if (mode === "hard") {
+    a = Math.floor(Math.random() * 10) * randomSign();
+    b = Math.floor(Math.random() * 10) * randomSign();
+    c = Math.floor(Math.random() * 10 + 1) * randomSign();
     op1 = Math.random() > 0.5 ? "+" : "-";
     op2 = Math.random() > 0.5 ? "×" : "÷";
     let inner = op1 === "+" ? a + b : a - b;
-    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+    correctAnswer = op2 === "×"
+      ? inner * c
+      : Math.floor(inner / c);
     currentProblemType = "hard";
     document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
+
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
+
 
   currentAnswer = "";
   document.getElementById("answerDisplay").textContent = "0";
