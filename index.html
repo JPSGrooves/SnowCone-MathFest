@@ -39,7 +39,6 @@
 
     .score-block, .timer-block {
       text-align: center;
-      width: auto;
     }
 
     .score-label {
@@ -70,7 +69,6 @@
       align-items: flex-end;
       gap: 50px;
       margin-top: 10px;
-      margin-bottom: 0;
     }
 
     .cone-wrapper {
@@ -91,7 +89,7 @@
       box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
       z-index: 2;
       position: relative;
-      top: -5px; /* Restored vertical alignment from v.077.4 */
+      top: -5px;
     }
 
     .main-scoop {
@@ -138,7 +136,7 @@
 
     .math-problem {
       font-size: 28px;
-      margin: 5px 0 5px;
+      margin: 5px 0;
     }
 
     .answer-display {
@@ -201,7 +199,6 @@
   </style>
 </head>
 <body>
-
 <canvas id="confettiCanvas" class="confetti"></canvas>
 <canvas id="celebrationCanvas" class="confetti"></canvas>
 
@@ -223,7 +220,6 @@
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
-
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
   <div class="layout-row">
@@ -408,6 +404,49 @@ function submitAnswer() {
   }
 }
 
+function generateProblem() {
+  let a, b, c, op1, op2;
+  const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
+
+  if (mode === "addsub") {
+    a = Math.floor(Math.random() * 100) * randomSign();
+    b = Math.floor(Math.random() * 100) * randomSign();
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    correctAnswer = op1 === "+" ? a + b : a - b;
+    currentProblemType = op1;
+    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
+
+  } else if (mode === "multdiv") {
+    if (Math.random() > 0.5) {
+      a = Math.floor(Math.random() * 90 + 10) * randomSign();
+      b = Math.floor(Math.random() * 90 + 10) * randomSign();
+      correctAnswer = a * b;
+      currentProblemType = "×";
+      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
+    } else {
+      correctAnswer = Math.floor(Math.random() * 90 + 10) * randomSign();
+      b = Math.floor(Math.random() * 9 + 1) * randomSign();
+      a = correctAnswer * b;
+      currentProblemType = "÷";
+      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
+    }
+
+  } else if (mode === "hard") {
+    a = Math.floor(Math.random() * 10) * randomSign();
+    b = Math.floor(Math.random() * 10) * randomSign();
+    c = Math.floor(Math.random() * 10 + 1) * randomSign();
+    op1 = Math.random() > 0.5 ? "+" : "-";
+    op2 = Math.random() > 0.5 ? "×" : "÷";
+    let inner = op1 === "+" ? a + b : a - b;
+    correctAnswer = op2 === "×" ? inner * c : Math.floor(inner / c);
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+  }
+
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
+}
+
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
   scoop.style.display = "block";
@@ -553,58 +592,7 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-function generateProblem() {
-  let a, b, c, op1, op2;
-  const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
-
-  if (mode === "addsub") {
-    a = Math.floor(Math.random() * 100) * randomSign();
-    b = Math.floor(Math.random() * 100) * randomSign();
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    correctAnswer = op1 === "+" ? a + b : a - b;
-    currentProblemType = op1;
-    document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-
-  } else if (mode === "multdiv") {
-    if (Math.random() > 0.5) {
-      a = Math.floor(Math.random() * 90 + 10) * randomSign();  // double digit
-      b = Math.floor(Math.random() * 90 + 10) * randomSign();  // double digit
-      correctAnswer = a * b;
-      currentProblemType = "×";
-      document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-    } else {
-      // Division: generate clean problem with negative options
-      correctAnswer = Math.floor(Math.random() * 90 + 10) * randomSign();
-      b = Math.floor(Math.random() * 9 + 1) * randomSign();  // avoid 0
-      a = correctAnswer * b;
-      currentProblemType = "÷";
-      document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-    }
-
-  } else if (mode === "hard") {
-    a = Math.floor(Math.random() * 10) * randomSign();
-    b = Math.floor(Math.random() * 10) * randomSign();
-    c = Math.floor(Math.random() * 10 + 1) * randomSign();
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    op2 = Math.random() > 0.5 ? "×" : "÷";
-    let inner = op1 === "+" ? a + b : a - b;
-    correctAnswer = op2 === "×"
-      ? inner * c
-      : Math.floor(inner / c);
-    currentProblemType = "hard";
-    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
-  }
-
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
-}
-
-
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
-}
-
-// FINALIZED INPUT FIXES
+// Final input handling
 window.appendNumber = num => {
   if (!gameEnded) {
     if (currentAnswer === "0") currentAnswer = "";
@@ -622,9 +610,7 @@ window.appendDecimal = () => {
 
 window.toggleNegative = () => {
   if (!gameEnded) {
-    // grab whatever's in the display (or "0" if blank)
     const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
-    // parse it, flip the sign, and convert back to a string
     const negated = -parseFloat(display);
     currentAnswer = String(negated);
     document.getElementById("answerDisplay").textContent = currentAnswer;
@@ -658,13 +644,18 @@ window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
 
+// MODAL INIT — WORKING FIXED VERSION
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("rulesModal").style.display = "flex";
-  document.getElementById("closeModalBtn").addEventListener("click", () => {
-    document.getElementById("rulesModal").style.display = "none";
-    generateProblem();
-  });
+  const modal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeModalBtn");
 
+  if (modal && closeBtn) {
+    modal.style.display = "flex";
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      generateProblem();
+    });
+  }
 });
 </script>
 </body>
