@@ -409,7 +409,6 @@ function generateProblem() {
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
 
   if (mode === "addsub") {
-    // 🧒 Single-digit problems with negative support
     a = Math.floor(Math.random() * 10) * randomSign();
     b = Math.floor(Math.random() * 10) * randomSign();
     op1 = Math.random() > 0.5 ? "+" : "-";
@@ -419,15 +418,13 @@ function generateProblem() {
 
   } else if (mode === "multdiv") {
     if (Math.random() > 0.5) {
-      // 🟢 Multiplication with negatives
       a = Math.floor(Math.random() * 10) * randomSign();
       b = Math.floor(Math.random() * 10) * randomSign();
       correctAnswer = a * b;
       currentProblemType = "×";
       document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
     } else {
-      // ✅ Division that ALWAYS results in a whole number
-      b = Math.floor(Math.random() * 9 + 1) * randomSign(); // avoid zero
+      b = Math.floor(Math.random() * 9 + 1) * randomSign();
       correctAnswer = Math.floor(Math.random() * 10) * randomSign();
       a = b * correctAnswer;
       currentProblemType = "÷";
@@ -435,32 +432,33 @@ function generateProblem() {
     }
 
   } else if (mode === "hard") {
-  while (true) {
-    a = Math.floor(Math.random() * 10) * randomSign();
-    b = Math.floor(Math.random() * 10) * randomSign();
-    c = Math.floor(Math.random() * 9 + 1) * randomSign(); // avoid 0
-    op1 = Math.random() > 0.5 ? "+" : "-";
-    op2 = Math.random() > 0.5 ? "×" : "÷";
+    while (true) {
+      a = Math.floor(Math.random() * 10) * randomSign();
+      b = Math.floor(Math.random() * 10) * randomSign();
+      c = Math.floor(Math.random() * 9 + 1) * randomSign();
+      op1 = Math.random() > 0.5 ? "+" : "-";
+      op2 = Math.random() > 0.5 ? "×" : "÷";
 
-    let inner = op1 === "+" ? a + b : a - b;
+      let inner = op1 === "+" ? a + b : a - b;
 
-    if (op2 === "×") {
-      correctAnswer = inner * c;
-      break; // ✅ valid equation, move on
-    } else {
-      // Ensure clean division only
-      if (inner % c === 0) {
-        correctAnswer = inner / c;
-        break; // ✅ clean division, valid
+      if (op2 === "×") {
+        correctAnswer = inner * c;
+        break;
+      } else {
+        if (inner % c === 0) {
+          correctAnswer = inner / c;
+          break;
+        }
       }
-      // ❌ Otherwise, retry new numbers
     }
+
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
 
-  currentProblemType = "hard";
-  document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
+  currentAnswer = "";
+  document.getElementById("answerDisplay").textContent = "0";
 }
-
 
 function showScoop(callback) {
   const scoop = document.getElementById("scoop");
@@ -607,7 +605,7 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-// Final input handling
+// INPUT CONTROLS
 window.appendNumber = num => {
   if (!gameEnded) {
     if (currentAnswer === "0") currentAnswer = "";
@@ -659,18 +657,26 @@ window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
 
-// MODAL INIT — WORKING FIXED VERSION
+// 🧊 FINAL FIXED MODAL INIT
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
 
-  if (modal && closeBtn) {
-    modal.style.display = "flex";
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-      generateProblem();
-    });
+  if (!modal || !closeBtn) {
+    console.error("❌ Modal or close button not found.");
+    return;
   }
+
+  modal.style.display = "flex";
+
+  closeBtn.onclick = () => {
+    modal.style.display = "none";
+    try {
+      generateProblem();
+    } catch (err) {
+      console.error("🔥 Error in generateProblem:", err);
+    }
+  };
 });
 </script>
 </body>
