@@ -685,29 +685,42 @@ window.toggleMute = () => {
   document.getElementById("milestone100").muted = isMuted;
 };
 
-// Global bindings
-window.resetScore = resetScore;
-window.submitAnswer = submitAnswer;
-window.generateProblem = generateProblem;
-document.addEventListener("DOMContentLoaded", () => {
-  const rulesModal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
+function resetScore() {
+  score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  gameEnded = false;
 
-  if (closeBtn && rulesModal) {
-    closeBtn.addEventListener("click", () => {
-      rulesModal.style.display = "none";
-      generateProblem();
-    });
-  }
+  window.twentyFiveTriggered = false;
+  window.fiftyTriggered = false;
+  window.seventyFiveTriggered = false;
+  window.hundredTriggered = false;
 
-  rulesModal.style.display = "flex";
+  // Reset visuals
+  document.getElementById("score").textContent = "0";
+  document.getElementById("timer").textContent = "0s";
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("scoop").style.display = "none";
+  document.getElementById("problem").textContent = "0 + 0 = 🍧";
 
-  setTimeout(() => {
-    if (!document.getElementById("problem").textContent.includes("=")) {
-      generateProblem();
-    }
-  }, 500);
-});
+  // Stop music and timer
+  clearInterval(timerInterval);
+  const music = document.getElementById("backgroundMusic1");
+  music.pause();
+  music.currentTime = 0;
+
+  // Clear animations
+  document.getElementById("leftCone").classList.remove("left-spin");
+  document.getElementById("rightCone").classList.remove("right-spin");
+
+  // CLOSE any open popups (like "Time’s Up!")
+  document.getElementById("popupModal").style.display = "none";
+
+  // ✅ OPEN the rules modal again
+  document.getElementById("rulesModal").style.display = "flex";
+}
 
 </script>
 </body>
