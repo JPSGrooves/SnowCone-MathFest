@@ -453,8 +453,13 @@ function submitAnswer() {
     }
     score -= 3;
     document.getElementById("score").textContent = score;
+    
+    // Reset answer display to 0
+    currentAnswer = "";
+    document.getElementById("answerDisplay").textContent = "0";
+    
+    // Show the incorrect popup
     showPopup("⛔ Incorrect!", "Try again.", true);
-    clearAnswer();
   }
 }
 
@@ -704,6 +709,18 @@ function resetScore() {
 window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("rulesModal").style.display = "flex";
+
+  const closeBtn = document.getElementById("closeModalBtn");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      document.getElementById("rulesModal").style.display = "none";
+      generateProblem();
+    });
+  }
+});
+
 </script>
 </body>
 </html>
