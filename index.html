@@ -689,6 +689,26 @@ window.toggleMute = () => {
 window.resetScore = resetScore;
 window.submitAnswer = submitAnswer;
 window.generateProblem = generateProblem;
+document.addEventListener("DOMContentLoaded", () => {
+  const rulesModal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeModalBtn");
+
+  if (closeBtn && rulesModal) {
+    closeBtn.addEventListener("click", () => {
+      rulesModal.style.display = "none";
+      generateProblem();
+    });
+  }
+
+  rulesModal.style.display = "flex";
+
+  setTimeout(() => {
+    if (!document.getElementById("problem").textContent.includes("=")) {
+      generateProblem();
+    }
+  }, 500);
+});
+
 </script>
 </body>
 </html>
