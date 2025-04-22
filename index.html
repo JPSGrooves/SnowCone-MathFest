@@ -63,7 +63,6 @@
       font-size: 26px;
       color: #00ccff;
     }
-
     .cone-zone {
       display: flex;
       justify-content: center;
@@ -222,7 +221,6 @@
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Cool!</button>
   </div>
 </div>
-
 <!-- GAME CONTAINER -->
 <div class="game-container" id="gameContainer">
   <div class="layout-row">
@@ -300,6 +298,7 @@
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
 
+<!-- SCRIPT START -->
 <script>
 let score = 0;
 let currentAnswer = "";
@@ -316,8 +315,6 @@ const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
 correctTrack.volume = 0.5;
 incorrectTrack.volume = 0.5;
-
-
 function generateProblem() {
   let a, b, c, d, op1, op2;
   const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
@@ -341,16 +338,14 @@ function generateProblem() {
     }
   } else if (mode === "multdiv") {
     if (isRamp) {
-      // Multiplication: double digits
       if (Math.random() > 0.5) {
-        a = Math.floor(Math.random() * 90 + 10) * randomSign(); // 10-99
-        b = Math.floor(Math.random() * 90 + 10) * randomSign(); // 10-99
+        a = Math.floor(Math.random() * 90 + 10) * randomSign();
+        b = Math.floor(Math.random() * 90 + 10) * randomSign();
         correctAnswer = a * b;
         currentProblemType = "×";
         document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
       } else {
-        // Division: double-digit whole number results only
-        correctAnswer = Math.floor(Math.random() * 90 + 10); // 10-99
+        correctAnswer = Math.floor(Math.random() * 90 + 10);
         b = Math.floor(Math.random() * 9 + 1) * randomSign();
         a = correctAnswer * b;
         currentProblemType = "÷";
@@ -381,7 +376,6 @@ function generateProblem() {
       op2 = Math.random() > 0.5 ? "×" : "÷";
 
       if (isRamp) {
-        // Hard mode ramp: (a op b) op2 (c op d)
         let left = op1 === "+" ? a + b : a - b;
         let right = Math.random() > 0.5 ? c + d : c - d;
         if (op2 === "×") {
@@ -394,7 +388,6 @@ function generateProblem() {
         document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} (${c} ${op1} ${d}) = 🍧`;
         break;
       } else {
-        // Pre-ramp classic: (a + b) × c or ÷ c
         let inner = op1 === "+" ? a + b : a - b;
         if (op2 === "×") {
           correctAnswer = inner * c;
@@ -461,12 +454,12 @@ function submitAnswer() {
     }
     score -= 3;
     document.getElementById("score").textContent = score;
-    
-    // Reset answer display to 0
+
+    // Reset answer input
     currentAnswer = "";
     document.getElementById("answerDisplay").textContent = "0";
-    
-    // Show the incorrect popup
+
+    // Show popup message
     showPopup("⛔ Incorrect!", "Try again.", true);
   }
 }
@@ -479,7 +472,6 @@ function showScoop(callback) {
     if (typeof callback === "function") callback();
   }, 700);
 }
-
 function checkMilestones() {
   const canvas = document.getElementById("celebrationCanvas");
 
@@ -510,7 +502,6 @@ function checkMilestones() {
     document.getElementById("rightCone").classList.add("right-spin");
   }
 }
-
 function sparkleShower(canvas) {
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -599,138 +590,6 @@ function fireworkBurst(canvas) {
     requestAnimationFrame(loop);
   })();
 }
-
-function showPopup(title, message, autoClose = false, endOfGame = false) {
-  document.getElementById("popupTitle").textContent = title;
-  document.getElementById("popupMessage").textContent = message;
-  document.getElementById("popupModal").style.display = "flex";
-
-  const btn = document.getElementById("popupButton");
-  btn.textContent = endOfGame ? "Play Again" : "Got it!";
-  btn.onclick = endOfGame ? resetScore : closePopup;
-
-  if (autoClose) setTimeout(closePopup, 1500);
-}
-
-function closePopup() {
-  document.getElementById("popupModal").style.display = "none";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("rulesModal").style.display = "flex";
-  document.getElementById("closeModalBtn").addEventListener("click", () => {
-    document.getElementById("rulesModal").style.display = "none";
-    generateProblem();
-  });
-
-  setTimeout(() => {
-    if (!document.getElementById("problem").textContent.includes("=")) {
-      generateProblem();
-    }
-  }, 500);
-});
-
-// Button Fixes
-window.appendNumber = num => {
-  if (!gameEnded) {
-    if (currentAnswer === "0") currentAnswer = "";
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.appendDecimal = () => {
-  if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += currentAnswer === "" ? "0." : ".";
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.toggleNegative = () => {
-  if (!gameEnded) {
-    if (currentAnswer === "") {
-      currentAnswer = "-";
-    } else if (currentAnswer.startsWith("-")) {
-      currentAnswer = currentAnswer.slice(1);
-    } else {
-      currentAnswer = "-" + currentAnswer;
-    }
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-window.clearAnswer = () => {
-  if (!gameEnded) {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-};
-
-window.setMode = newMode => {
-  mode = newMode;
-  generateProblem();
-};
-
-window.toggleMute = () => {
-  isMuted = !isMuted;
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  document.getElementById("correctSound").muted = isMuted;
-  document.getElementById("incorrectSound").muted = isMuted;
-  document.getElementById("milestone25").muted = isMuted;
-  document.getElementById("milestone50").muted = isMuted;
-  document.getElementById("milestone75").muted = isMuted;
-  document.getElementById("milestone100").muted = isMuted;
-};
-
-function resetScore() {
-  score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  gameEnded = false;
-  window.twentyFiveTriggered = false;
-  window.fiftyTriggered = false;
-  window.seventyFiveTriggered = false;
-  window.hundredTriggered = false;
-
-  document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "0s";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("scoop").style.display = "none";
-  document.getElementById("problem").textContent = "0 + 0 = 🍧";
-
-  document.getElementById("leftCone").classList.remove("left-spin");
-  document.getElementById("rightCone").classList.remove("right-spin");
-
-  clearInterval(timerInterval);
-  const music = document.getElementById("backgroundMusic1");
-  music.pause();
-  music.currentTime = 0;
-
-  // 💥 THIS is the line that re-opens the modal
-  document.getElementById("rulesModal").style.display = "flex";
-
-  document.getElementById("popupModal").style.display = "none";
-  document.getElementById("rulesModal").style.display = "flex";
-
-  generateProblem();
-}  
-
-window.resetScore = resetScore;
-window.submitAnswer = submitAnswer;
-window.generateProblem = generateProblem;
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("rulesModal").style.display = "flex";
-
-  const closeBtn = document.getElementById("closeModalBtn");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-      document.getElementById("rulesModal").style.display = "none";
-      generateProblem();
-    });
-  }
-});
 function showPopup(title, message, autoClose = false, endOfGame = false) {
   document.getElementById("popupTitle").textContent = title;
   document.getElementById("popupMessage").textContent = message;
@@ -748,6 +607,7 @@ function showPopup(title, message, autoClose = false, endOfGame = false) {
 function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   const rulesModal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
@@ -759,10 +619,76 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Force it open on first load too
   rulesModal.style.display = "flex";
-});
 
+  // Failsafe in case no problem was generated
+  setTimeout(() => {
+    if (!document.getElementById("problem").textContent.includes("=")) {
+      generateProblem();
+    }
+  }, 500);
+});
+// Number input
+window.appendNumber = num => {
+  if (!gameEnded) {
+    if (currentAnswer === "0") currentAnswer = "";
+    currentAnswer += num;
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+
+// Decimal support
+window.appendDecimal = () => {
+  if (!gameEnded && !currentAnswer.includes(".")) {
+    currentAnswer += currentAnswer === "" ? "0." : ".";
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+
+// Negative toggle
+window.toggleNegative = () => {
+  if (!gameEnded) {
+    if (currentAnswer === "") {
+      currentAnswer = "-";
+    } else if (currentAnswer.startsWith("-")) {
+      currentAnswer = currentAnswer.slice(1);
+    } else {
+      currentAnswer = "-" + currentAnswer;
+    }
+    document.getElementById("answerDisplay").textContent = currentAnswer;
+  }
+};
+
+// Clear input
+window.clearAnswer = () => {
+  if (!gameEnded) {
+    currentAnswer = "";
+    document.getElementById("answerDisplay").textContent = "0";
+  }
+};
+
+// Mode switching
+window.setMode = newMode => {
+  mode = newMode;
+  generateProblem();
+};
+
+// Mute toggle
+window.toggleMute = () => {
+  isMuted = !isMuted;
+  document.getElementById("backgroundMusic1").muted = isMuted;
+  document.getElementById("correctSound").muted = isMuted;
+  document.getElementById("incorrectSound").muted = isMuted;
+  document.getElementById("milestone25").muted = isMuted;
+  document.getElementById("milestone50").muted = isMuted;
+  document.getElementById("milestone75").muted = isMuted;
+  document.getElementById("milestone100").muted = isMuted;
+};
+
+// Global bindings
+window.resetScore = resetScore;
+window.submitAnswer = submitAnswer;
+window.generateProblem = generateProblem;
 </script>
 </body>
 </html>
