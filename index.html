@@ -282,6 +282,14 @@
     <div></div>
   </div>
 </div>
+<!-- POPUP MODAL -->
+<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; z-index:9999; justify-content:center; align-items:center; font-family: Arial, Helvetica, sans-serif;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
+    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
+    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
+  </div>
+</div>
 
 <!-- AUDIO ELEMENTS -->
 <audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
@@ -719,6 +727,37 @@ document.addEventListener("DOMContentLoaded", () => {
       generateProblem();
     });
   }
+});
+function showPopup(title, message, autoClose = false, endOfGame = false) {
+  document.getElementById("popupTitle").textContent = title;
+  document.getElementById("popupMessage").textContent = message;
+  document.getElementById("popupModal").style.display = "flex";
+
+  const btn = document.getElementById("popupButton");
+  btn.textContent = endOfGame ? "Play Again" : "Got it!";
+  btn.onclick = endOfGame ? resetScore : closePopup;
+
+  if (autoClose) {
+    setTimeout(closePopup, 1500);
+  }
+}
+
+function closePopup() {
+  document.getElementById("popupModal").style.display = "none";
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const rulesModal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeModalBtn");
+
+  if (closeBtn && rulesModal) {
+    closeBtn.addEventListener("click", () => {
+      rulesModal.style.display = "none";
+      generateProblem();
+    });
+  }
+
+  // Force it open on first load too
+  rulesModal.style.display = "flex";
 });
 
 </script>
