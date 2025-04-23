@@ -258,8 +258,9 @@
     <button onclick="setMode('addsub')">+/-</button>
     <button onclick="setMode('multdiv')">X-/</button>
     <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openStoryModeModal()" style="white-space: pre-line;">Full Scoop</button>
+    <button onclick="openMenuModal()" style="white-space: pre-line; background-color: #00ff88; color: black; border: none; padding: 10px; font-size: 16px; border-radius: 6px; box-shadow: 0 0 10px #00ff88; cursor: pointer; width: 80px; height: 50px; line-height: 1.1;">Menu</button>
   </div>
+
 
   <div class="keypad">
     <button onclick="appendNumber(7)">7</button>
@@ -311,6 +312,16 @@ let secondsElapsed = 0;
 let timerInterval = null;
 let gameEnded = false;
 
+// MENU MODAL LOGIC
+function openMenuModal() {
+  document.getElementById("menuModal").style.display = "flex";
+}
+
+function closeMenuModal() {
+  document.getElementById("menuModal").style.display = "none";
+}
+
+
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
 correctTrack.volume = 0.5;
@@ -339,14 +350,14 @@ function generateProblem() {
   } else if (mode === "multdiv") {
     if (isRamp) {
       if (Math.random() > 0.5) {
-        a = Math.floor(Math.random() * 90 + 10) * randomSign();
-        b = Math.floor(Math.random() * 90 + 10) * randomSign();
+        a = Math.floor(Math.random() * 90 + 10) * randomSign();  // 10–99
+        b = Math.floor(Math.random() * 9 + 1) * randomSign();     // 1–9
         correctAnswer = a * b;
         currentProblemType = "×";
         document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
       } else {
-        correctAnswer = Math.floor(Math.random() * 90 + 10);
-        b = Math.floor(Math.random() * 9 + 1) * randomSign();
+        correctAnswer = Math.floor(Math.random() * 90 + 10); // 10–99
+        b = Math.floor(Math.random() * 9 + 1);
         a = correctAnswer * b;
         currentProblemType = "÷";
         document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
@@ -359,9 +370,9 @@ function generateProblem() {
         currentProblemType = "×";
         document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
       } else {
-        b = Math.floor(Math.random() * 9 + 1) * randomSign();
-        correctAnswer = Math.floor(Math.random() * 10) * randomSign();
-        a = b * correctAnswer;
+        b = Math.floor(Math.random() * 9 + 1);
+        correctAnswer = Math.floor(Math.random() * 10);
+        a = correctAnswer * b;
         currentProblemType = "÷";
         document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
       }
@@ -370,45 +381,31 @@ function generateProblem() {
     while (true) {
       a = Math.floor(Math.random() * 10) * randomSign();
       b = Math.floor(Math.random() * 10) * randomSign();
-      c = Math.floor(Math.random() * 10) * randomSign();
-      d = Math.floor(Math.random() * 10) * randomSign();
+      c = Math.floor(Math.random() * 9 + 1) * randomSign();
       op1 = Math.random() > 0.5 ? "+" : "-";
       op2 = Math.random() > 0.5 ? "×" : "÷";
 
-      if (isRamp) {
-        let left = op1 === "+" ? a + b : a - b;
-        let right = Math.random() > 0.5 ? c + d : c - d;
-        if (op2 === "×") {
-          correctAnswer = left * right;
-        } else {
-          if (right === 0 || left % right !== 0) continue;
-          correctAnswer = left / right;
-        }
-        currentProblemType = "hard";
-        document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} (${c} ${op1} ${d}) = 🍧`;
+      let inner = op1 === "+" ? a + b : a - b;
+
+      if (op2 === "×") {
+        correctAnswer = inner * c;
         break;
       } else {
-        let inner = op1 === "+" ? a + b : a - b;
-        if (op2 === "×") {
-          correctAnswer = inner * c;
-          currentProblemType = "hard";
-          document.getElementById("problem").textContent = `(${a} ${op1} ${b}) × ${c} = 🍧`;
+        if (c !== 0 && inner % c === 0) {
+          correctAnswer = inner / c;
           break;
-        } else {
-          if (c !== 0 && inner % c === 0) {
-            correctAnswer = inner / c;
-            currentProblemType = "hard";
-            document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ÷ ${c} = 🍧`;
-            break;
-          }
         }
       }
     }
+
+    currentProblemType = "hard";
+    document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} ${c} = 🍧`;
   }
 
   currentAnswer = "";
   document.getElementById("answerDisplay").textContent = "0";
 }
+
 function submitAnswer() {
   if (gameEnded) {
     showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
@@ -612,22 +609,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const rulesModal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
 
-  if (closeBtn && rulesModal) {
+  if (rulesModal && closeBtn) {
+    rulesModal.style.display = "flex";
     closeBtn.addEventListener("click", () => {
       rulesModal.style.display = "none";
       generateProblem();
     });
   }
 
-  rulesModal.style.display = "flex";
-
-  // Failsafe in case no problem was generated
+  // Safety check to make sure a problem loads
   setTimeout(() => {
     if (!document.getElementById("problem").textContent.includes("=")) {
       generateProblem();
     }
   }, 500);
 });
+
 // Number input
 window.appendNumber = num => {
   if (!gameEnded) {
@@ -722,6 +719,24 @@ function resetScore() {
   document.getElementById("rulesModal").style.display = "flex";
 }
 
+window.openMenuModal = openMenuModal;
+window.closeMenuModal = closeMenuModal;
+
 </script>
+<!-- MENU MODAL -->
+<div id="menuModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
+  <div style="background:black; border:2px solid #00ff88; padding:30px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 20px #00ff88;">
+    <h2 style="color:#ffee00; font-size:26px; margin-bottom:20px;">🍧 SnowCone MathFest Menu 🍧</h2>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <button style="padding:10px; font-size:18px; background:#ff00cc; border:none; border-radius:5px; cursor:pointer;" disabled>🎵 Music Mode — Serving Soon!</button>
+      <button style="padding:10px; font-size:18px; background:#ff00cc; border:none; border-radius:5px; cursor:pointer;" disabled>📖 Story Mode — Serving Soon!</button>
+      <button style="padding:10px; font-size:18px; background:#ff00cc; border:none; border-radius:5px; cursor:pointer;" disabled>🧠 Math Tips — Serving Soon!</button>
+      <button style="padding:10px; font-size:18px; background:#ff00cc; border:none; border-radius:5px; cursor:pointer;" disabled>🏆 High Scores — Serving Soon!</button>
+      <button style="padding:10px; font-size:18px; background:#ff00cc; border:none; border-radius:5px; cursor:pointer;" disabled>♾️ Infinity Mode — Serving Soon!</button>
+    </div>
+    <button onclick="closeMenuModal()" style="margin-top:20px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to Game</button>
+  </div>
+</div>
+
 </body>
 </html>
