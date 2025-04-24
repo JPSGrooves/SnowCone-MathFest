@@ -323,6 +323,13 @@ function closeMenuModal() {
   document.getElementById("menuModal").style.display = "none";
 }
 
+function openMusicModal() {
+  document.getElementById("musicModal").style.display = "flex";
+}
+
+function closeMusicModal() {
+  document.getElementById("musicModal").style.display = "none";
+}
 
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
@@ -745,6 +752,7 @@ function resetScore() {
 window.openMenuModal = openMenuModal;
 window.closeMenuModal = closeMenuModal;
 
+
 </script>
 
 <!-- MENU MODAL -->
@@ -757,8 +765,23 @@ window.closeMenuModal = closeMenuModal;
       <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>🎵 Music Mode — Serving Soon!</button>
       <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>🧠 Math Tips — Serving Soon!</button>
       <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>🏆 High Scores — Serving Soon!</button>
+      <button onclick="openMusicModal()">🎵 Music Mode</button>
     </div>
     <button onclick="closeMenuModal()" style="margin-top:20px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to Quick Serve</button>
+  </div>
+</div>
+<!-- MUSIC MODE MODAL -->
+<div id="musicModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10001; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
+  <div style="background:black; border:2px solid #00ff88; padding:20px; width:90%; max-width:600px; text-align:center; box-shadow:0 0 20px #00ff88;">
+    <h2 style="color:#ffee00; font-size:26px; margin-bottom:20px;">🎵 JPS Grooves – Music Mode 🎵</h2>
+    <iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"
+      src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true">
+    </iframe>
+    <div style="font-size: 12px; color: #cccccc; margin-top: 5px;">
+      <a href="https://soundcloud.com/jpsgrooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a> · 
+      <a href="https://soundcloud.com/jpsgrooves/sets/electronic" target="_blank" style="color: #cccccc; text-decoration: none;">Electronic</a>
+    </div>
+    <button onclick="closeMusicModal()" style="margin-top:20px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to Menu</button>
   </div>
 </div>
 
