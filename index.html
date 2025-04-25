@@ -217,6 +217,10 @@
 <!-- TITLE -->
 <img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
 
+<button id="installAppBtn" style="display:none; margin: 10px auto; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:6px; font-size:18px; box-shadow:0 0 10px #00ff88; cursor:pointer;">
+  📲 Install SnowCone MathFest
+</button>
+
 <!-- RULES MODAL -->
 <div id="rulesModal" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
   <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
@@ -830,6 +834,32 @@ window.addEventListener('beforeinstallprompt', (e) => {
   if (installBtn) installBtn.style.display = 'inline-block';
 });
 
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  const installBtn = document.getElementById('installAppBtn');
+  if (installBtn) {
+    installBtn.style.display = 'inline-block';
+    installBtn.addEventListener('click', () => {
+      installBtn.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('🎉 App installed successfully!');
+          showPopup("📲 Installed!", "SnowCone MathFest is now chilling on your home screen!");
+        } else {
+          console.log('❌ Install dismissed.');
+        }
+        deferredPrompt = null;
+      });
+    });
+  }
+});
+  
+  
 function promptPWAInstall() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
