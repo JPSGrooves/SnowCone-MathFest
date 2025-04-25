@@ -649,29 +649,31 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const rulesModal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-
-  if (rulesModal && closeBtn) {
-    setTimeout(() => {
-      rulesModal.style.display = "flex";
-    }, 100); // <-- Give Safari time to breathe for 100 milliseconds
-
-    closeBtn.addEventListener("click", () => {
-      rulesModal.style.display = "none";
-      generateProblem();
-    });
-  }
-
-  // Backup safety check to make sure a problem loads
+window.addEventListener("load", () => {
   setTimeout(() => {
-    if (!document.getElementById("problem").textContent.includes("=")) {
-      generateProblem();
+    const rulesModal = document.getElementById("rulesModal");
+    const closeBtn = document.getElementById("closeModalBtn");
+
+    if (rulesModal && closeBtn) {
+      rulesModal.style.display = "flex";
+
+      closeBtn.addEventListener("click", () => {
+        rulesModal.style.display = "none";
+        generateProblem();
+      });
     }
-  }, 500);
+  }, 100); // just a tiny chill delay
 });
 
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const rulesModal = document.getElementById("rulesModal");
+    if (rulesModal) {
+      rulesModal.style.display = "flex";
+    }
+  }, 100);
+});
 
 // Number input
 window.appendNumber = num => {
@@ -847,21 +849,22 @@ window.addEventListener('beforeinstallprompt', (e) => {
   const installBtn = document.getElementById('installAppBtn');
   if (installBtn) {
     installBtn.style.display = 'inline-block';
-    installBtn.addEventListener('click', () => {
+    installBtn.onclick = () => {
       installBtn.style.display = 'none';
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          console.log('🎉 App installed successfully!');
+          console.log('🎉 User accepted install');
           showPopup("📲 Installed!", "SnowCone MathFest is now chilling on your home screen!");
         } else {
-          console.log('❌ Install dismissed.');
+          console.log('❌ Install dismissed');
         }
         deferredPrompt = null;
       });
-    });
+    };
   }
 });
+
   
   
 function promptPWAInstall() {
