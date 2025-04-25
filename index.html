@@ -467,7 +467,7 @@ function submitAnswer() {
       correctTrack.play().catch(e => console.warn("Play failed", e));
     }
 
-    score += (currentProblemType === "hard" ? 15 : (currentProblemType === "×" || currentProblemType === "÷" ? 6 : 3));
+    score += (currentProblemType === "hard" ? 10 : (currentProblemType === "×" || currentProblemType === "÷" ? 7 : 5));
     document.getElementById("score").textContent = score;
 
     showScoop(() => {
