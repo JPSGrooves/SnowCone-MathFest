@@ -345,6 +345,7 @@ function closeMusicModal() {
   document.getElementById("musicModal").style.display = "none";
 }
 
+// Correct / Incorrect Sounds
 const correctTrack = document.getElementById("correctSound");
 const incorrectTrack = document.getElementById("incorrectSound");
 correctTrack.volume = 0.5;
@@ -410,7 +411,6 @@ function generateProblem() {
       op2 = Math.random() > 0.5 ? "×" : "÷";
 
       if (isRamp) {
-        // Hard mode ramp: (a op b) op2 (c op d)
         let left = op1 === "+" ? a + b : a - b;
         let right = Math.random() > 0.5 ? c + d : c - d;
 
@@ -425,7 +425,6 @@ function generateProblem() {
         document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} (${c} ${op1} ${d}) = 🍧`;
         break;
       } else {
-        // Pre-ramp classic: (a op b) × or ÷ c
         let inner = op1 === "+" ? a + b : a - b;
 
         if (op2 === "×") {
@@ -448,8 +447,6 @@ function generateProblem() {
   currentAnswer = "";
   document.getElementById("answerDisplay").textContent = "0";
 }
-
-
 function submitAnswer() {
   if (gameEnded) {
     showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
@@ -458,6 +455,7 @@ function submitAnswer() {
 
   const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
   let userAnswer = parseFloat(display);
+  
   if (userAnswer === correctAnswer) {
     if (!timerStarted) {
       timerStarted = true;
@@ -496,11 +494,9 @@ function submitAnswer() {
     score -= 3;
     document.getElementById("score").textContent = score;
 
-    // Reset answer input
     currentAnswer = "";
     document.getElementById("answerDisplay").textContent = "0";
 
-    // Show popup message
     showPopup("⛔ Incorrect!", "Try again.", true);
   }
 }
@@ -543,6 +539,7 @@ function checkMilestones() {
     document.getElementById("rightCone").classList.add("right-spin");
   }
 }
+
 function sparkleShower(canvas) {
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -649,6 +646,7 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
+// OPENING MODAL after full page load
 window.addEventListener("load", () => {
   setTimeout(() => {
     const rulesModal = document.getElementById("rulesModal");
@@ -661,16 +659,6 @@ window.addEventListener("load", () => {
         rulesModal.style.display = "none";
         generateProblem();
       });
-    }
-  }, 100); // just a tiny chill delay
-});
-
-
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    const rulesModal = document.getElementById("rulesModal");
-    if (rulesModal) {
-      rulesModal.style.display = "flex";
     }
   }, 100);
 });
@@ -732,6 +720,7 @@ window.toggleMute = () => {
   document.getElementById("milestone100").muted = isMuted;
 };
 
+// Reset Score and Game
 function resetScore() {
   score = 0;
   currentAnswer = "";
@@ -745,34 +734,28 @@ function resetScore() {
   window.seventyFiveTriggered = false;
   window.hundredTriggered = false;
 
-  // Reset visuals
   document.getElementById("score").textContent = "0";
   document.getElementById("timer").textContent = "0s";
   document.getElementById("answerDisplay").textContent = "0";
   document.getElementById("scoop").style.display = "none";
   document.getElementById("problem").textContent = "0 + 0 = 🍧";
 
-  // Stop music and timer
   clearInterval(timerInterval);
   const music = document.getElementById("backgroundMusic1");
   music.pause();
   music.currentTime = 0;
 
-  // Clear animations
   document.getElementById("leftCone").classList.remove("left-spin");
   document.getElementById("rightCone").classList.remove("right-spin");
 
-  // CLOSE any open popups (like "Time’s Up!")
   document.getElementById("popupModal").style.display = "none";
-
-  // ✅ OPEN the rules modal again
   document.getElementById("rulesModal").style.display = "flex";
 }
 
 window.openMenuModal = openMenuModal;
 window.closeMenuModal = closeMenuModal;
-
-  document.addEventListener("keydown", function(event) {
+// Key event listener for keyboard input
+document.addEventListener("keydown", function(event) {
   if (gameEnded && event.key !== "r" && event.key !== "R") return;
 
   switch(event.key) {
@@ -811,13 +794,13 @@ window.closeMenuModal = closeMenuModal;
       break;
     case "Escape":
       closePopup();
-      closeMenuModal && closeMenuModal();
-      closeMusicModal && closeMusicModal();
+      closeMenuModal();
+      closeMusicModal();
       break;
   }
 });
 
-// 🔥 Register service worker for PWA magic
+// Register service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./service-worker.js')
@@ -829,17 +812,7 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
-
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  const installBtn = document.getElementById('installAppBtn');
-  if (installBtn) installBtn.style.display = 'inline-block';
-});
-
+// Install App Prompt Logic
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -865,67 +838,24 @@ window.addEventListener('beforeinstallprompt', (e) => {
   }
 });
 
-  
-  
-function promptPWAInstall() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choiceResult => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('🎉 User accepted the install');
-      } else {
-        console.log('❌ User dismissed the install');
-      }
-      deferredPrompt = null;
-      document.getElementById('installAppBtn').style.display = 'none';
-    });
-  }
-}
-
-function promptPWAInstall() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choiceResult => {
-      document.getElementById('installAppBtn').style.display = 'none';
-      deferredPrompt = null;
-
-      if (choiceResult.outcome === 'accepted') {
-        console.log('🎉 User accepted the install');
-        showPopup("📲 Installed!", "SnowCone MathFest is now on your home screen. Time to serve math full-time.");
-      } else {
-        console.log('❌ User dismissed the install');
-        showPopup("❌ Install Canceled", "No worries — you can still play in-browser anytime!");
-      }
-    });
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    const installBtn = document.getElementById('installAppBtn');
-    if (installBtn) installBtn.style.display = 'inline-block';
-  });
-});
-
+// Safari-specific install tip
 function isSafari() {
   const ua = navigator.userAgent;
   return /Safari/.test(ua) && !/Chrome/.test(ua);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("load", () => {
   if (isSafari()) {
     const safariMsg = document.createElement("div");
     safariMsg.innerHTML = `
       <div style="margin-top:20px; padding:15px; background:black; border:2px solid #ffee00; border-radius:5px; color:white; font-size:16px; box-shadow:0 0 10px #ffee00;">
         📱 <strong>Safari Users:</strong><br/>
-        Tap the <strong>Share icon</strong> <span style="font-size:20px;">🔗</span> and select<br/><strong>"Add to Home Screen"</strong><br/>to install SnowCone MathFest.
+        Tap the <strong>Share icon</strong> 🔗 and select<br/><strong>"Add to Home Screen"</strong><br/>to install SnowCone MathFest.
       </div>`;
     document.querySelector(".menu-text")?.appendChild(safariMsg);
   }
 });
+
   
 </script>
 
