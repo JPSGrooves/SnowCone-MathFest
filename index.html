@@ -752,6 +752,51 @@ function resetScore() {
 window.openMenuModal = openMenuModal;
 window.closeMenuModal = closeMenuModal;
 
+  document.addEventListener("keydown", function(event) {
+  if (gameEnded && event.key !== "r" && event.key !== "R") return;
+
+  switch(event.key) {
+    case "0": case "1": case "2": case "3": case "4":
+    case "5": case "6": case "7": case "8": case "9":
+      appendNumber(event.key);
+      break;
+    case "-":
+      toggleNegative();
+      break;
+    case ".":
+      appendDecimal();
+      break;
+    case "Enter":
+      submitAnswer();
+      break;
+    case "Backspace":
+      clearAnswer();
+      break;
+    case "1":
+      setMode("addsub");
+      break;
+    case "2":
+      setMode("multdiv");
+      break;
+    case "3":
+      setMode("hard");
+      break;
+    case "m":
+    case "M":
+      toggleMute();
+      break;
+    case "r":
+    case "R":
+      resetScore();
+      break;
+    case "Escape":
+      closePopup();
+      closeMenuModal && closeMenuModal();
+      closeMusicModal && closeMusicModal();
+      break;
+  }
+});
+
 
 </script>
 
