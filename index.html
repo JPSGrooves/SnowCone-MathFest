@@ -654,20 +654,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = document.getElementById("closeModalBtn");
 
   if (rulesModal && closeBtn) {
-    rulesModal.style.display = "flex";
+    setTimeout(() => {
+      rulesModal.style.display = "flex";
+    }, 100); // <-- Give Safari time to breathe for 100 milliseconds
+
     closeBtn.addEventListener("click", () => {
       rulesModal.style.display = "none";
       generateProblem();
     });
   }
 
-  // Safety check to make sure a problem loads
+  // Backup safety check to make sure a problem loads
   setTimeout(() => {
     if (!document.getElementById("problem").textContent.includes("=")) {
       generateProblem();
     }
   }, 500);
 });
+
 
 // Number input
 window.appendNumber = num => {
