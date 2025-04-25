@@ -815,7 +815,7 @@ if ('serviceWorker' in navigator) {
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); // Prevent the mini-infobar
+  e.preventDefault();
   deferredPrompt = e;
 
   const installBtn = document.getElementById('installAppBtn');
@@ -854,7 +854,17 @@ function promptPWAInstall() {
     });
   }
 }
-  
+
+document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const installBtn = document.getElementById('installAppBtn');
+    if (installBtn) installBtn.style.display = 'inline-block';
+  });
+});
+
   
 </script>
 
