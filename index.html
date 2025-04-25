@@ -812,6 +812,30 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // Prevent the mini-infobar
+  deferredPrompt = e;
+
+  const installBtn = document.getElementById('installAppBtn');
+  if (installBtn) installBtn.style.display = 'inline-block';
+});
+
+function promptPWAInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choiceResult => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('🎉 User accepted the install');
+      } else {
+        console.log('❌ User dismissed the install');
+      }
+      deferredPrompt = null;
+      document.getElementById('installAppBtn').style.display = 'none';
+    });
+  }
+}
 
 </script>
 
@@ -825,6 +849,11 @@ if ('serviceWorker' in navigator) {
       <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>♾️ Infinity Mode — Serving Soon!</button>
       <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>🧠 Math Tips — Serving Soon!</button>
       <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>🏆 High Scores — Serving Soon!</button>
+      <button id="installAppBtn"
+  onclick="promptPWAInstall()"
+  style="padding:10px; font-size:18px; background:#ffee00; border:none; border-radius:5px; cursor:pointer; color:black; box-shadow:0 0 10px #ffee00; display: none;">
+  📲 Add as an App!
+</button>
     </div>
     <button onclick="closeMenuModal()" style="margin-top:20px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to Quick Serve</button>
   </div>
