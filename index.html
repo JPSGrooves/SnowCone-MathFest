@@ -8,12 +8,14 @@
   <title>Math Fest Snow Cone</title>
   <link rel="manifest" href="manifest.json" />
   <style>
-    body {
+    html, body {
       background: black;
       color: white;
       font-family: Arial, Helvetica, sans-serif;
       text-align: center;
       padding: 20px;
+      touch-action: manipulation;
+      overscroll-behavior: contain;
     }
 
     .game-container {
@@ -189,6 +191,10 @@
       border-radius: 8px;
       box-shadow: 0 0 10px #ff00cc;
       cursor: pointer;
+    }
+    
+    .keypad button {
+      touch-action: manipulation;
     }
 
     canvas.confetti {
