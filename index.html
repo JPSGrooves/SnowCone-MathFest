@@ -876,6 +876,7 @@ window.setMode = newMode => {
 // Mute toggle
 window.toggleMute = () => {
   isMuted = !isMuted;
+
   document.getElementById("backgroundMusic1").muted = isMuted;
   document.getElementById("correctSound").muted = isMuted;
   document.getElementById("incorrectSound").muted = isMuted;
@@ -883,7 +884,17 @@ window.toggleMute = () => {
   document.getElementById("milestone50").muted = isMuted;
   document.getElementById("milestone75").muted = isMuted;
   document.getElementById("milestone100").muted = isMuted;
+
+  // 🧠 NEW: Mute/unmute SoundCloud too!
+  if (scWidget) {
+    if (isMuted) {
+      scWidget.setVolume(0);
+    } else {
+      scWidget.setVolume(100);
+    }
+  }
 };
+
 
 // Reset Score and Game
 function resetScore() {
@@ -1063,6 +1074,15 @@ window.addEventListener('load', function() {
   </div>
 </div>
 
-  
+let scWidget = null;
+
+// This runs after full page load
+window.addEventListener('load', () => {
+  const scFrame = document.getElementById('soundcloudPlayer');
+  if (scFrame) {
+    scWidget = SC.Widget(scFrame);
+  }
+});
+
 </body>
 </html>
