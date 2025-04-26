@@ -1029,6 +1029,17 @@ window.addEventListener('load', function() {
     });
   }
 });
+
+let scWidget = null;
+
+// This runs after full page load
+window.addEventListener('load', () => {
+  const scFrame = document.getElementById('soundcloudPlayer');
+  if (scFrame) {
+    scWidget = SC.Widget(scFrame);
+  }
+});
+
   
 </script>
 <!-- MENU MODAL -->
@@ -1073,16 +1084,6 @@ window.addEventListener('load', function() {
     <button onclick="closeMusicModal()" style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Back to Menu</button>
   </div>
 </div>
-
-let scWidget = null;
-
-// This runs after full page load
-window.addEventListener('load', () => {
-  const scFrame = document.getElementById('soundcloudPlayer');
-  if (scFrame) {
-    scWidget = SC.Widget(scFrame);
-  }
-});
 
 </body>
 </html>
