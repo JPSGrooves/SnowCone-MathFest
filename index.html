@@ -457,12 +457,30 @@ function closeMenuModal() {
 }
 
 function openMusicModal() {
+  // 🎵 Show the Music Mode modal
   document.getElementById("musicModal").style.display = "flex";
+  
+  // 🔇 Pause the background gameplay music
+  const bgMusic = document.getElementById("backgroundMusic1");
+  if (!bgMusic.paused) {
+    bgMusic.pause();
+  }
 }
 
+
 function closeMusicModal() {
+  // 🎵 Close the Music Mode modal
   document.getElementById("musicModal").style.display = "none";
+  
+  // 🎶 Resume background gameplay music if game is running
+  if (!gameEnded && timerStarted) {
+    const bgMusic = document.getElementById("backgroundMusic1");
+    if (bgMusic.paused) {
+      bgMusic.play().catch(e => console.warn("Music resume failed:", e));
+    }
+  }
 }
+
 
 // Correct / Incorrect Sounds
 const correctTrack = document.getElementById("correctSound");
