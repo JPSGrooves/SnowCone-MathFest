@@ -885,13 +885,9 @@ window.toggleMute = () => {
   document.getElementById("milestone75").muted = isMuted;
   document.getElementById("milestone100").muted = isMuted;
 
-  // 🧠 NEW: Mute/unmute SoundCloud too!
+  // 🧠 Universal mute including SoundCloud
   if (scWidget) {
-    if (isMuted) {
-      scWidget.setVolume(0);
-    } else {
-      scWidget.setVolume(100);
-    }
+    scWidget.setVolume(isMuted ? 0 : 100);
   }
 };
 
@@ -1030,15 +1026,6 @@ window.addEventListener('load', function() {
   }
 });
 
-let scWidget = null;
-
-// This runs after full page load
-window.addEventListener('load', () => {
-  const scFrame = document.getElementById('soundcloudPlayer');
-  if (scFrame) {
-    scWidget = SC.Widget(scFrame);
-  }
-});
 
   
 </script>
