@@ -855,22 +855,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 // Safari-specific install tip
 function isSafari() {
-  const ua = navigator.userAgent;
-  return /Safari/.test(ua) && !/Chrome/.test(ua);
+  const ua = navigator.userAgent.toLowerCase();
+  return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
 }
-
-window.addEventListener("load", () => {
-  if (isSafari()) {
-    const safariMsg = document.createElement("div");
-    safariMsg.innerHTML = `
-      <div style="margin-top:20px; padding:15px; background:black; border:2px solid #ffee00; border-radius:5px; color:white; font-size:16px; box-shadow:0 0 10px #ffee00;">
-        📱 <strong>Safari Users:</strong><br/>
-        Tap the <strong>Share icon</strong> 🔗 and select<br/><strong>"Add to Home Screen"</strong><br/>to install SnowCone MathFest.
-      </div>`;
-    document.querySelector(".menu-text")?.appendChild(safariMsg);
-  }
-});
-
   
 </script>
 
