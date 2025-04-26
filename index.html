@@ -587,7 +587,7 @@ function submitAnswer() {
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
           gameEnded = true;
-          showPopup("🍧 Time's Up Traveler! 🍧", `You scored ${score} points. Take a breath, grab a cone, and play again!`, false, true);
+          showPopup("🍧 Time's Up! 🍧", `You scored ${score} points. Take a breath, grab a cone, and play again!`, false, true);
         }
       }, 1000);
     }
