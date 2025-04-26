@@ -506,38 +506,6 @@ function closeMusicModal() {
   }
 }
 
-// Listen for SoundCloud playing event and fade out BG music
-window.addEventListener('message', function(event) {
-  if (typeof event.data === 'string' && event.data.includes('play')) {
-    console.log('🎵 Detected SoundCloud PLAY event!');
-
-    soundCloudPlaying = true;
-
-    const bgMusic = document.getElementById("backgroundMusic1");
-    if (bgMusic) {
-      if (bgMusic.volume > 0) {
-        let fadeOutInterval = setInterval(() => {
-          if (bgMusic.volume > 0.05) {
-            bgMusic.volume -= 0.05;
-            console.log(`🎶 Fading out... Current volume: ${bgMusic.volume.toFixed(2)}`);
-          } else {
-            clearInterval(fadeOutInterval);
-            bgMusic.volume = 0;
-            bgMusic.pause();
-            console.log('🎶 Background music fully faded and paused for SoundCloud.');
-          }
-        }, 100);
-      } else {
-        if (!bgMusic.paused) {
-          bgMusic.pause();
-          console.log('🎶 Background music paused instantly.');
-        } else {
-          console.log('🎶 Background music already paused.');
-        }
-      }
-    }
-  }
-});
 
 
 
@@ -1081,9 +1049,9 @@ window.addEventListener('load', function() {
 <div id="musicModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10001; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
   <div style="background:black; border:2px solid #00ff88; padding:20px; width:90%; max-width:600px; text-align:center; box-shadow:0 0 20px #00ff88;">
     <h2 id="musicTitle" style="color:#ffee00; font-size:26px; margin-bottom:20px; white-space:nowrap;">🎵 JPS Grooves – Music Mode 🎵</h2>
-   <iframe id="soundcloudPlayer" width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"
-    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true">
-   </iframe>
+  <iframe id="soundcloudPlayer" width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&api=true"
+  </iframe>
     <div style="font-size: 12px; color: #cccccc; margin-top: 5px;">
       <a href="https://soundcloud.com/jpsgrooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a> · 
       <a href="https://soundcloud.com/jpsgrooves/sets/electronic" target="_blank" style="color: #cccccc; text-decoration: none;">Electronic</a>
