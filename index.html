@@ -994,9 +994,9 @@ function isSafari() {
   return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
 }
 window.addEventListener('load', function() {
-  const iframeElement = document.getElementById('soundcloudPlayer');
-  if (iframeElement) {
-    const widget = SC.Widget(iframeElement);
+  const Element = document.getElementById('soundcloudPlayer');
+  if (Element) {
+    const widget = SC.Widget(Element);
 
     widget.bind(SC.Widget.Events.PLAY, function() {
       console.log('🎵 SoundCloud widget PLAY detected!');
@@ -1049,7 +1049,10 @@ window.addEventListener('load', function() {
 <div id="musicModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10001; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
   <div style="background:black; border:2px solid #00ff88; padding:20px; width:90%; max-width:600px; text-align:center; box-shadow:0 0 20px #00ff88;">
     <h2 id="musicTitle" style="color:#ffee00; font-size:26px; margin-bottom:20px; white-space:nowrap;">🎵 JPS Grooves – Music Mode 🎵</h2>
-  <iframe id="soundcloudPlayer" width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay"
+  <iframe id="soundcloudPlayer"
+    width="100%" height="450"
+    scrolling="no" frameborder="no"
+    allow="autoplay; encrypted-media"
     src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&api=true">
   </iframe>
     <div style="font-size: 12px; color: #cccccc; margin-top: 5px;">
