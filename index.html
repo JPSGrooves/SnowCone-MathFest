@@ -511,12 +511,26 @@ window.addEventListener('message', function(event) {
     if (typeof event.data === 'string' && event.data.includes('play')) {
       soundCloudPlaying = true;
       console.log('🎵 SoundCloud started playing!');
-      
-      // 💥 Immediately pause background music when SC starts
+
+      // 💥 Fade out or mute background music no matter what
       const bgMusic = document.getElementById("backgroundMusic1");
-      if (!bgMusic.paused) {
+
+      // Fade out even if already paused but volume > 0
+      if (bgMusic.volume > 0) {
+        let fadeOutInterval = setInterval(() => {
+          if (bgMusic.volume > 0.05) {
+            bgMusic.volume -= 0.05;
+          } else {
+            bgMusic.volume = 0;
+            bgMusic.pause();
+            clearInterval(fadeOutInterval);
+            console.log('🎶 Background music fully faded out for SoundCloud.');
+          }
+        }, 100);
+      } else if (!bgMusic.paused) {
+        // Hard pause backup (safety)
         bgMusic.pause();
-        console.log('🎶 Background music paused because SoundCloud is playing.');
+        console.log('🎶 Background music hard paused.');
       }
     }
   }
