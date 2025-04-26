@@ -219,8 +219,25 @@
       }
   
       .menu-text {
-        font-size: 16px; /* slightly smaller on phone for "serving soon" / safari message */
-        margin-bottom: 8px;
+        font-size: 18px; /* slightly smaller on phone for "serving soon" / safari message */
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+  <style>
+    #menuTitle {
+      white-space: nowrap;
+      font-size: 26px;
+    }
+  
+    @media (max-width: 600px) {
+      #menuTitle {
+        font-size: 20px;
+      }
+      #menuModal > div {
+        padding: 20px;
+        width: 85%;
+        max-width: 340px;
       }
     }
   </style>
