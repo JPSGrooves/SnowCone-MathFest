@@ -418,6 +418,8 @@ let secondsElapsed = 0;
 let timerInterval = null;
 let gameEnded = false;
 let wasPlayingBeforeMusicMode = false;
+let soundCloudPlaying = false;
+
 
 // MENU MODAL LOGIC
 function openMenuModal() {
@@ -477,14 +479,32 @@ function openMusicModal() {
 function closeMusicModal() {
   document.getElementById("musicModal").style.display = "none";
 
-  // 🔥 Only resume background music if it was playing before
-  if (wasPlayingBeforeMusicMode && !gameEnded && timerStarted) {
-    const bgMusic = document.getElementById("backgroundMusic1");
-    if (bgMusic.paused) {
-      bgMusic.play().catch(e => console.warn("Music resume failed:", e));
-    }
+  const bgMusic = document.getElementById("backgroundMusic1");
+
+  if (wasPlayingBeforeMusicMode && !gameEnded && timerStarted && !soundCloudPlaying) {
+    // 🌈 Only fade back in if SoundCloud DIDN'T start playing
+    bgMusic.volume = 0;
+    bgMusic.play().catch(e => console.warn("Music resume failed:", e));
+    let fadeInInterval = setInterval(() => {
+      if (bgMusic.volume < 0.5) {
+        bgMusic.volume += 0.05;
+      } else {
+        bgMusic.volume = 0.5;
+        clearInterval(fadeInInterval);
+      }
+    }, 100);
   }
 }
+
+// Listen for SoundCloud playing
+window.addEventListener('message', function(event) {
+  if (event.origin.includes('soundcloud.com')) {
+    if (typeof event.data === 'string' && event.data.includes('play')) {
+      soundCloudPlaying = true;
+      console.log('🎵 SoundCloud started playing!');
+    }
+  }
+});
 
 
 
