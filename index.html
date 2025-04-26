@@ -332,20 +332,51 @@ let gameEnded = false;
 function openMenuModal() {
   const menuModal = document.getElementById("menuModal");
   const menuText = document.querySelector(".menu-text");
-  
+
   menuModal.style.display = "flex";
 
-  if (isSafari() && !document.getElementById("safariTip")) {
-    const safariMsg = document.createElement("div");
-    safariMsg.id = "safariTip"; // 👈 give it an ID to prevent duplicates
-    safariMsg.innerHTML = `
-      <div style="margin-top:20px; padding:15px; background:black; border:2px solid #ffee00; border-radius:5px; color:white; font-size:16px; box-shadow:0 0 10px #ffee00;">
-        📱 <strong>Safari Users:</strong><br/>
-        Tap the <strong>Share icon</strong> 🔗 and select<br/><strong>"Add to Home Screen"</strong><br/>to install SnowCone MathFest.
-      </div>`;
-    menuText?.appendChild(safariMsg);
+  // Clean old tip if somehow it stuck
+  const oldTip = document.getElementById("installTip");
+  if (oldTip) oldTip.remove();
+
+  // Create the new unified tip
+  const installTip = document.createElement("div");
+  installTip.id = "installTip";
+  installTip.style.marginTop = "20px";
+  installTip.style.padding = "15px";
+  installTip.style.background = "black";
+  installTip.style.border = "2px solid #ffee00";
+  installTip.style.borderRadius = "5px";
+  installTip.style.color = "white";
+  installTip.style.fontSize = "16px";
+  installTip.style.boxShadow = "0 0 10px #ffee00";
+  installTip.style.cursor = deferredPrompt ? "pointer" : "default"; // clickable only if installable
+
+  installTip.innerHTML = `
+    📲 <strong>Install SnowCone MathFest!</strong><br/>
+    Chrome: Tap here to install!<br/>
+    Safari: Use the Share icon 🔗 and "Add to Home Screen"
+  `;
+
+  if (deferredPrompt) {
+    installTip.onclick = () => {
+      installTip.style.display = "none"; // hide after clicking
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choiceResult => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('🎉 User accepted install');
+          showPopup("📲 Installed!", "SnowCone MathFest is now chilling on your home screen!");
+        } else {
+          console.log('❌ Install dismissed');
+        }
+        deferredPrompt = null;
+      });
+    };
   }
+
+  menuText?.appendChild(installTip);
 }
+
 
 
 function closeMenuModal() {
@@ -833,25 +864,10 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-
-  const installBtn = document.getElementById('installAppBtn');
-  if (installBtn) {
-    installBtn.style.display = 'inline-block';
-    installBtn.onclick = () => {
-      installBtn.style.display = 'none';
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('🎉 User accepted install');
-          showPopup("📲 Installed!", "SnowCone MathFest is now chilling on your home screen!");
-        } else {
-          console.log('❌ Install dismissed');
-        }
-        deferredPrompt = null;
-      });
-    };
-  }
+  
+  console.log('📲 Install prompt captured and ready.');
 });
+
 
 // Safari-specific install tip
 function isSafari() {
