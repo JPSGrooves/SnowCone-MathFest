@@ -331,50 +331,33 @@ let gameEnded = false;
 // MENU MODAL LOGIC
 function openMenuModal() {
   const menuModal = document.getElementById("menuModal");
-  const menuText = document.querySelector(".menu-text");
+  const installTip = document.getElementById("installTip");
 
   menuModal.style.display = "flex";
 
-  // Clean old tip if somehow it stuck
-  const oldTip = document.getElementById("installTip");
-  if (oldTip) oldTip.remove();
+  if (installTip) {
+    installTip.style.display = "block";
 
-  // Create the new unified tip
-  const installTip = document.createElement("div");
-  installTip.id = "installTip";
-  installTip.style.marginTop = "20px";
-  installTip.style.padding = "15px";
-  installTip.style.background = "black";
-  installTip.style.border = "2px solid #ffee00";
-  installTip.style.borderRadius = "5px";
-  installTip.style.color = "white";
-  installTip.style.fontSize = "16px";
-  installTip.style.boxShadow = "0 0 10px #ffee00";
-  installTip.style.cursor = deferredPrompt ? "pointer" : "default"; // clickable only if installable
-
-  installTip.innerHTML = `
-    📲 <strong>Install SnowCone MathFest!</strong><br/>
-    Chrome: Tap here to install!<br/>
-    Safari: Use the Share icon 🔗 and "Add to Home Screen"
-  `;
-
-  if (deferredPrompt) {
-    installTip.onclick = () => {
-      installTip.style.display = "none"; // hide after clicking
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(choiceResult => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('🎉 User accepted install');
-          showPopup("📲 Installed!", "SnowCone MathFest is now chilling on your home screen!");
-        } else {
-          console.log('❌ Install dismissed');
-        }
-        deferredPrompt = null;
-      });
-    };
+    if (deferredPrompt) {
+      installTip.style.cursor = "pointer";
+      installTip.onclick = () => {
+        installTip.style.display = "none";
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('🎉 User accepted install');
+            showPopup("📲 Installed!", "SnowCone MathFest is now chilling on your home screen!");
+          } else {
+            console.log('❌ Install dismissed');
+          }
+          deferredPrompt = null;
+        });
+      };
+    } else {
+      installTip.style.cursor = "default";
+      installTip.onclick = null; // no action if no prompt available
+    }
   }
-
-  menuText?.appendChild(installTip);
 }
 
 
@@ -882,6 +865,11 @@ function isSafari() {
   <div style="background:black; border:2px solid #00ff88; padding:30px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 20px #00ff88;">
     <h2 style="color:#ffee00; font-size:26px; margin-bottom:20px;">🍧 SnowCone MathFest Menu 🍧</h2>
     <div class="menu-text" style="text-align:center; margin-bottom:10px;"></div>
+    <div id="installTip" style="margin-top:20px; padding:15px; background:black; border:2px solid #ffee00; border-radius:5px; color:white; font-size:16px; box-shadow:0 0 10px #ffee00; cursor:pointer; display:none;">
+      📲 <strong>Install SnowCone MathFest!</strong><br/>
+      Chrome: Tap here to install!<br/>
+      Safari: Use the Share icon 🔗 and "Add to Home Screen"
+    </div>
     <div style="display:flex; flex-direction:column; gap:10px;">
       <button onclick="openMusicModal()" style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;">🎵 Music Mode</button>
       <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>📖 Story Mode — Serving Soon!</button>
