@@ -621,10 +621,11 @@ function submitAnswer() {
 
       // 🚨 Only start background music if NOT in Music Mode
       if (!soundCloudPlaying) {
-        const music = document.getElementById("backgroundMusic1");
-        music.pause();
-        music.currentTime = 0;
+          const music = document.getElementById("backgroundMusic1");
+          music.currentTime = 0;
+          music.play().catch(e => console.warn("Music play failed:", e));
       }
+
 
       timerInterval = setInterval(() => {
         secondsElapsed++;
