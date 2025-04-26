@@ -616,11 +616,16 @@ function submitAnswer() {
   let userAnswer = parseFloat(display);
   
   if (userAnswer === correctAnswer) {
-    if (!timerStarted) {
+   if (!timerStarted) {
       timerStarted = true;
-      const music = document.getElementById("backgroundMusic1");
-      music.currentTime = 0;
-      music.play().catch(e => console.warn("Music play failed:", e));
+    
+      // 🚨 NEW CHECK: only play background music if NOT in Music Mode
+      if (!soundCloudPlaying) {
+        const music = document.getElementById("backgroundMusic1");
+        music.currentTime = 0;
+        music.play().catch(e => console.warn("Music play failed:", e));
+      }
+    
       timerInterval = setInterval(() => {
         secondsElapsed++;
         document.getElementById("timer").textContent = `${secondsElapsed}s`;
