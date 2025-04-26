@@ -330,8 +330,23 @@ let gameEnded = false;
 
 // MENU MODAL LOGIC
 function openMenuModal() {
-  document.getElementById("menuModal").style.display = "flex";
+  const menuModal = document.getElementById("menuModal");
+  const menuText = document.querySelector(".menu-text");
+  
+  menuModal.style.display = "flex";
+
+  if (isSafari() && !document.getElementById("safariTip")) {
+    const safariMsg = document.createElement("div");
+    safariMsg.id = "safariTip"; // 👈 give it an ID to prevent duplicates
+    safariMsg.innerHTML = `
+      <div style="margin-top:20px; padding:15px; background:black; border:2px solid #ffee00; border-radius:5px; color:white; font-size:16px; box-shadow:0 0 10px #ffee00;">
+        📱 <strong>Safari Users:</strong><br/>
+        Tap the <strong>Share icon</strong> 🔗 and select<br/><strong>"Add to Home Screen"</strong><br/>to install SnowCone MathFest.
+      </div>`;
+    menuText?.appendChild(safariMsg);
+  }
 }
+
 
 function closeMenuModal() {
   document.getElementById("menuModal").style.display = "none";
