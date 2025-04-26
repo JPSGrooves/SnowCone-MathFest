@@ -17,14 +17,14 @@
       touch-action: manipulation;
       overscroll-behavior: contain;
     }
-
+  
     .game-container {
       max-width: 600px;
       margin: auto;
       transform: scale(0.90);
       transform-origin: top center;
     }
-
+  
     .title-image {
       width: 100%;
       max-width: 500px;
@@ -207,6 +207,21 @@
       height: 100vh;
       z-index: 9999;
       display: block;
+    }
+    .menu-text {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+  
+    @media (max-width: 500px) {
+      #menuModal h2 {
+        font-size: 22px; /* fix wrap on mobile */
+      }
+  
+      .menu-text {
+        font-size: 16px; /* slightly smaller on phone for "serving soon" / safari message */
+        margin-bottom: 8px;
+      }
     }
   </style>
 </head>
@@ -859,11 +874,6 @@ function isSafari() {
 }
   
 </script>
-@media (max-width: 500px) {
-  #menuModal h2 {
-    font-size: 22px; /* was 26px */
-  }
-}
 <!-- MENU MODAL -->
 <div id="menuModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
   <div style="background:black; border:2px solid #00ff88; padding:30px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 20px #00ff88;">
