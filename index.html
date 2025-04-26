@@ -242,9 +242,9 @@
     <h2 style="color:#ffee00;">🍧 SnowCone MathFest 🍧</h2>
     <p style="font-size:16px; line-height:1.5;">
       Welcome to Quick Serve Mode! If you score over 100 points, the math gets funkier and the cones more fresh!<br/><br/>
-      ➕➖ Add & Subtract: <strong>+3 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+6 points</strong><br/>
-      💀 Hard Mode: <strong>+15 points</strong><br/>
+      ➕➖ Add & Subtract: <strong>+5 points</strong><br/>
+      ✖️➗ Multiply & Divide: <strong>+7 points</strong><br/>
+      💀 Hard Mode: <strong>+10 points</strong><br/>
       😵 Wrong answer: <strong>-3 points</strong><br/><br/>
       🍧 The song is 1:45 long — when it ends, your score freezes.<br/><br/>
       Serve up those equations and always return to see the new modes and updates! (V.083 4/25/2025)
@@ -512,7 +512,7 @@ function submitAnswer() {
         if (secondsElapsed >= 105) {
           clearInterval(timerInterval);
           gameEnded = true;
-          showPopup("🍧 Time's Up!", `You scored ${score} points. Take a breath, grab a cone, and play again.`, false, true);
+          showPopup("🍧 Time's Up Traveler!", `You scored ${score} points. Take a breath, grab a cone, and play again!`, false, true);
         }
       }, 1000);
     }
