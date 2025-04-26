@@ -505,36 +505,39 @@ function closeMusicModal() {
   }
 }
 
-// Listen for SoundCloud playing
+// Listen for SoundCloud playing event and fade out BG music
 window.addEventListener('message', function(event) {
-  if (event.origin.includes('soundcloud.com')) {
-    if (typeof event.data === 'string' && event.data.includes('play')) {
-      soundCloudPlaying = true;
-      console.log('🎵 SoundCloud started playing!');
+  if (typeof event.data === 'string' && event.data.includes('play')) {
+    console.log('🎵 Detected SoundCloud PLAY event!');
 
-      // 💥 Fade out or mute background music no matter what
-      const bgMusic = document.getElementById("backgroundMusic1");
+    soundCloudPlaying = true;
 
-      // Fade out even if already paused but volume > 0
+    const bgMusic = document.getElementById("backgroundMusic1");
+    if (bgMusic) {
       if (bgMusic.volume > 0) {
         let fadeOutInterval = setInterval(() => {
           if (bgMusic.volume > 0.05) {
             bgMusic.volume -= 0.05;
+            console.log(`🎶 Fading out... Current volume: ${bgMusic.volume.toFixed(2)}`);
           } else {
+            clearInterval(fadeOutInterval);
             bgMusic.volume = 0;
             bgMusic.pause();
-            clearInterval(fadeOutInterval);
-            console.log('🎶 Background music fully faded out for SoundCloud.');
+            console.log('🎶 Background music fully faded and paused for SoundCloud.');
           }
         }, 100);
-      } else if (!bgMusic.paused) {
-        // Hard pause backup (safety)
-        bgMusic.pause();
-        console.log('🎶 Background music hard paused.');
+      } else {
+        if (!bgMusic.paused) {
+          bgMusic.pause();
+          console.log('🎶 Background music paused instantly.');
+        } else {
+          console.log('🎶 Background music already paused.');
+        }
       }
     }
   }
 });
+
 
 
 
