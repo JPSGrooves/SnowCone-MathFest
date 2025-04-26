@@ -417,6 +417,7 @@ let timerStarted = false;
 let secondsElapsed = 0;
 let timerInterval = null;
 let gameEnded = false;
+let wasPlayingBeforeMusicMode = false;
 
 // MENU MODAL LOGIC
 function openMenuModal() {
@@ -457,29 +458,34 @@ function closeMenuModal() {
 }
 
 function openMusicModal() {
-  // 🎵 Show the Music Mode modal
-  document.getElementById("musicModal").style.display = "flex";
-  
-  // 🔇 Pause the background gameplay music
   const bgMusic = document.getElementById("backgroundMusic1");
+  
+  // 🧠 Remember if background music was playing
+  wasPlayingBeforeMusicMode = !bgMusic.paused;
+  
+  // 🔇 Pause background music
   if (!bgMusic.paused) {
     bgMusic.pause();
   }
+
+  // 🎵 Open Music Mode modal
+  document.getElementById("musicModal").style.display = "flex";
 }
 
 
+
 function closeMusicModal() {
-  // 🎵 Close the Music Mode modal
   document.getElementById("musicModal").style.display = "none";
-  
-  // 🎶 Resume background gameplay music if game is running
-  if (!gameEnded && timerStarted) {
+
+  // 🔥 Only resume background music if it was playing before
+  if (wasPlayingBeforeMusicMode && !gameEnded && timerStarted) {
     const bgMusic = document.getElementById("backgroundMusic1");
     if (bgMusic.paused) {
       bgMusic.play().catch(e => console.warn("Music resume failed:", e));
     }
   }
 }
+
 
 
 // Correct / Incorrect Sounds
