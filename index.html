@@ -511,6 +511,13 @@ window.addEventListener('message', function(event) {
     if (typeof event.data === 'string' && event.data.includes('play')) {
       soundCloudPlaying = true;
       console.log('🎵 SoundCloud started playing!');
+      
+      // 💥 Immediately pause background music when SC starts
+      const bgMusic = document.getElementById("backgroundMusic1");
+      if (!bgMusic.paused) {
+        bgMusic.pause();
+        console.log('🎶 Background music paused because SoundCloud is playing.');
+      }
     }
   }
 });
