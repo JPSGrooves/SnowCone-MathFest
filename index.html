@@ -239,6 +239,7 @@
         padding: 15px !important;
         width: 80% !important;
         max-width: 320px !important;
+        overflow: hidden; /* 💥 Force everything to stay inside */
       }
     
       #menuModal button {
@@ -254,11 +255,12 @@
       }
     
       #menuTitle {
-        font-size: 18px !important; /* 🔥 was 20px, shrink it a little more */
+        font-size: 18px !important; /* 💥 Shrink title slightly more */
         margin-bottom: 15px;
         white-space: nowrap;
       }
     }
+
   </style>
   <style>
     #menuTitle {
