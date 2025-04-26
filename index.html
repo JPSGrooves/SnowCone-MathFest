@@ -234,7 +234,7 @@
       🍧 The song is 1:45 long — when it ends, your score freezes.<br/><br/>
       Serve up those equations and always return to see the new modes and updates! (V.083 4/25/2025)
     </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Let's Go!</button>
+    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Let's Go!</button>
   </div>
 </div>
 <!-- GAME CONTAINER -->
@@ -300,8 +300,8 @@
 <!-- POPUP MODAL -->
 <div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; z-index:9999; justify-content:center; align-items:center; font-family: Arial, Helvetica, sans-serif;">
   <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
-    <h2 id="popupTitle" style="color:#ffee00; font-size:22px; margin-bottom:10px;">❗</h2>
-    <p id="popupMessage" style="font-size:16px; line-height:1.5;"></p>
+    <h2 id="popupTitle" style="color:#ffee00; font-size:28px; margin-bottom:15px;">❗</h2> <!-- Was 22px -->
+    <p id="popupMessage" style="font-size:20px; line-height:1.6;"></p> <!-- Was 16px -->
     <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
   </div>
 </div>
@@ -859,7 +859,11 @@ function isSafari() {
 }
   
 </script>
-
+@media (max-width: 500px) {
+  #menuModal h2 {
+    font-size: 22px; /* was 26px */
+  }
+}
 <!-- MENU MODAL -->
 <div id="menuModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
   <div style="background:black; border:2px solid #00ff88; padding:30px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 20px #00ff88;">
@@ -882,7 +886,7 @@ function isSafari() {
         📲 Add as an App!
       </button>
     </div>
-    <button onclick="closeMenuModal()" style="margin-top:20px; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Back to Quick Serve</button>
+    <button onclick="closeMenuModal()" style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Back to Quick Serve</button>
   </div>
 </div>
 <!-- MUSIC MODE MODAL -->
