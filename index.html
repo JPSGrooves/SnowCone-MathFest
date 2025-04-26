@@ -467,8 +467,17 @@ function openMusicModal() {
   
   // 🔇 Pause background music
   if (!bgMusic.paused) {
-    bgMusic.pause();
+    let fadeOutInterval = setInterval(() => {
+      if (bgMusic.volume > 0.05) {
+        bgMusic.volume -= 0.05;
+      } else {
+        bgMusic.volume = 0;
+        bgMusic.pause();
+        clearInterval(fadeOutInterval);
+      }
+    }, 100);
   }
+
 
   // 🎵 Open Music Mode modal
   document.getElementById("musicModal").style.display = "flex";
