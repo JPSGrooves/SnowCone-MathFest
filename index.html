@@ -878,6 +878,7 @@ window.setMode = newMode => {
 // Mute toggle
 window.toggleMute = () => {
   isMuted = !isMuted;
+  console.log(isMuted ? "🔇 Muted all sounds" : "🔊 Unmuted all sounds");
 
   document.getElementById("backgroundMusic1").muted = isMuted;
   document.getElementById("correctSound").muted = isMuted;
@@ -1014,12 +1015,15 @@ function isSafari() {
   const ua = navigator.userAgent.toLowerCase();
   return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
 }
+let scWidget = null;
+let scWasPlaying = false;
+
 window.addEventListener('load', function() {
   const Element = document.getElementById('soundcloudPlayer');
   if (Element) {
-    const widget = SC.Widget(Element);
+    scWidget = SC.Widget(Element);
 
-    widget.bind(SC.Widget.Events.PLAY, function() {
+    scWidget.bind(SC.Widget.Events.PLAY, function() {
       console.log('🎵 SoundCloud widget PLAY detected!');
       soundCloudPlaying = true;
 
@@ -1039,7 +1043,6 @@ window.addEventListener('load', function() {
     });
   }
 });
-
 
   
 </script>
