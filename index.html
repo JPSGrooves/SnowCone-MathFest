@@ -300,6 +300,76 @@
       }
     }
   </style>
+  <!-- TUTORIAL PANEL + BUTTON STYLES -->
+  <style>
+    /* Panel Layout */
+    .panel {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+      padding: 20px;
+      text-align: center;
+    }
+    .active {
+      display: flex;
+      opacity: 1;
+    }
+  
+    /* Button Basics */
+    .button-container {
+      margin-top: 20px;
+    }
+    button.tutorial-next, button.tutorial-back, button.tutorial-menu {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: 2px solid;
+      border-radius: 8px;
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+    
+    /* Specific Button Glows */
+    .tutorial-next {
+      border-color: #00ff88;
+      box-shadow: 0 0 12px #00ff88;
+    }
+    .tutorial-back {
+      border-color: #ff00cc;
+      box-shadow: 0 0 12px #ff00cc;
+    }
+    .tutorial-menu {
+      border-color: #00ff88;
+      box-shadow: 0 0 12px #00ff88;
+    }
+  </style>
+  <!-- CLICK-TO-REVEAL STYLES -->
+  <style>
+    .click-to-reveal {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 20px;
+      border: 2px dashed #00ccff;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      max-width: 400px;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00ccff;
+      transition: all 0.3s ease-in-out;
+    }
+    .click-to-reveal:hover {
+      box-shadow: 0 0 20px #00ccff;
+      transform: scale(1.05);
+    }
+  </style>
+
+
 </head>
 <body>
 <canvas id="confettiCanvas" class="confetti"></canvas>
@@ -397,6 +467,14 @@
   </div>
 </div>
 
+<!-- TUTORIAL CONTAINER - HIDDEN AT START -->
+<div id="tutorialContainer" style="display: none;">
+  <div id="tutorialPanel" class="panel active">
+    <!-- Dynamic tutorial content will get injected here -->
+  </div>
+</div>
+
+  
 <!-- AUDIO ELEMENTS -->
 <audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
 <audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
@@ -1069,7 +1147,175 @@ window.addEventListener('load', function() {
   }
 });
 
+// Panel Content Array
+const panels = [
+  // Quick Tips (Text Only)
+  { type: 'text', text: "Quick Tips: \\n➕ Break problems into parts.\\n➖ Look for friendly numbers.\\n✖️ Estimate first, solve second.\\n➗ Trust your instincts.", hasBackToMenu: true },
+
+  // Confession (Text)
+  { type: 'text', text: "Confession: I needed math to move, sing, matter.\\nThus, SnowCone MathFest began..." },
+
+  // Confession (Picture)
+  { type: 'picture', text: "[Confession Picture]" },
+
+  // Pythagoras (Text)
+  { type: 'text', text: "Pythagoras: \\\"Music is math vibrating in your bones.\\\"\\nPractice: Press halfway on a string. What fraction vibrates?", reveal: "1/2 (Octave Higher!)" },
+
+  // Pythagoras (Picture)
+  { type: 'picture', text: "[Pythagoras Picture]" },
+
+  // Turing & Brahmagupta (Text)
+  { type: 'text', text: "Turing & Brahmagupta: \\\"Secrets hide in puzzles.\\\"\\nPractice: What happens when any number is multiplied by zero?", reveal: "Becomes 0." },
+
+  // Turing & Brahmagupta (Picture)
+  { type: 'picture', text: "[Turing & Brahmagupta Picture]" },
+
+  // Lovelace & Gauss (Text)
+  { type: 'text', text: "Lovelace & Gauss: \\\"Find the rhythm hidden in the storm.\\\"\\nPractice: Pattern repeats every 5 beats; how many in 20 beats?", reveal: "4 repeats." },
+
+  // Lovelace & Gauss (Picture)
+  { type: 'picture', text: "[Lovelace & Gauss Picture]" },
+
+  // Euclid (Text)
+  { type: 'text', text: "Euclid: \\\"All structure begins with a line.\\\"\\nPractice: Triangle sides 3cm & 4cm. Hypotenuse?", reveal: "5cm." },
+
+  // Euclid (Picture)
+  { type: 'picture', text: "[Euclid Picture]" },
+
+  // Galileo & Newton (Text)
+  { type: 'text', text: "Galileo & Newton: \\\"Everything moves.\\\"\\nPractice: 60 miles in 2 hours. Speed?", reveal: "30 mph." },
+
+  // Galileo & Newton (Picture)
+  { type: 'picture', text: "[Galileo & Newton Picture]" },
+
+  // Bombelli & Euclid (Text)
+  { type: 'text', text: "Bombelli & Euclid: \\\"Impossible structures are real.\\\"\\nPractice: What is \\u221a-1?", reveal: "i (Imaginary Unit)" },
+
+  // Bombelli & Euclid (Picture)
+  { type: 'picture', text: "[Bombelli & Euclid Picture]" },
+
+  // Final Reflection (Text)
+  { type: 'text', text: "Final Reflection: Math is alive. Cosmic SnowCone is waiting..." },
+
+  // Final Reflection (Picture)
+  { type: 'picture', text: "[Final SnowCone Picture]", hasBackToMenu: true }
+];
+
+// Tracking where we are
+let currentPanel = 0;
+
+// Render the Tutorial Panel
+function renderTutorialPanel() {
+  const tutorialContainer = document.getElementById('tutorialContainer');
+  const tutorialPanel = document.getElementById('tutorialPanel');
+  tutorialPanel.innerHTML = ''; // Clear previous panel
+
+  const panelData = panels[currentPanel];
+
+  // Create Content
+  const content = document.createElement('div');
+  content.innerText = panelData.text;
+  tutorialPanel.appendChild(content);
+
+  // If this panel has a reveal
+  if (panelData.reveal) {
+    const revealBox = document.createElement('div');
+    revealBox.className = 'click-to-reveal';
+    revealBox.innerText = 'Click to Reveal Answer';
+    revealBox.onclick = () => {
+      revealBox.innerText = panelData.reveal;
+    }
+    tutorialPanel.appendChild(revealBox);
+  }
+
+  // Button Container
+  const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'button-container';
+
+  // Back Button
+  // BACK Button (if not first)
+  if (currentPanel > 0) {
+    const backButton = document.createElement('button');
+    backButton.innerText = panelData.hasBackToMenu ? 'Back to Menu' : 'Back';
+    backButton.className = panelData.hasBackToMenu ? 'tutorial-menu' : 'tutorial-back';
+    backButton.onclick = () => {
+      if (panelData.hasBackToMenu) {
+        stopTutorialMusic();
+        showMainMenu();
+      } else {
+        fadeToPanel(currentPanel - 1);
+      }
+    };
+    buttonContainer.appendChild(backButton);
+  }
   
+  // NEXT Button (if not last)
+  if (currentPanel < panels.length - 1) {
+    const nextButton = document.createElement('button');
+    nextButton.innerText = 'Next';
+    nextButton.className = 'tutorial-next';
+    nextButton.onclick = () => {
+      if (currentPanel === 1) startTutorialMusic();
+      fadeToPanel(currentPanel + 1);
+    };
+    buttonContainer.appendChild(nextButton);
+  }
+  
+  tutorialPanel.appendChild(buttonContainer);
+
+function fadeToPanel(newPanelIndex) {
+  const tutorialContainer = document.getElementById('tutorialContainer');
+  const tutorialPanel = document.getElementById('tutorialPanel');
+
+  // Fade out current panel
+  tutorialPanel.style.opacity = 0;
+
+  setTimeout(() => {
+    currentPanel = newPanelIndex;
+    renderTutorialPanel();
+
+    // Fade in new panel
+    tutorialPanel.style.opacity = 1;
+  }, 400); // Timing matches the CSS transition (0.4s)
+}
+
+// Show Tutorial, Hide Main Game/Menu
+function startTutorial() {
+  document.getElementById('gameContainer').style.display = 'none';
+  if (document.getElementById('menuContainer')) {
+    document.getElementById('menuContainer').style.display = 'none';
+  }
+  document.getElementById('tutorialContainer').style.display = 'flex';
+  renderTutorialPanel();
+}
+
+// Hide Tutorial, Show Main Menu
+function showMainMenu() {
+  document.getElementById('tutorialContainer').style.display = 'none';
+  if (document.getElementById('menuContainer')) {
+    document.getElementById('menuContainer').style.display = 'flex';
+  }
+  document.getElementById('gameContainer').style.display = 'flex';
+}
+// Attach Math Tips Button to Start Tutorial
+document.getElementById('mathTipsButton').addEventListener('click', startTutorial);
+// Setup Tutorial Music Element
+let tutorialMusic = new Audio('tutorial-music.mp3'); // Replace with your real music file path later
+tutorialMusic.loop = true;
+tutorialMusic.volume = 0.5; // You can adjust volume if needed
+
+function startTutorialMusic() {
+  tutorialMusic.play().catch((e) => {
+    console.log('Tutorial music play blocked:', e);
+  });
+  tutorialPanel.style.opacity = 1;
+}
+
+function stopTutorialMusic() {
+  tutorialMusic.pause();
+  tutorialMusic.currentTime = 0;
+}
+
 </script>
 <!-- MENU MODAL -->
 <div id="menuModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
