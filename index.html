@@ -887,12 +887,24 @@ window.toggleMute = () => {
   document.getElementById("milestone75").muted = isMuted;
   document.getElementById("milestone100").muted = isMuted;
 
-  // 🧠 Universal mute including SoundCloud
+// 🧠 Universal mute including SoundCloud
   if (scWidget) {
-    scWidget.setVolume(isMuted ? 0 : 100);
+    scWidget.isPaused(function(paused) {
+      if (isMuted) {
+        if (!paused) {
+          scWasPlaying = true;
+          scWidget.pause();
+        } else {
+          scWasPlaying = false;
+        }
+      } else {
+        if (scWasPlaying) {
+          scWidget.play();
+        }
+      }
+    });
   }
 };
-
 
 // Reset Score and Game
 function resetScore() {
