@@ -1328,16 +1328,11 @@ function stopTutorialMusic() {
       Safari: Use the Share icon 🔗 and "Add to Home Screen"
     </div>
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <button onclick="openMusicModal()" style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;">🎵 Music Mode</button>
-      <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>📖 Story Mode — Serving Soon!</button>
-      <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>♾️ Infinity Mode — Serving Soon!</button>
-      <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>🧠 Math Tips — Serving Soon!</button>
-      <button style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 10px #ff00cc;" disabled>🏆 High Scores — Serving Soon!</button>
-      <button id="installAppBtn"
-        onclick="promptPWAInstall()"
-        style="padding:10px; font-size:18px; background:#ffee00; border:none; border-radius:5px; cursor:pointer; color:black; box-shadow:0 0 10px #ffee00; display: none;">
-        📲 Add as an App!
-      </button>
+      <button id="mathTipsButton" onclick="startTutorial()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🧠 Math Tips & Story Intro</button>
+      <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">📖 Story Mode — Serving Soon!</button>
+      <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">♾️ Infinity Mode — Serving Soon!</button>
+      <button onclick="openMusicModal()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🎵 Music Player Mode</button>
+      <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">🏆 High Scores & Badges — Serving Soon!</button>
     </div>
     <button onclick="closeMenuModal()" style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Back to Quick Serve</button>
   </div>
