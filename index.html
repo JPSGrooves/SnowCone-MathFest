@@ -814,7 +814,7 @@ function closePopup() {
 }
 
 // OPENING MODAL after full page load
-window.addEventListener("load", () => {
+window.addEventListener('load', () => {
   setTimeout(() => {
     const rulesModal = document.getElementById("rulesModal");
     const closeBtn = document.getElementById("closeModalBtn");
@@ -828,7 +828,33 @@ window.addEventListener("load", () => {
       });
     }
   }, 100);
+
+  // 👇 SOUND CLOUD SETUP — move it inside the same load
+  const Element = document.getElementById('soundcloudPlayer');
+  if (Element) {
+    scWidget = SC.Widget(Element);
+
+    scWidget.bind(SC.Widget.Events.PLAY, function() {
+      console.log('🎵 SoundCloud widget PLAY detected!');
+      soundCloudPlaying = true;
+
+      const bgMusic = document.getElementById("backgroundMusic1");
+      if (bgMusic && !bgMusic.paused) {
+        let fadeOutInterval = setInterval(() => {
+          if (bgMusic.volume > 0.05) {
+            bgMusic.volume -= 0.05;
+          } else {
+            bgMusic.volume = 0;
+            bgMusic.pause();
+            clearInterval(fadeOutInterval);
+            console.log('🎶 Background music fully faded and paused because SoundCloud started.');
+          }
+        }, 100);
+      }
+    });
+  }
 });
+
 
 // Number input
 window.appendNumber = num => {
@@ -1015,8 +1041,7 @@ function isSafari() {
   const ua = navigator.userAgent.toLowerCase();
   return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
 }
-let scWidget = null;
-let scWasPlaying = false;
+
 
 window.addEventListener('load', function() {
   const Element = document.getElementById('soundcloudPlayer');
