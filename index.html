@@ -603,31 +603,6 @@ const pictureFilenames = {
 
 
 
-  // 🎵 Setup SoundCloud AFTER modal is ready
-  const soundcloudElement = document.getElementById('soundcloudPlayer');
-  if (soundcloudElement && window.SC) {
-    scWidget = SC.Widget(soundcloudElement);
-
-    scWidget.bind(SC.Widget.Events.PLAY, () => {
-      console.log('🎵 SoundCloud widget PLAY detected!');
-      soundCloudPlaying = true;
-
-      const bgMusic = document.getElementById("backgroundMusic1");
-      if (bgMusic && !bgMusic.paused) {
-        let fadeOutInterval = setInterval(() => {
-          if (bgMusic.volume > 0.05) {
-            bgMusic.volume -= 0.05;
-          } else {
-            bgMusic.volume = 0;
-            bgMusic.pause();
-            clearInterval(fadeOutInterval);
-            console.log('🎶 Background music fully faded because SoundCloud started.');
-          }
-        }, 100);
-      }
-    });
-  }
-});
 
   
 // MENU MODAL LOGIC
