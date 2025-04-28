@@ -601,7 +601,49 @@ const pictureFilenames = {
   "finalsnowconepicture": "finalsnowconepicture.png"
 };
 
+// Opening Modal - Launch at Full Load
+window.addEventListener('load', () => {
+  const rulesModal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeModalBtn");
 
+  if (rulesModal && closeBtn) {
+    // 🚀 Open the modal cleanly after DOM loads
+    rulesModal.style.display = "flex";
+
+    closeBtn.addEventListener("click", () => {
+      rulesModal.style.display = "none";
+      // 🚀 Make sure the first problem actually generates after modal closes
+      generateProblem();
+    });
+  }
+
+  // 🎵 Setup SoundCloud AFTER modal is ready
+  const soundcloudElement = document.getElementById('soundcloudPlayer');
+  if (soundcloudElement && window.SC) {
+    scWidget = SC.Widget(soundcloudElement);
+
+    scWidget.bind(SC.Widget.Events.PLAY, () => {
+      console.log('🎵 SoundCloud widget PLAY detected!');
+      soundCloudPlaying = true;
+
+      const bgMusic = document.getElementById("backgroundMusic1");
+      if (bgMusic && !bgMusic.paused) {
+        let fadeOutInterval = setInterval(() => {
+          if (bgMusic.volume > 0.05) {
+            bgMusic.volume -= 0.05;
+          } else {
+            bgMusic.volume = 0;
+            bgMusic.pause();
+            clearInterval(fadeOutInterval);
+            console.log('🎶 Background music fully faded because SoundCloud started.');
+          }
+        }, 100);
+      }
+    });
+  }
+});
+
+  
 // MENU MODAL LOGIC
 function openMenuModal() {
   const menuModal = document.getElementById("menuModal");
