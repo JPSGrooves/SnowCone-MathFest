@@ -385,6 +385,8 @@
       overflow-x: hidden;
       overflow-y: auto;
       background: black;
+      max-height: 100vh;
+      overflow-y: auto;
     }
   
     #tutorialPanel {
@@ -1342,7 +1344,7 @@ function renderTutorialPanel() {
     nextButton.innerText = 'Next';
     nextButton.className = 'tutorial-next';
     nextButton.onclick = () => {
-      if (currentPanel === 1) startTutorialMusic();
+      if (currentPanel === 1)
       fadeToPanel(currentPanel + 1);
     };
     buttonContainer.appendChild(nextButton);
@@ -1393,7 +1395,6 @@ function startTutorial() {
   
   currentPanel = 0; // Reset start
   renderTutorialPanel();
-  startTutorialMusic();
 }
 
 
