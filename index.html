@@ -1034,23 +1034,20 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-// OPENING MODAL after full page load
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const rulesModal = document.getElementById("rulesModal");
-    const closeBtn = document.getElementById("closeModalBtn");
+// 🚀 Open the Opening Modal and Setup SoundCloud FAST
+window.addEventListener('DOMContentLoaded', () => {
+  const rulesModal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeModalBtn");
 
-    if (rulesModal && closeBtn) {
-      rulesModal.style.display = "flex";
+  if (rulesModal && closeBtn) {
+    rulesModal.style.display = "flex";
 
-      closeBtn.addEventListener("click", () => {
-        rulesModal.style.display = "none";
-        generateProblem();
-      });
-    }
-  }, 100);
+    closeBtn.addEventListener("click", () => {
+      rulesModal.style.display = "none";
+      generateProblem();
+    });
+  }
 
-  // 👇 SOUND CLOUD SETUP — move it inside the same load
   const Element = document.getElementById('soundcloudPlayer');
   if (Element) {
     scWidget = SC.Widget(Element);
@@ -1075,6 +1072,7 @@ window.addEventListener('load', () => {
     });
   }
 });
+
 
 
 // Number input
