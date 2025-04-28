@@ -601,21 +601,7 @@ const pictureFilenames = {
   "finalsnowconepicture": "finalsnowconepicture.png"
 };
 
-// Opening Modal - Launch at Full Load
-window.addEventListener('load', () => {
-  const rulesModal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
 
-  if (rulesModal && closeBtn) {
-    // 🚀 Open the modal cleanly after DOM loads
-    rulesModal.style.display = "flex";
-
-    closeBtn.addEventListener("click", () => {
-      rulesModal.style.display = "none";
-      // 🚀 Make sure the first problem actually generates after modal closes
-      generateProblem();
-    });
-  }
 
   // 🎵 Setup SoundCloud AFTER modal is ready
   const soundcloudElement = document.getElementById('soundcloudPlayer');
@@ -1274,18 +1260,7 @@ document.addEventListener("keydown", function(event) {
   }
 });
 
-// Register service worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(registration => {
-        console.log('Service Worker registered with scope:', registration.scope);
-      })
-      .catch(error => {
-        console.log('Service Worker registration failed:', error);
-      });
-  });
-}
+
 // Install App Prompt Logic
 let deferredPrompt;
 
@@ -1304,31 +1279,7 @@ function isSafari() {
 }
 
 
-window.addEventListener('load', function() {
-  const Element = document.getElementById('soundcloudPlayer');
-  if (Element) {
-    scWidget = SC.Widget(Element);
 
-    scWidget.bind(SC.Widget.Events.PLAY, function() {
-      console.log('🎵 SoundCloud widget PLAY detected!');
-      soundCloudPlaying = true;
-
-      const bgMusic = document.getElementById("backgroundMusic1");
-      if (bgMusic && !bgMusic.paused) {
-        let fadeOutInterval = setInterval(() => {
-          if (bgMusic.volume > 0.05) {
-            bgMusic.volume -= 0.05;
-          } else {
-            bgMusic.volume = 0;
-            bgMusic.pause();
-            clearInterval(fadeOutInterval);
-            console.log('🎶 Background music fully faded and paused because SoundCloud started.');
-          }
-        }, 100);
-      }
-    });
-  }
-});
 
 // Panel Content Array
 const panels = [
@@ -1598,6 +1549,63 @@ function stopTutorialMusic() {
   tutorialMusic.pause();
   tutorialMusic.currentTime = 0;
 }
+// FULLY MERGED WINDOW LOAD HANDLER
+window.addEventListener('load', () => {
+  // 1. Show Opening Modal
+  const rulesModal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeModalBtn");
+
+  if (rulesModal && closeBtn) {
+    rulesModal.style.display = "flex";
+    closeBtn.addEventListener("click", () => {
+      rulesModal.style.display = "none";
+      generateProblem(); // Generate first problem when modal closes
+    });
+  }
+
+  // 2. Setup SoundCloud (optional if present)
+  const Element = document.getElementById('soundcloudPlayer');
+  if (Element && window.SC) {
+    scWidget = SC.Widget(Element);
+
+    scWidget.bind(SC.Widget.Events.PLAY, function() {
+      console.log('🎵 SoundCloud widget PLAY detected!');
+      soundCloudPlaying = true;
+
+      const bgMusic = document.getElementById("backgroundMusic1");
+      if (bgMusic && !bgMusic.paused) {
+        let fadeOutInterval = setInterval(() => {
+          if (bgMusic.volume > 0.05) {
+            bgMusic.volume -= 0.05;
+          } else {
+            bgMusic.volume = 0;
+            bgMusic.pause();
+            clearInterval(fadeOutInterval);
+            console.log('🎶 Background music faded because SoundCloud started.');
+          }
+        }, 100);
+      }
+    });
+  }
+
+  // 3. Setup Install Prompt (if captured)
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('📲 Install prompt captured.');
+  });
+
+  // 4. Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch(error => {
+        console.log('Service Worker registration failed:', error);
+      });
+  }
+});
 
 </script>
 <!-- MENU MODAL -->
