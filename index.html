@@ -1300,8 +1300,17 @@ function renderTutorialPanel() {
 
   // Create Content
   const content = document.createElement('div');
-  content.innerText = panelData.text;
-  tutorialPanel.appendChild(content);
+  if (panelData.type === 'text') {
+    content.innerHTML = panelData.text.replace(/\\n/g, '<br/>');
+    tutorialPanel.appendChild(content);
+  } else if (panelData.type === 'picture') {
+    const img = document.createElement('img');
+    img.src = `images/${panelData.text.replace(/\[|\]|\s/g, '').toLowerCase()}.png`;
+    img.style.maxWidth = '100%';
+    img.style.height = 'auto';
+    tutorialPanel.appendChild(img);
+  }
+
 
   // If this panel has a reveal
   if (panelData.reveal) {
@@ -1352,21 +1361,19 @@ function renderTutorialPanel() {
   tutorialPanel.appendChild(buttonContainer);
 }
 
-
 function fadeToPanel(newPanelIndex) {
-  const tutorialContainer = document.getElementById('tutorialContainer');
   const tutorialPanel = document.getElementById('tutorialPanel');
-
-  // Fade out current panel
   tutorialPanel.style.opacity = 0;
 
   setTimeout(() => {
     currentPanel = newPanelIndex;
     renderTutorialPanel();
-
-    // Fade in new panel
     tutorialPanel.style.opacity = 1;
-  }, 400); // Timing matches the CSS transition (0.4s)
+
+    if (currentPanel === 1) {
+      startTutorialMusic();
+    }
+  }, 400); 
 }
 
 // Show Tutorial, Hide Main Game/Menu
@@ -1404,11 +1411,8 @@ function showMainMenu() {
       tutorialContainer.style.display = 'none';
 
       if (menuContainer) {
-        menuContainer.style.display = 'flex';
         menuContainer.style.opacity = 0;
-        setTimeout(() => {
-          menuContainer.style.opacity = 1;
-        }, 50);
+        menuContainer.style.display = 'none'; // 💥 Hide the menu when coming back to Quick Serve
       }
 
       if (gameContainer) {
