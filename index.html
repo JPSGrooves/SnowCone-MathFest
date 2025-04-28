@@ -313,7 +313,10 @@
       transition: opacity 0.6s ease-in-out;
       padding: 20px;
       text-align: center;
+      background: rgba(0, 0, 0, 0.85);
+      box-shadow: 0 0 30px #00ff88;
     }
+
     .active {
       display: flex;
       opacity: 1;
@@ -1410,6 +1413,10 @@ function showMainMenu() {
 
       if (gameContainer) {
         gameContainer.style.display = 'flex';
+        gameContainer.style.opacity = 0;
+        setTimeout(() => {
+          gameContainer.style.opacity = 1;
+        }, 50);
       }
     }, 500); // timing matches the fade-out
   }
@@ -1435,7 +1442,6 @@ function startTutorialMusic() {
   tutorialMusic.play().catch((e) => {
     console.log('Tutorial music play blocked:', e);
   });
-  tutorialPanel.style.opacity = 1;
 }
 
 function stopTutorialMusic() {
