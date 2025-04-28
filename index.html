@@ -368,6 +368,89 @@
       transform: scale(1.05);
     }
   </style>
+  <style>
+    #tutorialContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+      text-align: center;
+      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: black;
+    }
+  
+    #tutorialPanel {
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: center;
+    }
+  
+    #tutorialPanel div {
+      margin-bottom: 20px;
+      color: white;
+      font-size: 20px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+  
+    .button-container {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  
+    .tutorial-next, .tutorial-back, .tutorial-menu {
+      padding: 10px 20px;
+      font-size: 18px;
+      border: 2px solid;
+      border-radius: 8px;
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+  
+    .tutorial-next {
+      border-color: #00ff88;
+      box-shadow: 0 0 12px #00ff88;
+    }
+  
+    .tutorial-back {
+      border-color: #ff00cc;
+      box-shadow: 0 0 12px #ff00cc;
+    }
+  
+    .tutorial-menu {
+      border-color: #00ff88;
+      box-shadow: 0 0 12px #00ff88;
+    }
+  
+    .click-to-reveal {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 20px;
+      border: 2px dashed #00ccff;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      max-width: 400px;
+      cursor: pointer;
+      box-shadow: 0 0 12px #00ccff;
+      transition: all 0.3s ease-in-out;
+    }
+  
+    .click-to-reveal:hover {
+      box-shadow: 0 0 20px #00ccff;
+      transform: scale(1.05);
+    }
+  </style>
+
 
 
 </head>
@@ -1232,24 +1315,16 @@ function renderTutorialPanel() {
   const buttonContainer = document.createElement('div');
   buttonContainer.className = 'button-container';
 
-  // Back Button
-  // BACK Button (if not first)
+  // BACK Button (if not first panel)
   if (currentPanel > 0) {
     const backButton = document.createElement('button');
-    backButton.innerText = panelData.hasBackToMenu ? 'Back to Menu' : 'Back';
-    backButton.className = panelData.hasBackToMenu ? 'tutorial-menu' : 'tutorial-back';
-    backButton.onclick = () => {
-      if (panelData.hasBackToMenu) {
-        stopTutorialMusic();
-        showMainMenu();
-      } else {
-        fadeToPanel(currentPanel - 1);
-      }
-    };
+    backButton.innerText = 'Back';
+    backButton.className = 'tutorial-back';
+    backButton.onclick = () => fadeToPanel(currentPanel - 1);
     buttonContainer.appendChild(backButton);
   }
-  
-  // NEXT Button (if not last)
+
+  // NEXT Button (if not last panel)
   if (currentPanel < panels.length - 1) {
     const nextButton = document.createElement('button');
     nextButton.innerText = 'Next';
@@ -1260,9 +1335,20 @@ function renderTutorialPanel() {
     };
     buttonContainer.appendChild(nextButton);
   }
-  
+
+  // 🌈 ALWAYS ADD "Back to Menu" Button
+  const menuButton = document.createElement('button');
+  menuButton.innerText = 'Back to Menu';
+  menuButton.className = 'tutorial-menu';
+  menuButton.onclick = () => {
+    stopTutorialMusic();
+    showMainMenu();
+  };
+  buttonContainer.appendChild(menuButton);
+
   tutorialPanel.appendChild(buttonContainer);
 }
+
 
 function fadeToPanel(newPanelIndex) {
   const tutorialContainer = document.getElementById('tutorialContainer');
@@ -1282,24 +1368,52 @@ function fadeToPanel(newPanelIndex) {
 
 // Show Tutorial, Hide Main Game/Menu
 function startTutorial() {
-  document.getElementById('gameContainer').style.display = 'none';
-  if (document.getElementById('menuContainer')) {
-    document.getElementById('menuContainer').style.display = 'none';
+  const gameContainer = document.getElementById('gameContainer');
+  const menuContainer = document.getElementById('menuContainer');
+  const tutorialContainer = document.getElementById('tutorialContainer');
+  
+  if (gameContainer) gameContainer.style.display = 'none';
+  if (menuContainer) menuContainer.style.display = 'none';
+  if (tutorialContainer) {
+    tutorialContainer.style.display = 'flex';
+    setTimeout(() => {
+      tutorialContainer.style.opacity = 1;
+    }, 50);
   }
-  document.getElementById('tutorialContainer').style.display = 'flex';
+  
+  currentPanel = 0; // Reset start
   renderTutorialPanel();
+  startTutorialMusic();
 }
+
+
 
 // Hide Tutorial, Show Main Menu
 function showMainMenu() {
-  document.getElementById('tutorialContainer').style.display = 'none';
-  if (document.getElementById('menuContainer')) {
-    document.getElementById('menuContainer').style.display = 'flex';
+  const tutorialContainer = document.getElementById('tutorialContainer');
+  const menuContainer = document.getElementById('menuContainer');
+  const gameContainer = document.getElementById('gameContainer');
+
+  if (tutorialContainer) {
+    tutorialContainer.style.opacity = 0;
+    setTimeout(() => {
+      tutorialContainer.style.display = 'none';
+      if (menuContainer) menuContainer.style.display = 'flex';
+      if (gameContainer) gameContainer.style.display = 'flex';
+    }, 500); // matches your opacity fade time (0.6s, soft synced)
   }
-  document.getElementById('gameContainer').style.display = 'flex';
 }
+
 // Attach Math Tips Button to Start Tutorial
-document.getElementById('mathTipsButton').addEventListener('click', startTutorial);
+window.addEventListener('load', function() {
+  const tipsButton = document.getElementById('mathTipsButton');
+  if (tipsButton) {
+    tipsButton.addEventListener('click', () => {
+      startTutorial();
+    });
+  }
+});
+
 // Setup Tutorial Music Element
 let tutorialMusic = new Audio('tutorial-music.mp3'); // Replace with your real music file path later
 tutorialMusic.loop = true;
