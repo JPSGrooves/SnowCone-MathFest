@@ -1582,6 +1582,19 @@ window.addEventListener('load', () => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const rulesModal = document.getElementById("rulesModal");
+  const closeBtn = document.getElementById("closeModalBtn");
+
+  if (rulesModal && closeBtn) {
+    rulesModal.style.display = "flex";
+    closeBtn.addEventListener("click", () => {
+      rulesModal.style.display = "none";
+      generateProblem(); // 🌟 start the first problem cleanly
+    });
+  }
+});
+
 </script>
 <!-- MENU MODAL -->
 <div id="menuModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
