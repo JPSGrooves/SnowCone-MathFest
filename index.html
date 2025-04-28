@@ -590,6 +590,16 @@ let wasPlayingBeforeMusicMode = false;
 let soundCloudPlaying = false;
 let scWasPlaying = false;
 
+const pictureFilenames = {
+  "confessionpicture": "confessionpicture.png",
+  "pythagoraspicture": "pythagoraspicture.png",
+  "turingbrahmaguptapicture": "turingbrahmaguptapicture.png",
+  "lovelacegausspicture": "lovelacegausspicture.png",
+  "euclidpicture": "euclidpicture.png",
+  "galileonewtonpicture": "galileonewtonpicture.png",
+  "bombellieuclidpicture": "bombellieuclidpicture.png",
+  "finalsnowconepicture": "finalsnowconepicture.png"
+};
 
 
 // MENU MODAL LOGIC
@@ -598,6 +608,13 @@ function openMenuModal() {
   const installTip = document.getElementById("installTip");
 
   menuModal.style.display = "flex";
+  
+  // 🧠 Re-hook Math Tips Button every time menu opens
+  const tipsButton = document.getElementById('mathTipsButton');
+  if (tipsButton) {
+    tipsButton.onclick = () => startTutorial();
+  }
+
 
   if (installTip) {
     installTip.style.display = "block";
@@ -624,10 +641,46 @@ function openMenuModal() {
   }
 }
 
+function softResetGameScreen() {
+  score = 0;
+  currentAnswer = "";
+  correctAnswer = 0;
+  timerStarted = false;
+  secondsElapsed = 0;
+  gameEnded = false;
+
+  window.twentyFiveTriggered = false;
+  window.fiftyTriggered = false;
+  window.seventyFiveTriggered = false;
+  window.hundredTriggered = false;
+
+  document.getElementById("score").textContent = "0";
+  document.getElementById("timer").textContent = "0s";
+  document.getElementById("answerDisplay").textContent = "0";
+  document.getElementById("scoop").style.display = "none";
+  document.getElementById("problem").textContent = "0 + 0 = 🍧";
+
+  clearInterval(timerInterval);
+  const music = document.getElementById("backgroundMusic1");
+  if (music) {
+    music.pause();
+    music.currentTime = 0;
+  }
+
+  document.getElementById("leftCone").classList.remove("left-spin");
+  document.getElementById("rightCone").classList.remove("right-spin");
+}
 
 
 function closeMenuModal() {
   document.getElementById("menuModal").style.display = "none";
+}
+  
+function openMathTipsFromMenu() {
+  closeMenuModal(); // Close the Menu first
+  setTimeout(() => {
+    startTutorial(); // Then after a slight delay, start the Tutorial
+  }, 300); // About a third of a second (perfect for fade smoothness)
 }
 
 function openMusicModal() {
@@ -1294,6 +1347,18 @@ const panels = [
 // Tracking where we are
 let currentPanel = 0;
 
+const pictureFilenames = {
+  "confessionpicture": "confessionpicture.png",
+  "pythagoraspicture": "pythagoraspicture.png",
+  "turingbrahmaguptapicture": "turingbrahmaguptapicture.png",
+  "lovelacegausspicture": "lovelacegausspicture.png",
+  "euclidpicture": "euclidpicture.png",
+  "galileonewtonpicture": "galileonewtonpicture.png",
+  "bombellieuclidpicture": "bombellieuclidpicture.png",
+  "finalsnowconepicture": "finalsnowconepicture.png"
+};
+
+  
 // Render the Tutorial Panel
 function renderTutorialPanel() {
   const tutorialContainer = document.getElementById('tutorialContainer');
@@ -1309,11 +1374,15 @@ function renderTutorialPanel() {
     tutorialPanel.appendChild(content);
   } else if (panelData.type === 'picture') {
     const img = document.createElement('img');
-    img.src = `images/${panelData.text.replace(/\[|\]|\s/g, '').toLowerCase()}.png`;
+    const key = panelData.text.replace(/\[|\]|\s/g, '').toLowerCase();
+    const filename = pictureFilenames[key] || "placeholder.png"; // fallback safety
+    img.src = `images/${filename}`;
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     tutorialPanel.appendChild(img);
   }
+
+
 
 
   // If this panel has a reveal
@@ -1323,12 +1392,13 @@ function renderTutorialPanel() {
     revealBox.innerText = 'Click to Reveal Answer';
     revealBox.onclick = () => {
       revealBox.innerText = panelData.reveal;
-      const revealSound = document.getElementById("revealSound");
-      if (revealSound) {
-        revealSound.currentTime = 0;
-        revealSound.play().catch(e => console.log('Reveal sound play blocked', e));
-      }
-    }
+    
+      // ✨ Play a FRESH copy of the sparkle sound
+      const sparkle = new Audio('reveal-sparkle.mp3');
+      sparkle.volume = 0.5;
+      sparkle.play().catch(e => console.log('Reveal sparkle play blocked:', e));
+    };
+
     tutorialPanel.appendChild(revealBox);
   }
 
@@ -1351,11 +1421,11 @@ function renderTutorialPanel() {
     nextButton.innerText = 'Next';
     nextButton.className = 'tutorial-next';
     nextButton.onclick = () => {
-      if (currentPanel === 1)
       fadeToPanel(currentPanel + 1);
     };
     buttonContainer.appendChild(nextButton);
   }
+
 
   // 🌈 ALWAYS ADD "Back to Menu" Button
   const menuButton = document.createElement('button');
@@ -1372,37 +1442,48 @@ function renderTutorialPanel() {
 
 function fadeToPanel(newPanelIndex) {
   const tutorialPanel = document.getElementById('tutorialPanel');
+  if (!tutorialPanel) return;
+
   tutorialPanel.style.opacity = 0;
 
   setTimeout(() => {
     currentPanel = newPanelIndex;
     renderTutorialPanel();
-    tutorialPanel.style.opacity = 1;
-
-    if (currentPanel === 1) {
-      startTutorialMusic();
-    }
-  }, 400); 
+    setTimeout(() => {
+      tutorialPanel.style.opacity = 1;
+    }, 50); // ✨ 50ms after rendering, THEN fade in
+  }, 300);
 }
+
 
 // Show Tutorial, Hide Main Game/Menu
 function startTutorial() {
   const gameContainer = document.getElementById('gameContainer');
-  const menuContainer = document.getElementById('menuContainer');
+  const menuContainer = document.getElementById('menuModal'); // 🛠️ Correct ID is 'menuModal'
   const tutorialContainer = document.getElementById('tutorialContainer');
-  
-  if (gameContainer) gameContainer.style.display = 'none';
-  if (menuContainer) menuContainer.style.display = 'none';
-  if (tutorialContainer) {
-    tutorialContainer.style.display = 'flex';
+
+  if (menuContainer) {
+    menuContainer.style.opacity = 0;
     setTimeout(() => {
-      tutorialContainer.style.opacity = 1;
-    }, 50);
+      menuContainer.style.display = 'none';
+
+      if (gameContainer) {
+        gameContainer.style.display = 'none';
+      }
+      if (tutorialContainer) {
+        tutorialContainer.style.display = 'flex';
+        setTimeout(() => {
+          tutorialContainer.style.opacity = 1;
+        }, 50);
+      }
+
+      currentPanel = 0; // Reset start
+      renderTutorialPanel();
+    }, 300); // 🌟 Fade menu away first, then fire tutorial
   }
-  
-  currentPanel = 0; // Reset start
-  renderTutorialPanel();
 }
+
+
 
 
 
@@ -1420,19 +1501,36 @@ function showMainMenu() {
 
       if (menuContainer) {
         menuContainer.style.opacity = 0;
-        menuContainer.style.display = 'none'; // 💥 Hide the menu when coming back to Quick Serve
+        menuContainer.style.display = 'none';
       }
 
       if (gameContainer) {
         gameContainer.style.display = 'flex';
         gameContainer.style.opacity = 0;
+      
+        // 💥 Reset the gameplay visuals properly
+        document.getElementById('problem').textContent = "0 + 0 = 🍧";
+        document.getElementById('answerDisplay').textContent = "0";
+        document.getElementById('score').textContent = "0";
+        document.getElementById('timer').textContent = "0s";
+        document.getElementById('scoop').style.display = "none";
+      
+        // ✨ STOP the cones from spinning if they were
+        document.getElementById('leftCone').classList.remove('left-spin');
+        document.getElementById('rightCone').classList.remove('right-spin');
+      
         setTimeout(() => {
           gameContainer.style.opacity = 1;
         }, 50);
+        mode = 'addsub'; 
+        generateProblem();
       }
-    }, 500); // timing matches the fade-out
+
+    }, 500);
   }
 }
+
+
 
 
 // Attach Math Tips Button to Start Tutorial
@@ -1473,7 +1571,7 @@ function stopTutorialMusic() {
       Safari: Use the Share icon 🔗 and "Add to Home Screen"
     </div>
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <button id="mathTipsButton" onclick="startTutorial()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🧠 Math Tips & Story Intro</button>
+      <button id="mathTipsButton" onclick="openMathTipsFromMenu()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🧠 Math Tips & Story Intro</button>
       <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">📖 Story Mode — Serving Soon!</button>
       <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">♾️ Infinity Mode — Serving Soon!</button>
       <button onclick="openMusicModal()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🎵 Music Player Mode</button>
