@@ -571,6 +571,8 @@
 <audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
 <audio id="correctSound" preload="auto" src="correct.mp3"></audio>
 <audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
+<audio id="revealSound" preload="auto" src="reveal-sparkle.mp3"></audio>
+
 
 <!-- SCRIPT START -->
 <script>
@@ -1321,6 +1323,11 @@ function renderTutorialPanel() {
     revealBox.innerText = 'Click to Reveal Answer';
     revealBox.onclick = () => {
       revealBox.innerText = panelData.reveal;
+      const revealSound = document.getElementById("revealSound");
+      if (revealSound) {
+        revealSound.currentTime = 0;
+        revealSound.play().catch(e => console.log('Reveal sound play blocked', e));
+      }
     }
     tutorialPanel.appendChild(revealBox);
   }
