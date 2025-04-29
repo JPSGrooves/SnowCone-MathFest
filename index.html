@@ -1484,8 +1484,9 @@ function stopTutorialMusic() {
   tutorialMusic.currentTime = 0;
 }
 // FULLY MERGED WINDOW LOAD HANDLER
+// FULLY MERGED WINDOW LOAD HANDLER
 window.addEventListener('load', () => {
-  // Show Opening Modal
+  // Show Opening Modal FIRST, always
   const rulesModal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
 
@@ -1493,13 +1494,13 @@ window.addEventListener('load', () => {
     rulesModal.style.display = "flex";
     closeBtn.addEventListener("click", () => {
       rulesModal.style.display = "none";
-      generateProblem(); // 🌟 Start first problem only AFTER modal closes
+      generateProblem(); // 🌟 Start first problem clean after clicking "Let's Go"
     });
   }
 
-  // Setup SoundCloud Widget (optional if present)
+  // Setup SoundCloud Widget, but SAFELY
   const Element = document.getElementById('soundcloudPlayer');
-  if (Element && window.SC) {
+  if (Element && typeof SC !== 'undefined') { 
     scWidget = SC.Widget(Element);
 
     scWidget.bind(SC.Widget.Events.PLAY, function() {
@@ -1533,10 +1534,10 @@ window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js')
       .then(registration => {
-        console.log('Service Worker registered with scope:', registration.scope);
+        console.log('✅ Service Worker registered with scope:', registration.scope);
       })
       .catch(error => {
-        console.log('Service Worker registration failed:', error);
+        console.log('❌ Service Worker registration failed:', error);
       });
   }
 });
