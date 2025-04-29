@@ -1347,18 +1347,21 @@ function fadeToPanel(newPanelIndex) {
 
   setTimeout(() => {
     currentPanel = newPanelIndex;
-    if (currentPanel === 1 && !soundCloudPlaying) {
-    // 🛑 STOP backgroundMusic1 if it's somehow trying to play
-    const bgMusic = document.getElementById("backgroundMusic1");
-    if (bgMusic && !bgMusic.paused) {
-      bgMusic.pause();
-      bgMusic.currentTime = 0;
-    }
-  // 🎵 START tutorial music (only at panel 1)
-  startTutorialMusic();
-}
-
     renderTutorialPanel();
+    if (currentPanel < panels.length - 1) {
+      const nextButton = document.createElement('button');
+      nextButton.innerText = 'Next';
+      nextButton.className = 'tutorial-next';
+      nextButton.onclick = () => {
+        // 🎵 START tutorial music only on first Next click
+        if (currentPanel === 0 && tutorialMusic.paused) {
+          startTutorialMusic();
+        }
+    
+        fadeToPanel(currentPanel + 1);
+      };
+      buttonContainer.appendChild(nextButton);
+    }
     setTimeout(() => {
       tutorialPanel.style.opacity = 1;
     }, 50); // ✨ 50ms after rendering, THEN fade in
