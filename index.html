@@ -1455,19 +1455,6 @@ function showMainMenu() {
   }
 }
 
-
-
-
-// Attach Math Tips Button to Start Tutorial
-window.addEventListener('load', function() {
-  const tipsButton = document.getElementById('mathTipsButton');
-  if (tipsButton) {
-    tipsButton.addEventListener('click', () => {
-      startTutorial();
-    });
-  }
-});
-
 // Setup Tutorial Music Element
 let tutorialMusic = new Audio('tutorial-music.mp3'); // Replace with your real music file path later
 tutorialMusic.loop = true;
@@ -1483,7 +1470,7 @@ function stopTutorialMusic() {
   tutorialMusic.pause();
   tutorialMusic.currentTime = 0;
 }
-// FULLY MERGED WINDOW LOAD HANDLER
+
 // FULLY MERGED WINDOW LOAD HANDLER
 window.addEventListener('load', () => {
   // Show Opening Modal FIRST, always
@@ -1498,7 +1485,7 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Setup SoundCloud Widget, but SAFELY
+  // Setup SoundCloud Widget
   const Element = document.getElementById('soundcloudPlayer');
   if (Element && typeof SC !== 'undefined') { 
     scWidget = SC.Widget(Element);
@@ -1539,6 +1526,14 @@ window.addEventListener('load', () => {
       .catch(error => {
         console.log('❌ Service Worker registration failed:', error);
       });
+  }
+
+  // 🧠 Now ALSO hook the Math Tips button properly
+  const tipsButton = document.getElementById('mathTipsButton');
+  if (tipsButton) {
+    tipsButton.addEventListener('click', () => {
+      startTutorial();
+    });
   }
 });
 
