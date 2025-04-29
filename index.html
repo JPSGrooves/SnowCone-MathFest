@@ -1273,7 +1273,7 @@ function renderTutorialPanel() {
     const img = document.createElement('img');
     const key = panelData.text.replace(/\[|\]|\s/g, '').toLowerCase();
     const filename = pictureFilenames[key] || "placeholder.png"; // fallback safety
-    img.src = `images/${filename}`;
+    img.src = `${filename}`;
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     tutorialPanel.appendChild(img);
