@@ -479,22 +479,23 @@
   }
   
   /* Picture inside Tutorial Panel */
-  <style>
   #tutorialPanel img {
-    width: auto;
+    max-width: 100%;
     height: auto;
-    max-width: 300px; /* 🍧 was probably around 200px before */
-    max-height: 300px; /* 🍧 gentle 50% upscale */
+    max-height: 300px; /* 🍧 keep image nice size so buttons fit */
     margin-bottom: 10px;
   }
   
   @media (max-width: 600px) {
+    #tutorialContainer > div {
+      width: 360px;
+      height: 675px;
+      bottom: 20px; /* 🍧 little tighter on mobile */
+      padding: 20px;
+    }
+  
     #tutorialPanel img {
-      width: auto;
-      height: auto;
-      max-width: 240px; /* 🍧 mobile smaller but still ~50% bigger */
-      max-height: 240px;
-      margin-bottom: 10px;
+      max-height: 350px; /* 🍧 smaller pic on mobile too */
     }
   }
   </style>
