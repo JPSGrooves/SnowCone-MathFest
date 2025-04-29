@@ -701,6 +701,14 @@ function softResetGameScreen() {
 function closeMenuModal() {
   document.getElementById("menuModal").style.display = "none";
 }
+
+// 🍧💥 ADD THIS NEW ONE RIGHT HERE
+function backToQuickServe() {
+  closeMenuModal();
+  document.getElementById("tutorialContainer").style.display = "none"; // Hide Story/Tutorial if up
+  document.getElementById("gameContainer").style.display = "block"; // Re-show game
+  softResetGameScreen(); // 🍧 Reset snow cone math to fresh
+}
   
 function openMathTipsFromMenu() {
   closeMenuModal(); // Close the Menu first
@@ -1606,7 +1614,7 @@ window.addEventListener('load', () => {
       <a href="https://soundcloud.com/jpsgrooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a> · 
       <a href="https://soundcloud.com/jpsgrooves/sets/electronic" target="_blank" style="color: #cccccc; text-decoration: none;">Electronic</a>
     </div>
-    <button onclick="closeMusicModal()" style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Back to Menu</button>
+    <button onclick="backToQuickServe()" style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Back to Quick Serve</button>
   </div>
 </div>
 
