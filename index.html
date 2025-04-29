@@ -462,25 +462,40 @@
   #tutorialContainer > div {
     background: black;
     border: 2px solid #00ff88;
-    padding: 30px;
     width: 400px;
-    height: 550px;
+    height: 750px;
+    position: fixed; /* fixed = always locked to screen */
+    bottom: 30px; /* 🧠  lock to bottom edge, steady */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 30px;
     text-align: center;
     box-shadow: 0 0 20px #00ff88;
     border-radius: 8px;
-    overflow: hidden; /* No scrollbars unless critical */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start; /* stack top down */
+    overflow: hidden; /* hide scrollbars */
+  }
+  
+  /* Picture inside Tutorial Panel */
+  #tutorialPanel img {
+    max-width: 100%;
+    height: auto;
+    max-height: 300px; /* 🍧 keep image nice size so buttons fit */
+    margin-bottom: 10px;
   }
   
   @media (max-width: 600px) {
     #tutorialContainer > div {
       width: 360px;
-      height: 480px;
+      height: 675px;
+      bottom: 20px; /* 🍧 little tighter on mobile */
       padding: 20px;
-      max-width: 360px;
-      overflow: hidden;
+    }
+  
+    #tutorialPanel img {
+      max-height: 250px; /* 🍧 smaller pic on mobile too */
     }
   }
   </style>
