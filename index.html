@@ -1367,6 +1367,16 @@ function startTutorial() {
   const menuContainer = document.getElementById('menuModal'); // 🛠️ Correct ID is 'menuModal'
   const tutorialContainer = document.getElementById('tutorialContainer');
 
+  // 🎵 Stop background game music
+  const bgMusic = document.getElementById("backgroundMusic1");
+  if (bgMusic && !bgMusic.paused) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+  }
+  
+  // 🎵 Start tutorial music
+  startTutorialMusic();
+
   if (menuContainer) {
     menuContainer.style.opacity = 0;
     setTimeout(() => {
@@ -1404,14 +1414,13 @@ function showMainMenu() {
     setTimeout(() => {
       tutorialContainer.style.display = 'none';
 
+      // 🛑 Stop tutorial music if playing
+      stopTutorialMusic();
+
       // 💥 FULL SOFT RESET THE GAME SCREEN
       softResetGameScreen();
 
-      // Hide gameplay, show menu
-      if (gameContainer) {
-        gameContainer.style.display = 'none';
-      }
-
+      // Show the menu
       if (menuContainer) {
         menuContainer.style.display = 'flex';
         setTimeout(() => {
@@ -1419,8 +1428,8 @@ function showMainMenu() {
         }, 50);
       }
 
-      // 🛑 Stop tutorial music if playing
-      stopTutorialMusic();
+      // 🚫 DO NOT touch the gameContainer here
+      // Game will properly start when they resetScore or click New Game
 
       // 🌈 Reset to default mode (optional but clean)
       mode = 'addsub'; 
@@ -1431,10 +1440,11 @@ function showMainMenu() {
 }
 
 
+
 // Setup Tutorial Music Element
-let tutorialMusic = new Audio('tutorial-music.mp3'); // Replace with your real music file path later
+let tutorialMusic = new Audio('tutorial-music.mp3');
 tutorialMusic.loop = true;
-tutorialMusic.volume = 0.5; // You can adjust volume if needed
+tutorialMusic.volume = 0.5;
 
 function startTutorialMusic() {
   tutorialMusic.play().catch((e) => {
