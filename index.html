@@ -481,17 +481,19 @@
   /* Picture inside Tutorial Panel */
   <style>
   #tutorialPanel img {
-    width: 100%; /* 🔥 FULL WIDTH of the panel */
-    height: auto; /* 💎 natural aspect ratio */
-    max-height: 500px; /* 🍧 was 250px — now it's DOUBLE */
+    width: auto;
+    height: auto;
+    max-width: 300px; /* 🍧 was probably around 200px before */
+    max-height: 300px; /* 🍧 gentle 50% upscale */
     margin-bottom: 10px;
   }
   
   @media (max-width: 600px) {
     #tutorialPanel img {
-      width: 100%;
+      width: auto;
       height: auto;
-      max-height: 400px; /* 🍧 was 200px — now DOUBLE for mobile too */
+      max-width: 240px; /* 🍧 mobile smaller but still ~50% bigger */
+      max-height: 240px;
       margin-bottom: 10px;
     }
   }
