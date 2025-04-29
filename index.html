@@ -1037,47 +1037,6 @@ function closePopup() {
   document.getElementById("popupModal").style.display = "none";
 }
 
-// 🚀 Open the Opening Modal and Setup SoundCloud FAST
-window.addEventListener('DOMContentLoaded', () => {
-  const rulesModal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-
-  if (rulesModal && closeBtn) {
-    rulesModal.style.display = "flex";
-
-    closeBtn.addEventListener("click", () => {
-      rulesModal.style.display = "none";
-      generateProblem();
-    });
-  }
-
-  const Element = document.getElementById('soundcloudPlayer');
-  if (Element) {
-    scWidget = SC.Widget(Element);
-
-    scWidget.bind(SC.Widget.Events.PLAY, function() {
-      console.log('🎵 SoundCloud widget PLAY detected!');
-      soundCloudPlaying = true;
-
-      const bgMusic = document.getElementById("backgroundMusic1");
-      if (bgMusic && !bgMusic.paused) {
-        let fadeOutInterval = setInterval(() => {
-          if (bgMusic.volume > 0.05) {
-            bgMusic.volume -= 0.05;
-          } else {
-            bgMusic.volume = 0;
-            bgMusic.pause();
-            clearInterval(fadeOutInterval);
-            console.log('🎶 Background music fully faded and paused because SoundCloud started.');
-          }
-        }, 100);
-      }
-    });
-  }
-});
-
-
-
 // Number input
 window.appendNumber = num => {
   if (!gameEnded) {
