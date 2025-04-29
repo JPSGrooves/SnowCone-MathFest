@@ -1348,11 +1348,16 @@ function fadeToPanel(newPanelIndex) {
   setTimeout(() => {
     currentPanel = newPanelIndex;
     if (currentPanel === 1 && !soundCloudPlaying) {
-      const bgMusic = document.getElementById("backgroundMusic1");
-      if (bgMusic.paused) {
-        bgMusic.play().catch(e => console.warn("Background music resume failed:", e));
-      }
+    // 🛑 STOP backgroundMusic1 if it's somehow trying to play
+    const bgMusic = document.getElementById("backgroundMusic1");
+    if (bgMusic && !bgMusic.paused) {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
     }
+  // 🎵 START tutorial music (only at panel 1)
+  startTutorialMusic();
+}
+
     renderTutorialPanel();
     setTimeout(() => {
       tutorialPanel.style.opacity = 1;
@@ -1427,7 +1432,13 @@ function showMainMenu() {
           menuContainer.style.opacity = 1;
         }, 50);
       }
-
+      if (menuContainer) {
+        menuContainer.style.display = 'flex';
+        menuContainer.style.opacity = 0;
+        setTimeout(() => {
+          menuContainer.style.opacity = 1;
+        }, 50);
+      }
       // 🚫 DO NOT touch the gameContainer here
       // Game will properly start when they resetScore or click New Game
 
