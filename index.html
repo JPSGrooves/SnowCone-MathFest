@@ -1278,7 +1278,7 @@ function renderTutorialPanel() {
     tutorialPanel.appendChild(content);
   } else if (panelData.type === 'picture') {
     const img = document.createElement('img');
-    img.src = `images/${panelData.image}`; 
+    img.src = `${panelData.image}`; 
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     tutorialPanel.appendChild(img);
