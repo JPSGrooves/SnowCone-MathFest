@@ -1271,18 +1271,6 @@ const panels = [
 
 // Tracking where we are
 let currentPanel = 0;
-
-const pictureFilenames = {
-  "confessionpicture": "confessionpicture.png",
-  "pythagoraspicture": "pythagoraspicture.png",
-  "turingbrahmaguptapicture": "turingbrahmaguptapicture.png",
-  "lovelacegausspicture": "lovelacegausspicture.png",
-  "euclidpicture": "euclidpicture.png",
-  "galileonewtonpicture": "galileonewtonpicture.png",
-  "bombellieuclidpicture": "bombellieuclidpicture.png",
-  "finalsnowconepicture": "finalsnowconepicture.png"
-};
-
   
 // Render the Tutorial Panel
 function renderTutorialPanel() {
@@ -1481,7 +1469,9 @@ window.addEventListener('load', () => {
     rulesModal.style.display = "flex";
     closeBtn.addEventListener("click", () => {
       rulesModal.style.display = "none";
-      generateProblem(); // 🌟 Start first problem clean after clicking "Let's Go"
+      setTimeout(() => {
+        generateProblem();
+      }, 100); // ✨ slight delay to let DOM breathe
     });
   }
 
