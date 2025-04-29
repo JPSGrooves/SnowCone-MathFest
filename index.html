@@ -479,23 +479,20 @@
   }
   
   /* Picture inside Tutorial Panel */
+  <style>
   #tutorialPanel img {
-    max-width: 100%;
-    height: auto;
-    max-height: 300px; /* 🍧 keep image nice size so buttons fit */
+    width: 100%; /* 🔥 FULL WIDTH of the panel */
+    height: auto; /* 💎 natural aspect ratio */
+    max-height: 500px; /* 🍧 was 250px — now it's DOUBLE */
     margin-bottom: 10px;
   }
   
   @media (max-width: 600px) {
-    #tutorialContainer > div {
-      width: 360px;
-      height: 675px;
-      bottom: 20px; /* 🍧 little tighter on mobile */
-      padding: 20px;
-    }
-  
     #tutorialPanel img {
-      max-height: 250px; /* 🍧 smaller pic on mobile too */
+      width: 100%;
+      height: auto;
+      max-height: 400px; /* 🍧 was 200px — now DOUBLE for mobile too */
+      margin-bottom: 10px;
     }
   }
   </style>
