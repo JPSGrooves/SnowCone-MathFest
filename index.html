@@ -1278,15 +1278,11 @@ function renderTutorialPanel() {
     tutorialPanel.appendChild(content);
   } else if (panelData.type === 'picture') {
     const img = document.createElement('img');
-    img.src = `${panelData.image}`; 
+    img.src = `${panelData.image}`; // ❌ NO "images/" folder – JUST the filename!
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     tutorialPanel.appendChild(img);
   }
-
-
-
-
 
   // If this panel has a reveal
   if (panelData.reveal) {
