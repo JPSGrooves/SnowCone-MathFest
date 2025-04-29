@@ -1526,7 +1526,7 @@ function stopTutorialMusic() {
 }
 // FULLY MERGED WINDOW LOAD HANDLER
 window.addEventListener('load', () => {
-  // 1. Show Opening Modal
+  // Show Opening Modal
   const rulesModal = document.getElementById("rulesModal");
   const closeBtn = document.getElementById("closeModalBtn");
 
@@ -1534,11 +1534,11 @@ window.addEventListener('load', () => {
     rulesModal.style.display = "flex";
     closeBtn.addEventListener("click", () => {
       rulesModal.style.display = "none";
-      generateProblem(); // Generate first problem when modal closes
+      generateProblem(); // 🌟 Start first problem only AFTER modal closes
     });
   }
 
-  // 2. Setup SoundCloud (optional if present)
+  // Setup SoundCloud Widget (optional if present)
   const Element = document.getElementById('soundcloudPlayer');
   if (Element && window.SC) {
     scWidget = SC.Widget(Element);
@@ -1563,14 +1563,14 @@ window.addEventListener('load', () => {
     });
   }
 
-  // 3. Setup Install Prompt (if captured)
+  // Setup Install Prompt
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     console.log('📲 Install prompt captured.');
   });
 
-  // 4. Register Service Worker
+  // Register Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js')
       .then(registration => {
@@ -1582,18 +1582,6 @@ window.addEventListener('load', () => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const rulesModal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-
-  if (rulesModal && closeBtn) {
-    rulesModal.style.display = "flex";
-    closeBtn.addEventListener("click", () => {
-      rulesModal.style.display = "none";
-      generateProblem(); // 🌟 start the first problem cleanly
-    });
-  }
-});
 
 </script>
 <!-- MENU MODAL -->
