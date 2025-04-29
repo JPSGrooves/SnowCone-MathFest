@@ -1343,29 +1343,31 @@ function fadeToPanel(newPanelIndex) {
   const tutorialPanel = document.getElementById('tutorialPanel');
   if (!tutorialPanel) return;
 
+  // 🛑 Before anything else: check if tutorial is finished
+  if (newPanelIndex >= panels.length) {
+    closeTutorial();
+    return;
+  }
+
   tutorialPanel.style.opacity = 0;
 
   setTimeout(() => {
     currentPanel = newPanelIndex;
-    renderTutorialPanel();
-    if (currentPanel < panels.length - 1) {
-      const nextButton = document.createElement('button');
-      nextButton.innerText = 'Next';
-      nextButton.className = 'tutorial-next';
-      nextButton.onclick = () => {
-        // 🎵 START tutorial music only on first Next click
-        if (currentPanel === 1 && !soundCloudPlaying) {
-          startTutorialMusic();
-        }
-        fadeToPanel(currentPanel + 1);
-      };
-      buttonContainer.appendChild(nextButton);
+
+    // 🎵 START tutorial music ONLY if moving onto panel 1
+    if (currentPanel === 1 && !soundCloudPlaying) {
+      startTutorialMusic();
     }
+
+    renderTutorialPanel();
+
     setTimeout(() => {
       tutorialPanel.style.opacity = 1;
-    }, 50); // ✨ 50ms after rendering, THEN fade in
+    }, 50);
   }, 300);
 }
+
+
 
 function nextPanel() {
   if (currentPanel >= panels.length - 1) {
@@ -1565,7 +1567,6 @@ window.addEventListener('load', () => {
       <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">♾️ Infinity Mode — Serving Soon!</button>
       <button onclick="openMusicModal()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🎵 Music Player Mode</button>
       <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">🏆 High Scores & Badges — Serving Soon!</button>
-      <button id="mathTipsButton" class="menu-button">🧠 Math Tips</button>
     </div>
     <button onclick="closeMenuModal()" style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Back to Quick Serve</button>
   </div>
