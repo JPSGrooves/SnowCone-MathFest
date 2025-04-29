@@ -487,26 +487,37 @@
     margin-bottom: 10px;
   }
   
-  /* Mobile override */
-  @media (max-width: 600px) {
-    #tutorialPanel img {
-      max-height: 250px; /* keep it clean and tight on phones */
-    }
+  /* Picture inside Tutorial Panel */
+  #tutorialPanel img {
+    max-width: 100%;
+    height: auto;
+    max-height: 500px; /* 🍧 Bigger view on desktop! */
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 18px #00ccff; /* optional glow boost */
   }
   
-    
+  /* Desktop container can flex now */
+  #tutorialContainer > div {
+    height: auto;
+    max-height: 90vh; /* 🍧 Allow tall view without scroll-lock */
+    overflow-y: auto;
+  }
+  
+  /* Mobile-specific tweaks */
   @media (max-width: 600px) {
+    #tutorialPanel img {
+      max-height: 250px; /* 🍧 tighter for phone display */
+    }
+  
     #tutorialContainer > div {
-      width: 360px;
-      height: 675px;
-      bottom: 20px; /* 🍧 little tighter on mobile */
+      max-height: 675px;
+      height: auto;
+      bottom: 20px;
       padding: 20px;
     }
-  
-    #tutorialPanel img {
-      max-height: 450px; /* 🍧 smaller pic on mobile too */
-    }
   }
+
   </style>
 </head>
 <body>
