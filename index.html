@@ -1415,7 +1415,7 @@ function startTutorial() {
 // Hide Tutorial, Show Main Menu
 function showMainMenu() {
   const tutorialContainer = document.getElementById('tutorialContainer');
-  const menuContainer = document.getElementById('menuContainer');
+  const menuContainer = document.getElementById('menuModal'); // <-- fix this line
   const gameContainer = document.getElementById('gameContainer');
 
   if (tutorialContainer) {
