@@ -1217,40 +1217,14 @@ function isSafari() {
 
 // Panel Content Array
 const panels = [
-  // Quick Tips (Text Only)
-  { type: 'text', text: "Quick Tips: \\n➕ Break problems into parts.\\n➖ Look for friendly numbers.\\n✖️ Estimate first, solve second.\\n➗ Trust your instincts.", hasBackToMenu: true },
-  // Confession (Text)
-  { type: 'text', text: "Confession: I needed math to move, sing, matter.\\nThus, SnowCone MathFest began..." },
-  // Confession (Picture)
-  { type: 'picture', text: "[Confession Picture]" },
-  // Pythagoras (Text)
-  { type: 'text', text: "Pythagoras: \\\"Music is math vibrating in your bones.\\\"\\nPractice: Press halfway on a string. What fraction vibrates?", reveal: "1/2 (Octave Higher!)" },
-  // Pythagoras (Picture)
-  { type: 'picture', text: "[Pythagoras Picture]" },
-  // Turing & Brahmagupta (Text)
-  { type: 'text', text: "Turing & Brahmagupta: \\\"Secrets hide in puzzles.\\\"\\nPractice: What happens when any number is multiplied by zero?", reveal: "Becomes 0." },
-  // Turing & Brahmagupta (Picture)
-  { type: 'picture', text: "[Turing Brahmagupta Picture]" },
-  // Lovelace & Gauss (Text)
-  { type: 'text', text: "Lovelace & Gauss: \\\"Find the rhythm hidden in the storm.\\\"\\nPractice: Pattern repeats every 5 beats; how many in 20 beats?", reveal: "4 repeats." },
-  // Lovelace & Gauss (Picture)
-  { type: 'picture', text: "[Lovelace Gauss Picture]" },
-  // Euclid (Text)
-  { type: 'text', text: "Euclid: \\\"All structure begins with a line.\\\"\\nPractice: Triangle sides 3cm & 4cm. Hypotenuse?", reveal: "5cm." },
-  // Euclid (Picture)
-  { type: 'picture', text: "[Euclid Picture]" },
-  // Galileo & Newton (Text)
-  { type: 'text', text: "Galileo & Newton: \\\"Everything moves.\\\"\\nPractice: 60 miles in 2 hours. Speed?", reveal: "30 mph." },
-  // Galileo & Newton (Picture)
-  { type: 'picture', text: "[Galileo Newton Picture]" },
-  // Bombelli & Euclid (Text)
-  { type: 'text', text: "Bombelli & Euclid: \\\"Impossible structures are real.\\\"\\nPractice: What is \\u221a-1?", reveal: "i (Imaginary Unit)" },
-  // Bombelli & Euclid (Picture)
-  { type: 'picture', text: "[Bombelli Euclid Picture]" },
-  // Final Reflection (Text)
-  { type: 'text', text: "Final Reflection: Math is alive. Cosmic SnowCone is waiting..." },
-  // Final Reflection (Picture)
-  { type: 'picture', text: "[Final SnowCone Picture]", hasBackToMenu: true }
+ { type: 'picture', image: "confessionpicture.png" },
+ { type: 'picture', image: "pythagoraspicture.png" },
+ { type: 'picture', image: "turingbrahmaguptapicture.png" },
+ { type: 'picture', image: "lovelacegausspicture.png" },
+ { type: 'picture', image: "euclidpicture.png" },
+ { type: 'picture', image: "galileonewtonpicture.png" },
+ { type: 'picture', image: "bombellieuclidpicture.png" },
+ { type: 'picture', image: "finalsnowconepicture.png" },
 ];
 
 // Tracking where we are
@@ -1266,14 +1240,14 @@ function renderTutorialPanel() {
 
   // Create Content
   const content = document.createElement('div');
+  
   if (panelData.type === 'text') {
     content.innerHTML = panelData.text.replace(/\\n/g, '<br/>');
     tutorialPanel.appendChild(content);
+  
   } else if (panelData.type === 'picture') {
     const img = document.createElement('img');
-    const key = panelData.text.replace(/\[|\]|\s/g, '').toLowerCase();
-    const filename = pictureFilenames[key] || "placeholder.png"; // fallback safety
-    img.src = `${filename}`;
+    img.src = `images/${panelData.image}`; // <<--- CLEAN AND DIRECT
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     tutorialPanel.appendChild(img);
@@ -1345,6 +1319,12 @@ function fadeToPanel(newPanelIndex) {
 
   setTimeout(() => {
     currentPanel = newPanelIndex;
+    if (currentPanel === 1 && !soundCloudPlaying) {
+      const bgMusic = document.getElementById("backgroundMusic1");
+      if (bgMusic.paused) {
+        bgMusic.play().catch(e => console.warn("Background music resume failed:", e));
+      }
+    }
     renderTutorialPanel();
     setTimeout(() => {
       tutorialPanel.style.opacity = 1;
@@ -1387,7 +1367,7 @@ function startTutorial() {
 // Hide Tutorial, Show Main Menu
 function showMainMenu() {
   const tutorialContainer = document.getElementById('tutorialContainer');
-  const menuContainer = document.getElementById('menuModal'); // <-- fix this line
+  const menuContainer = document.getElementById('menuModal');
   const gameContainer = document.getElementById('gameContainer');
 
   if (tutorialContainer) {
@@ -1396,36 +1376,32 @@ function showMainMenu() {
     setTimeout(() => {
       tutorialContainer.style.display = 'none';
 
-      if (menuContainer) {
-        menuContainer.style.opacity = 0;
-        menuContainer.style.display = 'none';
-      }
+      // 💥 FULL SOFT RESET THE GAME SCREEN
+      softResetGameScreen();
 
+      // Hide gameplay, show menu
       if (gameContainer) {
-        gameContainer.style.display = 'flex';
-        gameContainer.style.opacity = 0;
-      
-        // 💥 Reset the gameplay visuals properly
-        document.getElementById('problem').textContent = "0 + 0 = 🍧";
-        document.getElementById('answerDisplay').textContent = "0";
-        document.getElementById('score').textContent = "0";
-        document.getElementById('timer').textContent = "0s";
-        document.getElementById('scoop').style.display = "none";
-      
-        // ✨ STOP the cones from spinning if they were
-        document.getElementById('leftCone').classList.remove('left-spin');
-        document.getElementById('rightCone').classList.remove('right-spin');
-      
-        setTimeout(() => {
-          gameContainer.style.opacity = 1;
-        }, 50);
-        mode = 'addsub'; 
-        generateProblem();
+        gameContainer.style.display = 'none';
       }
 
-    }, 500);
+      if (menuContainer) {
+        menuContainer.style.display = 'flex';
+        setTimeout(() => {
+          menuContainer.style.opacity = 1;
+        }, 50);
+      }
+
+      // 🛑 Stop tutorial music if playing
+      stopTutorialMusic();
+
+      // 🌈 Reset to default mode (optional but clean)
+      mode = 'addsub'; 
+      generateProblem();
+
+    }, 500); // Fade out delay
   }
 }
+
 
 // Setup Tutorial Music Element
 let tutorialMusic = new Audio('tutorial-music.mp3'); // Replace with your real music file path later
