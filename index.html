@@ -1234,8 +1234,9 @@ function resetScore() {
 
   document.getElementById("leftCone").classList.remove("left-spin");
   document.getElementById("rightCone").classList.remove("right-spin");
-
   document.getElementById("popupModal").style.display = "none";
+  document.getElementById("rulesModal").style.display = "flex";
++ generateProblem();
 }
 
 
