@@ -327,11 +327,16 @@
     }
     
     #tutorialPanel .math-tips {
-      font-size: 20px !important;
-      line-height: 1 !important;
+      font-size: 25px !important;
       color: white !important;
-      margin-top: 2px !important; /* 🔥 tighten! was 5px */
+      margin-top: 2px !important;
     }
+    
+    #tutorialPanel .math-tips p {
+      margin: 4px 0 !important; /* Tight between bullets */
+      line-height: 1.4 !important; /* Comfy for wrapped text */
+    }
+
 
    
     .active {
@@ -1334,12 +1339,12 @@ const panels = [
     type: 'text',
     text: `<div class="character-intro">Quick Serve Math Tips:</div>
       <div class="math-tips">
-        ➕ Break problems into parts.<br>
-        ➖ Look for friendly numbers.<br>
-        ✖️ Estimate first, solve second.<br>
-        ➗ Trust your first instincts.<br>
-        🪩 Breathe like you're solving math under a disco ball.<br>
-        💪 Practice regularly at the SnowCone MathFest!
+        <p>➕ Break problems into parts.</p>
+        <p>➖ Look for friendly numbers.</p>
+        <p>✖️ Estimate first, solve second.</p>
+        <p>➗ Trust your first instincts.</p>
+        <p>🪩 Breathe like you're solving math under a disco ball.</p>
+        <p>💪 Practice regularly at the SnowCone MathFest!</p>
       </div>`
   },
 
