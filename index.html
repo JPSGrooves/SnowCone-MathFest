@@ -1383,7 +1383,7 @@ function renderTutorialPanel() {
   const content = document.createElement('div');
   
   if (panelData.type === 'text') {
-    content.innerHTML = panelData.text.replace(/\\n/g, '<br/>');
+    content.innerHTML = panelData.text.replace(/\n/g, '<br/>');
     tutorialPanel.appendChild(content);
   } else if (panelData.type === 'picture') {
     const img = document.createElement('img');
