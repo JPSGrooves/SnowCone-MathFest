@@ -370,6 +370,25 @@
       box-shadow: 0 0 20px #00ccff;
       transform: scale(1.05);
     }
+    .tutorial-back {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+    }
+    
+    .tutorial-next {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
+    
+    .tutorial-menu {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
   </style>
   <style>
     #tutorialContainer {
@@ -411,35 +430,8 @@
       display: flex;
       gap: 10px;
       justify-content: center;
-      flex-wrap: nowrap; /* 🍧 Keep buttons in one row, no wrap! */
-      flex-direction: row; /* 🧊 Ensure it's horizontal */
-      align-items: center; /* ✨ Keeps 'em vibin' on the same line */
+      flex-wrap: wrap;
     }
-    
-    .tutorial-next,
-    .tutorial-back,
-    .tutorial-menu {
-      flex: 1 1 auto; /* 🔧 Allow buttons to resize as needed */
-      min-width: 100px;
-      max-width: 150px;
-    }
-
-    }
-    @media (max-width: 500px) {
-      .button-container {
-        flex-direction: column;
-        align-items: center;
-      }
-    
-      .tutorial-next,
-      .tutorial-back,
-      .tutorial-menu {
-        width: 100%;
-        max-width: 260px;
-        margin: 5px 0;
-      }
-    }
-
   
     .tutorial-next, .tutorial-back, .tutorial-menu {
       padding: 10px 20px;
@@ -542,7 +534,7 @@
     }
   
     #tutorialPanel img {
-      max-height: 50vh;
+      max-height: 60vh; /* 🔥 was 50vh — now a bit bigger! */
       margin-bottom: 12px;
     }
   }
@@ -554,7 +546,10 @@
 <canvas id="celebrationCanvas" class="confetti"></canvas>
 
 <!-- TITLE -->
-<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
+<img src="SnowConeMathFestTitle.png"
+     alt="SnowCone MathFest"
+     class="title-image"
+     onclick="resetScore(); generateProblem();" />
 
 <button id="installAppBtn" style="display:none; margin: 10px auto; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:6px; font-size:18px; box-shadow:0 0 10px #00ff88; cursor:pointer;">
   📲 Install SnowCone MathFest
@@ -774,7 +769,6 @@ function backToQuickServe() {
   closeMenuModal();
   document.getElementById("tutorialContainer").style.display = "none"; // Hide Story/Tutorial if up
   document.getElementById("gameContainer").style.display = "block"; // Re-show game
-  softResetGameScreen(); // 🍧 Reset snow cone math to fresh
 }
   
 function openMathTipsFromMenu() {
@@ -1239,8 +1233,9 @@ function resetScore() {
 
   document.getElementById("leftCone").classList.remove("left-spin");
   document.getElementById("rightCone").classList.remove("right-spin");
-
   document.getElementById("popupModal").style.display = "none";
+  document.getElementById("rulesModal").style.display = "flex";
++ generateProblem();
 }
 
 
