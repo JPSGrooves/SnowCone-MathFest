@@ -411,8 +411,35 @@
       display: flex;
       gap: 10px;
       justify-content: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap; /* 🍧 Keep buttons in one row, no wrap! */
+      flex-direction: row; /* 🧊 Ensure it's horizontal */
+      align-items: center; /* ✨ Keeps 'em vibin' on the same line */
     }
+    
+    .tutorial-next,
+    .tutorial-back,
+    .tutorial-menu {
+      flex: 1 1 auto; /* 🔧 Allow buttons to resize as needed */
+      min-width: 100px;
+      max-width: 150px;
+    }
+
+    }
+    @media (max-width: 500px) {
+      .button-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    
+      .tutorial-next,
+      .tutorial-back,
+      .tutorial-menu {
+        width: 100%;
+        max-width: 260px;
+        margin: 5px 0;
+      }
+    }
+
   
     .tutorial-next, .tutorial-back, .tutorial-menu {
       padding: 10px 20px;
