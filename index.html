@@ -328,7 +328,7 @@
     
     #tutorialPanel .math-tips {
       font-size: 20px !important;
-      line-height: 1.6 !important;
+      line-height: 1 !important;
       color: white !important;
       margin-top: 2px !important; /* 🔥 tighten! was 5px */
     }
@@ -409,21 +409,21 @@
   </style>
   <style>
     #tutorialContainer {
+      position: fixed; /* 🚨 This is the KEY to covering everything */
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999; /* above everything else */
+      background: black;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
       opacity: 0;
       transition: opacity 0.6s ease-in-out;
-      text-align: center;
-      padding: 20px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      background: black;
-      max-height: 100vh;
-      overflow-y: auto;
     }
+
   
     #tutorialPanel {
       max-width: 500px;
