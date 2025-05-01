@@ -316,29 +316,7 @@
       background: rgba(0, 0, 0, 0.85);
       box-shadow: 0 0 30px #00ff88;
     }
-  
-    .character-intro {
-      font-size: 35px !important;
-      font-weight: bold !important;
-      color: #ffee00 !important;
-      margin-bottom: 1px !important; /* 🔥 tighten! was 5px */
-      text-shadow: 0 0 20px #00ff88 !important;
-      line-height: 1.2 !important;
-    }
-    
-    #tutorialPanel .math-tips {
-      font-size: 21px !important;
-      color: white !important;
-      margin-top: 2px !important;
-    }
-    
-    #tutorialPanel .math-tips p {
-      margin: 4px 0 !important; /* Tight between bullets */
-      line-height: 1.4 !important; /* Comfy for wrapped text */
-    }
 
-
-   
     .active {
       display: flex;
       opacity: 1;
@@ -392,50 +370,29 @@
       box-shadow: 0 0 20px #00ccff;
       transform: scale(1.05);
     }
-    .tutorial-back {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-    }
-    
-    .tutorial-next {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-    }
-    
-    .tutorial-menu {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
   </style>
   <style>
     #tutorialContainer {
-      position: fixed; /* 🚨 This is the KEY to covering everything */
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 9999; /* above everything else */
-      background: black;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      height: 100vh;
       opacity: 0;
       transition: opacity 0.6s ease-in-out;
+      text-align: center;
+      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: black;
+      max-height: 100vh;
+      overflow-y: auto;
     }
-
   
     #tutorialPanel {
       max-width: 500px;
       margin: 0 auto;
       text-align: center;
-      max-height: 70vh;
-      overflow-y: auto;
     }
   
     #tutorialPanel div {
@@ -518,7 +475,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start; /* stack top down */
-    overflow-y: auto !important; /* was hidden before */
+    overflow: hidden; /* hide scrollbars */
   }
   
   /* Picture inside Tutorial Panel */
@@ -558,7 +515,7 @@
     }
   
     #tutorialPanel img {
-      max-height: 60vh; /* 🔥 was 50vh — now a bit bigger! */
+      max-height: 50vh;
       margin-bottom: 12px;
     }
   }
@@ -570,10 +527,7 @@
 <canvas id="celebrationCanvas" class="confetti"></canvas>
 
 <!-- TITLE -->
-<img src="SnowConeMathFestTitle.png"
-     alt="SnowCone MathFest"
-     class="title-image"
-     onclick="resetScore(); generateProblem();" />
+<img src="SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" onclick="resetScore()" />
 
 <button id="installAppBtn" style="display:none; margin: 10px auto; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:6px; font-size:18px; box-shadow:0 0 10px #00ff88; cursor:pointer;">
   📲 Install SnowCone MathFest
@@ -590,7 +544,7 @@
       💀 Hard Mode: <strong>+10 points</strong><br/>
       😵 Wrong answer: <strong>-3 points</strong><br/><br/>
       🍧 The song is 1:45 long — when it ends, your score freezes.<br/><br/>
-      Serve up those equations and always return to see the new modes and updates! (V.088.1 4/29/2025)
+      Serve up those equations and always return to see the new modes and updates! (V.085 4/26/2025)
     </p>
     <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Let's Go!</button>
   </div>
@@ -793,6 +747,7 @@ function backToQuickServe() {
   closeMenuModal();
   document.getElementById("tutorialContainer").style.display = "none"; // Hide Story/Tutorial if up
   document.getElementById("gameContainer").style.display = "block"; // Re-show game
+  softResetGameScreen(); // 🍧 Reset snow cone math to fresh
 }
   
 function openMathTipsFromMenu() {
@@ -1257,9 +1212,8 @@ function resetScore() {
 
   document.getElementById("leftCone").classList.remove("left-spin");
   document.getElementById("rightCone").classList.remove("right-spin");
+
   document.getElementById("popupModal").style.display = "none";
-  document.getElementById("rulesModal").style.display = "flex";
-+ generateProblem();
 }
 
 
@@ -1334,19 +1288,8 @@ function isSafari() {
 
 // Panel Content Array
 const panels = [
-  // 🍧 Page 1: Quick Tips (Upgraded Font + Disco)
-  { 
-    type: 'text',
-    text: `<div class="character-intro">Quick Serve Math Tips:</div>
-      <div class="math-tips">
-        <p>➕ Break problems into parts.</p>
-        <p>➖ Look for friendly numbers.</p>
-        <p>✖️ Estimate first, solve second.</p>
-        <p>➗ Trust your first instincts.</p>
-        <p>🪩 Breathe like you're solving math under a disco ball.</p>
-        <p>💪 Practice regularly at the SnowCone MathFest!</p>
-      </div>`
-  },
+  // 🍧 Page 1: Quick Tips
+  { type: 'text', text: "Quick Serve Math Tips:\n➕ Break problems into parts.\n➖ Look for friendly numbers.\n✖️ Estimate first, solve second.\n➗ Trust your first instincts.\n🎯 Breathe like you're solving math under a disco ball." },
 
   // 🍧 Page 2: Confession + MathFest Origin
   { type: 'text', text: "I hated math when I was young.\nIt was cold. It was lifeless. It was just numbers.\nI needed it to move. To sing. To matter.\nThat's why I started the SnowCone MathFest. 🍧\nAfter the first year... strange things happened.\nGhosts started arriving — ancient, glowing, whispering numbers in the wind.\nI realized I had been seeing them my whole life...\nbut only now were they seeing me too.\nAs I stood at the gates, I heard them walk in and say…" },
@@ -1402,7 +1345,7 @@ function renderTutorialPanel() {
   const content = document.createElement('div');
   
   if (panelData.type === 'text') {
-    content.innerHTML = panelData.text.replace(/\n/g, '<br/>');
+    content.innerHTML = panelData.text.replace(/\\n/g, '<br/>');
     tutorialPanel.appendChild(content);
   } else if (panelData.type === 'picture') {
     const img = document.createElement('img');
