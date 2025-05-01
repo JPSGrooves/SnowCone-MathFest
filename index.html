@@ -1360,7 +1360,14 @@ function renderTutorialPanel() {
       content.innerHTML = panelData.text.replace(/\n/g, '<br/>');
     }
     tutorialPanel.appendChild(content);
+  } else if (panelData.type === 'picture') {
+    const img = document.createElement('img');
+    img.src = `${panelData.image}`;
+    img.style.maxWidth = '100%';
+    img.style.height = 'auto';
+    tutorialPanel.appendChild(img);
   }
+
 
     tutorialPanel.appendChild(content);
   } else if (panelData.type === 'picture') {
