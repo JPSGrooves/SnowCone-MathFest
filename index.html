@@ -812,7 +812,7 @@ function openMenuModal() {
   // 🧠 Re-hook Math Tips Button every time menu opens
   const tipsButton = document.getElementById('mathTipsButton');
   if (tipsButton) {
-    tipsButton.onclick = () => startTutorial();
+    tipsButton.onclick = () => startTransition('tutorialContainer');
   }
 
 
@@ -838,6 +838,7 @@ function openMenuModal() {
       installTip.style.cursor = "default";
       installTip.onclick = null; // no action if no prompt available
     }
+    
   }
 }
 
