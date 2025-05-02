@@ -1675,15 +1675,23 @@ function stopTutorialMusic() {
   
     // 🔔 Still keep the Quick Serve rules logic for when Jump to QS is clicked
     const closeBtn = document.getElementById("closeModalBtn");
+    // In your window.load (or right after you grabbed closeBtn), replace the listener with:
+    const rulesModal = document.getElementById("rulesModal");
+    const closeBtn    = document.getElementById("closeModalBtn");
+    
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
-        document.getElementById("rulesModal").style.display = "none";
-        setTimeout(() => generateProblem(), 100);
-      });
+      // 1) Hide the rules overlay
+      document.getElementById("rulesModal").style.display = "none";
+      // 2) Show the game UI
+      document.getElementById("gameContainer").style.display = "block";
+      // 3) Reset score/timer so you’re fresh
+      resetScore();
+      // 4) Fire off the first problem
+      generateProblem();
+    });
     }
-  
-    // …the rest of your initialization (SoundCloud, install prompt, SW registration, tutorial hook) stays unchanged…
-  });
+
 
   // Setup SoundCloud Widget
   const Element = document.getElementById('soundcloudPlayer');
