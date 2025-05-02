@@ -758,39 +758,50 @@ const pictureFilenames = {
 };
 
 
+// Chunk 16: Enhanced startTransition for Math Tips split‐cone transition
 function startTransition(targetModalId) {
   closeMenuModal();
+  // ── Hide the main game so the overlay covers everything
+  document.getElementById('gameContainer').style.display = 'none';
+
   const overlay = document.getElementById('transitionOverlay');
   const content = document.getElementById('transitionContent');
   content.innerHTML = '';
+
   const cone = document.createElement('img');
   cone.src = 'cone.png';
   cone.className = 'transition-cone';
+
   const scoop = document.createElement('div');
   scoop.className = 'transition-scoop';
+
   content.appendChild(cone);
   content.appendChild(scoop);
+
   overlay.style.display = 'flex';
   overlay.style.opacity = '1';
 
-  // Chunk 10: Right after appending elements, kick off the split
-    cone.style.animation = 'slideRight 2000ms forwards';
-    scoop.style.animation = 'slideLeft 2000ms forwards';
-  // Chunk 11: After 2s, fade out and show the target modal
+  // ── Kick off split animation
+  cone.style.animation = 'slideRight 2000ms forwards';
+  scoop.style.animation = 'slideLeft 2000ms forwards';
+
+  // ── After animation, fade out and show target modal
+  setTimeout(() => {
+    overlay.style.animation = 'fadeOutOverlay 200ms forwards';
     setTimeout(() => {
-      overlay.style.animation = 'fadeOutOverlay 200ms forwards';
-      setTimeout(() => {
-        overlay.style.display = 'none';
-        overlay.style.animation = '';
-        document.getElementById(targetModalId).style.display = 'flex';
-      }, 200);
-    }, 2000);
-  }
+      overlay.style.display = 'none';
+      overlay.style.animation = '';
 
+      // If we're transitioning to the tutorial, render the first panel
+      if (targetModalId === 'tutorialContainer') {
+        renderTutorialPanel();
+      }
+      // Show the requested modal (rulesModal or tutorialContainer)
+      document.getElementById(targetModalId).style.display = 'flex';
+    }, 200);
+  }, 2000);
+}
 
-
-
-  
 // MENU MODAL LOGIC
 function openMenuModal() {
   const menuModal = document.getElementById("menuModal");
