@@ -1668,20 +1668,22 @@ function stopTutorialMusic() {
 }
 
 // FULLY MERGED WINDOW LOAD HANDLER
-window.addEventListener('load', () => {
-  // Show Opening Modal FIRST, always
-  const rulesModal = document.getElementById("rulesModal");
-  const closeBtn = document.getElementById("closeModalBtn");
-
-  if (rulesModal && closeBtn) {
-    rulesModal.style.display = "flex";
-    closeBtn.addEventListener("click", () => {
-      rulesModal.style.display = "none";
-      setTimeout(() => {
-        generateProblem();
-      }, 100); // ✨ slight delay to let DOM breathe
-    });
-  }
+// Chunk 15: Swap out the load-handler so the Menu, not the rules, shows first
+  window.addEventListener('load', () => {
+    // 🍧 Show the main menu on page load
+    openMenuModal();
+  
+    // 🔔 Still keep the Quick Serve rules logic for when Jump to QS is clicked
+    const closeBtn = document.getElementById("closeModalBtn");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        document.getElementById("rulesModal").style.display = "none";
+        setTimeout(() => generateProblem(), 100);
+      });
+    }
+  
+    // …the rest of your initialization (SoundCloud, install prompt, SW registration, tutorial hook) stays unchanged…
+  });
 
   // Setup SoundCloud Widget
   const Element = document.getElementById('soundcloudPlayer');
