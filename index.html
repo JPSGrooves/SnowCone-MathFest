@@ -8,6 +8,62 @@
   <title>Math Fest Snow Cone</title>
   <link rel="manifest" href="manifest.json" />
   <style>
+    /* Chunk 2: In your first <style> block, add */
+    #transitionOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      z-index: 10002;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+    }
+    /* Chunk 3: Still in that <style>, add */
+    .transition-cone {
+      position: absolute;
+      width: 130px;
+      height: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10003;
+    }
+    /* Chunk 4: And also add */
+    .transition-scoop {
+      position: absolute;
+      width: 130px;
+      height: 65px;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-radius: 65px 65px 0 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      top: calc(50% - 32px);
+      left: calc(50% - 65px);
+      z-index: 10003;
+    }
+    /* Chunk 5: Keyframes for the split animations */
+    @keyframes slideRight {
+      from { transform: translate(-50%, -50%); }
+      to   { transform: translate(100vw, -50%); }
+    }
+    /* Chunk 6: And the scoop */
+    @keyframes slideLeft {
+      from { transform: translate(-50%, -50%); }
+      to   { transform: translate(-100vw, -50%); }
+    }
+    /* Chunk 7: Fade out the overlay */
+    @keyframes fadeOutOverlay {
+      to { opacity: 0; }
+    }
+
+
+
+
+
+
     html, body {
       background: black;
       color: white;
@@ -542,6 +598,10 @@
   </style>
 </head>
 <body>
+<!-- TRANSITION OVERLAY -->
+<div id="transitionOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:10002; justify-content:center; align-items:center; opacity:1;">
+  <div id="transitionContent" style="position:relative; width:100%; height:100%;"></div>
+</div>
 <canvas id="confettiCanvas" class="confetti"></canvas>
 <canvas id="celebrationCanvas" class="confetti"></canvas>
 
@@ -685,6 +745,36 @@ const pictureFilenames = {
   "bombellieuclidpicture": "bombellieuclidpicture.png",
   "finalsnowconepicture": "finalsnowconepicture.png"
 };
+
+
+function startTransition(targetModalId) {
+  closeMenuModal();
+  const overlay = document.getElementById('transitionOverlay');
+  const content = document.getElementById('transitionContent');
+  content.innerHTML = '';
+  const cone = document.createElement('img');
+  cone.src = 'cone.png';
+  cone.className = 'transition-cone';
+  const scoop = document.createElement('div');
+  scoop.className = 'transition-scoop';
+  content.appendChild(cone);
+  content.appendChild(scoop);
+  overlay.style.display = 'flex';
+  overlay.style.opacity = '1';
+
+  // Chunk 10: Right after appending elements, kick off the split
+    cone.style.animation = 'slideRight 2000ms forwards';
+    scoop.style.animation = 'slideLeft 2000ms forwards';
+  // Chunk 11: After 2s, fade out and show the target modal
+    setTimeout(() => {
+      overlay.style.animation = 'fadeOutOverlay 200ms forwards';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        overlay.style.animation = '';
+        document.getElementById(targetModalId).style.display = 'flex';
+      }, 200);
+    }, 2000);
+  }
 
 
 
@@ -1658,13 +1748,28 @@ window.addEventListener('load', () => {
       Safari: Use the Share icon 🔗 and "Add to Home Screen"
     </div>
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <button id="mathTipsButton" onclick="openMathTipsFromMenu()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🧠 Math Tips & Story Intro</button>
+      <!-- Math Tips & Story Intro -->
+      <button id="mathTipsButton"
+              onclick="startTransition('tutorialContainer')"
+              style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">
+        🧠 Math Tips & Story Intro
+      </button>
       <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">📖 Story Mode — Serving Soon!</button>
       <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">♾️ Infinity Mode — Serving Soon!</button>
-      <button onclick="openMusicModal()" style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">🎵 Music Player Mode</button>
+      <!-- Music Player Mode -->
+      <button id="musicModeBtn"
+              onclick="startTransition('musicModal')"
+              style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">
+        🎵 Music Player Mode
+      </button>
       <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">🏆 High Scores & Badges — Serving Soon!</button>
     </div>
-    <button onclick="backToQuickServe()" style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Back to Quick Serve</button>
+    <!-- Jump to Quick Serve -->
+    <button id="jumpToQSBtn"
+            onclick="startTransition('rulesModal')"
+            style="margin-top:20px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">
+      Jump to Quick Serve!
+    </button>
   </div>
 </div>
 <!-- MUSIC MODE MODAL -->
