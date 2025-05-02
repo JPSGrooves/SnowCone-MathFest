@@ -1324,19 +1324,10 @@ function resetScore() {
   document.getElementById("leftCone").classList.remove("left-spin");
   document.getElementById("rightCone").classList.remove("right-spin");
   document.getElementById("popupModal").style.display = "none";
-  document.getElementById("rulesModal").style.display = "flex";
-+ generateProblem();
-  clearInterval(timerInterval);
-  const music = document.getElementById("backgroundMusic1");
-  music.pause();
-  music.currentTime = 0;
-
-  document.getElementById("leftCone").classList.remove("left-spin");
-  document.getElementById("rightCone").classList.remove("right-spin");
-  document.getElementById("popupModal").style.display = "none";
-  // 📌 NO more rulesModal.style.display here!
+  // 📌 NO more rulesModal here!
   generateProblem();
 }
+
 
 
 
