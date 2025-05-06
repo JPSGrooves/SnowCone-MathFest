@@ -1453,7 +1453,7 @@ const panels = [
   {
     type: 'text',
     text:
-      "<strong style='font-size:1.5em; color: yellow;'>Why Math? Why Now? 🤔✨</strong><br>" +
+      "<strong style='font-size:1.4em; color: yellow;'>Why Math? Why Now? 🤔</strong><br>" +
       "I hated math when I was young.\n" +
       "It was cold 🥶. It was lifeless 💀. It was just numbers 🔢.\n" +
       "I needed it to move 🕺💃. To sing 🎶🎤. To matter ❤️.\n" +
@@ -1470,16 +1470,25 @@ const panels = [
   { 
     type: 'text', 
     text:
-      "<strong style='font-size:1.3em; color: yellow;'>Pythagorus – Song of Fractions</strong><br>" +
+      "<strong style='font-size:1.3em; color: yellow;'>Pythagorus' Song of Fractions</strong><br>" +
       "<span style='color: #00ccff;'>\"Music is the math you already know 🎶 — deep in your bones 💀🎸. " +
       "When you go up the string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️, " +
       "yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint. " +
-      "It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points 📐📍.\"</span><br><br>" +
+      "It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points.\"</span><br><br>" +
       "I served him a SnowCone 🍧 and knew that here at SnowCone MathFest 🌈🎉, " +
       "every neon beat is an octave you’ve already unlocked 🎵🔓 — " +
       "Maybe we're always just halfway to the next octave, but we can always discover the hidden frequencies singing along our path 👆🎶."
   },
-  { type: 'picture', image: "pythagoraspicture.png" },
+  // Right after the Pythagoras picture, add:
+  { 
+    type: 'picture', 
+    image: "pythagoraspicture.png" 
+  },
+  {
+    type: 'text',
+    text: "<em>Pythagorus Eyes the Gates</em><br>"
+  },
+
   // 🍧 Page 3: Practice Problems Duo on one panel with custom reveal sounds
   {
     type: 'text',
@@ -1492,7 +1501,7 @@ const panels = [
       "<div class='click-to-reveal' onclick=\"" +
         "this.innerText='1/2 (Half the string, twice the pitch — an octave higher! 🎵)';" +
         "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal Answer</div><br><br>" +
+      "\">Click to Reveal Answer</div><br>" +
       // Follow-up question
       "<strong style='font-size:1.2em; color: yellow;'>Follow-Up:</strong><br>" +
       "Now he presses 20 cm up the 60 cm string. What fraction vibrates this time? 🤔➗<br>" +
