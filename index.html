@@ -1470,7 +1470,7 @@ const panels = [
   { 
     type: 'text', 
     text:
-      "<strong style='font-size:1.3em; color: yellow;'>Pythagorus' Song of Fractions</strong><br>" +
+      "<strong style='font-size:1.2em; color: yellow;'>Pythagorus - Song of Fractions</strong><br>" +
       "<span style='color: #00ccff;'>\"Music is the math you already know 🎶 — deep in your bones 💀🎸. " +
       "When you go up the string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️, " +
       "yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint. " +
@@ -1483,8 +1483,6 @@ const panels = [
   { 
     type: 'picture', 
     image: "pythagoraspicture.png" 
-  },
-  {
     type: 'text',
     text: "<em>Pythagorus Eyes the Gates</em><br>"
   },
@@ -1513,19 +1511,32 @@ const panels = [
   },
 
 
-  // 🍧 Page 4: Euclid — Architect of Reality (fixed string concatenation)
-  { 
-    type: 'text', 
-    text:
-      "<strong style='font-size:1.3em; color: yellow;'>Euclid — Architect of Reality</strong><br>" +
-      "\"All structure, seen or unseen, begins with a line ✏️➡️📏.\"<br>" +
-      "He paused, tracing his proofs and figures through the void — \"The simplest gesture births every shape, every temple, every constellation above.<br>" +
-      "Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement.\"<br><br>" +
-      "By connecting two dots, Euclid wasn’t merely drawing — he was weaving the very fabric of existence into patterns the mind could grasp.<br>" +
-      "He was almost too distracted to see the SnowCone I was handing him, 🍧 but the glistening of the cone in the concert lights was more than enough to catch his eye."
-  },
+// 🍧 Page 4: Euclid — Architect of Reality (alternating blue dialogue and white narrative)
+{ 
+  type: 'text', 
+  text:
+    "<strong style='font-size:1.3em; color: yellow;'>Euclid — Architect of Reality</strong><br>" +
+    // First quote in blue
+    "<span style='color: #00ccff;'>\"All structure, seen or unseen, begins with a line ✏️➡️📏.\"</span>" +
+    // Narrative in default white
+    "He paused, tracing his proofs and figures through the void —" +
+    // Second quote back in blue
+    "<span style='color: #00ccff;'>\"The simplest gesture births every shape, every temple, every constellation above. " +
+    "Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement.\"</span><br><br>" +
+    // Closing narrative in white
+    "By connecting two dots in front of him, Euclid wasn’t merely drawing — he was weaving the very fabric of existence into patterns the mind could grasp.<br>" +
+    "He was so distracted by the charts and diagrams, he almost didn't see the SnowCone I was handing him. 🍧 But the glistening of the snow crystals in the concert light was more than enough to catch his eye.<br>"
+},
+
+
 
   { type: 'picture', image: "euclidpicture.png" },
+  { 
+    type: 'picture', 
+    image: "euclidpicture.png" 
+    type: 'text',
+    text: "<em>Euclid Perfects the Cone</em><br>"
+  },
   { type: 'text', text: "Practice Problem:\nIf a triangle's sides are 3 cm and 4 cm, what's the hypotenuse?", reveal: "5 cm (3² + 4² = 9 + 16 = 25 → √25 = 5)" },
 
   // 🍧 Page 5: Galileo & Newton — Secrets of Motion
