@@ -1535,7 +1535,16 @@ const panels = [
       // subtitle in italics
       "<em>Euclid Perfects the Cone</em><br>"
   },
-  { type: 'text', text: "Practice Problem:\nIf a triangle's sides are 3 cm and 4 cm, what's the hypotenuse?", reveal: "5 cm (3² + 4² = 9 + 16 = 25 → √25 = 5)" },
+  {
+    type: 'text',
+    text:
+      "<strong style='font-size:1.5em; color: yellow;'>Practice Problem 🍧🚀</strong><br><br>" +
+      "Euclid was cruising through and immediately spotted an defect in my cones. Each one was a right triangle with sides of 3 cm and 4 cm. He wondered, \"What is the length of the hypotenuse?" 🤔📐<br>" +
+      "<div class='click-to-reveal' onclick=\"" +
+        "this.innerText='5 cm (3² + 4² = 9 + 16 = 25 → √25 = 5)';" +
+        "new Audio('QuikServe points25.mp3').play();" +
+      "\">Click to Reveal Answer</div>"
+  },
 
   // 🍧 Page 5: Galileo & Newton — Secrets of Motion
   { type: 'text', text: "Galileo: \"Everything moves if you watch carefully enough.\"\nNewton: \"And every motion has a cause.\"\nMaybe even stillness is just movement I can't see yet." },
