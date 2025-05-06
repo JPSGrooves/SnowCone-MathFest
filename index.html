@@ -1458,38 +1458,51 @@ const panels = [
       "It was cold 🥶. It was lifeless 💀. It was just numbers 🔢.\n" +
       "I needed it to move 🕺💃. To sing 🎶🎤. To matter ❤️.\n" +
       "That's why I started the SnowCone MathFest 🍧🚚🎉.\n" +
-      "After the first year... strange things happened 👻🌌.<br><br>" +
+      "After the first year... strange things happened 🌌.<br><br>" +
       "Ghosts started arriving 👻✨ — ancient, glowing numbers whispering in the wind.\n" +
-      "I realized I had been seeing them my whole life, hidden in the numbers...\n" +
+      "I realized I had been seeing them my whole life, hidden in the columns before me...\n" +
       "but only now were they seeing me too 👀🔮.\n" +
-      "As I stood at the gates 🏰🍧, slinging SnowCones to the masses 🎊🍦, I heard the first ghost walk by and say… 🎶👂"
+      "As I stood at the gates 🏰🍧, slinging SnowCones to the masses in the mystical moist night-air 🎊🍦, I heard the first ghost walk by and say… 🎶👂"
   },
 
 
-  // 🍧 Page 3: Pythagoras — The Song of Fractions (with emojis and double line break)
+  // 🍧 Page 3: Pythagoras — The Song of Fractions (words of Pythagorus in Jump-button blue)
   { 
     type: 'text', 
     text:
       "<strong style='font-size:1.3em; color: yellow;'>Pythagorus – Song of Fractions</strong><br>" +
-      "He said, \"Music is the math you already know 🎶 — deep in your bones 💀🎸. " +
+      "<span style='color: #00ccff;'>\"Music is the math you already know 🎶 — deep in your bones 💀🎸. " +
       "When you go up the string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️, " +
       "yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint. " +
-      "It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points 📐📍.\"<br><br>" +
+      "It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points 📐📍.\"</span><br><br>" +
       "I served him a SnowCone 🍧 and knew that here at SnowCone MathFest 🌈🎉, " +
       "every neon beat is an octave you’ve already unlocked 🎵🔓 — " +
       "Maybe we're always just halfway to the next octave, but we can always discover the hidden frequencies singing along our path 👆🎶."
   },
-
   { type: 'picture', image: "pythagoraspicture.png" },
+  // 🍧 Page 3: Practice Problems Duo on one panel with custom reveal sounds
   {
     type: 'text',
     text:
-      "<strong style='font-size:1.5em; color: yellow;'>Practice Problem 🎸🎵</strong><br>" +
+      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🎸🎵</strong><br><br>" +
+      // First question
       "Pythagorus jumps onstage and begins shredding a standby guitar. He's jamming on a string that is 60 cm long 🎸.<br>" +
-      "When he presses it exactly halfway ⏱️ (30 cm),<br>" +
-      "what fraction of the original length is vibrating? 🤔➗<br>",
-    reveal: "1/2 <br>(Half the string, twice the pitch — an octave higher! 🎵)"
+      "When he presses it exactly halfway ⏱️ (30 cm), what fraction of the original length is vibrating? 🤔➗<br>" +
+      // First reveal box with milestone25 audio
+      "<div class='click-to-reveal' onclick=\"" +
+        "this.innerText='1/2 (Half the string, twice the pitch — an octave higher! 🎵)';" +
+        "new Audio('QuikServe points25.mp3').play();" +
+      "\">Click to Reveal Answer</div><br><br>" +
+      // Follow-up question
+      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up:</strong><br>" +
+      "Now he presses 20 cm up the 60 cm string. What fraction vibrates this time? 🤔➗<br>" +
+      // Second reveal box with milestone100 audio
+      "<div class='click-to-reveal' onclick=\"" +
+        "this.innerText='2/3 (Two-thirds vibrate, since 60 cm – 20 cm = 40 cm; 40/60 = 2/3)';" +
+        "new Audio('QuikServe points100.mp3').play();" +
+      "\">Click to Reveal Answer</div>"
   },
+
 
   // 🍧 Page 4: Euclid — Architect of Reality (fixed string concatenation)
   { 
