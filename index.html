@@ -1420,34 +1420,31 @@ function isSafari() {
   return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
 }
 
-
-
-
-// Updated Quick Serve Math Tips with light blue highlights
+// Updated Quick Serve Math Tips matching the Jump to Quick Serve button blue (#00ccff)
 const panels = [
   {
     type: 'text',
     text:
       // Title in yellow
       "<strong style='font-size:1.5em; color: yellow;'>Quick Serve Math Tips:</strong><br>" +
-      // ➕ tip in a bit larger, bold, light blue
-      "<span style='font-size:1.2em; font-weight:bold; color: lightblue;'>➕ Break problems into parts.</span><br>" +
+      // ➕ tip in a bit larger, bold, Jump-button blue
+      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>➕ Break problems into parts.</span><br>" +
       "• For example, 47 + 29 = 🍧<br>" +
       "• Break into Tens: 40 + 20 = 60<br>" +
       "• then into Ones: 7 + 9 = 16<br>" +
       "• Recombine: 60 + 16 = 76<br>" +
-      // ➖ tip in a bit larger, bold, light blue
-      "<span style='font-size:1.2em; font-weight:bold; color: lightblue;'>➖ Look for friendly numbers.</span><br>" +
+      // ➖ tip in Jump-button blue
+      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>➖ Look for friendly numbers.</span><br>" +
       "• For example, 98 - 57 = 🍧<br>" +
       "• Subtract 60 instead: 98 - 60 = 38.<br>" +
       "• add back difference of 3: 38 + 3 = 41<br>" +
-      // ✖️ tip in a bit larger, bold, light blue
-      "<span style='font-size:1.2em; font-weight:bold; color: lightblue;'>✖️ Use the distributive property:</span><br>" +
+      // ✖️ tip in Jump-button blue
+      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>✖️ Use the distributive property:</span><br>" +
       "For example, 8 × 23 = 🍧<br>" +
       "• Break it up: (8 × 20) + (8 × 3).<br>" +
-      "• Combine: (160) + (24) = 184<br>" +
-      // ➗ tip in a bit larger, bold, light blue
-      "<span style='font-size:1.2em; font-weight:bold; color: lightblue;'>➗ Trust your gut!</span><br>" +
+      "• Combine: 160 + 24 = 184<br>" +
+      // ➗ tip in Jump-button blue
+      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>➗ Trust your gut!</span><br>" +
       "Your abdominal brain is your second brain!<br>" +
       // disco-ball tip unchanged
       "🪩 Breathe like you're solving math under a disco ball.🪩 Five beats in, then five beats out 🎵"
