@@ -1465,7 +1465,6 @@ const panels = [
       "As I stood at the gates 🏰🍧, slinging SnowCones to the masses in the mystical moist night-air 🎊🍦, I heard the first ghost walk by and say… 🎶👂"
   },
 
-
   // 🍧 Page 3: Pythagoras — The Song of Fractions (words of Pythagorus in Jump-button blue)
   { 
     type: 'text', 
@@ -1479,12 +1478,13 @@ const panels = [
       "every neon beat is an octave you’ve already unlocked 🎵🔓 — " +
       "Maybe we're always just halfway to the next octave, but we can always discover the hidden frequencies singing along our path 👆🎶."
   },
-  // Right after the Pythagoras picture, add:
-  { 
-    type: 'picture', 
-    image: "pythagoraspicture.png" 
+  {
     type: 'text',
-    text: "<em>Pythagorus Eyes the Gates</em><br>"
+    text:
+      // inline image tag
+      "<img src=\"pythagoraspicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
+      // subtitle in italics
+      "<em>Pythagorus Eyes the Gates</em><br>"
   },
 
   // 🍧 Page 3: Practice Problems Duo on one panel with custom reveal sounds
@@ -1511,31 +1511,33 @@ const panels = [
   },
 
 
-// 🍧 Page 4: Euclid — Architect of Reality (alternating blue dialogue and white narrative)
-{ 
-  type: 'text', 
-  text:
-    "<strong style='font-size:1.3em; color: yellow;'>Euclid — Architect of Reality</strong><br>" +
-    // First quote in blue
-    "<span style='color: #00ccff;'>\"All structure, seen or unseen, begins with a line ✏️➡️📏.\"</span>" +
-    // Narrative in default white
-    "He paused, tracing his proofs and figures through the void —" +
-    // Second quote back in blue
-    "<span style='color: #00ccff;'>\"The simplest gesture births every shape, every temple, every constellation above. " +
-    "Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement.\"</span><br><br>" +
-    // Closing narrative in white
-    "By connecting two dots in front of him, Euclid wasn’t merely drawing — he was weaving the very fabric of existence into patterns the mind could grasp.<br>" +
-    "He was so distracted by the charts and diagrams, he almost didn't see the SnowCone I was handing him. 🍧 But the glistening of the snow crystals in the concert light was more than enough to catch his eye.<br>"
-},
+  // 🍧 Page 4: Euclid — Architect of Reality (alternating blue dialogue and white narrative)
+  { 
+    type: 'text', 
+    text:
+      "<strong style='font-size:1.3em; color: yellow;'>Euclid — Architect of Reality</strong><br>" +
+      // First quote in blue
+      "<span style='color: #00ccff;'>\"All structure, seen or unseen, begins with a line ✏️➡️📏.\"</span>" +
+      // Narrative in default white
+      "He paused, tracing his proofs and figures through the void —" +
+      // Second quote back in blue
+      "<span style='color: #00ccff;'>\"The simplest gesture births every shape, every temple, every constellation above. " +
+      "Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement.\"</span><br><br>" +
+      // Closing narrative in white
+      "By connecting two dots in front of him, Euclid wasn’t merely drawing — he was weaving the very fabric of existence into patterns the mind could grasp.<br>" +
+      "He was so distracted by the charts and diagrams, he almost didn't see the SnowCone I was handing him. 🍧 But the glistening of the snow crystals in the concert light was more than enough to catch his eye.<br>"
+  },
 
 
 
   { type: 'picture', image: "euclidpicture.png" },
-  { 
-    type: 'picture', 
-    image: "euclidpicture.png" 
+  {
     type: 'text',
-    text: "<em>Euclid Perfects the Cone</em><br>"
+    text:
+      // inline image tag
+      "<img src=\"euclidpicture.png.png\" style=\"max-width:100%; height:auto;\"><br>" +
+      // subtitle in italics
+      "<em>Pythagorus Eyes the Gates</em><br>"
   },
   { type: 'text', text: "Practice Problem:\nIf a triangle's sides are 3 cm and 4 cm, what's the hypotenuse?", reveal: "5 cm (3² + 4² = 9 + 16 = 25 → √25 = 5)" },
 
