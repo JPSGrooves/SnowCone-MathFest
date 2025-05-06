@@ -1562,10 +1562,30 @@ const panels = [
       "<span style='color: white;'>Newton:</span> <span style='color: #00ccff;'>\"And every motion has a cause 🪐⚙️. Forces sculpt the tapestry of reality: gravity pulls apples and planets alike, inertia resists every change, and for every action there’s an equal echo. Even the unseen hand of attraction shapes the universe’s grand ballet.\"</span><br><br>" +
       "I slung them a pair of neon SnowCones 🍧🍧 and mused at how I might measure the speed of their cosmic stroll.🚶🚶‍♂️"
   },
-
-
-  { type: 'picture', image: "galileonewtonpicture.png" },
-  { type: 'text', text: "Practice Problem:\nA snow cone truck travels 60 miles in 2 hours.\nWhat is its average speed?", reveal: "30 miles per hour (Speed = Distance ÷ Time)" },
+  {
+    type: 'text',
+    text:
+      // inline image tag
+      "<img src=\"galileonewtonpicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
+      // subtitle in italics
+      "<em>Galileo and Newton discussing the purpose of motion.</em><br>"
+  },
+  {
+    type: 'text',
+    text:
+      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
+      "A neon snow cone truck races across the highway at a steady pace: it travels 60 miles in 2 hours. \"What’s its average speed?\" 🤔🚚<br>" +
+      "<div class='click-to-reveal' onclick=\"" +
+        "this.innerText='30 miles per hour (Speed = Distance ÷ Time = 60 ÷ 2)';" +
+        "new Audio('QuikServe points25.mp3').play();" +
+      "\">Click to Reveal Answer</div><br>" +
+      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
+      "If it keeps rolling at this speed, how far will it cruise in 5 hours? 🤔📏<br>" +
+      "<div class='click-to-reveal' onclick=\"" +
+        "this.innerText='150 miles (Speed × Time = 30 × 5)';" +
+        "new Audio('QuikServe points100.mp3').play();" +
+      "\">Click to Reveal Answer</div>"
+  },
 
   // 🍧 Page 6: Turing & Brahmagupta — Secrets and Silence
   { type: 'text', text: "Turing: \"Every puzzle is a hidden message.\"\nBrahmagupta: \"And every silence is full of numbers.\"\nMaybe gaps and zeros are clues, not emptiness." },
@@ -1885,7 +1905,7 @@ function stopTutorialMusic() {
 <!-- MENU MODAL -->
 <div id="menuModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
   <div style="background:black; border:2px solid #00ff88; padding:30px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 20px #00ff88;">
-    <h2 id="menuTitle" style="color:#ffee00; font-size:26px; margin-bottom:20px; white-space:nowrap;">🍧 SnowCone MathFest Menu 🍧</h2>
+    <h2 id="menuTitle" style="color:#ffee00; font-size:26px; margin-bottom:20px; white-space:nowrap;">🍧 SnowCone MathFest 🍧</h2>
     <div class="menu-text" style="text-align:center; margin-bottom:10px;"></div>
     <div id="installTip" style="margin-top:20px; margin-bottom: 20px; padding:15px; background:black; border:2px solid #ffee00; border-radius:5px; color:white; font-size:16px; box-shadow:0 0 10px #ffee00; cursor:pointer; display:none;">
       📲 <strong>Install SnowCone MathFest!</strong><br/>
