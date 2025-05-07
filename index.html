@@ -613,6 +613,15 @@
       background: transparent !important;
     }
   </style>
+  <style>
+    /* disable all text-selection on the page */
+    * {
+      -webkit-user-select: none;  /* Safari/Chrome */
+      -moz-user-select: none;     /* Firefox */
+      -ms-user-select: none;      /* IE10+ */
+      user-select: none;          /* standard */
+    }
+  </style>
 </head>
 <body>
 <!-- TRANSITION OVERLAY -->
@@ -1983,6 +1992,17 @@ function stopTutorialMusic() {
     </button>
   </div>
 </div>
+<body>
+  <!-- …all your HTML… -->
 
+  <script>
+    // prevent text selection start
+    document.addEventListener('selectstart', e => e.preventDefault());
+    // prevent right-click menu
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    // prevent dragging text or images
+    document.addEventListener('dragstart', e => e.preventDefault());
+  </script>
+</body>
 </body>
 </html>
