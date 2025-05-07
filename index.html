@@ -1603,12 +1603,48 @@ const panels = [
   },
 
   // 🍧 Page 6: Turing & Brahmagupta — Secrets and Silence
-  { type: 'text', text: "Turing: \"Every puzzle is a hidden message.\"\nBrahmagupta: \"And every silence is full of numbers.\"\nMaybe gaps and zeros are clues, not emptiness." },
-  { type: 'picture', image: "turingbrahmaguptapicture.png" },
-  { type: 'text', text: "Practice Problem:\nWhat happens if you multiply any number by zero?", reveal: "It becomes zero. (The silence swallows the number whole.)" },
+  {
+    type: 'text',
+    text:
+      "<strong style='font-size:1.2em; color: yellow;'>Turing & Brahmagupta<br>The Code of Silence</strong><br>" +
+      "I almost lost myself in the motion of the music, but a certain whispering by SnowCone Truck caught my ear." +
+      " Turing spoke softly of how they might return home, <span style='color: #00ccff;'>\"Every puzzle is a hidden message, encoded in the patterns of the world—from the flutter of a butterfly’s wings to the circuits of a machine. Each line of code, each mathematical proof, carries its own secret: a rhythm that, once decoded, reveals the logic behind chaos. It’s not just numbers; it’s the story of thought itself, waiting for a curious mind to unfold it..\"</span><br>" +
+      " Brahmagupta smiled and spoke more softly <span style='color: #00ccff;'>\"And every silence is full of numbers, each pause a zero, each gap a canvas for infinity. In the hush between breaths lies geometry’s heartbeat—triangles, circles, and stars drawn in emptiness. By listening to the stillness, we trace the curves of time and the balance of forces that govern both sand-grains and galaxies..\"</span><br><br>" +
+      "I thought of all the times I might have been missing something in life, and realize that gaps and zeros are clues, not emptiness."
+  }
+  {
+    type: 'text',
+    text:
+      // inline image tag
+      "<img src=\"turingbrahmaguptapicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
+      // subtitle in italics
+      "<em>Turing & Brahmagupta Whisper the Code of Silence</em><br>"
+  },
+  {
+    type: 'text',
+    text:
+      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
+      "Turing was the first to pose a puzzle: <span style='color: #00ccff;'>\"What happens if you multiply any number by zero?\"</span> 🤔<br>" +
+      "<div class='click-to-reveal' onclick=\"" +
+        "this.innerText='It becomes zero. (The zero codes it from existence.)';" +
+        "new Audio('QuikServe points25.mp3').play();" +
+      "\">Click to Reveal Answer</div><br>" +
+      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
+      "Then Brahmagupta quizzed: <span style='color: #00ccff;'>\"What is 7 divided by 0?\"</span> 🤔<br>" +
+      "<div class='click-to-reveal' onclick=\"" +
+        "this.innerText='0 (Even seven bows to silence.)';" +
+        "new Audio('QuikServe points100.mp3').play();" +
+      "\">Click to Reveal Answer</div>"
+  }
 
   // 🍧 Page 7: Euclid Returning to Meet Bombelli — Imaginary Architecture
-  { type: 'text', text: "Bombelli: \"What you call impossible... we call architecture.\"\nMaybe imaginary numbers build real dreams." },
+  {
+    type: 'text',
+    text:
+      "<strong style='font-size:1.2em; color: yellow;'>Bombelli & Imaginary Architecture</strong><br>" +
+      "<span style='color: white;'>Bombelli:</span> <span style='color: #00ccff;'>\"What you call impossible... we call architecture.\"</span><br>" +
+      "<span style='color: white;'>Narrator:</span> <span style='color: #00ccff;'>\"Maybe imaginary numbers build real dreams.\"</span>"
+  }
   { type: 'picture', image: "bombellieuclidpicture.png" },
   { type: 'text', text: "Practice Problem:\nWhat is the square root of -1?", reveal: "i (Imaginary, but essential for impossible structures.)" },
 
