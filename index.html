@@ -254,6 +254,13 @@
     .keypad button {
       touch-action: manipulation;
     }
+    .enter-btn {
+      background-color: #00ccff;
+      border: 2px solid #00ccff;
+      box-shadow: 0 0 10px #00ccff;
+      color: white;      /* keep the text popping */
+    }
+
 
     canvas.confetti {
       position: fixed;
@@ -687,7 +694,7 @@
     <button onclick="appendNumber(7)">7</button>
     <button onclick="appendNumber(8)">8</button>
     <button onclick="appendNumber(9)">9</button>
-    <button onclick="submitAnswer()">Enter</button>
+    <button class="enter-btn" onclick="submitAnswer()">Enter</button>
     <button onclick="appendNumber(4)">4</button>
     <button onclick="appendNumber(5)">5</button>
     <button onclick="appendNumber(6)">6</button>
