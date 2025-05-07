@@ -254,12 +254,12 @@
     .keypad button {
       touch-action: manipulation;
     }
-    /* chunk 2: more specific selector to override .keypad button */
+    /* only outline Enter in blue, keep black BG + white text */
     .keypad button.enter-btn {
-      background-color: #00ccff;    /* blue sky */
-      border: 2px solid #00ccff;    /* match edge */
-      box-shadow: 0 0 10px #00ccff; /* blue glow */
-      color: white;                 /* keep text readable */
+      background-color: black;         /* match other keys */
+      border: 2px solid #00ccff;       /* blue outline */
+      box-shadow: 0 0 10px #00ccff;    /* blue glow */
+      color: white;                    /* same white font */
     }
     canvas.confetti {
       position: fixed;
