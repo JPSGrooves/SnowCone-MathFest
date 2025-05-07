@@ -254,14 +254,13 @@
     .keypad button {
       touch-action: manipulation;
     }
-    .enter-btn {
-      background-color: #00ccff;
-      border: 2px solid #00ccff;
-      box-shadow: 0 0 10px #00ccff;
-      color: white;      /* keep the text popping */
+    /* chunk 2: more specific selector to override .keypad button */
+    .keypad button.enter-btn {
+      background-color: #00ccff;    /* blue sky */
+      border: 2px solid #00ccff;    /* match edge */
+      box-shadow: 0 0 10px #00ccff; /* blue glow */
+      color: white;                 /* keep text readable */
     }
-
-
     canvas.confetti {
       position: fixed;
       pointer-events: none;
