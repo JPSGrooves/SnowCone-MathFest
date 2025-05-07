@@ -787,11 +787,11 @@ function startTransition(targetModalId) {
   overlay.style.display = 'flex';
   overlay.style.opacity = '1';
 
-  // ── Kick off split animation
-  cone.style.animation = 'slideRight 2000ms forwards';
-  scoop.style.animation = 'slideLeft 2000ms forwards';
+  // ── Kick off split animation at 1.5 s
+  cone.style.animation = 'slideRight 1500ms forwards';
+  scoop.style.animation = 'slideLeft 1500ms forwards';
 
-  // ── After animation, fade out and show target modal
+  // ── After 1.5 s, fade out and show target modal
   setTimeout(() => {
     overlay.style.animation = 'fadeOutOverlay 200ms forwards';
     setTimeout(() => {
@@ -805,7 +805,7 @@ function startTransition(targetModalId) {
       // Show the requested modal (rulesModal or tutorialContainer)
       document.getElementById(targetModalId).style.display = 'flex';
     }, 200);
-  }, 2000);
+  }, 1500);  // ◀️ changed from 2000 to 1500
 }
 
 // MENU MODAL LOGIC
@@ -1453,7 +1453,7 @@ const panels = [
       "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>➗ Trust your gut!</span><br>" +
       "Your abdominal brain is your second brain!<br>" +
       // disco-ball tip unchanged
-      "🪩 Breathe like you're solving math under a disco ball.🪩 Five beats in, then five beats out 🎵"
+      "🪩 Breathe like you're solving math under a disco ball🪩. 🎵Five beats in, then five beats out 🎵 Also...Practice!💪"
   },
 
   {
@@ -1545,13 +1545,13 @@ const panels = [
     type: 'text',
     text:
       "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
-      "Euclid immediately notices the odd shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. \"What’s the hypotenuse length?\" he asks 🤔📐<br>" +
+      "Euclid immediately notices the odd shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. <span style='color: #00ccff;'>\"What’s the hypotenuse length?\"</span> he asks. 🤔📐<br>" +
       "<div class='click-to-reveal' onclick=\"" +
         "this.innerText='5 cm (3² + 4² = 9 + 16 = 25 → √25 = 5)';" +
         "new Audio('QuikServe points25.mp3').play();" +
       "\">Click to Reveal Answer</div><br>" +
       "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
-      "Next, Euclid sketches the perfect snow cone: two equal sides of 6 cm and a top edge of 4 cm. \"What’s the perimeter of this neon triangle?\" 🤔📏<br>" +
+      "Next, Euclid sketches the perfect snow cone: two equal sides of 6 cm and a top edge of 4 cm. <span style='color: #00ccff;'>\"What’s the perimeter of this neon triangle?\"</span> 🤔📏<br>" +
       "<div class='click-to-reveal' onclick=\"" +
         "this.innerText='16 cm (6 + 6 + 4 = 16)';" +
         "new Audio('QuikServe points100.mp3').play();" +
