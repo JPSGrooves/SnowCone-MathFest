@@ -764,7 +764,7 @@ const pictureFilenames = {
 };
 
 
-// Chunk 16: Enhanced startTransition for Math Tips split‐cone transition
+// Chunk 16: Enhanced startTransition for Math Tips split‐cone transition (now 1000 ms)
 function startTransition(targetModalId) {
   closeMenuModal();
   // ── Hide the main game so the overlay covers everything
@@ -787,11 +787,11 @@ function startTransition(targetModalId) {
   overlay.style.display = 'flex';
   overlay.style.opacity = '1';
 
-  // ── Kick off split animation at 1.5 s
-  cone.style.animation = 'slideRight 1500ms forwards';
-  scoop.style.animation = 'slideLeft 1500ms forwards';
+  // ── Kick off split animation over 1000 ms
+  cone.style.animation = 'slideRight 1000ms forwards';
+  scoop.style.animation = 'slideLeft  1000ms forwards';
 
-  // ── After 1.5 s, fade out and show target modal
+  // ── After 1000 ms, fade out and show target modal
   setTimeout(() => {
     overlay.style.animation = 'fadeOutOverlay 200ms forwards';
     setTimeout(() => {
@@ -805,7 +805,7 @@ function startTransition(targetModalId) {
       // Show the requested modal (rulesModal or tutorialContainer)
       document.getElementById(targetModalId).style.display = 'flex';
     }, 200);
-  }, 1500);  // ◀️ changed from 2000 to 1500
+  }, 1000);  // ◀️ changed from 1500 to 1000
 }
 
 // MENU MODAL LOGIC
