@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snowcone-mathfest-v088.5';
+const CACHE_NAME = 'snowcone-mathfest-v088.9';
 const urlsToCache = [
   './',
   './index.html',
