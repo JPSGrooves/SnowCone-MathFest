@@ -1245,35 +1245,25 @@ function fireworkBurst(canvas) {
     });
     update();
   }
-  function triggerDreamRipple() {
+  function triggerDreamRipple(callback) {
     const overlay = document.getElementById("dreamOverlay");
-    const tutorialContainer = document.getElementById("tutorialContainer");
-    const menuContainer = document.getElementById("menuModal");
   
-    if (!overlay || !tutorialContainer || !menuContainer) return;
-  
-    // Step 1: Fade in ripple
+    overlay.style.transition = 'opacity 0.4s ease-in-out';
     overlay.style.opacity = '1';
+    overlay.style.pointerEvents = 'all';
   
-    // Step 2: Wait, then fade out and clean up
     setTimeout(() => {
       overlay.style.opacity = '0';
   
       setTimeout(() => {
-        overlay.style.pointerEvents = 'none'; // restore interaction
-        tutorialContainer.style.display = 'none';
-        tutorialContainer.style.opacity = '0';
-        stopTutorialMusic();
-        softResetGameScreen();
-  
-        menuContainer.style.display = 'flex';
-        menuContainer.style.opacity = '1';
-  
-        mode = 'addsub';
-        generateProblem();
-      }, 600); // let ripple fade fully
-    }, 700); // let it appear first
+        overlay.style.pointerEvents = 'none';
+        if (typeof callback === 'function') {
+          callback();
+        }
+      }, 400);
+    }, 700);
   }
+
 
   function update() {
     bursts.forEach(p => {
@@ -1871,7 +1861,7 @@ function renderTutorialPanel() {
     
       if (currentPanel === panels.length - 1) {
         // 🌌 Final panel? Trigger dream ripple
-        triggerDreamRipple();
+        triggerDreamRipple(showMainMenu);
       } else {
         showMainMenu();
       }
