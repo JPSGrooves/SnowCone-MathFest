@@ -8,6 +8,41 @@
   <title>Math Fest Snow Cone</title>
   <link rel="manifest" href="manifest.json" />
   <style>
+    /* NEON RIPPLE WAVE */
+    #neonRippleOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(0, 255, 255, 0.15) 0%, rgba(0, 0, 0, 0.9) 100%);
+      backdrop-filter: blur(3px) brightness(1.2) hue-rotate(45deg);
+      pointer-events: none;
+      z-index: 100001;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+      animation: none;
+    }
+
+    
+    @keyframes neonWavePulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.4;
+        box-shadow: 0 0 30px #00ffff, 0 0 60px #00ccff;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.6;
+        box-shadow: 0 0 50px #00ffff, 0 0 100px #00ccff;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0;
+        box-shadow: 0 0 30px #00ffff, 0 0 60px #00ccff;
+      }
+    }
+
     /* Chunk 2: In your first <style> block, add */
     #transitionOverlay {
       display: none;
@@ -58,10 +93,7 @@
     @keyframes fadeOutOverlay {
       to { opacity: 0; }
     }
-
-
-
-
+    
 
 
     html, body {
@@ -630,24 +662,10 @@
       user-select: none;          /* standard */
     }
   </style>
-  <style>
-    #dreamOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle at center, rgba(0, 255, 136, 0.3), black 80%);
-      backdrop-filter: blur(4px) hue-rotate(90deg);
-      z-index: 100000; /* ⬅️ bump this above everything else */
-      opacity: 0;
-      pointer-events: all; /* ⬅️ block interaction during ripple */
-      transition: opacity 0.4s ease-in-out;
-    }
-  </style>
 </head>
 <body>
-<div id="dreamOverlay"></div>
+<!-- NEON RIPPLE OVERLAY -->
+<div id="neonRippleOverlay"></div>
 
 <!-- TRANSITION OVERLAY -->
 <div id="transitionOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:10002; justify-content:center; align-items:center; opacity:1;">
@@ -1234,6 +1252,35 @@ function fireworkBurst(canvas) {
       color: `hsl(${Math.random() * 360}, 100%, 60%)`
     });
   }
+  function triggerNeonRipple(callback) {
+    const overlay = document.getElementById('neonRippleOverlay');
+  
+    // Style blast
+    overlay.style.transition = 'none';
+    overlay.style.opacity = '0';
+    overlay.style.background = `radial-gradient(circle at center, rgba(255,0,204,0.5), black 80%)`;
+    overlay.style.backdropFilter = `blur(3px) brightness(1.2) hue-rotate(45deg)`;
+    overlay.style.pointerEvents = 'all';
+    overlay.style.zIndex = 100001;
+  
+    // Force reflow to restart transition
+    void overlay.offsetWidth;
+  
+    overlay.style.transition = 'opacity 0.6s ease-in-out';
+    overlay.style.opacity = '1';
+  
+    setTimeout(() => {
+      overlay.style.opacity = '0';
+  
+      setTimeout(() => {
+        overlay.style.pointerEvents = 'none';
+        if (typeof callback === 'function') {
+          callback();
+        }
+      }, 600); // Fade out complete
+    }, 800); // Hold the effect briefly
+  }
+
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1245,25 +1292,6 @@ function fireworkBurst(canvas) {
     });
     update();
   }
-  function triggerDreamRipple(callback) {
-    const overlay = document.getElementById("dreamOverlay");
-  
-    overlay.style.transition = 'opacity 0.4s ease-in-out';
-    overlay.style.opacity = '1';
-    overlay.style.pointerEvents = 'all';
-  
-    setTimeout(() => {
-      overlay.style.opacity = '0';
-  
-      setTimeout(() => {
-        overlay.style.pointerEvents = 'none';
-        if (typeof callback === 'function') {
-          callback();
-        }
-      }, 400);
-    }, 700);
-  }
-
 
   function update() {
     bursts.forEach(p => {
@@ -1861,7 +1889,7 @@ function renderTutorialPanel() {
     
       if (currentPanel === panels.length - 1) {
         // 🌌 Final panel? Trigger dream ripple
-        triggerDreamRipple(showMainMenu);
+        triggerNeonRipple(showMainMenu);
       } else {
         showMainMenu();
       }
