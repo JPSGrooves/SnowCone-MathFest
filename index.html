@@ -630,8 +630,25 @@
       user-select: none;          /* standard */
     }
   </style>
+  <style>
+    #dreamOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(0, 255, 136, 0.3), black 80%);
+      backdrop-filter: blur(4px) hue-rotate(90deg);
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease-in-out;
+    }
+  </style>
 </head>
 <body>
+<div id="dreamOverlay"></div>
+
 <!-- TRANSITION OVERLAY -->
 <div id="transitionOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:10002; justify-content:center; align-items:center; opacity:1;">
   <div id="transitionContent" style="position:relative; width:100%; height:100%;"></div>
@@ -1228,6 +1245,16 @@ function fireworkBurst(canvas) {
     });
     update();
   }
+  function triggerDreamRipple(callback) {
+    const overlay = document.getElementById("dreamOverlay");
+    overlay.style.opacity = '1';
+  
+    setTimeout(() => {
+      overlay.style.opacity = '0';
+      if (typeof callback === 'function') callback();
+    }, 800); // glow duration before callback
+  }
+
 
   function update() {
     bursts.forEach(p => {
@@ -1824,13 +1851,14 @@ function renderTutorialPanel() {
       stopTutorialMusic();
     
       if (currentPanel === panels.length - 1) {
-        // 🍧 Trigger dream transition if it’s the final panel
-        startTransition('menuModal');
+        // 🌌 Final panel? Trigger dream ripple
+        triggerDreamRipple(showMainMenu);
       } else {
         showMainMenu();
       }
     };
     
+        
     buttonContainer.appendChild(menuButton);
 
 
