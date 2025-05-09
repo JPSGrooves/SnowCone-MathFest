@@ -2029,7 +2029,13 @@ function stopTutorialMusic() {
 // Chunk 15: Swap out the load-handler so the Menu, not the rules, shows first
   window.addEventListener('load', () => {
     openMenuModal();
-  
+
+    // 🧊 Safety check to make sure dreamOverlay and tutorial aren't blocking
+    document.getElementById('dreamOverlay').style.opacity = '0';
+    document.getElementById('dreamOverlay').style.pointerEvents = 'none';
+    document.getElementById('tutorialContainer').style.display = 'none';
+    document.getElementById('tutorialContainer').style.opacity = '0';
+
     const closeBtn = document.getElementById("closeModalBtn");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
