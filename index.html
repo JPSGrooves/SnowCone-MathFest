@@ -1246,7 +1246,13 @@ function showPopup(title, message, autoClose = false, endOfGame = false) {
 
   const btn = document.getElementById("popupButton");
   btn.textContent = endOfGame ? "Play Again" : "Got it!";
-  btn.onclick = endOfGame ? resetScore : closePopup;
+  btn.onclick = endOfGame ? resetScore : closePopup;btn.onclick = endOfGame
+    ? () => {
+        resetScore();
+        document.getElementById('rulesModal').style.display = 'flex';
+      }
+    : closePopup;
+
 
   if (autoClose) {
     setTimeout(closePopup, 1500);
