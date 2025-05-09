@@ -1983,21 +1983,26 @@ function stopTutorialMusic() {
     scWidget.bind(SC.Widget.Events.PLAY, function() {
       console.log('🎵 SoundCloud widget PLAY detected!');
       soundCloudPlaying = true;
-
+    
       const bgMusic = document.getElementById("backgroundMusic1");
-      if (bgMusic && !bgMusic.paused) {
-        let fadeOutInterval = setInterval(() => {
-          if (bgMusic.volume > 0.05) {
-            bgMusic.volume -= 0.05;
-          } else {
-            bgMusic.volume = 0;
-            bgMusic.pause();
-            clearInterval(fadeOutInterval);
-            console.log('🎶 Background music faded because SoundCloud started.');
-          }
-        }, 100);
-      }
+    
+      // 🎧 Add slight delay before fading to avoid overlap
+      setTimeout(() => {
+        if (bgMusic && !bgMusic.paused) {
+          let fadeOutInterval = setInterval(() => {
+            if (bgMusic.volume > 0.05) {
+              bgMusic.volume -= 0.05;
+            } else {
+              bgMusic.volume = 0;
+              bgMusic.pause();
+              clearInterval(fadeOutInterval);
+              console.log('🎶 Background music faded because SoundCloud started.');
+            }
+          }, 100);
+        }
+      }, 400); // 🕒 Delay by 400ms for smooth transition
     });
+
   }
 
   // Setup Install Prompt
