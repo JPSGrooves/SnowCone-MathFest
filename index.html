@@ -1247,25 +1247,23 @@ function fireworkBurst(canvas) {
   }
   function triggerDreamRipple(callback) {
     const overlay = document.getElementById("dreamOverlay");
-  
-    // Make sure we're starting clean
     if (!overlay) return;
   
     overlay.style.transition = 'opacity 0.4s ease-in-out';
     overlay.style.opacity = '1';
   
-    // Fade out after 700ms
     setTimeout(() => {
       overlay.style.opacity = '0';
   
-      // Actually call the callback after 400ms (to match fade-out)
+      // Wait 500ms AFTER fade-out starts before calling callback
       setTimeout(() => {
         if (typeof callback === 'function') {
-          callback(); // 🧠 this triggers showMainMenu
+          callback();
         }
-      }, 400);
-    }, 700);
+      }, 500); // ← This ensures the fade-out finishes first
+    }, 700); // ← This keeps the fade-in visible long enough
   }
+
 
 
 
