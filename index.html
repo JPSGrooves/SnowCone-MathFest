@@ -1245,9 +1245,12 @@ function fireworkBurst(canvas) {
     });
     update();
   }
-  function triggerDreamRipple(callback) {
+  function triggerDreamRipple() {
     const overlay = document.getElementById("dreamOverlay");
-    if (!overlay) return;
+    const tutorialContainer = document.getElementById("tutorialContainer");
+    const menuContainer = document.getElementById("menuModal");
+  
+    if (!overlay || !tutorialContainer || !menuContainer) return;
   
     overlay.style.transition = 'opacity 0.4s ease-in-out';
     overlay.style.opacity = '1';
@@ -1255,14 +1258,26 @@ function fireworkBurst(canvas) {
     setTimeout(() => {
       overlay.style.opacity = '0';
   
-      // Wait 500ms AFTER fade-out starts before calling callback
       setTimeout(() => {
-        if (typeof callback === 'function') {
-          callback();
-        }
-      }, 500); // ← This ensures the fade-out finishes first
-    }, 700); // ← This keeps the fade-in visible long enough
+        // Fully hide tutorial
+        tutorialContainer.style.display = 'none';
+        tutorialContainer.style.opacity = '0';
+  
+        // Clean reset
+        stopTutorialMusic();
+        softResetGameScreen();
+  
+        // Show the menu
+        menuContainer.style.display = 'flex';
+        menuContainer.style.opacity = '1';
+  
+        // Reset score logic just in case
+        mode = 'addsub';
+        generateProblem();
+      }, 400);
+    }, 700);
   }
+
 
 
 
@@ -1863,7 +1878,7 @@ function renderTutorialPanel() {
     
       if (currentPanel === panels.length - 1) {
         // 🌌 Final panel? Trigger dream ripple
-        triggerDreamRipple(showMainMenu);
+        triggerDreamRipple();
       } else {
         showMainMenu();
       }
