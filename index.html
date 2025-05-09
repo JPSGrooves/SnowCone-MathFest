@@ -639,9 +639,9 @@
       height: 100vh;
       background: radial-gradient(circle at center, rgba(0, 255, 136, 0.3), black 80%);
       backdrop-filter: blur(4px) hue-rotate(90deg);
-      z-index: 99999;
+      z-index: 100000; /* ⬅️ bump this above everything else */
       opacity: 0;
-      pointer-events: none;
+      pointer-events: all; /* ⬅️ block interaction during ripple */
       transition: opacity 0.4s ease-in-out;
     }
   </style>
@@ -1252,35 +1252,28 @@ function fireworkBurst(canvas) {
   
     if (!overlay || !tutorialContainer || !menuContainer) return;
   
-    overlay.style.transition = 'opacity 0.4s ease-in-out';
+    // Step 1: Fade in ripple
     overlay.style.opacity = '1';
   
+    // Step 2: Wait, then fade out and clean up
     setTimeout(() => {
       overlay.style.opacity = '0';
   
       setTimeout(() => {
-        // Fully hide tutorial
+        overlay.style.pointerEvents = 'none'; // restore interaction
         tutorialContainer.style.display = 'none';
         tutorialContainer.style.opacity = '0';
-  
-        // Clean reset
         stopTutorialMusic();
         softResetGameScreen();
   
-        // Show the menu
         menuContainer.style.display = 'flex';
         menuContainer.style.opacity = '1';
   
-        // Reset score logic just in case
         mode = 'addsub';
         generateProblem();
-      }, 400);
-    }, 700);
+      }, 600); // let ripple fade fully
+    }, 700); // let it appear first
   }
-
-
-
-
 
   function update() {
     bursts.forEach(p => {
