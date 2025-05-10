@@ -811,18 +811,32 @@ function startTransition(targetModalId) {
   // ── After 1000 ms, fade out and show target modal
   setTimeout(() => {
     overlay.style.animation = 'fadeOutOverlay 200ms forwards';
+  
     setTimeout(() => {
       overlay.style.display = 'none';
       overlay.style.animation = '';
-
-      // If we're transitioning to the tutorial, render the first panel
+  
+      // 🍧 If transitioning to tutorial, render it
       if (targetModalId === 'tutorialContainer') {
         renderTutorialPanel();
+        document.getElementById(targetModalId).style.display = 'flex';
       }
-      // Show the requested modal (rulesModal or tutorialContainer)
-      document.getElementById(targetModalId).style.display = 'flex';
-    }, 200);
-  }, 1000);  // ◀️ changed from 1500 to 1000
+  
+      // 🍧 If transitioning to menu, run sparkle and open menu
+      else if (targetModalId === 'menuModal') {
+        softResetGameScreen(); // optional but clean
+        const canvas = document.getElementById("celebrationCanvas");
+        sparkleShower(canvas); // 🎉 blast some flair
+        openMenuModal();
+      }
+  
+      // 🧊 Any other target, just show it normally
+      else {
+        document.getElementById(targetModalId).style.display = 'flex';
+      }
+  
+    }, 200); // wait for fade out
+  }, 1000); // wait for cone/scoop split
 }
 
 // MENU MODAL LOGIC
@@ -1824,12 +1838,15 @@ function renderTutorialPanel() {
       stopTutorialMusic();
     
       if (currentPanel === panels.length - 1) {
-        // 🍧 Trigger dream transition if it’s the final panel
+        // 🍧 Final panel? Launch split-cone transition with bonus confetti!
+        const canvas = document.getElementById("celebrationCanvas");
+        sparkleShower(canvas); // 🎉 add sparkle first
         startTransition('menuModal');
       } else {
         showMainMenu();
       }
     };
+
     
     buttonContainer.appendChild(menuButton);
 
