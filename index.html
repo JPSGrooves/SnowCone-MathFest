@@ -156,13 +156,19 @@
     
 
     .scoop {
-      width: 100%;
+      width: clamp(60px, 130px, 20vw);
       height: auto;
       aspect-ratio: 2 / 1;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-radius: 65px 65px 0 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+      z-index: 2;
+      position: relative;
+      top: 0;
     }
-
+    
     .main-scoop {
-      display: none;
+      display: none; /* controlled by JS to show on correct answer */
     }
 
     .cone-img {
@@ -473,17 +479,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      max-height: 85vh;
+      height: auto;
       opacity: 0;
       transition: opacity 0.6s ease-in-out;
       text-align: center;
       padding: 20px;
+      padding-bottom: 20px;
       overflow-x: hidden;
       overflow-y: auto;
       background: black;
-      max-height: 100vh;
-      overflow-y: auto;
     }
+
   
     #tutorialPanel {
       max-width: 500px;
