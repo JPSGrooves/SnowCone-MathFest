@@ -784,8 +784,6 @@ const pictureFilenames = {
 // Chunk 16: Enhanced startTransition for Math Tips split‐cone transition (now 1000 ms)
 function startTransition(targetModalId) {
   closeMenuModal();
-  // ── Hide the main game so the overlay covers everything
-  document.getElementById(targetModalId).style.display = 'flex';
 
   const overlay = document.getElementById('transitionOverlay');
   const content = document.getElementById('transitionContent');
