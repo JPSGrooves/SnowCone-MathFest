@@ -785,7 +785,7 @@ const pictureFilenames = {
 function startTransition(targetModalId) {
   closeMenuModal();
   // ── Hide the main game so the overlay covers everything
-  document.getElementById('gameContainer').style.display = 'none';
+  document.getElementById(targetModalId).style.display = 'flex';
 
   const overlay = document.getElementById('transitionOverlay');
   const content = document.getElementById('transitionContent');
@@ -816,32 +816,26 @@ function startTransition(targetModalId) {
       overlay.style.display = 'none';
       overlay.style.animation = '';
   
-      // 🍧 If transitioning to tutorial, render it
       if (targetModalId === 'tutorialContainer') {
         renderTutorialPanel();
         document.getElementById(targetModalId).style.display = 'flex';
-      
+  
       } else if (targetModalId === 'menuModal') {
-        // 🌈 special case: hide tutorial cleanly
         document.getElementById('tutorialContainer').style.display = 'none';
         document.getElementById('tutorialContainer').style.opacity = 0;
-      
-        // 💥 Optional clean reset
+  
         softResetGameScreen();
-      
-        // 🎉 Sparkle effect when exiting tutorial
+  
         const canvas = document.getElementById("celebrationCanvas");
         sparkleShower(canvas);
-      
-        // 🌈 Show menu after transition
-        openMenuModal();
-      
+  
+        openMenuModal(); // ✅ this opens the correct main menu
       } else {
-        // generic fallback
         document.getElementById(targetModalId).style.display = 'flex';
       }
-    }, 200); // wait for fade out
-  }, 1000); // wait for cone/scoop split
+  
+    }, 200); // after fade
+  }, 1000); // after animation
 }
 
 // MENU MODAL LOGIC
@@ -1841,16 +1835,9 @@ function renderTutorialPanel() {
     
     menuButton.onclick = () => {
       stopTutorialMusic();
-    
-      if (currentPanel === panels.length - 1) {
-        // 🍧 Final panel? Launch split-cone transition with bonus confetti!
-        const canvas = document.getElementById("celebrationCanvas");
-        sparkleShower(canvas); // 🎉 add sparkle first
-        startTransition('menuModal');
-      } else {
-        showMainMenu();
-      }
+      startTransition('menuModal');
     };
+
 
     
     buttonContainer.appendChild(menuButton);
