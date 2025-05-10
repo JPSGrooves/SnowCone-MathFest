@@ -1788,53 +1788,36 @@ function renderTutorialPanel() {
   // Button Container
   const buttonContainer = document.createElement('div');
   buttonContainer.className = 'button-container';
-
-  // BACK Button (if not first panel)
-    if (currentPanel > 0) {
-      const backButton = document.createElement('button');
-      backButton.innerText = 'Back';
-      backButton.className = 'tutorial-back';
-      backButton.onclick = () => fadeToPanel(currentPanel - 1);
-      buttonContainer.appendChild(backButton);
-    
-      // ✅ Only add NEXT if not on the final panel
-      if (currentPanel < panels.length - 1) {
-        const nextButton = document.createElement('button');
-        nextButton.innerText = 'Next';
-        nextButton.className = 'tutorial-next';
-        nextButton.onclick = () => fadeToPanel(currentPanel + 1);
-        buttonContainer.appendChild(nextButton);
-      }
-    } else {
-      // First panel case: show Next then Menu
-      const nextButton = document.createElement('button');
-      nextButton.innerText = 'Next';
-      nextButton.className = 'tutorial-next';
-      nextButton.onclick = () => fadeToPanel(currentPanel + 1);
-      buttonContainer.appendChild(nextButton);
-    }
-
   
-    // 🌈 Always add "Back to Menu" button
-    const menuButton = document.createElement('button');
-    menuButton.innerText = 'Back to Menu';
-    menuButton.className = 'tutorial-menu';
-    
-    menuButton.onclick = () => {
-      stopTutorialMusic();
-    
-      if (currentPanel === panels.length - 1) {
-        // 🍧 Trigger dream transition if it’s the final panel
-        startTransition('menuModal');
-      } else {
-        showMainMenu();
-      }
-    };
-    
-    buttonContainer.appendChild(menuButton);
-
-
-
+  // BACK Button (if not first panel)
+  if (currentPanel > 0) {
+    const backButton = document.createElement('button');
+    backButton.innerText = 'Back';
+    backButton.className = 'tutorial-back';
+    backButton.onclick = () => fadeToPanel(currentPanel - 1);
+    buttonContainer.appendChild(backButton);
+  }
+  
+  // ✅ Only add NEXT if not on the final panel
+  if (currentPanel < panels.length - 1) {
+    const nextButton = document.createElement('button');
+    nextButton.innerText = 'Next';
+    nextButton.className = 'tutorial-next';
+    nextButton.onclick = () => fadeToPanel(currentPanel + 1);
+    buttonContainer.appendChild(nextButton);
+  }
+  
+  // 🌈 Always add "Back to Menu" button (no transition!)
+  const menuButton = document.createElement('button');
+  menuButton.innerText = 'Back to Menu';
+  menuButton.className = 'tutorial-menu';
+  menuButton.onclick = () => {
+    stopTutorialMusic();
+    showMainMenu(); // 🔥 no cone-split, just straight to menu
+  };
+  buttonContainer.appendChild(menuButton);
+  
+  // Add all buttons to panel
   tutorialPanel.appendChild(buttonContainer);
 }
 
