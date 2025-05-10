@@ -783,8 +783,9 @@ const pictureFilenames = {
 
 // Chunk 16: Enhanced startTransition for Math Tips split‐cone transition (now 1000 ms)
 function startTransition(targetModalId) {
-  closeMenuModal(); // always clean up the menu
-  document.getElementById('gameContainer').style.display = 'none'; // hide game screen too
+  closeMenuModal();
+  // ── Hide the main game so the overlay covers everything
+  document.getElementById('gameContainer').style.display = 'none';
 
   const overlay = document.getElementById('transitionOverlay');
   const content = document.getElementById('transitionContent');
@@ -803,38 +804,26 @@ function startTransition(targetModalId) {
   overlay.style.display = 'flex';
   overlay.style.opacity = '1';
 
-  // Split animation
+  // ── Kick off split animation over 1000 ms
   cone.style.animation = 'slideRight 1000ms forwards';
-  scoop.style.animation = 'slideLeft 1000ms forwards';
+  scoop.style.animation = 'slideLeft  1000ms forwards';
 
+  // ── After 1000 ms, fade out and show target modal
   setTimeout(() => {
     overlay.style.animation = 'fadeOutOverlay 200ms forwards';
-
     setTimeout(() => {
       overlay.style.display = 'none';
       overlay.style.animation = '';
 
-      // 🍧 Tutorial Mode Logic
+      // If we're transitioning to the tutorial, render the first panel
       if (targetModalId === 'tutorialContainer') {
         renderTutorialPanel();
-        document.getElementById(targetModalId).style.display = 'flex';
-
-      // 🍧 Menu Mode Logic — this is the "Back to Menu" behavior
-      } else if (targetModalId === 'menuModal') {
-        const tut = document.getElementById('tutorialContainer');
-        tut.style.display = 'none';
-        tut.style.opacity = 0;
-        currentPanel = 0; // ❄️ RESET index
-        document.getElementById('tutorialPanel').innerHTML = ''; // 💥 remove old slide content
-      
-        softResetGameScreen();
-        sparkleShower(document.getElementById("celebrationCanvas"));
-        openMenuModal();
       }
-    }, 200); // wait for fade
-  }, 1000); // wait for cone/scoop
+      // Show the requested modal (rulesModal or tutorialContainer)
+      document.getElementById(targetModalId).style.display = 'flex';
+    }, 200);
+  }, 1000);  // ◀️ changed from 1500 to 1000
 }
-
 
 // MENU MODAL LOGIC
 function openMenuModal() {
@@ -1802,44 +1791,38 @@ function renderTutorialPanel() {
 
   // BACK Button (if not first panel)
     if (currentPanel > 0) {
+      // If NOT first panel: show Back, then Next, then Menu
       const backButton = document.createElement('button');
       backButton.innerText = 'Back';
       backButton.className = 'tutorial-back';
       backButton.onclick = () => fadeToPanel(currentPanel - 1);
-      buttonContainer.appendChild(backButton);
-    
-      // ✅ Only add NEXT if not on the final panel
-      if (currentPanel < panels.length - 1) {
-        const nextButton = document.createElement('button');
-        nextButton.innerText = 'Next';
-        nextButton.className = 'tutorial-next';
-        nextButton.onclick = () => fadeToPanel(currentPanel + 1);
-        buttonContainer.appendChild(nextButton);
-      }
-    } else {
-      // First panel case: show Next then Menu
+  
       const nextButton = document.createElement('button');
       nextButton.innerText = 'Next';
       nextButton.className = 'tutorial-next';
       nextButton.onclick = () => fadeToPanel(currentPanel + 1);
+  
+      buttonContainer.appendChild(backButton);
+      buttonContainer.appendChild(nextButton);
+    } else {
+      // If first panel: show Next first, then Menu
+      const nextButton = document.createElement('button');
+      nextButton.innerText = 'Next';
+      nextButton.className = 'tutorial-next';
+      nextButton.onclick = () => fadeToPanel(currentPanel + 1);
+  
       buttonContainer.appendChild(nextButton);
     }
-
   
     // 🌈 Always add "Back to Menu" button
     const menuButton = document.createElement('button');
     menuButton.innerText = 'Back to Menu';
     menuButton.className = 'tutorial-menu';
-    
     menuButton.onclick = () => {
       stopTutorialMusic();
-      startTransition('menuModal');
+      showMainMenu();
     };
-
-
-    
     buttonContainer.appendChild(menuButton);
-
 
 
   tutorialPanel.appendChild(buttonContainer);
