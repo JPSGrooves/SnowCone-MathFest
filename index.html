@@ -1791,38 +1791,48 @@ function renderTutorialPanel() {
 
   // BACK Button (if not first panel)
     if (currentPanel > 0) {
-      // If NOT first panel: show Back, then Next, then Menu
       const backButton = document.createElement('button');
       backButton.innerText = 'Back';
       backButton.className = 'tutorial-back';
       backButton.onclick = () => fadeToPanel(currentPanel - 1);
-  
-      const nextButton = document.createElement('button');
-      nextButton.innerText = 'Next';
-      nextButton.className = 'tutorial-next';
-      nextButton.onclick = () => fadeToPanel(currentPanel + 1);
-  
       buttonContainer.appendChild(backButton);
-      buttonContainer.appendChild(nextButton);
+    
+      // ✅ Only add NEXT if not on the final panel
+      if (currentPanel < panels.length - 1) {
+        const nextButton = document.createElement('button');
+        nextButton.innerText = 'Next';
+        nextButton.className = 'tutorial-next';
+        nextButton.onclick = () => fadeToPanel(currentPanel + 1);
+        buttonContainer.appendChild(nextButton);
+      }
     } else {
-      // If first panel: show Next first, then Menu
+      // First panel case: show Next then Menu
       const nextButton = document.createElement('button');
       nextButton.innerText = 'Next';
       nextButton.className = 'tutorial-next';
       nextButton.onclick = () => fadeToPanel(currentPanel + 1);
-  
       buttonContainer.appendChild(nextButton);
     }
+
   
     // 🌈 Always add "Back to Menu" button
     const menuButton = document.createElement('button');
     menuButton.innerText = 'Back to Menu';
     menuButton.className = 'tutorial-menu';
+    
     menuButton.onclick = () => {
       stopTutorialMusic();
-      showMainMenu();
+    
+      if (currentPanel === panels.length - 1) {
+        // 🍧 Trigger dream transition if it’s the final panel
+        startTransition('menuModal');
+      } else {
+        showMainMenu();
+      }
     };
+    
     buttonContainer.appendChild(menuButton);
+
 
 
   tutorialPanel.appendChild(buttonContainer);
