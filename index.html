@@ -1255,7 +1255,6 @@ function fireworkBurst(canvas) {
   function triggerNeonRipple(callback) {
     const overlay = document.getElementById('neonRippleOverlay');
   
-    // Style blast
     overlay.style.transition = 'none';
     overlay.style.opacity = '0';
     overlay.style.background = `radial-gradient(circle at center, rgba(255,0,204,0.5), black 80%)`;
@@ -1263,22 +1262,18 @@ function fireworkBurst(canvas) {
     overlay.style.pointerEvents = 'all';
     overlay.style.zIndex = 100001;
   
-    // Force reflow to restart transition
-    void overlay.offsetWidth;
+    void overlay.offsetWidth; // 🔁 force reflow to restart transition
   
     overlay.style.transition = 'opacity 0.6s ease-in-out';
     overlay.style.opacity = '1';
   
     setTimeout(() => {
       overlay.style.opacity = '0';
-  
       setTimeout(() => {
         overlay.style.pointerEvents = 'none';
-        if (typeof callback === 'function') {
-          callback();
-        }
-      }, 600); // Fade out complete
-    }, 800); // Hold the effect briefly
+        if (typeof callback === 'function') callback();
+      }, 600); // fade out complete
+    }, 800); // hold visible for a bit
   }
 
 
