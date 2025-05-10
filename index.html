@@ -8,41 +8,6 @@
   <title>Math Fest Snow Cone</title>
   <link rel="manifest" href="manifest.json" />
   <style>
-    /* NEON RIPPLE WAVE */
-    #neonRippleOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle at center, rgba(0, 255, 255, 0.15) 0%, rgba(0, 0, 0, 0.9) 100%);
-      backdrop-filter: blur(3px) brightness(1.2) hue-rotate(45deg);
-      pointer-events: none;
-      z-index: 100001;
-      opacity: 0;
-      transition: opacity 0.6s ease-in-out;
-      animation: none;
-    }
-
-    
-    @keyframes neonWavePulse {
-      0% {
-        transform: scale(1);
-        opacity: 0.4;
-        box-shadow: 0 0 30px #00ffff, 0 0 60px #00ccff;
-      }
-      50% {
-        transform: scale(1.05);
-        opacity: 0.6;
-        box-shadow: 0 0 50px #00ffff, 0 0 100px #00ccff;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 0;
-        box-shadow: 0 0 30px #00ffff, 0 0 60px #00ccff;
-      }
-    }
-
     /* Chunk 2: In your first <style> block, add */
     #transitionOverlay {
       display: none;
@@ -93,7 +58,10 @@
     @keyframes fadeOutOverlay {
       to { opacity: 0; }
     }
-    
+
+
+
+
 
 
     html, body {
@@ -664,9 +632,6 @@
   </style>
 </head>
 <body>
-<!-- NEON RIPPLE OVERLAY -->
-<div id="neonRippleOverlay"></div>
-
 <!-- TRANSITION OVERLAY -->
 <div id="transitionOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:10002; justify-content:center; align-items:center; opacity:1;">
   <div id="transitionContent" style="position:relative; width:100%; height:100%;"></div>
@@ -852,9 +817,7 @@ function startTransition(targetModalId) {
 
       // If we're transitioning to the tutorial, render the first panel
       if (targetModalId === 'tutorialContainer') {
-        startTutorial(); // 💥 not renderTutorialPanel — we want full setup
-      } else {
-        document.getElementById(targetModalId).style.display = 'flex';
+        renderTutorialPanel();
       }
       // Show the requested modal (rulesModal or tutorialContainer)
       document.getElementById(targetModalId).style.display = 'flex';
@@ -1254,30 +1217,6 @@ function fireworkBurst(canvas) {
       color: `hsl(${Math.random() * 360}, 100%, 60%)`
     });
   }
-  function triggerNeonRipple(callback) {
-    const overlay = document.getElementById('neonRippleOverlay');
-  
-    overlay.style.transition = 'none';
-    overlay.style.opacity = '0';
-    overlay.style.background = `radial-gradient(circle at center, rgba(255,0,204,0.5), black 80%)`;
-    overlay.style.backdropFilter = `blur(3px) brightness(1.2) hue-rotate(45deg)`;
-    overlay.style.pointerEvents = 'all';
-    overlay.style.zIndex = 100001;
-  
-    void overlay.offsetWidth; // 🔁 force reflow to restart transition
-  
-    overlay.style.transition = 'opacity 0.6s ease-in-out';
-    overlay.style.opacity = '1';
-  
-    setTimeout(() => {
-      overlay.style.opacity = '0';
-      setTimeout(() => {
-        overlay.style.pointerEvents = 'none';
-        if (typeof callback === 'function') callback();
-      }, 600); // fade out complete
-    }, 800); // hold visible for a bit
-  }
-
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1885,14 +1824,13 @@ function renderTutorialPanel() {
       stopTutorialMusic();
     
       if (currentPanel === panels.length - 1) {
-        // 🌌 Final panel? Trigger dream ripple
-        triggerNeonRipple(showMainMenu);
+        // 🍧 Trigger dream transition if it’s the final panel
+        startTransition('menuModal');
       } else {
         showMainMenu();
       }
     };
     
-        
     buttonContainer.appendChild(menuButton);
 
 
@@ -2044,23 +1982,16 @@ function stopTutorialMusic() {
 // Chunk 15: Swap out the load-handler so the Menu, not the rules, shows first
   window.addEventListener('load', () => {
     openMenuModal();
-
-    // 🧊 Safety check to make sure dreamOverlay and tutorial aren't blocking
-    document.getElementById('dreamOverlay').style.opacity = '0';
-    document.getElementById('dreamOverlay').style.pointerEvents = 'none';
-    document.getElementById('tutorialContainer').style.display = 'none';
-    document.getElementById('tutorialContainer').style.opacity = '0';
-
+  
     const closeBtn = document.getElementById("closeModalBtn");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
-        resetScore(); // Set flags
         document.getElementById("rulesModal").style.display = "none";
-        document.getElementById("gameContainer").style.display = "block"; // Show game
-        generateProblem(); // Make sure the first problem loads
+        document.getElementById("gameContainer").style.display = "block";
+        resetScore();
+        generateProblem();
       });
     }
-
    
   // Setup SoundCloud Widget
   const Element = document.getElementById('soundcloudPlayer');
