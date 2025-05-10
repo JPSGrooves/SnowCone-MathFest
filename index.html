@@ -2054,12 +2054,13 @@ function stopTutorialMusic() {
     const closeBtn = document.getElementById("closeModalBtn");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
-        console.log("🎮 Let's Go button clicked! Showing game.");
-        resetScore(); // ✅ set flags and reset state first
+        resetScore(); // Set flags
         document.getElementById("rulesModal").style.display = "none";
-        document.getElementById("gameContainer").style.display = "block"; // 💥 show the game
+        document.getElementById("gameContainer").style.display = "block"; // Show game
+        generateProblem(); // Make sure the first problem loads
       });
     }
+
    
   // Setup SoundCloud Widget
   const Element = document.getElementById('soundcloudPlayer');
