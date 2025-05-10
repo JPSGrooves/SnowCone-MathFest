@@ -2054,6 +2054,7 @@ function stopTutorialMusic() {
     const closeBtn = document.getElementById("closeModalBtn");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
+        console.log("🎮 Let's Go button clicked! Showing game.");
         resetScore(); // ✅ set flags and reset state first
         document.getElementById("rulesModal").style.display = "none";
         document.getElementById("gameContainer").style.display = "block"; // 💥 show the game
