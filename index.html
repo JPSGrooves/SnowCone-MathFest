@@ -852,7 +852,9 @@ function startTransition(targetModalId) {
 
       // If we're transitioning to the tutorial, render the first panel
       if (targetModalId === 'tutorialContainer') {
-        renderTutorialPanel();
+        startTutorial(); // 💥 not renderTutorialPanel — we want full setup
+      } else {
+        document.getElementById(targetModalId).style.display = 'flex';
       }
       // Show the requested modal (rulesModal or tutorialContainer)
       document.getElementById(targetModalId).style.display = 'flex';
@@ -2052,10 +2054,9 @@ function stopTutorialMusic() {
     const closeBtn = document.getElementById("closeModalBtn");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
+        resetScore(); // ✅ set flags and reset state first
         document.getElementById("rulesModal").style.display = "none";
-        document.getElementById("gameContainer").style.display = "block";
-        resetScore();
-        generateProblem();
+        document.getElementById("gameContainer").style.display = "block"; // 💥 show the game
       });
     }
    
