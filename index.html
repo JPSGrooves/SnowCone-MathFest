@@ -821,9 +821,12 @@ function startTransition(targetModalId) {
 
       // 🍧 Menu Mode Logic — this is the "Back to Menu" behavior
       } else if (targetModalId === 'menuModal') {
-        document.getElementById('tutorialContainer').style.display = 'none';
-        document.getElementById('tutorialContainer').style.opacity = 0;
-
+        const tut = document.getElementById('tutorialContainer');
+        tut.style.display = 'none';
+        tut.style.opacity = 0;
+        tut.innerHTML = ''; // 🧼 nuke all inner content just in case
+        document.body.offsetHeight; // ✨ force reflow to flush rendering glitches
+        
         softResetGameScreen();
         sparkleShower(document.getElementById("celebrationCanvas"));
         openMenuModal();
