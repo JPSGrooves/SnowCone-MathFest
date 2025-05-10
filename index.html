@@ -824,19 +824,13 @@ function startTransition(targetModalId) {
         const tut = document.getElementById('tutorialContainer');
         tut.style.display = 'none';
         tut.style.opacity = 0;
-        tut.innerHTML = ''; // 🧼 nuke all inner content just in case
-        document.body.offsetHeight; // ✨ force reflow to flush rendering glitches
-        
+        currentPanel = 0; // ❄️ RESET index
+        document.getElementById('tutorialPanel').innerHTML = ''; // 💥 remove old slide content
+      
         softResetGameScreen();
         sparkleShower(document.getElementById("celebrationCanvas"));
         openMenuModal();
-
-      // 🍧 All other modal cases (future proof)
-      } else {
-        const modal = document.getElementById(targetModalId);
-        if (modal) modal.style.display = 'flex';
       }
-
     }, 200); // wait for fade
   }, 1000); // wait for cone/scoop
 }
