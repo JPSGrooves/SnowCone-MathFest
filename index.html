@@ -820,21 +820,26 @@ function startTransition(targetModalId) {
       if (targetModalId === 'tutorialContainer') {
         renderTutorialPanel();
         document.getElementById(targetModalId).style.display = 'flex';
-      }
-  
-      // 🍧 If transitioning to menu, run sparkle and open menu
-      else if (targetModalId === 'menuModal') {
-        softResetGameScreen(); // optional but clean
+      
+      } else if (targetModalId === 'menuModal') {
+        // 🌈 special case: hide tutorial cleanly
+        document.getElementById('tutorialContainer').style.display = 'none';
+        document.getElementById('tutorialContainer').style.opacity = 0;
+      
+        // 💥 Optional clean reset
+        softResetGameScreen();
+      
+        // 🎉 Sparkle effect when exiting tutorial
         const canvas = document.getElementById("celebrationCanvas");
-        sparkleShower(canvas); // 🎉 blast some flair
+        sparkleShower(canvas);
+      
+        // 🌈 Show menu after transition
         openMenuModal();
-      }
-  
-      // 🧊 Any other target, just show it normally
-      else {
+      
+      } else {
+        // generic fallback
         document.getElementById(targetModalId).style.display = 'flex';
       }
-  
     }, 200); // wait for fade out
   }, 1000); // wait for cone/scoop split
 }
