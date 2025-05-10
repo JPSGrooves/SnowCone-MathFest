@@ -90,6 +90,10 @@
       display: block;
       cursor: pointer;
     }
+    #titleImage {
+      display: none;
+    }
+
 
     .layout-row {
       display: flex;
@@ -640,7 +644,8 @@
 <canvas id="celebrationCanvas" class="confetti"></canvas>
 
 <!-- TITLE -->
-<img src="SnowConeMathFestTitle.png"
+<img id="titleImage"
+     src="SnowConeMathFestTitle.png"
      alt="SnowCone MathFest"
      class="title-image"
      onclick="resetScore(); generateProblem(); document.getElementById('rulesModal').style.display = 'flex';" />
@@ -1971,6 +1976,7 @@ function stopTutorialMusic() {
       closeBtn.addEventListener("click", () => {
         document.getElementById("rulesModal").style.display = "none";
         document.getElementById("gameContainer").style.display = "block";
+        document.getElementById("titleImage").style.display = "block"; // ✨ SHOW PNG here
         resetScore();
         generateProblem();
       });
