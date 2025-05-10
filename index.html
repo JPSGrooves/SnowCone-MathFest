@@ -784,6 +784,7 @@ const pictureFilenames = {
 // Chunk 16: Enhanced startTransition for Math Tips split‐cone transition (now 1000 ms)
 function startTransition(targetModalId) {
   closeMenuModal();
+  document.getElementById('gameContainer').style.display = 'none';
 
   const overlay = document.getElementById('transitionOverlay');
   const content = document.getElementById('transitionContent');
@@ -802,38 +803,36 @@ function startTransition(targetModalId) {
   overlay.style.display = 'flex';
   overlay.style.opacity = '1';
 
-  // ── Kick off split animation over 1000 ms
   cone.style.animation = 'slideRight 1000ms forwards';
   scoop.style.animation = 'slideLeft  1000ms forwards';
 
-  // ── After 1000 ms, fade out and show target modal
   setTimeout(() => {
     overlay.style.animation = 'fadeOutOverlay 200ms forwards';
-  
+
     setTimeout(() => {
       overlay.style.display = 'none';
       overlay.style.animation = '';
-  
+
       if (targetModalId === 'tutorialContainer') {
         renderTutorialPanel();
         document.getElementById(targetModalId).style.display = 'flex';
-  
+
       } else if (targetModalId === 'menuModal') {
         document.getElementById('tutorialContainer').style.display = 'none';
         document.getElementById('tutorialContainer').style.opacity = 0;
-  
+
         softResetGameScreen();
-  
+
         const canvas = document.getElementById("celebrationCanvas");
         sparkleShower(canvas);
-  
-        openMenuModal(); // ✅ this opens the correct main menu
+
+        openMenuModal(); // 🍧 This is the only thing that should run
       } else {
         document.getElementById(targetModalId).style.display = 'flex';
       }
-  
-    }, 200); // after fade
-  }, 1000); // after animation
+
+    }, 200);
+  }, 1000);
 }
 
 // MENU MODAL LOGIC
