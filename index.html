@@ -641,1497 +641,606 @@
       user-select: none;          /* standard */
     }
   </style>
+  <style>
+  /* 🧱 CHUNK 2: Core Layout Scaffolding */
+  body {
+    background: black;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  
+  main#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100vw;
+    min-height: 100vh;
+    padding: 10px 20px;
+    box-sizing: border-box;
+  }
+  
+  .title-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .title-image {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    cursor: pointer;
+  }
+  
+  .install-button {
+    display: none;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background: #00ff88;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    box-shadow: 0 0 10px #00ff88;
+    cursor: pointer;
+  }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  .modal-content {
+    background: black;
+    border: 2px solid #00ff88;
+    padding: 20px;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 0 15px #00ff88;
+    border-radius: 8px;
+  }
+  .modal-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: black;
+    color: white;
+    border: 2px solid #00ff88;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00ff88;
+  }
+  /* 🧱 CHUNK 3: Core Gameplay Layout */
+
+  .game-container {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .layout-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    padding: 0 20px;
+  }
+  
+  .score-block, .timer-block {
+    text-align: center;
+    flex: 1;
+  }
+  
+  .score-label, .timer-label {
+    font-size: clamp(16px, 3vw, 22px);
+    margin-bottom: 5px;
+    color: #00ff88;
+  }
+  .timer-label {
+    color: #00ccff;
+  }
+  
+  .score, #timer {
+    font-size: clamp(20px, 4vw, 28px);
+    font-weight: bold;
+  }
+  .score {
+    color: #00ff88;
+  }
+  #timer {
+    color: #00ccff;
+  }
+  
+  /* 🧊 Cone Zone */
+  .cone-zone {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(10px, 5vw, 50px);
+    margin: 20px 0;
+    position: relative;
+    min-height: 220px;
+  }
+  
+  .cone-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: clamp(65px, 20vw, 130px);
+  }
+  
+  /* 🟣 Scoop */
+  .scoop {
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    background: linear-gradient(to right, #ff00cc, #6600ff);
+    border-radius: 65px 65px 0 0;
+    box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  
+  /* Hide main scoop until correct */
+  .main-scoop {
+    display: none
+  /* 🧱 CHUNK 4: Mode Buttons + Keypad */
+  .mode-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0 10px;
+  }
+  
+  .mode-buttons button {
+    background-color: black;
+    border: 2px solid #00ff88;
+    color: white;
+    font-size: clamp(12px, 3.5vw, 16px);
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px #00ff88;
+    cursor: pointer;
+    width: clamp(60px, 18vw, 80px);
+    height: 48px;
+    white-space: pre-line;
+  }
+  
+  /* 🟦 Menu button tweaks */
+  .mode-buttons button:last-child {
+    border-color: #00ccff;
+    box-shadow: 0 0 12px #00ccff;
+    color: #00ccff;
+  }
+  
+  /* 🔢 Keypad Grid */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .keypad button {
+    background-color: black;
+    border: 2px solid #ff00cc;
+    color: white;
+    font-size: clamp(16px, 4vw, 20px);
+    padding: 12px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #ff00cc;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  
+  /* 🟦 Special: Enter Button */
+  .keypad button.enter-btn {
+    border-color: #00ccff;
+    box-shadow: 0 0 10px #00ccff;
+  }
+  
+  /* 🧼 Clear layout cell if empty */
+  .keypad div {
+    visibility: hidden;
+  }
+  /* 🧱 CHUNK 5: Rules Modal + Popup + Tutorial Styles */
+
+  /* 🧾 Rules Modal (Quick Serve welcome) */
+  #rulesModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  #rulesModal .modal-content {
+    background: black;
+    border: 2px solid #ff00cc;
+    padding: 20px;
+    max-width: 320px;
+    box-shadow: 0 0 15px #ff00cc;
+    text-align: center;
+    border-radius: 8px;
+  }
+  #rulesModal h2 {
+    color: #ffee00;
+    font-size: clamp(20px, 4vw, 28px);
+    margin-bottom: 10px;
+  }
+  #rulesModal p {
+    font-size: clamp(14px, 3.2vw, 18px);
+    line-height: 1.6;
+  }
+  #rulesModal button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: black;
+    color: white;
+    border: 2px solid #00ff88;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #00ff88;
+  }
+  
+  /* 🚨 Popup Modal (correct / incorrect) */
+  #popupModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  #popupModal .modal-content {
+    background: black;
+    border: 2px solid #00ff88;
+    padding: 20px;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 0 15px #00ff88;
+    border-radius: 8px;
+  }
+  #popupTitle {
+    color: #ffee00;
+    font-size: clamp(22px, 5vw, 28px);
+    margin-bottom: 15px;
+  }
+  #popupMessage {
+    font-size: clamp(16px, 4vw, 20px);
+    line-height: 1.6;
+  }
+  #popupButton {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #ff00cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  /* 🎓 Tutorial Panel Layout */
+  #tutorialContainer {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-height: 85vh;
+    height: auto;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    text-align: center;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: black;
+  }
+  #tutorialPanel {
+    max-width: 500px;
+    width: 90vw;
+    margin: 0 auto;
+    text-align: center;
+  }
+  #tutorialPanel div {
+    margin-bottom: 20px;
+    color: white;
+    font-size: clamp(14px, 3.5vw, 18px);
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  #tutorialPanel img {
+    max-width: 100%;
+    max-height: 60vh;
+    height: auto;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #00ccff;
+    object-fit: contain;
+  }
+  
+  /* Panel buttons */
+  .button-container {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .tutorial-next, .tutorial-back, .tutorial-menu {
+    padding: 10px 20px;
+    font-size: 18px;
+    border: 2px solid;
+    border-radius: 8px;
+    background: black;
+    color: white;
+    cursor: pointer;
+  }
+  .tutorial-next {
+    border-color: #00ff88;
+    box-shadow: 0 0 12px #00ff88;
+  }
+  .tutorial-back {
+    border-color: #ff00cc;
+    box-shadow: 0 0 12px #ff00cc;
+  }
+  .tutorial-menu {
+    border-color: #00ccff;
+    box-shadow: 0 0 12px #00ccff;
+    color: #00ccff;
+  }
+  
+  /* Reveal boxes */
+  .click-to-reveal {
+    margin-top: 20px;
+    padding: 12px 20px;
+    font-size: 18px;
+    border: 2px dashed #00ccff;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    max-width: 400px;
+    cursor: pointer;
+    box-shadow: 0 0 12px #00ccff;
+    transition: all 0.3s ease-in-out;
+  }
+  .click-to-reveal:hover {
+    box-shadow: 0 0 20px #00ccff;
+    transform: scale(1.05);
+  }
+  /* 🧱 CHUNK 6: Menu Modal + Install Tip + Music Mode Prep */
+
+  /* 🎛️ Menu Modal */
+  #menuModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    z-index: 9998;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  #menuModal h2 {
+    font-size: clamp(22px, 5vw, 30px);
+    margin-bottom: 20px;
+    color: #00ff88;
+  }
+  
+  /* 🍧 Menu Buttons (modes) */
+  .menu-button {
+    padding: 12px 24px;
+    margin: 10px;
+    background: black;
+    border: 2px solid #ff00cc;
+    border-radius: 8px;
+    font-size: clamp(16px, 4vw, 20px);
+    color: #ff00cc;
+    box-shadow: 0 0 10px #ff00cc;
+    cursor: pointer;
+    min-width: 200px;
+  }
+  
+  .menu-button:hover {
+    background: #111;
+    box-shadow: 0 0 20px #ff00cc;
+  }
+  
+  /* 📲 Install Tip */
+  #installTip {
+    display: none;
+    font-size: clamp(14px, 3vw, 18px);
+    color: #00ccff;
+    text-align: center;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px dashed #00ccff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00ccff;
+    cursor: pointer;
+  }
+  
+  /* 🎵 Infinity Mode Prep (button style match) */
+  .infinity-mode-button {
+    background: black;
+    color: #ffee00;
+    border: 2px solid #ffee00;
+    font-size: clamp(16px, 4vw, 20px);
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px #ffee00;
+    cursor: pointer;
+  }
+
+  </style>
 </head>
 <body>
-<!-- TRANSITION OVERLAY -->
-<div id="transitionOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:10002; justify-content:center; align-items:center; opacity:1;">
-  <div id="transitionContent" style="position:relative; width:100%; height:100%;"></div>
-</div>
-<canvas id="confettiCanvas" class="confetti"></canvas>
-<canvas id="celebrationCanvas" class="confetti"></canvas>
-
-<!-- TITLE -->
-<img id="titleImage"
-     src="SnowConeMathFestTitle.png"
-     alt="SnowCone MathFest"
-     class="title-image"
-     onclick="resetScore(); generateProblem(); document.getElementById('rulesModal').style.display = 'flex';" />
-
-<button id="installAppBtn" style="display:none; margin: 10px auto; padding:10px 20px; background:#00ff88; color:black; border:none; border-radius:6px; font-size:18px; box-shadow:0 0 10px #00ff88; cursor:pointer;">
-  📲 Install SnowCone MathFest
-</button>
-
-<!-- RULES MODAL -->
-<div id="rulesModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); color:white; font-family: Arial, Helvetica, sans-serif; z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:black; border:2px solid #ff00cc; padding:20px; max-width:300px; box-shadow:0 0 15px #ff00cc; text-align:center;">
-    <h2 style="color:#ffee00;">🍧 Quick Serve 🍧</h2>
-    <p style="font-size:16px; line-height:1.5;">
-      Welcome to Quick Serve Mode! If you score over 100 points, the math gets funkier and the cones more fresh!<br/><br/>
-      ➕➖ Add & Subtract: <strong>+5 points</strong><br/>
-      ✖️➗ Multiply & Divide: <strong>+7 points</strong><br/>
-      💀 Hard Mode: <strong>+10 points</strong><br/>
-      😵 Wrong answer: <strong>-3 points</strong><br/><br/>
-      🍧 The song is 1:45 long — when it ends, your score freezes.<br/><br/>
-      Serve up those equations and always return to see the new modes and updates! (V.09 5/10/2025)
-    </p>
-    <button id="closeModalBtn" style="margin-top:10px; padding:10px 20px; background:black; color:white; border:2px solid #00ff88; border-radius:5px; font-size:16px; cursor:pointer; box-shadow:0 0 10px #00ff88;">Let's Go!</button>
-  </div>
-</div>
-<!-- GAME CONTAINER -->
-<div class="game-container" id="gameContainer" style="display: none;">
-  <div class="layout-row">
-    <div class="score-block">
-      <div class="score-label">Score</div>
-      <div class="score"><span id="score">0</span></div>
-    </div>
-    <div class="timer-block">
-      <div class="timer-label">Time</div>
-      <div id="timer">0s</div>
-    </div>
-  </div>
-
-  <div class="cone-zone">
-    <div class="cone-wrapper clone-cone" id="leftCone">
-      <div class="scoop"></div>
-      <img src="cone.png" class="cone-img" />
-    </div>
-
-    <div class="cone-wrapper" id="mainCone">
-      <div class="scoop main-scoop" id="scoop"></div>
-      <img src="cone.png" id="coneImg" class="cone-img" />
-    </div>
-
-    <div class="cone-wrapper clone-cone" id="rightCone">
-      <div class="scoop"></div>
-      <img src="cone.png" class="cone-img" />
-    </div>
-  </div>
-
-  <div class="math-problem" id="problem">0 + 0 = 🍧</div>
-  <div class="answer-display" id="answerDisplay">0</div>
-
-  <div class="mode-buttons">
-    <button onclick="setMode('addsub')">+/-</button>
-    <button onclick="setMode('multdiv')">X-/</button>
-    <button onclick="setMode('hard')">Hard<br/>Mode</button>
-    <button onclick="openMenuModal()" style="white-space: pre-line; background-color: black; color: white; border: 2px solid #00ff88; border-radius: 6px; box-shadow: 0 0 12px #00ff88, 0 0 20px #00ff88; padding: 10px; font-size: 16px; cursor: pointer; width: 70px; height: 50px; line-height: 1.1;">Menu</button>
-  </div>
-
-
-  <div class="keypad">
-    <button onclick="appendNumber(7)">7</button>
-    <button onclick="appendNumber(8)">8</button>
-    <button onclick="appendNumber(9)">9</button>
-    <button class="enter-btn" onclick="submitAnswer()">Enter</button>
-    <button onclick="appendNumber(4)">4</button>
-    <button onclick="appendNumber(5)">5</button>
-    <button onclick="appendNumber(6)">6</button>
-    <button onclick="clearAnswer()">Clear</button>
-    <button onclick="appendNumber(1)">1</button>
-    <button onclick="appendNumber(2)">2</button>
-    <button onclick="appendNumber(3)">3</button>
-    <button onclick="toggleNegative()">-</button>
-    <button onclick="appendDecimal()">.</button>
-    <button onclick="appendNumber(0)">0</button>
-    <button onclick="toggleMute()">Mute</button>
-    <div></div>
-  </div>
-</div>
-<!-- POPUP MODAL -->
-<div id="popupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); color:white; z-index:9999; justify-content:center; align-items:center; font-family: Arial, Helvetica, sans-serif;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; max-width:300px; box-shadow:0 0 15px #00ff88; text-align:center;">
-    <h2 id="popupTitle" style="color:#ffee00; font-size:28px; margin-bottom:15px;">❗</h2> <!-- Was 22px -->
-    <p id="popupMessage" style="font-size:20px; line-height:1.6;"></p> <!-- Was 16px -->
-    <button id="popupButton" style="margin-top:15px; padding:10px 20px; background:#ff00cc; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer;">Got it!</button>
-  </div>
-</div>
-
-<!-- TUTORIAL CONTAINER - HIDDEN AT START -->
-<div id="tutorialContainer" style="display: none;">
-  <div id="tutorialPanel" class="panel active">
-    <!-- Dynamic tutorial content will get injected here -->
-  </div>
-</div>
-
-  
-<!-- AUDIO ELEMENTS -->
-<audio id="milestone25" preload="auto" src="QuikServe points25.mp3"></audio>
-<audio id="milestone50" preload="auto" src="QuikServe points50.mp3"></audio>
-<audio id="milestone75" preload="auto" src="QuikServe points75.mp3"></audio>
-<audio id="milestone100" preload="auto" src="QuikServe points100.mp3"></audio>
-<audio id="backgroundMusic1" preload="auto" src="quikserveST- All.mp3"></audio>
-<audio id="correctSound" preload="auto" src="correct.mp3"></audio>
-<audio id="incorrectSound" preload="auto" src="incorrect.mp3"></audio>
-<audio id="revealSound" preload="auto" src="reveal-sparkle.mp3"></audio>
-
-
-<!-- SCRIPT START -->
-<script>
-let score = 0;
-let currentAnswer = "";
-let correctAnswer = 0;
-let currentProblemType = "+";
-let mode = "addsub";
-let isMuted = false;
-let timerStarted = false;
-let secondsElapsed = 0;
-let timerInterval = null;
-let gameEnded = false;
-let wasPlayingBeforeMusicMode = false;
-let soundCloudPlaying = false;
-let scWasPlaying = false;
-
-const pictureFilenames = {
-  "confessionpicture": "confessionpicture.png",
-  "pythagoraspicture": "pythagoraspicture.png",
-  "turingbrahmaguptapicture": "turingbrahmaguptapicture.png",
-  "lovelacegausspicture": "lovelacegausspicture.png",
-  "euclidpicture": "euclidpicture.png",
-  "galileonewtonpicture": "galileonewtonpicture.png",
-  "bombellieuclidpicture": "bombellieuclidpicture.png",
-  "finalsnowconepicture": "finalsnowconepicture.png"
-};
-
-
-// Chunk 16: Enhanced startTransition for Math Tips split‐cone transition (now 1000 ms)
-function startTransition(targetModalId) {
-  closeMenuModal();
-  // ── Hide the main game so the overlay covers everything
-  document.getElementById('gameContainer').style.display = 'none';
-
-  const overlay = document.getElementById('transitionOverlay');
-  const content = document.getElementById('transitionContent');
-  content.innerHTML = '';
-
-  const cone = document.createElement('img');
-  cone.src = 'cone.png';
-  cone.className = 'transition-cone';
-
-  const scoop = document.createElement('div');
-  scoop.className = 'transition-scoop';
-
-  content.appendChild(cone);
-  content.appendChild(scoop);
-
-  overlay.style.display = 'flex';
-  overlay.style.opacity = '1';
-
-  // ── Kick off split animation over 1000 ms
-  cone.style.animation = 'slideRight 1000ms forwards';
-  scoop.style.animation = 'slideLeft  1000ms forwards';
-
-  // ── After 1000 ms, fade out and show target modal
-  setTimeout(() => {
-    overlay.style.animation = 'fadeOutOverlay 200ms forwards';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      overlay.style.animation = '';
-
-      // If we're transitioning to the tutorial, render the first panel
-      if (targetModalId === 'tutorialContainer') {
-        renderTutorialPanel();
-      }
-      // Show the requested modal (rulesModal or tutorialContainer)
-      document.getElementById(targetModalId).style.display = 'flex';
-    }, 200);
-  }, 1000);  // ◀️ changed from 1500 to 1000
-}
-
-// MENU MODAL LOGIC
-function openMenuModal() {
-  const menuModal = document.getElementById("menuModal");
-  const installTip = document.getElementById("installTip");
-
-  menuModal.style.display = "flex";
-  
-  // 🧠 Re-hook Math Tips Button every time menu opens
-  const tipsButton = document.getElementById('mathTipsButton');
-  if (tipsButton) {
-    tipsButton.onclick = () => startTransition('tutorialContainer');
-  }
-
-
-  if (installTip) {
-    installTip.style.display = "block";
-
-    if (deferredPrompt) {
-      installTip.style.cursor = "pointer";
-      installTip.onclick = () => {
-        installTip.style.display = "none";
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choiceResult => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('🎉 User accepted install');
-            showPopup("📲 Installed!", "SnowCone MathFest is now chilling on your home screen!");
-          } else {
-            console.log('❌ Install dismissed');
-          }
-          deferredPrompt = null;
-        });
-      };
-    } else {
-      installTip.style.cursor = "default";
-      installTip.onclick = null; // no action if no prompt available
-    }
+  <main id="app">
     
-  }
-}
-
-function softResetGameScreen() {
-  score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  gameEnded = false;
-
-  window.twentyFiveTriggered = false;
-  window.fiftyTriggered = false;
-  window.seventyFiveTriggered = false;
-  window.hundredTriggered = false;
-
-  document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "0s";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("scoop").style.display = "none";
-  document.getElementById("problem").textContent = "0 + 0 = 🍧";
-
-  clearInterval(timerInterval);
-  const music = document.getElementById("backgroundMusic1");
-  if (music) {
-    music.pause();
-    music.currentTime = 0;
-  }
-
-  document.getElementById("leftCone").classList.remove("left-spin");
-  document.getElementById("rightCone").classList.remove("right-spin");
-}
-
-
-function closeMenuModal() {
-  document.getElementById("menuModal").style.display = "none";
-}
-
-// 🍧💥 ADD THIS NEW ONE RIGHT HERE
-function backToQuickServe() {
-  closeMenuModal();
-  document.getElementById("tutorialContainer").style.display = "none"; // Hide Story/Tutorial if up
-  document.getElementById("gameContainer").style.display = "block"; // Re-show game
-}
-  
-function openMathTipsFromMenu() {
-  closeMenuModal(); // Close the Menu first
-  setTimeout(() => {
-    startTutorial(); // Then after a slight delay, start the Tutorial
-  }, 300); // About a third of a second (perfect for fade smoothness)
-}
-
-function openMusicModal() {
-  const bgMusic = document.getElementById("backgroundMusic1");
-  
-  // 🧠 Remember if background music was playing
-  wasPlayingBeforeMusicMode = !bgMusic.paused;
-  
-  // 🛑 INSTANTLY STOP BACKGROUND MUSIC
-  if (!bgMusic.paused) {
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
-    bgMusic.volume = 0.5; // Reset volume for later
-    console.log('⏹️ BG music paused instantly on Music Mode open.');
-  }
-
-  // 🎵 Open Music Mode modal
-  document.getElementById("musicModal").style.display = "flex";
-}
-
-
-
-function closeMusicModal() {
-  document.getElementById("musicModal").style.display = "none";
-
-  const bgMusic = document.getElementById("backgroundMusic1");
-
-  if (wasPlayingBeforeMusicMode && !gameEnded && timerStarted && !soundCloudPlaying) {
-    // 🌈 Only fade back in if SoundCloud DIDN'T start playing
-    bgMusic.volume = 0;
-    bgMusic.play().catch(e => console.warn("Music resume failed:", e));
-    let fadeInInterval = setInterval(() => {
-      if (bgMusic.volume < 0.5) {
-        bgMusic.volume += 0.05;
-      } else {
-        bgMusic.volume = 0.5;
-        clearInterval(fadeInInterval);
-      }
-    }, 100);
-  }
-}
-
-
-
-
-
-// Correct / Incorrect Sounds
-const correctTrack = document.getElementById("correctSound");
-const incorrectTrack = document.getElementById("incorrectSound");
-correctTrack.volume = 0.5;
-incorrectTrack.volume = 0.5;
-function generateProblem() {
-  let a, b, c, d, op1, op2;
-  const randomSign = () => (Math.random() < 0.5 ? -1 : 1);
-  const isRamp = score >= 100;
-
-  if (mode === "addsub") {
-    if (isRamp) {
-      a = Math.floor(Math.random() * 10) * randomSign();
-      b = Math.floor(Math.random() * 10) * randomSign();
-      c = Math.floor(Math.random() * 10) * randomSign();
-      correctAnswer = a + b + c;
-      currentProblemType = "+";
-      document.getElementById("problem").textContent = `${a} + ${b} + ${c} = 🍧`;
-    } else {
-      a = Math.floor(Math.random() * 10) * randomSign();
-      b = Math.floor(Math.random() * 10) * randomSign();
-      op1 = Math.random() > 0.5 ? "+" : "-";
-      correctAnswer = op1 === "+" ? a + b : a - b;
-      currentProblemType = op1;
-      document.getElementById("problem").textContent = `${a} ${op1} ${b} = 🍧`;
-    }
-  } else if (mode === "multdiv") {
-    if (isRamp) {
-      if (Math.random() > 0.5) {
-        a = Math.floor(Math.random() * 90 + 10) * randomSign();  // 10–99
-        b = Math.floor(Math.random() * 9 + 1) * randomSign();     // 1–9
-        correctAnswer = a * b;
-        currentProblemType = "×";
-        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-      } else {
-        correctAnswer = Math.floor(Math.random() * 90 + 10); // 10–99
-        b = Math.floor(Math.random() * 9 + 1);
-        a = correctAnswer * b;
-        currentProblemType = "÷";
-        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-      }
-    } else {
-      if (Math.random() > 0.5) {
-        a = Math.floor(Math.random() * 10) * randomSign();
-        b = Math.floor(Math.random() * 10) * randomSign();
-        correctAnswer = a * b;
-        currentProblemType = "×";
-        document.getElementById("problem").textContent = `${a} × ${b} = 🍧`;
-      } else {
-        b = Math.floor(Math.random() * 9 + 1);
-        correctAnswer = Math.floor(Math.random() * 10);
-        a = correctAnswer * b;
-        currentProblemType = "÷";
-        document.getElementById("problem").textContent = `${a} ÷ ${b} = 🍧`;
-      }
-    }
-  } else if (mode === "hard") {
-    while (true) {
-      a = Math.floor(Math.random() * 10) * randomSign();
-      b = Math.floor(Math.random() * 10) * randomSign();
-      c = Math.floor(Math.random() * 10) * randomSign();
-      d = Math.floor(Math.random() * 10) * randomSign();
-      op1 = Math.random() > 0.5 ? "+" : "-";
-      op2 = Math.random() > 0.5 ? "×" : "÷";
-
-      if (isRamp) {
-        let left = op1 === "+" ? a + b : a - b;
-        let right = Math.random() > 0.5 ? c + d : c - d;
-
-        if (op2 === "×") {
-          correctAnswer = left * right;
-        } else {
-          if (right === 0 || left % right !== 0) continue;
-          correctAnswer = left / right;
-        }
-
-        currentProblemType = "hard";
-        document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ${op2} (${c} ${op1} ${d}) = 🍧`;
-        break;
-      } else {
-        let inner = op1 === "+" ? a + b : a - b;
-
-        if (op2 === "×") {
-          correctAnswer = inner * c;
-          currentProblemType = "hard";
-          document.getElementById("problem").textContent = `(${a} ${op1} ${b}) × ${c} = 🍧`;
-          break;
-        } else {
-          if (c !== 0 && inner % c === 0) {
-            correctAnswer = inner / c;
-            currentProblemType = "hard";
-            document.getElementById("problem").textContent = `(${a} ${op1} ${b}) ÷ ${c} = 🍧`;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  currentAnswer = "";
-  document.getElementById("answerDisplay").textContent = "0";
-}
-function submitAnswer() {
-  if (gameEnded) {
-    showPopup("⏱️ Time’s Up", "Score is frozen. Keep jamming if you want.");
-    return;
-  }
-
-  const display = currentAnswer || document.getElementById("answerDisplay").textContent || "0";
-  let userAnswer = parseFloat(display);
-
-  if (userAnswer === correctAnswer) {
-    if (!timerStarted) {
-      timerStarted = true;
-
-      // 🚨 Only start background music if NOT in Music Mode
-      if (!soundCloudPlaying) {
-          const music = document.getElementById("backgroundMusic1");
-          music.currentTime = 0;
-          music.play().catch(e => console.warn("Music play failed:", e));
-      }
-
-
-      timerInterval = setInterval(() => {
-        secondsElapsed++;
-        document.getElementById("timer").textContent = `${secondsElapsed}s`;
-        if (secondsElapsed >= 105) {
-          clearInterval(timerInterval);
-          gameEnded = true;
-          showPopup("🍧 Time's Up! 🍧", `You scored ${score} points. Take a breath, grab a cone, and play again!`, false, true);
-        }
-      }, 1000);
-    }
-
-    if (!isMuted) {
-      correctTrack.pause();
-      correctTrack.currentTime = 0;
-      correctTrack.play().catch(e => console.warn("Play failed", e));
-    }
-
-    score += (currentProblemType === "hard" ? 10 : (currentProblemType === "×" || currentProblemType === "÷" ? 7 : 5));
-    document.getElementById("score").textContent = score;
-
-    showScoop(() => {
-      generateProblem();
-      checkMilestones();
-    });
-  } else {
-    if (!isMuted) {
-      incorrectTrack.currentTime = 0;
-      incorrectTrack.play();
-    }
-    score -= 3;
-    document.getElementById("score").textContent = score;
-
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-
-    showPopup("⛔ Incorrect!", "Try again.", true);
-  }
-}
-
-function showScoop(callback) {
-  const scoop = document.getElementById("scoop");
-  scoop.style.display = "block";
-  setTimeout(() => {
-    scoop.style.display = "none";
-    if (typeof callback === "function") callback();
-  }, 700);
-}
-function checkMilestones() {
-  const canvas = document.getElementById("celebrationCanvas");
-
-  if (score >= 25 && !window.twentyFiveTriggered) {
-    window.twentyFiveTriggered = true;
-    if (!isMuted) document.getElementById("milestone25").play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 50 && !window.fiftyTriggered) {
-    window.fiftyTriggered = true;
-    if (!isMuted) document.getElementById("milestone50").play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 75 && !window.seventyFiveTriggered) {
-    window.seventyFiveTriggered = true;
-    if (!isMuted) document.getElementById("milestone75").play();
-    sparkleShower(canvas);
-  }
-
-  if (score >= 100 && !window.hundredTriggered) {
-    window.hundredTriggered = true;
-    if (!isMuted) document.getElementById("milestone100").play();
-    fireworkBurst(canvas);
-    setTimeout(() => fireworkBurst(canvas), 500);
-    document.getElementById("leftCone").classList.add("left-spin");
-    document.getElementById("rightCone").classList.add("right-spin");
-  }
-}
-
-function sparkleShower(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let sparkles = [];
-  for (let i = 0; i < 100; i++) {
-    sparkles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * -canvas.height,
-      r: Math.random() * 2 + 1,
-      d: Math.random() * 1 + 0.5,
-      alpha: 1
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sparkles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    for (let p of sparkles) {
-      p.y += p.d;
-      p.alpha -= 0.005;
-    }
-    sparkles = sparkles.filter(p => p.alpha > 0);
-  }
-
-  (function loop() {
-    if (sparkles.length === 0) return;
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-
-function fireworkBurst(canvas) {
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  let bursts = [];
-  for (let i = 0; i < 30; i++) {
-    let angle = Math.random() * 2 * Math.PI;
-    let speed = Math.random() * 5 + 2;
-    bursts.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      life: 60,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bursts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-    update();
-  }
-
-  function update() {
-    bursts.forEach(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.life -= 1;
-    });
-    bursts = bursts.filter(p => p.life > 0);
-  }
-
-  (function loop() {
-    if (bursts.length === 0) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      return;
-    }
-    draw();
-    requestAnimationFrame(loop);
-  })();
-}
-function showPopup(title, message, autoClose = false, endOfGame = false) {
-  document.getElementById("popupTitle").textContent = title;
-  document.getElementById("popupMessage").textContent = message;
-  document.getElementById("popupModal").style.display = "flex";
-
-  const btn = document.getElementById("popupButton");
-  btn.textContent = endOfGame ? "Play Again" : "Got it!";
-  btn.onclick = endOfGame ? resetScore : closePopup;btn.onclick = endOfGame
-    ? () => {
-        resetScore();
-        document.getElementById('rulesModal').style.display = 'flex';
-      }
-    : closePopup;
-
-
-  if (autoClose) {
-    setTimeout(closePopup, 1500);
-  }
-}
-
-function closePopup() {
-  document.getElementById("popupModal").style.display = "none";
-}
-
-// Number input
-window.appendNumber = num => {
-  if (!gameEnded) {
-    if (currentAnswer === "0") currentAnswer = "";
-    currentAnswer += num;
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-// Decimal support
-window.appendDecimal = () => {
-  if (!gameEnded && !currentAnswer.includes(".")) {
-    currentAnswer += currentAnswer === "" ? "0." : ".";
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-// Negative toggle
-window.toggleNegative = () => {
-  if (!gameEnded) {
-    if (currentAnswer === "") {
-      currentAnswer = "-";
-    } else if (currentAnswer.startsWith("-")) {
-      currentAnswer = currentAnswer.slice(1);
-    } else {
-      currentAnswer = "-" + currentAnswer;
-    }
-    document.getElementById("answerDisplay").textContent = currentAnswer;
-  }
-};
-
-// Clear input
-window.clearAnswer = () => {
-  if (!gameEnded) {
-    currentAnswer = "";
-    document.getElementById("answerDisplay").textContent = "0";
-  }
-};
-
-// Mode switching
-window.setMode = newMode => {
-  mode = newMode;
-  generateProblem();
-};
-
-// Mute toggle
-window.toggleMute = () => {
-  isMuted = !isMuted;
-  console.log(isMuted ? "🔇 Muted all sounds" : "🔊 Unmuted all sounds");
-
-  document.getElementById("backgroundMusic1").muted = isMuted;
-  document.getElementById("correctSound").muted = isMuted;
-  document.getElementById("incorrectSound").muted = isMuted;
-  document.getElementById("milestone25").muted = isMuted;
-  document.getElementById("milestone50").muted = isMuted;
-  document.getElementById("milestone75").muted = isMuted;
-  document.getElementById("milestone100").muted = isMuted;
-
-// 🧠 Universal mute including SoundCloud
-  if (scWidget) {
-    scWidget.isPaused(function(paused) {
-      if (isMuted) {
-        if (!paused) {
-          scWasPlaying = true;
-          scWidget.pause();
-        } else {
-          scWasPlaying = false;
-        }
-      } else {
-        if (scWasPlaying) {
-          scWidget.play();
-        }
-      }
-    });
-  }
-};
-
-// Reset Score and Game
-function resetScore() {
-  score = 0;
-  currentAnswer = "";
-  correctAnswer = 0;
-  timerStarted = false;
-  secondsElapsed = 0;
-  gameEnded = false;
-
-  window.twentyFiveTriggered = false;
-  window.fiftyTriggered = false;
-  window.seventyFiveTriggered = false;
-  window.hundredTriggered = false;
-
-  document.getElementById("score").textContent = "0";
-  document.getElementById("timer").textContent = "0s";
-  document.getElementById("answerDisplay").textContent = "0";
-  document.getElementById("scoop").style.display = "none";
-  document.getElementById("problem").textContent = "0 + 0 = 🍧";
-
-  clearInterval(timerInterval);
-  const music = document.getElementById("backgroundMusic1");
-  music.pause();
-  music.currentTime = 0;
-
-  document.getElementById("leftCone").classList.remove("left-spin");
-  document.getElementById("rightCone").classList.remove("right-spin");
-  document.getElementById("popupModal").style.display = "none";
-  // 📌 NO more rulesModal here!
-  generateProblem();
-}
-
-
-
-
-window.openMenuModal = openMenuModal;
-window.closeMenuModal = closeMenuModal;
-// Key event listener for keyboard input
-document.addEventListener("keydown", function(event) {
-  if (gameEnded && event.key !== "r" && event.key !== "R") return;
-
-  switch(event.key) {
-    case "0": case "1": case "2": case "3": case "4":
-    case "5": case "6": case "7": case "8": case "9":
-      appendNumber(event.key);
-      break;
-    case "-":
-      toggleNegative();
-      break;
-    case ".":
-      appendDecimal();
-      break;
-    case "Enter":
-      submitAnswer();
-      break;
-    case "Backspace":
-      clearAnswer();
-      break;
-    case "1":
-      setMode("addsub");
-      break;
-    case "2":
-      setMode("multdiv");
-      break;
-    case "3":
-      setMode("hard");
-      break;
-    case "m":
-    case "M":
-      toggleMute();
-      break;
-    case "r":
-    case "R":
-      resetScore();
-      break;
-    case "Escape":
-      closePopup();
-      closeMenuModal();
-      closeMusicModal();
-      break;
-  }
-});
-
-
-// Install App Prompt Logic
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  
-  console.log('📲 Install prompt captured and ready.');
-});
-
-
-// Safari-specific install tip
-function isSafari() {
-  const ua = navigator.userAgent.toLowerCase();
-  return ua.includes('safari') && !ua.includes('chrome') && !ua.includes('android');
-}
-
-// Updated Quick Serve Math Tips matching the Jump to Quick Serve button blue (#00ccff)
-const panels = [
-  {
-    type: 'text',
-    text:
-      // Title in yellow
-      "<strong style='font-size:1.5em; color: yellow;'>Quick Serve Math Tips:</strong><br>" +
-      // ➕ tip in a bit larger, bold, Jump-button blue
-      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>➕ Break problems into parts.</span><br>" +
-      "• For example, 47 + 29 = 🍧<br>" +
-      "• Break into Tens: 40 + 20 = 60<br>" +
-      "• then into Ones: 7 + 9 = 16<br>" +
-      "• Recombine: 60 + 16 = 76<br>" +
-      // ➖ tip in Jump-button blue
-      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>➖ Look for friendly numbers.</span><br>" +
-      "• For example, 98 - 57 = 🍧<br>" +
-      "• Subtract 60 instead: 98 - 60 = 38.<br>" +
-      "• add back difference of 3: 38 + 3 = 41<br>" +
-      // ✖️ tip in Jump-button blue
-      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>✖️ Use the distributive property:</span><br>" +
-      "For example, 8 × 23 = 🍧<br>" +
-      "• Break it up: (8 × 20) + (8 × 3).<br>" +
-      "• Combine: 160 + 24 = 184<br>" +
-      // ➗ tip in Jump-button blue
-      "<span style='font-size:1.2em; font-weight:bold; color: #00ccff;'>➗ Trust your gut!</span><br>" +
-      "Your abdominal brain is your second brain!<br>" +
-      // disco-ball tip unchanged
-      "🪩 Breathe like you're solving math under a disco ball🪩. 🎵Five beats in, then five beats out 🎵 Also...Practice!💪"
-  },
-
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.4em; color: yellow;'>Why Math? Why Now? 🤔</strong><br>" +
-      "I hated math when I was young.\n" +
-      "It was cold 🥶. It was lifeless 💀. It was just numbers 🔢.\n" +
-      "I needed it to move 🕺💃. To sing 🎶🎤. To matter ❤️.\n" +
-      "That's why I started the SnowCone MathFest 🍧🚚🎉.\n" +
-      "After the first year... strange things happened 🌌.<br><br>" +
-      "Ghosts started arriving 👻✨ — ancient, glowing numbers whispering in the wind.\n" +
-      "I realized I had been seeing them my whole life, hidden in the columns before me...\n" +
-      "but only now were they seeing me too 👀🔮.\n" +
-      "As I stood at the gates 🏰🍧, slinging SnowCones to the masses in the mystical moist night-air 🎊🍦, I heard the first ghost walk by and say… 🎶👂"
-  },
-
-  // 🍧 Page 3: Pythagoras — The Song of Fractions (words of Pythagorus in Jump-button blue)
-  { 
-    type: 'text', 
-    text:
-      "<strong style='font-size:1.2em; color: yellow;'>Pythagorus - Song of Fractions</strong><br>" +
-      "<span style='color: #00ccff;'>\"Music is the math you already know 🎶 — deep in your bones 💀🎸. " +
-      "When you go up the string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️, " +
-      "yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint. " +
-      "It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points.\"</span><br><br>" +
-      "I served him a SnowCone 🍧 and knew that here at SnowCone MathFest 🌈🎉, " +
-      "every neon beat is an octave you’ve already unlocked 🎵🔓 — " +
-      "Maybe we're always just halfway to the next octave, but we can always discover the hidden frequencies singing along our path 👆🎶."
-  },
-  {
-    type: 'text',
-    text:
-      // inline image tag
-      "<img src=\"pythagoraspicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
-      // subtitle in italics
-      "<em>Pythagorus Eyes the Gates</em><br>"
-  },
-
-  // 🍧 Page 3: Practice Problems Duo on one panel with custom reveal sounds
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🎸🎵</strong><br><br>" +
-      // First question
-      "Pythagorus jumps onstage and begins shredding a standby guitar. He's jamming on a string that is 60 cm long 🎸.<br>" +
-      "When he presses it exactly halfway ⏱️ (30 cm), what fraction of the original length is vibrating? 🤔➗<br>" +
-      // First reveal box with milestone25 audio
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerText='1/2 (Half the string, twice the pitch — an octave higher! 🎵)';" +
-        "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal Answer</div><br>" +
-      // Follow-up question
-      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up:</strong><br>" +
-      "Now he presses 20 cm up the 60 cm string. What fraction vibrates this time? 🤔➗<br>" +
-      // Second reveal box with milestone100 audio
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerText='2/3 (Two-thirds vibrate, since 60 cm – 20 cm = 40 cm; 40/60 = 2/3)';" +
-        "new Audio('QuikServe points100.mp3').play();" +
-      "\">Click to Reveal Answer</div>"
-  },
-
-
-  // 🍧 Page 4: Euclid — Architect of Reality (alternating blue dialogue and white narrative)
-  { 
-    type: 'text', 
-    text:
-      "<strong style='font-size:1.3em; color: yellow;'>Euclid — Architect of Reality</strong><br>" +
-      // First quote in blue
-      "<span style='color: #00ccff;'>\"All structure, seen or unseen, begins with a line ✏️➡️📏.\"</span>" +
-      // Narrative in default white
-      " He paused, tracing his proofs and figures through the void —" +
-      // Second quote back in blue
-      " <span style='color: #00ccff;'>\"The simplest gesture births every shape, every temple, every constellation above. " +
-      "Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement.\"</span><br><br>" +
-      // Closing narrative in white
-      "By connecting the two dots in front of him, Euclid wasn’t merely drawing — he was weaving the very fabric of existence into patterns the mind could grasp.<br>" +
-      "He was so distracted by the charts and diagrams, he almost didn't see the SnowCone I was handing him. 🍧 But the glistening of the snow crystals in the concert light was more than enough to catch his eye.<br>"
-  },
-  {
-    type: 'text',
-    text:
-      // inline image tag
-      "<img src=\"euclidpicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
-      // subtitle in italics
-      "<em>Euclid Perfects the Cone</em><br>"
-  },
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
-      "Euclid immediately notices the odd shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. <span style='color: #00ccff;'>\"What’s the hypotenuse length?\"</span> he asks. 🤔📐<br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerText='5 cm (3² + 4² = 9 + 16 = 25 → √25 = 5)';" +
-        "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal Answer</div><br>" +
-      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
-      "Next, Euclid sketches the perfect snow cone: two equal sides of 6 cm and a top edge of 4 cm. <span style='color: #00ccff;'>\"What’s the perimeter of this neon triangle?\"</span> 🤔📏<br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerText='16 cm (6 + 6 + 4 = 16)';" +
-        "new Audio('QuikServe points100.mp3').play();" +
-      "\">Click to Reveal Answer</div>"
-  },
-
-
-  // 🍧 Page 5: Galileo & Newton Secrets of Motion
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.2em; color: yellow;'>Galileo &amp; Newton Strolling<br>in a Symphony of Motion</strong><br>" +
-      "<span style='color: white;'>Galileo:</span> <span style='color: #00ccff;'>\"Everything moves if you watch carefully enough 🎵🔭. Even what seems at rest is weaving through space at unimaginable speeds—the Earth spins, the Moon orbits, and light itself races across the void. Observation is the instrument that reveals the hidden dance of the cosmos.\"</span><br>" +
-      "<span style='color: white;'>Newton:</span> <span style='color: #00ccff;'>\"And every motion has a cause 🪐⚙️. Forces sculpt the tapestry of reality: gravity pulls apples and planets alike, inertia resists every change, and for every action there’s an equal echo. Even the unseen hand of attraction shapes the universe’s grand ballet.\"</span><br><br>" +
-      "I slung them a pair of neon SnowCones 🍧🍧 and mused at how I might measure the speed of their cosmic stroll.🚶🚶‍♂️"
-  },
-  {
-    type: 'text',
-    text:
-      // inline image tag
-      "<img src=\"galileonewtonpicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
-      // subtitle in italics
-      "<em>Galileo and Newton discussing the purpose of motion.</em><br>"
-  },
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
-      "I informed Galileo that my neon snow cone truck cruised to the MathFest at a steady pace: I traveled 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerText='30 miles per hour (Speed = Distance ÷ Time = 60 ÷ 2)';" +
-        "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal Answer</div><br>" +
-      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
-      "Newton asked, <span style='color: #00ccff;'>\"If you kept rolling at that speed, how far would you cruise in 5 hours?\"</span> 🤔📏<br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerText='150 miles (Speed × Time = 30 × 5)';" +
-        "new Audio('QuikServe points100.mp3').play();" +
-      "\">Click to Reveal Answer</div>"
-  },
-
-  // 🍧 Page 6: Turing & Brahmagupta — Secrets and Silence
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.2em; color: yellow;'>Turing & Brahmagupta<br>Whisper a Code of Silence</strong><br>" +
-      "I almost lost myself in the motion of the music, but then I heard Turing speak softly," +
-      " <span style='color: #00ccff;'>\"Every puzzle is a hidden message, encoded in the patterns of the world. From the fluttering of a breeze to the circuits of a machine. Each mathematical proof, carries its own secret that reveals the logic behind chaos.\"</span>" +
-      " Brahmagupta smiled and spoke more softly <span style='color: #00ccff;'>\"And every silence is full of numbers, each pause a zero, each gap a canvas for infinity. By listening to the stillness, we trace the balance of forces that govern both sand-grains and galaxies.\"</span><br><br>" +
-      "I quickly realized that gaps and zeros in life are clues, not emptiness. Math isn't just numbers; it’s the story of life itself, waiting for a curious mind to unfold it"
-  },
-  
-  {
-    type: 'text',
-    text:
-      // inline image tag
-      "<img src=\"turingbrahmaguptapicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
-      // subtitle in italics
-      "<em>Turing & Brahmagupta discuss the chaos of nothingness.</em><br>"
-  },
-  
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
-      "Turing was excited to see the SnowCones and said, <span style='color: #00ccff;'>\"I would like to have 7 scoops.\"</span> Remembering his doubling-plus-one function as f(x) = 2x + 1, he asked, <span style='color: #00ccff;'>\"What is f(3) scoops?\"</span> 🤔<br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerHTML='2 × 3 + 1 = 7 = f(3) 🍧';" +
-        "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal Answer</div><br>" +
-      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
-      "Brahmagupta heard me say I couldn't stack that many scoops and asked Turing: <span style='color: #00ccff;'>\"What happens when a whole scoop is multiplied or divided by 0?\"</span> 🤔<br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerText='It melts into to nothing! (The scoops are reduced by the silence.)';" +
-        "new Audio('QuikServe points100.mp3').play();" +
-      "\">Click to Reveal Answer</div>"
-  },
-  // 🍧 Page 7: Euclid Returning to Meet Bombelli — Imaginary Architecture
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.2em; color: yellow;'>Euclid Returns<br>To Meet Bombelli</strong><br>" +
-      "Bombelli arrived later than the rest, but the familiar voice of Euclid ran back to understand the shifting shape of the world around us." +
-      " <span style='color: white;'>Bombelli:</span> <span style='color: #00ccff;'>\"What you call impossible... we call architecture. We draft cathedrals in the abstract, where each imaginary unit is a soaring arch and every complex plane lays the foundation for realms unseen. In our hands, ‘i’ becomes brick, and infinity our blueprint. Here, the dream of numbers carves space itself, and what others dismiss as folly reveals its hidden symmetry and strength.\"</span><br><br>" +
-      "My mind was tossed in a sprightly dance and I concluded that imaginary numbers build real dreams."
-  },
-  {
-    type: 'text',
-    text:
-      // inline image tag
-      "<img src=\"bombellieuclidpicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
-      // subtitle in italics
-      "<em>Euclid Learns More About Bombelli's Imaginary Stance</em><br>"
-  },
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
-      "Stepping up for his first Snowcone of the MathFest, Bombelli, was trying to figure out how to get an impossible SnowCone and asked, <span style='color: #00ccff;'>What is the square root of −1?🤔</span><br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerHTML='i (Imaginary, but essential for an impossible SnowCones.)';" +
-        "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal Answer</div><br>" +
-      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
-      "Euclid, figuring out how he could order an imaginary Snowcone, asked, <span style='color: #00ccff;'>What is i²?🤔</span><br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerHTML='−1 (The imaginary loops back into the negative realm, thus explaining the absence of his SnowCone!)';" +
-        "new Audio('QuikServe points100.mp3').play();" +
-      "\">Click to Reveal Answer</div>"
-  },
-  // 🍧 Page 8: Lovelace & Gauss — Rhythm Hidden in the Storm
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.2em; color: yellow;'>Lovelace & Gauss<br>Battling the Storms</strong><br>" +
-      "Eyeing a swirling mist over the MathFest, Ada Lovelace bent close to the dancing SnowCones... " +
-      " <span style='color: #00ccff;'>\"Find the rhythm hidden in the storm. Let each thunderclap be the drumbeat of your code and every spiral of wind the loop that composes our melody.\"</span>" +
-      " At the edge of a wind-whipped SnowCone, her new friend, Gauss, traced arcs in the raindrops falling like decimal points... " +
-      " <span style='color: #00ccff;'>\"They dance between the numbers, gliding through what seems to be randomness, but in every step lies a formula of fate waiting to be unveiled.\"</span><br><br>" +
-      "My heart raced as the musical tempest around me felt impossibly ordered; I realized chaos is merely a tapestry of patterns too vast for my untrained eyes."
-  },
-  {
-    type: 'text',
-    text:
-      // inline image tag
-      "<img src=\"lovelacegausspicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
-      // subtitle in italics
-      "<em>Lovelace and Guass Pondering the Patterns of the Rain</em><br>"
-  },
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.5em; color: yellow;'>Practice Problems 🍧🚀</strong><br><br>" +
-      "Before snagging a SnowCone, Lovelace pondered whether the weather might cancel the MathFest: <span style='color: #00ccff;'>\"If thunder repeats every 5 seconds, how many repeats happen in 20 seconds?\"🤔</span><br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerHTML='4 times (20 ÷ 5 = 4 repeats)';" +
-        "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal Answer</div><br>" +
-      "<strong style='font-size:1.2em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
-      "Gauss knew he wasn't leaving without a SnowCone. He mused at the neon rain, noting that a drop fell every 0.25 seconds: " +
-      "<span style='color: #00ccff;'>\"If the storm lasts 2.5 seconds, how many drops hit the ground?\"</span> 🤔<br>" +
-      "<div class='click-to-reveal' onclick=\"" +
-        "this.innerHTML='10 drops (2.5 ÷ 0.25 = 10).';" +
-        "new Audio('QuikServe points25.mp3').play();" +
-      "\">Click to Reveal</div><br>"
-  },
-  // 🍧 Page 9: Final Reflection - The Gates Are Opening
-  {
-    type: 'text',
-    text:
-      "<strong style='font-size:1.3em; color: yellow;'>✨Cosmic Reflections✨</strong><br><br>" +
-      "We’ve jammed through Pythagoras’ Song of Fractions 🎵🍧; we’ve walked through Euclid and Bombelli’s imaginary arches 🏛️🔮; " +
-      " We’ve strode alongside Galileo and Newton through a beautiful symphony of motion 🚀🎶; " +
-      " We’ve decoded Turing’s doubling-plus-one echoes 🤖➕1️⃣ and heard Brahmagupta’s zeros whisper the power of silence 0️⃣🤫; " +
-      " We’ve chased Lovelace’s hidden rhythms in the storm 💻🌩️ and traced Gauss’s patterns in the wildest chaos 🔢🎉.<br><br>" +
-      "Math is more than numbers—it’s music, architecture, motion, code, and the dreams that bind them together." +
-      " Keep practicing in Quick Serve Mode, and I’ll see you in Story Mode soon!"
-  },
-  {
-    type: 'text',
-    text:
-      // inline image tag
-      "<img src=\"finalsnowconepicture.png\" style=\"max-width:100%; height:auto;\"><br>" +
-      // subtitle in italics
-      "<em>Galileo and Newton are ready for a SnowCone!</em><br>"
-  }
-];
-
-
-// Tracking where we are
-let currentPanel = 0;
-  
-// Render the Tutorial Panel
-function renderTutorialPanel() {
-  const tutorialContainer = document.getElementById('tutorialContainer');
-  const tutorialPanel = document.getElementById('tutorialPanel');
-  tutorialPanel.innerHTML = ''; // Clear previous panel
-
-  const panelData = panels[currentPanel];
-
-  // Create Content
-  const content = document.createElement('div');
-  
-  if (panelData.type === 'text') {
-    content.innerHTML = panelData.text.replace(/\\n/g, '<br/>');
-    tutorialPanel.appendChild(content);
-  } else if (panelData.type === 'picture') {
-    const img = document.createElement('img');
-    img.src = `${panelData.image}`; // ❌ NO "images/" folder – JUST the filename!
-    img.style.maxWidth = '100%';
-    img.style.height = 'auto';
-    tutorialPanel.appendChild(img);
-  }
-
-  // If this panel has a reveal
-  if (panelData.reveal) {
-    const revealBox = document.createElement('div');
-    revealBox.className = 'click-to-reveal';
-    revealBox.innerText = 'Click to Reveal Answer';
-    revealBox.onclick = () => {
-      revealBox.innerText = panelData.reveal;
-    
-      // ✨ Play a FRESH copy of the sparkle sound
-      const sparkle = new Audio('reveal-sparkle.mp3');
-      sparkle.volume = 0.25;
-      sparkle.play().catch(e => console.log('Reveal sparkle play blocked:', e));
-    };
-
-    tutorialPanel.appendChild(revealBox);
-  }
-
-  // Button Container
-  const buttonContainer = document.createElement('div');
-  buttonContainer.className = 'button-container';
-  
-  // BACK Button (if not first panel)
-  if (currentPanel > 0) {
-    const backButton = document.createElement('button');
-    backButton.innerText = 'Back';
-    backButton.className = 'tutorial-back';
-    backButton.onclick = () => fadeToPanel(currentPanel - 1);
-    buttonContainer.appendChild(backButton);
-  }
-  
-  // ✅ Only add NEXT if not on the final panel
-  if (currentPanel < panels.length - 1) {
-    const nextButton = document.createElement('button');
-    nextButton.innerText = 'Next';
-    nextButton.className = 'tutorial-next';
-    nextButton.onclick = () => fadeToPanel(currentPanel + 1);
-    buttonContainer.appendChild(nextButton);
-  }
-  
-  // 🌈 Always add "Back to Menu" button (no transition!)
-  const menuButton = document.createElement('button');
-  menuButton.innerText = 'Back to Menu';
-  menuButton.className = 'tutorial-menu';
-  menuButton.onclick = () => {
-    stopTutorialMusic();
-    showMainMenu(); // 🔥 no cone-split, just straight to menu
-  };
-  buttonContainer.appendChild(menuButton);
-  
-  // Add all buttons to panel
-  tutorialPanel.appendChild(buttonContainer);
-}
-
-function fadeToPanel(newPanelIndex) {
-  const tutorialPanel = document.getElementById('tutorialPanel');
-  if (!tutorialPanel) return;
-
-  // 🛑 Before anything else: check if tutorial is finished
-  if (newPanelIndex >= panels.length) {
-    closeTutorial();
-    return;
-  }
-
-  tutorialPanel.style.opacity = 0;
-
-  setTimeout(() => {
-    currentPanel = newPanelIndex;
-
-    // 🎵 START tutorial music ONLY if moving onto panel 1
-    if (currentPanel === 1 && !soundCloudPlaying) {
-      startTutorialMusic();
-    }
-
-    renderTutorialPanel();
-
-    setTimeout(() => {
-      tutorialPanel.style.opacity = 1;
-    }, 50);
-  }, 300);
-}
-
-
-
-function nextPanel() {
-  if (currentPanel >= panels.length - 1) {
-    closeTutorial();
-    return;
-  }
-  // otherwise, move to next panel like normal
-  currentPanel++;
-  updatePanel();
-}
-  
-// Show Tutorial, Hide Main Game/Menu
-function startTutorial() {
-  const gameContainer = document.getElementById('gameContainer');
-  const menuContainer = document.getElementById('menuModal'); // 🛠️ Correct ID is 'menuModal'
-  const tutorialContainer = document.getElementById('tutorialContainer');
-
-  // 🎵 Stop background game music
-  const bgMusic = document.getElementById("backgroundMusic1");
-  if (bgMusic && !bgMusic.paused) {
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
-  }
-
-
-  if (menuContainer) {
-    menuContainer.style.opacity = 0;
-    setTimeout(() => {
-      menuContainer.style.display = 'none';
-
-      if (gameContainer) {
-        gameContainer.style.display = 'none';
-      }
-      if (tutorialContainer) {
-        tutorialContainer.style.display = 'flex';
-        setTimeout(() => {
-          tutorialContainer.style.opacity = 1;
-        }, 50);
-      }
-
-      currentPanel = 0; // Reset start
-      renderTutorialPanel();
-    }, 300); // 🌟 Fade menu away first, then fire tutorial
-  }
-}
-
-
-
-
-
-// Hide Tutorial, Show Main Menu
-function showMainMenu() {
-  const tutorialContainer = document.getElementById('tutorialContainer');
-  const menuContainer = document.getElementById('menuModal');
-  const gameContainer = document.getElementById('gameContainer');
-
-  if (tutorialContainer) {
-    tutorialContainer.style.opacity = 0;
-
-    setTimeout(() => {
-      tutorialContainer.style.display = 'none';
-
-      // 🛑 Stop tutorial music if playing
-      stopTutorialMusic();
-
-      // 💥 FULL SOFT RESET THE GAME SCREEN
-      softResetGameScreen();
-
-      // Show the menu
-      if (menuContainer) {
-        menuContainer.style.display = 'flex';
-        setTimeout(() => {
-          menuContainer.style.opacity = 1;
-        }, 50);
-      }
-      if (menuContainer) {
-        menuContainer.style.display = 'flex';
-        menuContainer.style.opacity = 0;
-        setTimeout(() => {
-          menuContainer.style.opacity = 1;
-        }, 50);
-      }
-      // 🚫 DO NOT touch the gameContainer here
-      // Game will properly start when they resetScore or click New Game
-
-      // 🌈 Reset to default mode (optional but clean)
-      mode = 'addsub'; 
-      generateProblem();
-
-    }, 500); // Fade out delay
-  }
-}
-
-
-
-// Setup Tutorial Music Element
-let tutorialMusic = new Audio('tutorial-music.mp3');
-tutorialMusic.loop = true;
-tutorialMusic.volume = 0.5;
-
-function startTutorialMusic() {
-  tutorialMusic.play().catch((e) => {
-    console.log('Tutorial music play blocked:', e);
-  });
-}
-
-function stopTutorialMusic() {
-  tutorialMusic.pause();
-  tutorialMusic.currentTime = 0;
-}
-
-// FULLY MERGED WINDOW LOAD HANDLER
-// Chunk 15: Swap out the load-handler so the Menu, not the rules, shows first
-  window.addEventListener('load', () => {
-    openMenuModal();
-  
-    const closeBtn = document.getElementById("closeModalBtn");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        document.getElementById("rulesModal").style.display = "none";
-        document.getElementById("gameContainer").style.display = "block";
-        document.getElementById("titleImage").style.display = "block"; // ✨ SHOW PNG here
-        resetScore();
-        generateProblem();
-      });
-    }
-   
-  // Setup SoundCloud Widget
-  const Element = document.getElementById('soundcloudPlayer');
-  if (Element && typeof SC !== 'undefined') { 
-    scWidget = SC.Widget(Element);
-
-    scWidget.bind(SC.Widget.Events.PLAY, function() {
-      console.log('🎵 SoundCloud widget PLAY detected!');
-      soundCloudPlaying = true;
-    
-      const bgMusic = document.getElementById("backgroundMusic1");
-    
-      // 🎧 Add slight delay before fading to avoid overlap
-      setTimeout(() => {
-        if (bgMusic && !bgMusic.paused) {
-          let fadeOutInterval = setInterval(() => {
-            if (bgMusic.volume > 0.05) {
-              bgMusic.volume -= 0.05;
-            } else {
-              bgMusic.volume = 0;
-              bgMusic.pause();
-              clearInterval(fadeOutInterval);
-              console.log('🎶 Background music faded because SoundCloud started.');
-            }
-          }, 100);
-        }
-      }, 400); // 🕒 Delay by 400ms for smooth transition
-    });
-
-  }
-
-  // Setup Install Prompt
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    console.log('📲 Install prompt captured.');
-  });
-
-  // Register Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(registration => {
-        console.log('✅ Service Worker registered with scope:', registration.scope);
-      })
-      .catch(error => {
-        console.log('❌ Service Worker registration failed:', error);
-      });
-  }
-
-  // 🧠 Now ALSO hook the Math Tips button properly
-  const tipsButton = document.getElementById('mathTipsButton');
-  if (tipsButton) {
-    tipsButton.addEventListener('click', () => {
-      startTutorial();
-    });
-  }
-});
-
-
-</script>
-<!-- MENU MODAL -->
-<div id="menuModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
-  <div style="background:black; border:2px solid #00ff88; padding:30px; width:90%; max-width:400px; text-align:center; box-shadow:0 0 20px #00ff88;">
-    <h2 id="menuTitle" style="color:#ffee00; font-size:26px; margin-bottom:20px; white-space:nowrap;">🍧 SnowCone MathFest 🍧</h2>
-    <div class="menu-text" style="text-align:center; margin-bottom:10px;"></div>
-    <div id="installTip" style="margin-top:20px; margin-bottom: 20px; padding:15px; background:black; border:2px solid #ffee00; border-radius:5px; color:white; font-size:16px; box-shadow:0 0 10px #ffee00; cursor:pointer; display:none;">
-      📲 <strong>Install SnowCone MathFest!</strong><br/>
-      Chrome: Tap here to install!<br/>
-      Safari: Use the Share icon 🔗 and "Add to Home Screen"
+    <!-- TRANSITION OVERLAY -->
+    <div id="transitionOverlay">
+      <div id="transitionContent"></div>
     </div>
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      <!-- Math Tips & Story Intro -->
-      <button
-        id="mathTipsButton"
-        style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; color:white; box-shadow:0 0 12px #00ff88; cursor:pointer;"
-      >
-        🧠 Math Tips & Story Intro
-      </button>
-      <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">📖 Story Mode — Serving Soon!</button>
-      <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">♾️ Infinity Mode — Serving Soon!</button>
-      <!-- Music Player Mode -->
-      <button id="musicModeBtn"
-              onclick="startTransition('musicModal')"
-              style="padding:10px; font-size:18px; background:black; border:2px solid #00ff88; border-radius:5px; cursor:pointer; color:white; box-shadow:0 0 12px #00ff88;">
-        🎵 Music Player Mode
-      </button>
-      <button disabled style="padding:10px; font-size:18px; background:black; border:2px solid #ff00cc; border-radius:5px; color:white; box-shadow:0 0 10px #ff00cc;">🏆 High Scores & Badges — Serving Soon!</button>
-    </div>
-    <!-- Jump to Quick Serve -->
-    <button id="jumpToQSBtn"
-            onclick="startTransition('rulesModal')"
-            style="margin-top:20px;
-                   padding:10px 20px;
-                   background:black;
-                   color:#00ccff;                   /* text blue */
-                   border:2px solid #00ccff;       /* border blue */
-                   border-radius:5px;
-                   font-size:16px;
-                   cursor:pointer;
-                   box-shadow:0 0 10px #00ccff;    /* glow blue */
-                   ">
-      Jump to Quick Serve!
-    </button>
-  </div>
-</div>
-<!-- MUSIC MODE MODAL -->
-<div id="musicModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); z-index:10001; justify-content:center; align-items:center; color:white; font-family: Arial, Helvetica, sans-serif;">
-  <div style="background:black; border:2px solid #00ff88; padding:20px; width:90%; max-width:600px; text-align:center; box-shadow:0 0 20px #00ff88;">
-    <h2 id="musicTitle" style="color:#ffee00; font-size:26px; margin-bottom:20px; white-space:nowrap;">🎵 JPS Grooves – Music Mode 🎵</h2>
-  <iframe id="soundcloudPlayer"
-    width="100%" height="450"
-    scrolling="no" frameborder="no"
-    allow="autoplay; encrypted-media"
-    src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&api=true">
-  </iframe>
-    <div style="font-size: 12px; color: #cccccc; margin-top: 5px;">
-      <a href="https://soundcloud.com/jpsgrooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a> · 
-      <a href="https://soundcloud.com/jpsgrooves/sets/electronic" target="_blank" style="color: #cccccc; text-decoration: none;">Electronic</a>
-    </div>
-    <button
-      onclick="closeMusicModal(); openMenuModal();"
-      style="margin-top:20px;
-             padding:10px 20px;
-             background:black;
-             color:white;
-             border:2px solid #00ff88;
-             border-radius:5px;
-             font-size:16px;
-             cursor:pointer;
-             box-shadow:0 0 10px #00ff88;"
-    >
-      Back to Menu
-    </button>
-  </div>
-</div>
 
-  <script>
-    // prevent text selection start
-    document.addEventListener('selectstart', e => e.preventDefault());
-    // prevent right-click menu
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    // prevent dragging text or images
-    document.addEventListener('dragstart', e => e.preventDefault());
-  </script>
+    <!-- CELEBRATION CANVASES -->
+    <canvas id="confettiCanvas" class="confetti"></canvas>
+    <canvas id="celebrationCanvas" class="confetti"></canvas>
+
+    <!-- TITLE IMAGE -->
+    <header class="title-header">
+      <img id="titleImage"
+           src="SnowConeMathFestTitle.png"
+           alt="SnowCone MathFest"
+           class="title-image"
+           onclick="resetScore(); generateProblem(); document.getElementById('rulesModal').style.display = 'flex';" />
+    </header>
+
+    <!-- INSTALL BUTTON -->
+    <button id="installAppBtn" class="install-button">📲 Install SnowCone MathFest</button>
+
+    <!-- RULES MODAL -->
+    <section id="rulesModal" class="modal">
+      <div class="modal-content">
+        <h2>🍧 Quick Serve 🍧</h2>
+        <p>
+          Welcome to Quick Serve Mode!<br/><br/>
+          ➕➖ Add & Subtract: <strong>+5 points</strong><br/>
+          ✖️➗ Multiply & Divide: <strong>+7 points</strong><br/>
+          💀 Hard Mode: <strong>+10 points</strong><br/>
+          😵 Wrong answer: <strong>-3 points</strong><br/><br/>
+          🍧 The song is 1:45 long — when it ends, your score freezes.<br/><br/>
+          Serve up those equations and always return to see the new modes and updates!
+        </p>
+        <button id="closeModalBtn" class="modal-button">Let's Go!</button>
+      </div>
+    </section>
+
+    <!-- GAME CONTAINER -->
+    <section class="game-container" id="gameContainer">
+
+      <!-- SCORE + TIMER -->
+      <div class="layout-row">
+        <div class="score-block">
+          <div class="score-label">Score</div>
+          <div class="score"><span id="score">0</span></div>
+        </div>
+        <div class="timer-block">
+          <div class="timer-label">Time</div>
+          <div id="timer">0s</div>
+        </div>
+      </div>
+
+      <!-- CONE ZONE -->
+      <section class="cone-zone">
+        <div class="cone-wrapper clone-cone" id="leftCone">
+          <div class="scoop"></div>
+          <img src="cone.png" class="cone-img" />
+        </div>
+
+        <div class="cone-wrapper" id="mainCone">
+          <div class="scoop main-scoop" id="scoop"></div>
+          <img src="cone.png" id="coneImg" class="cone-img" />
+        </div>
+
+        <div class="cone-wrapper clone-cone" id="rightCone">
+          <div class="scoop"></div>
+          <img src="cone.png" class="cone-img" />
+        </div>
+      </section>
+
+      <!-- MATH PROBLEM -->
+      <div class="math-problem" id="problem">0 + 0 = 🍧</div>
+      <div class="answer-display" id="answerDisplay">0</div>
+
+      <!-- MODE BUTTONS -->
+      <div class="mode-buttons">
+        <button onclick="setMode('addsub')">+/-</button>
+        <button onclick="setMode('multdiv')">X-/</button>
+        <button onclick="setMode('hard')">Hard<br/>Mode</button>
+        <button onclick="openMenuModal()">Menu</button>
+      </div>
+
+      <!-- KEYPAD -->
+      <section class="keypad">
+        <button onclick="appendNumber(7)">7</button>
+        <button onclick="appendNumber(8)">8</button>
+        <button onclick="appendNumber(9)">9</button>
+        <button class="enter-btn" onclick="submitAnswer()">Enter</button>
+        <button onclick="appendNumber(4)">4</button>
+        <button onclick="appendNumber(5)">5</button>
+        <button onclick="appendNumber(6)">6</button>
+        <button onclick="clearAnswer()">Clear</button>
+        <button onclick="appendNumber(1)">1</button>
+        <button onclick="appendNumber(2)">2</button>
+        <button onclick="appendNumber(3)">3</button>
+        <button onclick="toggleNegative()">-</button>
+        <button onclick="appendDecimal()">.</button>
+        <button onclick="appendNumber(0)">0</button>
+        <button onclick="toggleMute()">Mute</button>
+        <div></div>
+      </section>
+    </section>
+
+    <!-- POPUP MODAL -->
+    <section id="popupModal" class="modal">
+      <div class="modal-content">
+        <h2 id="popupTitle">❗</h2>
+        <p id="popupMessage"></p>
+        <button id="popupButton">Got it!</button>
+      </div>
+    </section>
+
+    <!-- TUTORIAL -->
+    <section id="tutorialContainer">
+      <div id="tutorialPanel" class="panel active">
+        <!-- Panel content injected by JS -->
+      </div>
+    </section>
+
+  </main>
 </body>
 </html>
