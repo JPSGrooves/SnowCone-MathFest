@@ -1114,9 +1114,10 @@
     border-radius: 8px;
     box-shadow: 0 0 12px #ffee00;
     cursor: pointer;
-  /* 🧱 CHUNK X: Responsive Cone + Keypad Scaling on Short Screens */
   
-  @media (max-height: 750px) {
+  /* 🧱 CHUNK X.2: Cone + Scoop Shrink on Phones ≤ 844px Height */
+
+  @media (max-height: 844px) {
     .cone-zone {
       transform: scale(0.85);
       transform-origin: top center;
@@ -1131,11 +1132,10 @@
       margin-bottom: 5px;
     }
   
-    .math-problem, .answer-display {
-      margin-bottom: 5px;
+    .math-problem,
+    .answer-display {
+      margin-bottom: 6px;
     }
-  }
-
   }
 
   </style>
