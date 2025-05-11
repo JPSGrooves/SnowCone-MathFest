@@ -369,6 +369,28 @@
         white-space: nowrap;
       }
     }
+    /* 🧱 CHUNK C.4: Scoop Socket Alignment */
+
+    .scoop-socket {
+      width: 100%;
+      height: 0;
+      position: relative;
+    }
+    
+    .clone-cone .scoop {
+      width: 100%;
+      aspect-ratio: 2 / 1;
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-top-left-radius: 50px;
+      border-top-right-radius: 50px;
+      box-shadow: 0 0 10px #ff00cc, 0 0 20px #6600ff;
+    }
+    .clone-cone {
+      width: 50px;
+    }
 
   </style>
   <style>
@@ -1236,7 +1258,9 @@
       <!-- CONE ZONE -->
       <section class="cone-zone">
         <div class="cone-wrapper clone-cone" id="leftCone">
-          <div class="scoop"></div>
+          <div class="scoop-socket">
+            <div class="scoop"></div>
+          </div>
           <img src="cone.png" class="cone-img" />
         </div>
 
@@ -1246,7 +1270,9 @@
         </div>
 
         <div class="cone-wrapper clone-cone" id="rightCone">
-          <div class="scoop"></div>
+          <div class="scoop-socket">
+            <div class="scoop"></div>
+          </div>
           <img src="cone.png" class="cone-img" />
         </div>
       </section>
