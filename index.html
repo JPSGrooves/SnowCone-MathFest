@@ -190,13 +190,12 @@
       width: 65px;
     }
 
-    /* 🧱 CHUNK C.1: Hard test shift clone scoops to the RIGHT */
+    /* 🧱 CHUNK C.2: DRAMATIC clone scoop shift LEFT */
 
     .clone-cone .scoop {
       left: 50%;
-      transform: translateX(-40%);
+      transform: translateX(-60%);
     }
-
 
     .left-spin {
       animation: spinLeft 6s linear infinite;
@@ -1163,6 +1162,17 @@
     .math-problem,
     .answer-display {
       margin-bottom: 6px;
+    }
+  }
+  @media (max-width: 375px) and (max-height: 700px) {
+    .cone-wrapper {
+      transform: scale(0.7);
+      transform-origin: bottom center;
+    }
+  
+    .scoop {
+      transform: scale(0.7);
+      transform-origin: bottom center;
     }
   }
   </style>
