@@ -1195,6 +1195,16 @@
       transform-origin: bottom center;
     }
   }
+  .scoop-img {
+    position: absolute;
+    bottom: 104%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: auto;
+    z-index: 2;
+    pointer-events: none;
+  }
   </style>
 </head>
 <body>
@@ -1257,7 +1267,7 @@
       <section class="cone-zone">
         <div class="cone-wrapper clone-cone" id="leftCone">
           <div class="scoop-socket">
-            <div class="scoop"></div>
+            <img src="scoop.png" class="scoop-img" />
           </div>
           <img src="cone.png" class="cone-img" />
         </div>
@@ -1269,7 +1279,7 @@
 
         <div class="cone-wrapper clone-cone" id="rightCone">
           <div class="scoop-socket">
-            <div class="scoop"></div>
+            <img src="scoop.png" class="scoop-img" />
           </div>
           <img src="cone.png" class="cone-img" />
         </div>
