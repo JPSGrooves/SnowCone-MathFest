@@ -141,13 +141,16 @@
       color: #00ccff;
     }
     .cone-zone {
+      min-height: 220px;
       display: flex;
       justify-content: center;
       align-items: flex-end;
       gap: clamp(10px, 5vw, 50px);
       flex-wrap: wrap;
       margin-top: 10px;
+      position: relative;
     }
+
     
     .cone-wrapper {
       width: clamp(60px, 20vw, 130px);
@@ -167,9 +170,20 @@
       top: 0;
     }
     
-    .main-scoop {
-      display: none; /* controlled by JS to show on correct answer */
+    #scoop.main-scoop {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: none;
+      width: clamp(60px, 130px, 20vw);
+      aspect-ratio: 2 / 1;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      border-radius: 65px 65px 0 0;
+      box-shadow: 0 0 15px #ff00cc, 0 0 30px #6600ff;
     }
+    
 
     .cone-img {
       width: 100%;
@@ -178,16 +192,26 @@
 
     .clone-cone .scoop {
       width: 60px;
-      height: 32px;
-      top: 0;
+      height: 30px;
       border-top-left-radius: 50px;
       border-top-right-radius: 50px;
-      position: relative;
+      background: linear-gradient(to right, #ff00cc, #6600ff);
+      box-shadow: 0 0 10px #ff00cc, 0 0 20px #6600ff;
+      position: absolute;
+      bottom: 100%; /* positions the scoop right above the cone */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
     }
+
 
     .clone-cone .cone-img {
       width: 65px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
     }
+
 
     .left-spin {
       animation: spinLeft 6s linear infinite;
@@ -221,24 +245,28 @@
     .mode-buttons {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 10px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
     }
+
 
     .mode-buttons button {
       background-color: black;
       border: 2px solid #00ff88;
       color: white;
-      font-size: 16px;
-      padding: 10px;
+      font-size: clamp(12px, 3.5vw, 16px);
+      padding: 8px;
       border-radius: 6px;
       box-shadow: 0 0 10px #00ff88;
       cursor: pointer;
-      width: 70px; /* was 80px */
-      height: 50px;
-      line-height: 1.1;
+      width: clamp(60px, 18vw, 80px);
+      height: 48px;
+      white-space: pre-line;
     }
+
 
 
 
@@ -501,11 +529,12 @@
     #tutorialPanel div {
       margin-bottom: 20px;
       color: white;
-      font-size: 20px;
-      line-height: 1.4;
+      font-size: clamp(14px, 3.5vw, 18px);
+      line-height: 1.5;
       word-wrap: break-word;
-      overflow-wrap: break-word; /* 🍧 New line you need */
+      overflow-wrap: break-word;
     }
+    
 
 
   
