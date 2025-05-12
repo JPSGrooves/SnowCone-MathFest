@@ -1201,6 +1201,77 @@
   .clone-cone .scoop {
     display: none;
   }
+  .cone-unit {
+    position: relative;
+    width: 65px;
+    height: auto;
+  }
+  
+  .cone-unit .cone-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .cone-unit .scoop-img {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    bottom: 100%; /* sit on top of the cone */
+    left: 0;
+    transform: translateY(1px); /* nudge if needed */
+    z-index: 2;
+    pointer-events: none;
+  }
+  /* Shared container layout */
+  .cone-unit {
+    position: relative;
+    width: 65px;
+    height: auto;
+  }
+  
+  /* Clone cone image */
+  .cone-unit .cone-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  /* Clone scoop image */
+  .cone-unit .scoop-img {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    transform: translateY(1px);
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  /* 🧠 BIGGER SCOOP ZONE for main cone */
+  .main-cone-unit {
+    position: relative;
+    width: 100px; /* scaled up for big center cone */
+    height: auto;
+  }
+  
+  .main-cone-unit .cone-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .main-cone-unit .scoop-img {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    transform: translateY(1px);
+    z-index: 2;
+    pointer-events: none;
+  }
 
   </style>
 </head>
@@ -1270,11 +1341,12 @@
         </div>
       
         <div class="cone-wrapper" id="mainCone">
-          <div class="cone-unit">
+          <div class="main-cone-unit">
             <img src="scoop.png" id="mainScoop" class="scoop-img main-scoop" />
             <img src="cone.png" id="coneImg" class="cone-img" />
           </div>
         </div>
+
       
         <div class="cone-wrapper clone-cone" id="rightCone">
           <div class="cone-unit">
