@@ -140,19 +140,27 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      gap: 50px;
-      margin-top: 10px;
-      margin-bottom: 0;
+      gap: clamp(10px, 5vw, 50px);
+      margin: 20px 0;
+      position: relative;
+      min-height: 220px;
+      transform-origin: top center;
     }
-
+    
     .cone-wrapper {
       position: relative;
-      width: 130px;
-      height: 210px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
+      width: clamp(65px, 20vw, 130px);
+    }
+    .cone-unit {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .scoop {
@@ -171,7 +179,7 @@
     }
 
     .cone-img {
-      width: 130px;
+      width: 100%;
       height: auto;
       z-index: 1;
       pointer-events: none;
@@ -362,9 +370,8 @@
     }
     
     .clone-cone {
-      width: 50px;
+      width: clamp(40px, 15vw, 65px);
     }
-
   </style>
   <style>
     #menuTitle {
@@ -1171,18 +1178,20 @@
     }
   }
   .scoop-img {
-    width: 50px !important;
-    height: auto !important;
-    max-width: 50px !important;
-    max-height: 30px !important;
-    object-fit: contain;
-    display: none;
-    pointer-events: none;
     position: absolute;
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
     z-index: 2;
+    display: none;
+    pointer-events: none;
+  }
+  .always-show {
+    display: block;
   }
   .clone-cone .scoop {
     display: none;
@@ -1249,27 +1258,27 @@
       <!-- CONE ZONE -->
       <section class="cone-zone">
         <div class="cone-wrapper clone-cone" id="leftCone">
-          <div class="scoop-socket">
-            <img src="scoop.png" class="scoop-img" />
+          <div class="cone-unit">
+            <img src="scoop.png" class="scoop-img always-show" />
+            <img src="cone.png" class="cone-img" />
           </div>
-          <img src="cone.png" class="cone-img" />
         </div>
-
+      
         <div class="cone-wrapper" id="mainCone">
-          <div class="scoop-socket">
+          <div class="cone-unit">
             <img src="scoop.png" id="mainScoop" class="scoop-img main-scoop" />
+            <img src="cone.png" id="coneImg" class="cone-img" />
           </div>
-          <img src="cone.png" id="coneImg" class="cone-img" />
         </div>
-        
-
+      
         <div class="cone-wrapper clone-cone" id="rightCone">
-          <div class="scoop-socket">
-            <img src="scoop.png" class="scoop-img" />
+          <div class="cone-unit">
+            <img src="scoop.png" class="scoop-img always-show" />
+            <img src="cone.png" class="cone-img" />
           </div>
-          <img src="cone.png" class="cone-img" />
         </div>
       </section>
+
 
       <!-- MATH PROBLEM -->
       <div class="math-problem" id="problem">0 + 0 = 🍧</div>
