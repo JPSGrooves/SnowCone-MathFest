@@ -6,27 +6,29 @@ html, body {
   height: 100dvh;
 }
 
-.menu-container {
+.image-frame {
   position: relative;
-  width: 100vw;
+  width: 100%;
   height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   overflow: hidden;
 }
 
 .menu-map {
+  object-fit: contain;
   width: 100%;
   height: 100%;
-  object-fit: contain;
   display: block;
+  pointer-events: none;
 }
 
-.label-wrapper {
+.label-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  pointer-events: none; /* labels will enable their own clicks */
   z-index: 5;
 }
 
@@ -34,10 +36,10 @@ html, body {
   position: absolute;
   pointer-events: auto;
   font-family: 'Arial', sans-serif;
-  font-size: 1.8vw; /* scales with image */
+  font-size: 1.8vw;
   font-weight: bold;
   text-align: center;
-  color: white; /* will be overridden per zone */
+  color: white;
   cursor: pointer;
   text-shadow:
     0 0 6px currentColor,
@@ -45,7 +47,7 @@ html, body {
     0 0 18px currentColor;
 }
 
-/* Position each label using % based on the image */
+/* Position each label using % based on image frame */
 .menu-label.quick {
   top: 23%;
   left: 55%;
@@ -85,43 +87,3 @@ html, body {
   height: 12%;
   color: #0077ff;
 }
-.image-frame {
-  position: relative;
-  width: 100%;
-  height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.menu-map {
-  object-fit: contain;
-  width: 100%;
-  height: 100%;
-  display: block;
-  pointer-events: none;
-}
-
-.label-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none; /* labels will enable their own clicks */
-}
-
-.menu-label {
-  position: absolute;
-  pointer-events: auto;
-  font-family: 'Arial', sans-serif;
-  font-size: 1.8vw; /* this now scales with image size */
-  color: white;
-  text-align: center;
-  text-shadow:
-    0 0 3px currentColor,
-    0 0 6px currentColor,
-    0 0 10px currentColor;
-  filter: blur(0.6px);
-  cursor: pointer;
-}
-
