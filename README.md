@@ -27,11 +27,6 @@ UPDATES OFTEN!! (UNTIL v1)
 - Story/tutorial content powered by external `panels.json`
 
 
-## 🚀 To Run Locally
-Clone this repo and open `index.html` in your browser:
-```bash
-git clone https://github.com/your-username/snowcone-mathfest.git
-
 ## 🧊 Coming Soon
 
 - 🎯 High Score boards (per mode)
@@ -47,4 +42,11 @@ git clone https://github.com/your-username/snowcone-mathfest.git
 Made with 💙 by **JPS Grooves**  
 Music + Art + Math Education, all fused into one clean vibe.  
 [https://jpsgrooves.com](https://jpsgrooves.com)
+
+## 🚀 To Run Locally
+Clone this repo and open `index.html` in your browser:
+```bash
+git clone https://github.com/your-username/snowcone-mathfest.git
+
+
 
