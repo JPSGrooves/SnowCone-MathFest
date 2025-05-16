@@ -21,25 +21,13 @@
 
   <!-- Main App Container -->
   <main id="app">
-    <div class="menu-container">
-      <img src="assets/img/branding/menubackground.png" alt="SnowCone Menu" class="menu-map" />
-  
-      <!-- Overlay labels locked to image scale -->
-      <div class="label-wrapper">
-        <div class="menu-label quick" onclick="startQuickServe()">
-          <span>QuickServe<br>Pavilion</span>
-        </div>
-        <div class="menu-label tips" onclick="startMathTips()">
-          <span>MathTips<br>Village</span>
-        </div>
-        <div class="menu-label story" onclick="startStoryMode()">
-          <span>StoryMode<br>Forest</span>
-        </div>
-        <div class="menu-label baby" onclick="startBabyScoop()">
-          <span>BabyScoop<br>Fields</span>
-        </div>
-        <div class="menu-label infinity" onclick="startInfinityMode()">
-          <span>Infinity Lake</span>
+    <div class="image-frame">
+      <div class="image-wrapper">
+        <img id="menuMap" src="assets/img/branding/menubackground.png" class="menu-map" />
+        <div class="label-overlay" id="labelOverlay">
+          <div class="menu-label quick" onclick="startQuickServe()">
+            <span>QuickServe<br>Pavilion</span>
+          </div>
         </div>
       </div>
     </div>
