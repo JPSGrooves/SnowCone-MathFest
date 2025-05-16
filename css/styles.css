@@ -13,19 +13,6 @@ html, body {
   overflow: hidden;
 }
 
-.menu-container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px; /* Make this taller to cover the mobile buffer */
-  background: red;
-  z-index: 10;
-  pointer-events: none;
-}
-
-
 .menu-map {
   width: 100%;
   height: 100%;
