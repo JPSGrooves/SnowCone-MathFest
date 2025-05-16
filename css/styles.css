@@ -1,3 +1,5 @@
+
+/* === GLOBAL === */
 html, body {
   margin: 0;
   padding: 0;
@@ -7,20 +9,25 @@ html, body {
   font-family: Arial, sans-serif;
 }
 
+/* === WRAPPER === */
 .menu-wrapper {
   position: relative;
-  max-width: 600px;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
   aspect-ratio: 9 / 16;
   margin: 0 auto;
 }
 
+/* === IMAGE === */
 .menu-map {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
   display: block;
+  pointer-events: none;
 }
 
+/* === LABEL CONTAINER === */
 .label-container {
   position: absolute;
   top: 0;
@@ -30,12 +37,13 @@ html, body {
   pointer-events: none;
 }
 
+/* === MENU LABEL === */
 .menu-label {
   position: absolute;
   pointer-events: auto;
   font-weight: bold;
   text-align: center;
-  font-size: 2.5vw;
+  font-size: clamp(12px, 2.8em, 28px);
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
@@ -43,6 +51,8 @@ html, body {
   color: white;
   cursor: pointer;
 }
+
+/* === INDIVIDUAL ZONES === */
 .menu-label.baby {
   top: 12%;
   left: 14%;
