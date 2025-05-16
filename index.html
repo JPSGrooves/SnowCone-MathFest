@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SnowCone MathFest</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>SnowCone Menu</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <section id="menuScreen" class="menu-container">
-    <h1 class="title-label">SnowCone MathFest</h1>
-    <div class="mode-labels">
-      <div class="mode-button">Quick Serve</div>
-      <div class="mode-button">Math Tips</div>
-      <div class="mode-button">Story Mode</div>
-      <div class="mode-button">Infinity</div>
+  <div class="menu-wrapper">
+    <img src="assets/img/branding/menubackground.png" alt="SnowCone Menu" class="menu-map" />
+    
+    <div class="label-container">
+      <div class="menu-label baby" onclick="startBabyScoop()">BabyScoop<br>Fields</div>
+      <div class="menu-label quick" onclick="startQuickServe()">QuickServe<br>Pavilion</div>
+      <div class="menu-label story" onclick="startStoryMode()">StoryMode<br>Forest</div>
+      <div class="menu-label tips" onclick="startMathTips()">MathTips<br>Village</div>
+      <div class="menu-label infinity" onclick="startInfinityMode()">Infinity<br>Lake</div>
     </div>
-  </section>
+  </div>
 
+  <!-- JS Hooks (Replace alerts with real functions) -->
   <script>
-    // Optional: Show menu on load (if this is hidden initially)
-    window.addEventListener('load', () => {
-      document.getElementById('menuScreen').style.display = 'flex';
-    });
+    function startBabyScoop() { alert("BabyScoop Mode!"); }
+    function startQuickServe() { alert("QuickServe Mode!"); }
+    function startStoryMode() { alert("Story Mode!"); }
+    function startMathTips() { alert("Math Tips Mode!"); }
+    function startInfinityMode() { alert("Infinity Mode!"); }
   </script>
 </body>
 </html>
