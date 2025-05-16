@@ -21,19 +21,47 @@ html, body {
 }
 .menu-btn {
   position: absolute;
-  background: transparent;
-  border: none;
-  cursor: pointer;
   z-index: 5;
-  pointer-events: auto;
-  /* Optional temp debugging */
-  /* outline: 2px dashed lime; */
+  padding: 10px 16px;
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-family: 'Arial', sans-serif;
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #00ff88;
+  border-radius: 10px;
+  box-shadow: 0 0 8px #00ff88;
+  cursor: pointer;
+  text-shadow: 0 0 5px black;
+  backdrop-filter: blur(4px);
 }
 
-/* 🔵 QUICK SERVE — adjust values in DevTools */
+/* ✏️ Button placement — adjust visually */
 .menu-btn.quick {
-  top: 22%;     /* percentage from top */
+  top: 23%;
   left: 55%;
-  width: 30%;
-  height: 12%;
+  width: 35%;
+}
+
+.menu-btn.tips {
+  top: 38%;
+  left: 12%;
+  width: 36%;
+}
+
+.menu-btn.story {
+  top: 46%;
+  left: 50%;
+  width: 38%;
+}
+
+.menu-btn.baby {
+  top: 12%;
+  left: 14%;
+  width: 32%;
+}
+
+.menu-btn.infinity {
+  top: 80%;
+  left: 34%;
+  width: 32%;
 }
