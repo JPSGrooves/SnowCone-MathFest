@@ -16,6 +16,19 @@ html, body {
   box-sizing: border-box;
 }
 
+.menu-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px; /* Make this taller to cover the mobile buffer */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.6), transparent);
+  z-index: 10;
+  pointer-events: none;
+}
+
+
 .menu-map {
   width: 100%;
   height: 100%;
