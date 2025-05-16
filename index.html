@@ -6,49 +6,43 @@
   <meta name="theme-color" content="#00ff88" />
   <title>SnowCone MathFest</title>
 
-  <!-- 💅 Styles -->
+  <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css" />
 
-  <!-- 🧊 Icons -->
-  <link rel="icon" href="assets/img/icon-192.png" sizes="192x192">
-  <link rel="icon" href="assets/img/icon-512.png" sizes="512x512">
-  <link rel="apple-touch-icon" href="assets/img/icon-512.png">
+  <!-- Icons -->
+  <link rel="icon" href="assets/img/icons/icon-192.png" sizes="192x192" />
+  <link rel="icon" href="assets/img/icons/icon-512.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="assets/img/icons/icon-512.png" />
 
-  <!-- 📱 PWA Manifest -->
+  <!-- Manifest for PWA -->
   <link rel="manifest" href="manifest.json" />
 </head>
-
 <body>
   <header>
-    <img src="assets/img/SnowConeMathFestTitle.png" alt="SnowCone MathFest" class="title-image" />
+    <img src="assets/img/branding/SnowConeMathFestTitle.png"
+         alt="SnowCone MathFest"
+         class="title-image" />
   </header>
 
   <main id="app">
-    <section id="menuScreen" class="menu-container">
-      <h1 class="menu-title">🍧 SnowCone MathFest 🍧</h1>
-    
-      <div class="menu-buttons">
-        <button class="menu-btn" onclick="startMathTips()">🧠 Math Tips / Intro</button>
-        <button class="menu-btn" onclick="startQuickServe()">🍧 Quick Serve Mode</button>
-        <button class="menu-btn disabled">📖 Story Mode — Coming Soon</button>
-        <button class="menu-btn" onclick="startInfinityMode()">♾️ Infinity Mode</button>
-        <button class="menu-btn" onclick="openMusicPlayer()">🎵 Music Player</button>
-      </div>
-    
-      <div id="installTip" class="install-box">
-        📲 <strong>Install SnowCone MathFest!</strong><br>
-        Chrome: Tap here to install<br>
-        Safari: Use Share → “Add to Home Screen”
-      </div>
+    <section class="menu">
+      <h2>🍧 Welcome to SnowCone MathFest 🍧</h2>
+      <p>Select a mode to begin:</p>
+      <button onclick="startMode('quickServe')">Quick Serve</button>
+      <button onclick="startMode('tutorial')">Math Tips</button>
+      <button onclick="startMode('story')">Story Mode</button>
+      <button onclick="startMode('infinity')">Infinity Mode</button>
     </section>
   </main>
 
-  <!-- 🔌 Core JS Files -->
-  <script src="js/problems.js"></script>
+  <!-- Scripts -->
+  <script src="js/dataManager.js"></script>
   <script src="js/game.js"></script>
-  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/problems.js"></script>
   <script src="js/sound.js"></script>
   <script src="js/story.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>
+
