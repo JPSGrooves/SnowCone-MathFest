@@ -22,43 +22,68 @@ html, body {
 .menu-btn {
   position: absolute;
   z-index: 5;
-  padding: 10px 16px;
-  font-size: clamp(14px, 2.5vw, 18px);
+  width: 32%;          /* width set manually in each region */
+  aspect-ratio: 1 / 1; /* square buttons! */
+  font-size: clamp(18px, 3.5vw, 26px);
   font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  letter-spacing: 0.5px;
   color: white;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5); /* soft base */
+  border: none;
+  border-radius: 12px;
+  text-shadow: 0 0 6px black;
   cursor: pointer;
-  text-shadow: 0 0 5px black;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 8px rgba(0, 153, 255, 0.3), /* subtle blue border glow */
+    0 0 15px currentColor;          /* button color glow */
 }
 
+
 /* ✏️ Button placement — adjust visually */
+.menu-btn.baby {
+  top: 12%;
+  left: 14%;
+  width: 32%;
+  color: #ffee00; /* yellow */
+}
+
 .menu-btn.quick {
   top: 23%;
   left: 55%;
   width: 35%;
-}
-
-.menu-btn.tips {
-  top: 55%;
-  left: 8%;
-  width: 30%;
+  color: #00ccff; /* light blue */
 }
 
 .menu-btn.story {
   top: 46%;
   left: 50%;
   width: 30%;
+  color: #cc66ff; /* purple */
 }
 
-.menu-btn.baby {
-  top: 12%;
-  left: 14%;
-  width: 32%;
+.menu-btn.tips {
+  top: 55%;
+  left: 8%;
+  width: 30%;
+  color: #00ff88; /* greenish */
 }
 
 .menu-btn.infinity {
   top: 80%;
   left: 34%;
   width: 32%;
+  color: #0077ff; /* darker blue */
 }
+
+.menu-btn:hover {
+  box-shadow:
+    0 0 10px rgba(0, 153, 255, 0.5),
+    0 0 25px currentColor;
+  transform: scale(1.02);
+}
+
