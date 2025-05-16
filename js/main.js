@@ -28,13 +28,14 @@ function updateLabelOverlay() {
   const overlay = document.getElementById("labelOverlay");
 
   const rect = image.getBoundingClientRect();
+
   overlay.style.width = `${rect.width}px`;
   overlay.style.height = `${rect.height}px`;
   overlay.style.left = `${rect.left}px`;
   overlay.style.top = `${rect.top}px`;
+  overlay.style.position = 'absolute';
 }
 
-// Run on load and resize
 window.addEventListener("load", updateLabelOverlay);
 window.addEventListener("resize", updateLabelOverlay);
 
