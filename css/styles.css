@@ -1,58 +1,61 @@
+
+/* === GLOBAL RESET === */
 html, body {
   margin: 0;
   padding: 0;
   background: black;
   overflow: hidden;
-  height: 100dvh;
+  height: 100vh;
+  font-family: Arial, sans-serif;
 }
 
-.menu-container {
+/* === IMAGE FRAME + OVERLAY SETUP === */
+.image-frame {
   position: relative;
   width: 100vw;
-  height: 100dvh;
+  height: 100vh;
+  background: black;
   overflow: hidden;
 }
 
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .menu-map {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  display: block;
+  pointer-events: none;
 }
 
-.label-wrapper {
+/* === LABEL LAYER === */
+.label-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
-  z-index: 5;
+  z-index: 10;
 }
 
 .menu-label {
   position: absolute;
   pointer-events: auto;
-  font-family: 'Arial', sans-serif;
-  font-size: 2.3vw;
+  font-size: 1.8vw;
   font-weight: bold;
   text-align: center;
-  line-height: 1.2;
   color: white;
-  background: transparent;
-  border: none;
   text-shadow:
-    0 0 3px currentColor,
     0 0 6px currentColor,
-    0 0 10px currentColor;
-  filter: blur(0.4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+    0 0 12px currentColor,
+    0 0 18px currentColor;
+  cursor: pointer;
 }
 
-/* Position each label using % based on the image */
+/* === EXAMPLE POSITIONING === */
 .menu-label.quick {
   top: 23%;
   left: 55%;
