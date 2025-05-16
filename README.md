@@ -17,8 +17,34 @@ This is a festival for the soul.
 
 UPDATES OFTEN!! (UNTIL v1)
 
+---
+
+## 🧠 Tech + Structure
+
+- Built as a **Progressive Web App (PWA)** — installable on most devices
+- Responsive layout using `clamp()`, `flex`, `grid`
+- Modular file structure with separate CSS, JS, and asset folders
+- Story/tutorial content powered by external `panels.json`
+
+
 ## 🚀 To Run Locally
 Clone this repo and open `index.html` in your browser:
 ```bash
 git clone https://github.com/your-username/snowcone-mathfest.git
+
+## 🧊 Coming Soon
+
+- 🎯 High Score boards (per mode)
+- 💾 Save story progress and player settings
+- 📖 Story Mode: unlockable ghost chapters
+- ♾️ Infinity Mode: music-enhanced flow state practice
+- 🔊 More soundtracks, ghosts, and Easter eggs
+
+---
+
+## 🌐 Credits
+
+Made with 💙 by **JPS Grooves**  
+Music + Art + Math Education, all fused into one clean vibe.  
+[https://jpsgrooves.com](https://jpsgrooves.com)
 
