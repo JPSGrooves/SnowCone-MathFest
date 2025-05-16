@@ -3,16 +3,24 @@ html, body {
   padding: 0;
   background: black;
   height: 100vh;
-  overflow: hidden;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
 .menu-wrapper {
-  position: relative;
   width: 100%;
-  max-width: 1000px;
+  height: 100%;
+  max-width: unset;
+  max-height: unset;
   aspect-ratio: 9 / 16;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .menu-map {
