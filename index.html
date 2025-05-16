@@ -3,32 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SnowCone Menu</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>SnowCone MathFest</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-   <section id="menuScreen" class="menu-container">
-      <h1 class="title-label">SnowCone MathFest</h1>
-      <div class="mode-labels">
-        <div class="mode-button">Quick Serve</div>
-        <div class="mode-button">Math Tips</div>
-        <div class="mode-button">Story Mode</div>
-        <div class="mode-button">Infinity</div>
-      </div>
-    </section>
-  
-    <!-- You can keep this below -->
-    <div id="gameContainer" style="display:none;"> ... </div>
-    <div id="tutorialContainer" style="display:none;"> ... </div>
+  <section id="menuScreen" class="menu-container">
+    <h1 class="title-label">SnowCone MathFest</h1>
+    <div class="mode-labels">
+      <div class="mode-button">Quick Serve</div>
+      <div class="mode-button">Math Tips</div>
+      <div class="mode-button">Story Mode</div>
+      <div class="mode-button">Infinity</div>
     </div>
+  </section>
 
-  <!-- JS Hooks (Replace alerts with real functions) -->
   <script>
-    function startBabyScoop() { alert("BabyScoop Mode!"); }
-    function startQuickServe() { alert("QuickServe Mode!"); }
-    function startStoryMode() { alert("Story Mode!"); }
-    function startMathTips() { alert("Math Tips Mode!"); }
-    function startInfinityMode() { alert("Infinity Mode!"); }
+    // Optional: Show menu on load (if this is hidden initially)
+    window.addEventListener('load', () => {
+      document.getElementById('menuScreen').style.display = 'flex';
+    });
   </script>
 </body>
 </html>
