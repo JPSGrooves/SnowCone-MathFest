@@ -20,7 +20,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 60px; /* Make this taller to cover the mobile buffer */
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.6), transparent);
+  background: red;
   z-index: 10;
   pointer-events: none;
 }
