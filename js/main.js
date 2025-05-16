@@ -26,13 +26,14 @@ function openMusicPlayer() {
 function updateLabelOverlay() {
   const image = document.getElementById("menuMap");
   const overlay = document.getElementById("labelOverlay");
+  const wrapper = image.parentElement;
 
   const rect = image.getBoundingClientRect();
 
   overlay.style.width = `${rect.width}px`;
   overlay.style.height = `${rect.height}px`;
-  overlay.style.left = `${rect.left + window.scrollX}px`;
-  overlay.style.top = `${rect.top + window.scrollY}px`;
+  overlay.style.top = `${rect.top}px`;
+  overlay.style.left = `${rect.left}px`;
   overlay.style.position = 'absolute';
 }
 
