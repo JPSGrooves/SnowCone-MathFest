@@ -33,6 +33,7 @@ html, body {
   cursor: pointer;
   text-shadow: 0 0 5px black;
   backdrop-filter: blur(4px);
+  outline: 1px dashed lime; /* REMOVE this later */
 }
 
 /* ✏️ Button placement — adjust visually */
