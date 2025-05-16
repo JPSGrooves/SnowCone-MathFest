@@ -2,44 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#00ff88" />
-  <title>SnowCone MathFest</title>
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/styles.css" />
-
-  <!-- Icons -->
-  <link rel="icon" href="assets/img/icons/icon-192.png" sizes="192x192" />
-  <link rel="icon" href="assets/img/icons/icon-512.png" sizes="512x512" />
-  <link rel="apple-touch-icon" href="assets/img/icons/icon-512.png" />
-
-  <!-- Manifest for PWA -->
-  <link rel="manifest" href="manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnowCone Menu</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-  <!-- Main App Container -->
-  <main id="app">
-    <div class="menu-wrapper">
-      <img src="assets/img/branding/menubackground.png" alt="SnowCone Menu" class="menu-map" />
-      <div class="label-container">
-        <div class="menu-label baby" onclick="startBabyScoop()">BabyScoop<br>Fields</div>
-        <div class="menu-label quick" onclick="startQuickServe()">QuickServe<br>Pavilion</div>
-        <div class="menu-label story" onclick="startStoryMode()">StoryMode<br>Forest</div>
-        <div class="menu-label tips" onclick="startMathTips()">MathTips<br>Village</div>
-        <div class="menu-label infinity" onclick="startInfinityMode()">Infinity<br>Lake</div>
-      </div>
+  <div class="menu-wrapper">
+    <img src="assets/img/branding/menubackground.png" alt="SnowCone Menu" class="menu-map" />
+    
+    <div class="label-container">
+      <div class="menu-label baby" onclick="startBabyScoop()">BabyScoop<br>Fields</div>
+      <div class="menu-label quick" onclick="startQuickServe()">QuickServe<br>Pavilion</div>
+      <div class="menu-label story" onclick="startStoryMode()">StoryMode<br>Forest</div>
+      <div class="menu-label tips" onclick="startMathTips()">MathTips<br>Village</div>
+      <div class="menu-label infinity" onclick="startInfinityMode()">Infinity<br>Lake</div>
     </div>
-  </main>
+  </div>
 
-  <!-- JS Scripts -->
-  <script src="js/dataManager.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/problems.js"></script>
-  <script src="js/sound.js"></script>
-  <script src="js/story.js"></script>
-  <script src="js/ui.js"></script>
+  <!-- JS Hooks (Replace alerts with real functions) -->
+  <script>
+    function startBabyScoop() { alert("BabyScoop Mode!"); }
+    function startQuickServe() { alert("QuickServe Mode!"); }
+    function startStoryMode() { alert("Story Mode!"); }
+    function startMathTips() { alert("Math Tips Mode!"); }
+    function startInfinityMode() { alert("Infinity Mode!"); }
+  </script>
 </body>
 </html>
