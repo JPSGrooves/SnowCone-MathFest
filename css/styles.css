@@ -34,22 +34,15 @@ html, body {
   position: absolute;
   pointer-events: auto;
   font-family: 'Arial', sans-serif;
-  font-size: 2.3vw;
+  font-size: 1.8vw; /* scales with image */
   font-weight: bold;
   text-align: center;
-  line-height: 1.2;
-  color: white;
-  background: transparent;
-  border: none;
+  color: white; /* will be overridden per zone */
+  cursor: pointer;
   text-shadow:
-    0 0 3px currentColor,
     0 0 6px currentColor,
-    0 0 10px currentColor;
-  filter: blur(0.4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+    0 0 12px currentColor,
+    0 0 18px currentColor;
 }
 
 /* Position each label using % based on the image */
