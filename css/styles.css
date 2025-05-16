@@ -19,3 +19,21 @@ html, body {
   object-fit: contain;
   display: block;
 }
+.menu-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 5;
+  pointer-events: auto;
+  /* Optional temp debugging */
+  /* outline: 2px dashed lime; */
+}
+
+/* 🔵 QUICK SERVE — adjust values in DevTools */
+.menu-btn.quick {
+  top: 22%;     /* percentage from top */
+  left: 55%;
+  width: 30%;
+  height: 12%;
+}
