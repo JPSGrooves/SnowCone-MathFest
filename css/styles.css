@@ -9,8 +9,8 @@ html, body {
 
 .menu-wrapper {
   position: relative;
-  max-width: 600px;
   width: 100%;
+  max-width: 1000px;
   aspect-ratio: 9 / 16;
   margin: 0 auto;
 }
@@ -35,7 +35,7 @@ html, body {
   pointer-events: auto;
   font-weight: bold;
   text-align: center;
-  font-size: 2.5vw;
+  font-size: clamp(14px, 2.5vw, 32px);
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
@@ -43,6 +43,7 @@ html, body {
   color: white;
   cursor: pointer;
 }
+
 .menu-label.baby {
   top: 12%;
   left: 14%;
