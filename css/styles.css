@@ -87,3 +87,6 @@ html, body {
   height: 12%;
   color: #0077ff;
 }
+.label-overlay {
+  background: rgba(255, 0, 0, 0.1); /* semi-transparent red */
+}
