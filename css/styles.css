@@ -43,3 +43,37 @@ html, body {
   color: white;
   cursor: pointer;
 }
+.menu-label.baby {
+  top: 12%;
+  left: 14%;
+  width: 32%;
+  color: #ffee00;
+}
+
+.menu-label.quick {
+  top: 23%;
+  left: 55%;
+  width: 35%;
+  color: #00ccff;
+}
+
+.menu-label.story {
+  top: 46%;
+  left: 50%;
+  width: 30%;
+  color: #cc66ff;
+}
+
+.menu-label.tips {
+  top: 55%;
+  left: 8%;
+  width: 30%;
+  color: #00ff88;
+}
+
+.menu-label.infinity {
+  top: 80%;
+  left: 34%;
+  width: 32%;
+  color: #0077ff;
+}
