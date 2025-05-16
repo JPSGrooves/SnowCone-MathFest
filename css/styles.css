@@ -101,3 +101,24 @@ html, body {
   width: 32%;
   color: #0077ff;
 }
+.mode-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 10;
+  position: relative;
+  margin-top: 20px;
+}
+
+.mode-button {
+  font-size: clamp(20px, 4vw, 32px);
+  color: white;
+  text-shadow: 0 0 8px #00ff88, 0 0 12px #00ff88;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  font-weight: bold;
+}
+
+.mode-button:hover {
+  transform: scale(1.1);
+}
