@@ -1,53 +1,61 @@
+
+/* === GLOBAL RESET === */
 html, body {
   margin: 0;
   padding: 0;
   background: black;
   overflow: hidden;
-  height: 100dvh;
+  height: 100vh;
+  font-family: Arial, sans-serif;
 }
 
+/* === IMAGE FRAME + OVERLAY SETUP === */
 .image-frame {
   position: relative;
-  width: 100%;
-  height: 100dvh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: black;
   overflow: hidden;
 }
 
-.menu-map {
-  object-fit: contain;
+.image-wrapper {
+  position: relative;
   width: 100%;
   height: 100%;
+}
+
+.menu-map {
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   pointer-events: none;
 }
 
+/* === LABEL LAYER === */
 .label-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  pointer-events: none; /* labels will enable their own clicks */
-  z-index: 5;
+  pointer-events: none;
+  z-index: 10;
 }
 
 .menu-label {
   position: absolute;
   pointer-events: auto;
-  font-family: 'Arial', sans-serif;
   font-size: 1.8vw;
   font-weight: bold;
   text-align: center;
   color: white;
-  cursor: pointer;
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
     0 0 18px currentColor;
+  cursor: pointer;
 }
 
-/* Position each label using % based on image frame */
+/* === EXAMPLE POSITIONING === */
 .menu-label.quick {
   top: 23%;
   left: 55%;
@@ -86,7 +94,4 @@ html, body {
   width: 32%;
   height: 12%;
   color: #0077ff;
-}
-.label-overlay {
-  background: rgba(255, 0, 0, 0.1); /* semi-transparent red */
 }
