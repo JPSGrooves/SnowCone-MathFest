@@ -17,9 +17,10 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: auto; /* allows scrolling if window is too small */
 }
 
-/* Scales consistently with aspect-ratio */
+/* Scales consistently with aspect-ratio, with minimums */
 .menu-frame {
   position: relative;
   height: 100vh;
@@ -27,6 +28,8 @@ html, body {
   max-height: 100vh;
   width: auto;
   max-width: 100vw;
+  min-height: 500px;
+  min-width: 281px; /* maintains 9:16 aspect ratio minimum */
 }
 
 /* Background image */
@@ -36,7 +39,6 @@ html, body {
   object-fit: contain;
   display: block;
 }
-
 
 /* Label container overlays the image */
 .label-container {
@@ -54,7 +56,7 @@ html, body {
   pointer-events: auto;
   font-weight: bold;
   text-align: center;
-  font-size: clamp(1rem, 2.5vw, 2.5rem);
+  font-size: clamp(0.6rem, 2.5vmin, 2.5rem);
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
