@@ -204,6 +204,7 @@ html::before {
   display: block;
   font-size: clamp(1.8rem, 4vw, 3.2rem);
   line-height: 1;
-  margin-bottom: 0.2em;
+  margin-bottom: 0.05em; /* tighter spacing */
   filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor);
 }
+
