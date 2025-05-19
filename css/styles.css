@@ -135,20 +135,20 @@ html::before {
 
 /* Menu labels */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
 .menu-label {
   position: absolute;
   pointer-events: auto;
-  font-family: 'Cinzel', serif;
+  font-family: 'Orbitron', sans-serif;
   font-weight: 500;
   text-align: center;
   font-size: 1.25rem;
   text-shadow:
-    0 0 2px #fff,
-    0 0 4px currentColor,
     0 0 6px currentColor,
-    0 0 8px currentColor;
+    0 0 12px currentColor,
+    0 0 18px currentColor;
   color: white;
   cursor: pointer;
   transition: transform 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
@@ -158,14 +158,62 @@ html::before {
 .menu-label:hover {
   transform: scale(1.05);
   text-shadow:
-    0 0 6px white,
-    0 0 12px white,
-    0 0 18px white;
+    0 0 8px white,
+    0 0 16px white,
+    0 0 24px white;
 }
 
-/* Final Arc Positions */
+/* Emoji-enhanced labels using inline spans for compatibility */
+.menu-label.tips::before {
+  content: "ðŸ“˜\A";
+  display: block;
+  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.menu-label.kids::before {
+  content: "â›º\A";
+  display: block;
+  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.menu-label.story::before {
+  content: "ðŸ“–\A";
+  display: block;
+  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.menu-label.quick::before {
+  content: "ðŸ§\A";
+  display: block;
+  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Special case: Infinity symbol on both sides, not stacked */
+.menu-label.infinity::before {
+  content: "â™¾ï¸ ";
+  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
+  font-size: 1.2rem;
+  margin-right: 0.2rem;
+}
+
+.menu-label.infinity::after {
+  content: " â™¾ï¸";
+  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
+  font-size: 1.2rem;
+  margin-left: 0.2rem;
+}
+
+/* Label Positions (from uploaded CSS.txt) */
 .menu-label.tips {
-  top: 38%;
+  top: 45%;
   left: 6%;
   width: 26%;
   color: #00ff88;
@@ -193,15 +241,8 @@ html::before {
 }
 
 .menu-label.infinity {
-  top: 55%;
-  left: 38%;
-  width: 28%;
+  top: 57%;
+  left: 33%;
+  width: 35%;
   color: #0077ff;
 }
-
-.menu-label span.emoji {
-  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
-  font-size: 1.5rem;
-  display: block;
-}
-
