@@ -206,12 +206,10 @@ html::before {
   width: 26%;
   color: #0077ff;
   text-shadow:
-    0 0 6px #00ccff,
-    0 0 12px #00ccff,
-    0 0 18px #00ccff;
+    0 0 4px #00ccff,
+    0 0 10px #00ccff,
+    0 0 14px #00ccff;
 }
-
-
 
 .menu-label.infinity .emoji-inline {
   display: inline;
@@ -223,11 +221,12 @@ html::before {
 
 .menu-label .emoji {
   display: block;
-  font-size: clamp(1.2rem, 3vw, 2.4rem);
+  font-size: 2.2rem; /* Fixed size = same on phone and desktop */
   line-height: 1;
-  margin-bottom: -0.35em;  /* Tightest visually safe overlap */
-  filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor);
+  margin-bottom: -0.55em; /* Nearly overlaps label text */
+  filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 6px currentColor);
 }
+
 
 
 
