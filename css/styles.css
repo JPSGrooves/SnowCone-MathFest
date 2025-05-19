@@ -86,7 +86,7 @@ html::before {
 
 /* Adjusted Arc Layout */
 .menu-label.tips {
-  top: 38%;       /* slightly lowered */
+  top: 45%;       /* slightly lowered */
   left: 6%;
   width: 26%;
   color: #00ff88;
@@ -94,14 +94,14 @@ html::before {
 
 .menu-label.kids {
   top: 24%;
-  left: 18%;      /* nudged left */
+  left: 10%;      /* nudged left */
   width: 26%;
   color: #ff66cc;
 }
 
 .menu-label.story {
-  top: 14%;
-  left: 44%;
+  top: 20%;
+  left: 50%;
   width: 28%;
   color: #cc66ff;
 }
@@ -114,8 +114,8 @@ html::before {
 }
 
 .menu-label.infinity {
-  top: 38%;       /* slightly lowered */
-  left: 83%;
+  top: 45%;       /* slightly lowered */
+  left: 70%;
   width: 26%;
   color: #0077ff;
 }
