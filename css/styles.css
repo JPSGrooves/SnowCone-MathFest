@@ -195,14 +195,14 @@ html::before {
 }
 
 .menu-label.infinity {
-  top: 51%;
+  top: 55%;
   left: 50%;
   width: 26%;
   color: #0077ff;
 }
 .menu-label.infinity {
-  top: 57%;
-  left: 32%;
+  top: 55%;
+  left: 50%;
   width: 26%;
   color: #0077ff;
   text-shadow:
