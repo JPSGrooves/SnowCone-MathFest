@@ -93,7 +93,7 @@ html::before {
 }
 
 .menu-label.kids {
-  top: 24%;
+  top: 30%;
   left: 10%;      /* nudged left */
   width: 26%;
   color: #ff66cc;
@@ -101,13 +101,13 @@ html::before {
 
 .menu-label.story {
   top: 20%;
-  left: 50%;
+  left: 40%;
   width: 28%;
   color: #cc66ff;
 }
 
 .menu-label.quick {
-  top: 24%;
+  top: 30%;
   left: 65%;
   width: 26%;
   color: #00ccff;
