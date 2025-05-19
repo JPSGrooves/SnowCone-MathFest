@@ -198,7 +198,7 @@ html::before {
   top: 56%;
   left: 37%;
   width: 26%;
-  color: #0077ff;
+  color: white;
   text-shadow:
     0 0 4px #00ccff,
     0 0 10px #00ccff,
@@ -215,9 +215,9 @@ html::before {
 
 .menu-label .emoji {
   display: block;
-  font-size: 2.2rem; /* Fixed size = same on phone and desktop */
+  font-size: 2.2rem; /* consistent size across devices */
   line-height: 1;
-  margin-bottom: -0.55em; /* Nearly overlaps label text */
+  margin-bottom: -0.65em; /* max tightness without clipping */
   filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 6px currentColor);
 }
 
