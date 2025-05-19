@@ -68,6 +68,24 @@ html::before {
   pointer-events: none;
 }
 
+/* Title PNG at the top */
+.menu-title-header {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 500px;
+  pointer-events: auto;
+}
+
+.menu-title-header img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
+}
+
 /* Menu labels */
 .menu-label {
   position: absolute;
@@ -93,9 +111,9 @@ html::before {
   transform: scale(1.05);
 }
 
-/* Final Arc Positions */
+/* Final Label Positions */
 .menu-label.tips {
-  top: 45%;
+  top: 38%;
   left: 6%;
   width: 26%;
   color: #00ff88;
@@ -105,13 +123,13 @@ html::before {
   top: 30%;
   left: 10%;
   width: 26%;
-  color: #ff66cc;
+  color: #ffee00; /* yellow */
 }
 
 .menu-label.story {
-  top: 17%;
-  left: 37%;
-  width: 28%;
+  top: 45%;
+  left: 70%;
+  width: 26%;
   color: #cc66ff;
 }
 
@@ -123,36 +141,8 @@ html::before {
 }
 
 .menu-label.infinity {
-  top: 45%;
-  left: 70%;
-  width: 26%;
+  top: 55%;
+  left: 38%;
+  width: 28%;
   color: #0077ff;
 }
-.menu-title-button {
-  position: absolute;
-  bottom: 3%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  max-width: 400px;
-  pointer-events: auto;
-  cursor: pointer;
-  animation: glow-pulse 2s infinite ease-in-out;
-}
-
-.menu-title-button img {
-  width: 100%;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
-  }
-  50% {
-    filter: drop-shadow(0 0 12px #00ff88) drop-shadow(0 0 24px #00ff88);
-  }
-}
-
