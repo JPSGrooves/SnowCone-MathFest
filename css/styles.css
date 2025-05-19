@@ -201,12 +201,17 @@ html::before {
   color: #0077ff;
 }
 .menu-label.infinity {
-  color: #0077ff; /* Same blue font color */
+  top: 57%;
+  left: 32%;
+  width: 32%;           /* Slightly wider */
+  color: #0077ff;
+  white-space: nowrap;  /* Prevent line breaks */
   text-shadow:
     0 0 6px white,
     0 0 12px white,
     0 0 18px white;
 }
+
 
 .menu-label.infinity .emoji-inline {
   display: inline;
@@ -218,10 +223,11 @@ html::before {
 
 .menu-label .emoji {
   display: block;
-  font-size: clamp(1.2rem, 3vw, 2.4rem); /* ~25% smaller on desktop */
-  line-height: 1.2;
-  margin-bottom: 0.1em; /* tighter, matches text spacing */
+  font-size: clamp(1.2rem, 3vw, 2.4rem);
+  line-height: 1;
+  margin-bottom: -0.2em; /* Pull emoji closer to text */
   filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor);
 }
+
 
 
