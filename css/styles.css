@@ -69,27 +69,9 @@ html::before {
 }
 
 /* Title PNG at the top */
-.menu-title-header {
-  position: absolute;
-  top: 2%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  max-width: 500px;
-  pointer-events: auto;
-}
-
-.menu-title-header img {
-  width: 100%;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
-}
-
-
 .menu-title-top {
   position: absolute;
-  top: 12%;
+  top: 8%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
