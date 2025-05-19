@@ -1,3 +1,4 @@
+
 /* Global Reset */
 html, body {
   margin: 0;
@@ -5,9 +6,11 @@ html, body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  font-family: Arial, sans-serif;
+  font-family: 'Orbitron', sans-serif;
   background: black;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
 html::before {
   content: "";
@@ -24,7 +27,6 @@ html::before {
   to { transform: translate(100px, 200px); }
 }
 
-
 /* Top-level container for centering */
 .menu-wrapper {
   position: relative;
@@ -33,10 +35,10 @@ html::before {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: auto; /* allows scrolling if window is too small */
+  overflow: auto;
 }
 
-/* Scales consistently with aspect-ratio, with minimums */
+/* Frame container with aspect-ratio */
 .menu-frame {
   position: relative;
   height: 100vh;
@@ -45,7 +47,7 @@ html::before {
   width: auto;
   max-width: 100vw;
   min-height: 500px;
-  min-width: 281px; /* maintains 9:16 aspect ratio minimum */
+  min-width: 281px;
 }
 
 /* Background image */
@@ -66,27 +68,34 @@ html::before {
   pointer-events: none;
 }
 
-/* Base label style */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
-
+/* Menu labels */
 .menu-label {
   position: absolute;
   pointer-events: auto;
   font-family: 'Orbitron', sans-serif;
   font-weight: 500;
   text-align: center;
-  font-size: clamp(0.75rem, 1.75vw, 2rem); /* half-size */
+  font-size: clamp(1rem, 2.5vw, 2rem);
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
     0 0 18px currentColor;
   color: white;
   cursor: pointer;
+  transition: transform 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
 }
 
-/* Adjusted Arc Layout */
+.menu-label:hover {
+  text-shadow:
+    0 0 8px white,
+    0 0 16px white,
+    0 0 24px white;
+  transform: scale(1.05);
+}
+
+/* Final Arc Positions */
 .menu-label.tips {
-  top: 45%;       /* slightly lowered */
+  top: 45%;
   left: 6%;
   width: 26%;
   color: #00ff88;
@@ -94,7 +103,7 @@ html::before {
 
 .menu-label.kids {
   top: 30%;
-  left: 10%;      /* nudged left */
+  left: 10%;
   width: 26%;
   color: #ff66cc;
 }
@@ -114,7 +123,7 @@ html::before {
 }
 
 .menu-label.infinity {
-  top: 45%;       /* slightly lowered */
+  top: 45%;
   left: 70%;
   width: 26%;
   color: #0077ff;
