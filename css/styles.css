@@ -89,14 +89,27 @@ html::before {
 
 .menu-title-top {
   position: absolute;
-  top: 10%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
   max-width: 400px;
-  height: auto;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   animation: neon-glow-cycle 6s linear infinite;
+  transition: transform 0.2s ease-in-out;
+}
+
+.menu-title-top:hover {
+  transform: translateX(-50%) scale(1.05);
+  animation: none;
+  filter: drop-shadow(0 0 8px white) drop-shadow(0 0 16px white);
+}
+
+.menu-title-top img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 @keyframes neon-glow-cycle {
@@ -119,7 +132,6 @@ html::before {
     filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080);
   }
 }
-
 
 /* Menu labels */
 .menu-label {
