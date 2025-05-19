@@ -75,7 +75,7 @@ html::before {
   font-family: 'Orbitron', sans-serif;
   font-weight: 500;
   text-align: center;
-  font-size: clamp(1.5rem, 3.5vw, 4rem); /* Slightly bigger */
+  font-size: clamp(0.75rem, 1.75vw, 2rem); /* half-size */
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
@@ -84,9 +84,9 @@ html::before {
   cursor: pointer;
 }
 
-/* Final Arc Placement */
+/* Adjusted Arc Layout */
 .menu-label.tips {
-  top: 34%;
+  top: 38%;       /* slightly lowered */
   left: 6%;
   width: 26%;
   color: #00ff88;
@@ -94,7 +94,7 @@ html::before {
 
 .menu-label.kids {
   top: 24%;
-  left: 24%;
+  left: 18%;      /* nudged left */
   width: 26%;
   color: #ff66cc;
 }
@@ -114,7 +114,7 @@ html::before {
 }
 
 .menu-label.infinity {
-  top: 34%;
+  top: 38%;       /* slightly lowered */
   left: 83%;
   width: 26%;
   color: #0077ff;
