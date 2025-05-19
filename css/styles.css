@@ -200,11 +200,28 @@ html::before {
   width: 26%;
   color: #0077ff;
 }
+.menu-label.infinity {
+  color: #0077ff; /* Same blue font color */
+  text-shadow:
+    0 0 6px white,
+    0 0 12px white,
+    0 0 18px white;
+}
+
+.menu-label.infinity .emoji-inline {
+  display: inline;
+  font-size: clamp(1.1rem, 2.8vw, 2.2rem); /* smaller inline emoji */
+  vertical-align: middle;
+  margin: 0 0.25em;
+  filter: drop-shadow(0 0 4px white) drop-shadow(0 0 8px white); /* White glow */
+}
+
 .menu-label .emoji {
   display: block;
-  font-size: clamp(1.8rem, 4vw, 3.2rem);
-  line-height: 1;
-  margin-bottom: 0.05em; /* tighter spacing */
+  font-size: clamp(1.2rem, 3vw, 2.4rem); /* ~25% smaller on desktop */
+  line-height: 1.2;
+  margin-bottom: 0.1em; /* tighter, matches text spacing */
   filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor);
 }
+
 
