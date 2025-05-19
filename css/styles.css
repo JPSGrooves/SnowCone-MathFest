@@ -237,3 +237,10 @@ html::before {
   width: 28%;
   color: #0077ff;
 }
+
+.menu-label span.emoji {
+  font-family: system-ui, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif;
+  font-size: 1.5rem;
+  display: block;
+}
+
