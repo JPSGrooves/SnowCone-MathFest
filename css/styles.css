@@ -200,3 +200,10 @@ html::before {
   width: 26%;
   color: #0077ff;
 }
+.menu-label .emoji {
+  display: block;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1;
+  margin-bottom: 0.2em;
+  filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor);
+}
