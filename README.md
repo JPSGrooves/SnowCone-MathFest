@@ -1,21 +1,26 @@
 # 🍧 SnowCone MathFest
 
-A neon-drenched math arcade where ghost legends teach you through rhythm, color, and cone-powered gameplay. Built by JPS Grooves — for kids, teachers, adults, and dreamers alike.
+A neon-drenched math arcade where ghost legends teach you through rhythm, color, and cone-powered gameplay.  
+Built by **JPS Grooves** — for kids, teachers, adults, and dreamers alike.
 
 ## 🎮 Modes
-- **Quick Serve** — Arcade-style math battles with music + milestones
-- **Math Tips / Tutorial** — Non-judgmental intro to real strategies
-- **Story Mode** — Meet ghost geniuses and travel through a math vortex 
-- **Infinity Mode** — Freeform flow with chill beats and endless equations
+
+- **🍿 Quick Serve** — Timed arcade battles with music, milestones, and combo cones.
+- **📘 Math Tips / Tutorial** — A chill zone of scrolls and wisdom with no judgment.
+- **📖 Story Mode** — A narrative journey with math ghosts and historic minds.
+- **♾️ Infinity Mode** — Flow-state math practice with chill vibes and lo-fi beats.
 
 ## 🧠 Why It Exists
+
 This app is a cosmic math-music jam.  
 It’s for every kid who hated math.  
 Every adult who forgot math.  
-Every dreamer who hears rhythm in the numbers.  
-This is a festival for the soul.
+Every dreamer who hears rhythm in the numbers.
 
-UPDATES OFTEN!! (UNTIL v1)
+It’s a learning tool.  
+It’s a reawakening.  
+It’s a personal act of creation.  
+This is a festival for the soul.
 
 ---
 
@@ -23,30 +28,4 @@ UPDATES OFTEN!! (UNTIL v1)
 
 - Built as a **Progressive Web App (PWA)** — installable on most devices
 - Responsive layout using `clamp()`, `flex`, `grid`
-- Modular file structure with separate CSS, JS, and asset folders
-- Story/tutorial content powered by external `panels.json`
-
-
-## 🧊 Coming Soon
-
-- 🎯 High Score boards (per mode)
-- 💾 Save story progress and player settings
-- 📖 Story Mode: unlockable ghost chapters
-- ♾️ Infinity Mode: music-enhanced flow state practice
-- 🔊 More soundtracks, ghosts, and Easter eggs
-
----
-
-## 🌐 Credits
-
-Made with 💙 by **JPS Grooves**  
-Music + Art + Math Education, all fused into one clean vibe.  
-[https://jpsgrooves.com](https://jpsgrooves.com)
-
-## 🚀 To Run Locally
-Clone this repo and open `index.html` in your browser:
-```bash
-git clone https://github.com/your-username/snowcone-mathfest.git
-
-
-
+- Modular file structure with clean separation of concerns:
