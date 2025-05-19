@@ -89,7 +89,7 @@ html::before {
 
 .menu-title-top {
   position: absolute;
-  top: 5%;
+  top: 10%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
@@ -188,7 +188,7 @@ html::before {
 }
 
 .menu-label.infinity {
-  top: 57%;
+  top: 56%;
   left: 35%;
   width: 28%;
   color: #0077ff;
