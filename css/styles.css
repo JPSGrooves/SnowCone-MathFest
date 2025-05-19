@@ -67,12 +67,15 @@ html::before {
 }
 
 /* Base label style */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
 .menu-label {
   position: absolute;
   pointer-events: auto;
-  font-weight: bold;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
   text-align: center;
-  font-size: clamp(0.6rem, 2.5vmin, 2.5rem);
+  font-size: clamp(1.5rem, 3.5vw, 4rem); /* Slightly bigger */
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
@@ -81,38 +84,38 @@ html::before {
   cursor: pointer;
 }
 
-/* Specific label positions + colors */
-.menu-label.baby {
-  top: 12%;
-  left: 14%;
-  width: 32%;
-  color: #ffee00;
-}
-
-.menu-label.quick {
-  top: 23%;
-  left: 55%;
-  width: 35%;
-  color: #00ccff;
-}
-
-.menu-label.story {
-  top: 46%;
-  left: 50%;
-  width: 30%;
-  color: #cc66ff;
-}
-
+/* Final Arc Placement */
 .menu-label.tips {
-  top: 55%;
-  left: 8%;
-  width: 30%;
+  top: 34%;
+  left: 6%;
+  width: 26%;
   color: #00ff88;
 }
 
+.menu-label.kids {
+  top: 24%;
+  left: 24%;
+  width: 26%;
+  color: #ff66cc;
+}
+
+.menu-label.story {
+  top: 14%;
+  left: 44%;
+  width: 28%;
+  color: #cc66ff;
+}
+
+.menu-label.quick {
+  top: 24%;
+  left: 65%;
+  width: 26%;
+  color: #00ccff;
+}
+
 .menu-label.infinity {
-  top: 80%;
-  left: 34%;
-  width: 32%;
+  top: 34%;
+  left: 83%;
+  width: 26%;
   color: #0077ff;
 }
