@@ -168,35 +168,35 @@ html::before {
 /* Label Positions (from uploaded CSS.txt) */
 .menu-label.tips {
   top: 45%;
-  left: 6%;
+  left: 8%;
   width: 26%;
   color: #00ff88;
 }
 
 .menu-label.kids {
   top: 30%;
-  left: 10%;
+  left: 8%;
   width: 26%;
   color: #ffee00;
 }
 
 .menu-label.story {
   top: 45%;
-  left: 70%;
+  left: 67%;
   width: 26%;
   color: #cc66ff;
 }
 
 .menu-label.quick {
   top: 30%;
-  left: 65%;
+  left: 67%;
   width: 26%;
   color: #00ccff;
 }
 
 .menu-label.infinity {
   top: 57%;
-  left: 33%;
-  width: 35%;
+  left: 32%;
+  width: 26%;
   color: #0077ff;
 }
