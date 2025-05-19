@@ -163,45 +163,6 @@ html::before {
     0 0 18px white;
 }
 
-/* Emoji-enhanced labels */
-.menu-label.tips::before {
-  content: "ðŸ“˜\A";
-  display: block;
-  font-size: 1.5rem;
-}
-
-.menu-label.kids::before {
-  content: "â›º\A";
-  display: block;
-  font-size: 1.5rem;
-}
-
-.menu-label.story::before {
-  content: "ðŸ“–\A";
-  display: block;
-  font-size: 1.5rem;
-}
-
-.menu-label.quick::before {
-  content: "ðŸ§\A";
-  display: block;
-  font-size: 1.5rem;
-}
-
-.menu-label.infinity::before {
-  content: "â™¾ï¸";
-  display: inline-block;
-  font-size: 1.2rem;
-  margin-right: 0.3rem;
-}
-
-.menu-label.infinity::after {
-  content: "â™¾ï¸";
-  display: inline-block;
-  font-size: 1.2rem;
-  margin-left: 0.3rem;
-}
-
 /* Final Arc Positions */
 .menu-label.tips {
   top: 38%;
