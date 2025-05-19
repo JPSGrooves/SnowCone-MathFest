@@ -128,3 +128,31 @@ html::before {
   width: 26%;
   color: #0077ff;
 }
+.menu-title-button {
+  position: absolute;
+  bottom: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  max-width: 400px;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: glow-pulse 2s infinite ease-in-out;
+}
+
+.menu-title-button img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px #00ff88) drop-shadow(0 0 24px #00ff88);
+  }
+}
+
