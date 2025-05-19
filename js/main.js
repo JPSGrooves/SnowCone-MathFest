@@ -40,4 +40,9 @@ function updateLabelOverlay() {
 window.addEventListener("load", updateLabelOverlay);
 window.addEventListener("resize", updateLabelOverlay);
 
+function handleTitleClick() {
+  console.log("Title clicked! Future feature coming...");
+  // TODO: Open credits, music player, or tutorial
+}
+
 
