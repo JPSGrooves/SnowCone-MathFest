@@ -167,7 +167,7 @@ html::before {
 
 /* Label Positions (from uploaded CSS.txt) */
 .menu-label.tips {
-  top: 45%;
+  top: 47%;
   left: 8%;
   width: 26%;
   color: #00ff88;
@@ -181,7 +181,7 @@ html::before {
 }
 
 .menu-label.story {
-  top: 45%;
+  top: 47%;
   left: 67%;
   width: 26%;
   color: #cc66ff;
@@ -196,7 +196,7 @@ html::before {
 
 .menu-label.infinity {
   top: 56%;
-  left: 37%;
+  left: 36%;
   width: 26%;
   color: white;
   text-shadow:
