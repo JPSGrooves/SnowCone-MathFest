@@ -86,6 +86,7 @@ html::before {
   filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
 }
 
+
 .menu-title-top {
   position: absolute;
   top: 10%;
@@ -95,7 +96,28 @@ html::before {
   max-width: 400px;
   height: auto;
   pointer-events: none;
-  filter: drop-shadow(0 0 6px white) drop-shadow(0 0 12px white);
+  animation: neon-glow-cycle 6s linear infinite;
+}
+
+@keyframes neon-glow-cycle {
+  0% {
+    filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080);
+  }
+  20% {
+    filter: drop-shadow(0 0 6px #ffcc00) drop-shadow(0 0 12px #ffcc00);
+  }
+  40% {
+    filter: drop-shadow(0 0 6px #00ff88) drop-shadow(0 0 12px #00ff88);
+  }
+  60% {
+    filter: drop-shadow(0 0 6px #00ccff) drop-shadow(0 0 12px #00ccff);
+  }
+  80% {
+    filter: drop-shadow(0 0 6px #cc66ff) drop-shadow(0 0 12px #cc66ff);
+  }
+  100% {
+    filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080);
+  }
 }
 
 
