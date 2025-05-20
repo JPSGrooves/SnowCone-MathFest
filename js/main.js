@@ -62,13 +62,15 @@ function lockGridToImage() {
   if (!bgImg || !grid) return;
 
   const rect = bgImg.getBoundingClientRect();
-  const minHeight = 600;
+  const minHeight = 600; // or whatever looks good on your art
+
   const height = Math.max(rect.height, minHeight);
   const width = rect.width;
 
   grid.style.height = `${height}px`;
   grid.style.width = `${width}px`;
 }
+
 
 
 
