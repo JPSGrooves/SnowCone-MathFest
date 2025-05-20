@@ -70,6 +70,13 @@ html::before {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 16% 22% 22% 22%;
 }
+#bg-measure {
+  display: block;
+  width: 100%;
+  min-height: 600px;
+  visibility: hidden;
+  position: absolute;
+}
 
 
 /* Title PNG at the top */
