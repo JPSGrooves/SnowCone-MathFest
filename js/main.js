@@ -3,6 +3,7 @@ function hideAllScreens() {
     el.style.display = 'none';
   });
 }
+
 function startMathTips() {
   hideAllScreens();
   document.getElementById('tutorialContainer').style.display = 'block';
@@ -23,22 +24,6 @@ function openMusicPlayer() {
   hideAllScreens();
   document.getElementById('musicModal').style.display = 'flex';
 }
-function updateLabelOverlay() {
-  const image = document.getElementById("menuMap");
-  const overlay = document.getElementById("labelOverlay");
-
-  const rect = image.getBoundingClientRect();
-
-  overlay.style.position = 'absolute';
-  overlay.style.width = `${rect.width}px`;
-  overlay.style.height = `${rect.height}px`;
-  overlay.style.left = `${rect.left + window.scrollX}px`;
-  overlay.style.top = `${rect.top + window.scrollY}px`;
-}
-
-// Run it on load and resize
-window.addEventListener("load", updateLabelOverlay);
-window.addEventListener("resize", updateLabelOverlay);
 
 function handleTitleClick() {
   console.log("Title clicked! Future feature coming...");
@@ -52,7 +37,7 @@ function lockGridToImage() {
   if (!bgImg || !grid) return;
 
   const rect = bgImg.getBoundingClientRect();
-  const minHeight = 600; // or whatever looks good on your art
+  const minHeight = 600;
 
   const height = Math.max(rect.height, minHeight);
   const width = rect.width;
@@ -61,6 +46,5 @@ function lockGridToImage() {
   grid.style.width = `${width}px`;
 }
 
-
-
-
+window.addEventListener("load", lockGridToImage);
+window.addEventListener("resize", lockGridToImage);
