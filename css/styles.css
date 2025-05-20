@@ -42,17 +42,19 @@ html::before {
 .menu-frame {
   position: relative;
   aspect-ratio: 9 / 16;
-  height: 100vh;
+  height: auto;
+  max-height: 100vh;
   width: auto;
   max-width: 100vw;
-  overflow: hidden;
-  background: black;
+  min-height: 600px;         /* locks the playfield floor */
+  min-width: 337.5px;        /* maintains 9:16 ratio floor */
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 600px;    /* 💥 prevents excessive vertical collapse */
-  min-width: 337.5px;   /* 600px * (9 / 16) = 337.5px for 9:16 ratio */
+  background: black;
+  overflow: hidden;
 }
+
 
 
 .menu-grid {
