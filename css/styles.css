@@ -71,13 +71,13 @@ html::before {
 /* Title PNG at the top */
 .menu-title-top {
   position: absolute;
-  top: 8%;
+  top: 14.5%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
   max-width: 400px;
   pointer-events: auto;
-  cursor: pointer;
+  z-index: 2;
   animation: neon-glow-cycle 6s linear infinite;
   transition: transform 0.2s ease-in-out;
 }
