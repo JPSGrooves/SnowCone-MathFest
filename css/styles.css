@@ -50,6 +50,7 @@ html::before {
   min-width: 281px;
   background: black;
   overflow: hidden;
+  outline: 2px solid red;
 }
 
 .menu-grid {
@@ -64,6 +65,7 @@ html::before {
     "infinity infinity";
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 18% 22% 22% 22%;
+  outline: 2px dashed lime;
 }
 
 /* Background image */
@@ -174,12 +176,5 @@ html::before {
   line-height: 1;
   margin-bottom: -0.65em;
   filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 6px currentColor);
-}
-.menu-frame {
-  outline: 2px solid red;
-}
-
-.menu-grid {
-  outline: 2px dashed lime;
 }
 
