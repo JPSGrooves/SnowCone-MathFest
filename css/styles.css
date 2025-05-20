@@ -55,7 +55,6 @@ html::before {
 
 .menu-grid {
   display: grid;
-  width: 100%;
   position: relative;
 
   background-image: url('../assets/img/branding/menubackground.png');
@@ -71,6 +70,7 @@ html::before {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 16% 22% 22% 22%;
 }
+
 
 /* Title PNG at the top */
 .menu-title-top {
