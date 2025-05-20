@@ -50,6 +50,8 @@ html::before {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 600px;    /* 💥 prevents excessive vertical collapse */
+  min-width: 337.5px;   /* 600px * (9 / 16) = 337.5px for 9:16 ratio */
 }
 
 
