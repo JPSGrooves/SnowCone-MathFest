@@ -202,6 +202,6 @@ html::before {
 .menu-label.infinity {
   grid-area: infinity;
   color: white;
-  transform: translateY(-45%);  /* ⬆ raise up */
+  transform: translateY(-75%);  /* ⬆ raise up */
 }
 
