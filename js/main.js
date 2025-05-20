@@ -54,14 +54,17 @@ function positionTitleOverImage() {
 window.addEventListener('load', positionTitleOverImage);
 window.addEventListener('resize', positionTitleOverImage);
 
+
 function lockGridToImage() {
   const bgImg = document.getElementById("bg-measure");
-  const menuGrid = document.querySelector(".menu-grid");
+  const grid = document.querySelector(".menu-grid");
+
+  if (!bgImg || !grid) return;
 
   const rect = bgImg.getBoundingClientRect();
-  const height = Math.max(rect.height, 600); // Set your minimum height here
+  const minHeight = 600; // You can adjust this if your PNG is taller or shorter
 
-  menuGrid.style.height = `${height}px`;
+  grid.style.height = `${Math.max(rect.height, minHeight)}px`;
 }
 
 window.addEventListener("load", lockGridToImage);
