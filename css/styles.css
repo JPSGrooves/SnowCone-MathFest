@@ -102,21 +102,16 @@ html::before {
   width: 60%;
   max-width: 400px;
   z-index: 2;
-  position: relative; /* ✅ Adds stability */
+  position: relative;
   animation: neon-glow-cycle 6s linear infinite;
 }
 
 .menu-title-top:hover {
-  transform: scale(1.05); /* ✅ Removed translateX */
+  transform: scale(1.05); /* ⚠️ No translateX */
   animation: none;
   filter: drop-shadow(0 0 8px white) drop-shadow(0 0 16px white);
 }
 
-.menu-title-top img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
 
 @keyframes neon-glow-cycle {
   0% { filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080); }
