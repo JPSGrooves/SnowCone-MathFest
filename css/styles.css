@@ -71,7 +71,6 @@ html::before {
 /* Title PNG at the top */
 .menu-title-top {
   position: absolute;
-  top: 14.5%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
