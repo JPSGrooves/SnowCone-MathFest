@@ -36,14 +36,24 @@ function lockGridToImage() {
 
   if (!bgImg || !grid) return;
 
-  const rect = bgImg.getBoundingClientRect();
-  const minHeight = 600; // <-- force a usable minimum
-  const height = Math.max(rect.height, minHeight);
-  const width = rect.width;
+  const resizeAndLock = () => {
+    const rect = bgImg.getBoundingClientRect();
 
-  grid.style.height = `${height}px`;
-  grid.style.width = `${width}px`;
+    // You can adjust this value as needed for visual usability
+    const minHeight = 600;
+    const height = Math.max(rect.height, minHeight);
+    const width = rect.width;
+
+    grid.style.height = `${height}px`;
+    grid.style.width = `${width}px`;
+  };
+
+  resizeAndLock(); // Initial sizing
+
+  // 👁 Use ResizeObserver to track size changes more precisely
+  const observer = new ResizeObserver(resizeAndLock);
+  observer.observe(bgImg);
+
+  // 👂 Also fall back to window resize for edge cases
+  window.addEventListener("resize", resizeAndLock);
 }
-
-window.addEventListener("load", lockGridToImage);
-window.addEventListener("resize", lockGridToImage);
