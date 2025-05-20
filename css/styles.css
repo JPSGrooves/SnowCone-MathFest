@@ -80,10 +80,10 @@ html::before {
   min-width: 337.5px;
 
   grid-template-areas:
-    "title title"
+    "title"
     "kids  quick"
     "tips  story"
-    "infinity infinity";
+    "infinity";
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 16% 22% 22% 22%;
 }
