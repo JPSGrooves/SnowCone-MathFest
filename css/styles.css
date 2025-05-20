@@ -82,15 +82,21 @@ html::before {
 /* Title PNG at the top */
 .menu-title-top {
   position: absolute;
-  top: 10%; /* Adjust as needed */
+  top: 11.8%;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
   max-width: 400px;
-  z-index: 2; /* This makes sure it's above the labels */
+  z-index: 2;
   pointer-events: auto;
   animation: neon-glow-cycle 6s linear infinite;
 }
+@media (min-width: 768px) {
+  .menu-title-top {
+    top: 8.9%; /* adjust for desktop to match visual anchor */
+  }
+}
+
 
 
 .menu-title-top:hover {
