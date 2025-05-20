@@ -62,14 +62,13 @@ function lockGridToImage() {
   if (!bgImg || !grid) return;
 
   const rect = bgImg.getBoundingClientRect();
-  const minHeight = 600; // You can adjust this if your PNG is taller or shorter
+  const minHeight = 600;
+  const height = Math.max(rect.height, minHeight);
+  const width = rect.width;
 
-  grid.style.height = `${Math.max(rect.height, minHeight)}px`;
+  grid.style.height = `${height}px`;
+  grid.style.width = `${width}px`;
 }
-
-window.addEventListener("load", lockGridToImage);
-window.addEventListener("resize", lockGridToImage);
-
 
 
 
