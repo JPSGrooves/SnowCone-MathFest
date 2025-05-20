@@ -178,30 +178,30 @@ html::before {
 .menu-label.quick {
   grid-area: quick;
   color: #00ccff;
-  transform: translateX(5%);  /* ➡ shift right */
+  transform: translateX(10%);  /* ➡ shift right */
 }
 
 .menu-label.kids {
   grid-area: kids;
   color: #ffee00;
-  transform: translateX(-5%);  /* ⬅ shift left */
+  transform: translateX(-7%);  /* ⬅ shift left */
 }
 
 .menu-label.tips {
   grid-area: tips;
   color: #00ff88;
-  transform: translateY(-10%);  /* ⬆ raise up */
+  transform: translateY(-20%);  /* ⬆ raise up */
 }
 
 .menu-label.story {
   grid-area: story;
   color: #cc66ff;
-  transform: translateY(-10%);  /* ⬆ raise up */
+  transform: translateY(-20%);  /* ⬆ raise up */
 }
 
 .menu-label.infinity {
   grid-area: infinity;
   color: white;
-  transform: translateY(-10%);  /* ⬆ raise up */
+  transform: translateY(-30%);  /* ⬆ raise up */
 }
 
