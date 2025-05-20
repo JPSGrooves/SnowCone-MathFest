@@ -54,5 +54,19 @@ function positionTitleOverImage() {
 window.addEventListener('load', positionTitleOverImage);
 window.addEventListener('resize', positionTitleOverImage);
 
+function lockGridToImage() {
+  const bgImg = document.getElementById("bg-measure");
+  const menuGrid = document.querySelector(".menu-grid");
+
+  const rect = bgImg.getBoundingClientRect();
+  const height = Math.max(rect.height, 600); // Set your minimum height here
+
+  menuGrid.style.height = `${height}px`;
+}
+
+window.addEventListener("load", lockGridToImage);
+window.addEventListener("resize", lockGridToImage);
+
+
 
 
