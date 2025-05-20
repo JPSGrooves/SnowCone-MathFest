@@ -74,9 +74,12 @@ html::before {
   display: block;
   width: 100%;
   height: auto;
+  min-height: 600px; /* <-- add it back here */
   position: absolute;
   visibility: hidden;
+  pointer-events: none;
 }
+
 
 
 
