@@ -34,8 +34,10 @@ html::before {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: black; /* keeps side buffers clean */
+  background: black;
+  overflow: hidden;   /* 🔒 No scrolling allowed */
 }
+
 
 
 /* Frame container with aspect-ratio */
