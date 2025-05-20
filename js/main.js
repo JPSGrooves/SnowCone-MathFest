@@ -44,5 +44,15 @@ function handleTitleClick() {
   console.log("Title clicked! Future feature coming...");
   // TODO: Open credits, music player, or tutorial
 }
+function positionTitleOverImage() {
+  const image = document.getElementById('menuMap');
+  const title = document.querySelector('.menu-title-top');
+
+  const rect = image.getBoundingClientRect();
+  title.style.top = `${rect.top + rect.height * 0.13}px`; // 13% down the image
+}
+window.addEventListener('load', positionTitleOverImage);
+window.addEventListener('resize', positionTitleOverImage);
+
 
 
