@@ -80,10 +80,10 @@ html::before {
   min-width: 337.5px;
 
   grid-template-areas:
-    "title"
+    "title  title"
     "kids  quick"
     "tips  story"
-    "infinity";
+    "infinity  infinity";
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 16% 22% 22% 22%;
 }
@@ -173,5 +173,34 @@ html::before {
   line-height: 1;
   margin-bottom: -0.65em;
   filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 6px currentColor);
+}
+.menu-label.quick {
+  grid-area: quick;
+  color: #00ccff;
+  transform: translateX(5%);  /* ➡ shift right */
+}
+
+.menu-label.kids {
+  grid-area: kids;
+  color: #ffee00;
+  transform: translateX(-5%);  /* ⬅ shift left */
+}
+
+.menu-label.tips {
+  grid-area: tips;
+  color: #00ff88;
+  transform: translateY(-10%);  /* ⬆ raise up */
+}
+
+.menu-label.story {
+  grid-area: story;
+  color: #cc66ff;
+  transform: translateY(-10%);  /* ⬆ raise up */
+}
+
+.menu-label.infinity {
+  grid-area: infinity;
+  color: white;
+  transform: translateY(-10%);  /* ⬆ raise up */
 }
 
