@@ -54,25 +54,30 @@ html::before {
 
 .menu-grid {
   display: grid;
+  position: relative;
   width: 100%;
   height: 100%;
-  position: relative;
   grid-template-areas:
     "title title"
     "kids  quick"
     "tips  story"
-    "infinity";
+    "infinity infinity";
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 18% 22% 22% 22%;
 }
 
 /* Background image */
 .menu-map {
+  grid-area: 1 / 1 / -1 / -1; /* Stretch full grid */
   width: 100%;
   height: 100%;
   object-fit: contain;
-  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
 }
+
 
 /* Label container overlays the image */
 .label-container {
