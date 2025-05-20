@@ -73,9 +73,11 @@ html::before {
 #bg-measure {
   display: block;
   width: 100%;
-  visibility: hidden;
+  height: auto;
   position: absolute;
+  visibility: hidden;
 }
+
 
 
 /* Title PNG at the top */
