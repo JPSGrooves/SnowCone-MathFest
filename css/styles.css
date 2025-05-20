@@ -44,18 +44,19 @@ html::before {
 .menu-frame {
   position: relative;
   aspect-ratio: 9 / 16;
-  height: auto;
-  max-height: 100vh;
   width: auto;
+  height: 100%;
+  max-height: 100vh;
   max-width: 100vw;
-  min-height: 600px;         /* locks the playfield floor */
-  min-width: 337.5px;        /* maintains 9:16 ratio floor */
+  min-height: 600px;
+  min-width: 337.5px;  /* maintain 9:16 ratio */
+  background: black;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: black;
   overflow: hidden;
 }
+
 
 
 
