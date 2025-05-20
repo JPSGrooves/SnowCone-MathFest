@@ -73,7 +73,6 @@ html::before {
 #bg-measure {
   display: block;
   width: 100%;
-  min-height: 600px;
   visibility: hidden;
   position: absolute;
 }
