@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cosmic Modal Test</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="modal.css" />
   <style>
     body {
       margin: 0;
@@ -48,7 +47,7 @@
       border-radius: 20px;
       padding: 2em;
       width: 80vw;
-      max-width: 500px;
+      max-width: 600px;
       box-shadow: 0 0 20px #00ccff;
       position: relative;
     }
@@ -57,6 +56,8 @@
       display: flex;
       justify-content: space-around;
       margin-bottom: 1em;
+      flex-wrap: wrap;
+      gap: 0.5em;
     }
 
     .tab-header button {
@@ -107,8 +108,31 @@
         <button data-tab="version">v0.1</button>
       </div>
 
-      <div class="tab-content" id="tab-credits">✨ Made with math + madness by JPS Grooves.</div>
-      <div class="tab-content hidden" id="tab-music">🎵 Favorite Tracks: (Coming soon)</div>
+      <div class="tab-content" id="tab-credits">
+        <h2>👾 JPS Grooves</h2>
+        <p>
+          Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
+          📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
+          This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
+        </p>
+        <p style="margin-top: 1em;">🌍 Follow JPS:</p>
+        <ul style="list-style: none; padding: 0;">
+          <li><a href="https://linktr.ee/jpsgrooves" target="_blank">🔗 Linktree</a></li>
+          <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
+          <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
+          <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
+        </ul>
+      </div>
+
+      <div class="tab-content hidden" id="tab-music">
+        <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+        <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
+          <a href="https://soundcloud.com/jpsgrooves" title="JPS Grooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a>
+          ·
+          <a href="https://soundcloud.com/jpsgrooves/sets/electronic" title="SnowCone MathFest Music Mode" target="_blank" style="color: #cccccc; text-decoration: none;">SnowCone MathFest Music Mode</a>
+        </div>
+      </div>
+
       <div class="tab-content hidden" id="tab-rules">📜 Play modes to earn XP. Unlock badges. Level up your cone soul.</div>
       <div class="tab-content hidden" id="tab-version">🧠 Version: v0.1 — SceneMgr + CDMS + Glowy Grid Menu</div>
 
