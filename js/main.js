@@ -91,3 +91,15 @@ function handleInstallClick() {
 
 window.handleInstallClick = handleInstallClick;
 
+// 🚫 Block double-tap zoom on iOS
+let lastTouchEnd = 0;
+
+document.addEventListener('touchend', function (e) {
+  const now = new Date().getTime();
+  if (now - lastTouchEnd <= 300) {
+    e.preventDefault(); // 🚫 Block the zoom
+  }
+  lastTouchEnd = now;
+}, false);
+
+
