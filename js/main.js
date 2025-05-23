@@ -57,3 +57,37 @@ function lockGridToImage() {
   // 👂 Also fall back to window resize for edge cases
   window.addEventListener("resize", resizeAndLock);
 }
+
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallLabel();
+});
+
+function isIOS() {
+  return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+}
+
+function showInstallLabel() {
+  const label = document.querySelector('.menu-label.install');
+  if (label) label.style.display = 'flex';
+}
+
+function handleInstallClick() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choice) => {
+      if (choice.outcome === 'accepted') console.log('Installed 🎉');
+      deferredPrompt = null;
+    });
+  } else if (isIOS()) {
+    alert("To install on iPhone:\n1. Tap the Share icon (⬆️)\n2. Choose 'Add to Home Screen'");
+  } else {
+    alert("Install not supported on this browser.");
+  }
+}
+
+window.handleInstallClick = handleInstallClick;
+
