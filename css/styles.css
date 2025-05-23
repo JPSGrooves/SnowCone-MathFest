@@ -80,13 +80,16 @@ html::before {
   min-width: 337.5px;
 
   grid-template-areas:
-    "title  title"
-    "kids  quick"
-    "tips  story"
-    "infinity  infinity";
+    "title    title"
+    "kids     quick"
+    "tips     story"
+    "infinity infinity"
+    "install  install";
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 16% 22% 22% 22%;
 }
+
+
 
 
 
@@ -198,5 +201,14 @@ html::before {
   grid-area: infinity;
   color: white;
   transform: translateY(-75%);  /* ⬆ raise up */
+}
+.menu-label.install {
+  grid-area: install;
+  color: #0033cc; /* deep electric blue */
+  transform: translateY(-25%);
+  text-shadow:
+    0 0 6px #0066ff,
+    0 0 12px #0066ff,
+    0 0 18px #0066ff;
 }
 
