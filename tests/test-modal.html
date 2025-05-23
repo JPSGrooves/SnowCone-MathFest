@@ -6,6 +6,94 @@
   <title>Cosmic Modal Test</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="modal.css" />
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #openModalBtn {
+      padding: 1em 2em;
+      font-size: 1.2rem;
+      background: #00ccff;
+      color: black;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ccff, 0 0 20px #00ccff;
+    }
+
+    .cosmic-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .cosmic-modal.hidden {
+      display: none;
+    }
+
+    .cosmic-modal-inner {
+      background: rgba(20, 20, 20, 0.95);
+      border: 2px solid #00ccff;
+      border-radius: 20px;
+      padding: 2em;
+      width: 80vw;
+      max-width: 500px;
+      box-shadow: 0 0 20px #00ccff;
+      position: relative;
+    }
+
+    .tab-header {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1em;
+    }
+
+    .tab-header button {
+      background: none;
+      border: 1px solid #00ccff;
+      color: #00ccff;
+      padding: 0.5em 1em;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      border-radius: 10px;
+    }
+
+    .tab-header button.active {
+      background: #00ccff;
+      color: black;
+    }
+
+    .tab-content {
+      color: white;
+      font-size: 1.1rem;
+    }
+
+    .tab-content.hidden {
+      display: none;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #00ccff;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <button id="openModalBtn">✨ Open Cosmic Modal ✨</button>
@@ -28,6 +116,29 @@
     </div>
   </div>
 
-  <script src="modal.js"></script>
+  <script>
+    document.getElementById('openModalBtn').addEventListener('click', () => {
+      document.getElementById('cosmicModal').classList.remove('hidden');
+    });
+
+    document.querySelector('.close-modal').addEventListener('click', () => {
+      document.getElementById('cosmicModal').classList.add('hidden');
+    });
+
+    document.querySelectorAll('.tab-header button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+
+        document.querySelectorAll('.tab-header button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.add('hidden');
+        });
+
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      });
+    });
+  </script>
 </body>
 </html>
