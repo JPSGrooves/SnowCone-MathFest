@@ -128,6 +128,13 @@ function markSynced() {
   saveData(data);
 }
 
+function setBuildVersion(version) {
+  const data = getData();
+  data.devFlags.build = version;
+  saveData(data);
+}
+
+
 // 🔍 Attach to window for testing
 window.getData = getData;
 window.saveData = saveData;
