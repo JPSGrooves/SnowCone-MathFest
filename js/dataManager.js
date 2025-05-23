@@ -1,3 +1,4 @@
+// /js/dataManager.js
 
 const STORAGE_KEY = 'snowconeUserData';
 
@@ -41,6 +42,7 @@ const DEFAULT_DATA = {
   }
 };
 
+// 🧠 Core Storage Handlers
 function getData() {
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || DEFAULT_DATA;
 }
@@ -49,7 +51,7 @@ function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-// High Scores
+// 💾 High Score System
 function saveScore(mode, score, initials = '???') {
   if (!mode || typeof score !== 'number') {
     console.warn('Missing or invalid mode/score in saveScore');
@@ -63,16 +65,16 @@ function saveScore(mode, score, initials = '???') {
   saveData(data);
 }
 
-
 function loadScores(mode) {
   return getData().scores[mode] || [];
 }
 
-// XP and Badges
+// 🧠 XP and Badge Logic
 function addXP(amount) {
   const data = getData();
   data.profile.xp = (data.profile.xp || 0) + amount;
   saveData(data);
+  checkForBadges(); // 🔓 Auto check for unlocks
 }
 
 function getXP() {
@@ -93,7 +95,7 @@ function checkForBadges() {
   if (xp >= 100 && !badges.includes('math_zen')) unlockBadge('math_zen');
 }
 
-// Story Progress
+// 📖 Story Progress Tracking
 function saveStoryProgress(chapter, panelId) {
   const data = getData();
   data.storyProgress.chapter = chapter;
@@ -107,7 +109,26 @@ function loadStoryProgress() {
   return getData().storyProgress;
 }
 
-// Attach to window for console testing
+// 📊 Stats Tracking
+function updateStats(mode, key, increment = 1) {
+  const data = getData();
+  if (!data.stats[mode]) data.stats[mode] = {};
+  data.stats[mode][key] = (data.stats[mode][key] || 0) + increment;
+  saveData(data);
+}
+
+// 🛠️ Dev + Sync Utilities
+function resetData() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+function markSynced() {
+  const data = getData();
+  data.devFlags.lastSync = new Date().toISOString();
+  saveData(data);
+}
+
+// 🔍 Attach to window for testing
 window.getData = getData;
 window.saveData = saveData;
 window.saveScore = saveScore;
@@ -118,3 +139,6 @@ window.unlockBadge = unlockBadge;
 window.checkForBadges = checkForBadges;
 window.saveStoryProgress = saveStoryProgress;
 window.loadStoryProgress = loadStoryProgress;
+window.updateStats = updateStats;
+window.resetData = resetData;
+window.markSynced = markSynced;
