@@ -27,6 +27,12 @@ html::before {
   to { transform: translate(100px, 200px); }
 }
 
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
 /* Top-level container for centering */
 .menu-wrapper {
   width: 100vw;
