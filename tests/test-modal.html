@@ -50,6 +50,18 @@
       max-width: 600px;
       box-shadow: 0 0 20px #00ccff;
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #00ccff black;
+    }
+
+    .cosmic-modal-inner::-webkit-scrollbar {
+      width: 6px;
+    }
+    .cosmic-modal-inner::-webkit-scrollbar-thumb {
+      background-color: #00ccff;
+      border-radius: 10px;
     }
 
     .tab-header {
