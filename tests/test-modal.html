@@ -94,10 +94,29 @@
     }
 
 
+    .tab-header button {
+      background: none;
+      border: 1px solid #00ccff;
+      color: #00ccff;
+      padding: 0.5em 1em;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      border-radius: 10px;
+      font-size: 1rem;
+      box-shadow: 0 0 8px #00ccff;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    
+    .tab-header button:hover {
+      background: #00ccff;
+      color: black;
+    }
+    
     .tab-header button.active {
       background: #00ccff;
       color: black;
     }
+
 
     .tab-content {
       font-family: 'Orbitron', sans-serif;
@@ -145,83 +164,85 @@
         <button data-tab="rules">Rules</button>
         <button data-tab="version">v0.1</button>
       </div>
+      
+      <div class="tab-content-area">
 
-      <div class="tab-content" id="tab-credits">
-        <h2>👾 JPS Grooves</h2>
-        <p>
-          Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
-          📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
-          This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
-        </p>
-        <p style="margin-top: 1em;">🌍 Follow JPS:</p>
-        <ul style="list-style: none; padding: 0;">
-          <li><a href="https://linktr.ee/jpsgrooves" target="_blank">🔗 Linktree</a></li>
-          <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
-          <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
-          <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
-        </ul>
-      </div>
-
-      <div class="tab-content hidden" id="tab-music">
-        <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
-        <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
-          <a href="https://soundcloud.com/jpsgrooves" title="JPS Grooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a>
-          ·
-          <a href="https://soundcloud.com/jpsgrooves/sets/electronic" title="SnowCone MathFest Music Mode" target="_blank" style="color: #cccccc; text-decoration: none;">SnowCone MathFest Music Mode</a>
+        <div class="tab-content" id="tab-credits">
+          <h2>👾 JPS Grooves</h2>
+          <p>
+            Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
+            📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
+            This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
+          </p>
+          <p style="margin-top: 1em;">🌍 Follow JPS:</p>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="https://linktr.ee/jpsgrooves" target="_blank">🔗 Linktree</a></li>
+            <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
+            <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
+            <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
+          </ul>
+        </div>
+  
+        <div class="tab-content hidden" id="tab-music">
+          <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+          <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
+            <a href="https://soundcloud.com/jpsgrooves" title="JPS Grooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a>
+            ·
+            <a href="https://soundcloud.com/jpsgrooves/sets/electronic" title="SnowCone MathFest Music Mode" target="_blank" style="color: #cccccc; text-decoration: none;">SnowCone MathFest Music Mode</a>
+          </div>
+        </div>
+  
+        <div class="tab-content hidden" id="tab-rules">
+          <h2>📜 How to Play</h2>
+          <p>
+            This is <strong>SnowCone MathFest</strong>: an arcade of learning, rhythm, and personal growth.
+            <br><br>
+            🍧 Choose a mode from the main menu:
+            <ul>
+              <li><strong>QuickServe:</strong> Fast-paced math matches. Get answers right to earn XP and climb the leaderboard.</li>
+              <li><strong>Story Mode:</strong> Unlock the past. Meet math ghosts. Solve puzzles to move forward.</li>
+              <li><strong>Infinity Mode:</strong> Pure flow. No end. Just vibe, solve, and soar.</li>
+              <li><strong>Kids Camp:</strong> Matching challenges for younger players or chill play sessions.</li>
+            </ul>
+          </p>
+          <p>
+            💡 Each correct answer earns you XP. XP unlocks badges, themes, cones, and future surprises.
+            <br><br>
+            🔓 New content unlocks as you play. Modes may be locked until you've proven your groove.
+            <br><br>
+            🎧 Use the music panel to vibe while you solve. Play your way, your pace.
+          </p>
+          <p>
+            This game is for learners, dreamers, stoners, teachers, kids, and math ghosts alike.
+            <br>
+            💫 There are no grades. No pressure. Just joy in the numbers.
+          </p>
+        </div>
+  
+        <div class="tab-content hidden" id="tab-version">
+          <h2>🧠 SnowCone MathFest v0.1</h2>
+          <p>
+            Welcome to the first playable preview of SnowCone MathFest — a neon math odyssey in the making.
+            <br><br>
+            🎉 This is <strong>v0.1</strong>, the foundation of our coneverse.
+          </p>
+          <ul>
+            <li>🌌 <strong>Main Menu</strong> — Grid-locked layout, fully scaled with glowing mode labels</li>
+            <li>🍧 <strong>QuickServe Mode</strong> — Early build logic for fast-paced problem solving</li>
+            <li>♾️ <strong>Infinity Mode</strong> — Placeholder for freeform play</li>
+            <li>📖 <strong>Story Mode</strong> — Launch logic wired in (content coming soon)</li>
+            <li>⛺ <strong>Kids Camp</strong> — Placeholder for matching game mode</li>
+            <li>🎛️ <strong>Scene Manager</strong> — Smooth mode switching and reset logic</li>
+            <li>🧠 <strong>Data Manager</strong> — XP, high scores, badges, settings, and story tracking</li>
+            <li>🔮 <strong>Modal System</strong> — This very menu! Music, Credits, Rules & Version</li>
+          </ul>
+          <p>
+            🍥 You’re part of an evolving project. Expect updates. Expect weirdness. Expect joy.
+            <br>
+            Built with glow, by <a href="https://linktr.ee/jpsgrooves" target="_blank">JPS Grooves</a>.
+          </p>
         </div>
       </div>
-
-      <div class="tab-content hidden" id="tab-rules">
-        <h2>📜 How to Play</h2>
-        <p>
-          This is <strong>SnowCone MathFest</strong>: an arcade of learning, rhythm, and personal growth.
-          <br><br>
-          🍧 Choose a mode from the main menu:
-          <ul>
-            <li><strong>QuickServe:</strong> Fast-paced math matches. Get answers right to earn XP and climb the leaderboard.</li>
-            <li><strong>Story Mode:</strong> Unlock the past. Meet math ghosts. Solve puzzles to move forward.</li>
-            <li><strong>Infinity Mode:</strong> Pure flow. No end. Just vibe, solve, and soar.</li>
-            <li><strong>Kids Camp:</strong> Matching challenges for younger players or chill play sessions.</li>
-          </ul>
-        </p>
-        <p>
-          💡 Each correct answer earns you XP. XP unlocks badges, themes, cones, and future surprises.
-          <br><br>
-          🔓 New content unlocks as you play. Modes may be locked until you've proven your groove.
-          <br><br>
-          🎧 Use the music panel to vibe while you solve. Play your way, your pace.
-        </p>
-        <p>
-          This game is for learners, dreamers, stoners, teachers, kids, and math ghosts alike.
-          <br>
-          💫 There are no grades. No pressure. Just joy in the numbers.
-        </p>
-      </div>
-
-      <div class="tab-content hidden" id="tab-version">
-        <h2>🧠 SnowCone MathFest v0.1</h2>
-        <p>
-          Welcome to the first playable preview of SnowCone MathFest — a neon math odyssey in the making.
-          <br><br>
-          🎉 This is <strong>v0.1</strong>, the foundation of our coneverse.
-        </p>
-        <ul>
-          <li>🌌 <strong>Main Menu</strong> — Grid-locked layout, fully scaled with glowing mode labels</li>
-          <li>🍧 <strong>QuickServe Mode</strong> — Early build logic for fast-paced problem solving</li>
-          <li>♾️ <strong>Infinity Mode</strong> — Placeholder for freeform play</li>
-          <li>📖 <strong>Story Mode</strong> — Launch logic wired in (content coming soon)</li>
-          <li>⛺ <strong>Kids Camp</strong> — Placeholder for matching game mode</li>
-          <li>🎛️ <strong>Scene Manager</strong> — Smooth mode switching and reset logic</li>
-          <li>🧠 <strong>Data Manager</strong> — XP, high scores, badges, settings, and story tracking</li>
-          <li>🔮 <strong>Modal System</strong> — This very menu! Music, Credits, Rules & Version</li>
-        </ul>
-        <p>
-          🍥 You’re part of an evolving project. Expect updates. Expect weirdness. Expect joy.
-          <br>
-          Built with glow, by <a href="https://linktr.ee/jpsgrooves" target="_blank">JPS Grooves</a>.
-        </p>
-      </div>
-
 
       <button class="close-modal">✖</button>
     </div>
