@@ -149,3 +149,5 @@ window.loadStoryProgress = loadStoryProgress;
 window.updateStats = updateStats;
 window.resetData = resetData;
 window.markSynced = markSynced;
+window.setBuildVersion = setBuildVersion; // ✅ Add this
+
