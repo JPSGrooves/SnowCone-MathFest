@@ -45,15 +45,16 @@
       background: rgba(20, 20, 20, 0.95);
       border: 2px solid #00ccff;
       border-radius: 20px;
-      padding: 2em;
+      padding: 1em;
       width: 80vw;
       max-width: 600px;
       box-shadow: 0 0 20px #00ccff;
       position: relative;
       max-height: 90vh;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #00ccff black;
+    
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* important */
     }
 
     .cosmic-modal-inner::-webkit-scrollbar {
@@ -72,15 +73,26 @@
       gap: 0.5em;
     }
 
-    .tab-header button {
-      background: none;
-      border: 1px solid #00ccff;
-      color: #00ccff;
-      padding: 0.5em 1em;
-      cursor: pointer;
-      font-family: 'Orbitron', sans-serif;
-      border-radius: 10px;
+    .tab-header {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      margin-bottom: 0.5em;
+      position: sticky;
+      top: 0;
+      background: rgba(20, 20, 20, 0.95); /* match modal bg */
+      z-index: 1;
+      padding-bottom: 0.5em;
     }
+    .tab-content-area {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #00ccff black;
+      padding-right: 0.5em;
+    }
+
 
     .tab-header button.active {
       background: #00ccff;
@@ -93,6 +105,7 @@
       color: white;
       line-height: 1.5;
       text-shadow: none;
+      padding-bottom: 2em;
     }
     .tab-content h2 {
       font-size: clamp(1.4rem, 3vmin, 2.2rem);
