@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cosmic Modal Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="modal.css" />
+</head>
+<body>
+  <button id="openModalBtn">✨ Open Cosmic Modal ✨</button>
+
+  <div id="cosmicModal" class="cosmic-modal hidden">
+    <div class="cosmic-modal-inner">
+      <div class="tab-header">
+        <button data-tab="credits" class="active">Credits</button>
+        <button data-tab="music">Music</button>
+        <button data-tab="rules">Rules</button>
+        <button data-tab="version">v0.1</button>
+      </div>
+
+      <div class="tab-content" id="tab-credits">✨ Made with math + madness by JPS Grooves.</div>
+      <div class="tab-content hidden" id="tab-music">🎵 Favorite Tracks: (Coming soon)</div>
+      <div class="tab-content hidden" id="tab-rules">📜 Play modes to earn XP. Unlock badges. Level up your cone soul.</div>
+      <div class="tab-content hidden" id="tab-version">🧠 Version: v0.1 — SceneMgr + CDMS + Glowy Grid Menu</div>
+
+      <button class="close-modal">✖</button>
+    </div>
+  </div>
+
+  <script src="modal.js"></script>
+</body>
+</html>
