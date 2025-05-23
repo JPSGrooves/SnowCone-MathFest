@@ -68,14 +68,6 @@
     .tab-header {
       display: flex;
       justify-content: space-around;
-      margin-bottom: 1em;
-      flex-wrap: wrap;
-      gap: 0.5em;
-    }
-
-    .tab-header {
-      display: flex;
-      justify-content: space-around;
       flex-wrap: wrap;
       gap: 0.5em;
       margin-bottom: 0.5em;
@@ -84,13 +76,19 @@
       background: rgba(20, 20, 20, 0.95); /* match modal bg */
       z-index: 1;
       padding-bottom: 0.5em;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-header::-webkit-scrollbar {
+      display: none;
     }
     .tab-content-area {
       flex: 1;
       overflow-y: auto;
+      padding: 0 1em;
       scrollbar-width: thin;
       scrollbar-color: #00ccff black;
-      padding-right: 0.5em;
     }
 
 
