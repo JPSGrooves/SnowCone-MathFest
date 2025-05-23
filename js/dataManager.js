@@ -51,6 +51,10 @@ function saveData(data) {
 
 // High Scores
 function saveScore(mode, score, initials = '???') {
+  if (!mode || typeof score !== 'number') {
+    console.warn('Missing or invalid mode/score in saveScore');
+    return;
+  }
   const data = getData();
   const entry = { score, initials, date: new Date().toISOString() };
   data.scores[mode] = [...(data.scores[mode] || []), entry]
@@ -58,6 +62,7 @@ function saveScore(mode, score, initials = '???') {
     .slice(0, 10);
   saveData(data);
 }
+
 
 function loadScores(mode) {
   return getData().scores[mode] || [];
