@@ -131,7 +131,9 @@ html::before {
   100% { filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080); }
 }
 
+
 .menu-label {
+  touch-action: manipulation; /* Prevents double-tap zoom */
   position: relative;
   display: flex;
   align-items: center;
