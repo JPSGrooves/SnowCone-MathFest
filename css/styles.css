@@ -204,11 +204,11 @@ html::before {
 }
 .menu-label.install {
   grid-area: install;
-  color: #0033cc; /* deep electric blue */
-  transform: translateY(-50%);
+  color: #0033cc;
+  transform: translateY(-25%);
   text-shadow:
-    0 0 6px #0066ff,
-    0 0 12px #0066ff,
-    0 0 18px #0066ff;
+    0 0 2px #0044ff,
+    0 0 3px #0044ff;
 }
+
 
