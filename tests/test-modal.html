@@ -69,15 +69,14 @@
     .tab-header {
       display: flex;
       justify-content: space-around;
-      flex-wrap: wrap;
+      flex-wrap: nowrap; /* 🚫 never wrap */
       gap: 0.5em;
       margin-bottom: 0.5em;
       position: sticky;
       top: 0;
-      background: rgba(20, 20, 20, 0.95); /* match modal bg */
+      background: rgba(20, 20, 20, 0.95);
       z-index: 1;
       padding-bottom: 0.5em;
-      flex-wrap: nowrap;
       overflow-x: auto;
       scrollbar-width: none;
       padding-right: calc(1em + 6px);
@@ -106,6 +105,9 @@
     }
     
     .tab-header button {
+      flex: 0 0 auto; /* 👈 never grow/shrink */
+      min-width: 6em; /* 👈 lock width based on when “Credits” is selected */
+      white-space: nowrap; /* 👈 no wrapping ever */
       background: none;
       border: 1px solid #00ccff;
       color: #00ccff;
