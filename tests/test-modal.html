@@ -57,9 +57,10 @@
       overflow: hidden; /* important */
     }
 
-    .cosmic-modal-inner::-webkit-scrollbar {
-      width: 6px;
+    .cosmic-modal-inner {
+      padding-right: calc(1em + 6px); /* match the scrollbar */
     }
+
     .cosmic-modal-inner::-webkit-scrollbar-thumb {
       background-color: #00ccff;
       border-radius: 10px;
@@ -90,7 +91,10 @@
       padding: 0 1em;
       scrollbar-width: thin;
       scrollbar-color: #00ccff black;
+      /* 👇 Add this to force consistent layout */
+      margin-right: -6px; /* or adjust based on your scrollbar width */
     }
+
 
 
     .tab-header button {
