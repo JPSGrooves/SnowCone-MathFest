@@ -51,15 +51,15 @@
       box-shadow: 0 0 20px #00ccff;
       position: relative;
       max-height: 90vh;
-    
       display: flex;
       flex-direction: column;
-      overflow: hidden; /* important */
+      overflow: hidden;
+    
+      /* 🛡️ Fix scroll squish */
+      scrollbar-gutter: stable;
+      padding-right: calc(1em + 6px);
     }
 
-    .cosmic-modal-inner {
-      padding-right: calc(1em + 6px); /* match the scrollbar */
-    }
 
     .cosmic-modal-inner::-webkit-scrollbar-thumb {
       background-color: #00ccff;
