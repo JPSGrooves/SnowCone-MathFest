@@ -46,10 +46,12 @@
       border: 2px solid #00ccff;
       border-radius: 20px;
       padding: 1em;
-      width: 80vw;
-      max-width: 600px;
+      width: 95vw;
+      max-width: 520px;
+      aspect-ratio: 9 / 12; /* Match the upright orientation of the crystal float */
       box-shadow: 0 0 20px #00ccff;
       position: relative;
+      height: auto;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
@@ -92,6 +94,7 @@
       scrollbar-color: #00ccff black;
       /* 👇 Add this to force consistent layout */
       margin-right: -6px; /* or adjust based on your scrollbar width */
+      min-height: 300px; /* Or measure how tall your longest tab is */
     }
     .tab-content-area::-webkit-scrollbar {
       width: 6px;
@@ -172,9 +175,10 @@
   <div id="cosmicModal" class="cosmic-modal hidden">
     <div class="cosmic-modal-inner">
       <div class="tab-header">
-        <button data-tab="credits" class="active">Credits</button>
+        <button data-tab="rules" class="active">Rules</button>
         <button data-tab="music">Music</button>
-        <button data-tab="rules">Rules</button>
+        <button data-tab="badges">Badges</button>
+        <button data-tab="credits">Credits</button>
         <button data-tab="version">v0.1</button>
       </div>
       
@@ -195,6 +199,16 @@
             <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
           </ul>
         </div>
+        <div class="tab-content hidden" id="tab-badges">
+          <h2>🏅 Badges</h2>
+          <p>You unlock badges by earning XP through gameplay.</p>
+          <ul>
+            <li>✨ <strong>First Steps</strong> — Earn 10 XP</li>
+            <li>🧘 <strong>Math Zen</strong> — Earn 100 XP</li>
+            <!-- Add more if you want -->
+          </ul>
+        </div>
+
   
         <div class="tab-content hidden" id="tab-music">
           <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
