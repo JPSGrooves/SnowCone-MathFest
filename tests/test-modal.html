@@ -94,9 +94,17 @@
       /* 👇 Add this to force consistent layout */
       margin-right: -6px; /* or adjust based on your scrollbar width */
     }
-
-
-
+    .tab-content-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .tab-content-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .tab-content-area::-webkit-scrollbar-thumb {
+      background-color: #00ccff;
+      border-radius: 10px;
+    }
+    
     .tab-header button {
       background: none;
       border: 1px solid #00ccff;
