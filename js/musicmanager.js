@@ -4,11 +4,11 @@ let currentTrackIndex = 0;
 
 const trackList = [
   {
-    title: "Menu Theme",
-    file: "assets/audio/menu-theme.mp3"
-  },
-  // Add more tracks here later!
+    title: "Infinity Addition",
+    file: "assets/audio/Infinity Addition.mp3"
+  }
 ];
+
 
 let music = null;
 
