@@ -20,7 +20,7 @@ function playTrack(index = 0) {
   const track = trackList[index];
   music = new Howl({
     src: [track.file],
-    volume: getSetting("musicVolume") ?? 1.0,
+    volume: 1.0, // hardcoded default,
     loop: true
   });
 
