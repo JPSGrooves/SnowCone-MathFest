@@ -189,7 +189,34 @@
       box-shadow: 0 0 6px #00ccff;
       border: none;
     }
-
+    .jukebox {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid #00ccff;
+      border-radius: 16px;
+      padding: 1em;
+      box-shadow: 0 0 10px #00ccff, 0 0 20px #00ccff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1em;
+      margin-top: 1em;
+    }
+    .jukebox-controls {
+      display: flex;
+      gap: 0.5em;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .jukebox-controls button {
+      background: #111;
+      border: 1px solid #00ccff;
+      color: #00ccff;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      box-shadow: 0 0 6px #00ccff;
+    }
 
     .close-modal {
       position: absolute;
@@ -294,20 +321,30 @@
 
   
         <div class="tab-content hidden" id="tab-music">
-          <h2>🎛️ Music Player</h2>
-          <p id="currentTrack">Loading...</p>
-          <button onclick="playTrack(0)">▶️ Play</button>
-          <button onclick="stopTrack()">⏹️ Stop</button>
-          <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
-            🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
-            It means the world to me that you'd play this game — and vibe to the music I make.  
-            You can chill here in this tab, or let the music override the other modes and create your own rhythm.  
-            There are even a few extra tracks here not found in the game itself... 👀<br><br>
-            Enjoy the jams!  
-            <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
-          </p>
-
-
+          <div class="tab-content hidden" id="tab-music">
+            <h2>🎛️ Music Player</h2>
+            <div class="jukebox">
+              <div id="currentTrack">Loading...</div>
+              <div class="jukebox-controls">
+                <button onclick="rewindTrack()">⏪</button>
+                <button onclick="prevTrack()">⏮️</button>
+                <button onclick="togglePlayPause()">▶️ / ⏸️</button>
+                <button onclick="nextTrack()">⏭️</button>
+                <button onclick="fastForwardTrack()">⏩</button>
+                <button onclick="toggleLoop()">🔁</button>
+              </div>
+              <progress id="trackProgress" value="0" max="100"></progress>
+              <div id="trackTimer">0:00 / 0:00</div>
+            </div>
+          
+            <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
+              🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
+              It means the world to me that you'd play this game — and vibe to the music I make.  
+              There are even a few extra tracks here not found in the game itself... 👀<br><br>
+              Enjoy the jams!  
+              <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
+            </p>
+          </div>
         </div>
   
         <div class="tab-content hidden" id="tab-rules">
