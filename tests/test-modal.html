@@ -175,39 +175,48 @@
   <div id="cosmicModal" class="cosmic-modal hidden">
     <div class="cosmic-modal-inner">
       <div class="tab-header">
-        <button data-tab="rules" class="active">Rules</button>
+        <button data-tab="profile" class="active">Profile</button>
+        <button data-tab="rules">Rules</button>
         <button data-tab="music">Music</button>
-        <button data-tab="badges">Badges</button>
-        <button data-tab="credits">Credits</button>
         <button data-tab="version">v0.1</button>
       </div>
       
       <div class="tab-content-area">
+        <div class="tab-content" id="tab-profile">
+          <h2>👨‍💻 Your Profile</h2>
+          <label for="username">Name Your Groove:</label>
+          <input id="username" type="text" placeholder="Guest" /><br><br>
 
-        <div class="tab-content" id="tab-credits">
-          <h2>👾 JPS Grooves</h2>
+          <label>XP Progress:</label>
+          <progress id="xpBar" value="0" max="100"></progress>
+          <span id="xpPercent">0%</span>
+          <br><br>
+
+          <h3>🏅 Badges</h3>
+          <div id="badgeGrid"></div>
+
+          <h3>🎙️ Sound Settings</h3>
+          <label for="musicVolume">🎵 Music Volume</label><br>
+          <input type="range" id="musicVolume" min="0" max="1" step="0.01"><br><br>
+
+          <label for="sfxVolume">🔔 SFX Volume</label><br>
+          <input type="range" id="sfxVolume" min="0" max="1" step="0.01"><br><br>
+
+          <h3>⚖️ Gameplay</h3>
+          <label><input type="checkbox" id="hardModeToggle"> Always play on Hard Mode?</label><br><br>
+
+          <h3>📂 Save Info</h3>
           <p>
-            Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
-            📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
-            This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
+            🧠 Your progress is saved <strong>automatically</strong> in this browser.<br>
+            ⚠️ To keep your data:
+            <ul>
+              <li>Use the <strong>same browser</strong></li>
+              <li>Don't clear browser data or use incognito mode</li>
+              <li>iPhone users: use "Add to Home Screen" for best results</li>
+            </ul>
           </p>
-          <p style="margin-top: 1em;">🌍 Follow JPS:</p>
-          <ul style="list-style: none; padding: 0;">
-            <li><a href="https://linktr.ee/jpsgrooves" target="_blank">🔗 Linktree</a></li>
-            <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
-            <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
-            <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
-          </ul>
         </div>
-        <div class="tab-content hidden" id="tab-badges">
-          <h2>🏅 Badges</h2>
-          <p>You unlock badges by earning XP through gameplay.</p>
-          <ul>
-            <li>✨ <strong>First Steps</strong> — Earn 10 XP</li>
-            <li>🧘 <strong>Math Zen</strong> — Earn 100 XP</li>
-            <!-- Add more if you want -->
-          </ul>
-        </div>
+
 
   
         <div class="tab-content hidden" id="tab-music">
@@ -247,6 +256,19 @@
         </div>
   
         <div class="tab-content hidden" id="tab-version">
+          <h2>👾 JPS Grooves</h2>
+          <p>
+            Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
+            📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
+            This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
+          </p>
+          <p style="margin-top: 1em;">🌍 Follow JPS:</p>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="https://linktr.ee/jpsgrooves" target="_blank">🔗 Linktree</a></li>
+            <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
+            <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
+            <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
+          </ul>
           <h2>🧠 SnowCone MathFest v0.1</h2>
           <p>
             Welcome to the first playable preview of SnowCone MathFest — a neon math odyssey in the making.
