@@ -256,8 +256,8 @@
     <div class="cosmic-modal-inner">
       <div class="tab-header">
         <button data-tab="profile" class="active">Profile</button>
-        <button data-tab="rules">Guide</button>
-        <button data-tab="music">Music</button>
+        <button data-tab="guide">Guide</button>
+        <button data-tab="sounds">Sounds</button>
         <button data-tab="version">v0.1</button>
       </div>
       
@@ -320,33 +320,44 @@
 
 
   
-        <div class="tab-content hidden" id="tab-music">
-            <h2>🎛️ Music Player</h2>
-            <div class="jukebox">
-              <div id="currentTrack">Loading...</div>
-              <div class="jukebox-controls">
-                <button onclick="rewindTrack()">⏪</button>
-                <button onclick="prevTrack()">⏮️</button>
-                <button onclick="togglePlayPause()">▶️ / ⏸️</button>
-                <button onclick="nextTrack()">⏭️</button>
-                <button onclick="fastForwardTrack()">⏩</button>
-                <button onclick="toggleLoop()">🔁</button>
-              </div>
-              <progress id="trackProgress" value="0" max="100"></progress>
-              <div id="trackTimer">0:00 / 0:00</div>
+        <div class="tab-content hidden" id="tab-sounds">
+          <h2>🎛️ Sounds</h2>
+        
+          <!-- 🔊 Volume Sliders -->
+          <h3>🔊 Volume Settings</h3>
+          <label for="musicVolume">🎵 Music Volume</label><br>
+          <input type="range" id="musicVolume" min="0" max="1" step="0.01"><br><br>
+        
+          <label for="sfxVolume">🔔 SFX Volume</label><br>
+          <input type="range" id="sfxVolume" min="0" max="1" step="0.01"><br><br>
+        
+          <!-- 🎵 Jukebox Player -->
+          <div class="jukebox">
+            <div id="currentTrack">Loading...</div>
+            <div class="jukebox-controls">
+              <button onclick="rewindTrack()">⏪</button>
+              <button onclick="prevTrack()">⏮️</button>
+              <button onclick="togglePlayPause()">▶️ / ⏸️</button>
+              <button onclick="nextTrack()">⏭️</button>
+              <button onclick="fastForwardTrack()">⏩</button>
+              <button onclick="toggleLoop()">🔁</button>
             </div>
-          
-            <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
-              🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
-              It means the world to me that you'd play this game — and vibe to the music I make.  
-              There are even a few extra tracks here not found in the game itself... 👀<br><br>
-              Enjoy the jams!  
-              <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
-            </p>
+            <progress id="trackProgress" value="0" max="100"></progress>
+            <div id="trackTimer">0:00 / 0:00</div>
           </div>
+        
+          <!-- 🧠 Blurb + Link -->
+          <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
+            🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
+            It means the world to me that you'd play this game — and vibe to the music I make.  
+            There are even a few extra tracks here not found in the game itself... 👀<br><br>
+            Enjoy the jams!  
+            <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
+          </p>
         </div>
+
   
-        <div class="tab-content hidden" id="tab-rules">
+        <div class="tab-content hidden" id="tab-guide">
           <h2>📜 MathFest Guide</h2>
           <p>
             This is <strong>SnowCone MathFest</strong>: an arcade of learning, rhythm, and personal growth.
