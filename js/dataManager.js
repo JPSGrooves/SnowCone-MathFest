@@ -134,6 +134,18 @@ function setBuildVersion(version) {
   saveData(data);
 }
 
+function getSetting(key) {
+  const data = getData();
+  return data.settings[key];
+}
+
+function setSetting(key, value) {
+  const data = getData();
+  data.settings[key] = value;
+  saveData(data);
+}
+
+
 
 // 🔍 Attach to window for testing
 window.getData = getData;
