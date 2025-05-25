@@ -246,6 +246,10 @@
       box-shadow: 0 0 8px white;
       transform: scale(1.1);
     }
+    function setMusicVolume(vol) {
+      Howler.volume(vol); // or use your own sound system!
+    }
+
 
   </style>
 </head>
@@ -487,5 +491,23 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
   <script src="js/musicManager.js"></script>
+  <script>
+    // 🔊 Load initial slider positions
+    document.getElementById('musicVolume').value = getSetting('musicVolume') ?? 1;
+    document.getElementById('sfxVolume').value = getSetting('sfxVolume') ?? 1;
+  
+    // 🔁 Update on change
+    document.getElementById('musicVolume').addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value);
+      setSetting('musicVolume', vol);
+      setMusicVolume(vol); // Optional: wire into Howler.js
+    });
+  
+    document.getElementById('sfxVolume').addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value);
+      setSetting('sfxVolume', vol);
+      setSFXVolume(vol); // Optional: tie into effects
+    });
+  </script>
 </body>
 </html>
