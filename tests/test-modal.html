@@ -79,7 +79,7 @@
       background: rgba(20, 20, 20, 0.95);
       z-index: 1;
       padding-bottom: 0.5em;
-      overflow-x: auto;
+      overflow-x: hidden;
       scrollbar-width: none;
       padding-right: calc(1em + 6px);
     }
@@ -108,17 +108,17 @@
     }
     
     .tab-header button {
-      flex: 0 0 auto; /* 👈 never grow/shrink */
-      min-width: 6em; /* 👈 lock width based on when “Credits” is selected */
+      flex: 1 1 0;                /* 👈 grow/shrink as needed */
+      min-width: 0;              /* 👈 allow shrinking below default */
       white-space: nowrap; /* 👈 no wrapping ever */
       background: none;
       border: 1px solid #00ccff;
       color: #00ccff;
-      padding: 0.5em 1em;
+      padding: 0.5em 0.6em;
       cursor: pointer;
       font-family: 'Orbitron', sans-serif;
       border-radius: 10px;
-      font-size: 1rem;
+      font-size: clamp(0.8rem, 2.5vw, 1rem); /* auto-scale text */
       box-shadow: 0 0 8px #00ccff;
       transition: background 0.2s ease, color 0.2s ease;
     }
