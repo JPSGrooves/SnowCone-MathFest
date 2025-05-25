@@ -294,12 +294,22 @@
 
   
         <div class="tab-content hidden" id="tab-music">
-          <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1284576481&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
-          <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;">
-            <a href="https://soundcloud.com/jpsgrooves" title="JPS Grooves" target="_blank" style="color: #cccccc; text-decoration: none;">JPS Grooves</a>
-            ·
-            <a href="https://soundcloud.com/jpsgrooves/sets/electronic" title="SnowCone MathFest Music Mode" target="_blank" style="color: #cccccc; text-decoration: none;">SnowCone MathFest Music Mode</a>
-          </div>
+          <h2>🎛️ Music Player</h2>
+          <p id="currentTrack">Loading...</p>
+          <button onclick="playTrack(0)">▶️ Play</button>
+          <button onclick="stopTrack()">⏹️ Stop</button>
+          <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
+            🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
+            It means the world to me that you'd play this game — and vibe to the music I make.  
+            You can chill here in this tab, or let the music override the other modes and create your own rhythm.  
+            There are even a few extra tracks here not found in the game itself... 👀<br><br>
+            Enjoy the jams!  
+            <a href="https://jpsgrooves.com" target="_blank">🌐 jpsgrooves.com</a>  
+            |  
+            <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
+          </p>
+
+
         </div>
   
         <div class="tab-content hidden" id="tab-rules">
@@ -370,6 +380,7 @@
       <button class="close-modal">✖</button>
     </div>
   </div>
+  
 
   <script>
     document.getElementById('openModalBtn').addEventListener('click', () => {
@@ -429,5 +440,7 @@
       }
     });
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  <script src="js/musicManager.js"></script>
 </body>
 </html>
