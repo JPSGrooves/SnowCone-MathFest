@@ -184,36 +184,36 @@ html::before {
 .menu-label.quick {
   grid-area: quick;
   color: #00ccff;
-  transform: translateX(13%);  /* ➡ shift right */
+  transform: translateX(13%) translateY(-10%);  /* ➡ shift right */
 }
 
 .menu-label.kids {
   grid-area: kids;
   color: #ffee00;
-  transform: translateX(-10%);  /* ⬅ shift left */
+  transform: translateX(-10%) translateY(-10%);  /* ⬅ shift left */
 }
 
 .menu-label.tips {
   grid-area: tips;
   color: #00ff88;
-  transform: translateY(-25%);  /* ⬆ raise up */
+  transform: translateY(-35%);  /* ⬆ raise up */
 }
 
 .menu-label.story {
   grid-area: story;
   color: #cc66ff;
-  transform: translateY(-25%);  /* ⬆ raise up */
+  transform: translateY(-35%);  /* ⬆ raise up */
 }
 
 .menu-label.infinity {
   grid-area: infinity;
   color: white;
-  transform: translateY(-75%);  /* ⬆ raise up */
+  transform: translateY(-85%);  /* ⬆ raise up */
 }
 .menu-label.install {
   grid-area: install;
   color: #0033cc;
-  transform: translateY(-52%);
+  transform: translateY(-65%);
 }
 /* === Cosmic Modal Base === */
 .cosmic-modal {
