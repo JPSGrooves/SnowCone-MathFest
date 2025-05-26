@@ -208,7 +208,7 @@ html::before {
 .menu-label.infinity {
   grid-area: infinity;
   color: white;
-  transform: translateY(-90%);  /* ⬆ raise up */
+  transform: translateY(-100%);  /* ⬆ raise up */
 }
 .menu-label.install {
   grid-area: install;
