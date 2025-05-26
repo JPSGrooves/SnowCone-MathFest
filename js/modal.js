@@ -1,3 +1,9 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const closeModalBtn = document.querySelector('.close-modal');
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closeCosmicModal);
+  }
+});
 // modal.js — Cosmic Modal Core Logic
 
 function openCosmicModal() {
