@@ -37,6 +37,169 @@
         </div>
       </div>
     </div>
+    <div id="cosmicModal" class="cosmic-modal hidden">
+    <div class="cosmic-modal-inner">
+      <div class="tab-header">
+        <button data-tab="profile" class="active">Profile</button>
+        <button data-tab="guide">Guide</button>
+        <button data-tab="sounds">Sounds</button>
+        <button data-tab="version">v0.1</button>
+      </div>
+      
+      <div class="tab-content-area">
+        <div class="tab-content" id="tab-profile">
+          <h2>👨‍💻 Your Profile</h2>
+          <label for="username">MathFest Name:</label>
+          <input id="username" type="text" placeholder="Guest" /><br><br>
+
+          <label>XP Progress:</label>
+          <progress id="xpBar" value="0" max="100"></progress>
+          <span id="xpPercent">0%</span>
+          <br><br>
+
+          <h3>🏅 SnowCone Badges</h3>
+          <div id="badgeGrid"></div>
+          <br><br>
+
+          <h3>⚖️ Gameplay</h3>
+          <label><input type="checkbox" id="hardModeToggle"> Hard Mode?</label><br><br>
+
+          <h3>📂 Save Info</h3>
+          <p>
+            🧠 Your progress is saved <strong>automatically</strong> in your browser.
+          </p>
+          
+          <ul>
+            <li>✅ Works on both desktop and mobile — no account needed</li>
+            <li>💾 Data stays saved as long as you don’t clear browser storage</li>
+            <li>🧪 Your name, XP, badges, and settings are all remembered</li>
+          </ul>
+          
+          <p><strong>To protect your progress:</strong></p>
+          <ul>
+            <li>🖥️ On desktop: avoid clearing cache or using private/incognito mode</li>
+            <li>📱 On Android: tap ⋮ in your browser, then <em>“Add to Home screen”</em> for the best app-like experience</li>
+            <li>📲 On iPhone: use the <strong>Share</strong> icon and <em>“Add to Home Screen”</em></li>
+          </ul>
+          
+          <p>
+            🔄 Future versions may support cloud saves or multiple profiles — for now, it's all local magic ✨
+          </p>
+          <h3>💽 Manual Save Options</h3>
+
+          <!-- 📥 Download Save File -->
+          <button id="downloadSaveBtn">📥 Download Save File</button><br><br>
+          
+          <!-- 📤 Upload Save File -->
+          <label for="uploadSaveInput">📤 Upload Save File</label><br>
+          <input type="file" id="uploadSaveInput" accept=".json" />
+          
+        </div>
+
+
+  
+        <div class="tab-content hidden" id="tab-sounds">
+          <h2>🎛️ Sounds</h2>
+        
+          <!-- 🔊 Volume Sliders -->
+          <h3>🔊 Volume Settings</h3>
+          <label for="musicVolume">🎵 Music Volume</label><br>
+          <input type="range" id="musicVolume" min="0" max="1" step="0.01"><br><br>
+        
+          <label for="sfxVolume">🔔 SFX Volume</label><br>
+          <input type="range" id="sfxVolume" min="0" max="1" step="0.01"><br><br>
+        
+          <!-- 🎵 Jukebox Player -->
+          <div class="jukebox">
+            <div id="currentTrack">Loading...</div>
+            <div class="jukebox-controls">
+              <button onclick="rewindTrack()">⏪</button>
+              <button onclick="prevTrack()">⏮️</button>
+              <button onclick="togglePlayPause()">▶️ / ⏸️</button>
+              <button onclick="nextTrack()">⏭️</button>
+              <button onclick="fastForwardTrack()">⏩</button>
+              <button onclick="toggleLoop()">🔁</button>
+            </div>
+            <progress id="trackProgress" value="0" max="100"></progress>
+            <div id="trackTimer">0:00 / 0:00</div>
+          </div>
+        
+          <!-- 🧠 Blurb + Link -->
+          <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
+            🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
+            It means the world to me that you'd play this game — and vibe to the music I make.  
+            There are even a few extra tracks here not found in the game itself... 👀<br><br>
+            Enjoy the jams!  
+            <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
+          </p>
+        </div>
+
+  
+        <div class="tab-content hidden" id="tab-guide">
+          <h2>📜 MathFest Guide</h2>
+          <p>
+            This is <strong>SnowCone MathFest</strong>: an arcade of learning, rhythm, and personal growth.
+            <br><br>
+            🍧 Choose a mode from the main menu:
+            <ul>
+              <li><strong>QuickServe:</strong> Fast-paced math matches. Get answers right to earn XP and climb the leaderboard.</li>
+              <li><strong>Story Mode:</strong> Unlock the past. Meet math ghosts. Solve puzzles to move forward.</li>
+              <li><strong>Infinity Mode:</strong> Pure flow. No end. Just vibe, solve, and soar.</li>
+              <li><strong>Kids Camp:</strong> Matching challenges for younger players or chill play sessions.</li>
+            </ul>
+          </p>
+          <p>
+            💡 Each correct answer earns you XP. XP unlocks badges, themes, cones, and future surprises.
+            <br><br>
+            🔓 New content unlocks as you play. Modes may be locked until you've proven your groove.
+            <br><br>
+            🎧 Use the music panel to vibe while you solve. Play your way, your pace.
+          </p>
+          <p>
+            This game is for learners, dreamers, stoners, teachers, kids, and math ghosts alike.
+            <br>
+            💫 There are no grades. No pressure. Just joy in the numbers.
+          </p>
+        </div>
+  
+        <div class="tab-content hidden" id="tab-version">
+          <h2>👾 JPS Grooves</h2>
+          <p>
+            Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
+            📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
+            This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
+          </p>
+          <p style="margin-top: 1em;">🌍 Follow JPS:</p>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="https://jpsgrooves.com" target="_blank">🌌 JPS Grooves</a></li>
+            <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
+            <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
+            <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
+          </ul>
+          <h2>🧠 SnowCone MathFest v0.1</h2>
+          <p>
+            Welcome to the first playable preview of SnowCone MathFest — a neon math odyssey in the making.
+            <br><br>
+            🎉 This is <strong>v0.1</strong>, the foundation of our coneverse.
+          </p>
+          <ul>
+            <li>🌌 <strong>Main Menu</strong> — Grid-locked layout, fully scaled with glowing mode labels</li>
+            <li>🍧 <strong>QuickServe Mode</strong> — Early build logic for fast-paced problem solving</li>
+            <li>♾️ <strong>Infinity Mode</strong> — Placeholder for freeform play</li>
+            <li>📖 <strong>Story Mode</strong> — Launch logic wired in (content coming soon)</li>
+            <li>⛺ <strong>Kids Camp</strong> — Placeholder for matching game mode</li>
+            <li>🎛️ <strong>Scene Manager</strong> — Smooth mode switching and reset logic</li>
+            <li>🧠 <strong>Data Manager</strong> — XP, high scores, badges, settings, and story tracking</li>
+            <li>🔮 <strong>Modal System</strong> — This very menu! Music, Credits, Rules & Version</li>
+          </ul>
+          <p>
+            🍥 You’re part of an evolving project. Expect updates. Expect weirdness. Expect joy.
+            <br>
+            Built with glow, by <a href="https://linktr.ee/jpsgrooves" target="_blank">JPS Grooves</a>.
+          </p>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- JS Scripts -->
