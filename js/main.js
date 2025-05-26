@@ -103,10 +103,15 @@ document.addEventListener('touchend', function (e) {
 }, false);
 
 function openCosmicModal() {
-  const modal = document.getElementById('cosmicModal');
-  if (modal) modal.classList.remove('hidden');
+  document.getElementById('cosmicModal').classList.remove('hidden');
 }
+function closeCosmicModal() {
+  document.getElementById('cosmicModal').classList.add('hidden');
+}
+
 window.openCosmicModal = openCosmicModal;
+window.closeCosmicModal = closeCosmicModal;
+
 
 
 
