@@ -102,4 +102,11 @@ document.addEventListener('touchend', function (e) {
   lastTouchEnd = now;
 }, false);
 
+function openCosmicModal() {
+  const modal = document.getElementById('cosmicModal');
+  if (modal) modal.classList.remove('hidden');
+}
+window.openCosmicModal = openCosmicModal;
+
+
 
