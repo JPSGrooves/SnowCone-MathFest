@@ -14,12 +14,13 @@ html, body {
 
 html::before {
   content: "";
-  position: absolute;
+  position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
-  opacity: 0.3;
-  z-index: -1;
+  background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+  opacity: 0.5;
+  z-index: -2;
   animation: drift 120s linear infinite;
+  pointer-events: none;
 }
 
 @keyframes drift {
