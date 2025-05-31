@@ -22,13 +22,13 @@ function applyBackgroundTheme() {
     setSetting('theme', theme);
   }
 
+  const bg = document.getElementById('menuImage'); // 🔥 RESTORED
   console.log("MenuImage element found:", bg); // 🖼️
   if (bg) {
     bg.src = `assets/img/branding/${theme}.png`;
     console.log("Set image src to:", bg.src); // ✅
   }
 }
-
 
 // 🛸 Cosmic Modal Controls
 function openCosmicModal() {
