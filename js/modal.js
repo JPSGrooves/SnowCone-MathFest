@@ -87,3 +87,59 @@ document.addEventListener('DOMContentLoaded', () => {
 // 🌐 Global Exports
 window.openCosmicModal = openCosmicModal;
 window.closeCosmicModal = closeCosmicModal;
+document.getElementById('openModalBtn').addEventListener('click', () => {
+      document.getElementById('cosmicModal').classList.remove('hidden');
+    });
+
+    document.querySelector('.close-modal').addEventListener('click', () => {
+      document.getElementById('cosmicModal').classList.add('hidden');
+    });
+
+    document.querySelectorAll('.tab-header button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+
+        document.querySelectorAll('.tab-header button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.add('hidden');
+        });
+
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      });
+    });
+    // Manual Save: Download current save file
+    document.getElementById('downloadSaveBtn').addEventListener('click', () => {
+      const data = localStorage.getItem('snowconeUserData');
+      if (!data) {
+        alert('No save data found.');
+        return;
+      }
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+    
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'snowcone_save.json';
+      a.click();
+    
+      URL.revokeObjectURL(url);
+    });
+    
+    // Manual Load: Upload and replace current save file
+    document.getElementById('uploadSaveInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+    
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+    
+        // Optional: add validation here
+        localStorage.setItem('snowconeUserData', JSON.stringify(parsed));
+        alert('Save file loaded! Refresh the page to apply it.');
+      } catch (err) {
+        alert('⚠️ Invalid file. Please select a valid SnowCone save file (.json).');
+      }
+    });
