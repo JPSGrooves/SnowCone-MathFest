@@ -17,7 +17,7 @@ const DEFAULT_DATA = {
   settings: {
     mute: false,
     difficulty: "normal",
-    theme: "default",
+    theme: "menubackground",
     textSize: "normal"
   },
   storyProgress: {
