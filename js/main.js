@@ -130,6 +130,13 @@ window.addEventListener('DOMContentLoaded', () => {
   loadInitialView();        // 🚀 Shows the menu screen
 });
 
+window.addEventListener('DOMContentLoaded', () => {
+  applyBackgroundTheme();
+  loadInitialView();
+  setupModalUI();
+  setupSaveLoadUI();
+  setupVolumeSliders();
+});
 
 
 
