@@ -9,20 +9,29 @@ function closeCosmicModal() {
 }
 
 function setupModalUI() {
-  // 🔒 Close Button
-  document.querySelector('.close-modal')?.addEventListener('click', closeCosmicModal);
+  const closeModalBtn = document.querySelector('.close-modal');
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closeCosmicModal);
+  }
 
-  // 🔄 Tab Switching
-  document.querySelectorAll('.tab-header button').forEach(btn => {
+  const tabButtons = document.querySelectorAll('.tab-header button');
+  tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.getAttribute('data-tab');
-      document.querySelectorAll('.tab-header button').forEach(b => b.classList.remove('active'));
+
+      tabButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+
       document.getElementById(`tab-${tab}`)?.classList.remove('hidden');
     });
   });
 }
+
+
 
 window.openCosmicModal = openCosmicModal;
 window.closeCosmicModal = closeCosmicModal;
