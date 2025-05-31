@@ -14,12 +14,11 @@ const trackList = [
 ];
 
 function playTrack(index = 0) {
-  if (music) {
-    music.stop();
-  }
+  if (music) music.stop();
 
   currentTrackIndex = index;
   const track = trackList[currentTrackIndex];
+
   music = new Howl({
     src: [track.file],
     volume: 1.0,
@@ -28,7 +27,7 @@ function playTrack(index = 0) {
       isPlaying = true;
       updateTrackTitle(track.title);
       updateProgress();
-      if (progressInterval) clearInterval(progressInterval);
+      clearInterval(progressInterval);
       progressInterval = setInterval(updateProgress, 1000);
     },
     onend: () => {
@@ -40,12 +39,11 @@ function playTrack(index = 0) {
 }
 
 function stopTrack() {
-  if (music) {
-    music.stop();
-    isPlaying = false;
-    clearInterval(progressInterval);
-    updateProgress();
-  }
+  if (!music) return;
+  music.stop();
+  isPlaying = false;
+  clearInterval(progressInterval);
+  updateProgress();
 }
 
 function togglePlayPause() {
@@ -57,6 +55,7 @@ function togglePlayPause() {
   } else {
     music.play();
     isPlaying = true;
+    clearInterval(progressInterval);
     progressInterval = setInterval(updateProgress, 1000);
   }
 }
@@ -72,28 +71,22 @@ function prevTrack() {
 }
 
 function rewindTrack() {
-  if (music) {
-    const newTime = Math.max(0, music.seek() - 5);
-    music.seek(newTime);
-    updateProgress();
-  }
+  if (!music) return;
+  music.seek(Math.max(0, music.seek() - 5));
+  updateProgress();
 }
 
 function fastForwardTrack() {
-  if (music) {
-    const duration = music.duration();
-    const newTime = Math.min(duration, music.seek() + 5);
-    music.seek(newTime);
-    updateProgress();
-  }
+  if (!music) return;
+  const newTime = Math.min(music.duration(), music.seek() + 5);
+  music.seek(newTime);
+  updateProgress();
 }
 
 function toggleLoop() {
   isLooping = !isLooping;
-  if (music) {
-    music.loop(isLooping);
-  }
-  alert("Looping is now " + (isLooping ? "ON" : "OFF"));
+  if (music) music.loop(isLooping);
+  alert(`Looping is now ${isLooping ? "ON" : "OFF"}`);
 }
 
 function updateTrackTitle(title) {
@@ -103,24 +96,24 @@ function updateTrackTitle(title) {
 
 function updateProgress() {
   if (!music) return;
-  const progress = document.getElementById("trackProgress");
-  const timer = document.getElementById("trackTimer");
+
   const pos = music.seek();
   const dur = music.duration();
-  if (progress) {
-    progress.value = (pos / dur) * 100;
-  }
-  if (timer) {
-    timer.textContent = formatTime(pos) + " / " + formatTime(dur);
-  }
+
+  const progress = document.getElementById("trackProgress");
+  if (progress) progress.value = (pos / dur) * 100;
+
+  const timer = document.getElementById("trackTimer");
+  if (timer) timer.textContent = `${formatTime(pos)} / ${formatTime(dur)}`;
 }
 
 function formatTime(sec) {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
-  return m + ":" + (s < 10 ? "0" + s : s);
+  return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
+// 🔊 Expose globally
 window.playTrack = playTrack;
 window.stopTrack = stopTrack;
 window.togglePlayPause = togglePlayPause;
