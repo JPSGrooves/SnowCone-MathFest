@@ -29,8 +29,6 @@ function applyBackgroundTheme() {
     console.log("Set image src to:", bg.src); // ✅
   }
 }
-const bg = document.getElementById('menuImage');
-console.log("🖼️ Menu image source should be:", bg?.src);
 
 
 // 🛸 Cosmic Modal Controls
