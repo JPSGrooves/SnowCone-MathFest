@@ -144,6 +144,33 @@ function setSetting(key, value) {
   data.settings[key] = value;
   saveData(data);
 }
+function setupSaveLoadUI() {
+  document.getElementById('downloadSaveBtn')?.addEventListener('click', () => {
+    const data = localStorage.getItem('snowconeUserData');
+    if (!data) return alert('No save data found.');
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'snowcone_save.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('uploadSaveInput')?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      localStorage.setItem('snowconeUserData', JSON.stringify(parsed));
+      alert('Save file loaded! Refresh the page to apply it.');
+    } catch {
+      alert('⚠️ Invalid file. Please select a valid SnowCone save file (.json).');
+    }
+  });
+}
+window.setupSaveLoadUI = setupSaveLoadUI;
 
 
 
