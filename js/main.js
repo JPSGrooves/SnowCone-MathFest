@@ -14,22 +14,22 @@ function loadInitialView() {
 
 function applyBackgroundTheme() {
   const data = getData();
-  let theme = data.settings?.theme;
+  console.log("Loaded data:", data); // 🕵️
 
-  // ⛑ Fallback + persist default
+  let theme = data.settings?.theme;
   if (!theme || typeof theme !== 'string' || theme === 'default') {
     theme = 'menubackground';
     setSetting('theme', theme);
   }
 
   const bg = document.getElementById('menuImage');
+  console.log("MenuImage element found:", bg); // 🖼️
   if (bg) {
     bg.src = `assets/img/branding/${theme}.png`;
-    console.log(`🌌 Background applied: ${theme}`);
-  } else {
-    console.warn("⚠️ No element with id 'menuImage' found.");
+    console.log("Set image src to:", bg.src); // ✅
   }
 }
+
 
 // 🛸 Cosmic Modal Controls
 function openCosmicModal() {
