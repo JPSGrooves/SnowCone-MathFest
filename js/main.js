@@ -125,6 +125,10 @@ function applyBackgroundTheme() {
     bg.src = `assets/img/branding/${theme}.png`;
   }
 }
+window.addEventListener('DOMContentLoaded', () => {
+  applyBackgroundTheme();   // 💾 Loads 'menubackground.png' if no theme saved
+  loadInitialView();        // 🚀 Shows the menu screen
+});
 
 
 
