@@ -1,5 +1,9 @@
 
-/* Global Reset */
+/* styles.css — SnowCone MathFest */
+
+/* ==== RESET & BASE ==== */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
 html, body {
   margin: 0;
   padding: 0;
@@ -8,9 +12,10 @@ html, body {
   overflow: hidden;
   font-family: 'Orbitron', sans-serif;
   background: black;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
 html::before {
   content: "";
@@ -24,47 +29,36 @@ html::before {
 }
 
 @keyframes drift {
-  from { transform: translate(0, 0); }
-  to { transform: translate(100px, 200px); }
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(100px, 200px); }
 }
 
-* {
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-}
-
-/* Top-level container for centering */
+/* ==== STRUCTURE ==== */
 .menu-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100vw;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  overflow: hidden;
   background: black;
-  overflow: hidden;   /* 🔒 No scrolling allowed */
 }
 
-
-
-
-/* Frame container with aspect-ratio */
 .menu-frame {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: black;
+  position: relative;
   width: auto;
   height: auto;
   max-width: 100vw;
   max-height: 100vh;
-  overflow: hidden;
   aspect-ratio: 9 / 16;
+  background: black;
+  overflow: hidden;
   min-height: 600px;
   min-width: 337.5px;
 }
-
 
 .menu-image {
   grid-area: 1 / 1 / -1 / -1;
@@ -76,7 +70,6 @@ html::before {
   pointer-events: none;
 }
 
-
 .menu-grid {
   display: grid;
   position: relative;
@@ -86,7 +79,6 @@ html::before {
   aspect-ratio: 9 / 16;
   min-height: 600px;
   min-width: 337.5px;
-
   grid-template-areas:
     "title    title"
     "kids     quick"
@@ -97,50 +89,39 @@ html::before {
   grid-template-rows: 16% 22% 22% 22%;
 }
 
-
-
-
-
-
-
-
-
-/* Title PNG at the top */
+/* ==== TITLE ==== */
 .menu-title-top {
   grid-area: title;
   justify-self: center;
   align-self: center;
   width: 60%;
   max-width: 400px;
-  z-index: 2;
   position: relative;
+  z-index: 2;
   animation: neon-glow-cycle 6s linear infinite;
 }
 
 .menu-title-top:hover {
-  transform: scale(1.05); /* ⚠️ No translateX */
+  transform: scale(1.05);
   animation: none;
   filter: drop-shadow(0 0 8px white) drop-shadow(0 0 16px white);
 }
 
-
 @keyframes neon-glow-cycle {
-  0% { filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080); }
-  20% { filter: drop-shadow(0 0 6px #ffcc00) drop-shadow(0 0 12px #ffcc00); }
-  40% { filter: drop-shadow(0 0 6px #00ff88) drop-shadow(0 0 12px #00ff88); }
-  60% { filter: drop-shadow(0 0 6px #00ccff) drop-shadow(0 0 12px #00ccff); }
-  80% { filter: drop-shadow(0 0 6px #cc66ff) drop-shadow(0 0 12px #cc66ff); }
+  0%   { filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080); }
+  20%  { filter: drop-shadow(0 0 6px #ffcc00) drop-shadow(0 0 12px #ffcc00); }
+  40%  { filter: drop-shadow(0 0 6px #00ff88) drop-shadow(0 0 12px #00ff88); }
+  60%  { filter: drop-shadow(0 0 6px #00ccff) drop-shadow(0 0 12px #00ccff); }
+  80%  { filter: drop-shadow(0 0 6px #cc66ff) drop-shadow(0 0 12px #cc66ff); }
   100% { filter: drop-shadow(0 0 6px #ff0080) drop-shadow(0 0 12px #ff0080); }
 }
 
-
+/* ==== MENU LABELS ==== */
 .menu-label {
-  touch-action: manipulation; /* Prevents double-tap zoom */
-  position: relative;
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 2;
+  align-items: center;
+  position: relative;
   font-family: 'Orbitron', sans-serif;
   font-weight: 500;
   text-align: center;
@@ -148,17 +129,42 @@ html::before {
   line-height: 1.3;
   pointer-events: auto;
   color: white;
+  z-index: 2;
   text-shadow:
     0 0 6px currentColor,
     0 0 12px currentColor,
     0 0 18px currentColor;
+  touch-action: manipulation;
 }
 
-.menu-label.kids     { grid-area: kids;     color: #ffee00; }
-.menu-label.quick    { grid-area: quick;    color: #00ccff; }
-.menu-label.tips     { grid-area: tips;     color: #00ff88; }
-.menu-label.story    { grid-area: story;    color: #cc66ff; }
-.menu-label.infinity { grid-area: infinity; color: white; }
+
+
+.menu-label .emoji {
+  display: block;
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: -0.65em;
+  filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 6px currentColor);
+}
+
+.menu-label.infinity .emoji-inline {
+  display: inline;
+  font-size: clamp(1.1rem, 2.8vw, 2.2rem);
+  vertical-align: middle;
+  margin: 0 0.25em;
+  filter: drop-shadow(0 0 4px #00ccff) drop-shadow(0 0 8px #00ccff);
+}
+
+/* Grid Area Overrides */
+.menu-label.kids     { grid-area: kids;     color: #ffee00; transform: translateX(-10%) translateY(-15%); }
+.menu-label.quick    { grid-area: quick;    color: #00ccff; transform: translateX(13%) translateY(-15%); }
+.menu-label.tips     { grid-area: tips;     color: #00ff88; transform: translateY(-45%); }
+.menu-label.story    { grid-area: story;    color: #cc66ff; transform: translateY(-45%); }
+.menu-label.infinity { grid-area: infinity; color: white;    transform: translateY(-100%); }
+.menu-label.install  { grid-area: install;  color: #0033cc;  transform: translateY(-70%); }
+
+/* Remaining components (modal, sliders, jukebox, close btn, tabs, etc.) are preserved as-is. */
+
 
 .menu-label:hover {
   transform: scale(1.05);
@@ -176,13 +182,6 @@ html::before {
   filter: drop-shadow(0 0 4px #00ccff) drop-shadow(0 0 8px #00ccff);
 }
 
-.menu-label .emoji {
-  display: block;
-  font-size: 2.2rem;
-  line-height: 1;
-  margin-bottom: -0.65em;
-  filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 6px currentColor);
-}
 .menu-label.quick {
   grid-area: quick;
   color: #00ccff;
