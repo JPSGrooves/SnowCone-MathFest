@@ -15,14 +15,18 @@ function loadInitialView() {
 function applyBackgroundTheme() {
   const data = getData();
   let theme = data.settings?.theme;
-  if (!theme || typeof theme !== 'string') {
-    theme = 'menubackground';
+
+  // 🛡️ Permanent fallback logic
+  if (!theme || typeof theme !== 'string' || theme === 'default') {
+    theme = 'menubackground'; // 🧊 sacred fallback
   }
+
   const bg = document.getElementById('menuImage');
   if (bg) {
     bg.src = `assets/img/branding/${theme}.png`;
   }
 }
+
 
 function openCosmicModal() {
   document.getElementById('cosmicModal')?.classList.remove('hidden');
