@@ -23,11 +23,7 @@
       <div class="menu-frame">
         <div class="menu-grid">
           <img id="menuImage" src="" class="menu-image" alt="Background" />
-        
-          <img src="assets/img/branding/SnowConeMathFestTitle.png"
-               class="menu-title-top"
-               alt="SnowCone MathFest Title" />
-        
+          <img src="assets/img/branding/SnowConeMathFestTitle.png" class="menu-title-top" alt="SnowCone MathFest Title" />
           <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
           <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
           <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
@@ -37,168 +33,143 @@
         </div>
       </div>
     </div>
+
     <div id="cosmicModal" class="cosmic-modal hidden">
-    <div class="cosmic-modal-inner">
-      <button class="close-modal">✖</button>
-      <div class="tab-header">
-        <button class="tab-button active" data-tab="profile">👤 Profile</button>
-        <button class="tab-button" data-tab="tab-backgrounds">🎨 Backgrounds</button>
-        <button class="tab-button" data-tab="sounds">🎧 Sounds</button>
-        <button class="tab-button" data-tab="version">🧠 Version</button>
-      </div>
-
-      
-      <div class="tab-content-area">
-        <div class="tab-content" id="tab-profile">
-          <h2>👨‍💻 Your Profile</h2>
-          <label for="username">MathFest Name:</label>
-          <input id="username" type="text" placeholder="Guest" /><br><br>
-
-          <label>XP Progress:</label>
-          <progress id="xpBar" value="0" max="100"></progress>
-          <span id="xpPercent">0%</span>
-          <br><br>
-
-          <h3>🏅 SnowCone Badges</h3>
-          <div id="badgeGrid"></div>
-          <br><br>
-
-          <h3>⚖️ Gameplay</h3>
-          <label><input type="checkbox" id="hardModeToggle"> Hard Mode?</label><br><br>
-
-          <h3>📂 Save Info</h3>
-          <p>
-            🧠 Your progress is saved <strong>automatically</strong> in your browser.
-          </p>
-          
-          <ul>
-            <li>✅ Works on both desktop and mobile — no account needed</li>
-            <li>💾 Data stays saved as long as you don’t clear browser storage</li>
-            <li>🧪 Your name, XP, badges, and settings are all remembered</li>
-          </ul>
-          
-          <p><strong>To protect your progress:</strong></p>
-          <ul>
-            <li>🖥️ On desktop: avoid clearing cache or using private/incognito mode</li>
-            <li>📱 On Android: tap ⋮ in your browser, then <em>“Add to Home screen”</em> for the best app-like experience</li>
-            <li>📲 On iPhone: use the <strong>Share</strong> icon and <em>“Add to Home Screen”</em></li>
-          </ul>
-          
-          <p>
-            🔄 Future versions may support cloud saves or multiple profiles — for now, it's all local magic ✨
-          </p>
-          <h3>💽 Manual Save Options</h3>
-
-          <!-- 📥 Download Save File -->
-          <button id="downloadSaveBtn">📥 Download Save File</button><br><br>
-          
-          <!-- 📤 Upload Save File -->
-          <label for="uploadSaveInput">📤 Upload Save File</label><br>
-          <input type="file" id="uploadSaveInput" accept=".json" />
-          
+      <div class="cosmic-modal-inner">
+        <button class="close-modal">✖</button>
+        <div class="tab-header">
+          <button class="tab-button active" data-tab="profile">👤 Profile</button>
+          <button class="tab-button" data-tab="tab-backgrounds">🎨 Backgrounds</button>
+          <button class="tab-button" data-tab="sounds">🎧 Sounds</button>
+          <button class="tab-button" data-tab="version">🧠 Version</button>
         </div>
 
+        <div class="tab-content-area">
+          <div class="tab-content" id="tab-profile">
+  <h2>👨‍💻 Your Profile</h2>
+  <label for="username">MathFest Name:</label>
+  <input id="username" type="text" placeholder="Guest" /><br><br>
 
-  
-        <div class="tab-content hidden" id="tab-sounds">
-          <h2>🎛️ Sounds</h2>
-        
-          <!-- 🔊 Volume Sliders -->
-          <h3>🔊 Volume Settings</h3>
-          <label for="musicVolume">🎵 Music Volume</label><br>
-          <input type="range" id="musicVolume" min="0" max="1" step="0.01"><br><br>
-        
-          <label for="sfxVolume">🔔 SFX Volume</label><br>
-          <input type="range" id="sfxVolume" min="0" max="1" step="0.01"><br><br>
-        
-          <!-- 🎵 Jukebox Player -->
-          <div class="jukebox">
-            <div id="currentTrack">Loading...</div>
-            <div class="jukebox-controls">
-              <button onclick="rewindTrack()">⏪</button>
-              <button onclick="prevTrack()">⏮️</button>
-              <button onclick="togglePlayPause()">▶️ / ⏸️</button>
-              <button onclick="nextTrack()">⏭️</button>
-              <button onclick="fastForwardTrack()">⏩</button>
-              <button onclick="toggleLoop()">🔁</button>
-            </div>
-            <progress id="trackProgress" value="0" max="100"></progress>
-            <div id="trackTimer">0:00 / 0:00</div>
-          </div>
-        
-          <!-- 🧠 Blurb + Link -->
-          <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
-            🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
-            It means the world to me that you'd play this game — and vibe to the music I make.  
-            There are even a few extra tracks here not found in the game itself... 👀<br><br>
-            Enjoy the jams!  
-            <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
-          </p>
-        </div>
+  <label>XP Progress:</label>
+  <progress id="xpBar" value="0" max="100"></progress>
+  <span id="xpPercent">0%</span>
+  <br><br>
 
-  
-        <div class="tab-content" id="tab-backgrounds">
-          <h2>🎨 Pick Your Background</h2>
-          <p>Select a theme to vibe out your menu.</p>
-        
-          <select onchange="handleThemeChange(this.value)">
-            <option value="menubackground">🌌 Default</option>
-            <option value="summer">🌞 Summer</option>
-            <option value="winter">❄️ Winter</option>
-            <option value="fall">🍂 Fall</option>
-            <option value="spring">🌸 Spring</option>
-            <option value="valentine">💘 Valentine’s</option>
-            <option value="halloween">🎃 Halloween</option>
-            <option value="christmas">🎄 Christmas</option>
-            <option value="newyear">🎊 New Year</option>
-            <option value="freedom">🎆 Freedom</option>
-            <option value="harvest">🌽 Harvest</option>
-            <option value="cosmic_01">🌀 Cosmic 01</option>
-            <option value="cosmic_2">🌀 Cosmic 02</option>
-            <option value="cosmic_03">🌀 Cosmic 03</option>
-            <option value="cosmic_04">🌀 Cosmic 04</option>
-            <option value="cosmic_05">🌀 Cosmic 05</option>
-            <option value="cosmic_06">🌀 Cosmic 06</option>
-            <option value="cosmic_07">🌀 Cosmic 07</option>
-          </select>
-        </div>
+  <h3>🏅 SnowCone Badges</h3>
+  <div id="badgeGrid"></div>
+  <br><br>
 
-  
-        <div class="tab-content hidden" id="tab-version">
-          <h2>👾 JPS Grooves</h2>
-          <p>
-            Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
-            📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
-            This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
-          </p>
-          <p style="margin-top: 1em;">🌍 Follow JPS:</p>
-          <ul style="list-style: none; padding: 0;">
-            <li><a href="https://jpsgrooves.com" target="_blank">🌌 JPS Grooves</a></li>
-            <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
-            <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
-            <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
-          </ul>
-          <h2>🧠 SnowCone MathFest v0.1</h2>
-          <p>
-            Welcome to the first playable preview of SnowCone MathFest — a neon math odyssey in the making.
-            <br><br>
-            🎉 This is <strong>v0.1</strong>, the foundation of our coneverse.
-          </p>
-          <ul>
-            <li>🌌 <strong>Main Menu</strong> — Grid-locked layout, fully scaled with glowing mode labels</li>
-            <li>🍧 <strong>QuickServe Mode</strong> — Early build logic for fast-paced problem solving</li>
-            <li>♾️ <strong>Infinity Mode</strong> — Placeholder for freeform play</li>
-            <li>📖 <strong>Story Mode</strong> — Launch logic wired in (content coming soon)</li>
-            <li>⛺ <strong>Kids Camp</strong> — Placeholder for matching game mode</li>
-            <li>🎛️ <strong>Scene Manager</strong> — Smooth mode switching and reset logic</li>
-            <li>🧠 <strong>Data Manager</strong> — XP, high scores, badges, settings, and story tracking</li>
-            <li>🔮 <strong>Modal System</strong> — This very menu! Music, Credits, Rules & Version</li>
-          </ul>
-          <p>
-            🍥 You’re part of an evolving project. Expect updates. Expect weirdness. Expect joy.
-            <br>
-            Built with glow, by <a href="https://linktr.ee/jpsgrooves" target="_blank">JPS Grooves</a>.
-          </p>
+  <h3>⚖️ Gameplay</h3>
+  <label><input type="checkbox" id="hardModeToggle"> Hard Mode?</label><br><br>
+
+  <h3>📂 Save Info</h3>
+  <p>
+    🧠 Your progress is saved <strong>automatically</strong> in your browser.
+  </p>
+  <ul>
+    <li>✅ Works on both desktop and mobile — no account needed</li>
+    <li>💾 Data stays saved as long as you don’t clear browser storage</li>
+    <li>🧪 Your name, XP, badges, and settings are all remembered</li>
+  </ul>
+  <p><strong>To protect your progress:</strong></p>
+  <ul>
+    <li>🖥️ On desktop: avoid clearing cache or using private/incognito mode</li>
+    <li>📱 On Android: tap ⋮ in your browser, then <em>“Add to Home screen”</em></li>
+    <li>📲 On iPhone: use the <strong>Share</strong> icon and <em>“Add to Home Screen”</em></li>
+  </ul>
+  <p>🔄 Future versions may support cloud saves or multiple profiles — for now, it's all local magic ✨</p>
+
+  <h3>💽 Manual Save Options</h3>
+  <button id="downloadSaveBtn">📥 Download Save File</button><br><br>
+  <label for="uploadSaveInput">📤 Upload Save File</label><br>
+  <input type="file" id="uploadSaveInput" accept=".json" />
+</div>
+          <div class="tab-content hidden" id="tab-sounds">
+  <h2>🎛️ Sounds</h2>
+  <h3>🔊 Volume Settings</h3>
+  <label for="musicVolume">🎵 Music Volume</label><br>
+  <input type="range" id="musicVolume" min="0" max="1" step="0.01"><br><br>
+  <label for="sfxVolume">🔔 SFX Volume</label><br>
+  <input type="range" id="sfxVolume" min="0" max="1" step="0.01"><br><br>
+  <div class="jukebox">
+    <div id="currentTrack">Loading...</div>
+    <div class="jukebox-controls">
+      <button onclick="rewindTrack()">⏪</button>
+      <button onclick="prevTrack()">⏮️</button>
+      <button onclick="togglePlayPause()">▶️ / ⏸️</button>
+      <button onclick="nextTrack()">⏭️</button>
+      <button onclick="fastForwardTrack()">⏩</button>
+      <button onclick="toggleLoop()">🔁</button>
+    </div>
+    <progress id="trackProgress" value="0" max="100"></progress>
+    <div id="trackTimer">0:00 / 0:00</div>
+  </div>
+  <p style="margin-top: 1em; font-size: 0.9rem; opacity: 0.8;">
+    🎶 <strong>JPS Grooves</strong> is the sound behind SnowCone MathFest.<br>
+    It means the world to me that you'd play this game — and vibe to the music I make.  
+    There are even a few extra tracks here not found in the game itself... 👀<br><br>
+    Enjoy the jams!  
+    <a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 More on SoundCloud</a>
+  </p>
+</div>
+          <div class="tab-content" id="tab-backgrounds">
+  <h2>🎨 Pick Your Background</h2>
+  <p>Select a theme to vibe out your menu.</p>
+  <select onchange="handleThemeChange(this.value)">
+    <option value="menubackground">🌌 Default</option>
+    <option value="summer">🌞 Summer</option>
+    <option value="winter">❄️ Winter</option>
+    <option value="fall">🍂 Fall</option>
+    <option value="spring">🌸 Spring</option>
+    <option value="valentine">💘 Valentine’s</option>
+    <option value="halloween">🎃 Halloween</option>
+    <option value="christmas">🎄 Christmas</option>
+    <option value="newyear">🎊 New Year</option>
+    <option value="freedom">🎆 Freedom</option>
+    <option value="harvest">🌽 Harvest</option>
+    <option value="cosmic_01">🌀 Cosmic 01</option>
+    <option value="cosmic_2">🌀 Cosmic 02</option>
+    <option value="cosmic_03">🌀 Cosmic 03</option>
+    <option value="cosmic_04">🌀 Cosmic 04</option>
+    <option value="cosmic_05">🌀 Cosmic 05</option>
+    <option value="cosmic_06">🌀 Cosmic 06</option>
+    <option value="cosmic_07">🌀 Cosmic 07</option>
+  </select>
+</div>
+          <div class="tab-content hidden" id="tab-version">
+  <h2>👾 JPS Grooves</h2>
+  <p>
+    Creator of <strong>SnowCone MathFest</strong> — a neon-drenched math arcade where rhythm meets equations.<br><br>
+    📀 Music, 🎨 Art, ✍️ Story, 🎮 Game Design, and 🌌 Vibes by JPS Grooves.<br>
+    This is a solo project powered by passion, pixels, and the ghosts of mathematicians past.
+  </p>
+  <p style="margin-top: 1em;">🌍 Follow JPS:</p>
+  <ul style="list-style: none; padding: 0;">
+    <li><a href="https://jpsgrooves.com" target="_blank">🌌 JPS Grooves</a></li>
+    <li><a href="https://soundcloud.com/jpsgrooves" target="_blank">🎵 SoundCloud</a></li>
+    <li><a href="https://instagram.com/jpsgrooves" target="_blank">📸 Instagram</a></li>
+    <li><a href="https://github.com/jpsgrooves" target="_blank">💻 GitHub</a></li>
+  </ul>
+  <h2>🧠 SnowCone MathFest v0.1</h2>
+  <p>
+    Welcome to the first playable preview of SnowCone MathFest — a neon math odyssey in the making.<br><br>
+    🎉 This is <strong>v0.1</strong>, the foundation of our coneverse.
+  </p>
+  <ul>
+    <li>🌌 <strong>Main Menu</strong> — Grid-locked layout, fully scaled with glowing mode labels</li>
+    <li>🍧 <strong>QuickServe Mode</strong> — Early build logic for fast-paced problem solving</li>
+    <li>♾️ <strong>Infinity Mode</strong> — Placeholder for freeform play</li>
+    <li>📖 <strong>Story Mode</strong> — Launch logic wired in (content coming soon)</li>
+    <li>⛺ <strong>Kids Camp</strong> — Placeholder for matching game mode</li>
+    <li>🎛️ <strong>Scene Manager</strong> — Smooth mode switching and reset logic</li>
+    <li>🧠 <strong>Data Manager</strong> — XP, high scores, badges, settings, and story tracking</li>
+    <li>🔮 <strong>Modal System</strong> — This very menu! Music, Credits, Rules & Version</li>
+  </ul>
+  <p>
+    🍥 You’re part of an evolving project. Expect updates. Expect weirdness. Expect joy.<br>
+    Built with glow, by <a href="https://linktr.ee/jpsgrooves" target="_blank">JPS Grooves</a>.
+  </p>
+</div>
         </div>
       </div>
     </div>
@@ -207,90 +178,13 @@
   <!-- JS Scripts -->
   <script src="js/dataManager.js"></script>
   <script src="js/game.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/problems.js"></script>
-  <script src="js/sound.js"></script>
   <script src="js/story.js"></script>
+  <script src="js/sound.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/modal.js"></script>
-  <script>
-    document.getElementById('openModalBtn').addEventListener('click', () => {
-      document.getElementById('cosmicModal').classList.remove('hidden');
-    });
-
-    document.querySelector('.close-modal').addEventListener('click', () => {
-      document.getElementById('cosmicModal').classList.add('hidden');
-    });
-
-    document.querySelectorAll('.tab-header button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.getAttribute('data-tab');
-
-        document.querySelectorAll('.tab-header button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        document.querySelectorAll('.tab-content').forEach(content => {
-          content.classList.add('hidden');
-        });
-
-        document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      });
-    });
-    // Manual Save: Download current save file
-    document.getElementById('downloadSaveBtn').addEventListener('click', () => {
-      const data = localStorage.getItem('snowconeUserData');
-      if (!data) {
-        alert('No save data found.');
-        return;
-      }
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-    
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'snowcone_save.json';
-      a.click();
-    
-      URL.revokeObjectURL(url);
-    });
-    
-    // Manual Load: Upload and replace current save file
-    document.getElementById('uploadSaveInput').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-    
-      try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-    
-        // Optional: add validation here
-        localStorage.setItem('snowconeUserData', JSON.stringify(parsed));
-        alert('Save file loaded! Refresh the page to apply it.');
-      } catch (err) {
-        alert('⚠️ Invalid file. Please select a valid SnowCone save file (.json).');
-      }
-    });
-  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
   <script src="js/sceneManager.js"></script>
   <script src="js/main.js"></script>
-  <script>
-    // 🔊 Load initial slider positions
-    document.getElementById('musicVolume').value = getSetting('musicVolume') ?? 1;
-    document.getElementById('sfxVolume').value = getSetting('sfxVolume') ?? 1;
-  
-    // 🔁 Update on change
-    document.getElementById('musicVolume').addEventListener('input', (e) => {
-      const vol = parseFloat(e.target.value);
-      setSetting('musicVolume', vol);
-      setMusicVolume(vol); // Optional: wire into Howler.js
-    });
-  
-    document.getElementById('sfxVolume').addEventListener('input', (e) => {
-      const vol = parseFloat(e.target.value);
-      setSetting('sfxVolume', vol);
-      setSFXVolume(vol); // Optional: tie into effects
-    });
-  </script>
 </body>
 </html>
