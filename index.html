@@ -41,11 +41,12 @@
     <div class="cosmic-modal-inner">
       <button class="close-modal">✖</button>
       <div class="tab-header">
-        <button data-tab="profile" class="active">Profile</button>
-        <button data-tab="guide">Guide</button>
-        <button data-tab="sounds">Sounds</button>
-        <button data-tab="version">v0.1</button>
+        <button class="tab-button active" data-tab="profile">👤 Profile</button>
+        <button class="tab-button" data-tab="tab-backgrounds">🎨 Backgrounds</button>
+        <button class="tab-button" data-tab="sounds">🎧 Sounds</button>
+        <button class="tab-button" data-tab="version">🧠 Version</button>
       </div>
+
       
       <div class="tab-content-area">
         <div class="tab-content" id="tab-profile">
@@ -136,32 +137,32 @@
         </div>
 
   
-        <div class="tab-content hidden" id="tab-guide">
-          <h2>📜 MathFest Guide</h2>
-          <p>
-            This is <strong>SnowCone MathFest</strong>: an arcade of learning, rhythm, and personal growth.
-            <br><br>
-            🍧 Choose a mode from the main menu:
-            <ul>
-              <li><strong>QuickServe:</strong> Fast-paced math matches. Get answers right to earn XP and climb the leaderboard.</li>
-              <li><strong>Story Mode:</strong> Unlock the past. Meet math ghosts. Solve puzzles to move forward.</li>
-              <li><strong>Infinity Mode:</strong> Pure flow. No end. Just vibe, solve, and soar.</li>
-              <li><strong>Kids Camp:</strong> Matching challenges for younger players or chill play sessions.</li>
-            </ul>
-          </p>
-          <p>
-            💡 Each correct answer earns you XP. XP unlocks badges, themes, cones, and future surprises.
-            <br><br>
-            🔓 New content unlocks as you play. Modes may be locked until you've proven your groove.
-            <br><br>
-            🎧 Use the music panel to vibe while you solve. Play your way, your pace.
-          </p>
-          <p>
-            This game is for learners, dreamers, stoners, teachers, kids, and math ghosts alike.
-            <br>
-            💫 There are no grades. No pressure. Just joy in the numbers.
-          </p>
+        <div class="tab-content" id="tab-backgrounds">
+          <h2>🎨 Pick Your Background</h2>
+          <p>Select a theme to vibe out your menu.</p>
+        
+          <select onchange="handleThemeChange(this.value)">
+            <option value="menubackground">🌌 Default</option>
+            <option value="summer">🌞 Summer</option>
+            <option value="winter">❄️ Winter</option>
+            <option value="fall">🍂 Fall</option>
+            <option value="spring">🌸 Spring</option>
+            <option value="valentine">💘 Valentine’s</option>
+            <option value="halloween">🎃 Halloween</option>
+            <option value="christmas">🎄 Christmas</option>
+            <option value="newyear">🎊 New Year</option>
+            <option value="freedom">🎆 Freedom</option>
+            <option value="harvest">🌽 Harvest</option>
+            <option value="cosmic_01">🌀 Cosmic 01</option>
+            <option value="cosmic_2">🌀 Cosmic 02</option>
+            <option value="cosmic_03">🌀 Cosmic 03</option>
+            <option value="cosmic_04">🌀 Cosmic 04</option>
+            <option value="cosmic_05">🌀 Cosmic 05</option>
+            <option value="cosmic_06">🌀 Cosmic 06</option>
+            <option value="cosmic_07">🌀 Cosmic 07</option>
+          </select>
         </div>
+
   
         <div class="tab-content hidden" id="tab-version">
           <h2>👾 JPS Grooves</h2>
