@@ -112,6 +112,22 @@ function closeCosmicModal() {
 window.openCosmicModal = openCosmicModal;
 window.closeCosmicModal = closeCosmicModal;
 
+function applyBackgroundTheme() {
+  const data = getData();
+  let theme = data.settings?.theme;
+
+  if (!theme || typeof theme !== 'string') {
+    theme = 'menubackground'; // 🧊 The sacred default
+  }
+
+  const bg = document.getElementById('menuImage');
+  if (bg) {
+    bg.src = `assets/img/branding/${theme}.png`;
+  }
+}
+
+
+
 
 
 
