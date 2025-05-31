@@ -22,7 +22,6 @@ function applyBackgroundTheme() {
     setSetting('theme', theme);
   }
 
-  const bg = document.getElementById('menuImage');
   console.log("MenuImage element found:", bg); // 🖼️
   if (bg) {
     bg.src = `assets/img/branding/${theme}.png`;
