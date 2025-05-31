@@ -16,9 +16,9 @@ function applyBackgroundTheme() {
   const data = getData();
   let theme = data.settings?.theme;
 
-  // 🛡️ Permanent fallback logic
   if (!theme || typeof theme !== 'string' || theme === 'default') {
-    theme = 'menubackground'; // 🧊 sacred fallback
+    theme = 'menubackground'; // 👼 sacred fallback
+    setSetting('theme', theme); // 💾 permanent fix
   }
 
   const bg = document.getElementById('menuImage');
