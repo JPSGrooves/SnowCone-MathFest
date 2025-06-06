@@ -1,0 +1,87 @@
+{
+  "name": "snowcone-mathfest",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "🎉 SnowCone MathFest – a neon-powered time-traveling math experience",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist",
+    "live": "npm run build && npm run deploy",
+    "reset": "sudo chown -R $USER node_modules && rm -rf dist node_modules package-lock.json && npm install",
+    "format": "prettier --write .",
+    "lint": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "prepare": "husky && husky install"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "math",
+    "festival",
+    "game",
+    "vite",
+    "education",
+    "snowcone",
+    "web game",
+    "educational app",
+    "math game",
+    "interactive learning",
+    "neon",
+    "time travel",
+    "fun learning",
+    "gamification",
+    "math puzzles",
+    "brain teasers",
+    "problem solving",
+    "STEM education",
+    "mobile friendly",
+    "responsive design",
+    "JavaScript game",
+    "HTML5 game",
+    "CSS animations",
+    "web development",
+    "open source"
+  ],
+  "author": "JPS Grooves <jpsgrooves@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://JPSGrooves.github.io/SnowCone-MathFest/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JPSGrooves/SnowCone-MathFest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JPSGrooves/SnowCone-MathFest/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11"
+  ],
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "gsap": "3.12.5",
+    "howler": "2.2.4",
+    "mobx": "6.10.2",
+    "pixi.js": "7.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.5.1",
+    "eslint-plugin-import": "^2.31.0",
+    "gh-pages": "6.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^16.1.0",
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "vite": "6.3.5",
+    "vite-plugin-inspect": "^11.1.0"
+  }
+}
