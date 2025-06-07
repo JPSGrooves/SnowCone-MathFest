@@ -1,0 +1,38 @@
+/* 🔮 Global style settings */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  color: white;
+  text-shadow: 1px 1px 3px black;
+  background-color: black; /* buffer zones look clean */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* 🧊 Lock layout into fixed aspect ratio */
+.menu-wrapper {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: 1fr;
+  width: 100vw;
+  max-width: 765px;            /* lock aspect ratio width */
+  aspect-ratio: 765 / 1152;    /* match your PNG shape */
+  position: relative;
+  z-index: 1;
+}
+
+/* 🍧 Mode labels float over grid */
+.menu-label {
+  font-size: 1.5rem;
+  text-align: center;
+  text-shadow: 2px 2px 6px black;
+  cursor: pointer;
+  padding: 0.5em;
+  transition: transform 0.2s ease;
+}
+.menu-label:hover {
+  transform: scale(1.1);
+}
