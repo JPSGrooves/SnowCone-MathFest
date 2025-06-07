@@ -2,25 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#00ff88" />
     <title>SnowCone MathFest</title>
-    <link rel="stylesheet" href="/SnowCone-MathFest/assets/styles/style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/SnowCone-MathFest/assets/index-D9a54LkU.js"></script>
-  </head>
-  <body>
-    <img id="menuImage" alt="background" />
 
+    <!-- ✨ Fonts & Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/SnowCone-MathFest/assets/styles/style.css" />
+
+    <!-- 🧊 Favicons & Manifest (serve from public/) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/SnowCone-MathFest/assets/manifest-BmB81smq.json" />
+    <script type="module" crossorigin src="/SnowCone-MathFest/assets/index-CUIEUxdV.js"></script>
+  </head>
+
+  <body>
+    <!-- 🧊 Background Image (set via JS) -->
+    <img id="menuImage" class="menu-image" alt="background" />
+
+    <!-- 🍧 Main Menu Grid -->
     <div class="menu-wrapper">
-      <div class="menu-label" style="grid-row: 1;">⛺ Kids</div>
-      <div class="menu-label" style="grid-row: 2;">🍧 QuickServe</div>
-      <div class="menu-label" style="grid-row: 3;">🧮 Math Tips</div>
-      <div class="menu-label" style="grid-row: 4;">📖 Story Mode</div>
-      <div class="menu-label" style="grid-row: 5;">♾️ Infinity</div>
-      <div class="menu-label" style="grid-row: 6;">⚙️ Options</div>
+      <div class="menu-frame">
+        <div class="menu-grid">
+          <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
+          <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
+          <div class="menu-label tips">🧮<br>Math Tips<br>Village</div>
+          <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
+          <div class="menu-label infinity">♾️<br>Infinity Lake</div>
+          <div class="menu-label install" onclick="openCosmicModal()">⚙️ Options</div>
+        </div>
+      </div>
     </div>
 
-    <h1>🍧 SnowCone MathFest</h1>
-    <p>If you're reading this, the dev server is live!</p>
-
+    <!-- 🚀 JavaScript Modules -->
   </body>
 </html>
