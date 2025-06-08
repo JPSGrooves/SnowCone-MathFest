@@ -4,8 +4,8 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  min-height: 720px;
-  min-width: calc(720px * (11 / 16)); /* match frame */
+  min-height: 500px;
+  min-width: calc(500px * (11 / 16)); /* match frame */
   overflow: hidden;
 
   font-family: 'Orbitron', sans-serif;
@@ -70,8 +70,8 @@ body::after {
   max-width: 100vw;
 
   /* LOCK IT IN PLACE */
-  min-height: 720px;
-  min-width: calc(720px * (11 / 16)); /* 495px */
+  min-height: 500px;
+  min-width: calc(500px * (11 / 16)); /* 495px */
 
   display: flex;
   justify-content: center;
