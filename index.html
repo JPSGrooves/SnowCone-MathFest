@@ -2,12 +2,48 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#00ff88" />
     <title>SnowCone MathFest</title>
-  </head>
-  <body>
-    <h1>🍧 SnowCone MathFest</h1>
-    <p>If you're reading this, the dev server is live!</p>
 
+    <!-- ✨ Fonts & Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/styles/style.css" />
+
+    <!-- 🧊 Favicons & Manifest (serve from public/) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+  </head>
+
+  <body>
+    <!-- 🧊 Background Image (set via JS) -->
+    <img id="menuImage" class="menu-image" alt="background" />
+
+    <!-- 🍧 Main Menu Grid -->
+    <div class="menu-wrapper">
+      <div class="menu-frame">
+        <img src="assets/img/branding/menubackground.png" class="menu-image" alt="Background" />
+        
+        <div class="menu-grid">
+          <img src="assets/img/branding/SnowConeMathFestTitle.png"
+              class="menu-title-top"
+              alt="SnowCone MathFest Title" />
+
+          <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
+          <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
+          <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
+          <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
+          <div class="menu-label infinity">♾️<br>Infinity Lake</div>
+          <div class="menu-label options">⚙️ Options</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 🚀 JavaScript Modules -->
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
