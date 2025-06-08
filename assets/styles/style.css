@@ -5,6 +5,7 @@ html, body {
   height: 100%;
   width: 100%;
   min-height: 720px;
+  min-width: calc(720px * (11 / 16)); /* match frame */
   overflow: hidden;
 
   font-family: 'Orbitron', sans-serif;
@@ -48,33 +49,36 @@ body::after {
 }
 
 .menu-wrapper {
-  width: 100vw;
-  height: 100svh; /* ✅ Locks to real screen size */
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  width: 100vw;
+  height: 100svh;
   background: black;
+  overflow: hidden;
 }
 
 
-.menu-frame {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 
+
+.menu-frame {
   aspect-ratio: 11 / 16;
   width: auto;
   height: 100%;
 
-  max-height: 100svh; /* ✅ Safe height lock */
+  max-height: 100svh;
   max-width: 100vw;
 
-  /* ✨ On tall viewports, this caps width to preserve PNG ratio */
-  max-width: calc(100svh * (11 / 16));
+  /* LOCK IT IN PLACE */
   min-height: 720px;
+  min-width: calc(720px * (11 / 16)); /* 495px */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
+
 
 
 @media screen and (hover: none) and (pointer: coarse) {
@@ -89,20 +93,25 @@ body::after {
 
 .menu-image {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%;
+  top: 0;
+  left: 0;
   height: 100%;
-  object-fit: contain;
+  width: 100%;
+  object-fit: cover; /* change from 'contain' */
   z-index: 0;
   pointer-events: none;
 }
 
+
 .menu-grid {
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
   width: 100%;
   height: 100%;
-  display: grid;
   grid-template-areas:
     "title    title"
     "kids     quick"
