@@ -141,7 +141,7 @@ html::before {
 .menu-label.quick    { grid-area: quick;    color: #00ccff; transform: translateY(-4vh); }
 .menu-label.tips     { grid-area: tips;     color: #00ff88; transform: translateY(-9vh); }
 .menu-label.story    { grid-area: story;    color: #cc66ff; transform: translateY(-9vh); }
-.menu-label.infinity { grid-area: infinity; color: white;    transform: translateY(-19vh); }
+.menu-label.infinity { grid-area: infinity; color: white;    transform: translateY(-18vh); }
 .menu-label.options  { grid-area: options;  color: #0033cc;  transform: translateY(-2vh); }
 
 /* ✨ Hover Animation */
@@ -149,7 +149,7 @@ html::before {
 .menu-label.quick:hover    { transform: translateY(-4vh) scale(1.05); }
 .menu-label.tips:hover     { transform: translateY(-9vh) scale(1.05); }
 .menu-label.story:hover    { transform: translateY(-9vh) scale(1.05); }
-.menu-label.infinity:hover { transform: translateY(-19vh) scale(1.05); }
+.menu-label.infinity:hover { transform: translateY(-18vh) scale(1.05); }
 .menu-label.options:hover  { transform: translateY(-2vh)  scale(1.05); }
 
 /* 👑 TITLE PNG FLOATS STRONG */
