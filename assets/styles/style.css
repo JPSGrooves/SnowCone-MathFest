@@ -9,6 +9,7 @@ html, body {
   overflow: hidden;
   font-family: 'Orbitron', sans-serif;
   background: black;
+  touch-action: manipulation; /* disables pinch + double-tap zoom */
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
@@ -34,6 +35,7 @@ html::before {
   -webkit-user-select: none;
   -ms-user-select: none;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
 
@@ -135,6 +137,12 @@ html::before {
   transform-origin: center top;
   transition: transform 0.2s ease, text-shadow 0.2s ease;
 }
+
+button, .menu-label, .tab-button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent; /* smooth tap */
+}
+
 
 /* 🍧 Positioning Per Zone */
 .menu-label.kids     { grid-area: kids;     color: #ffee00; transform: translateY(-4vh); }
