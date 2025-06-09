@@ -4,8 +4,8 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  min-height: 500px;
-  min-width: calc(500px * (11 / 16)); /* match frame */
+  min-height: 720px;
+  min-width: calc(720px * (11 / 16)); /* match frame */
   overflow: hidden;
 
   font-family: 'Orbitron', sans-serif;
@@ -70,8 +70,8 @@ body::after {
   max-width: 100vw;
 
   /* LOCK IT IN PLACE */
-  min-height: 500px;
-  min-width: calc(500px * (11 / 16)); /* 495px */
+  min-height: 720px;
+  min-width: calc(720px * (11 / 16)); /* 495px */
 
   display: flex;
   justify-content: center;
@@ -125,7 +125,7 @@ body::after {
     "infinity infinity"
     "options  options";
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 16% 21% 21% 21% 10%;
+  grid-template-rows: 1.6fr 2.1fr 2.1fr 2.1fr 1fr;
   z-index: 2;
   place-items: center;
   pointer-events: none;
@@ -140,15 +140,18 @@ body::after {
   align-items: center;
   pointer-events: auto;
 
-  font-size: clamp(1.2rem, 1.5vw + 1vh, 2.6rem); /* 🧠 tuned to match grid height */
-  padding-top: clamp(0.2rem, 1vh, 1.2rem);
+  font-size: clamp(1rem, 2.5vh, 2.6rem); /* 🧠 tuned to match grid height */
+  padding-top: 0;
   font-family: 'Orbitron', sans-serif;
   color: white;
   text-align: center;
-  line-height: 1.3;
+  line-height: 1.0;
   text-shadow: 0 0 6px currentColor, 0 0 12px currentColor, 0 0 18px currentColor;
 }
 
+.menu-label.infinity {
+  will-change: transform;
+}
 
 
 
