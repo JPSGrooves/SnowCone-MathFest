@@ -90,6 +90,12 @@ body::after {
   }
 }
 
+@media (max-width: 600px) {
+  .menu-label.infinity {
+    margin-top: -1vh; /* start here and tweak */
+  }
+}
+
 
 .menu-image {
   position: absolute;
