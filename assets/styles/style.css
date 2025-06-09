@@ -200,3 +200,12 @@ html::before {
       drop-shadow(0 0 16px #00cc88);
   }
 }
+@media (max-width: 600px) {
+  .menu-title-top {
+    height: clamp(5rem, 12vh, 12rem); /* 🌀 slightly smaller for phone */
+  }
+
+  .menu-label {
+    font-size: clamp(0.9rem, 2.1vh, 2.3rem); /* 🧊 smaller text on mobile */
+  }
+}
