@@ -131,6 +131,11 @@ body::after {
   pointer-events: none;
 }
 
+@media (min-aspect-ratio: 20/9) {
+  .menu-label.infinity {
+    margin-top: 1.5vh; /* push it back down */
+  }
+}
 
 /* 🍧 Glowing Labels */
 .menu-label {
@@ -139,40 +144,77 @@ body::after {
   justify-content: center;
   align-items: center;
   pointer-events: auto;
-
-  font-size: clamp(1rem, 2.5vh, 2.6rem); /* 🧠 tuned to match grid height */
+  font-size: clamp(1rem, 2.5vh, 2.6rem);
   padding-top: 0;
   font-family: 'Orbitron', sans-serif;
   color: white;
   text-align: center;
   line-height: 1.0;
-  text-shadow: 0 0 6px currentColor, 0 0 12px currentColor, 0 0 18px currentColor;
+  text-shadow:
+    0 0 6px currentColor,
+    0 0 12px currentColor,
+    0 0 18px currentColor;
+  transform-origin: center top;
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
 }
 
+.menu-label.kids {
+  grid-area: kids;
+  color: #ffee00;
+  transform: translate(0, -6vh);
+}
+.menu-label.quick {
+  grid-area: quick;
+  color: #00ccff;
+  transform: translate(0, -6vh);
+}
+.menu-label.tips {
+  grid-area: tips;
+  color: #00ff88;
+  transform: translate(0, -13vh);
+}
+.menu-label.story {
+  grid-area: story;
+  color: #cc66ff;
+  transform: translate(0, -13vh);
+}
 .menu-label.infinity {
-  will-change: transform;
+  grid-area: infinity;
+  color: white;
+  transform: translate(0, -17vh);
+}
+.menu-label.options {
+  grid-area: options;
+  color: #0033cc;
+  transform: translate(0, -2vh);
+}
+
+/* 🌀 HOVER TRANSFORMS – no hop, just glow & scale */
+.menu-label.kids:hover {
+  transform: translate(0, -6vh) scale(1.05);
+}
+.menu-label.quick:hover {
+  transform: translate(0, -6vh) scale(1.05);
+}
+.menu-label.tips:hover {
+  transform: translate(0, -13vh) scale(1.05);
+}
+.menu-label.story:hover {
+  transform: translate(0, -13vh) scale(1.05);
+}
+.menu-label.infinity:hover {
+  transform: translate(0, -17vh) scale(1.05);
+}
+.menu-label.options:hover {
+  transform: translate(0, -2vh) scale(1.05);
 }
 
 
-
-.menu-label:hover {
-  transform: scale(1.05);
-  text-shadow: 0 0 8px white, 0 0 16px white, 0 0 24px white;
-}
-
-@media (min-width: 1024px) {
-  .menu-label.infinity {
-    margin-top: -10vh;
-  }
-}
-
-.menu-grid {
-  border: 2px dashed rgba(255, 255, 255, 0.1);
-}
 
 .menu-label {
-  outline: 1px dotted lime;
+  transform-origin: center center;
 }
+
 
 
 .menu-label.kids     { grid-area: kids;     color: #ffee00; }
@@ -186,8 +228,8 @@ body::after {
   grid-area: title;
   justify-self: center;
   align-self: center;
-  width: 55%;
-  max-width: 380px;
+  width: clamp(240px, 48vw, 520px);
+  max-height: 16vh; /* 🍦 cap vertical growth */
   height: auto;
   object-fit: contain;
   z-index: 2;
@@ -199,6 +241,35 @@ body::after {
 
 .menu-title-top:hover {
   transform: scale(1.05);
-  animation: none;
+  /* animation: none; */ /* let it live! */
   filter: drop-shadow(0 0 8px white) drop-shadow(0 0 16px white);
 }
+
+@keyframes neon-glow-cycle {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 4px white)
+      drop-shadow(0 0 8px #00ffff)
+      drop-shadow(0 0 16px #00ccff)
+      drop-shadow(0 0 24px #00ccff);
+  }
+  25% {
+    filter:
+      drop-shadow(0 0 4px #ffee00)
+      drop-shadow(0 0 8px #ffee00)
+      drop-shadow(0 0 16px #ffcc00);
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 4px #cc66ff)
+      drop-shadow(0 0 8px #cc66ff)
+      drop-shadow(0 0 16px #9933ff);
+  }
+  75% {
+    filter:
+      drop-shadow(0 0 4px #00ff88)
+      drop-shadow(0 0 8px #00ff88)
+      drop-shadow(0 0 16px #00cc88);
+  }
+}
+
