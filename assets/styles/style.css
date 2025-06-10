@@ -68,12 +68,12 @@ html::before {
 
 @media screen and (hover: none) and (pointer: coarse) {
   .menu-frame {
-    max-height: calc(100vw * (16 / 11));
-    max-width: 100vw;
-    width: 100%;
+    width: 100vw;
     height: auto;
+    max-height: min(100svh, calc(100vw * (16 / 11))); /* 🍧 safest combo */
   }
 }
+
 
 .menu-image {
   position: absolute;
