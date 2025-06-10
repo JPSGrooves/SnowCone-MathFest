@@ -8,27 +8,12 @@ html, body {
   min-width: calc(720px * (11 / 16));
   overflow: hidden;
   font-family: 'Orbitron', sans-serif;
-  background: black;
+  background: transparent; /* 🌌 show the cosmos! */
   touch-action: manipulation; /* disables pinch + double-tap zoom */
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
-html::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
-  opacity: 0.5;
-  z-index: -2;
-  animation: drift 120s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes drift {
-  from { transform: translate(0, 0); }
-  to { transform: translate(100px, 200px); }
-}
 
 * {
   user-select: none;
@@ -36,6 +21,23 @@ html::before {
   -ms-user-select: none;
   box-sizing: border-box;
   touch-action: manipulation;
+}
+.background-floater {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -10;
+  pointer-events: none;
+  opacity: 0.85;
+  animation: cosmicDrift 120s linear infinite;
+}
+
+@keyframes cosmicDrift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(50px, 100px); }
 }
 
 
@@ -48,7 +50,6 @@ html::before {
   height: 100vh;
   height: 100svh; /* overrides vh when supported */
   min-height: 720px;
-  background: black;
   overflow: hidden;
 }
 
