@@ -82,7 +82,6 @@
     "lint-staged": "^16.1.0",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "vite": "6.3.5",
-    "vite-plugin-inspect": "^11.1.0",
     "vitest": "^3.2.2"
   }
 }

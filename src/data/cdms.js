@@ -47,3 +47,5 @@ function getDefaultData() {
     }
   };
 }
+
+window.devFlags = { build: "v0.1.0" };

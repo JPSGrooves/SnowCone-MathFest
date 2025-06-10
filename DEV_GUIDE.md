@@ -1,9 +1,19 @@
 # 🍧 SnowCone MathFest – Developer Ritual Guide
+if shit is fucking up??
+(Real bad)
+sudo chown -R $(whoami) ~/.npm
+npm cache clean --force
 
+then...
+rm -rf node_modules package-lock.json dist .vite
+npm install
+
+
+standard fucking up..
 rm -rf node_modules .vite dist
 npm install
-if shit is fucking up??
 
+Sometimes you just gotta wait and be patient!
 
 ## ✨ 1. Start Local Dev Server
 
@@ -125,8 +135,9 @@ Should finally show your first commit:
 abcd123 🌈 First commit – Locking in dev state
 
 
+OOOORRRRRRR
 
-
+rm -f .git/index.lock
 
 
 
