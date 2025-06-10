@@ -45,7 +45,7 @@ html::before {
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 100svh;
+  height: 100vh; /*changed from 100svh to 100vh for better compatibility*/
   min-height: 720px;
   background: black;
   overflow: hidden;
@@ -80,11 +80,12 @@ html::before {
   top: 0;
   left: 0;
   height: 100%;
-  width: 100%;
+  width: auto; /*changed from 100% to auto for aspect ratio123*/
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
 }
+
 
 /* 🔒 MAIN GRID */
 .menu-grid {
@@ -169,10 +170,11 @@ button, .menu-label, .tab-button {
   width: auto;
   aspect-ratio: 9 / 2;
   object-fit: contain;
-  z-index: 2;
-  pointer-events: none;
+  pointer-events: auto;
   animation: neon-glow-cycle 6s linear infinite;
   transform-origin: center top;
+  position: relative;
+  z-index: 10; /* BOOST ABOVE BACKGROUND */
 }
 
 .menu-title-top:hover {
