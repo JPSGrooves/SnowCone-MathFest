@@ -45,11 +45,13 @@ html::before {
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 100vh; /*changed from 100svh to 100vh for better compatibility*/
+  height: 100vh;
+  height: 100svh; /* overrides vh when supported */
   min-height: 720px;
   background: black;
   overflow: hidden;
 }
+
 
 /* 🍧 LOCKED FRAME W/ASPECT */
 .menu-frame {
@@ -68,11 +70,13 @@ html::before {
 
 @media screen and (hover: none) and (pointer: coarse) {
   .menu-frame {
-    width: 100vw;
-    height: auto;
-    max-height: min(100svh, calc(100vw * (16 / 11))); /* 🍧 safest combo */
+    height: 100svh;           /* 💪 fill full height again */
+    width: auto;
+    aspect-ratio: 11 / 16;
+    max-width: 100vw;
   }
 }
+
 
 
 .menu-image {
@@ -80,7 +84,7 @@ html::before {
   top: 0;
   left: 0;
   height: 100%;
-  width: auto; /*changed from 100% to auto for aspect ratio123*/
+  width: 100%; /*changed from 100% to auto for aspect ratio123*/
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
