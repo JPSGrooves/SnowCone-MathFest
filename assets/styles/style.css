@@ -51,6 +51,7 @@ html, body {
   height: 100svh; /* overrides vh when supported */
   min-height: 720px;
   overflow: hidden;
+  z-index: 1; /* 👈 under modal, above cosmic bg */
 }
 
 
@@ -78,8 +79,16 @@ html, body {
   }
 }
 
-
-
+.menu-floater {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -20; /* stays deep back */
+  opacity: 1;
+  pointer-events: none;
+}
 .menu-image {
   position: absolute;
   top: 0;
@@ -87,7 +96,7 @@ html, body {
   height: 100%;
   width: 100%; /*changed from 100% to auto for aspect ratio123*/
   object-fit: cover;
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
 }
 
