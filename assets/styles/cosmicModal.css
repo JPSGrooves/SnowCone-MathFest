@@ -1,21 +1,21 @@
 /* 🌌 Cosmic Modal Shell */
 /* 🌌 Cosmic Modal Shell (Unified with cosmic-modal-inner style) */
 .modal {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(17, 17, 17, 0.95);
   color: white;
-  padding: 1em;
+  padding: 1.5em;
   border: 2px solid #00ffee;
   border-radius: 1em;
   z-index: 9999;
 
-  width: 90vw;
-  max-width: calc(100vh * (9 / 16)); /* matches info modal aspect ratio */
-  aspect-ratio: 9 / 12;
-  max-height: 90vh;
+  width: 95vw;
+  max-width: calc(100vh * (10 / 16)); /* matches info modal aspect ratio */
+  aspect-ratio: 10 / 12;
+  max-height: 95vh;
 
   box-shadow: 0 0 20px #00ffeeaa;
   display: flex;
@@ -31,21 +31,29 @@
   display: none;
 }
 
-/* ✖ Close Button */
 .modal-close {
-  font-size: 1.2rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 1.5rem; /* a lil' bigger for mobile vibe */
   background: none;
   border: none;
   color: #fff;
+  z-index: 9999;
   cursor: pointer;
 }
 
-/* 🔘 Tab Buttons */
+
+/* 🔘 Modal Header – Wrap Tab Buttons */
 .modal-header {
   display: flex;
+  flex-wrap: nowrap;               /* 🔥 Allow wrap on small screens */
   justify-content: space-between;
-  gap: 0.5em;
+  align-items: center;       /* 🔥 Center all rows */
+  gap: 0.5em;                     /* 🔥 Keep spacing tight but comfy */
   margin-bottom: 1em;
+  padding: 0.5em;
+  width: 100%;
 }
 
 /* 🧊 Actually hide the modal */
@@ -58,19 +66,37 @@
   background: #222;
   border: none;
   color: #fff;
-  padding: 0.5em 1em;
+
+  padding: 0.6em 0.9em; /* 🔥 slimmed but tappable */
   border-radius: 0.5em;
   cursor: pointer;
-  font-size: 1rem;
-  flex-grow: 1;
+
+  font-size: clamp(0.45rem, 0.9vw, 0.8rem); /* 🎯 tighter scale */
+  line-height: 1.1;
+
+  min-width: 80px;
+  max-width: none;
+  flex: 1 1 0;
+
+  display: flex;                 /* 🧊 enables centering */
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;          /* 🚫 no wrapping */
+  overflow: hidden;             /* ✅ contain overflow visually, no scroll */
+  letter-spacing: 0.03em;
+
   transition: all 0.2s ease;
 }
+
 
 .tab-button.active,
 .tab-button:hover {
   background: #00ffee;
   color: black;
   box-shadow: 0 0 8px #00ffeeaa;
+  transform: scale(1.03);
+  transition: transform 0.15s ease, box-shadow 0.3s ease;
 }
 
 /* 🧑‍🚀 Input + Completion */
@@ -213,6 +239,8 @@
   scrollbar-gutter: stable;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  flex: 1;
+  min-height: 0; /* prevents flex bugs in production */
 }
 .modal-content::-webkit-scrollbar {
   display: none;
