@@ -135,14 +135,26 @@
 /* 🏅 Badge Grid */
 .badge-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   gap: 0.5em;
   justify-items: center;
-  margin-top: 0.5em;
+  width: 100%;
 }
+.badge-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3em;            /* 📏 bigger space between groupings */
+  padding-bottom: 2em; /* ⬇️ prevent last group clipping */
+}
+
+
 .badge-tile {
-  width: 64px;
-  height: 64px;
+  width: 72px;               
+  height: auto;              /* 🔥 this lets the cone grow naturally */
+  min-height: 96px; /* 🚧 optional: locks grid if you want 3-line breathing room */
+  aspect-ratio: 1 / 1.2;
+  padding-bottom: 0.4em;     /* 🌬️ adds space for the short label */
+  padding: 0.5em 0.2em;
   background: #333;
   border: 2px solid #888;
   border-radius: 0.5em;
@@ -150,15 +162,71 @@
   font-size: 0.7rem;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
+  flex-direction: column;
   text-align: center;
   box-shadow: 0 0 8px #00000055;
 }
+
 .badge-tile.unlocked {
   border-color: #00ffee;
   background: #111;
   color: #00ffee;
   box-shadow: 0 0 12px #00ffeeaa;
+}
+.badge-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 0.2em;
+}
+
+.badge-label {
+  font-size: 0.7rem;
+  color: white;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.badge-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 0.2em;
+}
+
+.badge-label {
+  font-size: 0.7rem;
+  color: white;
+  text-align: center;
+}
+.badge-short {
+  font-size: 0.6rem;
+  color: #aaa;
+  text-align: center;
+  margin-top: 0.25em;
+  line-height: 1;
+}
+.badge-group {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+
+.badge-section {
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #00ffee;
+  margin-bottom: 0.5em;
+  padding-left: 0;
+  border-left: none;
+}
+
+.badge-section:first-child {
+  margin-top: 0;
 }
 
 /* 🎨 Theme Grid */
@@ -272,4 +340,19 @@
 .track-button,
 .modal-close {
   font-size: clamp(1rem, 2vmin, 1.2rem);
+}
+/* 🌌 Cosmic Modal Background Dimmer */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85); /* 🕶️ Dim level */
+  z-index: 9998; /* Just under the modal (which is 9999) */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
 }
