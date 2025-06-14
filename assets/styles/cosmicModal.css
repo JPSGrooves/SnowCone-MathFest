@@ -356,3 +356,78 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* === 🎛️ Cosmic Jukebox Player === */
+.jukebox {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #00ffee;
+  border-radius: 1em;
+  padding: 1.25em;
+  box-shadow: 0 0 12px #00ffee88, 0 0 24px #00ffee44;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-top: 1em;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+}
+
+.jukebox h3 {
+  color: #00ffee;
+  font-size: 1.25rem;
+  margin-bottom: 0.25em;
+}
+
+#currentTrack {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #00ffee;
+  margin-top: 0.25em;
+}
+
+#trackProgress {
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  accent-color: #00ccff;
+}
+
+#trackTimer {
+  font-size: 0.85rem;
+  color: #ccffff;
+  margin-top: 0.25em;
+}
+
+.jukebox-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  justify-content: center;
+}
+
+.jukebox-controls button {
+  background: #111;
+  border: 2px solid #00ffee;
+  color: #00ffee;
+  padding: 0.5em 1em;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 0 6px #00ffee55;
+  transition: background 0.2s ease, transform 0.2s ease;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.jukebox-controls button:hover {
+  background: #00ffee22;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* 🟢 Active button glow */
+.icon-btn.active {
+  background-color: rgba(0, 255, 255, 0.15);
+  box-shadow: 0 0 6px #00ffff, inset 0 0 4px #00ffff;
+  color: white;
+}
