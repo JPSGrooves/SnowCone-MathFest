@@ -1,19 +1,29 @@
 # 🍧 SnowCone MathFest – Developer Ritual Guide
-if shit is fucking up??
-(Real bad)
+
+---
+
+## ⚡️ WHEN SHIT IS FUCKING UP (REAL BAD):
+
+```bash
 sudo chown -R $(whoami) ~/.npm
 npm cache clean --force
 
-then...
 rm -rf node_modules package-lock.json dist .vite
 npm install
+```
 
+---
 
-standard fucking up..
+## ⚠️ WHEN SHIT IS JUST KIND OF FUCKED:
+
+```bash
 rm -rf node_modules .vite dist
 npm install
+```
 
-Sometimes you just gotta wait and be patient!
+> 🚤 Sometimes you just gotta wait and be patient!
+
+---
 
 ## ✨ 1. Start Local Dev Server
 
@@ -28,14 +38,13 @@ Open: [http://localhost:5173](http://localhost:5173)
 
 ## 🛠️ 2. Edit Your Code
 
-Modify:
+Modify core files like:
 
 * `index.html`
 * `src/`
 * `vite.config.js`
-* etc...
-
-Test changes in browser + dev console.
+* `main.js`
+* `versionTab.js`
 
 ---
 
@@ -46,8 +55,7 @@ npm run build
 npx gh-pages -d dist --branch=gh-pages --message="🍧 Live deploy"
 ```
 
-Live at:
-[https://JPSGrooves.github.io/SnowCone-MathFest/](https://JPSGrooves.github.io/SnowCone-MathFest/)
+Live at: [https://JPSGrooves.github.io/SnowCone-MathFest/](https://JPSGrooves.github.io/SnowCone-MathFest/)
 
 ---
 
@@ -60,89 +68,75 @@ git push origin main
 ```
 
 ---
-trouble?
-💿 First: Confirm you’re in the correct repo folder
-Just to be sure, run:
 
+## 🚨 GIT TROUBLESHOOTING
+
+### 📏 First: Confirm You're in the Right Repo
+
+```bash
 git remote -v
-☑️ You should see something like:
+```
 
+You should see:
+
+```
 origin  https://github.com/JPSGrooves/SnowCone-MathFest.git (fetch)
 origin  https://github.com/JPSGrooves/SnowCone-MathFest.git (push)
-If not: You’re in the wrong directory or your repo isn't connected.
+```
 
-🧠 Second: Double-check latest commit
-Since git log -1 didn’t show anything (weird)... try this:
+---
 
+### 🧠 Second: Double-check Latest Commit
+
+```bash
 git log --oneline
-☑️ You should see a list of recent commits like:
+```
 
-abcd123 🌈 Locking in current dev state
-efgh456 another commit
-If your "🌈 Locking in current dev state" commit is not there, then the commit actually never happened — maybe Husky blocked it earlier and you thought it passed.
+If your latest commit isn’t there, re-commit:
 
-🚀 Third: Force the push manually
-Assuming you do see your commit locally and just need to shove it up to GitHub like a snow cone through a flavor tube:
-
-git push origin main --force
-(⚠️ Only do --force if you're 100% sure your local main is the latest and you want it to overwrite what's on GitHub. Sounds like it is.)
-
-
-
-💣 Step 1: Clear the tracked cache
-git rm -r --cached .
-This unstages everything without deleting your files — it just tells Git, “let’s re-look at everything based on the current .gitignore.”
-💾 Step 2: Add everything back, this time respecting .gitignore
-git add .
-💬 Step 3: Commit the clean slate
-git commit -m "🧼 Refresh tracked files to respect .gitignore"
-🌍 Step 4: Push to the cloud
-git push
-💡 BONUS: Check what Git’s ignoring
-
-git check-ignore -v .
-That’ll show you which files Git is currently ignoring and why — super handy if you're debugging.
-
-
-
-🌱 Step-by-Step: First Commit & Push
-
-✅ 1. Stage everything
+```bash
 git add -A
-🧠 2. Make your first real commit
+git commit -m "🌈 Locking in current dev state"
+```
+
+---
+
+### 🚀 Third: Force Push (ONLY IF YOU'RE SURE)
+
+```bash
+git push origin main --force
+```
+
+---
+
+## 💣 Reset Tracked Files + .gitignore Respect
+
+```bash
+git rm -r --cached .
+git add .
+git commit -m "🧼 Refresh tracked files to respect .gitignore"
+git push
+```
+
+Check what’s being ignored:
+
+```bash
+git check-ignore -v .
+```
+
+---
+
+## 🌱 First Time Commit & Push Ritual
+
+```bash
+git add -A
 git commit -m "🌈 First commit – Locking in dev state"
-You should see output like:
-
-[main (root-commit) abcd123] 🌈 First commit – Locking in dev state
- N files changed...
-This creates your very first commit — now git log will actually work.
-
-🚀 3. Push it up to GitHub
 git push -u origin main
-The -u sets the default upstream so future git push and git pull work cleanly.
-Now you should see it show up immediately on your GitHub repo.
-🧪 Optional sanity check
-git status
-Should return:
+```
 
-On branch main
-nothing to commit, working tree clean
-And now:
+---
 
-git log --oneline
-Should finally show your first commit:
-
-abcd123 🌈 First commit – Locking in dev state
-
-
-OOOORRRRRRR
-
-rm -f .git/index.lock
-
-
-
-
-## 🚹 .gitignore Template
+## 🔒 .gitignore Template
 
 ```bash
 /node_modules
@@ -152,19 +146,11 @@ rm -f .git/index.lock
 .husky/_/
 ```
 
-Create `.gitignore`, add contents above, then:
-
-```bash
-git add .gitignore
-git commit -m "🔒 Add .gitignore"
-git push
-```
-
 ---
 
 ## 🌬️ Bonus: Quick Deploy Script
 
-### Create `deploy-live.sh`
+**deploy-live.sh**
 
 ```bash
 #!/bin/bash
@@ -181,13 +167,17 @@ Make it executable:
 
 ```bash
 chmod +x deploy-live.sh
-```
-
-Then run anytime:
-
-```bash
 ./deploy-live.sh
 ```
+
+---
+
+## 🧠 Dev Versioning Reminders
+
+* [ ] Update `devFlags.build` in `main.js` or `dataManager.js`
+* [ ] Update text & HTML in `versionTab.js`
+* [ ] Add section to `CHANGELOG.md`
+* [ ] Push with matching version in commit msg
 
 ---
 
@@ -231,9 +221,9 @@ module.exports = {
 
 ---
 
-## 🔄 Auto Format on Save (VS Code)
+## 🌀 Auto Format on Save (VS Code)
 
-Create or update `.vscode/settings.json`:
+`.vscode/settings.json`:
 
 ```json
 {
@@ -244,9 +234,9 @@ Create or update `.vscode/settings.json`:
 
 ---
 
-## 🔮 Optional: Husky + lint-staged
+## 🛡️ Optional: Husky + lint-staged
 
-Add to `package.json`:
+**In `package.json`:**
 
 ```json
 "lint-staged": {
@@ -257,7 +247,7 @@ Add to `package.json`:
 }
 ```
 
-Install it:
+**Install + Hook:**
 
 ```bash
 npm install -D lint-staged husky
@@ -267,5 +257,6 @@ npx husky add .husky/pre-commit "npx lint-staged"
 
 ---
 
-🍧 CONE RITUAL COMPLETE. Code. Commit. Deploy. Repeat.
-All glory to the Cone 🌈
+🍧 **CONE RITUAL COMPLETE**
+Code. Commit. Deploy. Chill.
+🌈 All glory to the Cone.
