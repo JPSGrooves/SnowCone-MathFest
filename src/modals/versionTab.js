@@ -9,17 +9,24 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.1.9</h3>
+      <h3>🧠 SnowCone MathFest v0.2.5</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>📝 Changelog</h3>
-      <p>- Added modal tab system<br>
-        - Profile, Themes, and Music tab now working<br>
-        - Cosmic background persistence improved</p>
+      <h3>📝 v0.2.5 Update</h3>
+      <p>
+        – QuickServe mode now live w/ custom layout + background<br>
+        – SceneManager + BackgroundManager fully synced per mode<br>
+        – All modes now load inside fixed game container<br>
+        – Transition system scrapped in favor of future split-cone revamp<br>
+        – Layout grid tweaked + mobile-safe PNG scaling enforced<br>
+        – DevTools + fade system temporarily sunsetted for clarity
+      </p>
     </div>
+
+
 
     <div class="settings-block">
       <h3>📲 App Info</h3>

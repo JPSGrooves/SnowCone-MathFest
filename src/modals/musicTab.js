@@ -39,6 +39,12 @@ export function renderMusicTab() {
         <button id="btnLoop" class="icon-btn ${loopActive ? 'active' : ''}">🔁</button>
         <button id="btnShuffle" class="icon-btn ${shuffleActive ? 'active' : ''}">🔀</button>
       </div>
+
+      <div class="jukebox-message" style="margin-top: 15px; font-size: 14px; line-height: 1.6; color: #cccccc;">
+        You made it to the music player. That’s kinda amazing. 🌌<br>
+        Math creates the music that connects the soul to the numbers of the festival.<br>
+        I'm honored you're listening. Some of these tracks? You can <em>only</em> hear them here — at SnowCone MathFest. Enjoy! 🍧🎵
+      </div>
     </div>
   `;
 }
@@ -52,13 +58,17 @@ export function setupMusicTabUI() {
     muteToggle.addEventListener('change', () => {
       const muted = muteToggle.checked;
       setSetting('mute', muted);
-      // 🔇 Instantly apply global mute via Howler.volume()
+      Howler.volume(muted ? 0 : 1); // 🔇 apply instantly
     });
   }
 
   document.getElementById('btnPlayPause')?.addEventListener('click', togglePlayPause);
   document.getElementById('btnNext')?.addEventListener('click', skipNext);
   document.getElementById('btnPrev')?.addEventListener('click', skipPrev);
+
+  // ✅ Set loop default to OFF
+  setLoop(false); // ← This disables looping at load
+  loopBtn?.classList.remove('active'); // Ensure button is clean visually
 
   loopBtn?.addEventListener('click', () => {
     const isNowLooping = setLoop(!getLooping());
@@ -70,8 +80,9 @@ export function setupMusicTabUI() {
     shuffleBtn.classList.toggle('active', isNowShuffling);
   });
 
-  initMusicPlayer();
+  initMusicPlay();
 }
+
 
 // 💥 Optional: stop music when entering a game mode
 export function stopMusicPlayer() {

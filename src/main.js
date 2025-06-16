@@ -4,6 +4,8 @@ import { openModal } from './modals/cosmicModal.js';
 import './modals/infoModal.js'; // doesn’t export, just initializes listeners
 import { getSetting } from './data/cdms.js';
 import { Howler } from 'howler';
+import { startMode } from './managers/sceneManager.js';
+
 
 // 🍧 Anti–Double-Tap Zoom Shield (esp. iOS Safari)
 let lastTouchTime = 0;
@@ -25,10 +27,14 @@ if (import.meta.env?.VITE_SECRET_KEY) {
   console.warn("🚨 No VITE_SECRET_KEY found. Is .env missing?");
 }
 
-// 🚀 DOM Ready Entry Point
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
+  // ✅ This waits for ALL assets including CSS + images
   applyBackgroundTheme();
-
-  // 🧊 Load mute state from localStorage
   Howler.volume(getSetting('mute') ? 0 : 1);
 });
+
+
+document.querySelector('.menu-label.quick')?.addEventListener('click', () => {
+  startMode('quickServe'); // 🔥 handles background + scene logic
+});
+

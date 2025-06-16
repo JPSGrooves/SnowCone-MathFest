@@ -279,3 +279,19 @@ window.setTheme = (themeName) => {
   setSetting('theme', themeName);
   applyBackgroundTheme();
 };
+document.getElementById('labelQuickServe')?.addEventListener('click', () => {
+  startMode('quickServe');
+});
+
+export function swapModeBackground(fileName) {
+  const bg = document.getElementById('menuImage');
+  if (!bg) {
+    console.warn("🚨 No #menuImage found to swap.");
+    return;
+  }
+
+  bg.src = `assets/img/modes/${fileName}.png`;
+  console.log(`🎮 Mode background swapped to: ${fileName}`);
+}
+
+

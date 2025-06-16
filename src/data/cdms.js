@@ -108,4 +108,4 @@ export function unlockBadge(id) {
   }
 }
 
-window.devFlags = { build: "v0.1.9" };
+window.devFlags = { build: "v0.2.5" };
