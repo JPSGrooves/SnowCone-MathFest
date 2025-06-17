@@ -21,15 +21,26 @@
     <!-- 🍧 Main Menu Layout w/ Decoupled Background -->
     <div class="menu-wrapper">
       <div class="menu-layout">
-        <!-- 💫 Background PNG (no layout influence) -->
-        <img id="menuImage" class="background-fill" src="assets/img/branding/menubackground.png" alt="Festival Map" />
+    
+        <!-- 💫 Background PNG (positioned independently) -->
+        <img
+          id="menuImage"
+          class="background-fill"
+          src="assets/img/branding/menubackground.png"
+          alt="Festival Map"
+        />
 
-        <!-- 🧱 Foreground Grid Layout -->
+        <!-- 🧱 Foreground Grid Frame (anchors title + grid) -->
         <div class="menu-frame">
-          <!-- 🌟 Title Image (grid-area: title) -->
-          <img src="assets/img/branding/SnowConeMathFestTitle.png" class="menu-title-top" alt="SnowCone MathFest Title" />
+      
+          <!-- 🌟 Title (grid-area: title) -->
+          <img
+            src="assets/img/branding/SnowConeMathFestTitle.png"
+            class="menu-title-top"
+            alt="SnowCone MathFest Title"
+          />
 
-          <!-- 🍧 Label Grid (grid-area: grid) -->
+          <!-- 🍧 Mode Labels Grid (grid-area: grid) -->
           <div class="menu-grid">
             <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
             <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
@@ -38,9 +49,12 @@
             <div class="menu-label infinity">♾️<br>Infinity Lake</div>
             <div class="menu-label options label-options">⚙️ Options</div>
           </div>
-        </div>
-      </div>
-    </div>
+
+        </div> <!-- end .menu-frame -->
+
+      </div> <!-- end .menu-layout -->
+    </div> <!-- end .menu-wrapper -->
+
 
 
     <!-- 🎮 Game Container for Modes -->

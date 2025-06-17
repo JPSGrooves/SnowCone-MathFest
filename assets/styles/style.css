@@ -12,6 +12,10 @@ html, body {
   font-family: 'Orbitron', sans-serif;
   background: transparent;
   touch-action: manipulation;
+
+  /* 🧃 Mobile polish (iOS & Android) */
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
@@ -49,7 +53,8 @@ html, body {
 .background-fill {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   height: 100%;
   width: auto;
   max-width: 100%;
@@ -77,8 +82,8 @@ html, body {
 .menu-frame {
   position: relative;
   z-index: 5;
-  width: 100vw;
-  height: 100vh;
+  width: auto;
+  height: 100%;
   aspect-ratio: 11 / 16;
   max-width: 100vw;
   max-height: 100vh;
@@ -101,6 +106,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 .menu-wrapper {
@@ -122,9 +128,7 @@ html, body {
 
 .menu-grid {
   width: 100%;
-  min-height: 80vh; /* TEMP FORCE */
   height: 100%;
-  min-height: 100%;
   grid-area: grid;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -146,6 +150,7 @@ html, body {
 }
 
 .menu-title-top {
+  margin-top: 1.5em; /* or translateY() for better control */
   grid-area: title;
   justify-self: center;
   align-self: center;
