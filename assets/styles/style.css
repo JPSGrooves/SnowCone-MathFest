@@ -22,7 +22,7 @@ html, body {
   touch-action: manipulation;
 }
 
-/* 🌌 Background Floaters */
+/* 🌌 Background Floaters*/ 
 .background-floater, .menu-floater {
   position: fixed;
   top: 0;
@@ -45,13 +45,15 @@ html, body {
   to   { transform: translate(50px, 100px); }
 }
 
-/* 🏊 Background System */
+/* 🏊 Background System*/ 
 .background-fill {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
   height: 100%;
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 11 / 16;
   object-fit: contain; /* crop sides, vertical priority */
   z-index: 0;
   pointer-events: none;
@@ -59,53 +61,82 @@ html, body {
   will-change: transform, opacity;
 }
 
+.game-frame {
+  width: auto;
+  height: 100%;
+  max-height: 100svh;
+  max-width: 100vw;
+  aspect-ratio: 11 / 16;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+}
+
+.menu-frame {
+  position: relative;
+  z-index: 5;
+  width: 100vw;
+  height: 100vh;
+  aspect-ratio: 11 / 16;
+  max-width: 100vw;
+  max-height: 100vh;
+  display: grid;
+  grid-template-areas:
+    "title"
+    "grid";
+  grid-template-rows: auto 1fr;
+  place-items: center;
+
+  font-size: clamp(12px, 1.8vh, 20px); /* 🎯 Font root: scales with HEIGHT */
+  outline: 2px solid yellow;
+}
+
 /* ✨ Main Menu Layout */
+.menu-layout {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .menu-wrapper {
-  position: absolute;
+  position: fixed; /* use fixed to anchor to screen always */
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;  /* 🔼 start from top */
+  align-items: center;
   overflow: hidden;
   z-index: 2;
 }
 
 
-.menu-title-top {
-  grid-area: title;
-  justify-self: center;
-  align-self: center;
-  height: clamp(6rem, 15vh, 14rem);
-  width: auto;
-  aspect-ratio: 9 / 2;
-  object-fit: contain;
-  pointer-events: auto;
-  animation: neon-glow-cycle 6s linear infinite;
-  transform-origin: center top;
-  position: relative;
-  z-index: 10;
-}
+
 
 
 .menu-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
+  min-height: 80vh; /* TEMP FORCE */
   height: 100%;
+  min-height: 100%;
+  grid-area: grid;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(5, 1fr);
   gap: 0;
-  z-index: 4;
-  pointer-events: none;
+  z-index: 5;
+  pointer-events: auto; /*changed from none*/
 
   /* 🍭 Dev Debug Grid Visual */
+  border: 4px solid hotpink;
   background-color: rgba(255, 255, 255, 0.03);
-  outline: 2px dashed rgba(0, 255, 255, 0.4);
+  outline: 2px solid lime;
   background-image: 
     linear-gradient(to right, rgba(0,255,255,0.1) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0,255,255,0.1) 1px, transparent 1px);
@@ -114,39 +145,20 @@ html, body {
   align-items: center;
 }
 
-
-
-.menu-label.kids     { grid-column: 1; grid-row: 2; justify-self: start; transform: translate(10%, -30%); }
-.menu-label.quick    { grid-column: 2; grid-row: 3; justify-self: center; transform: translate(0, -10%); }
-.menu-label.tips     { grid-column: 3; grid-row: 2; justify-self: end; transform: translate(-10%, -30%); }
-.menu-label.story    { grid-column: 2; grid-row: 4; justify-self: center; transform: translate(0, -10%); }
-.menu-label.infinity { grid-column: 2; grid-row: 5; justify-self: center; transform: translate(0, 10%); }
-.menu-label.options  { grid-column: 3; grid-row: 5; justify-self: end; transform: translate(-5%, 10%); }
-
-.menu-label {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: clamp(1rem, 2.5vh, 2.6rem);
-  font-family: 'Orbitron', sans-serif;
-  text-align: center;
-  text-shadow:
-    0 0 6px currentColor,
-    0 0 12px currentColor,
-    0 0 18px currentColor;
-  color: white;
-  line-height: 1.0;
+.menu-title-top {
+  grid-area: title;
+  justify-self: center;
+  align-self: center;
+  height: clamp(4em, 8em, 10em); /* 🌈 Scales off menu-frame font-size */
+  width: auto;
+  aspect-ratio: 9 / 2;
+  object-fit: contain;
+  pointer-events: auto;
+  animation: neon-glow-cycle 6s linear infinite;
   transform-origin: center top;
-  transition: transform 0.2s ease, text-shadow 0.2s ease;
-
-  /* 🪩 Dev Box */
-  outline: 1px dashed magenta;
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.menu-label:hover {
-  transform: scale(1.05);
+  position: relative;
+  z-index: 3; /* ⬅️ sits below menu-grid */
+  outline: 2px solid red;
 }
 
 .menu-title-top:hover {
@@ -184,12 +196,86 @@ html, body {
 
 @media (max-width: 600px) {
   .menu-title-top {
-    height: clamp(5rem, 12vh, 12rem);
+    height: clamp(3.5em, 7em, 9em); /* 👇 Softer top spacing on phones */
   }
+
   .menu-label {
-    font-size: clamp(0.9rem, 2.1vh, 2.3rem);
+    font-size: clamp(1.1em, 1.5em, 1.8em); /* match the new em-based flow */
   }
 }
+
+
+.menu-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1.2em, 1.8em, 2.2em);
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  text-shadow:
+    0 0 6px currentColor,
+    0 0 12px currentColor,
+    0 0 18px currentColor;
+  color: white;
+  line-height: 1.0;
+  transform-origin: center center; /* no longer center top */
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+  pointer-events: auto;
+
+  /* 🪩 Dev Box (optional) */
+  outline: 1px dashed magenta;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+
+.menu-label:hover {
+  transform: scale(1.05);
+}
+
+.menu-label.kids {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  align-self: start;
+}
+
+.menu-label.quick {
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: center;
+  align-self: center;
+}
+
+.menu-label.tips {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: end;
+  align-self: start;
+}
+
+.menu-label.story {
+  grid-column: 2;
+  grid-row: 4;
+  justify-self: center;
+  align-self: center;
+}
+
+.menu-label.infinity {
+  grid-column: 2;
+  grid-row: 5;
+  justify-self: center;
+  align-self: end;
+}
+
+.menu-label.options {
+  grid-column: 3;
+  grid-row: 5;
+  justify-self: end;
+  align-self: end;
+}
+
+
 
 /* ❌ Hide Elements */
 .hidden {
@@ -213,27 +299,5 @@ html, body {
   background: transparent;
 }
 
-.game-frame {
-  width: auto;
-  height: 100%;
-  max-height: 100svh;
-  max-width: 100vw;
-  aspect-ratio: 11 / 16;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
 
-.menu-frame {
-  aspect-ratio: 11 / 16;
-  width: auto;
-  height: 100%;
-  max-height: 100svh;
-  max-width: 100vw;
-  position: relative;
-  display: block;
-  justify-content: center;
-  align-items: center;
-}
+

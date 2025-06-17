@@ -18,22 +18,30 @@
     <!-- 🌌 Cosmic Background -->
     <img src="assets/img/branding/starfield.png" class="menu-floater" />
 
-    <!-- 🍧 Main Menu with Game Frame Wrapper -->
+    <!-- 🍧 Main Menu Layout w/ Decoupled Background -->
     <div class="menu-wrapper">
-      <div class="menu-frame">
-        <img id="menuImage" class="background-fill" />
-        <div class="menu-grid">
-          <img src="assets/img/branding/SnowConeMathFestTitle.png" class="menu-title-top" style="grid-area: title" alt="SnowCone MathFest Title" />
+      <div class="menu-layout">
+        <!-- 💫 Background PNG (no layout influence) -->
+        <img id="menuImage" class="background-fill" src="assets/img/branding/menubackground.png" alt="Festival Map" />
 
-          <div class="menu-label kids" style="grid-area: kids">⛺<br>Kids<br>Camping</div>
-          <div class="menu-label quick" style="grid-area: quick">🍧<br>QuickServe<br>Pavilion</div>
-          <div class="menu-label tips" style="grid-area: tips">🧮<br>MathTips<br>Village</div>
-          <div class="menu-label story" style="grid-area: story">📖<br>Story Mode<br>Forest</div>
-          <div class="menu-label infinity" style="grid-area: infinity">♾️<br>Infinity Lake</div>
-          <div class="menu-label options label-options" style="grid-area: options">⚙️ Options</div>
+        <!-- 🧱 Foreground Grid Layout -->
+        <div class="menu-frame">
+          <!-- 🌟 Title Image (grid-area: title) -->
+          <img src="assets/img/branding/SnowConeMathFestTitle.png" class="menu-title-top" alt="SnowCone MathFest Title" />
+
+          <!-- 🍧 Label Grid (grid-area: grid) -->
+          <div class="menu-grid">
+            <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
+            <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
+            <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
+            <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
+            <div class="menu-label infinity">♾️<br>Infinity Lake</div>
+            <div class="menu-label options label-options">⚙️ Options</div>
+          </div>
         </div>
       </div>
     </div>
+
 
     <!-- 🎮 Game Container for Modes -->
     <div id="game-container" class="hidden"></div>
