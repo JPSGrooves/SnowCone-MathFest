@@ -11,34 +11,26 @@
     <link rel="stylesheet" href="/SnowCone-MathFest/assets/styles/style.css" />
     <link rel="stylesheet" href="/SnowCone-MathFest/assets/styles/cosmicModal.css" />
 
-    <!-- 🧊 Favicons & Manifest (serve from public/) -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/SnowCone-MathFest/assets/manifest-BmB81smq.json" />
-    <script type="module" crossorigin src="/SnowCone-MathFest/assets/index-DV8EoyQA.js"></script>
+    <script type="module" crossorigin src="/SnowCone-MathFest/assets/index-Ce3HuKSy.js"></script>
     <link rel="stylesheet" crossorigin href="/SnowCone-MathFest/assets/index-QZu-ZK49.css">
   </head>
   <body>
     <!-- 🌌 Cosmic Background -->
     <img src="assets/img/branding/starfield.png" class="menu-floater" />
-    <!-- 🍧 Main Menu Grid -->
+
+    <!-- 🍧 Main Menu with Game Frame Wrapper -->
     <div class="menu-wrapper">
       <div class="menu-frame">
-        <img id="menuImage" class="background-fill" alt="background" />
-        
+        <img id="menuImage" class="background-fill" />
         <div class="menu-grid">
-          <img src="assets/img/branding/SnowConeMathFestTitle.png"
-              class="menu-title-top"
-              alt="SnowCone MathFest Title" />
+          <img src="assets/img/branding/SnowConeMathFestTitle.png" class="menu-title-top" style="grid-area: title" alt="SnowCone MathFest Title" />
 
-          <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
-          <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
-          <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
-          <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
-          <div class="menu-label infinity">♾️<br>Infinity Lake</div>
-          <div class="menu-label options label-options">⚙️ Options</div>
+          <div class="menu-label kids" style="grid-area: kids">⛺<br>Kids<br>Camping</div>
+          <div class="menu-label quick" style="grid-area: quick">🍧<br>QuickServe<br>Pavilion</div>
+          <div class="menu-label tips" style="grid-area: tips">🧮<br>MathTips<br>Village</div>
+          <div class="menu-label story" style="grid-area: story">📖<br>Story Mode<br>Forest</div>
+          <div class="menu-label infinity" style="grid-area: infinity">♾️<br>Infinity Lake</div>
+          <div class="menu-label options label-options" style="grid-area: options">⚙️ Options</div>
         </div>
       </div>
     </div>
@@ -93,6 +85,7 @@
         </div>
       </div>
     </div>
+
     <!-- 🌌 Cosmic Background Dimmer -->
     <div id="cosmicOverlay" class="modal-overlay hidden"></div>
 

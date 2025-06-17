@@ -1,3 +1,5 @@
+/* ✨ REFACTORED CSS FOR UNIFIED MENU + MODE BACKGROUND SYSTEM ✨ */
+
 /* 🌌 Global Reset */
 html, body {
   margin: 0;
@@ -12,100 +14,66 @@ html, body {
   touch-action: manipulation;
 }
 
-
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
-
 
 * {
   user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
   box-sizing: border-box;
   touch-action: manipulation;
 }
-.background-floater {
+
+/* 🌌 Background Floaters */
+.background-floater, .menu-floater {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  z-index: -10;
   pointer-events: none;
+  z-index: -10;
   opacity: 0.85;
-  animation: cosmicDrift 120s linear infinite;
+}
+
+.menu-floater {
+  z-index: -20;
+  opacity: 1;
 }
 
 @keyframes cosmicDrift {
   from { transform: translate(0, 0); }
-  to { transform: translate(50px, 100px); }
+  to   { transform: translate(50px, 100px); }
 }
 
-.menu-floater {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  z-index: -20; /* stays deep back */
-  opacity: 1;
-  pointer-events: none;
-}
-/*.menu-image {
+/* 🏊 Background System */
+.background-fill {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
   height: 100%;
-  width: 100%; *changed from 100% to auto for aspect ratio123*
-  object-fit: cover;
-  z-index: -1;
-  pointer-events: none; moved this to menu-bg-cover
-}*/
+  object-fit: contain; /* crop sides, vertical priority */
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.99;
+  will-change: transform, opacity;
+}
 
-/* 🍧 GLOWING LABELS */
-.menu-label {
+/* ✨ Main Menu Layout */
+.menu-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  pointer-events: auto;
-  font-size: clamp(1rem, 2.5vh, 2.6rem);
-  padding-top: 0;
-  font-family: 'Orbitron', sans-serif;
-  color: white;
-  text-align: center;
-  line-height: 1.0;
-  text-shadow:
-    0 0 6px currentColor,
-    0 0 12px currentColor,
-    0 0 18px currentColor;
-  transform-origin: center top;
-  transition: transform 0.2s ease, text-shadow 0.2s ease;
-}
-
-button, .menu-label, .tab-button {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent; /* smooth tap */
+  align-items: center;  /* 🔼 start from top */
+  overflow: hidden;
+  z-index: 2;
 }
 
 
-/* 🍧 Positioning Per Zone */
-.menu-label.kids     { grid-area: kids;     color: #ffee00; transform: translateY(-4vh); }
-.menu-label.quick    { grid-area: quick;    color: #00ccff; transform: translateY(-4vh); }
-.menu-label.tips     { grid-area: tips;     color: #00ff88; transform: translateY(-9vh); }
-.menu-label.story    { grid-area: story;    color: #cc66ff; transform: translateY(-9vh); }
-.menu-label.infinity { grid-area: infinity; color: white;    transform: translateY(-18vh); }
-.menu-label.options  { grid-area: options;  color: #0033cc;  transform: translateY(-2vh); }
-
-/* ✨ Hover Animation */
-.menu-label.kids:hover     { transform: translateY(-4vh) scale(1.05); }
-.menu-label.quick:hover    { transform: translateY(-4vh) scale(1.05); }
-.menu-label.tips:hover     { transform: translateY(-9vh) scale(1.05); }
-.menu-label.story:hover    { transform: translateY(-9vh) scale(1.05); }
-.menu-label.infinity:hover { transform: translateY(-18vh) scale(1.05); }
-.menu-label.options:hover  { transform: translateY(-2vh)  scale(1.05); }
-
-/* 👑 TITLE PNG FLOATS STRONG */
 .menu-title-top {
   grid-area: title;
   justify-self: center;
@@ -118,7 +86,67 @@ button, .menu-label, .tab-button {
   animation: neon-glow-cycle 6s linear infinite;
   transform-origin: center top;
   position: relative;
-  z-index: 10; /* BOOST ABOVE BACKGROUND */
+  z-index: 10;
+}
+
+
+.menu-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0;
+  z-index: 4;
+  pointer-events: none;
+
+  /* 🍭 Dev Debug Grid Visual */
+  background-color: rgba(255, 255, 255, 0.03);
+  outline: 2px dashed rgba(0, 255, 255, 0.4);
+  background-image: 
+    linear-gradient(to right, rgba(0,255,255,0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,255,255,0.1) 1px, transparent 1px);
+  background-size: calc(100% / 3) calc(100% / 5);
+  justify-items: center;
+  align-items: center;
+}
+
+
+
+.menu-label.kids     { grid-column: 1; grid-row: 2; justify-self: start; transform: translate(10%, -30%); }
+.menu-label.quick    { grid-column: 2; grid-row: 3; justify-self: center; transform: translate(0, -10%); }
+.menu-label.tips     { grid-column: 3; grid-row: 2; justify-self: end; transform: translate(-10%, -30%); }
+.menu-label.story    { grid-column: 2; grid-row: 4; justify-self: center; transform: translate(0, -10%); }
+.menu-label.infinity { grid-column: 2; grid-row: 5; justify-self: center; transform: translate(0, 10%); }
+.menu-label.options  { grid-column: 3; grid-row: 5; justify-self: end; transform: translate(-5%, 10%); }
+
+.menu-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1rem, 2.5vh, 2.6rem);
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  text-shadow:
+    0 0 6px currentColor,
+    0 0 12px currentColor,
+    0 0 18px currentColor;
+  color: white;
+  line-height: 1.0;
+  transform-origin: center top;
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+
+  /* 🪩 Dev Box */
+  outline: 1px dashed magenta;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.menu-label:hover {
+  transform: scale(1.05);
 }
 
 .menu-title-top:hover {
@@ -126,7 +154,6 @@ button, .menu-label, .tab-button {
   filter: drop-shadow(0 0 8px white) drop-shadow(0 0 16px white);
 }
 
-/* 🔥 NEON ANIMATION CYCLE */
 @keyframes neon-glow-cycle {
   0%, 100% {
     filter:
@@ -154,32 +181,22 @@ button, .menu-label, .tab-button {
       drop-shadow(0 0 16px #00cc88);
   }
 }
+
 @media (max-width: 600px) {
   .menu-title-top {
-    height: clamp(5rem, 12vh, 12rem); /* 🌀 slightly smaller for phone */
+    height: clamp(5rem, 12vh, 12rem);
   }
-
   .menu-label {
-    font-size: clamp(0.9rem, 2.1vh, 2.3rem); /* 🧊 smaller text on mobile */
+    font-size: clamp(0.9rem, 2.1vh, 2.3rem);
   }
 }
+
+/* ❌ Hide Elements */
 .hidden {
   display: none !important;
 }
-.game-frame {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: auto;
-  height: 100%;
-  max-height: 100svh;
-  max-width: 100vw;
-  aspect-ratio: 11 / 16;
-}
 
-
+/* 🌈 QuickServe Mode Zones */
 #game-container {
   position: absolute;
   top: 0;
@@ -189,24 +206,34 @@ button, .menu-label, .tab-button {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: transparent;
   z-index: 2;
   overflow: hidden;
   opacity: 1;
   transition: opacity 0.6s ease-in-out;
+  background: transparent;
 }
 
-.background-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;         /* 🌀 vertical fill, crop sides */
-  z-index: 0;                /* 👈 below grid + UI */
-  pointer-events: none;
-  opacity: 0.99;             /* 🍧 render priority on mobile */
-  will-change: transform, opacity;
+.game-frame {
+  width: auto;
+  height: 100%;
+  max-height: 100svh;
+  max-width: 100vw;
+  aspect-ratio: 11 / 16;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
 }
 
-
+.menu-frame {
+  aspect-ratio: 11 / 16;
+  width: auto;
+  height: 100%;
+  max-height: 100svh;
+  max-width: 100vw;
+  position: relative;
+  display: block;
+  justify-content: center;
+  align-items: center;
+}
