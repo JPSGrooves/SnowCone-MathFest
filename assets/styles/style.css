@@ -49,6 +49,15 @@ html, body {
   to   { transform: translate(50px, 100px); }
 }
 
+.aspect-wrap {
+  position: relative;
+  width: auto;
+  height: 100vh;
+  aspect-ratio: 11 / 16;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
 /* 🏊 Background System*/ 
 .background-fill {
   position: absolute;
@@ -59,7 +68,7 @@ html, body {
   width: auto;
   max-width: 100%;
   aspect-ratio: 11 / 16;
-  object-fit: contain; /* crop sides, vertical priority */
+  object-fit: cover; /* ⚠️ change this from contain */
   z-index: 0;
   pointer-events: none;
   opacity: 0.99;
@@ -81,7 +90,7 @@ html, body {
 
 .menu-frame {
   position: relative;
-  z-index: 5;
+  z-index: 5;/* z-index: 5; // ☠️ was breaking modals — safe now, but test before trusting */
   width: auto;
   height: 100%;
   aspect-ratio: 11 / 16;
@@ -94,7 +103,7 @@ html, body {
   grid-template-rows: auto 1fr;
   place-items: center;
 
-  font-size: clamp(12px, 1.8vh, 20px); /* 🎯 Font root: scales with HEIGHT */
+  font-size: clamp(10px, 2.2vmin, 18px);
   outline: 2px solid yellow;
 }
 
