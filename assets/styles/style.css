@@ -167,11 +167,10 @@ html, body {
 }
 
 .menu-title-top {
-  margin-top: 1.5em; /* or translateY() for better control */
   grid-area: title;
   justify-self: center;
   align-self: center;
-  height: clamp(4em, 8em, 10em); /* 🌈 Scales off menu-frame font-size */
+  height: clamp(4.5em, 9.5em, 11em); /* ⬆️ Slightly larger title */
   width: auto;
   aspect-ratio: 9 / 2;
   object-fit: contain;
@@ -179,8 +178,13 @@ html, body {
   animation: neon-glow-cycle 6s linear infinite;
   transform-origin: center top;
   position: relative;
-  z-index: 3; /* ⬅️ sits below menu-grid */
+  z-index: 3;
+
+  /* 💀 this was likely pushing grid */
+  /* outline: 2px solid red; */
+  box-shadow: 0 0 0 2px red inset; /* optional dev-only alt */
 }
+
 
 .menu-title-top:hover {
   transform: scale(1.05);
@@ -296,7 +300,7 @@ html, body {
   grid-row: 5;
   justify-self: center;
   align-self: center;
-  margin-top: 0.25em; /* ⬇️ tiny bump down */
+  margin-top: 0.50em; /* ⬇️ tiny bump down */
 }
 
 
