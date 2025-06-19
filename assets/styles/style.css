@@ -259,31 +259,31 @@ html, body {
   grid-column: 1;
   grid-row: 1;
   justify-self: start;
-  align-self: start;
-  padding-left: 0.75em; /* 👈 scoot inward */
+  align-self: end; /* ⬇️ bottom of cell */
+  padding-left: 0.75em;
 }
 
 .menu-label.quick {
   grid-column: 3;
   grid-row: 1;
   justify-self: end;
-  align-self: start;
-  padding-right: 0.75em; /* 👉 scoot inward */
+  align-self: end;
+  padding-right: 0.75em;
 }
 
 .menu-label.tips {
   grid-column: 1;
   grid-row: 2;
   justify-self: end;
-  align-self: start;
-  padding-right: 1em; /* pull in toward center */
+  align-self: end;
+  padding-right: 1em;
 }
 
 .menu-label.story {
   grid-column: 3;
   grid-row: 2;
   justify-self: start;
-  align-self: start;
+  align-self: end;
   padding-left: 1em;
 }
 
@@ -298,8 +298,9 @@ html, body {
   grid-column: 2;
   grid-row: 4;
   justify-self: center;
-  align-self: end;
+  align-self: center;
 }
+
 
 
 /* ❌ Hide Elements */
@@ -338,7 +339,8 @@ html, body {
     max-height: 100%;
   }
   .menu-title-top {
-    height: clamp(4em, 9em, 11em); /* ⬆️ from 3.5–9 to 4–11 */
+    margin-top: 1.25em; /* ⬇️ tighter spacing */
+    height: clamp(4em, 9em, 11em);
   }
 }
 
