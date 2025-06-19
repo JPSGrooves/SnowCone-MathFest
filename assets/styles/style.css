@@ -321,18 +321,21 @@ html, body {
   background: transparent;
 }
 @media (max-width: 600px) {
+  .background-fill {
+    height: 100dvh; /* ← Dynamic viewport height respects toolbars */
+  }
+
   .menu-frame {
-    height: 100svh;
-    max-height: 100svh;
-    overflow: hidden;
+    height: 100dvh;
+    max-height: 100dvh;
   }
 
   .menu-grid {
     height: 100%;
     max-height: 100%;
-    overflow: hidden;
   }
 }
+
 
 
 
