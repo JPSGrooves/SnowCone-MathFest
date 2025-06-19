@@ -101,8 +101,9 @@ html, body {
   max-height: 100svh;
   display: grid;
   grid-template-areas:
-    "title"
-    "grid";
+    "title title title"
+    "grid  grid  grid";
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto 1fr;
   place-items: center;
   overflow: hidden;
@@ -168,10 +169,12 @@ html, body {
 
 .menu-title-top {
   grid-area: title;
+  grid-column: 1 / span 3;
   justify-self: center;
   align-self: center;
   height: clamp(4.5em, 9.5em, 11em); /* ⬆️ Slightly larger title */
   width: auto;
+  max-width: 90%; /* or 90% if you want it big */
   aspect-ratio: 9 / 2;
   object-fit: contain;
   pointer-events: auto;
