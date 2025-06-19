@@ -1,186 +1,177 @@
+/* ✨ REFACTORED CSS FOR UNIFIED MENU + MODE BACKGROUND SYSTEM ✨ */
+
 /* 🌌 Global Reset */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
   width: 100%;
-  min-height: 720px;
-  min-width: calc(720px * (11 / 16));
+  height: 100%;
+  min-width: 320px;
+  min-height: 568px;
   overflow: hidden;
   font-family: 'Orbitron', sans-serif;
-  background: transparent; /* 🌌 show the cosmos! */
-  touch-action: manipulation; /* disables pinch + double-tap zoom */
+  background: transparent;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+
+  /* 🧃 Mobile polish (iOS & Android) */
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
 
-
 * {
   user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
   box-sizing: border-box;
   touch-action: manipulation;
 }
-.background-floater {
+
+
+
+/* 🌌 Background Floaters*/ 
+.background-floater, .menu-floater {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  z-index: -10;
   pointer-events: none;
+  z-index: -10;
   opacity: 0.85;
-  animation: cosmicDrift 120s linear infinite;
+}
+
+.menu-floater {
+  z-index: -20;
+  opacity: 1;
 }
 
 @keyframes cosmicDrift {
   from { transform: translate(0, 0); }
-  to { transform: translate(50px, 100px); }
+  to   { transform: translate(50px, 100px); }
 }
 
-
-/* 🧊 OUTER CONTAINER LOCKDOWN */
-.menu-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
+.aspect-wrap {
+  position: relative;
+  width: auto;
   height: 100vh;
-  height: 100svh; /* overrides vh when supported */
-  min-height: 720px;
+  aspect-ratio: 11 / 16;
+  max-width: 100vw;
   overflow: hidden;
-  z-index: 1; /* 👈 under modal, above cosmic bg */
 }
 
-
-/* 🍧 LOCKED FRAME W/ASPECT */
-.menu-frame {
+/* 🏊 Background System*/ 
+.background-fill {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
+  width: auto;
+  max-width: 100svh;
   aspect-ratio: 11 / 16;
+  object-fit: cover; /* ⚠️ change this from contain */
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.99;
+  will-change: transform, opacity;
+}
+
+.game-frame {
   width: auto;
   height: 100%;
   max-height: 100svh;
   max-width: 100vw;
-  min-height: 720px;
-  min-width: calc(720px * (11 / 16));
+  aspect-ratio: 11 / 16;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 3;
+}
+
+.menu-frame {
   position: relative;
+  z-index: 5;/* z-index: 5; // ☠️ was breaking modals — safe now, but test before trusting */
+  width: 100%;
+  height: 100svh;
+  aspect-ratio: 11 / 16;
+  max-width: 100%;
+  max-height: 100svh;
+  display: grid;
+  grid-template-areas:
+    "title"
+    "grid";
+  grid-template-rows: auto 1fr;
+  place-items: center;
+  overflow: hidden;
+  position: relative;
+
+  font-size: calc(1.25vh + 0.25vw); /* 🎯 Scales with window size smoothly */
+  outline: 2px solid yellow;
 }
 
-@media screen and (hover: none) and (pointer: coarse) {
-  .menu-frame {
-    height: 100svh;           /* 💪 fill full height again */
-    width: auto;
-    aspect-ratio: 11 / 16;
-    max-width: 100vw;
-  }
-}
-
-.menu-floater {
-  position: fixed;
-  top: 0; left: 0;
+/* ✨ Main Menu Layout */
+.menu-layout {
+  position: relative;
   width: 100vw;
   height: 100vh;
-  object-fit: cover;
-  z-index: -20; /* stays deep back */
-  opacity: 1;
-  pointer-events: none;
-}
-.menu-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%; /*changed from 100% to auto for aspect ratio123*/
-  object-fit: cover;
-  z-index: -1;
-  pointer-events: none;
-}
-
-
-/* 🔒 MAIN GRID */
-.menu-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: grid;
-  width: 100%;
-  height: 100%;
-  min-height: 720px;
-  min-width: calc(720px * (11 / 16));
-  grid-template-areas:
-    "title    title"
-    "kids     quick"
-    "tips     story"
-    "infinity infinity"
-    "options  options";
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1.6fr 2.1fr 2.1fr 2.1fr 1fr;
-  z-index: 2;
-  place-items: center;
-  pointer-events: none;
-}
-
-@media (min-aspect-ratio: 20/9) {
-  .menu-label.infinity {
-    margin-top: 1.5vh;
-  }
-}
-
-/* 🍧 GLOWING LABELS */
-.menu-label {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  pointer-events: auto;
-  font-size: clamp(1rem, 2.5vh, 2.6rem);
-  padding-top: 0;
-  font-family: 'Orbitron', sans-serif;
-  color: white;
-  text-align: center;
-  line-height: 1.0;
-  text-shadow:
-    0 0 6px currentColor,
-    0 0 12px currentColor,
-    0 0 18px currentColor;
-  transform-origin: center top;
-  transition: transform 0.2s ease, text-shadow 0.2s ease;
+  overflow: hidden;
 }
 
-button, .menu-label, .tab-button {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent; /* smooth tap */
+.menu-wrapper {
+  position: fixed; /* use fixed to anchor to screen always */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 2;
 }
 
 
-/* 🍧 Positioning Per Zone */
-.menu-label.kids     { grid-area: kids;     color: #ffee00; transform: translateY(-4vh); }
-.menu-label.quick    { grid-area: quick;    color: #00ccff; transform: translateY(-4vh); }
-.menu-label.tips     { grid-area: tips;     color: #00ff88; transform: translateY(-9vh); }
-.menu-label.story    { grid-area: story;    color: #cc66ff; transform: translateY(-9vh); }
-.menu-label.infinity { grid-area: infinity; color: white;    transform: translateY(-18vh); }
-.menu-label.options  { grid-area: options;  color: #0033cc;  transform: translateY(-2vh); }
 
-/* ✨ Hover Animation */
-.menu-label.kids:hover     { transform: translateY(-4vh) scale(1.05); }
-.menu-label.quick:hover    { transform: translateY(-4vh) scale(1.05); }
-.menu-label.tips:hover     { transform: translateY(-9vh) scale(1.05); }
-.menu-label.story:hover    { transform: translateY(-9vh) scale(1.05); }
-.menu-label.infinity:hover { transform: translateY(-18vh) scale(1.05); }
-.menu-label.options:hover  { transform: translateY(-2vh)  scale(1.05); }
 
-/* 👑 TITLE PNG FLOATS STRONG */
+
+.menu-grid {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  grid-area: grid;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 0;
+  z-index: 5;
+  pointer-events: auto; /*changed from none*/
+
+  /* 🍭 Dev Debug Grid Visual */
+  border: 4px solid hotpink;
+  background-color: rgba(255, 255, 255, 0.03);
+  outline: 2px solid lime;
+  background-image: 
+    linear-gradient(to right, rgba(0,255,255,0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,255,255,0.1) 1px, transparent 1px);
+  background-size: calc(100% / 3) calc(100% / 5);
+  justify-items: center;
+  align-items: center;
+  overflow: hidden;
+}
+
 .menu-title-top {
+  margin-top: 1.5em; /* or translateY() for better control */
   grid-area: title;
   justify-self: center;
   align-self: center;
-  height: clamp(6rem, 15vh, 14rem);
+  height: clamp(4em, 8em, 10em); /* 🌈 Scales off menu-frame font-size */
   width: auto;
   aspect-ratio: 9 / 2;
   object-fit: contain;
@@ -188,7 +179,8 @@ button, .menu-label, .tab-button {
   animation: neon-glow-cycle 6s linear infinite;
   transform-origin: center top;
   position: relative;
-  z-index: 10; /* BOOST ABOVE BACKGROUND */
+  z-index: 3; /* ⬅️ sits below menu-grid */
+  outline: 2px solid red;
 }
 
 .menu-title-top:hover {
@@ -196,7 +188,6 @@ button, .menu-label, .tab-button {
   filter: drop-shadow(0 0 8px white) drop-shadow(0 0 16px white);
 }
 
-/* 🔥 NEON ANIMATION CYCLE */
 @keyframes neon-glow-cycle {
   0%, 100% {
     filter:
@@ -224,45 +215,128 @@ button, .menu-label, .tab-button {
       drop-shadow(0 0 16px #00cc88);
   }
 }
+
 @media (max-width: 600px) {
   .menu-title-top {
-    height: clamp(5rem, 12vh, 12rem); /* 🌀 slightly smaller for phone */
+    height: clamp(3.5em, 7em, 9em); /* 👇 Softer top spacing on phones */
   }
 
   .menu-label {
-    font-size: clamp(0.9rem, 2.1vh, 2.3rem); /* 🧊 smaller text on mobile */
+    font-size: clamp(1.1em, 1.5em, 1.8em); /* match the new em-based flow */
   }
 }
+
+
+.menu-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1.2em, 1.8em, 2.2em);
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  text-shadow:
+    0 0 6px currentColor,
+    0 0 12px currentColor,
+    0 0 18px currentColor;
+  color: white;
+  line-height: 1.0;
+  transform-origin: center center; /* no longer center top */
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+  pointer-events: auto;
+
+  /* 🪩 Dev Box (optional) */
+  outline: 1px dashed magenta;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+
+.menu-label:hover {
+  transform: scale(1.05);
+}
+
+.menu-label.kids {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  align-self: start;
+}
+
+.menu-label.quick {
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: center;
+  align-self: center;
+}
+
+.menu-label.tips {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: end;
+  align-self: start;
+}
+
+.menu-label.story {
+  grid-column: 2;
+  grid-row: 4;
+  justify-self: center;
+  align-self: center;
+}
+
+.menu-label.infinity {
+  grid-column: 2;
+  grid-row: 5;
+  justify-self: center;
+  align-self: end;
+}
+
+.menu-label.options {
+  grid-column: 3;
+  grid-row: 5;
+  justify-self: end;
+  align-self: end;
+}
+
+
+
+/* ❌ Hide Elements */
 .hidden {
   display: none !important;
 }
-.game-frame {
-  aspect-ratio: 11 / 16;
-  width: auto;
-  height: 100%;
-  max-height: 100svh;
-  max-width: 100vw;
-  min-height: 720px;
-  min-width: calc(720px * (11 / 16));
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
+
+/* 🌈 QuickServe Mode Zones */
 #game-container {
-  position: absolute;         /* 🔥 floats above background */
+  position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  display: flex;              /* ✅ keep your centering */
+  display: flex;
   justify-content: center;
-  align-items: center;
-  background: transparent;
+  align-items: flex-start;
   z-index: 2;
-  overflow: hidden;           /* 🧼 don’t let inner content overflow offscreen */
+  overflow: hidden;
   opacity: 1;
   transition: opacity 0.6s ease-in-out;
-  outline: 2px solid red;
+  background: transparent;
 }
+@media (max-width: 600px) {
+  .background-fill {
+    height: 100dvh; /* ← Dynamic viewport height respects toolbars */
+  }
+
+  .menu-frame {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .menu-grid {
+    height: 100%;
+    max-height: 100%;
+  }
+}
+
+
+
+
 

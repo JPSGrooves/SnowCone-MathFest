@@ -11,35 +11,49 @@
     <link rel="stylesheet" href="/assets/styles/style.css" />
     <link rel="stylesheet" href="/assets/styles/cosmicModal.css" />
 
-    <!-- 🧊 Favicons & Manifest (serve from public/) -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
     <!-- 🌌 Cosmic Background -->
     <img src="assets/img/branding/starfield.png" class="menu-floater" />
-    <!-- 🍧 Main Menu Grid -->
-    <div class="menu-wrapper">
-      <div class="menu-frame">
-        <img id="menuImage" class="menu-image" alt="background" />
-        
-        <div class="menu-grid">
-          <img src="assets/img/branding/SnowConeMathFestTitle.png"
-              class="menu-title-top"
-              alt="SnowCone MathFest Title" />
 
-          <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
-          <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
-          <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
-          <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
-          <div class="menu-label infinity">♾️<br>Infinity Lake</div>
-          <div class="menu-label options label-options">⚙️ Options</div>
-        </div>
+    <!-- 🍧 Main Menu Layout w/ Decoupled Background -->
+    <div class="menu-wrapper">
+      <div class="menu-layout">
+    
+        <!-- 🌀 Aspect-Controlled Container -->
+        <div class="aspect-wrap">
+          <img
+            id="menuImage"
+            class="background-fill"
+            src="assets/img/branding/menubackground.png"
+            alt="Festival Map"
+          />
+
+          <div class="menu-frame">
+            <!-- 🌟 Title -->
+            <img
+              src="assets/img/branding/SnowConeMathFestTitle.png"
+              class="menu-title-top"
+              alt="SnowCone MathFest Title"
+            />
+
+            <!-- 🍧 Labels Grid -->
+            <div class="menu-grid">
+              <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
+              <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
+              <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
+              <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
+              <div class="menu-label infinity">♾️<br>Infinity Lake</div>
+              <div class="menu-label options label-options">⚙️ Options</div>
+            </div>
+          </div>
+        </div> <!-- end .aspect-wrap -->
+
       </div>
     </div>
+
+
+
 
     <!-- 🎮 Game Container for Modes -->
     <div id="game-container" class="hidden"></div>
@@ -91,6 +105,7 @@
         </div>
       </div>
     </div>
+
     <!-- 🌌 Cosmic Background Dimmer -->
     <div id="cosmicOverlay" class="modal-overlay hidden"></div>
 

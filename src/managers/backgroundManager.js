@@ -284,14 +284,19 @@ document.getElementById('labelQuickServe')?.addEventListener('click', () => {
 });
 
 export function swapModeBackground(fileName) {
-  const bg = document.getElementById('menuImage');
+  const bg = document.getElementById('modeBackground');
   if (!bg) {
-    console.warn("🚨 No #menuImage found to swap.");
+    console.warn("🚨 No #modeBackground found to swap.");
     return;
   }
 
+  // 👇 Force replace even if src is already correct
+  bg.src = '';
+  bg.offsetHeight; // force reflow
   bg.src = `assets/img/modes/${fileName}.png`;
-  console.log(`🎮 Mode background swapped to: ${fileName}`);
+
+  console.log(`🌌 Mode background swapped to: ${fileName}`);
 }
+
 
 

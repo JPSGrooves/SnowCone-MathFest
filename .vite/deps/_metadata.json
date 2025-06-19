@@ -2,7 +2,14 @@
   "hash": "7da51ddd",
   "configHash": "6f6c19be",
   "lockfileHash": "f9c4b4c3",
-  "browserHash": "da7b6f6e",
-  "optimized": {},
+  "browserHash": "594009d8",
+  "optimized": {
+    "howler": {
+      "src": "../../node_modules/howler/dist/howler.js",
+      "file": "howler.js",
+      "fileHash": "9844cf4c",
+      "needsInterop": true
+    }
+  },
   "chunks": {}
 }

@@ -38,3 +38,19 @@ document.querySelector('.menu-label.quick')?.addEventListener('click', () => {
   startMode('quickServe'); // 🔥 handles background + scene logic
 });
 
+// 🌍 Inject favicons with proper base path
+const base = import.meta.env.BASE_URL;
+
+const links = [
+  { rel: 'icon', type: 'image/x-icon', href: `${base}favicon.ico` },
+  { rel: 'icon', type: 'image/png', sizes: '192x192', href: `${base}icon-192.png` },
+  { rel: 'icon', type: 'image/png', sizes: '512x512', href: `${base}icon-512.png` },
+  { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` },
+  { rel: 'manifest', href: `${base}manifest.json` }
+];
+
+links.forEach(attrs => {
+  const link = document.createElement('link');
+  Object.entries(attrs).forEach(([key, val]) => link.setAttribute(key, val));
+  document.head.appendChild(link);
+});
