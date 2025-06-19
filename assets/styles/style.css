@@ -262,38 +262,45 @@ html, body {
   align-self: start;
 }
 
-.menu-label.tips {
+.menu-label.quick {
   grid-column: 3;
   grid-row: 2;
   justify-self: end;
   align-self: start;
 }
 
-.menu-label.quick {
-  grid-column: 2;
+.menu-label.tips {
+  grid-column: 1;
   grid-row: 3;
-  justify-self: center;
-  align-self: center;
+  justify-self: start;
+  align-self: start;
 }
 
 .menu-label.story {
+  grid-column: 3;
+  grid-row: 3;
+  justify-self: end;
+  align-self: start;
+}
+
+.menu-label.infinity {
   grid-column: 2;
   grid-row: 4;
   justify-self: center;
   align-self: center;
 }
 
-.menu-label.infinity {
+.menu-label.truck {
   grid-column: 2;
   grid-row: 5;
   justify-self: center;
-  align-self: end;
+  align-self: center;
 }
 
 .menu-label.options {
-  grid-column: 3;
-  grid-row: 5;
-  justify-self: end;
+  grid-column: 2;
+  grid-row: 6;
+  justify-self: center;
   align-self: end;
 }
 
