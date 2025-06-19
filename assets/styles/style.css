@@ -262,18 +262,18 @@ html, body {
   align-self: start;
 }
 
-.menu-label.quick {
-  grid-column: 2;
-  grid-row: 3;
-  justify-self: center;
-  align-self: center;
-}
-
 .menu-label.tips {
   grid-column: 3;
   grid-row: 2;
   justify-self: end;
   align-self: start;
+}
+
+.menu-label.quick {
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: center;
+  align-self: center;
 }
 
 .menu-label.story {
@@ -296,6 +296,7 @@ html, body {
   justify-self: end;
   align-self: end;
 }
+
 
 
 
@@ -333,6 +334,9 @@ html, body {
   .menu-grid {
     height: 100%;
     max-height: 100%;
+  }
+  .menu-title-top {
+    height: clamp(4em, 9em, 11em); /* ⬆️ from 3.5–9 to 4–11 */
   }
 }
 
