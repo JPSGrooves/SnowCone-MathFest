@@ -101,8 +101,9 @@ html, body {
   max-height: 100svh;
   display: grid;
   grid-template-areas:
-    "title"
-    "grid";
+    "title title title"
+    "grid  grid  grid";
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto 1fr;
   place-items: center;
   overflow: hidden;
@@ -167,21 +168,26 @@ html, body {
 }
 
 .menu-title-top {
-  margin-top: 1.5em; /* or translateY() for better control */
   grid-area: title;
+  grid-column: 1 / span 3;
   justify-self: center;
   align-self: center;
-  height: clamp(4em, 8em, 10em); /* 🌈 Scales off menu-frame font-size */
+  height: clamp(4.5em, 9.5em, 11em); /* ⬆️ Slightly larger title */
   width: auto;
+  max-width: 90%; /* or 90% if you want it big */
   aspect-ratio: 9 / 2;
   object-fit: contain;
   pointer-events: auto;
   animation: neon-glow-cycle 6s linear infinite;
   transform-origin: center top;
   position: relative;
-  z-index: 3; /* ⬅️ sits below menu-grid */
-  outline: 2px solid red;
+  z-index: 3;
+
+  /* 💀 this was likely pushing grid */
+  /* outline: 2px solid red; */
+  box-shadow: 0 0 0 2px red inset; /* optional dev-only alt */
 }
+
 
 .menu-title-top:hover {
   transform: scale(1.05);
@@ -257,45 +263,49 @@ html, body {
 
 .menu-label.kids {
   grid-column: 1;
-  grid-row: 2;
-  justify-self: start;
-  align-self: start;
+  grid-row: 1;
+  justify-self: center;
+  align-self: end;
 }
 
 .menu-label.quick {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: center;
+  align-self: end;
+}
+
+
+.menu-label.tips {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: center;
+  align-self: end;
+}
+
+.menu-label.story {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: center;
+  align-self: end;
+}
+
+
+.menu-label.infinity {
   grid-column: 2;
   grid-row: 3;
   justify-self: center;
   align-self: center;
 }
 
-.menu-label.tips {
-  grid-column: 3;
-  grid-row: 2;
-  justify-self: end;
-  align-self: start;
-}
-
-.menu-label.story {
+.menu-label.options {
   grid-column: 2;
-  grid-row: 4;
+  grid-row: 5;
   justify-self: center;
   align-self: center;
+  margin-top: 0.50em; /* ⬇️ tiny bump down */
 }
 
-.menu-label.infinity {
-  grid-column: 2;
-  grid-row: 5;
-  justify-self: center;
-  align-self: end;
-}
-
-.menu-label.options {
-  grid-column: 3;
-  grid-row: 5;
-  justify-self: end;
-  align-self: end;
-}
 
 
 
@@ -333,6 +343,10 @@ html, body {
   .menu-grid {
     height: 100%;
     max-height: 100%;
+  }
+  .menu-title-top {
+    margin-top: 1.25em;
+    height: clamp(4.5em, 9.5em, 11em); /* ⬆️ slightly taller but not pushing */
   }
 }
 
