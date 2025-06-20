@@ -37,6 +37,19 @@ window.addEventListener('load', () => {
 document.querySelector('.menu-label.quick')?.addEventListener('click', () => {
   startMode('quickServe'); // 🔥 handles background + scene logic
 });
+document.querySelector('.menu-label.kids')?.addEventListener('click', () => {
+  startMode('kids');
+});
+document.querySelector('.menu-label.tips')?.addEventListener('click', () => {
+  startMode('mathtips');
+});
+document.querySelector('.menu-label.story')?.addEventListener('click', () => {
+  startMode('story');
+});
+document.querySelector('.menu-label.infinity')?.addEventListener('click', () => {
+  startMode('infinity');
+});
+
 
 // 🌍 Inject favicons with proper base path
 const base = import.meta.env.BASE_URL;
