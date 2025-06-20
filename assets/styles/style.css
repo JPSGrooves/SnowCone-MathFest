@@ -109,7 +109,8 @@ html, body {
   overflow: hidden;
   position: relative;
 
-  font-size: calc(1.25vh + 0.25vw); /* 👈 Safer on mobile now */
+  font-size: calc(1.25vh + 0.25vw); /* 🎯 Scales with window size smoothly */
+  outline: 2px solid yellow;
 }
 
 /* ✨ Main Menu Layout */
@@ -153,13 +154,13 @@ html, body {
   z-index: 5;
   pointer-events: auto; /*changed from none*/
 
-  /* 🍭 Dev Debug Grid Visual */
   justify-items: center;
   align-items: center;
   overflow: hidden;
 }
 
 .menu-title-top {
+  margin-top: 1.25em;
   grid-area: title;
   grid-column: 1 / span 3;
   justify-self: center;
@@ -323,8 +324,4 @@ html, body {
     margin-top: 1.25em;
     height: clamp(4.5em, 9.5em, 11em); /* ⬆️ slightly taller but not pushing */
   }
-  .menu-label {
-    font-size: clamp(0.9em, 1.2em, 1.6em); /* gentle shrinkage */
-  }
-
 }
