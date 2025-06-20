@@ -109,7 +109,7 @@ html, body {
   overflow: hidden;
   position: relative;
 
-  font-size: calc(1.25vh + 0.25vw); /* 🎯 Scales with window size smoothly */
+  font-size: calc(1.25svh + 0.25vw); /* 👈 Safer on mobile now */
   outline: 2px solid yellow;
 }
 
@@ -222,15 +222,6 @@ html, body {
   }
 }
 
-@media (max-width: 600px) {
-  .menu-title-top {
-    height: clamp(3.5em, 7em, 9em); /* 👇 Softer top spacing on phones */
-  }
-
-  .menu-label {
-    font-size: clamp(1.1em, 1.5em, 1.8em); /* match the new em-based flow */
-  }
-}
 
 
 .menu-label {
@@ -332,7 +323,7 @@ html, body {
 }
 @media (max-width: 600px) {
   .background-fill {
-    height: 100dvh; /* ← Dynamic viewport height respects toolbars */
+    height: 100dvh;
   }
 
   .menu-frame {
@@ -344,13 +335,13 @@ html, body {
     height: 100%;
     max-height: 100%;
   }
+
   .menu-title-top {
     margin-top: 1.25em;
-    height: clamp(4.5em, 9.5em, 11em); /* ⬆️ slightly taller but not pushing */
+    height: clamp(4.5em, 9.5em, 11em); /* ← Use the one that aligns well */
+  }
+
+  .menu-label {
+    font-size: clamp(0.9em, 1.2em, 1.6em); /* 🔮 Gentle & effective */
   }
 }
-
-
-
-
-
