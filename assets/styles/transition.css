@@ -46,6 +46,14 @@
   transform: translateX(150%);
 }
 
+@media (max-width: 768px) and (orientation: portrait) {
+  .transition-truck,
+  .transition-cone {
+    transform: scale(2.4);
+    max-width: 300px; /* or something sane */
+  }
+}
+
 
 @keyframes fade-in {
   from {
