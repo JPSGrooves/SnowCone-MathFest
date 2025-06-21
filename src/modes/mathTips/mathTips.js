@@ -1,4 +1,5 @@
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
+import { playTransition } from '../../managers/transitionManager.js';
 
 export function loadMathTips() {
   console.log("🧮 Loading Math Tips Mode");
@@ -39,11 +40,13 @@ export function loadMathTips() {
   });
 
   document.getElementById('returnToMenu')?.addEventListener('click', () => {
-    gameContainer.classList.add('hidden');
-    gameContainer.innerHTML = '';
-    menuWrapper?.classList.remove('hidden');
-    requestAnimationFrame(() => {
-      applyBackgroundTheme();
+    playTransition(() => {
+      gameContainer.classList.add('hidden');
+      gameContainer.innerHTML = '';
+      menuWrapper?.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        applyBackgroundTheme();
+      });
     });
   });
 }

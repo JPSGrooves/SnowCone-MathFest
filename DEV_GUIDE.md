@@ -66,7 +66,7 @@ git add -A
 git commit -m "🌈 Locking in current dev state"
 git push origin main
 ```
-
+feat: transition system + startup screen + mode launch polish
 ---
 
 ## 🚨 GIT TROUBLESHOOTING

@@ -1,11 +1,11 @@
 // 🍦 Import core systems
 import { applyBackgroundTheme } from './managers/backgroundManager.js';
 import { openModal } from './modals/cosmicModal.js';
-import './modals/infoModal.js'; // doesn’t export, just initializes listeners
+import './modals/infoModal.js'; // ⛩️ just runs, no export
 import { getSetting } from './data/cdms.js';
 import { Howler } from 'howler';
-import { startMode } from './managers/sceneManager.js';
-
+import { setupMenu } from './menu/menu.js'; // ⬅️ this wires transitions
+import { playTransition } from './managers/transitionManager.js'; // still available if needed
 
 // 🍧 Anti–Double-Tap Zoom Shield (esp. iOS Safari)
 let lastTouchTime = 0;
@@ -27,30 +27,6 @@ if (import.meta.env?.VITE_SECRET_KEY) {
   console.warn("🚨 No VITE_SECRET_KEY found. Is .env missing?");
 }
 
-window.addEventListener('load', () => {
-  // ✅ This waits for ALL assets including CSS + images
-  applyBackgroundTheme();
-  Howler.volume(getSetting('mute') ? 0 : 1);
-});
-
-
-document.querySelector('.menu-label.quick')?.addEventListener('click', () => {
-  startMode('quickServe'); // 🔥 handles background + scene logic
-});
-document.querySelector('.menu-label.kids')?.addEventListener('click', () => {
-  startMode('kids');
-});
-document.querySelector('.menu-label.tips')?.addEventListener('click', () => {
-  startMode('mathtips');
-});
-document.querySelector('.menu-label.story')?.addEventListener('click', () => {
-  startMode('story');
-});
-document.querySelector('.menu-label.infinity')?.addEventListener('click', () => {
-  startMode('infinity');
-});
-
-
 // 🌍 Inject favicons with proper base path
 const base = import.meta.env.BASE_URL;
 
@@ -66,4 +42,20 @@ links.forEach(attrs => {
   const link = document.createElement('link');
   Object.entries(attrs).forEach(([key, val]) => link.setAttribute(key, val));
   document.head.appendChild(link);
+});
+
+// 🌀 Init after DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+  applyBackgroundTheme();
+  Howler.volume(getSetting('mute') ? 0 : 1);
+
+  const startup = document.getElementById('startup-screen');
+
+  setTimeout(() => {
+    startup.style.opacity = 0;
+    setTimeout(() => {
+      startup.remove(); // 🔥 kill the overlay completely
+      setupMenu(); // 🧃 load the real menu
+    }, 600); // fade out duration
+  }, 2500); // wait for logo sequence to finish
 });

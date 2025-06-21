@@ -1,5 +1,7 @@
 import './quickServe.css'; // 🍦 QuickServe styles
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
+import { playTransition } from '../../managers/transitionManager.js';
+
 
 export function loadQuickServe() {
   console.log("🍧 Loading QuickServe Mode");
@@ -50,12 +52,14 @@ export function loadQuickServe() {
   // 🔙 Return to menu cleanup
   const returnBtn = document.getElementById('returnToMenu');
   returnBtn?.addEventListener('click', () => {
-    gameContainer.classList.add('hidden');
-    gameContainer.innerHTML = ''; // 💣 nuke game DOM
-    menuWrapper?.classList.remove('hidden');
+    playTransition(() => {
+      gameContainer.classList.add('hidden');
+      gameContainer.innerHTML = ''; // 💣 nuke game DOM
+      menuWrapper?.classList.remove('hidden');
 
-    requestAnimationFrame(() => {
-      applyBackgroundTheme(); // 🌌 restore menu image
+      requestAnimationFrame(() => {
+        applyBackgroundTheme(); // 🌌 restore menu image
+      });
     });
   });
 }

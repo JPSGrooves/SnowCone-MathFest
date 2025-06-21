@@ -1,0 +1,65 @@
+/* 🌌 Starfield Transition Layer */
+#scene-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.starfield {
+  background-color: red; /* 🔥 test this */
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.25s ease-in;
+}
+
+#scene-transition.active .starfield {
+  opacity: 1;
+}
+
+.transition-truck {
+  position: absolute;
+  top: 5vh;
+  left: -25vw;
+  width: clamp(120px, 30vw, 300px);
+  height: auto;
+  will-change: transform;
+  z-index: 2;
+  transform: translateX(-150%);
+}
+
+.transition-cone {
+  position: absolute;
+  bottom: 5vh;
+  right: -20vw;
+  width: clamp(100px, 20vw, 250px);
+  height: auto;
+  will-change: transform;
+  z-index: 2;
+  transform: translateX(150%);
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .transition-truck,
+  .transition-cone {
+    transform: scale(2.4);
+    max-width: 300px; /* or something sane */
+  }
+}
+
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
