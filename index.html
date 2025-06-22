@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#00ff88" />
+    <title>SnowCone MathFest</title>
+
+    <!-- ✨ Fonts & Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/styles/style.css" />
+    <link rel="stylesheet" href="/assets/styles/cosmicModal.css" />
+    <link rel="stylesheet" href="/assets/styles/transition.css" />
+
+
+  </head>
+  <body>
+    <div id="startup-screen">
+      <img class="startup-stars" src="assets/img/transitions/transitionStars.png" />
+      <img class="startup-cone" src="assets/img/transitions/snowCone.png" />
+    </div>
+
+    <!-- 🌌 Cosmic Background -->
+    <img src="assets/img/branding/starfield.png" class="menu-floater" />
+
+    <!-- 🍧 Main Menu Layout w/ Decoupled Background -->
+    <div class="menu-wrapper">
+      <div class="menu-layout">
+    
+        <!-- 🌀 Aspect-Controlled Container -->
+        <div class="aspect-wrap">
+          <img
+            id="menuImage"
+            class="background-fill"
+            src="assets/img/branding/menubackground.png"
+            alt="Festival Map"
+          />
+
+          <div class="menu-frame">
+            <!-- 🌟 Title -->
+            <img
+              src="assets/img/branding/SnowConeMathFestTitle.png"
+              class="menu-title-top"
+              alt="SnowCone MathFest Title"
+            />
+
+            <!-- 🍧 Labels Grid -->
+            <div class="menu-grid">
+              <div class="menu-label kids">⛺<br>Kids<br>Camping</div>
+              <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
+              <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
+              <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
+              <div class="menu-label infinity">♾️<br>Infinity Lake</div>
+              <div class="menu-label options label-options">⚙️ Options</div>
+            </div>
+          </div>
+        </div> <!-- end .aspect-wrap -->
+
+      </div>
+    </div>
+
+
+
+
+    <!-- 🎮 Game Container for Modes -->
+    <div id="game-container" class="hidden"></div>
+
+    <!-- 🧊 Info Modal -->
+    <div id="infoModal" class="cosmic-modal hidden">
+      <div class="cosmic-modal-inner scrollable-modal">
+        <button class="close-modal" onclick="closeInfoModal()">✖</button>
+        <div class="tab-content">
+          <h2>🌈 What is SnowCone MathFest?</h2>
+          <p>
+            <h3>(Use full screen mode for the full cosmic effect!)</h3>
+            SnowCone MathFest is an interactive math experience wrapped in rhythm, neon, and good vibes. 
+            It's a game, it's a festival, it's a playground for brains. 🎪🧠<br><br>
+            Created for kids, nerds, chillers, and math rebels — the whole thing runs offline, remembers your progress, 
+            and lets you groove your way through problems, badges, and themes.
+          </p>
+
+          <h2>🗺️ Modes & Zones</h2>
+          <p>
+            💠 <strong>QuickServe:</strong> Solve fast, earn XP, stack cones.<br>
+            🌲 <strong>StoryMode:</strong> Work the truck, meet math ghosts, unravel the lore.<br>
+            ♾️ <strong>Infinity:</strong> Free play + endless combos.<br>
+            🧠 <strong>Math Tips:</strong> Ghost-taught micro lessons.<br>
+            ⛺ <strong>Kids Mode:</strong> Tactile, fidget-friendly fun.<br>
+          </p>
+
+          <h2>🎨 A Solo Dev Passion Project</h2>
+          <p>
+            Designed, coded, drawn, and scored entirely by <strong>JPS Grooves</strong> — a musician, educator, 
+            and pixel conjurer with a glowing cone obsession. This isn’t just a game — it's the latest 
+            addition to my creative portfolio.<br><br>
+            This is the only place you'll hear about my other work in this app — but if you’re curious:
+          </p>
+
+          <ul>
+            <li><a href="https://JPSGrooves.com" target="_blank" rel="noopener">🌐 JPSGrooves.com</a></li>
+            <li><a href="https://soundcloud.com/jpsgrooves" target="_blank" rel="noopener">🔊 SoundCloud</a></li>
+            <li><a href="https://open.spotify.com/artist/436k9RrQa35PJ357R5Kq6c?si=32xgVLQJRgmQxEMhzul9GA" target="_blank" rel="noopener">🎧 Spotify</a></li>
+            <li><a href="https://music.apple.com/us/album/jps-grooves/1755334789" target="_blank" rel="noopener">🍎 Apple Music</a></li>
+          </ul>
+
+          <h2>📜 How to Use the App</h2>
+          <p>
+            Tap a zone on the festival map to explore different game modes.<br>
+            Your XP and cones (badges) are saved automatically in your browser.<br>
+            Go for mastery, unlock new themes, and enjoy the mathy ride.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🌌 Cosmic Background Dimmer -->
+    <div id="cosmicOverlay" class="modal-overlay hidden"></div>
+
+    <!-- 🍧 Cosmic Modal System -->
+    <div id="cosmicModal" class="modal hidden">
+      <div class="modal-header">
+        <button class="tab-button" data-tab="profile">🧑‍🚀Profile</button>
+        <button class="tab-button" data-tab="themes">🎨Themes</button>
+        <button class="tab-button" data-tab="music">🎧Music</button>
+        <button class="tab-button" data-tab="version">🧠Version</button>
+        <button class="modal-close">✖️</button>
+      </div>
+      <div class="modal-content" id="modalContent">
+        <!-- dynamically filled by JS -->
+      </div>
+    </div>
+
+    <!-- 🚀 JavaScript Modules -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

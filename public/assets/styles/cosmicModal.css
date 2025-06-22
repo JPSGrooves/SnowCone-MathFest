@@ -1,0 +1,433 @@
+/* 🌌 Cosmic Modal Shell */
+/* 🌌 Cosmic Modal Shell (Unified with cosmic-modal-inner style) */
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(17, 17, 17, 0.95);
+  color: white;
+  padding: 1.5em;
+  border: 2px solid #00ffee;
+  border-radius: 1em;
+  z-index: 9999;
+
+  width: 95vw;
+  max-width: calc(100vh * (10 / 16)); /* matches info modal aspect ratio */
+  aspect-ratio: 10 / 12;
+  max-height: 95vh;
+
+  box-shadow: 0 0 20px #00ffeeaa;
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden; /* 🧊 Freeze outer modal */
+  scrollbar-gutter: stable;
+  padding-right: calc(1em + 6px);
+  scrollbar-width: none;
+}
+
+.modal::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 1.5rem; /* a lil' bigger for mobile vibe */
+  background: none;
+  border: none;
+  color: #fff;
+  z-index: 9999;
+  cursor: pointer;
+}
+
+
+/* 🔘 Modal Header – Wrap Tab Buttons */
+.modal-header {
+  display: flex;
+  flex-wrap: nowrap;               /* 🔥 Allow wrap on small screens */
+  justify-content: space-between;
+  align-items: center;       /* 🔥 Center all rows */
+  gap: 0.5em;                     /* 🔥 Keep spacing tight but comfy */
+  margin-bottom: 1em;
+  padding: 0.5em;
+  width: 100%;
+}
+
+/* 🧊 Actually hide the modal */
+.modal.hidden {
+  display: none !important;
+}
+
+
+.tab-button {
+  background: #222;
+  border: none;
+  color: #fff;
+
+  padding: 0.6em 0.9em; /* 🔥 slimmed but tappable */
+  border-radius: 0.5em;
+  cursor: pointer;
+
+  font-size: clamp(0.45rem, 0.9vw, 0.8rem); /* 🎯 tighter scale */
+  line-height: 1.1;
+
+  min-width: 80px;
+  max-width: none;
+  flex: 1 1 0;
+
+  display: flex;                 /* 🧊 enables centering */
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;          /* 🚫 no wrapping */
+  overflow: hidden;             /* ✅ contain overflow visually, no scroll */
+  letter-spacing: 0.03em;
+
+  transition: all 0.2s ease;
+}
+
+
+.tab-button.active,
+.tab-button:hover {
+  background: #00ffee;
+  color: black;
+  box-shadow: 0 0 8px #00ffeeaa;
+  transform: scale(1.03);
+  transition: transform 0.15s ease, box-shadow 0.3s ease;
+}
+
+/* 🧑‍🚀 Input + Completion */
+.settings-block {
+  margin: 1em 0;
+  text-align: center;
+}
+
+#profileNameInput {
+  background: #111;
+  color: #fff;
+  border: 2px solid #00ffee;
+  padding: 0.5em;
+  font-size: 1rem;
+  border-radius: 0.5em;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* 📈 XP Bar */
+.xp-bar-wrap {
+  width: 100%;
+  height: 10px;
+  background: #222;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.5em;
+}
+.xp-bar {
+  height: 100%;
+  background: linear-gradient(to right, #00ffee, #ff33ff);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* 🏅 Badge Grid */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 0.5em;
+  justify-items: center;
+  width: 100%;
+}
+.badge-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3em;            /* 📏 bigger space between groupings */
+  padding-bottom: 2em; /* ⬇️ prevent last group clipping */
+}
+
+
+.badge-tile {
+  width: 72px;               
+  height: auto;              /* 🔥 this lets the cone grow naturally */
+  min-height: 96px; /* 🚧 optional: locks grid if you want 3-line breathing room */
+  aspect-ratio: 1 / 1.2;
+  padding-bottom: 0.4em;     /* 🌬️ adds space for the short label */
+  padding: 0.5em 0.2em;
+  background: #333;
+  border: 2px solid #888;
+  border-radius: 0.5em;
+  color: white;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  flex-direction: column;
+  text-align: center;
+  box-shadow: 0 0 8px #00000055;
+}
+
+.badge-tile.unlocked {
+  border-color: #00ffee;
+  background: #111;
+  color: #00ffee;
+  box-shadow: 0 0 12px #00ffeeaa;
+}
+.badge-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 0.2em;
+}
+
+.badge-label {
+  font-size: 0.7rem;
+  color: white;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.badge-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 0.2em;
+}
+
+.badge-label {
+  font-size: 0.7rem;
+  color: white;
+  text-align: center;
+}
+.badge-short {
+  font-size: 0.6rem;
+  color: #aaa;
+  text-align: center;
+  margin-top: 0.25em;
+  line-height: 1;
+}
+.badge-group {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+
+.badge-section {
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #00ffee;
+  margin-bottom: 0.5em;
+  padding-left: 0;
+  border-left: none;
+}
+
+.badge-section:first-child {
+  margin-top: 0;
+}
+
+/* 🎨 Theme Grid */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5em;
+  justify-items: center;
+}
+.theme-tile {
+  border: 2px solid #444;
+  border-radius: 0.5em;
+  overflow: hidden;
+  width: 100%; /* 🔥 Changed from 100px */
+  max-width: 140px; /* 🔥 add a cap for consistency */
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 0 6px #000000aa;
+  transition: transform 0.2s ease;
+}
+.theme-tile.active {
+  border-color: #00ffee;
+  box-shadow: 0 0 12px #00ffeeaa;
+}
+.theme-tile:hover {
+  transform: scale(1.05);
+}
+.theme-tile.locked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.theme-preview {
+  width: 100%;
+  height: clamp(60px, 10vmin, 80px); /* 🔥 Stretchy preview */
+  background-size: cover;
+  background-position: center;
+}
+.theme-label {
+  text-align: center;
+  font-size: clamp(0.85rem, 1.8vmin, 1.1rem); /* 🔥 Responsive font! */
+  padding: 0.25em;
+}
+.theme-lock {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 1.2rem;
+  color: #ff4444;
+}
+
+/* 🎧 Audio Track Buttons */
+.track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  align-items: center;
+}
+.track-button {
+  padding: 0.5em 1em;
+  background: #222;
+  border: 2px solid #00ffee;
+  color: white;
+  border-radius: 0.5em;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.track-button:hover {
+  background: #00ffee;
+  color: black;
+}
+
+/* 🔍 Scrollbars hidden */
+.modal-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1em;
+  scrollbar-gutter: stable;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  flex: 1;
+  min-height: 0; /* prevents flex bugs in production */
+}
+.modal-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* 🌠 Responsive Typography Inside Modal */
+.modal {
+  font-size: clamp(1rem, 2.2vmin, 1.3rem);
+  line-height: 1.6;
+}
+
+.modal h3 {
+  font-size: clamp(1.3rem, 3vmin, 1.8rem);
+  color: #00ffee;
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+.modal p,
+.modal label,
+.modal span,
+.modal input,
+.modal button {
+  font-size: inherit;
+}
+
+/* 🌀 Optional tweak to help buttons feel tappable on mobile */
+.tab-button,
+.track-button,
+.modal-close {
+  font-size: clamp(1rem, 2vmin, 1.2rem);
+}
+/* 🌌 Cosmic Modal Background Dimmer */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85); /* 🕶️ Dim level */
+  z-index: 9998; /* Just under the modal (which is 9999) */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* === 🎛️ Cosmic Jukebox Player === */
+.jukebox {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #00ffee;
+  border-radius: 1em;
+  padding: 1.25em;
+  box-shadow: 0 0 12px #00ffee88, 0 0 24px #00ffee44;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-top: 1em;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+}
+
+.jukebox h3 {
+  color: #00ffee;
+  font-size: 1.25rem;
+  margin-bottom: 0.25em;
+}
+
+#currentTrack {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #00ffee;
+  margin-top: 0.25em;
+}
+
+#trackProgress {
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  accent-color: #00ccff;
+}
+
+#trackTimer {
+  font-size: 0.85rem;
+  color: #ccffff;
+  margin-top: 0.25em;
+}
+
+.jukebox-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  justify-content: center;
+}
+
+.jukebox-controls button {
+  background: #111;
+  border: 2px solid #00ffee;
+  color: #00ffee;
+  padding: 0.5em 1em;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 0 6px #00ffee55;
+  transition: background 0.2s ease, transform 0.2s ease;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.jukebox-controls button:hover {
+  background: #00ffee22;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* 🟢 Active button glow */
+.icon-btn.active {
+  background-color: rgba(0, 255, 255, 0.15);
+  box-shadow: 0 0 6px #00ffff, inset 0 0 4px #00ffff;
+  color: white;
+}

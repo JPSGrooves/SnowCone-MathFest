@@ -1,0 +1,95 @@
+/* === Info Modal Only === */
+.cosmic-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  /* 🔥 prevent it from inheriting grid behavior accidentally */
+  pointer-events: auto;
+}
+
+
+.cosmic-modal.hidden {
+  display: none;
+}
+
+.cosmic-modal-inner {
+  background: rgba(20, 20, 20, 0.95);
+  border: 2px solid #00ccff;
+  border-radius: 20px;
+  padding: 1em;
+
+  width: 90vw;
+  max-width: calc(100vh * (9 / 16));
+  aspect-ratio: 9 / 12;
+
+  box-shadow: 0 0 20px #00ccff;
+  position: relative;
+  height: auto;
+  max-height: 90vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;               /* 🧊 This is the key */
+  scrollbar-gutter: stable;
+  padding-right: calc(1em + 6px);
+  scrollbar-width: none; /* Firefox */
+}
+
+.cosmic-modal-inner::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+
+
+.close-modal {
+  position: absolute;
+  top: 19px;
+  right: 10px;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #00ccff;
+  font-size: 1.2rem;
+  font-family: 'Orbitron', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 6px #00ccff, 0 0 10px #00ccff;
+  z-index: 10000;
+  transition: transform 0.2s ease;
+}
+
+.close-modal:hover {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  box-shadow: 0 0 8px white;
+  transform: scale(1.1);
+}
+
+.tab-content {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.1rem, 2.3vmin, 1.7rem);
+  color: white;
+  line-height: 1.5;
+  text-shadow: none;
+  padding-bottom: 2em;
+}
+
+
+.tab-content h2 {
+  font-size: clamp(1.4rem, 3vmin, 2.2rem);
+  color: white;
+  text-align: center;
+  margin-bottom: 0.5em;
+}
+
+
