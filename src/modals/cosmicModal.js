@@ -1,8 +1,10 @@
+import { autorun } from 'mobx';
+import { appState } from '../data/appState.js';
+
 import { renderProfileTab, setupProfileTabUI } from './profileTab.js';
 import { renderThemesTab, setupThemesTabUI } from './themesTab.js';
 import { renderMusicTab, setupMusicTabUI } from './musicTab.js';
 import { renderVersionTab, setupVersionTabUI } from './versionTab.js';
-
 
 export function openModal(tab = 'profile') {
   const modal = document.getElementById('cosmicModal');
@@ -16,8 +18,6 @@ export function openModal(tab = 'profile') {
   renderTab(tab);
 }
 
-
-
 export function closeModal() {
   const modal = document.getElementById('cosmicModal');
   const overlay = document.getElementById('cosmicOverlay');
@@ -26,7 +26,6 @@ export function closeModal() {
   overlay?.classList.remove('show');
   overlay?.classList.add('hidden');
 }
-
 
 function renderTab(tabName) {
   const content = document.getElementById('modalContent');
@@ -60,7 +59,7 @@ function renderTab(tabName) {
       break;
   }
 
-  // 🛑 FIX HERE: rebind close after new content
+  // 🔁 Always rebind close button after tab swap
   const closeBtn = document.querySelector('.modal-close');
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
@@ -70,8 +69,7 @@ function renderTab(tabName) {
   }
 }
 
-
-// 🔄 Handles all tab clicks with one clean reusable func
+// 🔄 Unified Tab Click Handling
 function handleTabClick(e) {
   const tab = e.currentTarget.dataset.tab;
   console.log(`🪐 Tab clicked: ${tab}`);
@@ -80,7 +78,6 @@ function handleTabClick(e) {
 
 function setupTabListeners() {
   console.log("🧪 Setting up tab listeners...");
-
   document.querySelectorAll('.tab-button').forEach(btn => {
     btn.addEventListener('click', handleTabClick);
   });
@@ -91,11 +88,12 @@ function setupTabListeners() {
   });
 }
 
+// 🧊 Init once DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
   console.log("🧊 Cosmic modal listeners wired.");
 });
-// 🧊 Bind close button once on load
+
 window.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.querySelector('.modal-close');
   closeBtn?.addEventListener('click', () => {
@@ -106,6 +104,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
 window.openModal = openModal;
 
+// 🌌 REACT TO BADGE UNLOCK AND OPEN MODAL
+autorun(() => {
+  const badgeFlag = appState.uiState?.triggerBadgeModal;
+  if (badgeFlag) {
+    console.log("🌈 Badge modal trigger received via autorun!");
+    openModal('profile'); // you could change this to 'themes' or 'version' if better
+    appState.clearTriggerBadgeModal();
+  }
+});
+
+// 📲 PWA install logic still lives here
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {

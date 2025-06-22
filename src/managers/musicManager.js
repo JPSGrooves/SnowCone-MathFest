@@ -1,141 +1,94 @@
-// /src/managers/musicManager.js 🎧 Music Logic Core
+// 🎧 musicManager.js – SnowCone Music Controls with MobX
+import { appState } from '../data/appState.js';
 import { Howl, Howler } from 'howler';
-import { getSetting } from '../data/cdms.js';
 
-const tracks = [
-  { id: 'infinity_addition', label: '♾️ Infinity Addition', file: 'assets/audio/tracks/InfinityAddition.mp3' },
-  { id: 'kk_tribute', label: '🌀 KK Tribute', file: 'assets/audio/tracks/KKtribute.mp3' },
-  { id: 'nothing_organic', label: '🌿 Nothing Organic', file: 'assets/audio/tracks/nothing_organic.mp3' },
-  { id: 'quikserve_og', label: '🍦 Quick Serve OG', file: 'assets/audio/tracks/quikserveST_OG.mp3' },
-  { id: 'sc_90', label: '💾 SnowCone ‘90', file: 'assets/audio/tracks/sc_90.mp3' },
-  { id: 'secrets_math', label: '🧠 Secrets of Math', file: 'assets/audio/tracks/secretsOfMath.mp3' },
-  { id: 'stoopid_electro', label: '🤪 Stoopid Electro', file: 'assets/audio/tracks/stoopid electro fixed.m4a' },
-  { id: 'soft_down', label: '🌙 Soft Down Math Vibes', file: 'assets/audio/tracks/softDownMathVibes.mp3' }
+let currentTrack = null;
+let trackIndex = 0;
+
+const trackList = [
+  { title: "Cone Vibes Vol. 1", file: "cone_vibes_1.mp3" },
+  { title: "Ice Chill Nocturne", file: "ice_chill_nocturne.mp3" },
+  { title: "Frosted Frequencies", file: "frosted_frequencies.mp3" }
 ];
 
-let currentIndex = 0;
-let currentTrack = null;
-let isLooping = true;
-let isShuffling = false;
-let progressInterval = null;
-let initialized = false;
+function loadTrack(index) {
+  if (currentTrack) currentTrack.stop();
 
-export function initMusicPlayer() {
-  if (!initialized) {
-    Howler.volume(getSetting('mute') ? 0 : 1);
-    updateUI(tracks[currentIndex]);
-    initialized = true;
-  }
-}
-
-export function playTrack(index = 0, muted = getSetting('mute')) {
-  stopTrack();
-  currentIndex = index;
-  const track = tracks[currentIndex];
-
+  const track = trackList[index];
   currentTrack = new Howl({
-    src: [track.file],
-    loop: isLooping,
-    volume: 1,
-    onplay: () => {
-      updateUI(track);
-      progressInterval = setInterval(updateProgress, 1000);
-    },
+    src: [`assets/audio/${track.file}`],
+    loop: appState.settings.loop,
+    volume: appState.settings.mute ? 0 : 1,
     onend: () => {
-      if (!isLooping) {
-        isShuffling ? shuffleNext() : skipNext();
-      }
+      if (!appState.settings.loop) skipNext();
     }
   });
 
   currentTrack.play();
+  updateTrackInfo(track.title);
 }
 
-export function togglePlayPause() {
-  if (!currentTrack) return playTrack(currentIndex);
-
-  if (currentTrack.playing()) {
-    currentTrack.pause();
-    clearInterval(progressInterval);
-  } else {
-    currentTrack.play();
-    progressInterval = setInterval(updateProgress, 1000);
-  }
+function updateTrackInfo(title) {
+  const label = document.getElementById('currentTrack');
+  if (label) label.textContent = title || '(none)';
 }
 
-export function skipNext() {
-  currentIndex = (currentIndex + 1) % tracks.length;
-  playTrack(currentIndex);
-}
+// === PUBLIC CONTROLS ===
 
-export function skipPrev() {
-  currentIndex = (currentIndex - 1 + tracks.length) % tracks.length;
-  playTrack(currentIndex);
-}
-
-export function toggleShuffle() {
-  isShuffling = !isShuffling;
-  return isShuffling;
-}
-
-function shuffleNext() {
-  let next;
-  do {
-    next = Math.floor(Math.random() * tracks.length);
-  } while (next === currentIndex);
-
-  currentIndex = next;
-  playTrack(currentIndex);
+export function playTrack(index = trackIndex) {
+  trackIndex = index;
+  loadTrack(trackIndex);
 }
 
 export function stopTrack() {
-  if (currentTrack) {
-    currentTrack.stop();
-    clearInterval(progressInterval);
-    currentTrack = null;
-  }
+  if (currentTrack) currentTrack.stop();
+  currentTrack = null;
+  updateTrackInfo('(none)');
 }
 
-export function fadeOutMusic() {
-  if (currentTrack) {
-    currentTrack.fade(currentTrack.volume(), 0, 400);
-    setTimeout(() => stopTrack(), 500);
-  }
+export function togglePlayPause() {
+  if (!currentTrack) return playTrack();
+  currentTrack.playing() ? currentTrack.pause() : currentTrack.play();
 }
 
-function updateUI(track) {
-  const el = document.getElementById('currentTrack');
-  if (el) el.textContent = track.label;
-  updateProgress();
+export function skipNext() {
+  trackIndex = appState.settings.shuffle
+    ? Math.floor(Math.random() * trackList.length)
+    : (trackIndex + 1) % trackList.length;
+  playTrack(trackIndex);
 }
 
-function updateProgress() {
-  if (!currentTrack) return;
-
-  const progress = document.getElementById('trackProgress');
-  const timer = document.getElementById('trackTimer');
-  const pos = currentTrack.seek();
-  const dur = currentTrack.duration();
-
-  if (progress) progress.value = (pos / dur) * 100;
-  if (timer) timer.textContent = `${formatTime(pos)} / ${formatTime(dur)}`;
+export function skipPrev() {
+  trackIndex = (trackIndex - 1 + trackList.length) % trackList.length;
+  playTrack(trackIndex);
 }
 
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return m + ':' + (s < 10 ? '0' + s : s);
+export function toggleShuffle() {
+  const newShuffle = !appState.settings.shuffle;
+  appState.setSetting('shuffle', newShuffle);
+  return newShuffle;
 }
 
-export function setLoop(value) {
-  isLooping = value;
-  if (currentTrack) currentTrack.loop(value);
+export function setLoop(state) {
+  appState.setSetting('loop', state);
+  if (currentTrack) currentTrack.loop(state);
+  return state;
 }
 
 export function getLooping() {
-  return isLooping;
+  return appState.settings.loop;
 }
 
 export function getShuffling() {
-  return isShuffling;
+  return appState.settings.shuffle;
 }
+
+export function initMusicPlayer() {
+  if (!currentTrack) updateTrackInfo('(none)');
+}
+
+// 🛑 Catch mute changes outside player
+window.addEventListener('settingChanged', (e) => {
+  const { key, value } = e.detail;
+  if (key === 'mute') Howler.volume(value ? 0 : 1);
+});

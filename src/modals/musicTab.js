@@ -1,5 +1,5 @@
-// /src/tabs/musicTab.js 🎛️ Cosmic Sound Selector
-import { getSetting, setSetting } from '../data/cdms.js';
+// 🎛️ Cosmic Sound Selector (MobX Ready)
+import { Howler } from 'howler';
 import {
   playTrack,
   togglePlayPause,
@@ -13,8 +13,10 @@ import {
   stopTrack
 } from '../managers/musicManager.js';
 
+import { appState } from '../data/appState.js';
+
 export function renderMusicTab() {
-  const muted = getSetting('mute');
+  const muted = appState.settings.mute;
   const loopActive = getLooping();
   const shuffleActive = getShuffling();
 
@@ -57,18 +59,14 @@ export function setupMusicTabUI() {
   if (muteToggle) {
     muteToggle.addEventListener('change', () => {
       const muted = muteToggle.checked;
-      setSetting('mute', muted);
-      Howler.volume(muted ? 0 : 1); // 🔇 apply instantly
+      appState.setSetting('mute', muted);
+      Howler.volume(muted ? 0 : 1); // 🔇 immediate effect
     });
   }
 
   document.getElementById('btnPlayPause')?.addEventListener('click', togglePlayPause);
   document.getElementById('btnNext')?.addEventListener('click', skipNext);
   document.getElementById('btnPrev')?.addEventListener('click', skipPrev);
-
-  // ✅ Set loop default to OFF
-  setLoop(false); // ← This disables looping at load
-  loopBtn?.classList.remove('active'); // Ensure button is clean visually
 
   loopBtn?.addEventListener('click', () => {
     const isNowLooping = setLoop(!getLooping());
@@ -80,11 +78,10 @@ export function setupMusicTabUI() {
     shuffleBtn.classList.toggle('active', isNowShuffling);
   });
 
-  initMusicPlay();
+  initMusicPlayer();
 }
 
-
-// 💥 Optional: stop music when entering a game mode
+// 🧊 External scene call
 export function stopMusicPlayer() {
   stopTrack();
 }

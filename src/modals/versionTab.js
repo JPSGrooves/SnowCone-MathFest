@@ -1,11 +1,8 @@
-// versionTab.js
-
-import { getData, saveData } from '../data/cdms.js';
+import { appState } from '../data/appState.js';
 
 export function renderVersionTab() {
   const build = window?.devFlags?.build || 'unknown';
-  const data = getData();
-  const backup = JSON.stringify(data, null, 2);
+  const backup = JSON.stringify(appState, null, 2); // 🧠 Using MobX state directly!
 
   return `
     <div class="settings-block">
@@ -26,14 +23,11 @@ export function renderVersionTab() {
       </p>
     </div>
 
-
-
-
     <div class="settings-block">
       <h3>📲 App Info</h3>
       <p>This app works offline after install!<br>To save your data, don't clear site storage.</p>
       <p>If you're on an iPhone or iPad using Safari:<br>
-      Tap the <strong>Share</strong> icon, then choose <strong>"Add to Home Screen"</strong> to install the app.</p>
+        Tap the <strong>Share</strong> icon, then choose <strong>"Add to Home Screen"</strong> to install the app.</p>
       <p>If you're using Android or Chrome:<br>
         You can install this app for offline play:
       </p>
@@ -77,7 +71,9 @@ export function setupVersionTabUI() {
 
   if (downloadBtn) {
     downloadBtn.addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(getData(), null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(appState.toJSON(), null, 2)], {
+        type: 'application/json'
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -106,11 +102,11 @@ export function setupVersionTabUI() {
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
-          const data = JSON.parse(event.target.result);
-          localStorage.setItem('snowcone_data', JSON.stringify(data));
+          const incoming = JSON.parse(event.target.result);
+          Object.assign(appState, incoming); // 🧬 merge state
           sessionStorage.setItem('forceWelcomeReload', 'true');
           alert('✅ Save data loaded! Reloading...');
-          setTimeout(() => location.reload(), 100); // 🧊 let that localStorage lock in
+          setTimeout(() => location.reload(), 100);
         } catch (err) {
           alert('⚠️ Failed to load save. Invalid file format.');
         }

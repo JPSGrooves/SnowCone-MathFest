@@ -1,12 +1,11 @@
-// themesTab.js
+// 🎨 themesTab.js — Cosmic Theme Chooser
 
-import { getData, setSetting } from '../data/cdms.js';
+import { appState } from '../data/appState.js';
 import { unlockableThemes, themeLabels } from '../managers/backgroundManager.js';
 
 export function renderThemesTab() {
-  const data = getData();
-  const currentTheme = data.settings.theme;
-  const unlocked = data.profile?.unlockedThemes || [];
+  const currentTheme = appState.settings.theme;
+  const unlocked = appState.profile?.unlockedThemes || [];
 
   let html = '<div class="theme-grid">';
 
@@ -28,7 +27,6 @@ export function renderThemesTab() {
   return html;
 }
 
-// 🔥 Must be called after renderThemesTab injection
 export function setupThemesTabUI() {
   const tiles = document.querySelectorAll('.theme-tile');
   if (!tiles.length) {
@@ -41,8 +39,8 @@ export function setupThemesTabUI() {
       tile.addEventListener('click', () => {
         const theme = tile.dataset.theme;
         console.log(`🎨 Theme selected: ${theme}`);
-        setSetting('theme', theme);
-        location.reload(); // reloads to reapply labelColorMap + bg
+        appState.setSetting('theme', theme);
+        location.reload(); // reload to reapply theme colors + bg
       });
     }
   });

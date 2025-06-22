@@ -1,4 +1,4 @@
-import { getData, setSetting } from '../data/cdms.js';
+import { appState } from '../data/appState.js';
 
 export function applyBackgroundTheme() {
   const bg = document.getElementById('menuImage');
@@ -7,12 +7,11 @@ export function applyBackgroundTheme() {
     return;
   }
 
-  const data = getData();
-  let theme = data.settings?.theme;
+  let theme = appState.settings.theme;
 
   if (!theme || typeof theme !== 'string' || theme === 'default') {
     theme = 'menubackground';
-    setSetting('theme', theme);
+    appState.setSetting('theme', theme);
   }
 
   bg.src = `assets/img/branding/${theme}.png`;
@@ -32,7 +31,6 @@ function applyLabelColors(theme) {
   });
 }
 
-
 export function swapBackground(themeName) {
   const bg = document.getElementById('menuImage');
   if (!bg) {
@@ -40,10 +38,7 @@ export function swapBackground(themeName) {
     return;
   }
 
-  if (typeof setSetting === 'function') {
-    setSetting('theme', themeName); // 🧠 persist new theme
-  }
-
+  appState.setSetting('theme', themeName); // 🧠 persist new theme
   bg.src = `assets/img/branding/${themeName}.png`;
   console.log(`🌌 Swapped to theme: ${themeName}`);
 }
@@ -53,7 +48,6 @@ window.swapBackground = swapBackground;
 
 // 🎨 Label Color Themes by Background
 const labelColorMap = {
-  // 🌌 Default Theme adjust
   menubackground: {
     kids:     '#ff77ff',
     quick:    '#00ffee',
@@ -62,174 +56,141 @@ const labelColorMap = {
     infinity: '#88ccff',
     options:  '#cccccc'
   },
-
-  // 🌸 Spring – Bloom Beam adjust a bit
   spring: {
-    kids:     '#cc66ff', // lavender
-    quick:    '#00cc99', // mint green
-    tips:     '#ffcc66', // pastel orange
-    story:    '#ff66aa', // pink blossom
-    infinity: '#66ddff', // sky blue
-    options:  '#9999cc'  // soft violet
+    kids:     '#cc66ff',
+    quick:    '#00cc99',
+    tips:     '#ffcc66',
+    story:    '#ff66aa',
+    infinity: '#66ddff',
+    options:  '#9999cc'
   },
-
-  // ☀️ Summer – Solar Lick adjust story
   summer: {
-    kids:     '#ffdd00', // sunny yellow
-    quick:    '#ff6600', // creamsicle orange
-    tips:     '#33cc33', // watermelon rind
-    story:    '#ff3399', // hot pink
-    infinity: '#00ddff', // pool water
-    options:  '#ff9933'  // mango glaze
+    kids:     '#ffdd00',
+    quick:    '#ff6600',
+    tips:     '#33cc33',
+    story:    '#ff3399',
+    infinity: '#00ddff',
+    options:  '#ff9933'
   },
-
-  // 🍂 Fall – Maple Drip looks decent but adjust
   fall: {
-    kids:     '#ffaa00', // pumpkin spice
-    quick:    '#ff6600', // autumn blaze
-    tips:     '#66cc33', // mossy green
-    story:    '#cc6633', // maple bark
-    infinity: '#ffffff', // neutral
-    options:  '#663300'  // dark bark
+    kids:     '#ffaa00',
+    quick:    '#ff6600',
+    tips:     '#66cc33',
+    story:    '#cc6633',
+    infinity: '#ffffff',
+    options:  '#663300'
   },
-
-  // ❄️ Winter – Frost Spiral
   winter: {
-    kids:     '#aaddff', // ice blue
-    quick:    '#ffffff', // frost white
-    tips:     '#66ffff', // glacial aqua
-    story:    '#ddddff', // pale purple
-    infinity: '#66ccff', // chilly cyan
-    options:  '#ccccff'  // snow violet
+    kids:     '#aaddff',
+    quick:    '#ffffff',
+    tips:     '#66ffff',
+    story:    '#ddddff',
+    infinity: '#66ccff',
+    options:  '#ccccff'
   },
-
-  // 🎆 Freedom – Firework Fizz (4th of July)
   freedom: {
-    kids:     '#ff4444', // red pop
-    quick:    '#ffffff', // stars
-    tips:     '#3366ff', // blue blast
-    story:    '#ffcc00', // sparkler gold
-    infinity: '#bbbbbb', // smoke glow
-    options:  '#222222'  // night sky
+    kids:     '#ff4444',
+    quick:    '#ffffff',
+    tips:     '#3366ff',
+    story:    '#ffcc00',
+    infinity: '#bbbbbb',
+    options:  '#222222'
   },
-
-  // 🎃 Halloween – Ghoulberry Hex
   halloween: {
-    kids:     '#ff9933', // pumpkin
-    quick:    '#6600cc', // witchy purple
-    tips:     '#00cc66', // slime green
-    story:    '#cc0000', // haunted red
-    infinity: '#dddddd', // bone white
-    options:  '#000000'  // void
+    kids:     '#ff9933',
+    quick:    '#6600cc',
+    tips:     '#00cc66',
+    story:    '#cc0000',
+    infinity: '#dddddd',
+    options:  '#000000'
   },
-
-  // 🌽 Harvest – Cornucopia Crunch adjust story and qs
   harvest: {
-    kids:     '#ffcc00', // corn gold
-    quick:    '#996633', // gravy brown
-    tips:     '#cc9900', // yam crust
-    story:    '#993300', // cranberry rust
-    infinity: '#ffffff', // neutral
-    options:  '#333300'  // olive stem
+    kids:     '#ffcc00',
+    quick:    '#996633',
+    tips:     '#cc9900',
+    story:    '#993300',
+    infinity: '#ffffff',
+    options:  '#333300'
   },
-
-  // 🎄 Christmas – Merry Mint adjust qs and inf
   christmas: {
-    kids:     '#00dd00', // pine green
-    quick:    '#dd0000', // ornament red
-    tips:     '#ffffff', // snow white
-    story:    '#ff66cc', // candy pink
-    infinity: '#aaaaaa', // silver bell
-    options:  '#006600'  // dark pine
+    kids:     '#00dd00',
+    quick:    '#dd0000',
+    tips:     '#ffffff',
+    story:    '#ff66cc',
+    infinity: '#aaaaaa',
+    options:  '#006600'
   },
-
-  // 🎊 New Year – Midnight Pop adjust story
   newyear: {
-    kids:     '#ffffff', // fireworks pop
-    quick:    '#ffcc00', // champagne gold
-    tips:     '#999999', // metallic silver
-    story:    '#330066', // midnight purple
-    infinity: '#ff00ff', // neon burst
-    options:  '#111111'  // dark mode
+    kids:     '#ffffff',
+    quick:    '#ffcc00',
+    tips:     '#999999',
+    story:    '#330066',
+    infinity: '#ff00ff',
+    options:  '#111111'
   },
-
-  // 💘 Valentine – Heart Melt adjust all maybe remake bg
   valentine: {
-    kids:     '#ff6699', // bubblegum pink
-    quick:    '#cc0066', // lipstick
-    tips:     '#ffcccc', // soft blush
-    story:    '#990033', // rose heart
-    infinity: '#ffe6f0', // dreamy fog
-    options:  '#660033'  // deep romance
+    kids:     '#ff6699',
+    quick:    '#cc0066',
+    tips:     '#ffcccc',
+    story:    '#990033',
+    infinity: '#ffe6f0',
+    options:  '#660033'
   },
-  // 🌀 Cosmic 01 – Nebula Swirl (10 XP)
   cosmic_01: {
-    kids:     '#cc66ff', // violet burst
-    quick:    '#00ffff', // aqua star
-    tips:     '#ffcc00', // nebula core
-    story:    '#ff6699', // pink gas cloud
-    infinity: '#ffffff', // stellar white
-    options:  '#9999ff'  // soft starlight
+    kids:     '#cc66ff',
+    quick:    '#00ffff',
+    tips:     '#ffcc00',
+    story:    '#ff6699',
+    infinity: '#ffffff',
+    options:  '#9999ff'
   },
-
-  // 🌀 Cosmic 02 – Fractal Bloom (Story Clear)
   cosmic_02: {
-    kids:     '#ff99cc', // bloom petal
-    quick:    '#33ccff', // electric blue
-    tips:     '#ccff66', // lime fractal
-    story:    '#ff66cc', // glitch pink
-    infinity: '#cccccc', // static white
-    options:  '#6666ff'  // recursive indigo
+    kids:     '#ff99cc',
+    quick:    '#33ccff',
+    tips:     '#ccff66',
+    story:    '#ff66cc',
+    infinity: '#cccccc',
+    options:  '#6666ff'
   },
-
-  // 🌀 Cosmic 03 – Logic Pulse (Math Zen Badge)
   cosmic_03: {
-    kids:     '#ffffff', // focus white
-    quick:    '#88ffcc', // calm mint
-    tips:     '#00cc99', // theorem teal
-    story:    '#66ccff', // thought ripple
-    infinity: '#ccffff', // silent pulse
-    options:  '#333399'  // deep logic core
+    kids:     '#ffffff',
+    quick:    '#88ffcc',
+    tips:     '#00cc99',
+    story:    '#66ccff',
+    infinity: '#ccffff',
+    options:  '#333399'
   },
-
-  // 🌀 Cosmic 04 – Galactic Ice (QuickServe Top Score) adjust infiinty 
   cosmic_04: {
-    kids:     '#aaffff', // crystal frost
-    quick:    '#ffffff', // flash ice
-    tips:     '#66ccff', // glacier streak
-    story:    '#99ccff', // chill zone
-    infinity: '#33ccff', // subzero trail
-    options:  '#005577'  // deep cold logic
+    kids:     '#aaffff',
+    quick:    '#ffffff',
+    tips:     '#66ccff',
+    story:    '#99ccff',
+    infinity: '#33ccff',
+    options:  '#005577'
   },
-
-  // 🌀 Cosmic 05 – Coneverse Prime (All Modes Tried)
   cosmic_05: {
-    kids:     '#ffcc00', // core energy
-    quick:    '#ff9900', // cone sun
-    tips:     '#00ffff', // hyper glow
-    story:    '#ff33cc', // deep cone lore
-    infinity: '#ffffff', // echo white
-    options:  '#ff0066'  // coneverse axis
+    kids:     '#ffcc00',
+    quick:    '#ff9900',
+    tips:     '#00ffff',
+    story:    '#ff33cc',
+    infinity: '#ffffff',
+    options:  '#ff0066'
   },
-
-  // 🌀 Cosmic 06 – Singularity Scoop (100% XP Bar)
   cosmic_06: {
-    kids:     '#000000', // event horizon
-    quick:    '#ff0000', // danger math
-    tips:     '#ffccff', // anomaly pink
-    story:    '#330033', // void bloom
-    infinity: '#ff99ff', // glitch static
-    options:  '#9900cc'  // singularity core
+    kids:     '#000000',
+    quick:    '#ff0000',
+    tips:     '#ffccff',
+    story:    '#330033',
+    infinity: '#ff99ff',
+    options:  '#9900cc'
   },
-
-  // 🌀 Cosmic 07 – Abery’s Cone (fifth badge? 🌀💖) adjust all
   cosmic_07: {
-    kids:     '#ffffff', // gentle halo
-    quick:    '#ffffff', // fave pink
-    tips:     '#ffffff', // dream math
-    story:    '#ffffff', // memory bloom
-    infinity: '#ffffff', // soft fog
-    options:  '#ffffff'  // Abery's aura
+    kids:     '#ffffff',
+    quick:    '#ffffff',
+    tips:     '#ffffff',
+    story:    '#ffffff',
+    infinity: '#ffffff',
+    options:  '#ffffff'
   }
 };
 
@@ -274,11 +235,11 @@ export const unlockableThemes = [
   'cosmic_07'
 ];
 
-
 window.setTheme = (themeName) => {
-  setSetting('theme', themeName);
+  appState.setSetting('theme', themeName);
   applyBackgroundTheme();
 };
+
 document.getElementById('labelQuickServe')?.addEventListener('click', () => {
   startMode('quickServe');
 });
@@ -297,6 +258,3 @@ export function swapModeBackground(fileName) {
 
   console.log(`🌌 Mode background swapped to: ${fileName}`);
 }
-
-
-
