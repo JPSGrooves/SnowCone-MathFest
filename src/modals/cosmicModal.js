@@ -1,3 +1,4 @@
+// 🎛️ cosmicModal.js – Sacred Modal System 🍧🚛
 import { autorun } from 'mobx';
 import { appState } from '../data/appState.js';
 
@@ -6,70 +7,74 @@ import { renderThemesTab, setupThemesTabUI } from './themesTab.js';
 import { renderMusicTab, setupMusicTabUI } from './musicTab.js';
 import { renderVersionTab, setupVersionTabUI } from './versionTab.js';
 
+//////////////////////////////
+// 🚀 Open / Close Modal
+//////////////////////////////
 export function openModal(tab = 'profile') {
   const modal = document.getElementById('cosmicModal');
   const overlay = document.getElementById('cosmicOverlay');
-  if (!modal) return console.warn("🛑 cosmicModal not found");
+  if (!modal) return console.warn('🛑 cosmicModal not found');
 
   modal.classList.remove('hidden');
   overlay?.classList.remove('hidden');
   overlay?.classList.add('show');
 
-  renderTab(tab);
+  requestAnimationFrame(() => {
+    renderTab(tab);
+  });
 }
 
 export function closeModal() {
   const modal = document.getElementById('cosmicModal');
   const overlay = document.getElementById('cosmicOverlay');
 
-  if (modal) modal.classList.add('hidden');
+  modal?.classList.add('hidden');
   overlay?.classList.remove('show');
   overlay?.classList.add('hidden');
 }
 
+//////////////////////////////
+// 🎛️ Render Tabs
+//////////////////////////////
 function renderTab(tabName) {
   const content = document.getElementById('modalContent');
   if (!content) return;
 
-  // Activate correct tab button
+  const tabMap = {
+    profile: { render: renderProfileTab, setup: setupProfileTabUI },
+    themes: { render: renderThemesTab, setup: setupThemesTabUI },
+    music: { render: renderMusicTab, setup: setupMusicTabUI },
+    version: { render: renderVersionTab, setup: setupVersionTabUI },
+  };
+
+  const tab = tabMap[tabName];
+  if (!tab) {
+    content.innerHTML = `<p>Unknown tab: ${tabName}</p>`;
+    return;
+  }
+
+  content.innerHTML = tab.render();
+
+  // 🔥 DOM Paint before setup
+  requestAnimationFrame(() => {
+    tab.setup();
+  });
+
+  // 🔥 Tab Highlight
   document.querySelectorAll('.tab-button').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tabName);
   });
 
-  // Inject content
-  switch (tabName) {
-    case 'profile':
-      content.innerHTML = renderProfileTab();
-      setupProfileTabUI();
-      break;
-    case 'themes':
-      content.innerHTML = renderThemesTab();
-      setupThemesTabUI();
-      break;
-    case 'music':
-      content.innerHTML = renderMusicTab();
-      setupMusicTabUI();
-      break;
-    case 'version':
-      content.innerHTML = renderVersionTab();
-      setupVersionTabUI();
-      break;
-    default:
-      content.innerHTML = `<p>Unknown tab: ${tabName}</p>`;
-      break;
-  }
-
-  // 🔁 Always rebind close button after tab swap
-  const closeBtn = document.querySelector('.modal-close');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      console.log("❌ Cosmic modal closing!");
-      closeModal();
-    });
-  }
+  // 🔗 Close Button
+  document.querySelector('.modal-close')?.addEventListener('click', () => {
+    console.log('❌ Cosmic modal closing!');
+    closeModal();
+  });
 }
 
-// 🔄 Unified Tab Click Handling
+//////////////////////////////
+// 🪐 Tab Click Logic
+//////////////////////////////
 function handleTabClick(e) {
   const tab = e.currentTarget.dataset.tab;
   console.log(`🪐 Tab clicked: ${tab}`);
@@ -77,44 +82,48 @@ function handleTabClick(e) {
 }
 
 function setupTabListeners() {
-  console.log("🧪 Setting up tab listeners...");
+  console.log('🧪 Setting up tab listeners...');
+
   document.querySelectorAll('.tab-button').forEach(btn => {
     btn.addEventListener('click', handleTabClick);
   });
 
   document.querySelector('.label-options')?.addEventListener('click', () => {
-    console.log("⚙️ Options clicked – opening modal");
+    console.log('⚙️ Options clicked – opening modal');
     openModal('profile');
+  });
+
+  document.querySelector('.modal-close')?.addEventListener('click', () => {
+    console.log('❌ Closing modal from global listener');
+    closeModal();
   });
 }
 
-// 🧊 Init once DOM ready
+//////////////////////////////
+// 🔥 DOM Ready Bootup
+//////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
-  console.log("🧊 Cosmic modal listeners wired.");
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-  const closeBtn = document.querySelector('.modal-close');
-  closeBtn?.addEventListener('click', () => {
-    console.log("❌ Closing modal from global listener");
-    closeModal();
-  });
+  console.log('🧊 Cosmic modal listeners wired.');
 });
 
 window.openModal = openModal;
 
-// 🌌 REACT TO BADGE UNLOCK AND OPEN MODAL
+//////////////////////////////
+// 🪩 Badge Modal Autorun
+//////////////////////////////
 autorun(() => {
   const badgeFlag = appState.uiState?.triggerBadgeModal;
   if (badgeFlag) {
-    console.log("🌈 Badge modal trigger received via autorun!");
-    openModal('profile'); // you could change this to 'themes' or 'version' if better
+    console.log('🌈 Badge modal trigger received via autorun!');
+    openModal('profile');
     appState.clearTriggerBadgeModal();
   }
 });
 
-// 📲 PWA install logic still lives here
+//////////////////////////////
+// 📲 PWA Install Logic
+//////////////////////////////
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -124,6 +133,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   const installBtn = document.getElementById('installAppBtn');
   if (installBtn) {
     installBtn.style.display = 'inline-block';
+
     installBtn.addEventListener('click', () => {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {

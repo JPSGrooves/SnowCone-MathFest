@@ -1,0 +1,143 @@
+/* 🌌 MathTips Grid */
+.mt-grid {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "header"
+    "content";
+  height: 100%;
+  width: 100%;
+  padding: 1.5rem;
+  gap: 1rem;
+  box-sizing: border-box;
+
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px dashed #00ffee88;
+  backdrop-filter: blur(6px);
+  z-index: 2;
+}
+
+/* === Header === */
+.mt-header {
+  grid-area: header;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  border: 2px solid #ff00ff44;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+}
+
+.mt-header h1 {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee88;
+}
+
+/* === Content === */
+.mt-content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+
+  border: 2px solid #ff00ff44;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.65);
+  box-shadow: 0 0 24px #00ffee88;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  height: fit-content;
+}
+
+/* === Chat Window === */
+.chat-window {
+  width: 100%;
+  max-height: 40vh;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px dashed #00ffee88;
+}
+
+.user-msg, .cat-reply {
+  margin: 0.5rem 0;
+}
+
+.user-msg {
+  color: #00ffee;
+}
+
+.cat-reply {
+  color: #ffdd55;
+}
+
+/* === Chat Input === */
+.chat-input-zone {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  gap: 0.5rem;
+}
+
+#userInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1.2rem;
+  border: 2px solid #00ffee;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.9);
+  color: #00ffee;
+  outline: none;
+  box-shadow: 0 0 8px #00ffee88;
+}
+
+#sendBtn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  background-color: #00ffee;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 10px #00ffee88;
+  transition: background 0.2s ease;
+}
+
+#sendBtn:hover {
+  background-color: #33ffff;
+}
+
+/* === Return Button === */
+.btn-return {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  background: #00ffee;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 12px #00ffeeaa;
+  transition: background 0.2s ease;
+}
+
+.btn-return:hover {
+  background-color: #33ffff;
+}
+.user-msg, .cat-reply {
+  margin: 0.5rem 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(5px);}
+  to {opacity: 1; transform: translateY(0);}
+}

@@ -6,20 +6,23 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.3.0</h3>
+      <h3>🧠 SnowCone MathFest v0.5.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>📝 v0.3.0 Update</h3>
+      <h3>📝 v0.5.0 Update – Neon Jukebox Ascension</h3>
       <p>
-        – 🚀 New startup sequence with starfield + snow cone<br>
-        – 🔁 Scene transitions now live (truck + cone animation)<br>
-        – ✨ Menu label clicks use smooth animated transitions<br>
-        – 🔧 Fixed info modal title bug (no more cosmic overlay glitch)<br>
-        – 🎨 Startup + transition animations re-centered + sped up<br>
-        – 📱 Awaiting mobile confirmation before locking in visuals
+        – 🎶 Cosmic Jukebox fully upgraded to sacred final form<br>
+        – 🔀 True shuffle works — skips current, no repeats until needed<br>
+        – ✨ Neon Mode toggle for glowing progress bar and timeline<br>
+        – 🎚️ Scrubbing works — drag the timeline to seek tracks perfectly<br>
+        – 🔊 Smooth fade between tracks on skip, next, prev, and auto-play<br>
+        – 🎶 Now Playing label updates flawlessly with every track change<br>
+        – 🛑 Music stops when entering any mode (except Math Tips Village)<br>
+        – 🚫 Fixed mute + neon toggle desync bugs — state now respected on load<br>
+        – 🔥 Jukebox runs clean, synced, and error-free — desktop + mobile stable
       </p>
     </div>
 

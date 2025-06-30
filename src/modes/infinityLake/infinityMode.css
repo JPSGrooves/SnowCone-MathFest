@@ -1,0 +1,151 @@
+/* ♾️ Infinity Mode Grid */
+.infinity-grid {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header"
+    "content"
+    "footer";
+  height: 100%;
+  width: 100%;
+  padding: 1.5rem;
+  gap: 1rem;
+  box-sizing: border-box;
+
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px dashed #00ffee88;
+  backdrop-filter: blur(6px);
+  z-index: 2;
+}
+
+/* === Header === */
+.infinity-header {
+  grid-area: header;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  border: 2px solid #ff00ff44;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+}
+
+.infinity-header h1 {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee88;
+}
+
+/* === Content === */
+.infinity-content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+
+  border: 2px solid #ff00ff44;
+  border-radius: 1rem;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.65);
+  box-shadow: 0 0 24px #00ffee88;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* === Score === */
+.score-box {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #00ffee;
+  border: 2px solid #00ffee88;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 8px #00ffee88;
+}
+
+/* === Math Problem === */
+.math-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.math-stack span {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 6px #ffffff88;
+}
+
+.math-stack input {
+  padding: 0.5rem 1rem;
+  font-size: 1.4rem;
+  border: 2px solid #00ffee;
+  border-radius: 8px;
+  background: #000;
+  color: #00ffee;
+  text-align: center;
+  width: clamp(180px, 20vw, 240px);
+  box-shadow: 0 0 8px #00ffee88;
+}
+
+.math-stack button {
+  font-size: 1.2rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 10px;
+  background-color: #00ffee;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 10px #00ffee88;
+  transition: background 0.2s ease;
+}
+
+.math-stack button:hover {
+  background-color: #33ffff;
+}
+
+/* === Cone Status === */
+.cone-status {
+  font-size: 1.1rem;
+  color: #ffdd55;
+  min-height: 1.5em;
+  text-shadow: 0 0 4px #ffdd5588;
+}
+
+/* === Footer === */
+.infinity-footer {
+  grid-area: footer;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+
+  border: 2px solid #ff00ff44;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+}
+
+/* === Return Button === */
+.btn-return {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  background: #00ffee;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 12px #00ffeeaa;
+  transition: background 0.2s ease;
+}
+
+.btn-return:hover {
+  background-color: #33ffff;
+}

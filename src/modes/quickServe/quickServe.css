@@ -1,136 +1,293 @@
+/* === 🍧 Global Grid Layout === */
 .qs-grid {
   display: grid;
-  grid-template-rows: 1fr 3fr 5fr;
   grid-template-areas:
     "header"
-    "content"
-    "footer";
-  height: 100%;
+    "stage"
+    "math"
+    "keypad";
+  grid-template-rows: min-content 3fr 2fr auto;
+  gap: 1rem;
+  padding: 1rem;
   width: 100%;
+  height: 100%;
+  color: white;
   position: relative;
   z-index: 2;
-  padding: 2rem;
-  color: white;
   background: rgba(0, 0, 0, 0.4);
-  border: 2px dashed #00ffee88;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
+  box-sizing: border-box;
 }
 
-/* === Header / Footer === */
+/* === 🍧 Header === */
 .qs-header {
   grid-area: header;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ff00ff44;
 }
 
-.qs-footer {
-  grid-area: footer;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  border: 1px solid #ff00ff44;
+.qs-header h1 {
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee88;
 }
 
-/* === Core Game Area === */
-.qs-content {
-  grid-area: content;
-  display: flex;
-  justify-content: center;
+/* === 🎸 Stage === */
+.qs-stage {
+  grid-area: stage;
+  display: grid;
+  grid-template-areas: "score phil timer";
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  flex-direction: column;
-  border: 1px solid #ff00ff44;
-  gap: 2rem;
+  justify-items: center;
+  padding: 0.5rem;
+  border: 2px dashed #00ffee88;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(6px);
+  position: relative;
+  overflow: hidden;
 }
 
-.score-box {
-  font-size: 1.4rem;
+.phil-wrapper {
+  grid-area: phil;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 100%;
+  z-index: 2; /* 🧠 Puts Phil above glow lines */
+}
+
+.phil-img {
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* === ✨ Info Boxes (Score + Timer) === */
+.info-box {
+  font-size: 1.2rem;
   font-weight: bold;
   color: #00ffee;
-  border: 1px solid #00ffee55;
-  padding: 0.5rem 1rem;
+  border: 2px solid #00ffee88;
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 8px #00ffee88;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* === ✨ Glow Lines === */
+.glow-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1; /* 🔥 Behind Phil */
+}
+
+.glow-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #00ffee;
+  opacity: 0.2;
+  box-shadow: 0 0 16px #00ffeeaa;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.glow-line:nth-child(1) { top: 20%; }
+.glow-line:nth-child(2) { top: 50%; }
+.glow-line:nth-child(3) { top: 80%; }
+
+/* === 🧠 Math Panel === */
+.qs-math {
+  grid-area: math;
+  display: grid;
+  grid-template-areas: "score center timer";
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #00ffee88;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 8px #00ffee88;
+  backdrop-filter: blur(8px) saturate(120%);
 }
 
-.math-stack {
+.qs-math .info-box {
+  grid-area: score;
+}
+
+.qs-math .timer-box {
+  grid-area: timer;
+}
+
+.center-stack {
+  grid-area: center;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   align-items: center;
-  justify-content: center;
+  gap: 0.5rem;
 }
 
-.math-stack span {
-  font-size: 2rem;
+.math-problem {
+  font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: bold;
-  color: #ffffff;
+  color: white;
+  text-shadow: 0 0 6px #ffffff88;
 }
 
-.math-stack input {
-  padding: 0.5rem 1rem;
-  font-size: 1.2rem;
-  border: 2px solid #00ffee;
-  border-radius: 8px;
-  background: #000;
+.answer-display {
+  font-size: clamp(2.5rem, 5vw, 3rem);
+  font-weight: bold;
   color: #00ffee;
-  text-align: center;
-  width: 200px;
+  text-shadow: 0 0 8px #00ffee88;
 }
 
-.math-stack button {
-  font-size: 1.1rem;
-  padding: 0.5rem 1.2rem;
-  border-radius: 10px;
-  background-color: #00ffee;
-  border: none;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 0 10px #00ffee88;
-  transition: background 0.2s ease;
-}
-
-.math-stack button:hover {
-  background-color: #33ffff;
-}
-
-.cone-status {
+.qs-result-msg {
   font-size: 1.1rem;
   color: #ffdd55;
   min-height: 1.5em;
+  text-shadow: 0 0 4px #ffdd5588;
 }
 
-.btn-return {
-  margin-top: 2rem;
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  background: #00ffee;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 0 12px #00ffeeaa;
-  transition: background 0.2s ease;
+/* === 🎹 Keypad === */
+.qs-keypad {
+  grid-area: keypad;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 0.4rem;
 }
 
-.btn-return:hover {
-  background-color: #33ffff;
-}
-
-.qs-zone {
-  padding: 2rem;
-  background: rgba(0, 0, 0, 0.7);
+.qs-keypad button {
+  background: linear-gradient(145deg, #000, #111);
   border: 2px solid #00ffee;
-  border-radius: 1.5rem;
-  box-shadow: 0 0 24px #00ffee88;
-  text-align: center;
   color: white;
-  max-width: 90%;
-  width: clamp(300px, 80%, 480px);
+  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+  padding: 0.8rem;
+  border-radius: 14px;
+  box-shadow: 0 0 12px #00ffeeaa, inset 0 0 10px #00ffee22;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
 }
 
-.menu-image.hidden {
-  display: none !important;
+.qs-keypad button:hover {
+  box-shadow: 0 0 20px #00ffee, inset 0 0 14px #00ffee44;
+}
+
+.qs-keypad button:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px #00ffee, inset 0 0 10px #00ffee55;
+}
+
+.qs-keypad .empty {
+  background: transparent;
+  border: none;
+  pointer-events: none;
+}
+
+/* === 🎬 Intro Screen === */
+.qs-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px dashed #00ffee88;
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+}
+
+.qs-intro .phil-wrapper {
+  max-height: 60%;
+}
+
+/* === 🎛️ Buttons (Intro + Popup) === */
+.start-show-btn,
+.back-to-menu-btn,
+.result-popup button {
+  background: #00ffee;
+  color: black;
+  font-size: 1.4rem;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #00ffeeaa;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.start-show-btn:hover,
+.back-to-menu-btn:hover,
+.result-popup button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px #00ffee;
+}
+
+.start-show-btn:active,
+.back-to-menu-btn:active,
+.result-popup button:active {
+  transform: scale(0.95);
+}
+
+/* === 🍧 Fade In/Out === */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* === 🎯 Result Popup === */
+.result-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  box-shadow: 0 0 24px #00ffeeaa;
+  text-align: center;
+}
+
+.result-popup h2 {
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee88;
+}
+
+.result-popup p {
+  color: white;
+  font-size: 1.3rem;
+}
+
+/* === 🎸 Mini Phil Below Popup === */
+.result-phil img {
+  max-height: 80px;
+  opacity: 0.9;
+  margin-top: 1rem;
 }

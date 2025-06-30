@@ -69,15 +69,18 @@
   ],
   "dependencies": {
     "dotenv": "^16.5.0",
+    "fuse.js": "^7.1.0",
     "gsap": "3.12.5",
     "howler": "2.2.4",
+    "mathjs": "^14.5.2",
     "mobx": "6.10.2",
-    "pixi.js": "7.3.1"
+    "pixi.js": "7.3.1",
+    "semver": "^7.7.2"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.5.1",
     "eslint-plugin-import": "^2.31.0",
-    "gh-pages": "6.0.0",
+    "gh-pages": "^6.0.0",
     "husky": "^8.0.0",
     "lint-staged": "^16.1.0",
     "prettier-plugin-tailwindcss": "^0.6.12",
