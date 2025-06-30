@@ -431,3 +431,59 @@
   box-shadow: 0 0 6px #00ffff, inset 0 0 4px #00ffff;
   color: white;
 }
+/* === 🎧 Styled Dropdown (Jukebox Select) === */
+select#trackSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-color: #111;
+  color: #00ffee;
+  border: 2px solid #00ffee;
+  border-radius: 8px;
+  padding: 0.4em 1.2em 0.4em 0.6em;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 0 8px #00ffee55;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg fill="%2300ffee" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.6em center;
+  background-size: 1em;
+}
+
+select#trackSelect:hover {
+  background-color: #222;
+}
+
+select#trackSelect:focus {
+  outline: none;
+  background-color: #000;
+  box-shadow: 0 0 10px #00ffeeaa;
+}
+.track-title-container {
+  position: relative;
+  min-height: 1.8em;
+  height: auto;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.track-title {
+  position: static; /* 🔥 kill the absolute */
+  text-align: center;
+  color: #00ffee;
+  font-weight: bold;
+  font-size: 1.2rem;
+  opacity: 1;
+  pointer-events: none;
+}
+
+#currentTrack {
+  display: block;
+  color: #00ffee;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+}
