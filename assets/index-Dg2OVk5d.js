@@ -155,7 +155,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 `)).join(`
 `)}
     </div>
-  `}function t_(){var r;const e=document.getElementById("game-container");e.innerHTML="",e.classList.add("hidden"),e.style.display="none",(r=document.querySelector(".menu-wrapper"))==null||r.classList.remove("hidden"),Rt(),Me.clearCurrentMode()}function n_(e){const r=document.getElementById(e);r&&r.addEventListener("click",()=>{xn(()=>{t_()})})}const a_={correct:"/SnowCone-MathFest/assets/audio/SFX/correct.mp3",incorrect:"/SnowCone-MathFest/assets/audio/SFX/incorrect.mp3",milestone:"/SnowCone-MathFest/assets/audio/SFX/QuikServepointsmilestone.mp3",points100:"/SnowCone-MathFest/assets/audio/SFX/QuikServepoints100.mp3"},i_=.4,Dg={};for(const[e,r]of Object.entries(a_))Dg[e]=new pn.Howl({src:[r],volume:pn.Howler._muted?0:i_});function Ng(e){const r=Dg[e];if(!r){console.warn(`⚠️ SFX "${e}" not found.`);return}r.play()}function o_(){Ng("correct")}function s_(){Ng("incorrect")}let Ks=0,Ni=105,ps=null,mt="";function jc(){c_(),l_()}function ea(){clearInterval(ps),xg(),Xc()}function u_(){mt="",ai()}function c_(){Ks=0,Ni=105,mt=""}function l_(){Eg(),ai(),f_(),Vw(),wg(),Sg()}function f_(){const e=document.getElementById("qsTimer");e&&(e.textContent=lf(Ni),ps=setInterval(()=>{Ni--,e.textContent=lf(Ni),Ni<=0&&(clearInterval(ps),m_())},1e3))}function m_(){clearInterval(ps),Ww(),Xc(),g_()}function lf(e){const r=Math.floor(e/60),t=e%60;return`${r}:${t.toString().padStart(2,"0")}`}function ai(){const e=document.getElementById("answerDisplay");e&&(e.textContent=mt===""?"0":mt)}function Eg(){const e=document.getElementById("qsScore");e&&(e.textContent=Ks)}function Sg(){const e=Math.floor(Math.random()*20)+1,r=Math.floor(Math.random()*20)+1,t=document.getElementById("mathProblem");t&&(t.textContent=`${e} + ${r} = ?`,t.dataset.answer=(e+r).toString())}function d_(){const e=document.getElementById("mathProblem");if(!e)return;const r=parseInt(mt.trim(),10),t=parseInt(e.dataset.answer,10);r===t?p_():v_()}function p_(){Ks++,Eg(),Me.addXP(3),Cg("✅ Correct! +3 XP","#00ffee"),Ag(),jw(),o_(),h_(),mt="",ai(),Sg()}function v_(){Cg("❌ Nope!","#ff5555"),Ag("bad"),Xw(),s_()}function Cg(e,r){const t=document.getElementById("qsResultMsg");t&&(t.textContent=e,t.style.color=r,setTimeout(()=>{t.textContent=""},1500))}function h_(){Me.profile.xp>=100&&!Me.profile.badges.includes("cone_master")&&(Me.unlockBadge("cone_master"),console.log("🏅 Badge unlocked: cone_master"))}function g_(){var r,t;const e=document.createElement("div");e.classList.add("result-popup"),e.innerHTML=`
+  `}function t_(){var r;const e=document.getElementById("game-container");e.innerHTML="",e.classList.add("hidden"),e.style.display="none",(r=document.querySelector(".menu-wrapper"))==null||r.classList.remove("hidden"),Rt(),Me.clearCurrentMode()}function n_(e){const r=document.getElementById(e);r&&r.addEventListener("click",()=>{xn(()=>{t_()})})}const a_={correct:"/SnowCone-MathFest/assets/audio/SFX/correct.mp3",incorrect:"/SnowCone-MathFest/assets/audio/SFX/incorrect.mp3",milestone:"/SnowCone-MathFest/assets/audio/SFX/QuikServepointsmilestone.mp3",points100:"/SnowCone-MathFest/assets/audio/SFX/QuikServepoints100.mp3"},i_=.4,Dg={};for(const[e,r]of Object.entries(a_))Dg[e]=new pn.Howl({src:[r],volume:pn.Howler._muted?0:i_});function Ng(e){const r=Dg[e];if(!r){console.warn(`⚠️ SFX "${e}" not found.`);return}r.play()}function o_(){Ng("correct")}function s_(){Ng("incorrect")}let Ks=0,Ni=105,ps=null,mt="";function jc(){c_(),l_()}function ea(){clearInterval(ps),xg(),Xc()}function u_(){mt="",ai()}function c_(){Ks=0,Ni=105,mt=""}function l_(){Eg(),ai(),f_(),Vw(),wg(),Sg()}function f_(){const e=document.getElementById("qsTimer");e&&(e.textContent=lf(Ni),ps=setInterval(()=>{Ni--,e.textContent=lf(Ni),Ni<=0&&(clearInterval(ps),m_())},1e3))}function m_(){clearInterval(ps),Ww(),Xc(),g_()}function lf(e){const r=Math.floor(e/60),t=e%60;return`${r}:${t.toString().padStart(2,"0")}`}function ai(){const e=document.getElementById("answerDisplay");e&&(e.textContent=mt===""?"0":mt)}function Eg(){const e=document.getElementById("qsScore");e&&(e.textContent=Ks)}function Sg(){const e=Math.floor(Math.random()*20)+1,r=Math.floor(Math.random()*20)+1,t=document.getElementById("mathProblem");t&&(t.textContent=`${e} + ${r} = ?`,t.dataset.answer=(e+r).toString())}function d_(){const e=document.getElementById("mathProblem");if(!e)return;const r=parseInt(mt.trim(),10),t=parseInt(e.dataset.answer,10);r===t?p_():v_()}function p_(){Ks++,Eg(),Me.addXP(3),Cg(!0,3),Ag(),jw(),o_(),h_(),mt="",ai(),Sg()}function v_(){Cg(!1,0),Ag("bad"),Xw(),s_()}function Cg(e,r=0){const t=document.getElementById("qsResultMsg"),n=document.getElementById("qsXPMsg");!t||!n||(t.textContent=e?"✅ Correct!":"❌ Nope!",t.classList.remove("hidden"),t.classList.toggle("error",!e),n.textContent=`🍧 ${r} XP`,n.classList.remove("hidden"),n.classList.toggle("zero",r===0),n.style.color=e?"#00ffee":"#ff4444",n.style.textShadow=e?"0 0 4px #00ffee88":"0 0 4px #ff444488",setTimeout(()=>{t.classList.add("hidden"),n.classList.add("hidden")},1500))}function h_(){Me.profile.xp>=100&&!Me.profile.badges.includes("cone_master")&&(Me.unlockBadge("cone_master"),console.log("🏅 Badge unlocked: cone_master"))}function g_(){var r,t;const e=document.createElement("div");e.classList.add("result-popup"),e.innerHTML=`
     <h2>🍧 Show Complete!</h2>
     <p>Score: ${Ks}</p>
     <button id="playAgainBtn">🎧 Play Again</button>
@@ -176,7 +176,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
         <button id="backToMenuBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
       </div>
     </div>
-  `,yg(),C_(),Tg(),(r=document.getElementById("startShowBtn"))==null||r.addEventListener("click",()=>{xn(()=>{__(),N_()})}),(t=document.getElementById("backToMenuBtn"))==null||t.addEventListener("click",E_)}function N_(){const e=Js();e.innerHTML=`
+  `,yg(),C_(),Tg(),(r=document.getElementById("startShowBtn"))==null||r.addEventListener("click",()=>{xn(()=>{__(),N_()})}),(t=document.getElementById("backToMenuBtn"))==null||t.addEventListener("click",E_)}function N_(){var r,t;const e=Js();e.innerHTML=`
     <div class="game-frame">
       <img id="modeBackground" class="background-fill" src="/SnowCone-MathFest/assets/img/modes/quickServe/quickserveBG.png"/>
       
@@ -192,7 +192,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           <div class="score-box info-box">Score: <span id="qsScore">0</span></div>
 
           <div class="phil-wrapper">
-            <img id="philSprite" class="phil-img" src="..." alt="Cosmic Phil" />
+            <img id="philSprite" class="phil-img" src="/SnowCone-MathFest/assets/img/characters/quickServe/phil_01_idle.png" alt="Cosmic Phil" />
           </div>
 
           <div class="timer-box info-box">⏱️ <span id="qsTimer">1:45</span></div>
@@ -205,23 +205,24 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           </div>
         </div>
 
-
         <!-- 🧠 Math Stack -->
         <div class="qs-math">
           <div class="center-stack">
-            <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+            <div class="equation-row">
+              <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+              <div class="qs-xp-msg hidden" id="qsXPMsg">🍧 +3 XP</div>
+              <div class="qs-result-msg hidden" id="qsResultMsg">✅ Correct!</div>
+            </div>
             <div id="answerDisplay" class="answer-display">0</div>
-            <div class="qs-result-msg" id="qsResultMsg"></div>
           </div>
         </div>
-
 
         <!-- 🎹 Keypad -->
         ${r_()}
 
       </div>
     </div>
-  `,yg(),Qw(),wg(),y_(),Tg(),jc()}function Tg(){const e=document.getElementById("muteBtn");if(!e)return;const r=()=>{e.textContent=Howler._muted?"🔇 Unmute":"🔊 Mute"};e.addEventListener("click",()=>{Cw(),r()}),r()}function E_(){Mg(),vn(),xn(()=>{S_(),T_(),Rt()})}function S_(){console.log("🧹 Cleaning up QuickServe"),ea(),Xc(),xg(),u_(),F_(),Me.clearCurrentMode()}function C_(){requestAnimationFrame(()=>{setTimeout(()=>{const e=document.getElementById("modeBackground");e&&(e.src=e.src)},10)})}function M_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.add("hidden")}function T_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.remove("hidden")}function B_(){const e=Js();e.classList.remove("hidden"),e.style.display="flex"}function F_(){const e=Js();e.innerHTML="",e.classList.add("hidden"),e.style.display="none"}function Js(){return document.getElementById("game-container")}let Wc=0,ra,ta,Bg,Yc,na;function O_(){console.log("🏕️ Loading Kids Camping Mode"),Me.setMode("kids"),Qi("kidsCamping");const e=document.querySelector(".menu-wrapper"),r=document.getElementById("game-container");e==null||e.classList.add("hidden"),r.classList.remove("hidden"),r.style.display="flex",I_(),$_(),R_()}function zo(){const e=document.getElementById("game-container");e.innerHTML="",e.classList.add("hidden"),e.style.display="none",P_(),console.log("🏕️ Kids Camping Mode cleaned up!")}function I_(){const e=document.getElementById("game-container");e.innerHTML=`
+  `,console.log("💥 CORRECT FIRED"),(r=document.getElementById("qsXPMsg"))==null||r.classList.add("hidden"),(t=document.getElementById("qsResultMsg"))==null||t.classList.add("hidden"),yg(),Qw(),wg(),y_(),Tg(),jc()}function Tg(){const e=document.getElementById("muteBtn");if(!e)return;const r=()=>{e.textContent=Howler._muted?"🔇 Unmute":"🔊 Mute"};e.addEventListener("click",()=>{Cw(),r()}),r()}function E_(){Mg(),vn(),xn(()=>{S_(),T_(),Rt()})}function S_(){console.log("🧹 Cleaning up QuickServe"),ea(),Xc(),xg(),u_(),F_(),Me.clearCurrentMode()}function C_(){requestAnimationFrame(()=>{setTimeout(()=>{const e=document.getElementById("modeBackground");e&&(e.src=e.src)},10)})}function M_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.add("hidden")}function T_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.remove("hidden")}function B_(){const e=Js();e.classList.remove("hidden"),e.style.display="flex"}function F_(){const e=Js();e.innerHTML="",e.classList.add("hidden"),e.style.display="none"}function Js(){return document.getElementById("game-container")}let Wc=0,ra,ta,Bg,Yc,na;function O_(){console.log("🏕️ Loading Kids Camping Mode"),Me.setMode("kids"),Qi("kidsCamping");const e=document.querySelector(".menu-wrapper"),r=document.getElementById("game-container");e==null||e.classList.add("hidden"),r.classList.remove("hidden"),r.style.display="flex",I_(),$_(),R_()}function zo(){const e=document.getElementById("game-container");e.innerHTML="",e.classList.add("hidden"),e.style.display="none",P_(),console.log("🏕️ Kids Camping Mode cleaned up!")}function I_(){const e=document.getElementById("game-container");e.innerHTML=`
     <div class="game-frame">
       <img id="modeBackground" class="background-fill" src="assets/img/modes/kidsCamping/campingBG.png" alt="Camping Background" />
       <div class="kc-grid">
