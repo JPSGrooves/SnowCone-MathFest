@@ -94,7 +94,7 @@ const labelColorMap = {
     tips:     '#3366ff',
     story:    '#ffcc00',
     infinity: '#bbbbbb',
-    options:  '#222222'
+    options:  '#ff4444'
   },
   halloween: {
     kids:     '#ff9933',
@@ -223,7 +223,6 @@ export const unlockableThemes = [
   'halloween',
   'harvest',
   'christmas',
-  'freedom',
   'newyear',
   'valentine',
   'cosmic_01',

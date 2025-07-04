@@ -6,10 +6,10 @@ let poseTimer = null;
 let reactionTimeout = null;
 
 const poseMap = {
-  idle: 'phil_01_idle',
-  focus: 'phil_02_focus',
-  groove: 'phil_03_groove',
-  lockin: 'phil_04_lockin',
+  idle: 'phil_intro',
+  focus: 'phil_01_idle',
+  groove: 'phil_02_focus',
+  lockin: 'phil_03_groove',
   crank: 'phil_05_crank',
   hype: 'phil_06_hype',
   cosmic: 'phil_07_cosmic',
@@ -21,7 +21,7 @@ const poseMap = {
 // 🚀 Init
 //////////////////////////////
 export function initPhil() {
-  philEl = document.getElementById('philSprite');
+  philEl = document.getElementById('philSpriteInGame');
   if (!philEl) {
     console.warn('⚠️ Cosmic Phil not found in DOM!');
     return;

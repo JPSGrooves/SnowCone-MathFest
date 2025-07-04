@@ -7,6 +7,8 @@ import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { showMenu } from '../../managers/sceneManager.js';
 import { playCorrect, playIncorrect } from './soundFX.js';
 import { playTrack, stopTrack } from '../../managers/musicManager.js';
+import { stopQS, playQSRandomTrack } from './quickServeMusic.js';
+import { renderGameUI } from './quickServe.js'; // 💥 Need to export this!
 
 //////////////////////////////
 // 🔥 Game State
@@ -36,6 +38,12 @@ export function resetCurrentAnswer() {
   currentAnswer = '';
   updateAnswerDisplay();
 }
+
+export function appendToAnswer(val) {
+  currentAnswer += val;
+  updateAnswerDisplay();
+}
+
 
 //////////////////////////////
 // 🎮 Runtime Logic
@@ -131,7 +139,7 @@ function handleCorrect() {
   updateScore();
   appState.addXP(3);
 
-  showResultMsg('✅ Correct! +3 XP', '#00ffee');
+  showResultMsg(true, 3);
   gridFX.bumpGridGlow();
   phil.bumpJam();
   playCorrect();
@@ -144,22 +152,38 @@ function handleCorrect() {
 }
 
 function handleIncorrect() {
-  showResultMsg('❌ Nope!', '#ff5555');
+  showResultMsg(false, 0);
   gridFX.bumpGridGlow('bad');
   phil.triggerGlitch();
   playIncorrect();
 }
 
-function showResultMsg(text, color) {
+function showResultMsg(isCorrect, xp = 0) {
   const resultMsg = document.getElementById('qsResultMsg');
-  if (!resultMsg) return;
-  resultMsg.textContent = text;
-  resultMsg.style.color = color;
+  const xpMsg = document.getElementById('qsXPMsg');
+
+  if (!resultMsg || !xpMsg) return;
+
+  // 💚 Result feedback (right side)
+  resultMsg.textContent = isCorrect ? '✅ Correct!' : '❌ Nope!';
+  resultMsg.classList.remove('hidden');
+  resultMsg.classList.toggle('error', !isCorrect);
+
+  // 🍧 XP feedback (left side)
+  xpMsg.textContent = `🍧 ${xp} XP`;
+  xpMsg.classList.remove('hidden');
+  xpMsg.classList.toggle('zero', xp === 0);
+  xpMsg.style.color = isCorrect ? '#00ffee' : '#ff4444';
+  xpMsg.style.textShadow = isCorrect
+    ? '0 0 4px #00ffee88'
+    : '0 0 4px #ff444488';
 
   setTimeout(() => {
-    resultMsg.textContent = '';
+    resultMsg.classList.add('hidden');
+    xpMsg.classList.add('hidden');
   }, 1500);
 }
+
 
 function checkBadgeUnlock() {
   if (appState.profile.xp >= 100 && !appState.profile.badges.includes('cone_master')) {
@@ -178,71 +202,30 @@ function showResultScreen() {
   popup.innerHTML = `
     <h2>🍧 Show Complete!</h2>
     <p>Score: ${score}</p>
+    <p>XP Earned: ${score * 3}</p>
     <button id="playAgainBtn">🎧 Play Again</button>
     <button id="menuBtn">🔙 Menu</button>
   `;
 
   document.getElementById('game-container').appendChild(popup);
 
-  document.getElementById('playAgainBtn')?.addEventListener('click', () => {
+  document.getElementById('playAgainBtn')?.addEventListener('click', async () => {
     popup.remove();
-    stopTrack();
-    stopGameLogic();
-    startGameLogic();
-    playTrack('main');
+
+    await stopQS();            // Fade out old song
+    stopGameLogic();           // Stop game state
+    renderGameUI();            // Rebuild full UI
+    setTimeout(() => playQSRandomTrack(), 50);  // 🔥 Let DOM breathe, then start music
   });
+
 
   document.getElementById('menuBtn')?.addEventListener('click', () => {
     popup.remove();
-    stopTrack();
+    stopQS();         // 🔇💀 Kill the DJ properly
+    stopTrack();      // 🪦 Belt + suspenders
     stopGameLogic();
     showMenu();
-  });
-}
-
-//////////////////////////////
-// 🎛️ Keypad Logic
-//////////////////////////////
-export function setupKeypad() {
-  const keys = [
-    { id: 'zero', val: '0' },
-    { id: 'one', val: '1' },
-    { id: 'two', val: '2' },
-    { id: 'three', val: '3' },
-    { id: 'four', val: '4' },
-    { id: 'five', val: '5' },
-    { id: 'six', val: '6' },
-    { id: 'seven', val: '7' },
-    { id: 'eight', val: '8' },
-    { id: 'nine', val: '9' },
-    { id: 'decimal', val: '.' }
-  ];
-
-  keys.forEach(({ id, val }) => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.addEventListener('click', () => {
-        currentAnswer += val;
-        updateAnswerDisplay();
-      });
-    }
-  });
-
-  document.getElementById('reset')?.addEventListener('click', () => {
-    stopTrack();
-    stopGameLogic();
-    startGameLogic();
-    playTrack('main');
-  });
-
-  document.getElementById('neg')?.addEventListener('click', toggleNegative);
-  document.getElementById('clear')?.addEventListener('click', clearAnswer);
-  document.getElementById('enter')?.addEventListener('click', submitAnswer);
-  document.getElementById('algMode')?.addEventListener('click', () => {
-    alert('🔢 Algebra Mode is under construction!');
-  });
-
-  hookReturnButton('menu');
+    });
 }
 
 function toggleNegative() {
@@ -258,3 +241,11 @@ function clearAnswer() {
   currentAnswer = '';
   updateAnswerDisplay();
 }
+
+// ✅ Keypad Helpers (export for keypad use)
+// ✅ Keypad Helpers (export for keypad use)
+export {
+  toggleNegative,
+  clearAnswer,
+  submitAnswer
+};

@@ -49,16 +49,19 @@ export function playQSRandomTrack() {
 // 🛑 Stop Current Track
 //////////////////////////////
 export function stopQS() {
-  if (!qsTrack) return;
+  return new Promise((resolve) => {
+    if (!qsTrack) return resolve();
 
-  qsTrack.fade(qsTrack.volume(), 0, fadeDuration);
-  setTimeout(() => {
-    qsTrack.stop();
-    qsTrack.unload();
-    qsTrack = null;
-    currentFile = null;
-    console.log('🛑 QS Track stopped and unloaded');
-  }, fadeDuration);
+    qsTrack.fade(qsTrack.volume(), 0, fadeDuration);
+    setTimeout(() => {
+      qsTrack.stop();
+      qsTrack.unload();
+      qsTrack = null;
+      currentFile = null;
+      console.log('🛑 QS Track stopped and unloaded');
+      resolve(); // ✅ only resolve once fully stopped
+    }, fadeDuration);
+  });
 }
 
 //////////////////////////////

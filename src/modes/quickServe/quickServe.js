@@ -8,12 +8,11 @@ import { stopTrack, toggleMute } from '../../managers/musicManager.js';
 
 import * as phil from './quickServePhil.js';
 import * as gridFX from './quickServeGridFX.js';
-import { generateKeypadHTML } from './quickServeKeypad.js';
+import { setupKeypad, generateKeypadHTML, setupKeyboardInput } from './quickServeKeypad.js';
 import { 
   startGameLogic, 
   stopGameLogic, 
   resetCurrentAnswer, 
-  setupKeypad 
 } from './quickServeGame.js';
 
 import { playQSRandomTrack, stopQS } from './quickServeMusic.js';
@@ -46,10 +45,9 @@ function renderIntroScreen() {
       <div class="qs-intro">
         <div class="phil-wrapper">
           <img 
-            id="philSprite" 
+            id="philSpriteIntro" 
             class="phil-img" 
-            src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_01_idle.png"
-            alt="Cosmic Phil"
+            src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_intro.png"
           />
         </div>
         <button id="startShowBtn" class="start-show-btn">✨ Start the Show ✨</button>
@@ -75,7 +73,7 @@ function renderIntroScreen() {
 //////////////////////////////
 // 🎮 Main Game Screen
 //////////////////////////////
-function renderGameUI() {
+export function renderGameUI() {
   const container = getGameContainer();
 
   container.innerHTML = `
@@ -86,19 +84,23 @@ function renderGameUI() {
 
         <!-- 🍧 Header -->
         <div class="qs-header">
-          <h1>🍧 QuickServe Pavilion</h1>
+          <h1>QuickServe Pavilion</h1>
         </div>
 
         <!-- 🎸 Stage -->
         <div class="qs-stage">
-          <div class="phil-wrapper">
+          <div class="score-box info-box">Score: <span id="qsScore">0</span></div>
+
+          <div class="phil-wrapper in-game">
             <img 
-              id="philSprite" 
-              class="phil-img" 
-              src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_01_idle.png" 
-              alt="Cosmic Phil"
+              id="philSpriteInGame" 
+              class="phil-img in-game"
+              src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_01_idle.png"
             />
           </div>
+
+
+          <div class="timer-box info-box">⏱️ <span id="qsTimer">1:45</span></div>
 
           <!-- ✨ Glow Lines -->
           <div class="glow-lines">
@@ -110,15 +112,14 @@ function renderGameUI() {
 
         <!-- 🧠 Math Stack -->
         <div class="qs-math">
-          <div class="info-box">Score: <span id="qsScore">0</span></div>
-
           <div class="center-stack">
-            <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+            <div class="equation-row">
+              <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+              <div class="qs-xp-msg hidden" id="qsXPMsg">🍧 +3 XP</div>
+              <div class="qs-result-msg hidden" id="qsResultMsg">✅ Correct!</div>
+            </div>
             <div id="answerDisplay" class="answer-display">0</div>
-            <div class="qs-result-msg" id="qsResultMsg"></div>
           </div>
-
-          <div class="info-box timer-box">⏱️ <span id="qsTimer">1:45</span></div>
         </div>
 
         <!-- 🎹 Keypad -->
@@ -128,11 +129,17 @@ function renderGameUI() {
     </div>
   `;
 
+  // 🚨 MOVE THIS *AFTER* innerHTML is injected
+  console.log('💥 CORRECT FIRED');
+  document.getElementById('qsXPMsg')?.classList.add('hidden');
+  document.getElementById('qsResultMsg')?.classList.add('hidden');
+
   // 🚀 Setup Sequence (correct order)
   phil.initPhil();
   gridFX.initGridGlow();
   gridFX.startGridPulse();
   setupKeypad();
+  setupKeyboardInput();
   setupMuteButton();
   startGameLogic();
 }
@@ -177,6 +184,7 @@ export function returnToMenu() {
 function cleanUpQuickServe() {
   console.log('🧹 Cleaning up QuickServe');
 
+  stopQS(); // 🔇 Kill QuickServe music every single time cleanup is called
   stopGameLogic();
   gridFX.stopGridPulse();
   phil.resetPhil();
@@ -224,6 +232,61 @@ function clearGameContainer() {
 
 function getGameContainer() {
   return document.getElementById('game-container');
+}
+
+function handleCorrect() {
+  showResultMsg('✅ Correct!', '#00ffee', 3);
+  score++;
+  updateScore();
+  appState.addXP(3);
+
+  const xpMsg = document.getElementById('qsXPMsg');
+  const resultMsg = document.getElementById('qsResultMsg');
+
+  xpMsg.textContent = '🍧 +3 XP';
+  resultMsg.textContent = '✅ Correct!';
+
+  xpMsg.classList.remove('hidden', 'zero');
+  resultMsg.classList.remove('hidden', 'error');
+  resultMsg.style.color = '#00ff88'; // bright green if needed
+
+  gridFX.bumpGridGlow();
+  phil.bumpJam();
+  playCorrect();
+
+  checkBadgeUnlock();
+
+  currentAnswer = '';
+  updateAnswerDisplay();
+  generateProblem();
+
+  setTimeout(clearFeedback, 1500);
+}
+function handleIncorrect() {
+  showResultMsg('❌ Nope!', '#ff4444', 0);
+  const xpMsg = document.getElementById('qsXPMsg');
+  const resultMsg = document.getElementById('qsResultMsg');
+
+  xpMsg.textContent = '🍧 0 XP';
+  resultMsg.textContent = '❌ Try Again';
+
+  xpMsg.classList.remove('hidden');
+  xpMsg.classList.add('zero');
+
+  resultMsg.classList.remove('hidden');
+  resultMsg.classList.add('error');
+
+  resultMsg.style.color = '#ff4444'; // red
+
+  gridFX.bumpGridGlow('bad');
+  phil.triggerGlitch();
+  playIncorrect();
+  setTimeout(clearFeedback, 1500);
+}
+
+function clearFeedback() {
+  document.getElementById('qsXPMsg')?.classList.add('hidden');
+  document.getElementById('qsResultMsg')?.classList.add('hidden');
 }
 
 //////////////////////////////

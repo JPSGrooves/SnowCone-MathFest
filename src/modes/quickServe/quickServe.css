@@ -6,7 +6,7 @@
     "stage"
     "math"
     "keypad";
-  grid-template-rows: min-content 3fr 2fr auto;
+  grid-template-rows: min-content 3fr auto auto;
   gap: 1rem;
   padding: 1rem;
   width: 100%;
@@ -19,6 +19,7 @@
   box-sizing: border-box;
 }
 
+
 /* === 🍧 Header === */
 .qs-header {
   grid-area: header;
@@ -28,45 +29,130 @@
 }
 
 .qs-header h1 {
-  font-size: clamp(1.5rem, 2vw, 2rem);
+  font-size: clamp(1.2rem, 3vw, 2.5rem); /* 🚨 dialed back */
+  font-family: 'Orbitron', sans-serif;
   color: #00ffee;
-  text-shadow: 0 0 8px #00ffee88;
+  text-shadow:
+    0 0 4px #00ffee,
+    0 0 8px #00ffeeaa,
+    0 0 16px #00ffee55;
+  animation: pulseTitle 3s infinite ease-in-out;
+  text-align: center;
+  letter-spacing: 0.08em;
+  margin: 0;
+  padding: 0.4em 0;
 }
+@keyframes pulseTitle {
+  0%, 100% {
+    text-shadow:
+      0 0 4px #00ffee,
+      0 0 8px #00ffeeaa,
+      0 0 16px #00ffee55;
+    transform: scale(1);
+  }
+  50% {
+    text-shadow:
+      0 0 6px #ff66ff,
+      0 0 12px #ff66ffaa,
+      0 0 20px #ff66ff55;
+    transform: scale(1.02); /* subtle lift */
+  }
+}
+
+
 
 /* === 🎸 Stage === */
 .qs-stage {
   grid-area: stage;
-  display: grid;
-  grid-template-areas: "score phil timer";
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  justify-items: center;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   padding: 0.5rem;
   border: 2px dashed #00ffee88;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(6px);
-  position: relative;
   overflow: hidden;
+  min-height: 20vh;
+  max-height: 33vh;
 }
 
-.phil-wrapper {
-  grid-area: phil;
+/* ⬅️ Score box */
+.qs-stage .score-box {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  width: clamp(77px, 15.4vw, 154px);
+  height: clamp(55px, 8.8vh, 77px);
+  z-index: 2; /* ✅ ABOVE grid glow */
+}
+
+/* ➡️ Timer box */
+.qs-stage .timer-box {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: clamp(77px, 15.4vw, 154px);
+  height: clamp(55px, 8.8vh, 77px);
+  z-index: 2; /* ✅ ABOVE grid glow */
+}
+
+/* 💎 Inside box */
+.qs-stage .info-box {
+  font-size: clamp(1rem, 2.8vw, 1.32rem);
+  font-weight: bold;
+  color: #00ffee;
+  border: 2px solid #00ffee88;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 8px #00ffee88;
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 100%;
-  z-index: 2; /* 🧠 Puts Phil above glow lines */
+  text-align: center;
+  padding: 0;
 }
 
+
+.phil-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  max-height: 70%;
+  max-width: 60%;
+  z-index: 2;
+  pointer-events: none;
+  position: relative;
+  transform: translateY(8%);
+}
+
+
+
 .phil-img {
-  max-height: 100%;
+  max-height: 90%;
   width: auto;
+  height: auto;
   object-fit: contain;
   transition: opacity 0.4s ease;
   pointer-events: none;
   user-select: none;
 }
+
+/* === 🧠 In-Game Phil Only === */
+.phil-wrapper.in-game {
+  max-height: clamp(100px, 30%, 180px);
+  transform: translateY(10%);
+}
+
+
+#philSprite::after {
+  content: "🐱";
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 
 /* === ✨ Info Boxes (Score + Timer) === */
 .info-box {
@@ -89,7 +175,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 1; /* 🔥 Behind Phil */
+  z-index: 0; /* 🔥 Behind Phil */
 }
 
 .glow-line {
@@ -110,47 +196,65 @@
 /* === 🧠 Math Panel === */
 .qs-math {
   grid-area: math;
-  display: grid;
-  grid-template-areas: "score center timer";
-  grid-template-columns: 1fr auto 1fr;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
   border: 2px solid #00ffee88;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px) saturate(120%);
+  min-height: clamp(120px, 18vh, 200px);
+  max-height: clamp(140px, 22vh, 240px);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.qs-math .info-box {
-  grid-area: score;
-}
-
-.qs-math .timer-box {
-  grid-area: timer;
-}
 
 .center-stack {
-  grid-area: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.4rem;
+  max-height: 100%;
+  width: 100%;
+  overflow: hidden;
+  flex-shrink: 1;
 }
 
+
+
 .math-problem {
-  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-size: clamp(1.5rem, 4vmin, 2.4rem);
   font-weight: bold;
   color: white;
   text-shadow: 0 0 6px #ffffff88;
+  text-align: center;
+  justify-self: center;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
 }
 
+
 .answer-display {
-  font-size: clamp(2.5rem, 5vw, 3rem);
+  font-size: clamp(1.6rem, 5vmin, 2.6rem);
   font-weight: bold;
   color: #00ffee;
   text-shadow: 0 0 8px #00ffee88;
+  padding: 0.2rem 0.5rem;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  line-height: 1.1;
 }
+
+
+
 
 .qs-result-msg {
   font-size: 1.1rem;
@@ -166,21 +270,33 @@
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(4, 1fr);
   gap: 0.4rem;
+  width: 100%;
+  max-height: 36vh;
+  aspect-ratio: 5 / 4; /* 🔥 this ensures square buttons in 5x4 grid */
+  box-sizing: border-box;
 }
+
 
 .qs-keypad button {
   background: linear-gradient(145deg, #000, #111);
   border: 2px solid #00ffee;
   color: white;
-  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
-  padding: 0.8rem;
+  font-size: clamp(1rem, 1.5vw, 1.6rem);
   border-radius: 14px;
   box-shadow: 0 0 12px #00ffeeaa, inset 0 0 10px #00ffee22;
   width: 100%;
   height: 100%;
   cursor: pointer;
   transition: transform 0.05s ease, box-shadow 0.05s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+  padding: 0.2rem;
+  overflow: hidden;
 }
+
 
 .qs-keypad button:hover {
   box-shadow: 0 0 20px #00ffee, inset 0 0 14px #00ffee44;
@@ -203,7 +319,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.2rem;
+  gap: clamp(1rem, 2vh, 2rem); /* 🔥 Scales the button gap cleanly */
   height: 100%;
   width: 100%;
   background: rgba(0, 0, 0, 0.4);
@@ -214,6 +330,34 @@
 
 .qs-intro .phil-wrapper {
   max-height: 60%;
+}
+
+/* 🎛️ Buttons */
+.qs-intro button {
+  background: #00ffee;
+  color: black;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #00ffeeaa;
+  cursor: pointer;
+
+  padding: clamp(0.4em, 1.2vh, 0.8em) clamp(1.2em, 2.5vh, 2em);
+  font-size: clamp(0.9rem, 2.2vh, 1.8rem); /* 🔥 can go a tick smaller now */
+
+  min-width: clamp(100px, 12vw, 180px); /* 🔥 LOWER min — shrinks further if needed */
+  max-width: 90%;
+
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.qs-intro button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #00ffee;
+}
+
+.qs-intro button:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px #00ffee;
 }
 
 /* === 🎛️ Buttons (Intro + Popup) === */
@@ -290,4 +434,120 @@
   max-height: 80px;
   opacity: 0.9;
   margin-top: 1rem;
+}
+
+.equation-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* 🍧 XP (left overlay) */
+.qs-xp-msg {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.2rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #00ffee;
+  text-shadow: 0 0 4px #00ffee88;
+}
+
+/* ✅ Result (right overlay) */
+.qs-result-msg {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.2rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #00ffee;
+  text-shadow: 0 0 4px #00ffee88;
+}
+
+
+.qs-result-msg.error {
+  color: #ff4444;
+  text-shadow: 0 0 4px #ff444488;
+}
+
+.qs-xp-msg.zero {
+  color: #888;
+  text-shadow: none;
+}
+.hidden {
+  display: none !important;
+}
+
+
+/* === 🎮 Game Phil Only === */
+.phil-wrapper.in-game {
+  max-height: clamp(121px, 34.1%, 193.6px);
+  transform: translateY(10%);
+  align-items: flex-start;
+  justify-content: center;
+  display: flex;
+  pointer-events: none;
+  z-index: 2;
+  position: relative;
+}
+
+/* 🔒 LOCKED AND INDEPENDENT from intro Phil */
+#philSpriteInGame.phil-img.in-game {
+  max-height: clamp(145px, 46.2vh, 242px) !important;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+
+.qs-keypad button:hover {
+  box-shadow: 0 0 12px currentColor, inset 0 0 8px currentColor;
+}
+
+.qs-keypad button:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px currentColor;
+}
+/* === 🎨 Keypad Button Variants === */
+
+.qs-keypad .btn-number {
+  background: black;
+  border: 2px solid #00ffee;
+}
+
+.qs-keypad .btn-mode {
+  background: rgba(0, 255, 238, 0.2); /* translucent cyan */
+  border: 2px solid #00ffee;
+}
+
+.qs-keypad .btn-menu {
+  background: rgba(255, 0, 255, 0.25); /* translucent pink/purple */
+  border: 2px solid #ff66ff;
+}
+
+.qs-keypad .btn-reset {
+  background: rgba(255, 0, 255, 0.25); /* same as menu */
+  border: 2px solid #ff66ff;
+}
+
+.qs-keypad .btn-enter {
+  background: none !important;
+  background-color: rgba(0, 255, 238, 0.4) !important;
+  border: 2px solid #00ffee;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 0 6px #00ffee88;
+  box-shadow: 0 0 12px #00ffeeaa, inset 0 0 6px #00ffee44;
+}
+
+
+.qs-keypad .btn-clear {
+  background: transparent;
+  border: 2px solid #00ffee88;
+  box-shadow: none;
 }

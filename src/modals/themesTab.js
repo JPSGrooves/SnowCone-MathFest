@@ -11,7 +11,10 @@ export function renderThemesTab() {
 
   Object.keys(themeLabels).forEach(themeId => {
     const label = themeLabels[themeId];
-    const isUnlocked = themeId === 'menubackground' || unlocked.includes(themeId);
+    const isUnlocked = 
+      themeId === 'menubackground' || 
+      themeId === 'freedom' || 
+      unlocked.includes(themeId);
     const active = currentTheme === themeId ? 'active' : '';
 
     html += `
