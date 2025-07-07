@@ -102,7 +102,7 @@ const labelColorMap = {
     tips:     '#00cc66',
     story:    '#cc0000',
     infinity: '#dddddd',
-    options:  '#000000'
+    options:  '#ff4444'
   },
   harvest: {
     kids:     '#ffcc00',
@@ -243,17 +243,17 @@ document.getElementById('labelQuickServe')?.addEventListener('click', () => {
   startMode('quickServe');
 });
 
-export function swapModeBackground(fileName) {
+export function swapModeBackground(fullPathToFile) {
   const bg = document.getElementById('modeBackground');
   if (!bg) {
     console.warn("🚨 No #modeBackground found to swap.");
     return;
   }
 
-  // 👇 Force replace even if src is already correct
   bg.src = '';
   bg.offsetHeight; // force reflow
-  bg.src = `assets/img/modes/${fileName}.png`;
+  bg.src = `${import.meta.env.BASE_URL}${fullPathToFile}`;
 
-  console.log(`🌌 Mode background swapped to: ${fileName}`);
+  console.log(`🌌 Mode background swapped to: ${fullPathToFile}`);
 }
+

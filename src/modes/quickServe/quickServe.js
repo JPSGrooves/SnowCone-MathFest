@@ -40,18 +40,27 @@ function renderIntroScreen() {
   const container = getGameContainer();
 
   container.innerHTML = `
-    <div class="game-frame">
-      <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
-      <div class="qs-intro">
-        <div class="phil-wrapper">
-          <img 
-            id="philSpriteIntro" 
-            class="phil-img" 
-            src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_intro.png"
-          />
+    <div class="aspect-wrap">
+      <div class="game-frame">
+        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
+        <div class="qs-intro">
+          <div class="phil-speech">
+            Yo! I’m <strong>Cosmic Phil</strong> and we’re about to kick off the show!<br/>
+            You’ve got <strong>1 minute and 45 seconds</strong> to score as many points as you can!<br/>
+            The tougher the math mode, the more <em>XP</em> and <em>points</em> you earn.<br/>
+            🎸 Rock on!
+          </div>
+
+          <div class="phil-wrapper">
+            <img 
+              id="philSpriteIntro" 
+              class="phil-img" 
+              src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_intro.png"
+            />
+          </div>
+          <button id="startShowBtn" class="start-show-btn">✨ Start the Show ✨</button>
+          <button id="backToMenuBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
         </div>
-        <button id="startShowBtn" class="start-show-btn">✨ Start the Show ✨</button>
-        <button id="backToMenuBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
       </div>
     </div>
   `;
@@ -77,54 +86,71 @@ export function renderGameUI() {
   const container = getGameContainer();
 
   container.innerHTML = `
-    <div class="game-frame">
-      <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
-      
-      <div class="qs-grid">
+    <div class="aspect-wrap">
+      <div class="game-frame">
+        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
+        
+        <div class="qs-grid">
 
-        <!-- 🍧 Header -->
-        <div class="qs-header">
-          <h1>QuickServe Pavilion</h1>
-        </div>
-
-        <!-- 🎸 Stage -->
-        <div class="qs-stage">
-          <div class="score-box info-box">Score: <span id="qsScore">0</span></div>
-
-          <div class="phil-wrapper in-game">
-            <img 
-              id="philSpriteInGame" 
-              class="phil-img in-game"
-              src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_01_idle.png"
-            />
+          <!-- 🍧 Header -->
+          <div class="qs-header">
+            <h1>QuickServe Pavilion</h1>
           </div>
 
+          <!-- 🎸 Stage -->
+          <div class="qs-stage">
+            <div class="score-box">
+              <div class="info-box">
+                <span class="label">Score</span>
+                <span class="value" id="qsScore">0</span>
+              </div>
+            </div>
 
-          <div class="timer-box info-box">⏱️ <span id="qsTimer">1:45</span></div>
 
-          <!-- ✨ Glow Lines -->
-          <div class="glow-lines">
-            <div class="glow-line"></div>
-            <div class="glow-line"></div>
-            <div class="glow-line"></div>
+            <div class="phil-wrapper in-game">
+              <img 
+                id="philSpriteInGame" 
+                class="phil-img in-game"
+                src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_01_idle.png"
+              />
+            </div>
+
+
+            <div class="timer-box">
+              <div class="info-box">
+                <span class="label">Time</span>
+                <span class="value" id="qsTimer">35</span>
+              </div>
+            </div>
+
+            <!-- ✨ Glow Lines -->
+            <div class="glow-lines">
+              <div class="glow-line"></div>
+              <div class="glow-line"></div>
+              <div class="glow-line"></div>
+            </div>
           </div>
-        </div>
 
-        <!-- 🧠 Math Stack -->
-        <div class="qs-math">
-          <div class="center-stack">
-            <div class="equation-row">
-              <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+          <!-- 🧠 Math Stack -->
+          <div class="qs-math">
+            <div class="center-stack">
+              <div class="equation-row">
+                <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+              </div>
+
+              <div id="answerDisplay" class="answer-display">0</div>
+
+              <!-- 🌈 Feedback floats down here -->
               <div class="qs-xp-msg hidden" id="qsXPMsg">🍧 +3 XP</div>
               <div class="qs-result-msg hidden" id="qsResultMsg">✅ Correct!</div>
             </div>
-            <div id="answerDisplay" class="answer-display">0</div>
           </div>
+
+
+          <!-- 🎹 Keypad -->
+          ${generateKeypadHTML()}
+
         </div>
-
-        <!-- 🎹 Keypad -->
-        ${generateKeypadHTML()}
-
       </div>
     </div>
   `;
@@ -159,6 +185,7 @@ function setupMuteButton() {
   muteBtn.addEventListener('click', () => {
     toggleMute();
     updateLabel();
+    muteBtn.blur(); // ✨ lose focus after click
   });
 
   updateLabel();

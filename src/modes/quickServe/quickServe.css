@@ -6,9 +6,14 @@
     "stage"
     "math"
     "keypad";
-  grid-template-rows: min-content 3fr auto auto;
-  gap: 1rem;
+  grid-template-rows:
+    minmax(6%, 10%)     /* header */
+    minmax(24%, 34%)    /* stage */
+    minmax(18%, 26%)    /* math */
+    minmax(28%, 40%);   /* keypad */
   padding: 1rem;
+  padding: 0.5rem;
+  gap: 0.5rem;
   width: 100%;
   height: 100%;
   color: white;
@@ -20,6 +25,22 @@
 }
 
 
+
+
+
+.aspect-wrap {
+  width: auto;
+  height: 100svh;
+  max-height: 100svh;
+  aspect-ratio: 11 / 16;
+  max-width: 100vw;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* === 🍧 Header === */
 .qs-header {
   grid-area: header;
@@ -29,7 +50,7 @@
 }
 
 .qs-header h1 {
-  font-size: clamp(1.2rem, 3vw, 2.5rem); /* 🚨 dialed back */
+  font-size: clamp(1.2rem, 4.5vh, 2.6rem);
   font-family: 'Orbitron', sans-serif;
   color: #00ffee;
   text-shadow:
@@ -42,6 +63,7 @@
   margin: 0;
   padding: 0.4em 0;
 }
+
 @keyframes pulseTitle {
   0%, 100% {
     text-shadow:
@@ -75,14 +97,14 @@
   backdrop-filter: blur(6px);
   overflow: hidden;
   min-height: 20vh;
-  max-height: 33vh;
+  max-height: clamp(120px, 30vh, 200px);
 }
 
 /* ⬅️ Score box */
 .qs-stage .score-box {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  left: clamp(0.5rem, 2vw, 1rem);
+  top: clamp(0.5rem, 2vh, 1rem);
   width: clamp(77px, 15.4vw, 154px);
   height: clamp(55px, 8.8vh, 77px);
   z-index: 2; /* ✅ ABOVE grid glow */
@@ -91,8 +113,8 @@
 /* ➡️ Timer box */
 .qs-stage .timer-box {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  right: clamp(0.5rem, 2vw, 1rem);
+  top: clamp(0.5rem, 2vh, 1rem);
   width: clamp(77px, 15.4vw, 154px);
   height: clamp(55px, 8.8vh, 77px);
   z-index: 2; /* ✅ ABOVE grid glow */
@@ -100,7 +122,7 @@
 
 /* 💎 Inside box */
 .qs-stage .info-box {
-  font-size: clamp(1rem, 2.8vw, 1.32rem);
+  font-size: clamp(0.6rem, 1.6vw, 1.2rem);
   font-weight: bold;
   color: #00ffee;
   border: 2px solid #00ffee88;
@@ -111,7 +133,11 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0;
+  padding: 0.4;
+
+  flex-direction: column;
+  line-height: 1.2;
+
 }
 
 
@@ -166,8 +192,11 @@
   box-shadow: 0 0 8px #00ffee88;
   display: flex;
   align-items: center;
+  flex-direction: column;
   justify-content: center;
   text-align: center;
+  font-size: clamp(0.6rem, 1.5vw, 1rem);
+  line-height: 1.2;
 }
 
 /* === ✨ Glow Lines === */
@@ -207,10 +236,16 @@
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px) saturate(120%);
-  min-height: clamp(120px, 18vh, 200px);
-  max-height: clamp(140px, 22vh, 240px);
+  /*min-height: clamp(120px, 18vh, 200px);*/
+  /*max-height: clamp(140px, 22vh, 240px);*/
   box-sizing: border-box;
   overflow: hidden;
+  font-size: clamp(1.5rem, 4vmin, 2.2rem);
+
+  min-height: unset;
+  max-height: 100%;
+  height: 100%;
+  flex-shrink: 1
 }
 
 
@@ -229,7 +264,7 @@
 
 
 .math-problem {
-  font-size: clamp(1.5rem, 4vmin, 2.4rem);
+  /*font-size: clamp(1.5rem, 4vmin, 2.4rem);*/
   font-weight: bold;
   color: white;
   text-shadow: 0 0 6px #ffffff88;
@@ -238,6 +273,11 @@
   margin: 0;
   padding: 0;
   z-index: 1;
+
+  font-size: clamp(0.3rem, 4vh, 2.2rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
@@ -254,6 +294,14 @@
 }
 
 
+.math-problem,
+.answer-display {
+  font-size: clamp(1.2rem, 4vh, 2rem); /* 📉 allow shrink */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 
 .qs-result-msg {
@@ -271,9 +319,10 @@
   grid-template-rows: repeat(4, 1fr);
   gap: 0.4rem;
   width: 100%;
-  max-height: 36vh;
+  max-height: 0;
   aspect-ratio: 5 / 4; /* 🔥 this ensures square buttons in 5x4 grid */
   box-sizing: border-box;
+  max-height: clamp(180px, 34vh, 280px);
 }
 
 
@@ -281,7 +330,7 @@
   background: linear-gradient(145deg, #000, #111);
   border: 2px solid #00ffee;
   color: white;
-  font-size: clamp(1rem, 1.5vw, 1.6rem);
+  font-size: clamp(0.7rem, 2.5vh, 1.4rem);
   border-radius: 14px;
   box-shadow: 0 0 12px #00ffeeaa, inset 0 0 10px #00ffee22;
   width: 100%;
@@ -323,9 +372,18 @@
   height: 100%;
   width: 100%;
   background: rgba(0, 0, 0, 0.4);
-  border: 2px dashed #00ffee88;
   backdrop-filter: blur(6px);
   border-radius: 12px;
+  justify-content: flex-start; /* or use space-evenly if you want balance */
+
+  max-height: 100%;
+  overflow: hidden;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.qs-intro > * {
+  max-width: 100%;
 }
 
 .qs-intro .phil-wrapper {
@@ -334,20 +392,19 @@
 
 /* 🎛️ Buttons */
 .qs-intro button {
-  background: #00ffee;
-  color: black;
+  
   border: none;
   border-radius: 16px;
   box-shadow: 0 0 12px #00ffeeaa;
   cursor: pointer;
 
-  padding: clamp(0.4em, 1.2vh, 0.8em) clamp(1.2em, 2.5vh, 2em);
-  font-size: clamp(0.9rem, 2.2vh, 1.8rem); /* 🔥 can go a tick smaller now */
-
-  min-width: clamp(100px, 12vw, 180px); /* 🔥 LOWER min — shrinks further if needed */
   max-width: 90%;
 
   transition: transform 0.1s ease, box-shadow 0.1s ease;
+
+  font-size: clamp(0.7rem, 2.2vh, 1.2rem);
+  padding: clamp(0.4em, 1vh, 0.8em) clamp(1em, 2vh, 1.8em);
+  min-width: clamp(90px, 16vw, 160px);
 }
 
 .qs-intro button:hover {
@@ -360,10 +417,163 @@
   box-shadow: 0 0 16px #00ffee;
 }
 
+
+
 /* === 🎛️ Buttons (Intro + Popup) === */
-.start-show-btn,
-.back-to-menu-btn,
-.result-popup button {
+/* 🎯 Start Show stays CYAN */
+.start-show-btn {
+  background: #00ffee;
+  color: black;
+  font-size: 1.4rem;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #00ffeeaa;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.start-show-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px #00ffee;
+}
+.start-show-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px #00ffee;
+}
+
+.back-to-menu-btn {
+  background: #ff66ff; /* 🩷 light magenta */
+  color: white; /* ✅ stay white */
+  font-size: 1.4rem;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #ff66ffaa;
+  cursor: pointer;
+  font-weight: bold;
+  text-shadow: 0 0 4px #ff66ffaa;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.back-to-menu-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px #ff66ff;
+}
+
+.back-to-menu-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px #ff66ff;
+}
+
+/* === 🗣️ Phil Speech Bubble === */
+.phil-speech {
+  max-width: 90%;
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  padding: 1rem;
+  color: #00ffee;
+  text-shadow: 0 0 6px #00ffee88;
+  box-shadow: 0 0 16px #00ffee55;
+  position: relative;
+  margin-bottom: 1rem;
+  text-align: center;
+  animation: fadeInBubble 1s ease forwards;
+  opacity: 0;
+  /*max-height: clamp(30rem, 30vh, 30rem); sacred grid attempt*/
+  overflow: visible;
+  
+  line-height: 1.35;
+  
+
+  font-size: clamp(-3rem, 2.1vh, 1.6rem);
+  max-height: clamp(10rem, 30vh, 20rem); /* 🍧 bigger upper limit */
+}
+
+@keyframes fadeInBubble {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 🐾 Optional little tail */
+.phil-speech::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #00ffeeaa;
+  filter: drop-shadow(0 0 6px #00ffee55);
+}
+
+/* 💙 Keep Play Again button CYAN with white text */
+
+.result-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.8rem, 2vh, 2rem);
+  padding: clamp(1rem, 2.5vh, 2rem);
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  box-shadow: 0 0 24px #00ffeeaa;
+  text-align: center;
+
+  width: clamp(260px, 90vw, 420px);
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow: auto;
+  font-size: clamp(1rem, 2.2vh, 1.4rem);
+
+  animation:
+    popupFadeIn 0.6s ease-out forwards,
+    popupGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translate(-50%, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}
+
+@keyframes popupGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px #00ffee, 0 0 40px #00ffee55;
+  }
+  50% {
+    box-shadow: 0 0 40px #00ffeeaa, 0 0 60px #00ffee88;
+  }
+}
+.result-popup h2 {
+  font-size: clamp(1.2rem, 3vh, 2.2rem);
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee88;
+}
+
+.result-popup p {
+  font-size: clamp(1rem, 2vh, 1.3rem);
+  color: white;
+  margin: 0.5rem 0;
+}
+
+
+.result-popup .play-again-btn {
   background: #00ffee;
   color: black;
   font-size: 1.4rem;
@@ -375,17 +585,44 @@
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.start-show-btn:hover,
-.back-to-menu-btn:hover,
-.result-popup button:hover {
+.result-popup .play-again-btn,
+.result-popup .back-to-menu-btn {
+  font-size: clamp(1rem, 2.5vh, 1.6rem);
+  padding: clamp(0.4rem, 1vh, 0.8rem) clamp(1rem, 2vh, 2rem);
+  min-width: clamp(120px, 30vw, 240px);
+}
+
+
+.result-popup .play-again-btn:hover {
   transform: scale(1.08);
   box-shadow: 0 0 20px #00ffee;
 }
 
-.start-show-btn:active,
-.back-to-menu-btn:active,
-.result-popup button:active {
+.result-popup .play-again-btn:active {
   transform: scale(0.95);
+  box-shadow: 0 0 16px #00ffee;
+}
+/* 🩷 Back to Menu inside popup = magenta bg, white text */
+.result-popup .back-to-menu-btn {
+  background: #ff66ff;
+  color: white;
+  font-size: 1.4rem;
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #ff66ffaa;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.result-popup .back-to-menu-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px #ff66ff;
+}
+
+.result-popup .back-to-menu-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px #ff66ff;
 }
 
 /* === 🍧 Fade In/Out === */
@@ -399,35 +636,6 @@
   transition: opacity 0.4s ease;
 }
 
-/* === 🎯 Result Popup === */
-.result-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 2rem;
-  background: rgba(0, 0, 0, 0.95);
-  border: 2px solid #00ffeeaa;
-  border-radius: 16px;
-  box-shadow: 0 0 24px #00ffeeaa;
-  text-align: center;
-}
-
-.result-popup h2 {
-  color: #00ffee;
-  text-shadow: 0 0 8px #00ffee88;
-}
-
-.result-popup p {
-  color: white;
-  font-size: 1.3rem;
-}
 
 /* === 🎸 Mini Phil Below Popup === */
 .result-phil img {
@@ -550,4 +758,84 @@
   background: transparent;
   border: 2px solid #00ffee88;
   box-shadow: none;
+}
+
+.btn-mode.active-mode {
+  box-shadow: 0 0 10px #00ffee, 0 0 20px #00ffeeaa, inset 0 0 10px #00ffee55;
+  font-weight: bold;
+  background: rgba(0, 255, 238, 0.5);
+}
+.qs-stage,
+.qs-math,
+.qs-keypad {
+  max-height: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.qs-intro .phil-wrapper {
+  max-height: 50%; /* 🔻 from 60% */
+}
+
+.info-box {
+  font-size: clamp(0.7rem, 2.2vh, 1.4rem);
+  width: 100%;
+  height: 100%;
+  padding: 0.4rem;
+  border: 2px solid #00ffee88;
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 8px #00ffee88;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  line-height: 1.2;
+  text-align: center;
+}
+
+
+
+.qs-stage .score-box,
+.qs-stage .timer-box {
+  aspect-ratio: 1 / 1;
+  width: clamp(54px, 12vh, 120px);
+  height: auto;
+  position: absolute;
+  top: clamp(0.5rem, 2vh, 1rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border: none; /* 🔥 kill outer border */
+  background: transparent; /* 🧼 no bg here */
+  box-shadow: none;
+}
+
+.qs-stage .score-box { left: clamp(0.5rem, 2vw, 1rem); }
+.qs-stage .timer-box { right: clamp(0.5rem, 2vw, 1rem); }
+
+
+.label {
+  font-size: clamp(0.6rem, 1.6vw, 1rem);
+  opacity: 0.8;
+  line-height: 1;
+}
+.value {
+  font-size: clamp(1rem, 2.8vh, 1.8rem);
+  font-weight: bold;
+  line-height: 1;
+}
+.new-highscore-msg {
+  color: #00ffee;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  text-shadow: 0 0 6px #00ffeeaa;
+  font-size: 1.3rem;
+  animation: pulseHighScore 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseHighScore {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }

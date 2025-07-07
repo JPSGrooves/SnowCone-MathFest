@@ -1,151 +1,145 @@
-/* ♾️ Infinity Mode Grid */
-.infinity-grid {
+/* infinityMode.css — testing layout for Infinity Lake ♾️ */
+
+
+
+/* === Grid Core === */
+.il-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  grid-template-areas:
-    "header"
-    "content"
-    "footer";
+  grid-template-rows:
+    minmax(3rem, 12%)
+    minmax(10rem, 30%)
+    minmax(10rem, 30%)
+    minmax(6rem, 28%);
   height: 100%;
   width: 100%;
-  padding: 1.5rem;
-  gap: 1rem;
+  padding: 1rem;
   box-sizing: border-box;
-
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px dashed #00ffee88;
-  backdrop-filter: blur(6px);
-  z-index: 2;
+  gap: 0.5rem;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
 }
 
-/* === Header === */
-.infinity-header {
-  grid-area: header;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* === Title === */
+.il-title {
   text-align: center;
-
-  border: 2px solid #ff00ff44;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 12px;
-}
-
-.infinity-header h1 {
-  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
   color: #00ffee;
-  text-shadow: 0 0 8px #00ffee88;
+  text-shadow: 0 0 8px #00ffeeaa;
+  padding-top: 0.5rem;
 }
 
-/* === Content === */
-.infinity-content {
-  grid-area: content;
+/* === Stage === */
+.il-stage {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
-
-  border: 2px solid #ff00ff44;
-  border-radius: 1rem;
-  padding: 2rem;
-  background: rgba(0, 0, 0, 0.65);
-  box-shadow: 0 0 24px #00ffee88;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid #00ffee55;
+  border-radius: 12px;
 }
 
-/* === Score === */
+.twins-box {
+  font-size: 2rem;
+}
+
 .score-box {
-  font-size: 1.4rem;
-  font-weight: bold;
+  font-size: 1.2rem;
   color: #00ffee;
-  border: 2px solid #00ffee88;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.7);
+  font-weight: bold;
+  border: 2px solid #00ffeeaa;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 8px #00ffee88;
 }
 
-/* === Math Problem === */
-.math-stack {
+/* === Math === */
+.il-math {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 2px solid #00ffee66;
+  box-shadow: 0 0 12px #00ffee88;
+  text-align: center;
 }
 
-.math-stack span {
-  font-size: clamp(2rem, 6vw, 3rem);
+#mathProblem {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
   font-weight: bold;
-  color: #ffffff;
+  color: #fff;
   text-shadow: 0 0 6px #ffffff88;
 }
 
-.math-stack input {
-  padding: 0.5rem 1rem;
-  font-size: 1.4rem;
-  border: 2px solid #00ffee;
-  border-radius: 8px;
-  background: #000;
-  color: #00ffee;
-  text-align: center;
-  width: clamp(180px, 20vw, 240px);
-  box-shadow: 0 0 8px #00ffee88;
+.answer-options {
+  display: flex;
+  gap: 1rem;
 }
 
-.math-stack button {
-  font-size: 1.2rem;
-  padding: 0.5rem 1.5rem;
-  border-radius: 10px;
-  background-color: #00ffee;
-  border: none;
-  color: #000;
-  font-weight: bold;
+.ans-btn {
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  border: 2px solid #00ffeeaa;
+  background: rgba(0, 0, 0, 0.8);
+  color: #00ffee;
   cursor: pointer;
   box-shadow: 0 0 10px #00ffee88;
-  transition: background 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
-.math-stack button:hover {
-  background-color: #33ffff;
+.ans-btn:hover {
+  transform: scale(1.08);
+  background-color: #00ffee22;
 }
 
-/* === Cone Status === */
-.cone-status {
+.result-msg {
+  min-height: 1.5rem;
   font-size: 1.1rem;
   color: #ffdd55;
-  min-height: 1.5em;
-  text-shadow: 0 0 4px #ffdd5588;
+  text-shadow: 0 0 6px #ffdd5588;
 }
 
-/* === Footer === */
-.infinity-footer {
-  grid-area: footer;
+/* === Controls === */
+.il-controls {
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-
-  border: 2px solid #ff00ff44;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 12px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid #00ffee44;
+  border-radius: 10px;
 }
 
-/* === Return Button === */
-.btn-return {
-  padding: 0.75rem 1.5rem;
-  font-size: 1.1rem;
-  background: #00ffee;
-  border: none;
-  border-radius: 12px;
+.mode-buttons,
+.utility-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mode-buttons button,
+.utility-buttons button {
+  flex: 1;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: #000;
+  border: 2px solid #00ffee88;
+  color: #00ffee;
   cursor: pointer;
-  box-shadow: 0 0 12px #00ffeeaa;
-  transition: background 0.2s ease;
+  transition: background 0.2s;
 }
 
-.btn-return:hover {
-  background-color: #33ffff;
+.mode-buttons button:hover,
+.utility-buttons button:hover {
+  background-color: #00ffee22;
 }

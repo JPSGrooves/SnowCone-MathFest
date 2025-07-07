@@ -1,3 +1,54 @@
+## 🔮 Version Roadmap (2025)  
+
+- ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**  
+- 🔜 **v0.6.0 – QS & Infinity Mode Complete**  
+- 🔜 **v0.7.0 – Math Tips Mode Complete**  
+- 🔜 **v0.8.0 – Kids Mode Complete**  
+- 🔜 **v0.9.0 – Story Mode + Narratives**  
+- 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**  
+
+
+## v0.5.5 — *“QuickServe Pavilion Complete”* (July 7, 2025)
+
+### 🚀 Major New Features
+
+🍦 **QuickServe Game Mode — Final Form Achieved**
+
+* ✅ **Full gameplay loop complete** — intro screen → timer countdown → math problems → XP tracking → result popup.
+* ✅ **All math types supported** — Add/Sub, Mult/Div, and Algebra, with XP and score rewards scaling by mode.
+* ✅ **XP system and live score tracking integrated** — synced with appState and visual feedback.
+* ✅ **Keypad and keyboard input fully functional** — input is smooth, snappy, and accurate.
+* ✅ **Result popup now tracks and displays high scores** — all-time best score stored in `appState.profile.qsHighScore`.
+* ✅ **“New High Score!” message appears on record-breaker runs** — bright glow animation included.
+* ✅ **Confetti celebration added** for high score runs — throttled for performance, still festival-level hype.
+
+---
+
+### 🌟 UI & UX Enhancements
+
+* 🍣 **Result popup now fades in gracefully** and is perfectly vertically centered using `translate(-50%, -50%)`.
+* 🌟 **Score and timer boxes remain square and locked to grid** across all screen sizes.
+* 🎹 **Keypad layout tuned for clean responsiveness** — aligned spacing, working decimal, and negation button.
+* 🧠 **Correct and incorrect feedback messages float in with color-coded clarity** — timed and hidden automatically.
+
+---
+
+### 🐛 Critical Fixes
+
+* 🧽 Removed **duplicate `toggleNegative()` function** — was causing Vite build crash.
+* 🔁 Refactored `showResultScreen()` into modular structure:
+
+  * `buildResultHTML()`, `handlePlayAgain()`, and `handleReturnToMenu()` for cleaner flow.
+* 🧼 Scoped button IDs using `popup.querySelector()` to prevent DOM collisions across scenes.
+
+---
+
+### ⚡ Performance & Stability
+
+* 🪄 **Confetti particle count reduced** — now smooth even on older hardware.
+* ✅ **Popup alignment locked** — no more visual cropping or off-screen issues.
+* 🧣 \*\*QuickServe mode now fully stable and performance-tuned on both desktop and mobile.
+
 ## v0.5.0 — *“Neon Jukebox Ascension”* (June 30, 2025)
 
 ### 🚀 Major New Features

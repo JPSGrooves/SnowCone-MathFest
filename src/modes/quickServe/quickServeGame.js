@@ -9,6 +9,9 @@ import { playCorrect, playIncorrect } from './soundFX.js';
 import { playTrack, stopTrack } from '../../managers/musicManager.js';
 import { stopQS, playQSRandomTrack } from './quickServeMusic.js';
 import { renderGameUI } from './quickServe.js'; // 💥 Need to export this!
+import { generateProblem } from '../../logic/mathBrain.js';
+import { launchConfetti } from '../../utils/confetti.js';
+
 
 //////////////////////////////
 // 🔥 Game State
@@ -18,6 +21,13 @@ let timeRemaining = 105;
 let timerInterval = null;
 let currentAnswer = '';
 let gameRunning = false;
+
+// 🌈 NEW STUFF
+let currentMathMode = 'addSub';
+let currentCorrectAnswer = 0;
+let currentXP = 3;
+let currentPoints = 1;
+let totalSessionXP = 0;
 
 //////////////////////////////
 // 🚀 Scene Lifecycle
@@ -44,6 +54,35 @@ export function appendToAnswer(val) {
   updateAnswerDisplay();
 }
 
+export function setMathMode(mode) {
+  highlightModeButton(mode);
+  currentMathMode = mode;
+
+  // 🎯 Set XP and point rewards based on mode
+  switch (mode) {
+    case 'addSub':
+      currentXP = 3;
+      currentPoints = 1;
+      break;
+    case 'multiDiv':
+      currentXP = 5;
+      currentPoints = 3;
+      break;
+    case 'algebra':
+      currentXP = 8;
+      currentPoints = 5;
+      break;
+    default:
+      currentXP = 3;
+      currentPoints = 1;
+      break;
+  }
+
+  resetCurrentAnswer();
+  renderProblem();
+}
+
+
 
 //////////////////////////////
 // 🎮 Runtime Logic
@@ -56,13 +95,33 @@ function resetGameState() {
 }
 
 function startGame() {
+  highlightModeButton(currentMathMode); // 🌟 Apply glow to current mode
   gameRunning = true;
   updateScore();
   updateAnswerDisplay();
   startTimer();
   phil.startPhilPoseTimer();
   gridFX.startGridPulse();
-  generateProblem();
+
+  renderProblem();
+}
+function highlightModeButton(mode) {
+  const buttons = ['plusMinus', 'multiplyDivide', 'algMode'];
+  buttons.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.classList.toggle('active-mode', id === modeToButtonId(mode));
+    }
+  });
+}
+
+function modeToButtonId(mode) {
+  switch (mode) {
+    case 'addSub': return 'plusMinus';
+    case 'multiDiv': return 'multiplyDivide';
+    case 'algebra': return 'algMode';
+    default: return '';
+  }
 }
 
 function startTimer() {
@@ -87,8 +146,16 @@ function endGame() {
   clearInterval(timerInterval);
   phil.philCelebrate();
   gridFX.stopGridPulse();
+
+  const isNewHighScore = score > appState.profile.qsHighScore;
+  appState.setQuickServeHighScore(score);
+
+  if (isNewHighScore) {
+    launchConfetti(); // 🌽💥🌈 math party activated
+  }
   showResultScreen();
 }
+
 
 //////////////////////////////
 // 🔢 Game Functions
@@ -109,23 +176,20 @@ function updateScore() {
   if (scoreDisplay) scoreDisplay.textContent = score;
 }
 
-function generateProblem() {
-  const a = Math.floor(Math.random() * 20) + 1;
-  const b = Math.floor(Math.random() * 20) + 1;
-  const problemEl = document.getElementById('mathProblem');
 
-  if (problemEl) {
-    problemEl.textContent = `${a} + ${b} = ?`;
-    problemEl.dataset.answer = (a + b).toString();
-  }
-}
 
 function submitAnswer() {
   const problemEl = document.getElementById('mathProblem');
   if (!problemEl) return;
 
-  const guess = parseInt(currentAnswer.trim(), 10);
   const correct = parseInt(problemEl.dataset.answer, 10);
+
+  // 🧠 Treat empty answer as "0" ONLY if correct answer is zero
+  const guessStr = currentAnswer.trim() === '' && correct === 0
+    ? '0'
+    : currentAnswer.trim();
+
+  const guess = parseInt(guessStr, 10);
 
   if (guess === correct) {
     handleCorrect();
@@ -134,12 +198,14 @@ function submitAnswer() {
   }
 }
 
-function handleCorrect() {
-  score++;
-  updateScore();
-  appState.addXP(3);
 
-  showResultMsg(true, 3);
+function handleCorrect() {
+  score += currentPoints;
+  updateScore();
+  const xpEarned = appState.addXP(currentXP);
+  totalSessionXP += xpEarned; // 🧠 track it
+  showResultMsg(true, xpEarned);
+
   gridFX.bumpGridGlow();
   phil.bumpJam();
   playCorrect();
@@ -148,15 +214,38 @@ function handleCorrect() {
 
   currentAnswer = '';
   updateAnswerDisplay();
-  generateProblem();
+  renderProblem();
 }
+
+
+
 
 function handleIncorrect() {
   showResultMsg(false, 0);
   gridFX.bumpGridGlow('bad');
   phil.triggerGlitch();
   playIncorrect();
+
+  // 💀 RESET answer display to '0' after wrong guess
+  currentAnswer = '';
+  updateAnswerDisplay();
 }
+
+
+function renderProblem() {
+  const { equation, answer, xp = 3, points = 1 } = generateProblem(currentMathMode);
+  currentCorrectAnswer = answer;
+  currentXP = xp;
+  currentPoints = points;
+
+  const problemEl = document.getElementById('mathProblem');
+  if (problemEl) {
+    problemEl.textContent = `${equation} = ?`;
+    problemEl.dataset.answer = answer.toString();
+  }
+}
+
+
 
 function showResultMsg(isCorrect, xp = 0) {
   const resultMsg = document.getElementById('qsResultMsg');
@@ -196,44 +285,71 @@ function checkBadgeUnlock() {
 // 🏆 Result Screen
 //////////////////////////////
 function showResultScreen() {
+  const container = document.getElementById('game-container');
+  if (!container) {
+    console.warn('⚠️ No game-container found for result popup.');
+    return;
+  }
+
+  const isNewHighScore = score > appState.profile.qsHighScore;
+  appState.setQuickServeHighScore(score);
+
+  if (isNewHighScore) {
+    launchConfetti();
+  }
+
   const popup = document.createElement('div');
   popup.classList.add('result-popup');
+  popup.innerHTML = buildResultHTML(isNewHighScore);
 
-  popup.innerHTML = `
+  container.appendChild(popup);
+
+  const playAgainBtn = popup.querySelector('#playAgainBtn');
+  const menuBtn = popup.querySelector('#menuBtn');
+
+  playAgainBtn?.addEventListener('click', handlePlayAgain);
+  menuBtn?.addEventListener('click', handleReturnToMenu);
+
+  // Optional: focus on Play Again for keyboard flow
+  playAgainBtn?.focus();
+}
+
+function buildResultHTML(isNewHighScore) {
+  const highScoreMsg = isNewHighScore
+    ? `<p class="new-highscore-msg">🎉 New High Score!</p>`
+    : '';
+
+  return `
     <h2>🍧 Show Complete!</h2>
     <p>Score: ${score}</p>
-    <p>XP Earned: ${score * 3}</p>
-    <button id="playAgainBtn">🎧 Play Again</button>
-    <button id="menuBtn">🔙 Menu</button>
+    ${highScoreMsg}
+    <p>High Score: ${appState.profile.qsHighScore}</p>
+    <p>XP Earned: ${totalSessionXP}</p>
+    <button id="playAgainBtn" class="play-again-btn">🎧 Play Again</button>
+    <button id="menuBtn" class="back-to-menu-btn">🔙 Menu</button>
   `;
+}
 
-  document.getElementById('game-container').appendChild(popup);
+async function handlePlayAgain() {
+  document.querySelector('.result-popup')?.remove();
+  await stopQS();
+  stopGameLogic();
+  renderGameUI();
+  setTimeout(() => playQSRandomTrack(), 50);
+}
 
-  document.getElementById('playAgainBtn')?.addEventListener('click', async () => {
-    popup.remove();
-
-    await stopQS();            // Fade out old song
-    stopGameLogic();           // Stop game state
-    renderGameUI();            // Rebuild full UI
-    setTimeout(() => playQSRandomTrack(), 50);  // 🔥 Let DOM breathe, then start music
-  });
-
-
-  document.getElementById('menuBtn')?.addEventListener('click', () => {
-    popup.remove();
-    stopQS();         // 🔇💀 Kill the DJ properly
-    stopTrack();      // 🪦 Belt + suspenders
-    stopGameLogic();
-    showMenu();
-    });
+function handleReturnToMenu() {
+  document.querySelector('.result-popup')?.remove();
+  stopQS();
+  stopTrack();
+  stopGameLogic();
+  showMenu();
 }
 
 function toggleNegative() {
-  if (currentAnswer.startsWith('-')) {
-    currentAnswer = currentAnswer.slice(1);
-  } else {
-    currentAnswer = '-' + currentAnswer;
-  }
+  currentAnswer = currentAnswer.startsWith('-')
+    ? currentAnswer.slice(1)
+    : '-' + currentAnswer;
   updateAnswerDisplay();
 }
 
@@ -241,6 +357,8 @@ function clearAnswer() {
   currentAnswer = '';
   updateAnswerDisplay();
 }
+
+
 
 // ✅ Keypad Helpers (export for keypad use)
 // ✅ Keypad Helpers (export for keypad use)

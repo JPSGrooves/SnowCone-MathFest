@@ -6,23 +6,23 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.5.0</h3>
+      <h3>🧠 SnowCone MathFest v0.5.5</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>📝 v0.5.0 Update – Neon Jukebox Ascension</h3>
+      <h3>🍦 v0.5.5 Update – QuickServe Pavilion Complete</h3>
       <p>
-        – 🎶 Cosmic Jukebox fully upgraded to sacred final form<br>
-        – 🔀 True shuffle works — skips current, no repeats until needed<br>
-        – ✨ Neon Mode toggle for glowing progress bar and timeline<br>
-        – 🎚️ Scrubbing works — drag the timeline to seek tracks perfectly<br>
-        – 🔊 Smooth fade between tracks on skip, next, prev, and auto-play<br>
-        – 🎶 Now Playing label updates flawlessly with every track change<br>
-        – 🛑 Music stops when entering any mode (except Math Tips Village)<br>
-        – 🚫 Fixed mute + neon toggle desync bugs — state now respected on load<br>
-        – 🔥 Jukebox runs clean, synced, and error-free — desktop + mobile stable
+        – ⏱️ Full QuickServe loop complete — intro, timer, score, XP, and results<br>
+        – 🧠 Supports Add/Sub, Mult/Div, and Algebra with XP scaling by difficulty<br>
+        – 🧮 Keypad and keyboard input fully wired — snappy and reliable<br>
+        – 🏆 High score system added — saves personal bests across sessions<br>
+        – 🎉 “New High Score!” message glows when record is broken<br>
+        – 🎊 Confetti celebration launches on high score (optimized for performance)<br>
+        – 🍭 Result popup fades in and centers perfectly on all screens<br>
+        – 🧽 Duplicate function bug fixed — Vite build now clean<br>
+        – 🧼 Fully modular game logic + scoped layout — locked and stable on all devices
       </p>
     </div>
 

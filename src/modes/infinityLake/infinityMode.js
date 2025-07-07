@@ -1,22 +1,18 @@
+// /src/modes/infinity/infinityMode.js
+
 import './infinityMode.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 
-// === 🔥 Game State ===
 let score = 0;
-let currentAnswer = '';
 let currentCorrect = 0;
 
-// === 🔗 DOM Refs
-let problemEl, inputEl, submitBtn, scoreDisplay, resultMsg;
+let problemEl, answerBtns, scoreDisplay, resultMsg;
 
-// === 🚀 ENTRY POINT
 export function loadInfinityMode() {
   console.log('♾️ Loading Infinity Mode');
   appState.setMode('infinity');
-
-  swapModeBackground('infinity');
 
   const menuWrapper = document.querySelector('.menu-wrapper');
   const gameContainer = document.getElementById('game-container');
@@ -26,11 +22,12 @@ export function loadInfinityMode() {
   gameContainer.style.display = 'flex';
 
   renderUI();
+  swapModeBackground('assets/img/modes/infinityLake/infinityBG.png');
   setupEventHandlers();
   startGame();
 }
 
-// === 💀 EXIT POINT
+
 export function stopInfinityMode() {
   const container = document.getElementById('game-container');
   container.innerHTML = '';
@@ -41,74 +38,69 @@ export function stopInfinityMode() {
   console.log('♾️ Infinity Mode cleaned up!');
 }
 
-//////////////////////////////
-// 🎨 Render UI
-//////////////////////////////
 function renderUI() {
   const container = document.getElementById('game-container');
-
   container.innerHTML = `
-    <div class="game-frame">
-      <img id="modeBackground" class="background-fill" src="assets/img/modes/infinity/infinityBG.png" alt="Infinity Mode Background" />
-      <div class="infinity-grid">
-        <div class="infinity-header">
-          <h1>♾️ Infinity Lake</h1>
-        </div>
-        <div class="infinity-content">
-          <div class="score-box">
-            <span>Score:</span> <span id="infScore">0</span>
+    <div class="aspect-wrap">
+      <div class="game-frame">
+        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/infinityBG.png"
+          alt="Infinity Mode Background"
+        />
+        <div class="il-grid">
+          <div class="il-title">♾️ Infinity Lake</div>
+
+          <div class="il-stage">
+            <div class="twins-box">👯‍♀️</div>
+            <div class="score-box">Score: <span id="infScore">0</span></div>
           </div>
 
-          <div class="math-stack">
-            <span id="mathProblem">-- + -- = ?</span>
-            <input id="mathInput" type="number" placeholder="Answer..." />
-            <button id="submitAnswer">✔️ Submit</button>
+          <div class="il-math">
+            <div id="mathProblem">-- + -- = ?</div>
+            <div class="answer-options">
+              <button class="ans-btn" data-choice="0">?</button>
+              <button class="ans-btn" data-choice="1">?</button>
+              <button class="ans-btn" data-choice="2">?</button>
+            </div>
+            <div id="coneResultMsg" class="result-msg"></div>
           </div>
 
-          <div class="cone-status">
-            <span id="coneResultMsg"></span>
+          <div class="il-controls">
+            <div class="mode-buttons">
+              <button data-mode="add">+</button>
+              <button data-mode="sub">−</button>
+              <button data-mode="mul">×</button>
+              <button data-mode="div">÷</button>
+              <button data-mode="alg">𝒙</button>
+            </div>
+            <div class="utility-buttons">
+              <button id="backToMenu">Main<br>Menu</button>
+              <button id="resetGame">Reset</button>
+              <button id="muteToggle">🔇</button>
+            </div>
           </div>
-        </div>
-
-        <div class="infinity-footer">
-          <button id="returnToMenu" class="btn-return">🔙 Return to Menu</button>
         </div>
       </div>
     </div>
   `;
 
-  repaintBackground();
-
-  // 🎯 DOM refs
   problemEl = document.getElementById('mathProblem');
-  inputEl = document.getElementById('mathInput');
-  submitBtn = document.getElementById('submitAnswer');
+  answerBtns = Array.from(document.querySelectorAll('.ans-btn'));
   scoreDisplay = document.getElementById('infScore');
   resultMsg = document.getElementById('coneResultMsg');
 }
 
-//////////////////////////////
-// 🚦 Event Handlers
-//////////////////////////////
 function setupEventHandlers() {
-  document.getElementById('returnToMenu')?.addEventListener('click', returnToMenu);
-  submitBtn?.addEventListener('click', submitAnswer);
-  inputEl?.addEventListener('keydown', onInputKeydown);
+  document.getElementById('backToMenu')?.addEventListener('click', returnToMenu);
+  document.getElementById('resetGame')?.addEventListener('click', startGame);
+  answerBtns.forEach(btn => btn.addEventListener('click', () => handleAnswer(btn)));
 }
 
 function cleanupEventHandlers() {
-  document.getElementById('returnToMenu')?.removeEventListener('click', returnToMenu);
-  submitBtn?.removeEventListener('click', submitAnswer);
-  inputEl?.removeEventListener('keydown', onInputKeydown);
+  document.getElementById('backToMenu')?.removeEventListener('click', returnToMenu);
+  document.getElementById('resetGame')?.removeEventListener('click', startGame);
+  answerBtns.forEach(btn => btn.removeEventListener('click', handleAnswer));
 }
 
-function onInputKeydown(e) {
-  if (e.key === 'Enter') submitAnswer();
-}
-
-//////////////////////////////
-// 🔙 Return Flow
-//////////////////////////////
 function returnToMenu() {
   playTransition(() => {
     stopInfinityMode();
@@ -117,31 +109,35 @@ function returnToMenu() {
   });
 }
 
-//////////////////////////////
-// 🎮 Game Logic
-//////////////////////////////
 function startGame() {
   score = 0;
-  currentAnswer = '';
-  currentCorrect = 0;
-
   updateScore();
   newProblem();
 }
 
 function newProblem() {
-  const a = Math.floor(Math.random() * 100) + 1;
-  const b = Math.floor(Math.random() * 100) + 1;
-  currentCorrect = a + b;
+  const a = Math.floor(Math.random() * 20) + 1;
+  const b = Math.floor(Math.random() * 20) + 1;
+  const correctAnswer = a + b;
+  currentCorrect = correctAnswer;
+
+  // Generate fake options
+  let options = [correctAnswer];
+  while (options.length < 3) {
+    let fake = correctAnswer + Math.floor(Math.random() * 11) - 5;
+    if (!options.includes(fake) && fake >= 0) options.push(fake);
+  }
+  options.sort(() => Math.random() - 0.5);
 
   problemEl.textContent = `${a} + ${b} = ?`;
-  inputEl.value = '';
-  inputEl.focus();
+  answerBtns.forEach((btn, i) => {
+    btn.textContent = options[i];
+    btn.dataset.value = options[i];
+  });
 }
 
-function submitAnswer() {
-  const guess = parseInt(inputEl.value.trim(), 10);
-
+function handleAnswer(btn) {
+  const guess = parseInt(btn.dataset.value);
   if (guess === currentCorrect) {
     handleCorrect();
   } else {
@@ -150,9 +146,8 @@ function submitAnswer() {
 }
 
 function handleCorrect() {
-  score += 1;
+  score++;
   appState.addXP(5);
-
   showResult('✅ Correct! +5 XP', '#00ffee');
   updateScore();
   newProblem();
@@ -162,24 +157,12 @@ function handleIncorrect() {
   showResult('❌ Nope. Try again!', '#ff5555');
 }
 
-function showResult(msg, color) {
-  resultMsg.textContent = msg;
-  resultMsg.style.color = color;
-  setTimeout(() => resultMsg.textContent = '', 1500);
-}
-
 function updateScore() {
   scoreDisplay.textContent = score;
 }
 
-//////////////////////////////
-// 🔄 Background Refresh
-//////////////////////////////
-function repaintBackground() {
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      const img = document.getElementById('modeBackground');
-      if (img) img.src = img.src;
-    }, 10);
-  });
+function showResult(msg, color) {
+  resultMsg.textContent = msg;
+  resultMsg.style.color = color;
+  setTimeout(() => resultMsg.textContent = '', 1500);
 }

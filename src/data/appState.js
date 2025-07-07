@@ -5,6 +5,7 @@ class AppState {
     username: 'Guest',
     xp: 0,
     level: 1,
+    qsHighScore: 0, // 🏁 Add this!
     badges: [],
     completedModes: [],
     lastPlayed: null,
@@ -56,11 +57,15 @@ class AppState {
   //////////////////////////////////////
   addXP(amount) {
     this.profile.xp += amount;
+
     const newLevel = Math.floor(this.profile.xp / 100) + 1;
     if (newLevel > this.profile.level) {
       this.profile.level = newLevel;
     }
+
+    return amount; // ✅ This makes it future-safe
   }
+
 
   setUsername(name) {
     this.profile.username = name;
@@ -112,6 +117,13 @@ class AppState {
   markPanelSeen(panelId) {
     if (!this.storyProgress.seenPanels.includes(panelId)) {
       this.storyProgress.seenPanels.push(panelId);
+    }
+  }
+
+  setQuickServeHighScore(score) {
+    if (score > this.profile.qsHighScore) {
+      this.profile.qsHighScore = score;
+      console.log(`🏆 New QuickServe High Score: ${score}`);
     }
   }
 
@@ -282,4 +294,4 @@ autorun(() => {
 /////////////////////////////////
 // 🧪 DEV FLAG
 /////////////////////////////////
-window.devFlags = { build: "v0.5.0-Sacred_Jukebox" };
+window.devFlags = { build: "v0.5.5-QS-Pavilion_Lock" };

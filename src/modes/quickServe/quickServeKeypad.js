@@ -11,6 +11,7 @@ import { stopGameLogic, startGameLogic } from './quickServeGame.js';
 import { stopTrack, playTrack } from '../../managers/musicManager.js';
 import { returnToMenu } from './quickServe.js'; // 🌟 Full QS exit
 import { stopQS, playQSRandomTrack } from './quickServeMusic.js'; // ✅ up top
+import { setMathMode as setMathModeInGame } from './quickServeGame.js';
 
 
 export function generateKeypadHTML() {
@@ -38,9 +39,9 @@ export function generateKeypadHTML() {
     ],
     [
       { id: 'menu', label: 'Main<br>Menu', class: 'btn-menu' },
-      { id: 'neg', label: '±', class: 'btn-num' },
-      { id: 'zero', label: '0', class: 'btn-num' },
       { id: 'decimal', label: '.', class: 'btn-num' },
+      { id: 'zero', label: '0', class: 'btn-num' },
+      { id: 'neg', label: '±', class: 'btn-num' },
       { id: 'reset', label: 'Reset<br>Game', class: 'btn-menu' },
     ],
   ];
@@ -93,8 +94,9 @@ export function setupKeypad() {
     console.log('🔁 Resetting QuickServe and restarting track');
 
     await stopQS();         // 🌟 wait for music to fully stop
-    stopGameLogic();        // 🎮 clear state
-    startGameLogic();       // 🎬 start game
+    stopGameLogic();
+    setMathMode('addSub');  // 🧠 Reset to default
+    startGameLogic();
     playQSRandomTrack();    // 🎧 spin fresh vibes
   });
 
@@ -103,7 +105,21 @@ export function setupKeypad() {
   safeBind('enter', submitAnswer);
 
   // 🚧 Algebra Mode (placeholder)
-  safeBind('algMode', () => alert('🔢 Algebra Mode is under construction!'));
+  safeBind('plusMinus', () => {
+    console.log('➕➖ Mode activated');
+    setMathMode('addSub');
+  });
+
+  safeBind('multiplyDivide', () => {
+    console.log('✖️➗ Mode activated');
+    setMathMode('multiDiv');
+  });
+
+  safeBind('algMode', () => {
+    console.log('🧩 Algebra Mode activated');
+    setMathMode('algebra');
+  });
+
 
   // 🌀 Return to Main Menu (Full cleanup)
   safeBind('menu', returnToMenu);
@@ -134,4 +150,22 @@ export function setupKeyboardInput() {
   };
 
   window.addEventListener('keydown', keyboardListener);
+}
+function setMathMode(mode) {
+  setMathModeInGame(mode); // update state + rerender problem
+
+  // remove previous active
+  document.querySelectorAll('.btn-mode').forEach(btn =>
+    btn.classList.remove('active-mode')
+  );
+
+  // add active class
+  const map = {
+    addSub: 'plusMinus',
+    multiDiv: 'multiplyDivide',
+    algebra: 'algMode'
+  };
+
+  const btn = document.getElementById(map[mode]);
+  if (btn) btn.classList.add('active-mode');
 }
