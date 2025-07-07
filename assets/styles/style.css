@@ -336,7 +336,7 @@ html, body {
 
 /* 🌈 QuickServe Mode Zones */
 #game-container {
-  position: absolute;
+  position: relative; /*chaged from absolute*/
   top: 0;
   left: 0;
   width: 100vw;
