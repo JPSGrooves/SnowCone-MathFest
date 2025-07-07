@@ -155,82 +155,90 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
     <p>XP Earned: ${Rg}</p>
     <button id="playAgainBtn" class="play-again-btn">🎧 Play Again</button>
     <button id="menuBtn" class="back-to-menu-btn">🔙 Menu</button>
-  `,document.getElementById("game-container").appendChild(e),(r=document.getElementById("playAgainBtn"))==null||r.addEventListener("click",async()=>{e.remove(),await Ka(),ea(),Xg(),setTimeout(()=>el(),50)}),(t=document.getElementById("menuBtn"))==null||t.addEventListener("click",()=>{e.remove(),Ka(),ya(),ea(),qz()})}function Gg(){Qr.startsWith("-")?Qr=Qr.slice(1):Qr="-"+Qr,ba()}function Vg(){Qr="",ba()}function P_(){return`<div class="qs-keypad">${[[{id:"plusMinus",label:"+/-<br>Mode",class:"btn-mode"},{id:"seven",label:"7",class:"btn-num"},{id:"eight",label:"8",class:"btn-num"},{id:"nine",label:"9",class:"btn-num"},{id:"enter",label:"Enter",class:"btn-enter"}],[{id:"multiplyDivide",label:"×/÷<br>Mode",class:"btn-mode"},{id:"four",label:"4",class:"btn-num"},{id:"five",label:"5",class:"btn-num"},{id:"six",label:"6",class:"btn-num"},{id:"clear",label:"Clear",class:"btn-clear"}],[{id:"algMode",label:"Alg<br>Mode",class:"btn-mode"},{id:"one",label:"1",class:"btn-num"},{id:"two",label:"2",class:"btn-num"},{id:"three",label:"3",class:"btn-num"},{id:"muteBtn",label:"🔊 Mute",class:"btn-mode"}],[{id:"menu",label:"Main<br>Menu",class:"btn-menu"},{id:"neg",label:"±",class:"btn-num"},{id:"zero",label:"0",class:"btn-num"},{id:"decimal",label:".",class:"btn-num"},{id:"reset",label:"Reset<br>Game",class:"btn-menu"}]].map(t=>t.map(n=>`<button id="${n.id}" class="${n.class}">${n.label}</button>`).join(`
+  `,document.getElementById("game-container").appendChild(e),(r=document.getElementById("playAgainBtn"))==null||r.addEventListener("click",async()=>{e.remove(),await Ka(),ea(),Xg(),setTimeout(()=>el(),50)}),(t=document.getElementById("menuBtn"))==null||t.addEventListener("click",()=>{e.remove(),Ka(),ya(),ea(),qz()})}function Gg(){Qr.startsWith("-")?Qr=Qr.slice(1):Qr="-"+Qr,ba()}function Vg(){Qr="",ba()}function P_(){return`<div class="qs-keypad">${[[{id:"plusMinus",label:"+/-<br>Mode",class:"btn-mode"},{id:"seven",label:"7",class:"btn-num"},{id:"eight",label:"8",class:"btn-num"},{id:"nine",label:"9",class:"btn-num"},{id:"enter",label:"Enter",class:"btn-enter"}],[{id:"multiplyDivide",label:"×/÷<br>Mode",class:"btn-mode"},{id:"four",label:"4",class:"btn-num"},{id:"five",label:"5",class:"btn-num"},{id:"six",label:"6",class:"btn-num"},{id:"clear",label:"Clear",class:"btn-clear"}],[{id:"algMode",label:"Alg<br>Mode",class:"btn-mode"},{id:"one",label:"1",class:"btn-num"},{id:"two",label:"2",class:"btn-num"},{id:"three",label:"3",class:"btn-num"},{id:"muteBtn",label:"🔊 Mute",class:"btn-mode"}],[{id:"menu",label:"Main<br>Menu",class:"btn-menu"},{id:"decimal",label:".",class:"btn-num"},{id:"zero",label:"0",class:"btn-num"},{id:"neg",label:"±",class:"btn-num"},{id:"reset",label:"Reset<br>Game",class:"btn-menu"}]].map(t=>t.map(n=>`<button id="${n.id}" class="${n.class}">${n.label}</button>`).join(`
 `)).join(`
 `)}</div>`}function R_(){const e=[{id:"zero",val:"0"},{id:"one",val:"1"},{id:"two",val:"2"},{id:"three",val:"3"},{id:"four",val:"4"},{id:"five",val:"5"},{id:"six",val:"6"},{id:"seven",val:"7"},{id:"eight",val:"8"},{id:"nine",val:"9"},{id:"decimal",val:"."}],r=(t,n)=>{const a=document.getElementById(t);a&&a.addEventListener("pointerdown",i=>{i.preventDefault(),n()},{passive:!1})};e.forEach(({id:t,val:n})=>{r(t,()=>oc(n))}),r("reset",async()=>{console.log("🔁 Resetting QuickServe and restarting track"),await Ka(),ea(),Ao("addSub"),qg(),el()}),r("neg",Gg),r("clear",Vg),r("enter",Ug),r("plusMinus",()=>{console.log("➕➖ Mode activated"),Ao("addSub")}),r("multiplyDivide",()=>{console.log("✖️➗ Mode activated"),Ao("multiDiv")}),r("algMode",()=>{console.log("🧩 Algebra Mode activated"),Ao("algebra")}),r("menu",Wg)}let _o=null;function q_(){_o&&window.removeEventListener("keydown",_o),_o=e=>{const r=e.key;r>="0"&&r<="9"?oc(r):r==="."?oc("."):r==="Enter"?Ug():r==="Backspace"?Vg():r==="-"&&Gg()},window.addEventListener("keydown",_o)}function Ao(e){S_(e),document.querySelectorAll(".btn-mode").forEach(n=>n.classList.remove("active-mode"));const r={addSub:"plusMinus",multiDiv:"multiplyDivide",algebra:"algMode"},t=document.getElementById(r[e]);t&&t.classList.add("active-mode")}function L_(){console.log("🍧 Loading QuickServe Mode"),Ce.setMode("quickServe"),Ce.incrementQuickServeSessions(),to("quickServe"),ya(),H_(),V_(),k_()}function k_(){var r,t;const e=au();e.innerHTML=`
-    <div class="game-frame">
-      <img id="modeBackground" class="background-fill" src="/SnowCone-MathFest/assets/img/modes/quickServe/quickserveBG.png"/>
-      <div class="qs-intro">
-        <div class="phil-speech">
-          Yo! I’m <strong>Cosmic Phil</strong> and we’re about to kick off the show!<br/>
-          You’ve got <strong>1:45 minutes</strong> to score as many points as you can.<br/>
-          The tougher the math mode, the more <em>XP</em> and <em>points</em> you earn.<br/>
-          🎸 Rock on!
-        </div>
+    <div class="aspect-wrap">
+      <div class="game-frame">
+        <img id="modeBackground" class="background-fill" src="/SnowCone-MathFest/assets/img/modes/quickServe/quickserveBG.png"/>
+        <div class="qs-intro">
+          <div class="phil-speech">
+            Yo! I’m <strong>Cosmic Phil</strong> and we’re about to kick off the show!<br/>
+            You’ve got <strong>1 minute and 45 seconds</strong> to score as many points as you can!<br/>
+            The tougher the math mode, the more <em>XP</em> and <em>points</em> you earn.<br/>
+            🎸 Rock on!
+          </div>
 
-        <div class="phil-wrapper">
-          <img 
-            id="philSpriteIntro" 
-            class="phil-img" 
-            src="/SnowCone-MathFest/assets/img/characters/quickServe/phil_intro.png"
-          />
+          <div class="phil-wrapper">
+            <img 
+              id="philSpriteIntro" 
+              class="phil-img" 
+              src="/SnowCone-MathFest/assets/img/characters/quickServe/phil_intro.png"
+            />
+          </div>
+          <button id="startShowBtn" class="start-show-btn">✨ Start the Show ✨</button>
+          <button id="backToMenuBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
         </div>
-        <button id="startShowBtn" class="start-show-btn">✨ Start the Show ✨</button>
-        <button id="backToMenuBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
       </div>
     </div>
   `,Mg(),U_(),jg(),(r=document.getElementById("startShowBtn"))==null||r.addEventListener("click",()=>{Pn(()=>{el(),Xg()})}),(t=document.getElementById("backToMenuBtn"))==null||t.addEventListener("click",Wg)}function Xg(){var r,t;const e=au();e.innerHTML=`
-    <div class="game-frame">
-      <img id="modeBackground" class="background-fill" src="/SnowCone-MathFest/assets/img/modes/quickServe/quickserveBG.png"/>
-      
-      <div class="qs-grid">
+    <div class="aspect-wrap">
+      <div class="game-frame">
+        <img id="modeBackground" class="background-fill" src="/SnowCone-MathFest/assets/img/modes/quickServe/quickserveBG.png"/>
+        
+        <div class="qs-grid">
 
-        <!-- 🍧 Header -->
-        <div class="qs-header">
-          <h1>QuickServe Pavilion</h1>
-        </div>
-
-        <!-- 🎸 Stage -->
-        <div class="qs-stage">
-          <div class="score-box info-box">Score: <span id="qsScore">0</span></div>
-
-          <div class="phil-wrapper in-game">
-            <img 
-              id="philSpriteInGame" 
-              class="phil-img in-game"
-              src="/SnowCone-MathFest/assets/img/characters/quickServe/phil_01_idle.png"
-            />
+          <!-- 🍧 Header -->
+          <div class="qs-header">
+            <h1>QuickServe Pavilion</h1>
           </div>
 
+          <!-- 🎸 Stage -->
+          <div class="qs-stage">
+            <div class="score-box info-box">Score: <span id="qsScore">0</span></div>
 
-          <div class="timer-box info-box">⏱️ <span id="qsTimer">1:45</span></div>
+            <div class="phil-wrapper in-game">
+              <img 
+                id="philSpriteInGame" 
+                class="phil-img in-game"
+                src="/SnowCone-MathFest/assets/img/characters/quickServe/phil_01_idle.png"
+              />
+            </div>
 
-          <!-- ✨ Glow Lines -->
-          <div class="glow-lines">
-            <div class="glow-line"></div>
-            <div class="glow-line"></div>
-            <div class="glow-line"></div>
+
+            <div class="timer-box info-box">⏱️ <span id="qsTimer">1:45</span></div>
+
+            <!-- ✨ Glow Lines -->
+            <div class="glow-lines">
+              <div class="glow-line"></div>
+              <div class="glow-line"></div>
+              <div class="glow-line"></div>
+            </div>
           </div>
-        </div>
 
-        <!-- 🧠 Math Stack -->
-        <div class="qs-math">
-          <div class="center-stack">
-            <div class="equation-row">
-              <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+          <!-- 🧠 Math Stack -->
+          <div class="qs-math">
+            <div class="center-stack">
+              <div class="equation-row">
+                <div class="math-problem" id="mathProblem">-- + -- = ?</div>
+              </div>
+
+              <div id="answerDisplay" class="answer-display">0</div>
+
+              <!-- 🌈 Feedback floats down here -->
               <div class="qs-xp-msg hidden" id="qsXPMsg">🍧 +3 XP</div>
               <div class="qs-result-msg hidden" id="qsResultMsg">✅ Correct!</div>
             </div>
-            <div id="answerDisplay" class="answer-display">0</div>
           </div>
+
+
+          <!-- 🎹 Keypad -->
+          ${P_()}
+
         </div>
-
-        <!-- 🎹 Keypad -->
-        ${P_()}
-
       </div>
     </div>
-  `,console.log("💥 CORRECT FIRED"),(r=document.getElementById("qsXPMsg"))==null||r.classList.add("hidden"),(t=document.getElementById("qsResultMsg"))==null||t.classList.add("hidden"),Mg(),g_(),Bg(),R_(),q_(),jg(),qg()}function jg(){const e=document.getElementById("muteBtn");if(!e)return;const r=()=>{e.textContent=Howler._muted?"🔇 Unmute":"🔊 Mute"};e.addEventListener("click",()=>{Xx(),r()}),r()}function Wg(){Ka(),ya(),Pn(()=>{z_(),G_(),Qt()})}function z_(){console.log("🧹 Cleaning up QuickServe"),Ka(),ea(),Jc(),Tg(),Lg(),X_(),Ce.clearCurrentMode()}function U_(){requestAnimationFrame(()=>{setTimeout(()=>{const e=document.getElementById("modeBackground");e&&(e.src=e.src)},10)})}function H_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.add("hidden")}function G_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.remove("hidden")}function V_(){const e=au();e.classList.remove("hidden"),e.style.display="flex"}function X_(){const e=au();e.innerHTML="",e.classList.add("hidden"),e.style.display="none"}function au(){return document.getElementById("game-container")}let nl=0,ra,ta,Yg,al,na;function j_(){console.log("🏕️ Loading Kids Camping Mode"),Ce.setMode("kids"),to("kidsCamping");const e=document.querySelector(".menu-wrapper"),r=document.getElementById("game-container");e==null||e.classList.add("hidden"),r.classList.remove("hidden"),r.style.display="flex",W_(),Y_(),K_()}function jo(){const e=document.getElementById("game-container");e.innerHTML="",e.classList.add("hidden"),e.style.display="none",Z_(),console.log("🏕️ Kids Camping Mode cleaned up!")}function W_(){const e=document.getElementById("game-container");e.innerHTML=`
+  `,console.log("💥 CORRECT FIRED"),(r=document.getElementById("qsXPMsg"))==null||r.classList.add("hidden"),(t=document.getElementById("qsResultMsg"))==null||t.classList.add("hidden"),Mg(),g_(),Bg(),R_(),q_(),jg(),qg()}function jg(){const e=document.getElementById("muteBtn");if(!e)return;const r=()=>{e.textContent=Howler._muted?"🔇 Unmute":"🔊 Mute"};e.addEventListener("click",()=>{Xx(),r(),e.blur()}),r()}function Wg(){Ka(),ya(),Pn(()=>{z_(),G_(),Qt()})}function z_(){console.log("🧹 Cleaning up QuickServe"),Ka(),ea(),Jc(),Tg(),Lg(),X_(),Ce.clearCurrentMode()}function U_(){requestAnimationFrame(()=>{setTimeout(()=>{const e=document.getElementById("modeBackground");e&&(e.src=e.src)},10)})}function H_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.add("hidden")}function G_(){var e;(e=document.querySelector(".menu-wrapper"))==null||e.classList.remove("hidden")}function V_(){const e=au();e.classList.remove("hidden"),e.style.display="flex"}function X_(){const e=au();e.innerHTML="",e.classList.add("hidden"),e.style.display="none"}function au(){return document.getElementById("game-container")}let nl=0,ra,ta,Yg,al,na;function j_(){console.log("🏕️ Loading Kids Camping Mode"),Ce.setMode("kids"),to("kidsCamping");const e=document.querySelector(".menu-wrapper"),r=document.getElementById("game-container");e==null||e.classList.add("hidden"),r.classList.remove("hidden"),r.style.display="flex",W_(),Y_(),K_()}function jo(){const e=document.getElementById("game-container");e.innerHTML="",e.classList.add("hidden"),e.style.display="none",Z_(),console.log("🏕️ Kids Camping Mode cleaned up!")}function W_(){const e=document.getElementById("game-container");e.innerHTML=`
     <div class="game-frame">
       <img id="modeBackground" class="background-fill" src="assets/img/modes/kidsCamping/campingBG.png" alt="Camping Background" />
       <div class="kc-grid">
