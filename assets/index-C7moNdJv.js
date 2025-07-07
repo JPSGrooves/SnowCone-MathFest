@@ -195,9 +195,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 
           <!-- 🎸 Stage -->
           <div class="qs-stage">
-            <div class="score-box info-box">
-              <span class="label">Score</span>
-              <span class="value" id="qsScore">0</span>
+            <div class="score-box">
+              <div class="info-box">
+                <span class="label">Score</span>
+                <span class="value" id="qsScore">0</span>
+              </div>
             </div>
 
 
@@ -210,7 +212,12 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
             </div>
 
 
-            <div class="timer-box info-box">⏱️ <span id="qsTimer">1:45</span></div>
+            <div class="timer-box">
+              <div class="info-box">
+                <span class="label">Time</span>
+                <span class="value" id="qsTimer">35</span>
+              </div>
+            </div>
 
             <!-- ✨ Glow Lines -->
             <div class="glow-lines">
