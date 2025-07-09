@@ -410,10 +410,8 @@ In case of a (multi dimensional) array or matrix, the prob order quantile of all
               />
             </div>
 
-            <div class="il-intro-buttons">
-              <button id="startInfinitySet" class="start-show-btn">🎶 Start the Set 🎶</button>
-              <button id="backToMenu" class="back-to-menu-btn">🔙 Back to Menu</button>
-            </div>
+            <button id="startInfinitySet" class="start-show-btn">🎶 Start the Set 🎶</button>
+            <button id="backToMenu" class="back-to-menu-btn">🔙 Back to Menu</button>
           </div>
         </div>
       </div>
