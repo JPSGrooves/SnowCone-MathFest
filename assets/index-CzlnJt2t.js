@@ -392,7 +392,7 @@ In case of a (multi dimensional) array or matrix, the prob order quantile of all
           alt="Infinity Lake Background"
         />
 
-        <!-- 🧊 INFINITY INTRO STACK -->
+        <!-- 🧊 INFINITY INTRO STACK — now grid-powered -->
         <div class="il-intro">
           <div class="il-intro-stack">
             <div class="il-speech">
@@ -401,6 +401,7 @@ In case of a (multi dimensional) array or matrix, the prob order quantile of all
               We keep the beats pumping and the equations<br>
               rolling until the sun comes up!
             </div>
+
             <div class="triplet-wrapper">
               <img 
                 id="tripletSpriteIntro" 
@@ -409,13 +410,10 @@ In case of a (multi dimensional) array or matrix, the prob order quantile of all
               />
             </div>
 
-            <!-- 🎛️ Scoped buttons — properly classed and styled -->
-            <button id="startInfinitySet" class="il-intro-btn start-show-btn">
-              🎶 Start the Set 🎶
-            </button>
-            <button id="backToMenu" class="il-intro-btn back-to-menu-btn">
-              🔙 Back to Menu
-            </button>
+            <div class="il-intro-buttons">
+              <button id="startInfinitySet" class="start-show-btn">🎶 Start the Set 🎶</button>
+              <button id="backToMenu" class="back-to-menu-btn">🔙 Back to Menu</button>
+            </div>
           </div>
         </div>
       </div>
