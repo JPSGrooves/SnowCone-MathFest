@@ -32,6 +32,9 @@ let totalSessionXP = 0;
 //////////////////////////////
 // 🚀 Scene Lifecycle
 //////////////////////////////
+
+export { endGame as endQuickServeGame };
+
 export function startGameLogic() {
   resetGameState();
   startGame();
@@ -47,6 +50,7 @@ export function stopGameLogic() {
 export function resetCurrentAnswer() {
   currentAnswer = '';
   updateAnswerDisplay();
+  setCurrentAnswer(''); // ✨ keep inputManager harmony
 }
 
 export function appendToAnswer(val) {
@@ -55,7 +59,6 @@ export function appendToAnswer(val) {
 }
 
 export function setMathMode(mode) {
-  highlightModeButton(mode);
   currentMathMode = mode;
 
   // 🎯 Set XP and point rewards based on mode
@@ -80,8 +83,15 @@ export function setMathMode(mode) {
 
   resetCurrentAnswer();
   renderProblem();
+  highlightModeButton(mode);
+
+  console.log(`🌈 Mode set to: ${mode}`);
 }
 
+
+export function setCurrentAnswer(val) {
+  currentAnswer = val;
+}
 
 
 //////////////////////////////
@@ -106,14 +116,18 @@ function startGame() {
   renderProblem();
 }
 function highlightModeButton(mode) {
-  const buttons = ['plusMinus', 'multiplyDivide', 'algMode'];
-  buttons.forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.classList.toggle('active-mode', id === modeToButtonId(mode));
-    }
+  const map = {
+    addSub: 'plusMinus',
+    multiDiv: 'multiplyDivide',
+    algebra: 'algMode'
+  };
+
+  const activeId = map[mode];
+  document.querySelectorAll('.btn-mode').forEach(btn => {
+    btn.classList.toggle('active-mode', btn.id === activeId);
   });
 }
+
 
 function modeToButtonId(mode) {
   switch (mode) {

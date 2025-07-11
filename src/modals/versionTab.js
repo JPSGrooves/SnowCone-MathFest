@@ -12,18 +12,20 @@ export function renderVersionTab() {
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.5.5 Update – QuickServe Pavilion Complete</h3>
+      <h3>🍦 v0.6.0 Update – QuickServe Pavilion Complete</h3>
       <p>
-        – ⏱️ Full QuickServe loop complete — intro, timer, score, XP, and results<br>
-        – 🧠 Supports Add/Sub, Mult/Div, and Algebra with XP scaling by difficulty<br>
-        – 🧮 Keypad and keyboard input fully wired — snappy and reliable<br>
-        – 🏆 High score system added — saves personal bests across sessions<br>
-        – 🎉 “New High Score!” message glows when record is broken<br>
-        – 🎊 Confetti celebration launches on high score (optimized for performance)<br>
-        – 🍭 Result popup fades in and centers perfectly on all screens<br>
-        – 🧽 Duplicate function bug fixed — Vite build now clean<br>
-        – 🧼 Fully modular game logic + scoped layout — locked and stable on all devices
+        – ♾️ Infinity Lake Mode now fully playable — intro screen, Triplet jam, math problems, XP, and high scores<br>
+        – 🎶 Background music shuffles from curated Infinity tracks — reshuffles every loop for eternal vibes<br>
+        – 🔊 Mute button now syncs with Howler state — works via mouse or keyboard (M key)<br>
+        – 🧠 Mode switching with <strong>J / K / L</strong> keys fully functional — updates visuals and generates new problems<br>
+        – 💫 Mode button glow now reflects current selection — both mouse and keyboard stay in sync<br>
+        – 💥 3–6–9 streak SFX burst added — Triplet hype plays alternating sound effects at key intervals<br>
+        – 🎉 High score and longest streak are tracked and celebrated with confetti explosions<br>
+        – ⏱️ Time played now reported at end-of-game popup — no more guessing your grind<br>
+        – 🧃 Clean problem generator handles Add/Sub, Mult/Div, and Algebra with smooth fake answer logic<br>
+        – 🧽 Fixed missing answer button values — blue and violet buttons now update properly every time<br>
       </p>
+
     </div>
 
     <div class="settings-block">

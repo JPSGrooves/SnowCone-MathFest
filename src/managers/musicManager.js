@@ -1,5 +1,6 @@
 import { Howl, Howler } from 'howler';
 
+
 let currentTrack = null;
 let rafId = null;
 const fadeDuration = 1000;
@@ -17,6 +18,9 @@ const tracks = [
 
 let looping = false;
 let shuffling = false;
+let currentIndex = 0;
+let trackLoop = null;
+
 
 //////////////////////////////
 // 🚀 Play Track
@@ -40,8 +44,12 @@ export function playTrack(id = getFirstTrackId()) {
         startProgressUpdater();
       },
       onend: () => {
-        if (!looping && shuffling) {
+        if (looping) return;
+
+        if (shuffling) {
           playRandomTrack();
+        } else {
+          skipNext(); // <-- this line makes it play next normally
         }
       },
       onplayerror: (_, err) => {
@@ -51,6 +59,7 @@ export function playTrack(id = getFirstTrackId()) {
     });
 
     currentTrack.play();
+    startProgressUpdater(); // don't wait for onplay
   });
 }
 
@@ -195,7 +204,7 @@ function startProgressUpdater() {
   if (!bar || !timer || !currentTrack) return;
 
   function update() {
-    if (!currentTrack?.playing()) return;
+    if (!currentTrack) return; // allow paused seek to show
 
     const seek = currentTrack.seek() || 0;
     const duration = currentTrack.duration() || 1;
@@ -275,4 +284,34 @@ export function getCurrentSeekPercent() {
   const duration = currentTrack.duration();
   if (!duration) return 0;
   return (currentTrack.seek() || 0) / duration;
+}
+
+const infinityTrackIds = ['infadd', 'sc90', 'nothingorg', 'secrets'];
+
+function shuffleInfinityTrackList() {
+  return infinityTrackIds
+    .map(id => ({ id, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(obj => obj.id);
+}
+
+let infQueue = shuffleInfinityTrackList();
+let infIndex = 0;
+
+export function playInfinityLoop() {
+  const nextId = infQueue[infIndex];
+
+  playTrack(nextId);
+
+  infIndex = (infIndex + 1) % infQueue.length;
+  if (infIndex === 0) {
+    infQueue = shuffleInfinityTrackList(); // reshuffle after full loop
+  }
+}
+
+export function stopInfinityLoop() {
+  if (trackLoop) {
+    trackLoop.stop();
+    isPlaying = false;
+  }
 }

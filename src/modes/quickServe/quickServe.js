@@ -8,20 +8,29 @@ import { stopTrack, toggleMute } from '../../managers/musicManager.js';
 
 import * as phil from './quickServePhil.js';
 import * as gridFX from './quickServeGridFX.js';
-import { setupKeypad, generateKeypadHTML, setupKeyboardInput } from './quickServeKeypad.js';
+import { setupKeypad, generateKeypadHTML } from './quickServeKeypad.js';
 import { 
   startGameLogic, 
   stopGameLogic, 
-  resetCurrentAnswer, 
+  resetCurrentAnswer 
 } from './quickServeGame.js';
 
+
+
 import { playQSRandomTrack, stopQS } from './quickServeMusic.js';
+import { activateInputHandler } from '../../managers/inputManager.js';
+
+
+
 
 //////////////////////////////
 // 🚀 Load QuickServe Mode
 //////////////////////////////
 export function loadQuickServe() {
   console.log('🍧 Loading QuickServe Mode');
+  // 💫 Activate QS mode keys
+  activateInputHandler('quickServe');
+  document.body.classList.add('qs-active');
   appState.setMode('quickServe');
   appState.incrementQuickServeSessions();
   swapModeBackground('quickServe');
@@ -32,6 +41,10 @@ export function loadQuickServe() {
   showGameContainer();
   renderIntroScreen();
 }
+
+
+
+
 
 //////////////////////////////
 // 🎬 Intro Screen
@@ -45,10 +58,10 @@ function renderIntroScreen() {
         <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
         <div class="qs-intro">
           <div class="phil-speech">
-            Yo! I’m <strong>Cosmic Phil</strong> and we’re about to kick off the show!<br/>
+            Yo! I’m <strong>Cosmic Phil</strong>!<br/>
             You’ve got <strong>1 minute and 45 seconds</strong> to score as many points as you can!<br/>
-            The tougher the math mode, the more <em>XP</em> and <em>points</em> you earn.<br/>
-            🎸 Rock on!
+            The tougher the math, the sweeter the reward!<br/>
+            🎸 Rock on to your next high score!
           </div>
 
           <div class="phil-wrapper">
@@ -165,7 +178,6 @@ export function renderGameUI() {
   gridFX.initGridGlow();
   gridFX.startGridPulse();
   setupKeypad();
-  setupKeyboardInput();
   setupMuteButton();
   startGameLogic();
 }
@@ -183,13 +195,20 @@ function setupMuteButton() {
   };
 
   muteBtn.addEventListener('click', () => {
-    toggleMute();
+    const nowMuted = toggleMute();  // 🔇 actually flip sound
     updateLabel();
-    muteBtn.blur(); // ✨ lose focus after click
   });
+
 
   updateLabel();
 }
+
+export function updateMuteButtonLabel() {
+  const muteBtn = document.getElementById('muteBtn');
+  if (!muteBtn) return;
+  muteBtn.textContent = Howler._muted ? '🔇 Unmute' : '🔊 Mute';
+}
+
 
 //////////////////////////////
 // 🔙 Return to Menu

@@ -4,15 +4,54 @@ import './infinityMode.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
+import { startTripletLoop, stopTripletLoop, startTripletSequence } from './tripletAnimator.js';
+import { stopTrack, toggleMute } from '../../managers/musicManager.js';
+import { activateInputHandler } from '../../managers/inputManager.js';
+import { launchConfetti } from '../../utils/confetti.js';
+import { runInAction } from 'mobx';
+import { playInfinityLoop } from '../../managers/musicManager.js';
 
+
+
+
+
+
+
+
+
+
+let answerBtns = [];
 let score = 0;
-let currentCorrect = 0;
+let currentCorrect = null;
+let problemEl = null;
+let scoreDisplay = null;
+let resultMsg = null;
+let streak = 0;
+let addsubToggle = true;
+let multdivToggle = true;
+let startTime = 0;
+let streakFlipFlop = true; // true = play milestone, false = play points100
 
-let problemEl, answerBtns, scoreDisplay, resultMsg;
+
+
+
+
+
+
+
+
+
+
+
+
 
 export function loadInfinityMode() {
   console.log('♾️ Loading Infinity Mode');
+  activateInputHandler('infinity');
+  document.body.classList.add('il-active');
   appState.setMode('infinity');
+  appState.setGameMode('addsub'); // 🌊 Default to +/- combo mode
+  stopTrack(); // 🔇 stop jukebox track cold on entry
 
   const menuWrapper = document.querySelector('.menu-wrapper');
   const gameContainer = document.getElementById('game-container');
@@ -21,12 +60,68 @@ export function loadInfinityMode() {
   gameContainer.classList.remove('hidden');
   gameContainer.style.display = 'flex';
 
-  renderUI();
-  swapModeBackground('assets/img/modes/infinityLake/infinityBG.png');
-  setupEventHandlers();
-  startGame();
-}
+  renderIntroScreen();
+  setTimeout(() => {
+    startTripletLoop('intro', 'tripletSpriteIntro', 500);
+  }, 100);
 
+
+  // 🎨 Swap IL background (on first load and again later if needed)
+  swapModeBackground('assets/img/modes/infinityLake/infinityBG.png');
+
+  // 🌀 Animate intro strobe after #tripletSprite is in DOM
+  setTimeout(() => {
+    startTripletLoop('intro', 'tripletSpriteIntro', 500);
+  }, 50);
+
+  // 🔙 Back to Menu
+  document.querySelector('.il-intro .back-to-menu-btn')?.addEventListener('click', returnToMenu);
+
+  // 🎶 Start the Set
+  document.querySelector('.il-intro .start-show-btn')?.addEventListener('click', () => {
+    setTimeout(() => {
+      startTripletLoop('intro', 'tripletSpriteIntro', 500);
+    }, 100);
+    const introEl = document.querySelector('.il-intro');
+
+    if (introEl) {
+      introEl.classList.add('fade-out');
+
+      setTimeout(() => {
+        stopTripletLoop(); // 🛑 Kill strobe
+
+        renderUI(); // 🧠 Build game screen
+        updateModeButtonUI(); // 👈 this will now highlight the correct button on load
+        swapModeBackground('assets/img/modes/infinityLake/infinityBG.png');
+        setupEventHandlers();
+        startGame();
+        playInfinityLoop(); // 🎶🍧💫 kick off the infinite jam session
+        
+
+        // Fade in new game grid
+        const grid = document.querySelector('.il-grid');
+        if (grid) grid.classList.add('fade-in');
+
+        // Start sprite sequence
+        startTripletSequence([
+          { pose: 'openSet', time: 3000 },
+          { pose: 'jam1', time: 6000 },
+          { pose: 'jam2', time: 9000 },
+          { pose: 'change', time: 3000 },
+          { pose: 'other', time: 6000 },
+          { pose: 'other2', time: 9000 }
+        ], 'tripletSpriteGame');
+
+
+
+        // 🛸 Fade-In Candy: micro-delay before glow
+        setTimeout(() => {
+          document.getElementById('tripletSpriteGame')?.classList.add('fade-in');
+        }, 100);
+      }, 450); // allow fade-out to finish
+    }
+  });
+}
 
 export function stopInfinityMode() {
   const container = document.getElementById('game-container');
@@ -37,46 +132,123 @@ export function stopInfinityMode() {
   cleanupEventHandlers();
   console.log('♾️ Infinity Mode cleaned up!');
 }
+function renderIntroScreen() {
+  const container = document.getElementById('game-container');
+
+  container.innerHTML = `
+    <div class="il-aspect-wrap">
+      <div class="il-game-frame">
+        <img 
+          class="background-fill"
+          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/infinityBG.png" 
+          alt="Infinity Lake Background"
+        />
+
+        <!-- 🧊 INFINITY INTRO STACK -->
+        <div class="il-intro">
+          <div class="il-intro-stack">
+            <div class="il-speech">
+              Hi! We're the <strong>Infinity Triplets</strong>!<br>
+              We keep the beats pumping while you solve math problems!<br>
+              Infinity Awaits!
+            </div>
+            <div class="triplet-wrapper">
+              <img 
+                id="tripletSpriteIntro" 
+                class="triplet-img" 
+                src="${import.meta.env.BASE_URL}assets/img/characters/infinityLake/il_intro.png"
+              />
+            </div>
+
+            <!-- 🎛️ Scoped buttons — properly classed and styled -->
+            <button id="startInfinitySet" class="il-intro-btn start-show-btn">
+              🎶 Start the Set 🎶
+            </button>
+            <button id="backToMenu" class="il-intro-btn back-to-menu-btn">
+              🔙 Back to Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+
+  updateModeButtonUI(); // ✨ maybe change button glows
+  generateNewProblem(); // ✅ this must happen
+}
 
 function renderUI() {
   const container = document.getElementById('game-container');
   container.innerHTML = `
-    <div class="aspect-wrap">
-      <div class="game-frame">
-        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/infinityBG.png"
-          alt="Infinity Mode Background"
+    <div class="il-aspect-wrap">
+      <div class="il-game-frame">
+        <img 
+          id="modeBackground" 
+          class="background-fill" 
+          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/infinityBG.png" 
         />
         <div class="il-grid">
-          <div class="il-title">♾️ Infinity Lake</div>
 
+          <!-- 🌊 Title -->
+          <div class="il-title">Infinity Lake</div>
+
+          <!-- 🎶 Stage Row (Triplets + Score) -->
           <div class="il-stage">
-            <div class="twins-box">👯‍♀️</div>
-            <div class="score-box">Score: <span id="infScore">0</span></div>
+            <img 
+              id="tripletSpriteGame" 
+              class="il-triplet-img fade-in" 
+              src="${import.meta.env.BASE_URL}assets/img/characters/infinityLake/il_openSet.png"
+            />
           </div>
 
+
+          <!-- 🧠 Math & Answer UI -->
           <div class="il-math">
             <div id="mathProblem">-- + -- = ?</div>
             <div class="answer-options">
-              <button class="ans-btn" data-choice="0">?</button>
-              <button class="ans-btn" data-choice="1">?</button>
-              <button class="ans-btn" data-choice="2">?</button>
+              <button class="ans-btn ans-yellow" data-choice="0">?</button>
+              <button class="ans-btn ans-blue" data-choice="1">?</button>
+              <button class="ans-btn ans-violet" data-choice="2">?</button>
             </div>
             <div id="coneResultMsg" class="result-msg"></div>
+
+            <!-- 🌟 Wrap the score + streak in a horizontal row -->
+            <div class="il-metric-row">
+              <div class="il-score-box">Score: <span id="infScore">0</span></div>
+              <div class="il-streak-box">Streak: <span id="infStreak">0</span></div>
+            </div>
           </div>
 
+          <!-- 🎛️ Controls Grid -->
           <div class="il-controls">
             <div class="mode-buttons">
-              <button data-mode="add">+</button>
-              <button data-mode="sub">−</button>
-              <button data-mode="mul">×</button>
-              <button data-mode="div">÷</button>
-              <button data-mode="alg">𝒙</button>
+              <button data-mode="addsub">+/−<br>Mode</button>
+              <button data-mode="multdiv">×÷<br>Mode</button>
+              <button data-mode="alg">𝒙<br>Mode</button>
             </div>
             <div class="utility-buttons">
               <button id="backToMenu">Main<br>Menu</button>
-              <button id="resetGame">Reset</button>
-              <button id="muteToggle">🔇</button>
+              <button id="endGame">End<br>♾️</button>
+              <button id="muteToggle">🔇<br>Mute</button>
             </div>
+          </div>
+
+        </div>
+        <div class="il-result-popup hidden" id="ilResultPopup">
+          <h2>🎉 Set Complete!</h2>
+
+          <p><strong>Score:</strong> <span id="ilScoreFinal">0</span></p>
+          <p><strong>High Score:</strong> <span id="ilHighScore">0</span></p>
+          <p><strong>Longest Streak:</strong> <span id="ilStreak">0</span></p>
+          <p><strong>Time Played:</strong> <span id="ilTime">0:00</span></p>
+
+          <div class="il-result-buttons">
+            <button id="ilPlayAgainBtn" class="start-show-btn">🔁 Play Again</button>
+            <button id="ilBackBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
           </div>
         </div>
       </div>
@@ -90,18 +262,84 @@ function renderUI() {
 }
 
 function setupEventHandlers() {
-  document.getElementById('backToMenu')?.addEventListener('click', returnToMenu);
+  document.getElementById('backToMenu')?.addEventListener('click', () => {
+    activateInputHandler(null); // disable hotkeys
+    document.body.classList.remove('il-active', 'qs-active');
+    returnToMenu(); // or whatever scene-switcher you use
+  });
   document.getElementById('resetGame')?.addEventListener('click', startGame);
+  document.getElementById('endGame')?.addEventListener('click', () => {
+    console.log('🛑 End Game pressed – show result popup here');
+    // Future: showResultPopup(); or renderEndGameStats();
+  });
+  document.getElementById('ilPlayAgainBtn')?.addEventListener('click', () => {
+    closeResultPopup();
+    startGame();
+  });
+
+  document.getElementById('ilBackBtn')?.addEventListener('click', () => {
+    closeResultPopup();
+    returnToMenu();
+  });
+  document.getElementById('endGame')?.addEventListener('click', () => {
+    console.log('🛑 End Game pressed – show result popup here');
+
+    // replace with real values when you track them
+    showResultPopup({
+      score: score,
+      highScore: appState.profile.infinityHighScore || 0,
+      streak: 0,
+      time: '1:45'
+    });
+  });
+
   answerBtns.forEach(btn => btn.addEventListener('click', () => handleAnswer(btn)));
+
+  // Add these 👇
+  document.querySelectorAll('.mode-buttons button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      if (!mode) return;
+      appState.setGameMode(mode);
+      updateModeButtonUI();
+      newProblem();
+      flashModeName();
+    });
+  });
+  function updateMuteButtonLabel() {
+    const icon = document.getElementById('muteToggle');
+    const muted = Howler._muted;
+    if (icon) {
+      icon.innerHTML = muted ? '🔇<br>Unmute' : '🔊<br>Mute';
+    }
+  }
+
+  document.getElementById('muteToggle')?.addEventListener('click', () => {
+    toggleMute();
+    updateMuteButtonLabel();
+    flashMuteIcon();
+  });
+
+
 }
+
+
 
 function cleanupEventHandlers() {
   document.getElementById('backToMenu')?.removeEventListener('click', returnToMenu);
   document.getElementById('resetGame')?.removeEventListener('click', startGame);
+  document.getElementById('endGame')?.removeEventListener('click', () => {});
+
+
+  if (!answerBtns || !Array.isArray(answerBtns)) return; // 🍃 Chill if no game yet
+
   answerBtns.forEach(btn => btn.removeEventListener('click', handleAnswer));
 }
 
+
+
 function returnToMenu() {
+  stopTrack(); // 💥 nukes the Howl
   playTransition(() => {
     stopInfinityMode();
     document.querySelector('.menu-wrapper')?.classList.remove('hidden');
@@ -111,25 +349,120 @@ function returnToMenu() {
 
 function startGame() {
   score = 0;
+  streak = 0;
   updateScore();
+  updateStreak(); // 👈 add this
   newProblem();
+  startTime = Date.now();
 }
 
+function updateStreak() {
+  const el = document.getElementById('infStreak');
+  if (el) el.textContent = streak;
+}
+
+function compute(a, b, op) {
+  switch (op) {
+    case '+': return a + b;
+    case '-': return a - b;
+    case '×': return a * b;
+    case '÷': return Math.floor(a / b); // simple clean divide
+  }
+}
+
+
 function newProblem() {
-  const a = Math.floor(Math.random() * 20) + 1;
-  const b = Math.floor(Math.random() * 20) + 1;
-  const correctAnswer = a + b;
+  const mode = appState.getGameMode();
+  let a = Math.floor(Math.random() * 20) + 1;
+  let b = Math.floor(Math.random() * 20) + 1;
+  let correctAnswer;
+  let question;
+
+  switch (mode) {
+    case 'addsub':
+      if (addsubToggle) {
+        correctAnswer = a + b;
+        question = `${a} + ${b} = ?`;
+      } else {
+        correctAnswer = a - b;
+        question = `${a} − ${b} = ?`;
+      }
+      addsubToggle = !addsubToggle;
+      break;
+
+    case 'multdiv':
+      if (multdivToggle) {
+        correctAnswer = a * b;
+        question = `${a} × ${b} = ?`;
+      } else {
+        // Generate clean division
+        b = Math.floor(Math.random() * 9) + 1; // 1–9
+        correctAnswer = Math.floor(Math.random() * 10) + 1; // 1–10
+        a = b * correctAnswer;
+        question = `${a} ÷ ${b} = ?`;
+      }
+      multdivToggle = !multdivToggle;
+      break;
+
+    case 'alg': {
+      const ops = ['+', '-', '×', '÷'];
+      let op = ops[Math.floor(Math.random() * ops.length)];
+      let result;
+
+      // default safe values
+      correctAnswer = a;
+
+      if (op === '+') {
+        result = a + b;
+        question = `solve for 𝒙<br>𝒙 + ${b} = ${result}`;
+      }
+
+      else if (op === '-') {
+        result = a - b;
+        question = `solve for 𝒙<br>𝒙 − ${b} = ${result}`;
+      }
+
+      else if (op === '×') {
+        result = a * b;
+        correctAnswer = a;
+        question = `solve for 𝒙<br>𝒙 × ${b} = ${result}`;
+      }
+
+      else if (op === '÷') {
+        // only allow clean division: a = b * x
+        correctAnswer = Math.floor(Math.random() * 10) + 1;
+        b = Math.floor(Math.random() * 9) + 1;
+        result = correctAnswer;
+        a = b * correctAnswer;
+        question = `solve for 𝒙<br>${a} ÷ 𝒙 = ${b}`;
+      }
+
+      break;
+    }
+  }
+
+
+
   currentCorrect = correctAnswer;
 
-  // Generate fake options
+  // 🎲 Generate 2 fake options that aren’t the correct answer
   let options = [correctAnswer];
+  let tries = 0;
   while (options.length < 3) {
-    let fake = correctAnswer + Math.floor(Math.random() * 11) - 5;
-    if (!options.includes(fake) && fake >= 0) options.push(fake);
+    const fake = correctAnswer + Math.floor(Math.random() * 11) - 5;
+    if (!options.includes(fake) && fake >= 0) {
+      options.push(fake);
+    } else {
+      options.push(Math.floor(Math.random() * 50)); // 💥 backup junk answer
+    }
   }
+
+
+
   options.sort(() => Math.random() - 0.5);
 
-  problemEl.textContent = `${a} + ${b} = ?`;
+  // ✍️ Inject into DOM
+  problemEl.innerHTML = question;
   answerBtns.forEach((btn, i) => {
     btn.textContent = options[i];
     btn.dataset.value = options[i];
@@ -137,7 +470,7 @@ function newProblem() {
 }
 
 function handleAnswer(btn) {
-  const guess = parseInt(btn.dataset.value);
+  const guess = Number(btn.dataset.value);
   if (guess === currentCorrect) {
     handleCorrect();
   } else {
@@ -146,14 +479,50 @@ function handleAnswer(btn) {
 }
 
 function handleCorrect() {
-  score++;
-  appState.addXP(5);
-  showResult('✅ Correct! +5 XP', '#00ffee');
+  const mode = appState.getGameMode();
+  let points = 0;
+  let xp = 0;
+
+  switch (mode) {
+    case 'addsub':
+      points = 1;
+      xp = 3;
+      break;
+    case 'multdiv':
+      points = 3;
+      xp = 4;
+      break;
+    case 'alg':
+      points = 4;
+      xp = 5;
+      break;
+    default:
+      points = 1;
+      xp = 1;
+  }
+
+  score += points;
+  streak++; // 🥳 Move streak up BEFORE triggering SFX
+
+  // 🎯 3-6-9 Burst Logic
+  console.log(`🌈 Streak now at: ${streak}`);
+  if (streak % 3 === 0) {
+    console.log('💥 Triggering SFX burst!');
+    playStreakBurst();
+  }
+ // 🍧💥💿 no early exit!
+
+  appState.addXP(xp);
   updateScore();
+  updateStreak();
+  showResult(`✅ +${points} pt, +${xp} XP`, '#00ffee');
   newProblem();
 }
 
+
 function handleIncorrect() {
+  streak = 0;
+  updateStreak();
   showResult('❌ Nope. Try again!', '#ff5555');
 }
 
@@ -166,3 +535,161 @@ function showResult(msg, color) {
   resultMsg.style.color = color;
   setTimeout(() => resultMsg.textContent = '', 1500);
 }
+
+/*popup*/
+function showResultPopup() {
+  const popup = document.getElementById('ilResultPopup');
+  if (!popup) return;
+
+  const endTime = Date.now();
+  const elapsed = formatElapsedTime(endTime - startTime);
+
+  const isNewHighScore = score > (appState.profile.infinityHighScore || 0);
+  const isNewStreak = streak > (appState.profile.infinityLongestStreak || 0);
+
+  if (isNewHighScore) {
+    appState.profile.infinityHighScore = score;
+    launchConfetti(); // or `launchConfetti('score')`
+  }
+
+  if (isNewStreak) {
+    appState.profile.infinityLongestStreak = streak;
+    launchConfetti(); // or `launchConfetti('streak')`
+  }
+
+
+  document.getElementById('ilScoreFinal').textContent = score;
+  document.getElementById('ilHighScore').textContent = appState.profile.infinityHighScore;
+  document.getElementById('ilStreak').textContent = appState.profile.infinityLongestStreak;
+  document.getElementById('ilTime').textContent = elapsed;
+
+  popup.classList.remove('hidden');
+}
+
+function closeResultPopup() {
+  const popup = document.getElementById('ilResultPopup');
+  if (popup) popup.classList.add('hidden');
+}
+
+
+function getCurrentModeName() {
+  const mode = appState.getGameMode();
+  switch (mode) {
+    case 'addsub': return 'Addition/Subtraction Mode';
+    case 'multdiv': return 'Multiply/Divide Mode';
+    case 'alg': return 'Algebra Mode';
+    default: return 'Infinity Mode';
+  }
+}
+
+function formatElapsedTime(ms) {
+  const seconds = Math.floor(ms / 1000);
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+
+
+function flashModeName() {
+  const el = document.createElement('div');
+  el.className = 'mode-flash';
+  el.textContent = getCurrentModeName(); // Like "Algebra Mode"
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+function flashMuteIcon() {
+  const icon = document.querySelector('#muteIcon'); // Whatever ID/class you use
+  if (!icon) return;
+  icon.classList.add('flash');
+  setTimeout(() => icon.classList.remove('flash'), 400);
+}
+
+export function updateMuteButtonLabel() {
+  const icon = document.getElementById('muteToggle');
+  const muted = Howler._muted;
+  if (icon) {
+    icon.innerHTML = muted ? '🔇<br>Unmute' : '🔊<br>Mute';
+  }
+}
+
+
+
+function updateModeButtonUI() {
+  const mode = appState.getGameMode();
+  const map = {
+    addsub: 0,
+    multdiv: 1,
+    alg: 2
+  };
+
+  const buttons = document.querySelectorAll('.mode-buttons button');
+  buttons.forEach((btn, i) => {
+    if (i === map[mode]) {
+      btn.classList.add('active-mode');
+    } else {
+      btn.classList.remove('active-mode');
+    }
+  });
+}
+
+function endInfinityGame() {
+  console.log('♾️ Ending Infinity Mode...');
+  
+  const endTime = Date.now();
+  const elapsed = formatElapsedTime(endTime - startTime);
+
+  const isNewHighScore = score > (appState.profile.infinityHighScore || 0);
+  const isNewStreak = streak > (appState.profile.infinityLongestStreak || 0);
+
+  runInAction(() => {
+    if (isNewHighScore) {
+      appState.profile.infinityHighScore = score;
+    }
+
+    if (isNewStreak) {
+      appState.profile.infinityLongestStreak = streak;
+    }
+  });
+
+
+  showResultPopup({
+    score,
+    highScore: appState.profile.infinityHighScore,
+    streak: appState.profile.infinityLongestStreak,
+    time: elapsed
+  });
+
+  if (isNewHighScore || isNewStreak) {
+    launchConfetti(); // 💥 celebrate after showing results
+  }
+}
+
+
+function playStreakBurst() {
+  console.log('💥 Triggering SFX burst!');
+  const file = streakFlipFlop
+    ? 'QuikServemilestone.mp3'
+    : 'QuikServepoints100.mp3';
+
+  const sfx = new Howl({
+    src: [`${import.meta.env.BASE_URL}assets/audio/SFX/${file}`],
+    volume: 1.0
+  });
+
+  sfx.play();
+  streakFlipFlop = !streakFlipFlop;
+}
+
+
+
+
+export {
+  switchMode,
+  endInfinityGame,
+  flashModeName,
+  newProblem,
+  updateModeButtonUI // 👈 add this line bro
+};
+
+

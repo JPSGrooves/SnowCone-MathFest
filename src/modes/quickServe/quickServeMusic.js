@@ -16,8 +16,8 @@ const fadeDuration = 1000;
 //////////////////////////////
 // 🚀 Start a Random Track
 //////////////////////////////
-export function playQSRandomTrack() {
-  stopQS();
+export async function playQSRandomTrack() {
+  await stopQS(); // 🌟 WAIT until the current track fully fades + unloads
 
   const random = Math.floor(Math.random() * qsTracks.length);
   const file = qsTracks[random];
@@ -52,14 +52,26 @@ export function stopQS() {
   return new Promise((resolve) => {
     if (!qsTrack) return resolve();
 
-    qsTrack.fade(qsTrack.volume(), 0, fadeDuration);
+    try {
+      qsTrack.fade(qsTrack.volume(), 0, fadeDuration);
+    } catch (err) {
+      console.warn('⚠️ Fade error:', err);
+    }
+
     setTimeout(() => {
-      qsTrack.stop();
-      qsTrack.unload();
+      if (qsTrack) {
+        try {
+          qsTrack.stop();
+          qsTrack.unload();
+          console.log('🛑 QS Track stopped and unloaded');
+        } catch (err) {
+          console.warn('⚠️ Stop/unload error:', err);
+        }
+      }
+
       qsTrack = null;
       currentFile = null;
-      console.log('🛑 QS Track stopped and unloaded');
-      resolve(); // ✅ only resolve once fully stopped
+      resolve();
     }, fadeDuration);
   });
 }

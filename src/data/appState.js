@@ -17,7 +17,8 @@ class AppState {
     mute: false,
     difficulty: 'normal',
     loop: false,
-    shuffle: false
+    shuffle: false,
+    gameMode: 'add' // 🧪 NEW: default mode!
   };
 
   stats = {
@@ -34,7 +35,8 @@ class AppState {
   uiState = {
     pendingBadgePopup: null,
     triggerBadgeModal: false,
-    currentMode: null
+    currentMode: null,
+    gameMode: 'add' // 💥 Default safe value!
   };
 
   storyMemory = {
@@ -175,6 +177,16 @@ class AppState {
     this.setCurrentMode(mode);
   }
 
+  setGameMode(mode) {
+    this.settings.gameMode = mode;
+  }
+
+  getGameMode() {
+    return this.settings.gameMode;
+  }
+
+
+
   //////////////////////////////////////
   // 🔮 MOOD ENGINE (XP DRIVEN)
   //////////////////////////////////////
@@ -294,4 +306,4 @@ autorun(() => {
 /////////////////////////////////
 // 🧪 DEV FLAG
 /////////////////////////////////
-window.devFlags = { build: "v0.5.5-QS-Pavilion_Lock" };
+window.devFlags = { build: "v0.6.0-Infinity_Unlocked" };

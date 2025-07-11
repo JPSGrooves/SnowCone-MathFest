@@ -1,12 +1,146 @@
-## 🔮 Version Roadmap (2025)  
+## 🔮 Version Roadmap (2025)
 
-- ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**  
-- 🔜 **v0.6.0 – QS & Infinity Mode Complete**  
-- 🔜 **v0.7.0 – Math Tips Mode Complete**  
-- 🔜 **v0.8.0 – Kids Mode Complete**  
-- 🔜 **v0.9.0 – Story Mode + Narratives**  
-- 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**  
+- ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**
+- ✅ **v0.5.6 – QuickServe Keyboard Ascension**
+- ✅ **v0.6.0 – Infinity Mode Complete**
+- 🔜 **v0.7.0 – Kids Mode Complete**
+- 🔜 **v0.8.0 – Story Mode + Narratives**
+- 🔜 **v0.9.0 – Math Tips Mode Complete**
+- 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**
 
+
+---
+
+## v0.6.0 — *“Infinity Mode Complete”* (July 10, 2025)
+
+### 🚀 Major New Features
+
+🎵 **Infinity Lake Mode — FULL GAMEPLAY LOOP COMPLETE**  
+- ✅ Intro sequence with the Triplets — full character intro, sprite animation, and start-show button with fade-out and transition to the game grid.  
+- ✅ Math Mode switching (J/K/L or on-screen buttons) — instantly swaps between Add/Subtract, Multiply/Divide, and Algebra — streak is preserved between modes!  
+- ✅ Problem generator supports all three math types:
+  - Clean division logic  
+  - Algebra with variable isolation  
+  - Alternating toggle patterns for variety  
+- ✅ XP and Point System wired in:
+  - Add/Subtract → +1 pt, +3 XP  
+  - Multiply/Divide → +3 pt, +4 XP  
+  - Algebra → +4 pt, +5 XP  
+  - All tracked in appState and reflected live!
+
+---
+
+### 🔊 Audio SFX & Music Engine Enhancements
+
+💥 **3–6–9 SFX BURST SYSTEM**  
+- ✅ Custom reward sounds play at streak 3, 6, 9, 12, and 15:  
+  - `QuikServemilestone.mp3` (streaks 3, 9, 15...)  
+  - `QuikServepoints100.mp3` (streaks 6, 12...)  
+  - Alternates automatically via `streakFlipFlop`  
+  - Console logs: `💥 Triggering SFX burst!`
+
+🎶 **Infinity Music Looping Engine**  
+- ✅ `playInfinityLoop()` shuffles a curated list of tracks  
+- ✅ Tracks reshuffle after full loop — infinite jam session  
+- ✅ `stopTrack()` halts playback cleanly when leaving mode  
+- ✅ Mute toggle works from click or keyboard — visually synced
+
+---
+
+### 🌟 UI & UX Enhancements
+
+- 🌈 Mode buttons now highlight the current math type  
+- ✨ Result popup added:
+  - Score  
+  - High Score (personal best)  
+  - Longest Streak (personal best)  
+  - Time Played  
+  - Confetti for new records  
+- ✅ Mute toggle label now says "Mute" or "Unmute" correctly  
+- 🌀 Smooth fade-ins for game grid and sprite upon start
+
+---
+
+### 🐛 Critical Fixes
+
+- 🐛 Fixed Add/Sub mode answer button bug — answers now populate correctly  
+- 🐛 Patched `Howl` load errors preventing SFX from playing  
+- 🧽 Scoped audio logic to avoid ghost tracks  
+- 🔧 Bracket fix after `playStreakBurst()` — prevented Vite crash
+
+---
+
+### ⚡ Performance & Stability
+
+- 🧼 Event handlers cleaned up on mode exit  
+- ✅ DOM references now safely cached  
+- ⏱️ Sprite animation sequencer is smooth and non-blocking  
+- 🎶 Music logic guarantees only one loop active at a time
+
+---
+
+### 📌 Dev Notes
+
+> *“Infinity Mode finally breathes — and it breathes in triplets.  
+> The rhythm is real. The rewards are cosmic. The game is alive.  
+> We’re no longer testing the mode… we’re listening to it.”*
+
+
+## v0.5.6 — *“QuickServe Keyboard Ascension”* (July 9, 2025)
+
+### 🚀 Major New Features
+
+🎹 **Universal Keyboard Input Integration for QuickServe Mode**
+
+* ✅ **Full keybind system activated** for QuickServe Mode, now handles:
+
+  * Numbers `0–9`
+  * Decimal `.` and Negation `-`
+  * `Enter`, `Backspace`, and `Shift + R` to reset game
+  * `Shift + E` to end the game early
+  * `M` to mute / unmute — *instantly from the keyboard*
+
+* ✅ **Mode switching with J / K / L** keys — now hot-swaps between:
+
+  * `J` = Add/Subtract
+  * `K` = Multiply/Divide
+  * `L` = Algebra
+  * All with ✨ no streak reset ✨
+
+* ✅ **Reset via `Shift + R`** fully wipes the board and restarts the timer, math mode, and music — *you’re back in the zone instantly.*
+
+---
+
+### 🌟 UI & UX Enhancements
+
+* 🎯 **Mode button glow now reflects current math type** — keyboard and on-screen buttons sync up their visual state perfectly.
+* 💡 **Negation via keypad now matches keyboard behavior**, allowing negative answers *before* any digits are entered.
+* ✨ **Mute button now responds visually** when toggled via the `M` key or button press — synced to Howler’s internal state.
+* 🌀 **Refactored keypad setup to use safeBind** — now totally resilient to layout changes, pointer event quirks, and DOM timing.
+
+---
+
+### 🐛 Critical Fixes
+
+* 🐛 **Fixed bug where reset (Shift + R) crashed** due to missing imports.
+* 🐛 **Fixed mute button not updating when triggered via keyboard** — now fully in sync with Howler mute state.
+* 🧼 **Patched rare race condition where `stopQS()` was called after `playQSRandomTrack()`** — now resolved with promise chaining and async order logic.
+
+---
+
+### ⚡ Performance & Stability
+
+* 🧠 **Reduced likelihood of double music starts or ghost tracks** by enforcing stop-before-start on QuickServe tracks.
+* 🧃 **Phil’s stage performance now starts exactly once per game loop**, preventing duplicate timeline bugs or animation stack leaks.
+* ✅ **QuickServe is now stable across all input methods** — mouse, keyboard, or touchscreen.
+
+---
+
+### 📌 Dev Notes
+
+> "*This update felt like dropping a MIDI controller into a math dimension and watching it light up in sync with reality. Keyboard support wasn’t an afterthought — it’s now a core part of the QuickServe rhythm.*"
+
+---
 
 ## v0.5.5 — *“QuickServe Pavilion Complete”* (July 7, 2025)
 

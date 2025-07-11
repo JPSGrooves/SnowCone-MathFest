@@ -1,51 +1,112 @@
 /* infinityMode.css — testing layout for Infinity Lake ♾️ */
 
+.il-aspect-wrap {
+  width: auto;
+  height: 100svh;
+  max-height: 100svh;
+  aspect-ratio: 11 / 16;
+  max-width: 100vw;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
+.il-game-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
 
 /* === Grid Core === */
 .il-grid {
   position: relative;
   z-index: 1;
   display: grid;
+
+  /* 🌈 Sacred row plan: title | triplets | math | controls */
   grid-template-rows:
-    minmax(3rem, 12%)
-    minmax(10rem, 30%)
-    minmax(10rem, 30%)
-    minmax(6rem, 28%);
+    auto
+    auto
+    auto
+    auto;
+
   height: 100%;
   width: 100%;
+  max-width: 100%;
+  max-height: 100%;
   padding: 1rem;
   box-sizing: border-box;
   gap: 0.5rem;
   color: #fff;
   font-family: 'Orbitron', sans-serif;
+  overflow: hidden;
 }
+
 
 /* === Title === */
 .il-title {
   text-align: center;
-  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  font-size: clamp(1.5rem, 1.8vw + 1.8vh, 2.4rem);
   color: #00ffee;
   text-shadow: 0 0 8px #00ffeeaa;
   padding-top: 0.5rem;
 }
 
 /* === Stage === */
+
 .il-stage {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 0.5rem 1rem;
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid #00ffee55;
+  padding: clamp(0.5rem, 1vh, 1rem);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 12px #00ffee88;
+  min-height: clamp(120px, 18vh, 240px); /* 💥 scale up */
+
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+.il-stage .il-triplet-img {
+  width: 100%;
+  max-width: 50vw;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  animation: tripletBounce 2s ease-in-out infinite alternate;
+}
+
+
+.il-stage .score-box {
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  color: #00ffee;
+  font-weight: bold;
+  border: 2px solid #00ffeeaa;
+  padding: 0.6rem 1.2rem;
   border-radius: 12px;
+  background: rgba(0, 0, 0, 0.65);
+  box-shadow: 0 0 10px #00ffee88;
 }
 
-.twins-box {
-  font-size: 2rem;
+.il-stage .il-streak-box {
+  font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+  color: #ffdd55;
+  font-weight: bold;
+  border: 2px solid #ffdd55aa;
+  padding: 0.4rem 1rem;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 8px #ffdd5588;
+  margin-top: 0.3rem;
 }
 
-.score-box {
+
+/*.score-box {
   font-size: 1.2rem;
   color: #00ffee;
   font-weight: bold;
@@ -54,7 +115,7 @@
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.5);
   box-shadow: 0 0 8px #00ffee88;
-}
+}*/
 
 /* === Math === */
 .il-math {
@@ -62,45 +123,63 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
   background: rgba(0, 0, 0, 0.5);
   padding: 1rem;
   border-radius: 1rem;
   border: 2px solid #00ffee66;
   box-shadow: 0 0 12px #00ffee88;
   text-align: center;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: visible;
 }
 
-#mathProblem {
+/*#mathProblem {
   font-size: clamp(1.8rem, 5vw, 2.8rem);
   font-weight: bold;
   color: #fff;
   text-shadow: 0 0 6px #ffffff88;
+}needs to be il specific it was fukcing up qs*/
+
+.il-math #mathProblem {
+  font-size: clamp(1rem, 4svh, 3rem); /* respect da grid, baby */
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 4px #ffffff88;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.answer-options {
+
+.il-math .answer-options {
   display: flex;
   gap: 1rem;
+  font-size: clamp(0.9rem, 2.5svh, 1.6rem);
+  padding: clamp(0.4rem, 1.2svh, 0.8rem) clamp(0.8rem, 2.5vw, 1.4rem);
 }
 
-.ans-btn {
-  font-size: clamp(1.2rem, 4vw, 2rem);
-  padding: 0.8rem 1.5rem;
+/* Base Answer Button */
+.il-math .ans-btn {
+  background-color: transparent;
+  border-width: 2px;
+  border-style: solid;
   border-radius: 12px;
-  border: 2px solid #00ffeeaa;
-  background: rgba(0, 0, 0, 0.8);
-  color: #00ffee;
+  font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 0 10px #00ffee88;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: clamp(0.4rem, 1.2svh, 0.8rem) clamp(0.8rem, 2.5vw, 1.4rem);
+  font-size: clamp(0.9rem, 2.5svh, 1.6rem);
+  text-shadow: none;
 }
 
-.ans-btn:hover {
+.il-math .ans-btn:hover {
   transform: scale(1.08);
-  background-color: #00ffee22;
 }
 
-.result-msg {
+.il-math .result-msg{
   min-height: 1.5rem;
   font-size: 1.1rem;
   color: #ffdd55;
@@ -119,15 +198,24 @@
   border-radius: 10px;
 }
 
-.mode-buttons,
-.utility-buttons {
+.il-controls .mode-buttons button.active-mode {
+  background-color: #00ffee22 !important;
+  border-color: #00ffee !important;
+  box-shadow: 0 0 14px #00ffeeaa;
+  color: #ffffff;
+}
+
+
+
+.il-controls .mode-buttons,
+.il-controls .utility-buttons {
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
 }
 
-.mode-buttons button,
-.utility-buttons button {
+.il-controls .mode-buttons button,
+.il-controls .utility-buttons button {
   flex: 1;
   font-size: 1rem;
   padding: 0.5rem;
@@ -139,7 +227,391 @@
   transition: background 0.2s;
 }
 
-.mode-buttons button:hover,
-.utility-buttons button:hover {
+.il-controls .mode-buttons button:hover,
+.il-controls .utility-buttons button:hover {
   background-color: #00ffee22;
+}
+
+
+/* === ♾️ IL Intro Screen === */
+.il-intro {
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto auto auto auto;
+  flex-direction: column;
+  justify-content: flex-start;
+  justify-items: center;
+  align-items: start;
+  gap: 1rem;
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  transition: opacity 0.4s ease;
+  overflow: visible;
+  padding: 1rem;
+}
+
+
+
+
+
+.il-speech {
+  width: 100%;
+  height: 100%;
+  max-height: 25vh; /* or 25vh if you want a lil more room */
+  transition: font-size 0.2s ease, max-height 0.2s ease;
+
+  text-align: center;
+  overflow: hidden;
+
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.85rem, 1.1vw + 1.1vh, 1.35rem); /* 🧈 silky scaling */
+  box-sizing: border-box;
+
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  box-shadow: 0 0 16px #00ffee55;
+  color: #00ffee;
+  text-shadow: 0 0 6px #00ffee88;
+
+  animation: fadeInBubble 1s ease forwards;
+  opacity: 0;
+  position: relative;
+  padding: clamp(0.5rem, 2vh, 1rem); /* 🔥 scale padding too */
+}
+
+
+
+@media (max-height: 600px) {
+  .il-speech {
+    font-size: clamp(0.8rem, 1.8vh, 1.2rem);
+    padding: 0.6rem;
+  }
+}
+
+
+@keyframes fadeInBubble {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.il-triplet-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  height: 100;
+  overflow: visible;
+  max-height: 30vh;
+  background: rgba(255, 0, 255, 0.2); /* Debug pink */
+}
+
+.il-triplet-img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  user-select: none;
+  padding: 0;
+}
+
+@keyframes tripletBounce {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+
+
+.il-score-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.il-metric-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.3rem, 1vh, 0.8rem);
+  scale: clamp(0.7, 1vw + 0.3, 1); /* 🧼 smooth shrink when needed */
+}
+
+.il-metric-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+  margin-top: 0.5rem;
+  flex-wrap: wrap; /* 🍃 optional: allow stacking on tiny screens */
+}
+
+
+.il-score-box,
+.il-streak-box {
+  font-size: clamp(1rem, 1.25vw, 1rem); /* 📉 reduce by ~50% */
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 110px;
+}
+
+
+.il-score-box {
+  color: #00ffee;
+  border: 2px solid #00ffeeaa;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 8px #00ffee88;
+}
+
+
+.il-streak-box {
+  color: #ff66ff;
+  border: 2px solid #ff66ffaa;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 8px #ff66ffaa;
+}
+
+
+/* ⚡ Yellow */
+.ans-yellow {
+  color: #ffee00 !important;; 
+  border-color: #ffee00;
+  box-shadow: 0 0 8px #ffee0077;
+}
+
+/* 💙 Blue */
+.ans-blue {
+  color: #00ccff !important;;
+  border-color: #00ccff;
+  box-shadow: 0 0 8px #00ccff77;
+}
+
+/* 💜 Violet */
+.ans-violet {
+  color: #cc33ff !important;;
+  border-color: #cc33ff;
+  box-shadow: 0 0 8px #cc33ff77;
+}
+
+
+/* 💫 Hover Glow (optional) */
+.ans-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 16px currentColor;
+}
+
+
+.mode-flash {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  color: #00ffee;
+  background: rgba(0,0,0,0.8);
+  padding: 0.5rem 1rem;
+  border: 2px solid #00ffee88;
+  border-radius: 12px;
+  box-shadow: 0 0 16px #00ffeeaa;
+  z-index: 999;
+  animation: fadeFlash 1.2s ease-out forwards;
+}
+@keyframes fadeFlash {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to   { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+#muteIcon.flash {
+  box-shadow: 0 0 12px #00ffeeaa;
+  transform: scale(1.2);
+  transition: all 0.2s ease;
+}
+
+
+/* === 🎛️ Buttons === */
+/* === 🎛️ Buttons — Infinity Intro Only === */
+.il-intro .start-show-btn,
+.il-intro .back-to-menu-btn {
+  font-size: clamp(0.7rem, 2vh, 1.2rem);
+  min-width: clamp(100px, 18vw, 180px);
+  max-width: 90%;
+  padding: clamp(0.4rem, 1vh, 0.8rem) clamp(0.8rem, 2vw, 1.4rem);
+  border-radius: 16px;
+  box-shadow: 0 0 12px currentColor;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+
+
+
+/* 🧊 Button Colors */
+.il-intro .start-show-btn {
+  background: #00ffee;
+  color: black;
+}
+
+.il-intro .back-to-menu-btn {
+  background: #ff66ff;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 0 4px #ff66ffaa;
+}
+
+/* 💫 Button Interactions */
+
+.il-intro .start-show-btn:active,
+.il-intro .back-to-menu-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px currentColor;
+}
+
+/* === ♾️ Intro Transitions === */
+.fade-out {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.ans-yellow {
+  background-color: #ffec4f;
+  color: black;
+  border-color: #ffee00;
+  box-shadow: 0 0 12px #ffee0077;
+}
+
+.ans-blue {
+  background-color: #4fdfff;
+  color: black;
+  border-color: #00ccff;
+  box-shadow: 0 0 12px #00ccff77;
+}
+
+.ans-violet {
+  background-color: #c74fff;
+  color: black;
+  border-color: #cc33ff;
+  box-shadow: 0 0 12px #cc33ff77;
+}
+
+.il-intro {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100svh;
+  aspect-ratio: 11 / 16;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+.il-intro-stack {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  max-height: 100%;
+  padding: clamp(0.5rem, 2vh, 1rem); /* 🔥 scale padding too */
+  gap: clamp(0.6rem, 2vh, 1.2rem);
+}
+
+.triplet-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 50vh; /* was 40vh */
+  max-width: 100%;
+  padding-top: 1rem;
+}
+.triplet-img {
+  max-height: 100%;
+  max-width: 100%; /* was 80% */
+  object-fit: contain;
+  transition: opacity 0.4s ease;
+}
+.il-result-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.8rem, 2vh, 2rem);
+  padding: clamp(1rem, 2.5vh, 2rem);
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  box-shadow: 0 0 24px #00ffeeaa;
+  text-align: center;
+
+  width: clamp(260px, 90vw, 420px);
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow: auto;
+  font-size: clamp(1rem, 2.2vh, 1.4rem);
+
+  animation:
+    popupFadeIn 0.6s ease-out forwards,
+    popupGlow 2.5s ease-in-out infinite;
+}
+
+.il-result-popup h2 {
+  font-size: clamp(1.4rem, 3vh, 2.4rem);
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee88;
+  margin-bottom: 0.5rem;
+}
+
+.il-result-popup p {
+  font-size: clamp(1rem, 2vh, 1.3rem);
+  color: white;
+  margin: 0.25rem 0;
+}
+
+.il-result-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#ilResultPopup.hidden {
+  display: none;
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translate(-50%, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}
+
+@keyframes popupGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px #00ffee, 0 0 40px #00ffee55;
+  }
+  50% {
+    box-shadow: 0 0 40px #00ffeeaa, 0 0 60px #00ffee88;
+  }
 }

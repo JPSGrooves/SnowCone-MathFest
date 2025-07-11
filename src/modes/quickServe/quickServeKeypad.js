@@ -11,7 +11,13 @@ import { stopGameLogic, startGameLogic } from './quickServeGame.js';
 import { stopTrack, playTrack } from '../../managers/musicManager.js';
 import { returnToMenu } from './quickServe.js'; // 🌟 Full QS exit
 import { stopQS, playQSRandomTrack } from './quickServeMusic.js'; // ✅ up top
-import { setMathMode as setMathModeInGame } from './quickServeGame.js';
+import { setMathMode } from './quickServeGame.js';
+import { setCurrentAnswer } from './quickServeGame.js'; // 💥 you'll add this below
+import { toggleMute } from '../../managers/musicManager.js';
+import { updateMuteButtonLabel } from './quickServe.js'; // 💥 this is what we need
+
+
+export { setMathMode } from './quickServeGame.js';
 
 
 export function generateKeypadHTML() {
@@ -104,68 +110,94 @@ export function setupKeypad() {
   safeBind('clear', clearAnswer);
   safeBind('enter', submitAnswer);
 
-  // 🚧 Algebra Mode (placeholder)
   safeBind('plusMinus', () => {
-    console.log('➕➖ Mode activated');
     setMathMode('addSub');
   });
-
   safeBind('multiplyDivide', () => {
-    console.log('✖️➗ Mode activated');
     setMathMode('multiDiv');
   });
-
   safeBind('algMode', () => {
-    console.log('🧩 Algebra Mode activated');
     setMathMode('algebra');
   });
+
+
+  safeBind('muteBtn', (e) => {
+    e.stopPropagation(); // 💥 Block event from bubbling up
+    toggleMute();
+    updateMuteButtonLabel();
+  });
+
 
 
   // 🌀 Return to Main Menu (Full cleanup)
   safeBind('menu', returnToMenu);
 }
 
-let keyboardListener = null;
 
-export function setupKeyboardInput() {
-  // 🚫 Remove existing listener first
-  if (keyboardListener) {
-    window.removeEventListener('keydown', keyboardListener);
+export function handleKeypadInput(value) {
+  const display = document.getElementById('answerDisplay');
+  if (!display) return;
+
+  let current = display.textContent;
+
+  switch (value) {
+    case 'enter':
+      submitAnswer(); // already exists?
+      break;
+
+    case 'clear':
+      updateAnswer('0');
+      break;
+
+    case 'neg':
+      if (current.startsWith('-')) {
+        updateAnswer(current.slice(1));
+      } else {
+        updateAnswer(current === '0' ? '-' : '-' + current);
+      }
+      break;
+
+
+    case '.':
+      if (!current.includes('.')) {
+        updateAnswer(current + '.');
+      }
+      break;
+
+    default:
+      // Append digit or replace "0"
+      if (current === '0') {
+        updateAnswer(value);
+      } else {
+        updateAnswer(current + value);
+      }
+      break;
   }
-
-  keyboardListener = (e) => {
-    const key = e.key;
-
-    if (key >= '0' && key <= '9') {
-      appendToAnswer(key);
-    } else if (key === '.') {
-      appendToAnswer('.');
-    } else if (key === 'Enter') {
-      submitAnswer();
-    } else if (key === 'Backspace') {
-      clearAnswer();
-    } else if (key === '-') {
-      toggleNegative();
-    }
-  };
-
-  window.addEventListener('keydown', keyboardListener);
 }
-function setMathMode(mode) {
-  setMathModeInGame(mode); // update state + rerender problem
 
-  // remove previous active
-  document.querySelectorAll('.btn-mode').forEach(btn =>
-    btn.classList.remove('active-mode')
-  );
-
-  // add active class
-  const map = {
-    addSub: 'plusMinus',
-    multiDiv: 'multiplyDivide',
-    algebra: 'algMode'
+export function highlightModeButton(mode) {
+  const modeMap = {
+    addSub: 0,
+    multiDiv: 1,
+    algebra: 2
   };
 
-  const btn = document.getElementById(map[mode]);
-  if (btn) btn.classList.add('active-mode');
+  const buttons = document.querySelectorAll('.mode-toggle');
+  buttons.forEach((btn, i) => {
+    if (i === modeMap[mode]) {
+      btn.classList.add('active-mode');
+    } else {
+      btn.classList.remove('active-mode');
+    }
+  });
+}
+
+
+// Helper to set answer
+function updateAnswer(newVal) {
+  const display = document.getElementById('answerDisplay');
+  if (display) {
+    display.textContent = newVal;
+  }
+  setCurrentAnswer(newVal); // ✨ sync the real game variable
 }
