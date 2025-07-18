@@ -27,10 +27,15 @@ let problemEl = null;
 let scoreDisplay = null;
 let resultMsg = null;
 let streak = 0;
+let maxStreak = 0;
 let addsubToggle = true;
 let multdivToggle = true;
 let startTime = 0;
-let streakFlipFlop = true; // true = play milestone, false = play points100
+let streakFlipFlop = true; // Alternates SFX: true = milestone, false = points100
+const sfxIntervals = [3, 6, 9, 6, 3, 6, 9]; // Your exact pattern: 3 6 9 6 3 6 9 etc
+let patternIndex = 0;
+let nextTrigger = sfxIntervals[0];
+
 
 
 
@@ -350,8 +355,12 @@ function returnToMenu() {
 function startGame() {
   score = 0;
   streak = 0;
+  maxStreak = 0; // Reset session max
+  streakFlipFlop = true; // Start with milestone SFX
+  patternIndex = 0;
+  nextTrigger = sfxIntervals[0]; // First trigger at 3
   updateScore();
-  updateStreak(); // 👈 add this
+  updateStreak();
   newProblem();
   startTime = Date.now();
 }
@@ -502,15 +511,20 @@ function handleCorrect() {
   }
 
   score += points;
-  streak++; // 🥳 Move streak up BEFORE triggering SFX
+  streak++; // 🥳 Increment streak
 
-  // 🎯 3-6-9 Burst Logic
+  // 🎯 Interval-Based Burst Logic
   console.log(`🌈 Streak now at: ${streak}`);
-  if (streak % 3 === 0) {
+  if (streak === nextTrigger) {
     console.log('💥 Triggering SFX burst!');
     playStreakBurst();
+
+    // Advance pattern and update next cumulative trigger
+    patternIndex = (patternIndex + 1) % sfxIntervals.length;
+    nextTrigger += sfxIntervals[patternIndex];
   }
- // 🍧💥💿 no early exit!
+
+  if (streak > maxStreak) maxStreak = streak; // Track session peak
 
   appState.addXP(xp);
   updateScore();
@@ -518,7 +532,6 @@ function handleCorrect() {
   showResult(`✅ +${points} pt, +${xp} XP`, '#00ffee');
   newProblem();
 }
-
 
 function handleIncorrect() {
   streak = 0;
@@ -562,6 +575,7 @@ function showResultPopup() {
   document.getElementById('ilHighScore').textContent = appState.profile.infinityHighScore;
   document.getElementById('ilStreak').textContent = appState.profile.infinityLongestStreak;
   document.getElementById('ilTime').textContent = elapsed;
+  document.getElementById('ilStreak').textContent = appState.profile.infinityLongestStreak;
 
   popup.classList.remove('hidden');
 }
@@ -640,7 +654,7 @@ function endInfinityGame() {
   const elapsed = formatElapsedTime(endTime - startTime);
 
   const isNewHighScore = score > (appState.profile.infinityHighScore || 0);
-  const isNewStreak = streak > (appState.profile.infinityLongestStreak || 0);
+  const isNewStreak = maxStreak > (appState.profile.infinityLongestStreak || 0);
 
   runInAction(() => {
     if (isNewHighScore) {
@@ -648,10 +662,9 @@ function endInfinityGame() {
     }
 
     if (isNewStreak) {
-      appState.profile.infinityLongestStreak = streak;
+      appState.profile.infinityLongestStreak = maxStreak;
     }
   });
-
 
   showResultPopup({
     score,

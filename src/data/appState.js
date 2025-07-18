@@ -2,6 +2,9 @@ import { makeAutoObservable, autorun, runInAction } from 'mobx';
 
 class AppState {
   profile = {
+    // ... existing
+    infinityHighScore: 0,
+    infinityLongestStreak: 0,
     username: 'Guest',
     xp: 0,
     level: 1,
@@ -207,6 +210,16 @@ class AppState {
   }
 
   //////////////////////////////////////
+  // 🍄 POP COUNT (Kids Camping)
+  //////////////////////////////////////
+  popCount = 0;
+
+  incrementPopCount(amount = 1) {
+    this.popCount += amount;
+  }
+
+
+  //////////////////////////////////////
   // 🧠 STORY MEMORY (PERSISTENT)
   //////////////////////////////////////
   setMemory(key, value = true) {
@@ -264,10 +277,12 @@ class AppState {
       stats: this.stats,
       storyProgress: this.storyProgress,
       storyMemory: this.storyMemory,
-      chatLogs: this.chatLogs
+      chatLogs: this.chatLogs,
+      popCount: this.popCount // 🆕 ADD THIS
     };
     localStorage.setItem('snowcone_save_data', JSON.stringify(dataToSave));
   }
+
 
   loadFromStorage() {
     const raw = localStorage.getItem('snowcone_save_data');
@@ -281,6 +296,7 @@ class AppState {
           Object.assign(this.storyProgress, data.storyProgress);
           Object.assign(this.storyMemory, data.storyMemory);
           this.chatLogs = data.chatLogs || [];
+          this.popCount = data.popCount || 0;
         });
       } catch (err) {
         console.warn('⚠️ Bad save data. Resetting to defaults.', err);

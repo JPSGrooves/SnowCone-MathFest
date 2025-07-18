@@ -615,3 +615,105 @@
     box-shadow: 0 0 40px #00ffeeaa, 0 0 60px #00ffee88;
   }
 }
+
+/* 🔒 Force Grid Lockdown: No Overflow Allowed */
+.il-aspect-wrap,
+.il-game-frame,
+.il-grid {
+  overflow: hidden !important; /* Clip anything that dares to spill */
+}
+
+/* 🧼 Tighter Clamps for Small Viewports */
+@media (max-height: 500px) {
+  .il-grid {
+    padding: clamp(0.3rem, 1vh, 0.6rem); /* Shrink padding */
+    gap: clamp(0.2rem, 0.5vh, 0.4rem);   /* Shrink gaps */
+  }
+
+  .il-title {
+    font-size: clamp(1rem, 1.5vw + 1.5vh, 1.8rem); /* Downsize title */
+  }
+
+  .il-stage {
+    min-height: clamp(80px, 15vh, 120px); /* Compress stage */
+    padding: clamp(0.3rem, 0.8vh, 0.6rem);
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+  }
+
+  .il-math {
+    padding: clamp(0.5rem, 1vh, 0.8rem);
+  }
+
+  .il-math #mathProblem {
+    font-size: clamp(0.8rem, 3svh, 2rem); /* Aggressive text shrink */
+    white-space: normal; /* Allow wrap to prevent wide overflow */
+    overflow: hidden;    /* Clip if it still pushes */
+    text-overflow: ellipsis;
+    max-lines: 2;        /* Limit to 2 lines max */
+  }
+
+  .il-math .answer-options {
+    gap: clamp(0.5rem, 1vw, 0.8rem);
+    font-size: clamp(0.7rem, 2svh, 1.2rem);
+  }
+
+  .il-math .ans-btn {
+    padding: clamp(0.3rem, 1svh, 0.6rem) clamp(0.6rem, 2vw, 1rem);
+    font-size: clamp(0.7rem, 2svh, 1.2rem);
+  }
+
+  .il-controls {
+    padding: clamp(0.3rem, 0.8vh, 0.6rem);
+    gap: clamp(0.3rem, 0.8vh, 0.5rem);
+  }
+
+  .il-controls button {
+    font-size: clamp(0.8rem, 1.5vh, 1rem); /* Smaller buttons */
+    padding: clamp(0.3rem, 0.8vh, 0.5rem);
+  }
+
+  .il-speech {
+    max-height: 20vh; /* Compress speech bubble */
+    font-size: clamp(0.7rem, 1.5vh, 1rem);
+    padding: clamp(0.3rem, 1vh, 0.5rem);
+    white-space: normal; /* Allow wrap */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit to 3 lines */
+    -webkit-box-orient: vertical;
+  }
+
+  .triplet-wrapper {
+    max-height: 25vh; /* Shrink sprite area */
+  }
+
+  .il-metric-row {
+    gap: clamp(0.3rem, 1vw, 0.8rem);
+  }
+
+  .il-score-box,
+  .il-streak-box {
+    font-size: clamp(0.8rem, 1vw, 1rem);
+    padding: 0.2rem 0.5rem;
+    min-width: 80px;
+  }
+}
+
+/* 📏 General Text Wrapping + Clipping for Safety */
+.il-speech,
+.il-math #mathProblem {
+  white-space: normal; /* Let text wrap naturally */
+  word-break: break-word; /* Break long words if needed */
+  hyphens: auto; /* Auto-hyphenate for better flow */
+  overflow: hidden; /* Clip overflow text */
+  text-overflow: ellipsis; /* ... for clipped lines */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4; /* Max 4 lines before clip (adjust per element) */
+}
+
+/* For math problem specifically (override if needed) */
+.il-math #mathProblem {
+  -webkit-line-clamp: 2; /* Shorter for equations */
+}

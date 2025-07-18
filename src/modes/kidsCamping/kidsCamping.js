@@ -2,19 +2,22 @@ import './kidsCamping.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
+import { hookReturnButton } from '../../utils/returnToMenu.js'; // BTM hook
 
-// === 🏕️ Game State ===
-let popCount = 0;
+// Game State (add per game, e.g., popCount = 0; tentLit = Array(9).fill(false); etc.)
 
-// === 🔗 DOM Refs
-let popBtn, spinBtn, popCountDisplay, spinResultDisplay, returnBtn;
+// DOM Refs (add as built)
 
-// === 🚀 ENTRY POINT
+// ENTRY POINT
 export function loadKidsMode() {
   console.log('🏕️ Loading Kids Camping Mode');
+
+  appState.popCount = 0;         // 💥 Reset ACTUAL value
+  updatePopUI?.();               // 🧼 Reset visible score immediately
+
   appState.setMode('kids');
 
-  swapModeBackground('kidsCamping');
+  swapModeBackground('assets/img/modes/kidsCamping/kidsBG.png'); // Full path fix
 
   const menuWrapper = document.querySelector('.menu-wrapper');
   const gameContainer = document.getElementById('game-container');
@@ -23,86 +26,127 @@ export function loadKidsMode() {
   gameContainer.classList.remove('hidden');
   gameContainer.style.display = 'flex';
 
-  renderUI();
-  setupEventHandlers();
-  startGame();
+  renderIntroScreen();
+  setupIntroEventHandlers();
 }
 
-// === 💀 EXIT POINT
+
+// EXIT POINT
 export function stopKidsMode() {
   const container = document.getElementById('game-container');
   container.innerHTML = '';
   container.classList.add('hidden');
   container.style.display = 'none';
 
-  cleanupEventHandlers();
+  appState.popCount = 0; // 🧼 Reset the camping score
+  updatePopUI?.(); // Optional, guarantees it’s updated visually
 
+
+  cleanupEventHandlers();
   console.log('🏕️ Kids Camping Mode cleaned up!');
 }
 
-//////////////////////////////
-// 🎨 Render UI
-//////////////////////////////
-function renderUI() {
+// Render Intro (IL Mirror)
+// kidsCamping.js (Updated renderIntroScreen for centering and sizing)
+
+function renderIntroScreen() {
   const container = document.getElementById('game-container');
 
   container.innerHTML = `
-    <div class="game-frame">
-      <img id="modeBackground" class="background-fill" src="assets/img/modes/kidsCamping/campingBG.png" alt="Camping Background" />
-      <div class="kc-grid">
-        <div class="kc-header">
-          <h1>🏕️ Kids Camping Zone</h1>
-        </div>
+    <div class="kc-aspect-wrap">
+      <div class="kc-game-frame">
+        <img 
+          id="modeBackground" 
+          class="background-fill kc-bg-img" 
+          src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/kidsBG.png" 
+          alt="Kids Camping Background" 
+        />
 
-        <div class="kc-content">
-          <div class="fidget-game">
-            <h2>🍄 Mushroom Popper</h2>
-            <button id="popBtn">Pop!</button>
-            <div id="popCount">Pops: 0</div>
+        <div class="kc-intro">
+          <div class="kc-intro-stack">
+            <div class="kc-speech">
+              Hello! We are the Dino Dividers! Let's play some games in Kids Camping!
+            </div>
+            <div class="director-wrapper">
+              <img 
+                id="directorSpriteIntro" 
+                class="director-img" 
+                src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/directors_intro.png" 
+              />
+            </div>
+            <button id="startCamping" class="kc-intro-btn kc-btn-large start-camp-btn">⛺ Get to Camping! ⛺</button>
+            <button id="backToMenuIntro" class="kc-intro-btn kc-btn-large back-to-menu-btn">🔙 Back to Menu</button>
           </div>
-
-          <div class="fidget-game">
-            <h2>🌌 Spin the Cones</h2>
-            <button id="spinBtn">Spin!</button>
-            <div id="spinResult">Result: 🎲</div>
-          </div>
         </div>
+      </div>
+    </div>
+  `;
+}// Intro Handlers
+function setupIntroEventHandlers() {
+  document.querySelector('#backToMenuIntro')?.addEventListener('click', returnToMenu);
 
-        <div class="kc-footer">
-          <button id="returnToMenu" class="btn-return">🔙 Return to Menu</button>
+  document.querySelector('#startCamping')?.addEventListener('click', () => {
+    const introEl = document.querySelector('.kc-intro');
+    if (introEl) {
+      introEl.classList.add('fade-out');
+
+      setTimeout(() => {
+        renderUI();
+        setupEventHandlers();
+        startGame();
+
+        const grid = document.querySelector('.kc-grid');
+        if (grid) grid.classList.add('fade-in');
+      }, 450);
+    }
+  });
+}
+
+// Render Main UI (Grid)
+function renderUI() {
+  const container = document.getElementById('game-container');
+  container.innerHTML = `
+    <div class="kc-aspect-wrap">
+      <div class="kc-game-frame">
+        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/kidsBG.png" alt="Kids Camping Background" />
+        <div class="kc-grid">
+          <div class="kc-title">🦕 Kids Camping 🦕</div>
+          <div class="kc-scroller-cell">Scroller</div>
+          <div class="kc-tent-cell">Tent</div>
+          <div class="kc-match-cell">Match</div>
+          <div class="kc-slider-cell">Slider</div>
+          <div class="kc-popper-cell">
+            <button id="backToMenu">🔙 Menu</button>
+            
+            <div class="kc-score-box">
+              <div class="kc-score-label">Camping Score</div>
+              <span id="popCount">0</span>
+            </div>
+
+            <button id="mushroomPopper">🚗 Park!</button>
+          </div>
         </div>
       </div>
     </div>
   `;
 
-  repaintBackground();
-
-  // 🔗 DOM refs
-  popBtn = document.getElementById('popBtn');
-  spinBtn = document.getElementById('spinBtn');
-  popCountDisplay = document.getElementById('popCount');
-  spinResultDisplay = document.getElementById('spinResult');
-  returnBtn = document.getElementById('returnToMenu');
+  hookReturnButton('backToMenu'); // Hook BTM
 }
 
-//////////////////////////////
-// 🚦 Event Handlers
-//////////////////////////////
+// Main Handlers (Stub—Add game events)
 function setupEventHandlers() {
-  popBtn?.addEventListener('click', handlePop);
-  spinBtn?.addEventListener('click', handleSpin);
-  returnBtn?.addEventListener('click', returnToMenu);
+  document.getElementById('mushroomPopper')?.addEventListener('click', () => {
+    appState.incrementPopCount(1);
+    updatePopUI();
+    animatePopCount();
+  });
 }
+
 
 function cleanupEventHandlers() {
-  popBtn?.removeEventListener('click', handlePop);
-  spinBtn?.removeEventListener('click', handleSpin);
-  returnBtn?.removeEventListener('click', returnToMenu);
+  // Remove listeners
 }
 
-//////////////////////////////
-// 🔙 Return to Menu
-//////////////////////////////
 function returnToMenu() {
   playTransition(() => {
     stopKidsMode();
@@ -111,38 +155,25 @@ function returnToMenu() {
   });
 }
 
-//////////////////////////////
-// 🎯 Game Logic
-//////////////////////////////
+// Game Logic (Stub)
 function startGame() {
-  popCount = 0;
-  updatePopCount();
-  spinResultDisplay.textContent = 'Result: 🎲';
+  // Init games
 }
 
-function handlePop() {
-  popCount++;
-  updatePopCount();
+function updatePopUI() {
+  const popSpan = document.getElementById('popCount');
+  if (popSpan) popSpan.textContent = appState.popCount;
 }
 
-function handleSpin() {
-  const spinResults = ['🍧', '🎲', '🌈', '🔥', '❄️', '🚀'];
-  const random = spinResults[Math.floor(Math.random() * spinResults.length)];
-  spinResultDisplay.textContent = `Result: ${random}`;
+function animatePopCount() {
+  const el = document.getElementById('popCount');
+  if (!el) return;
+  el.style.transform = 'scale(1.2)';
+  el.style.transition = 'transform 0.2s ease';
+  setTimeout(() => {
+    el.style.transform = 'scale(1)';
+  }, 200);
 }
 
-function updatePopCount() {
-  popCountDisplay.textContent = `Pops: ${popCount}`;
-}
 
-//////////////////////////////
-// 🔄 Background Refresh
-//////////////////////////////
-function repaintBackground() {
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      const img = document.getElementById('modeBackground');
-      if (img) img.src = img.src;
-    }, 10);
-  });
-}
+

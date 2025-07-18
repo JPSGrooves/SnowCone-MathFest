@@ -1,103 +1,356 @@
-/* 🏕️ Kids Camping Grid */
 .kc-grid {
   display: grid;
-  grid-template-rows: auto 1fr;
   grid-template-areas:
-    "header"
-    "content";
-  height: 100%;
+    "title title title"
+    "scroller tent match"
+    "scroller tent slider"
+    "scroller tent ."
+    "popper popper popper";
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows:
+    auto                      /* title */
+    minmax(10%, 1fr)          /* row 2 */
+    minmax(10%, 1fr)          /* row 3 */
+    minmax(10%, 1fr)          /* row 4 (more tent/slider) */
+    minmax(14%, auto);        /* 🌟 new row for popper/footer */
+  gap: 0.5rem;
+  padding: 1rem;
+  position: relative;
+  z-index: 2; /* above the background */
   width: 100%;
-  padding: 1.5rem;
-  gap: 1rem;
+  height: 100%;
   box-sizing: border-box;
+  border: 2px dashed #ffee00aa; /* 🌈 visible debug border */
+  background: rgba(0, 0, 0, 0.2); /* slight tint to see grid space */
+}
 
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px dashed #00ffee88;
-  backdrop-filter: blur(6px);
+/* Optional cell visuals — these are your debug guides */
+.kc-grid > div {
+  border: 1px solid #00ffee88;
+  padding: 0.5rem;
+  color: white;
+  font-family: monospace;
+}
+
+/* Assign grid areas for clarity */
+.kc-title { grid-area: title; }
+.kc-scroller-cell { grid-area: scroller; }
+.kc-tent-cell { grid-area: tent; }
+.kc-match-cell { grid-area: match; }
+.kc-slider-cell { grid-area: slider; }
+.kc-popper-cell { grid-area: popper; }
+
+.kc-title {
+  grid-area: title;
+  font-size: clamp(1rem, 1.4vw + 1.4vh, 2.2rem);
+  text-align: center;
+  font-weight: bold;
+  color: #ffee00;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow:
+    0 0 4px #ffee00cc,
+    0 0 8px #ffee00aa,
+    0 0 12px #ffaa0088;
+  padding: 0.3rem 0;
+  margin-top: clamp(0.2rem, 1vh, 0.6rem);
   z-index: 2;
 }
 
-/* === Header === */
-.kc-header {
-  grid-area: header;
+
+/* Scroller */
+.scroller-wheel {
+  width: 50px;
+  height: 50px;
+  background: #000;
+  border: 2px solid #00ffee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+#scrollerOp { font-size: 2rem; color: #ffee00; }
+
+/* Tents */
+.tent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  position: relative;
+}
+
+.tent {
+  width: 40px;
+  height: 40px;
+  background: #333;
+  border: 1px solid #fff;
+  cursor: pointer;
+}
+
+.tent.lit { background: #00ff00; }
+
+/* Maze Lines (Below Grid) */
+.tent-grid::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: repeating-linear-gradient(90deg, #fff 0 2px, transparent 2px 4px); /* Horizontal lines */
+}
+
+/* Match */
+.match-display { font-size: 1.5rem; }
+#matchCheck, #matchX { padding: 0.5rem; }
+
+/* Slider */
+.slider-box {
+  width: 60px;
+  height: 60px;
+  background: #000;
+  border: 2px solid #00ffee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.mid { cursor: grab; }
+
+.kc-popper-cell {
+  grid-area: popper;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  height: 100%;
+  width: 100%;
+}
+
+
+
+#popCount {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #ffee00;
+}
+.kc-aspect-wrap,
+.kc-game-frame {
+  overflow: hidden;
+}
+
+
+/* Popper */
+#mushroomPopper {
+  background: radial-gradient(circle at 50% 30%, #00ffee, #00ccdd);
+  color: black;
+  font-weight: bold;
+  font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.4rem;
+  box-shadow:
+    0 0 12px #00ffee88,
+    inset 0 0 6px #ccffff;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#mushroomPopper:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 18px #00ffeecc,
+    inset 0 0 10px #ccffff;
+}
+
+#mushroomPopper:active {
+  transform: scale(0.95);
+  box-shadow:
+    0 0 8px #00ffeeaa,
+    inset 0 0 4px #aaffff;
+}
+
+.kc-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.kc-score-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #ffee00;
+  text-shadow: 0 0 6px #ffee00aa;
+  font-family: 'monospace';
+}
+
+
+/* Icons */
+.kc-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 1rem;
+}
+
+/* kidsCamping.css (Updated for BG centering, speech fix, button equality) */
+
+/* Aspect Wrap (Modeled after IL) */
+.kc-aspect-wrap {
+  width: auto;
+  height: 100svh;
+  max-height: 100svh;
+  aspect-ratio: 11 / 16;
+  max-width: 100vw;
+  overflow: hidden;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Game Frame (Modeled after IL) */
+.kc-game-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+/* Background - Center Fix (Direct from IL model) */
+.background-fill.kc-bg-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* True centering */
+  width: auto;
+  height: 100%;
+  max-width: none; /* Allow overflow if needed for centering */
+  object-fit: contain; /* Keeps full image visible, centered */
+  object-position: center center; /* Reinforce center */
+  z-index: -1; /* Behind everything */
+}
+
+/* Speech Bubble - Fix Broken Display (Modeled after IL .il-speech) */
+.kc-speech {
+  width: 100%;
+  max-width: 90%;
+  max-height: 25vh; /* Limit height like IL */
   text-align: center;
-
-  border: 2px solid #ff00ff44;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 12px;
-}
-
-.kc-header h1 {
-  font-size: clamp(1.2rem, 3vw, 2rem);
+  overflow: hidden;
+  font-size: clamp(0.85rem, 1.1vw + 1.1vh, 1.35rem); /* IL scaling */
+  padding: clamp(0.5rem, 2vh, 1rem);
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  box-shadow: 0 0 16px #00ffee55;
   color: #00ffee;
-  text-shadow: 0 0 8px #00ffee88;
+  text-shadow: 0 0 6px #00ffee88;
+  animation: fadeInBubble 1s ease forwards;
+  opacity: 1; /* Force visible */
+  position: relative;
+  white-space: normal; /* Allow wrap */
+  word-break: break-word;
 }
 
-/* === Content === */
-.kc-content {
-  grid-area: content;
+@keyframes fadeInBubble {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Buttons - Equal Size (Modeled after IL buttons) */
+.kc-intro-btn.kc-btn-large {
+  font-size: clamp(0.7rem, 2vh, 1.2rem); /* IL scaling */
+  min-width: clamp(100px, 18vw, 180px); /* Same min width */
+  max-width: 90%;
+  padding: clamp(0.4rem, 1vh, 0.8rem) clamp(0.8rem, 2vw, 1.4rem); /* IL padding */
+  border-radius: 16px;
+  box-shadow: 0 0 12px currentColor;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  opacity: 1; /* Visible always */
+  cursor: pointer;
+}
+
+.kc-intro-btn.kc-btn-large:hover {
+  transform: scale(1.05);
+}
+
+.kc-intro-btn.kc-btn-large:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 16px currentColor;
+}
+
+.start-camp-btn {
+  background: #00ffee;
+  color: black;
+}
+
+.back-to-menu-btn {
+  background: #ff66ff;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 0 4px #ff66ffaa;
+}
+
+/* Intro Stack (Modeled after IL for layering) */
+.kc-intro-stack {
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
-  gap: 1rem;
-
-  border: 2px solid #ff00ff44;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.65);
-  box-shadow: 0 0 24px #00ffee88;
+  justify-content: center;
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  height: fit-content;
-}
-
-/* === Fidget Games === */
-.fidget-game {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 12px;
-  border: 2px dashed #00ffee88;
-  background: rgba(0, 0, 0, 0.75);
-  color: #00ffee;
+  height: 100%;
   text-align: center;
+  max-height: 100%;
+  padding: clamp(0.5rem, 2vh, 1rem);
+  gap: clamp(0.6rem, 2vh, 1.2rem);
 }
 
-.fidget-game button {
-  padding: 0.75rem 1.5rem;
-  margin: 0.5rem;
-  font-size: 1.1rem;
-  border-radius: 10px;
-  background-color: #00ffee;
-  border: none;
-  color: #000;
+/* Director Image (Visible like IL triplet) */
+.director-wrapper img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  transition: opacity 0.4s ease;
+  opacity: 1;
+}
+
+/* Lockdown Overflow (From IL model for safety) */
+.kc-aspect-wrap,
+.kc-game-frame,
+.kc-intro {
+  overflow: hidden !important;
+}
+
+/*game mode b to m*/
+#backToMenu {
+  background: #ff66ff;
+  color: white;
   font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 0 10px #00ffee88;
-  transition: background 0.2s ease;
-}
-
-.fidget-game button:hover {
-  background-color: #33ffff;
-}
-
-/* === Return Button === */
-.btn-return {
-  padding: 0.75rem 1.5rem;
-  font-size: 1.1rem;
-  background: #00ffee;
+  font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+  text-shadow: 0 0 4px #ff66ffaa;
   border: none;
   border-radius: 12px;
+  padding: 0.5rem 1.2rem;
+  box-shadow: 0 0 12px #ff66ff88;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  box-shadow: 0 0 12px #00ffeeaa;
-  transition: background 0.2s ease;
 }
 
-.btn-return:hover {
-  background-color: #33ffff;
+#backToMenu:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px #ff66ffcc;
+}
+
+#backToMenu:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 10px #ff66ff88;
 }
