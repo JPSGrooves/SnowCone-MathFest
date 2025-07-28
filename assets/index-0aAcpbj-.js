@@ -413,14 +413,14 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
           <div class="kc-slider-cell">Slider</div>
           <div class="kc-popper-cell">
             <div class="kc-popper-lineup">
-              <button id="backToMenu">🔙 Menu</button>
+              <button id="backToMenu">🔙<br/>Menu</button>
               <img src="/SnowCone-MathFest/assets/img/characters/kidsCamping/stegoVider.png" class="kc-icon" />
               <div class="kc-score-box">
                 <div class="kc-score-label">Camping Score</div>
                 <span id="popCount">0</span>
               </div>
               <img src="/SnowCone-MathFest/assets/img/characters/kidsCamping/brachioVider.png" class="kc-icon" />
-              <button id="mushroomPopper">🚗 Park!</button>
+              <button id="mushroomPopper">🚗<br/>Park!</button>
             </div>
           </div>
         </div>
