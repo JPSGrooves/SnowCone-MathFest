@@ -1,38 +1,50 @@
+/* kidsCamping.css */
+
 .kc-grid {
   display: grid;
   grid-template-areas:
-    "title title title"
-    "scroller tent match"
-    "scroller tent slider"
-    "scroller tent ."
-    "popper popper popper";
-  grid-template-columns: 1fr 2fr 1fr;
+    "title title title title title"
+    "scroller scroller tent tent tent"
+    "match match tent tent tent"
+    "slider slider slider slider slider"
+    "popper popper popper popper popper";
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   grid-template-rows:
-    auto                      /* title */
-    minmax(10%, 1fr)          /* row 2 */
-    minmax(10%, 1fr)          /* row 3 */
-    minmax(10%, 1fr)          /* row 4 (more tent/slider) */
-    minmax(14%, auto);        /* 🌟 new row for popper/footer */
-  gap: 0.5rem;
-  padding: 1rem;
-  position: relative;
-  z-index: 2; /* above the background */
+    auto
+    minmax(10%, 1fr)
+    minmax(10%, 1fr)
+    minmax(10%, 1fr)
+    minmax(14%, auto);
+  gap: clamp(0.3rem, 1vw, 1rem);
+  padding: clamp(0.5rem, 2vw, 1.5rem);
+  position: absolute;
+  z-index: 2;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  border: 2px dashed #ffee00aa; /* 🌈 visible debug border */
-  background: rgba(0, 0, 0, 0.2); /* slight tint to see grid space */
+  background: rgba(0, 0, 0, 0.2);
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
-/* Optional cell visuals — these are your debug guides */
 .kc-grid > div {
   border: 1px solid #00ffee88;
   padding: 0.5rem;
   color: white;
   font-family: monospace;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 0 8px #00ffee44;
 }
 
-/* Assign grid areas for clarity */
+.kc-grid > .kc-title,
+.kc-grid > .kc-popper-cell {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+
 .kc-title { grid-area: title; }
 .kc-scroller-cell { grid-area: scroller; }
 .kc-tent-cell { grid-area: tent; }
@@ -41,13 +53,12 @@
 .kc-popper-cell { grid-area: popper; }
 
 .kc-title {
-  grid-area: title;
-  font-size: clamp(1rem, 1.4vw + 1.4vh, 2.2rem);
+  font-size: clamp(1rem, 2vw + 2vh, 3rem);
   text-align: center;
   font-weight: bold;
   color: #ffee00;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
   text-shadow:
     0 0 4px #ffee00cc,
@@ -56,96 +67,113 @@
   padding: 0.3rem 0;
   margin-top: clamp(0.2rem, 1vh, 0.6rem);
   z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(0.25rem, 1vw, 0.5rem);
+  flex-wrap: nowrap;
 }
 
+.kc-title img.kc-icon {
+  width: clamp(28px, 6vw, 48px);
+  height: auto;
+  transform: scaleX(-1);
+  filter: drop-shadow(0 0 6px #00ffeecc);
+  cursor: pointer;
+  animation: mysticalFloat 3s ease-in-out infinite;
+}
 
-/* Scroller */
-.scroller-wheel {
-  width: 50px;
-  height: 50px;
-  background: #000;
-  border: 2px solid #00ffee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
+.kc-title img.kc-icon.kc-right-title {
+  transform: none;
+}
+
+.kc-icon {
+  width: clamp(32px, 8vw, 48px);
+  height: auto;
+  animation: mysticalFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #00ffeecc);
   cursor: pointer;
 }
 
-#scrollerOp { font-size: 2rem; color: #ffee00; }
-
-/* Tents */
-.tent-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  position: relative;
+@keyframes mysticalFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
-.tent {
-  width: 40px;
-  height: 40px;
-  background: #333;
-  border: 1px solid #fff;
-  cursor: pointer;
+@keyframes twistTouch {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(6deg); }
+  100% { transform: rotate(0deg); }
 }
 
-.tent.lit { background: #00ff00; }
-
-/* Maze Lines (Below Grid) */
-.tent-grid::after {
-  content: '';
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-  width: 100%;
-  height: 20px;
-  background: repeating-linear-gradient(90deg, #fff 0 2px, transparent 2px 4px); /* Horizontal lines */
+.kc-icon.twisting,
+.kc-title img.kc-icon.twisting {
+  animation: twistTouch 0.6s ease-in-out;
 }
-
-/* Match */
-.match-display { font-size: 1.5rem; }
-#matchCheck, #matchX { padding: 0.5rem; }
-
-/* Slider */
-.slider-box {
-  width: 60px;
-  height: 60px;
-  background: #000;
-  border: 2px solid #00ffee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-}
-
-.mid { cursor: grab; }
 
 .kc-popper-cell {
-  grid-area: popper;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
   height: 100%;
   width: 100%;
+  padding: clamp(0.5rem, 1vw, 1rem);
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.kc-score-label {
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  font-weight: bold;
+  color: #ffee00;
+  text-shadow: 0 0 6px #ffee00aa;
+  font-family: 'monospace';
+  text-align: center;
+}
+
+.kc-popper-lineup {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(0.3rem, 1vw, 0.6rem);
+  width: 100%;
+  justify-content: center;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+button {
+  font-size: clamp(0.2rem, 1vw, .5rem);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 
+.kc-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  max-width: 100%;
+}
+
+.kc-score-label {
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  font-weight: bold;
+  color: #ffee00;
+  text-shadow: 0 0 6px #ffee00aa;
+  font-family: 'monospace';
+}
 
 #popCount {
   text-align: center;
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
   color: #ffee00;
 }
-.kc-aspect-wrap,
-.kc-game-frame {
-  overflow: hidden;
-}
 
-
-/* Popper */
 #mushroomPopper {
   background: radial-gradient(circle at 50% 30%, #00ffee, #00ccdd);
   color: black;
@@ -153,12 +181,14 @@
   font-size: clamp(0.8rem, 1.5vw, 1.1rem);
   border: none;
   border-radius: 999px;
-  padding: 0.6rem 1.4rem;
+  padding: clamp(0.4rem, 1vw, 0.6rem) clamp(1rem, 2vw, 1.4rem);
   box-shadow:
     0 0 12px #00ffee88,
     inset 0 0 6px #ccffff;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 #mushroomPopper:hover {
@@ -174,6 +204,7 @@
     0 0 8px #00ffeeaa,
     inset 0 0 4px #aaffff;
 }
+
 
 .kc-score-box {
   display: flex;
@@ -192,12 +223,7 @@
 }
 
 
-/* Icons */
-.kc-icon {
-  width: 30px;
-  height: 30px;
-  margin-right: 1rem;
-}
+
 
 /* kidsCamping.css (Updated for BG centering, speech fix, button equality) */
 
@@ -215,15 +241,16 @@
   align-items: center;
 }
 
-/* Game Frame (Modeled after IL) */
+/* 🍧 Frame inside aspect wrap */
 .kc-game-frame {
   width: 100%;
   height: 100%;
-  position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
+  position: relative;
+  overflow: hidden;
+  contain: layout style; /* 🧱 isolate layout */
 }
-
 /* Background - Center Fix (Direct from IL model) */
 .background-fill.kc-bg-img {
   position: absolute;
@@ -354,3 +381,183 @@
   transform: scale(0.95);
   box-shadow: 0 0 10px #ff66ff88;
 }
+
+@keyframes bounceDino {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6%);
+  }
+}
+
+/*Tent!*/
+
+/* kidsCamping.css */
+/* Adjust kc-grid row heights to enforce wider aspect */
+.kc-grid {
+  display: grid;
+  grid-template-areas:
+    "title title title title title"
+    "scroller scroller tent tent tent"
+    "match match tent tent tent"
+    "slider slider slider slider slider"
+    "popper popper popper popper popper";
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows:
+    auto
+    minmax(10%, 1fr)
+    minmax(15%, 1fr) /* Increase height for tent area */
+    minmax(10%, 1fr)
+    minmax(14%, auto);
+  gap: clamp(0.3rem, 1vw, 1rem);
+  padding: clamp(0.5rem, 2vw, 1.5rem);
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.2);
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* kidsCamping.css - Tent Section */
+
+/* kidsCamping.css - Tent Section */
+
+/* Tent zone - no clipping */
+.kc-tent-zone {
+  grid-area: tent;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: visible;
+  position: relative;
+}
+
+/* Wrapper for alignment */
+.kc-tent-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+/* Tent grid - 4x6 */
+.kc-tent-grid {
+  width: 100%;
+  height: auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr)); /* 6 rows */
+  grid-auto-flow: row;
+  gap: 0.05rem;
+  padding: 0.1rem;
+  box-sizing: border-box;
+  min-height: 0;
+  min-width: 0;
+  max-height: 90%; /* Space for below */
+  background: transparent;
+  position: relative;
+  overflow: visible; /* Ensure SVG isn't clipped */
+}
+
+
+/* Inner cells */
+.kc-tent-inner-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative; /* Ensure higher than SVG */
+  z-index: 2; /* Explicit for stacking */
+}
+
+/* Images scaled */
+.kc-tent-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  transition: filter 0.2s;
+}
+
+/* Dino icon */
+.kc-dino-icon {
+  width: clamp(32px, 10vw, 64px);
+  height: auto;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  animation: mysticalFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #00ffeecc);
+}
+
+/* Space below - reduced */
+.kc-tent-space-below {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 10%;
+}
+
+
+/* Success message */
+.kc-success-msg {
+  position: absolute;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  color: #ffee00;
+  text-shadow: 0 0 6px #ffee00aa;
+  font-family: monospace;
+  text-align: center;
+  z-index: 2;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* Glow overlay - below tents */
+.kc-glow-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1; /* Below tents */
+  overflow: visible !important;  /* remove is global issues!! */
+}
+
+/* Flash animation */
+.tent-flash {
+  animation: flash 0.5s ease-in-out;
+}
+
+@keyframes flash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+}
+
+/* Add to existing kidsCamping.css */
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+

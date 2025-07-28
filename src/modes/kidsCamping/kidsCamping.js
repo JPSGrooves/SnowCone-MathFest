@@ -1,23 +1,22 @@
+// kidsCamping.js
+
 import './kidsCamping.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
-import { hookReturnButton } from '../../utils/returnToMenu.js'; // BTM hook
+import { hookReturnButton } from '../../utils/returnToMenu.js';
+import { createTentLineGame, initGameLine } from './kidsCampingTentLineGame.js';
+import { runInAction } from 'mobx';
+import { cleanupTentLineGame } from './kidsCampingTentLineGame.js';
 
-// Game State (add per game, e.g., popCount = 0; tentLit = Array(9).fill(false); etc.)
 
-// DOM Refs (add as built)
-
-// ENTRY POINT
 export function loadKidsMode() {
+  runInAction(() => {
+    appState.popCount = 0;
+  });
   console.log('🏕️ Loading Kids Camping Mode');
-
-  appState.popCount = 0;         // 💥 Reset ACTUAL value
-  updatePopUI?.();               // 🧼 Reset visible score immediately
-
+  updatePopUI?.();
   appState.setMode('kids');
-
-  swapModeBackground('assets/img/modes/kidsCamping/kidsBG.png'); // Full path fix
 
   const menuWrapper = document.querySelector('.menu-wrapper');
   const gameContainer = document.getElementById('game-container');
@@ -28,30 +27,25 @@ export function loadKidsMode() {
 
   renderIntroScreen();
   setupIntroEventHandlers();
+  setTimeout(() => swapModeBackground('assets/img/modes/kidsCamping/kidsBG.png'), 0);
 }
 
-
-// EXIT POINT
 export function stopKidsMode() {
+  cleanupTentLineGame(); // ☠️ wipe old game state!
+
   const container = document.getElementById('game-container');
   container.innerHTML = '';
   container.classList.add('hidden');
   container.style.display = 'none';
 
-  appState.popCount = 0; // 🧼 Reset the camping score
-  updatePopUI?.(); // Optional, guarantees it’s updated visually
-
-
+  appState.popCount = 0;
+  updatePopUI?.();
   cleanupEventHandlers();
   console.log('🏕️ Kids Camping Mode cleaned up!');
 }
 
-// Render Intro (IL Mirror)
-// kidsCamping.js (Updated renderIntroScreen for centering and sizing)
-
 function renderIntroScreen() {
   const container = document.getElementById('game-container');
-
   container.innerHTML = `
     <div class="kc-aspect-wrap">
       <div class="kc-game-frame">
@@ -65,7 +59,7 @@ function renderIntroScreen() {
         <div class="kc-intro">
           <div class="kc-intro-stack">
             <div class="kc-speech">
-              Hello! We are the Dino Dividers! Let's play some games in Kids Camping!
+              Hello! We're the Dino Dividers! Let's play some camping games! They are intended for little ones, but are fun for all ages!
             </div>
             <div class="director-wrapper">
               <img 
@@ -81,28 +75,30 @@ function renderIntroScreen() {
       </div>
     </div>
   `;
-}// Intro Handlers
+}
+
 function setupIntroEventHandlers() {
   document.querySelector('#backToMenuIntro')?.addEventListener('click', returnToMenu);
-
   document.querySelector('#startCamping')?.addEventListener('click', () => {
     const introEl = document.querySelector('.kc-intro');
     if (introEl) {
       introEl.classList.add('fade-out');
-
       setTimeout(() => {
         renderUI();
         setupEventHandlers();
         startGame();
 
-        const grid = document.querySelector('.kc-grid');
-        if (grid) grid.classList.add('fade-in');
+        // 💥 Defer initGameLine reliably, fade-in or not
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            initGameLine(); // <- clean and guaranteed after DOM paints
+          });
+        });
       }, 450);
     }
   });
 }
 
-// Render Main UI (Grid)
 function renderUI() {
   const container = document.getElementById('game-container');
   container.innerHTML = `
@@ -110,42 +106,56 @@ function renderUI() {
       <div class="kc-game-frame">
         <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/kidsBG.png" alt="Kids Camping Background" />
         <div class="kc-grid">
-          <div class="kc-title">🦕 Kids Camping 🦕</div>
+          <div class="kc-title">
+            <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/rexVider.png" class="kc-icon kc-left-title" />
+            <span class="kc-title-text">Kids Camping</span>
+            <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/triceriVider.png" class="kc-icon kc-right-title" />
+          </div>
           <div class="kc-scroller-cell">Scroller</div>
-          <div class="kc-tent-cell">Tent</div>
+          <div class="kc-tent-zone"></div>
           <div class="kc-match-cell">Match</div>
           <div class="kc-slider-cell">Slider</div>
           <div class="kc-popper-cell">
-            <button id="backToMenu">🔙 Menu</button>
-            
-            <div class="kc-score-box">
-              <div class="kc-score-label">Camping Score</div>
-              <span id="popCount">0</span>
+            <div class="kc-popper-lineup">
+              <button id="backToMenu">🔙<br/>Menu</button>
+              <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/stegoVider.png" class="kc-icon" />
+              <div class="kc-score-box">
+                <div class="kc-score-label">Camping Score</div>
+                <span id="popCount">0</span>
+              </div>
+              <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/brachioVider.png" class="kc-icon" />
+              <button id="mushroomPopper">🚗<br/>Park!</button>
             </div>
-
-            <button id="mushroomPopper">🚗 Park!</button>
           </div>
         </div>
       </div>
     </div>
   `;
-
-  hookReturnButton('backToMenu'); // Hook BTM
+  hookReturnButton('backToMenu');
 }
 
-// Main Handlers (Stub—Add game events)
 function setupEventHandlers() {
-  document.getElementById('mushroomPopper')?.addEventListener('click', () => {
-    appState.incrementPopCount(1);
-    updatePopUI();
-    animatePopCount();
+  const popBtn = document.getElementById('mushroomPopper');
+  if (popBtn) {
+    const triggerPop = () => {
+      appState.incrementPopCount(1);
+      updatePopUI();
+      animatePopCount();
+    };
+
+    popBtn.addEventListener('pointerdown', triggerPop);
+  }
+
+  document.querySelectorAll('.kc-icon, .kc-title img.kc-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+      icon.classList.remove('twisting');
+      void icon.offsetWidth; // Force reflow
+      icon.classList.add('twisting');
+    });
   });
 }
 
-
-function cleanupEventHandlers() {
-  // Remove listeners
-}
+function cleanupEventHandlers() {}
 
 function returnToMenu() {
   playTransition(() => {
@@ -155,10 +165,27 @@ function returnToMenu() {
   });
 }
 
-// Game Logic (Stub)
 function startGame() {
-  // Init games
+  const tentZone = document.querySelector('.kc-tent-zone');
+  if (tentZone) {
+    tentZone.innerHTML = ''; // Clear existing content
+    console.log('Tent zone found, clearing and rendering');
+
+    const tentGameEl = createTentLineGame((score) => {
+      appState.incrementPopCount(score);
+      updatePopUI();
+      animatePopCount();
+    });
+
+    tentZone.appendChild(tentGameEl);
+    console.log('Tent game element appended');
+
+    // ❌ No longer manually calling drawLineGlow here
+  } else {
+    console.error('Tent zone not found!');
+  }
 }
+
 
 function updatePopUI() {
   const popSpan = document.getElementById('popCount');
@@ -174,6 +201,3 @@ function animatePopCount() {
     el.style.transform = 'scale(1)';
   }, 200);
 }
-
-
-

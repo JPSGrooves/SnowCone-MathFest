@@ -9,6 +9,9 @@ import { loadInfinityMode, stopInfinityMode } from '../modes/infinityLake/infini
 
 import { applyBackgroundTheme } from './backgroundManager.js';
 
+
+
+
 //////////////////////////////
 // 🚀 GLOBAL SCENE SWAPPER
 //////////////////////////////
