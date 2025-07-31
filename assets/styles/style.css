@@ -12,7 +12,7 @@ html, body {
   font-family: 'Orbitron', sans-serif;
   background: transparent;
   touch-action: manipulation;
-  overscroll-behavior: none;
+  overscroll-behavior: contain;
 
   /* 🧃 Mobile polish (iOS & Android) */
   -webkit-touch-callout: none;
