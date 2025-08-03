@@ -47,14 +47,15 @@
 /* 🔘 Modal Header – Wrap Tab Buttons */
 .modal-header {
   display: flex;
-  flex-wrap: nowrap;               /* 🔥 Allow wrap on small screens */
-  justify-content: space-between;
-  align-items: center;       /* 🔥 Center all rows */
-  gap: 0.5em;                     /* 🔥 Keep spacing tight but comfy */
+  flex-wrap: wrap; /* 💪 ALLOW WRAPPING */
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
   margin-bottom: 1em;
   padding: 0.5em;
   width: 100%;
 }
+
 
 /* 🧊 Actually hide the modal */
 .modal.hidden {
@@ -74,9 +75,14 @@
   font-size: clamp(0.45rem, 0.9vw, 0.8rem); /* 🎯 tighter scale */
   line-height: 1.1;
 
-  min-width: 80px;
+
   max-width: none;
-  flex: 1 1 0;
+
+
+  flex: 1 1 auto; /* 🔄 shrink and grow as needed */
+  min-width: clamp(60px, 18vw, 100px); /* 📱 lower min-width on tiny screens */
+  font-size: clamp(0.6rem, 1.5vmin, 0.85rem); /* 🌀 scales tighter */
+
 
   display: flex;                 /* 🧊 enables centering */
   align-items: center;
