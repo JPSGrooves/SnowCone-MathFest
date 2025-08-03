@@ -3,10 +3,68 @@
 - ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**
 - ✅ **v0.5.6 – QuickServe Keyboard Ascension**
 - ✅ **v0.6.0 – Infinity Mode Complete**
+- ✅ **v0.6.6 – TentsUpCarsParked**
 - 🔜 **v0.7.0 – Kids Mode Complete**
 - 🔜 **v0.8.0 – Story Mode + Narratives**
 - 🔜 **v0.9.0 – Math Tips Mode Complete**
 - 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**
+
+---
+
+## v0.6.6 — *“Tents Up, Cars Parked!”* (August 2, 2025)
+
+### 🏕️ Kids Camping Parking Game — Complete
+
+* ✅ **Full gameplay loop implemented and polished** — from "Park the Cars!" intro to full 11-car celebration.
+* ✅ **PNG car sprites scale perfectly** — center-aligned, with honk label on the left and Park button on the right.
+* ✅ **Honk Counter & UI**:
+
+  * Responsive stacked layout — displays `X / Y` honks and ordinal parking order ("Park 3rd")
+  * Prevents over-honking — no longer awards extra points after limit
+* ✅ **Final overlay (“All Parked!”)**:
+
+  * Holds visibly for 2.5s, then resets the game cleanly
+  * Confetti and fade logic handled via manual overlay animation stack
+  * Honk label and park button are hidden during this sequence
+
+### 🧠 Scoring + XP Logic
+
+* +1 pt per Park button press
+* +10 pts for completing a car (regardless of order)
+* +50 pts for correct ordinal match
+* +100 pts if all cars parked in under one minute
+* ✅ **XP batches**: +20 XP for every 100 points
+* ✅ **Points now match visual feedback and game loop**
+
+### 🔊 Honk Audio Engine (New!)
+
+* 🔊 **Sequential SFX plays as cars require more honks:**
+
+  * `honk1.mp3`, `honk2.mp3`, `...` up to `honk5.mp3`
+  * Pattern loops after 5: 1 → 12 → 123 → 1234 → 12345 → 123451 → ...
+* ✅ SFX progress is stored per car — returns to correct spot if user revisits car mid-sequence
+* ✅ **Victory honk (honk1.mp3)** plays after successful parking
+* 🔇 Fully respects global mute toggle (`Howler` synced)
+
+### 📦 Asset & Layout Enhancements
+
+* 🖼️ All car PNGs preloaded on game init via `preloadParkingSprites()`
+* 🎨 Fixed snapping and layout jumping between car transitions
+* 🔍 Added padding and alignment fixes for consistent vertical locking on mobile and desktop
+* ✅ Fade/transition stacking logic cleanly scopes overlay events (no stuck honk or park buttons)
+
+### 📱 Mobile Polish
+
+* ✅ Touch-friendly Park button scaling
+* ✅ Car press + park button responsiveness tweaked for fast tapping
+* ✅ Smaller viewports no longer push car below screen or snap layout
+* ✅ Double-tap zoom prevention applied to parking zone
+
+---
+
+### 📌 Dev Notes
+
+> *“It actually works. The game is responsive, musical, and smooth — and yeah, you gotta honk 66 times if you want that final car parked. But it’s worth it. Preloading, scaling, hiding, scoring, syncing... it all paid off. This is what done feels like.”*
 
 
 ---

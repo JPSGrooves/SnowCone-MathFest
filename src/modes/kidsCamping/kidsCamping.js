@@ -8,13 +8,35 @@ import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { createTentLineGame, initGameLine } from './kidsCampingTentLineGame.js';
 import { runInAction } from 'mobx';
 import { cleanupTentLineGame } from './kidsCampingTentLineGame.js';
+import { stopTrack, playTrack } from '../../managers/musicManager.js'; // 🎶 add this
+import { initParkingGame } from './parkingGame.js';
+import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
+
+
+
 
 
 export function loadKidsMode() {
   runInAction(() => {
     appState.popCount = 0;
   });
+
+  document.querySelectorAll('.kc-tent-inner-cell, .kc-grid, .kc-game-frame, .kc-aspect-wrap')
+    .forEach(el => preventDoubleTapZoom(el));
+
+  document.body.addEventListener('touchstart', unlockAudioContext, { once: true });
+  document.body.addEventListener('click', unlockAudioContext, { once: true });
+
+  function unlockAudioContext() {
+    if (Howler.ctx && Howler.ctx.state === 'suspended') {
+      Howler.ctx.resume().then(() => {
+        console.log('🔓 Howler AudioContext unlocked');
+      });
+    }
+  }
+
   console.log('🏕️ Loading Kids Camping Mode');
+  stopTrack(); // 💥 shut down current music (jukebox etc)
   updatePopUI?.();
   appState.setMode('kids');
 
@@ -25,13 +47,21 @@ export function loadKidsMode() {
   gameContainer.classList.remove('hidden');
   gameContainer.style.display = 'flex';
 
+  // ✅ Load background *first*
+  setTimeout(() => swapModeBackground('assets/img/modes/kidsCamping/kidsBG.png'), 0);
+
+  // 🍧 PRELOAD PNGs BEFORE UI RENDERS
+  import('./preloadParkingSprites.js').then(mod => mod.preloadParkingSprites());
+
+  // 🏁 Then show the UI
   renderIntroScreen();
   setupIntroEventHandlers();
-  setTimeout(() => swapModeBackground('assets/img/modes/kidsCamping/kidsBG.png'), 0);
 }
 
+
 export function stopKidsMode() {
-  cleanupTentLineGame(); // ☠️ wipe old game state!
+  stopTrack(); // ⛔ fade out camping music
+  cleanupTentLineGame();
 
   const container = document.getElementById('game-container');
   container.innerHTML = '';
@@ -97,9 +127,14 @@ function setupIntroEventHandlers() {
       }, 450);
     }
   });
+  document.querySelector('#backToMenuIntro')?.addEventListener('click', () => {
+    stopTrack(); // 🔇 just in case
+    returnToMenu(); 
+  });
 }
 
 function renderUI() {
+  playTrack('sc90'); // 🔊 let the camping begin
   const container = document.getElementById('game-container');
   container.innerHTML = `
     <div class="kc-aspect-wrap">
@@ -114,17 +149,26 @@ function renderUI() {
           <div class="kc-scroller-cell">Scroller</div>
           <div class="kc-tent-zone"></div>
           <div class="kc-match-cell">Match</div>
-          <div class="kc-slider-cell">Slider</div>
+          <div class="kc-slider-cell" id="parkingZone"></div>
           <div class="kc-popper-cell">
-            <div class="kc-popper-lineup">
+          <div class="kc-popper-lineup">
+            <!-- Left Spacer -->
+            <div class="kc-popper-slot">
               <button id="backToMenu">🔙<br/>Menu</button>
-              <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/stegoVider.png" class="kc-icon" />
+            </div>
+
+            <!-- Center Score Wrap -->
+            <div class="kc-score-wrap">
               <div class="kc-score-box">
                 <div class="kc-score-label">Camping Score</div>
                 <span id="popCount">0</span>
               </div>
-              <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/brachioVider.png" class="kc-icon" />
-              <button id="mushroomPopper">🚗<br/>Park!</button>
+            </div>
+
+            <!-- Right Park + Mute Controls -->
+            <!-- 🍉 Right Spacer -->
+            <div class="kc-popper-slot">
+              <button id="muteToggle" class="mute-btn">🔊<br/>Mute?</button>
             </div>
           </div>
         </div>
@@ -135,15 +179,31 @@ function renderUI() {
 }
 
 function setupEventHandlers() {
-  const popBtn = document.getElementById('mushroomPopper');
+  const popBtn = document.getElementById('parkTrigger');
   if (popBtn) {
     const triggerPop = () => {
       appState.incrementPopCount(1);
       updatePopUI();
       animatePopCount();
     };
-
     popBtn.addEventListener('pointerdown', triggerPop);
+  }
+
+  const muteBtn = document.getElementById('muteToggle');
+  if (muteBtn) {
+    const updateMuteVisual = () => {
+      const isMuted = Howler._muted;
+      muteBtn.innerHTML = isMuted ? '🔇<br/>Muted' : '🔊<br/>Mute?';
+      muteBtn.classList.toggle('muted', isMuted);
+    };
+
+    muteBtn.addEventListener('click', () => {
+      const isMuted = Howler._muted;
+      Howler.mute(!isMuted);
+      updateMuteVisual();
+    });
+
+    updateMuteVisual(); // 💡 Initialize UI state
   }
 
   document.querySelectorAll('.kc-icon, .kc-title img.kc-icon').forEach(icon => {
@@ -154,6 +214,7 @@ function setupEventHandlers() {
     });
   });
 }
+
 
 function cleanupEventHandlers() {}
 
@@ -168,7 +229,7 @@ function returnToMenu() {
 function startGame() {
   const tentZone = document.querySelector('.kc-tent-zone');
   if (tentZone) {
-    tentZone.innerHTML = ''; // Clear existing content
+    tentZone.innerHTML = '';
     console.log('Tent zone found, clearing and rendering');
 
     const tentGameEl = createTentLineGame((score) => {
@@ -179,10 +240,16 @@ function startGame() {
 
     tentZone.appendChild(tentGameEl);
     console.log('Tent game element appended');
-
-    // ❌ No longer manually calling drawLineGlow here
   } else {
     console.error('Tent zone not found!');
+  }
+
+  const parkingZone = document.getElementById('parkingZone');
+  if (parkingZone) {
+    initParkingGame(parkingZone);
+    console.log('🚗 Parking game initialized!');
+  } else {
+    console.warn('⚠️ parkingZone not found in .kc-slider-cell');
   }
 }
 

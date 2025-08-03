@@ -1,3 +1,6 @@
+// kidsCampingTentLineGame.js
+// 🏕️ Tent Swipe + Tap Hybrid Fix
+
 const GRID_SIZE = 24; // 4x6 grid
 
 let selectedTents = new Set();
@@ -5,6 +8,11 @@ let activeLine = [];
 let gridEls = [];
 let onScoreCallback = null;
 let svgOverlay = null;
+let swipeTracking = {
+  isSwiping: false,
+  touchedIndices: new Set(),
+  tentRects: new Map(),
+};
 
 export function createTentLineGame(onScore) {
   onScoreCallback = onScore;
@@ -50,11 +58,10 @@ export function createTentLineGame(onScore) {
     cell.appendChild(img);
     grid.appendChild(cell);
     gridEls.push({ cell, img, index: i });
-
-    cell.addEventListener('pointerdown', () => toggleTent(i));
   }
 
-  // ResizeObserver for auto-draw on layout ready/resize
+  setupSwipeHandlers(grid);
+
   const observer = new ResizeObserver(() => {
     if (grid.getBoundingClientRect().height > 0 && activeLine.length) {
       requestAnimationFrame(() => drawLineGlow({ svgOverlay, activeLine, gridEls }));
@@ -62,7 +69,6 @@ export function createTentLineGame(onScore) {
   });
   observer.observe(grid);
 
-  // Orientation/resize backup
   const redrawOnChange = () => requestAnimationFrame(() => drawLineGlow({ svgOverlay, activeLine, gridEls }));
   window.addEventListener('resize', redrawOnChange, { passive: true });
   window.addEventListener('orientationchange', redrawOnChange, { passive: true });
@@ -238,8 +244,13 @@ function clearTentGrid() {
 }
 
 function playCorrect() {
-  console.log('Playing correct SFX');
+  const sfx = new Howl({
+    src: [`${import.meta.env.BASE_URL}assets/audio/SFX/tentSuccess.mp3`],
+    volume: 0.1
+  });
+  sfx.play();
 }
+
 
 export function initGameLine() {
   console.log('🍧 initGameLine() triggered');
@@ -248,6 +259,86 @@ export function initGameLine() {
   // But force one initial call after a frame
   requestAnimationFrame(() => drawLineGlow({ svgOverlay, activeLine, gridEls }));
 }
+
+function setupSwipeHandlers(grid) {
+  let pointerDown = false;
+  let seen = new Set();
+  let startX = 0, startY = 0;
+
+  grid.addEventListener('pointerdown', (e) => {
+    pointerDown = true;
+    seen.clear();
+    startX = e.clientX;
+    startY = e.clientY;
+
+    gridEls.forEach(({ cell }, index) => {
+      swipeTracking.tentRects.set(index, cell.getBoundingClientRect());
+    });
+
+    processHit(e); // 🎯 hit first tent immediately
+  });
+
+  grid.addEventListener('pointermove', (e) => {
+    if (!pointerDown) return;
+
+    const dx = Math.abs(e.clientX - startX);
+    const dy = Math.abs(e.clientY - startY);
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 5) processHit(e);
+  });
+
+  grid.addEventListener('pointerup', () => {
+    pointerDown = false;
+    seen.clear();
+  });
+
+  // 🔥 Global kill — ends swipe no matter *where* the mouse/finger goes up
+  document.addEventListener('pointerup', () => {
+    pointerDown = false;
+    seen.clear(); // 🌬️ prevent rogue hover lighting
+  });
+
+  function processHit(e) {
+    if (!pointerDown) return;
+
+    const x = e.clientX;
+    const y = e.clientY;
+
+    for (const [index, rect] of swipeTracking.tentRects.entries()) {
+      const marginX = rect.width * 0.15;
+      const marginY = rect.height * 0.15;
+
+      if (
+        x >= rect.left + marginX && x <= rect.right - marginX &&
+        y >= rect.top + marginY && y <= rect.bottom - marginY &&
+        !seen.has(index)
+      ) {
+        seen.add(index);
+        toggleTent(index);
+        break;
+      }
+    }
+  }
+}
+
+
+
+
+function registerTentFromCoords(x, y) {
+  for (let [index, rect] of swipeTracking.tentRects.entries()) {
+    if (
+      x >= rect.left && x <= rect.right &&
+      y >= rect.top && y <= rect.bottom &&
+      !swipeTracking.touchedIndices.has(index)
+    ) {
+      swipeTracking.touchedIndices.add(index);
+      toggleTent(index);
+      break;
+    }
+  }
+}
+
 
 export function cleanupTentLineGame() {
   gridEls = [];

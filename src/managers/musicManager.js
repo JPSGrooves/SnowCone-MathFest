@@ -286,7 +286,7 @@ export function getCurrentSeekPercent() {
   return (currentTrack.seek() || 0) / duration;
 }
 
-const infinityTrackIds = ['infadd', 'sc90', 'nothingorg', 'secrets'];
+const infinityTrackIds = ['infadd', 'nothingorg', 'secrets'];
 
 function shuffleInfinityTrackList() {
   return infinityTrackIds

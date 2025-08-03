@@ -322,4 +322,4 @@ autorun(() => {
 /////////////////////////////////
 // 🧪 DEV FLAG
 /////////////////////////////////
-window.devFlags = { build: "v0.6.0-Infinity_Unlocked" };
+window.devFlags = { build: "v0.6.6-TentsUpCarsParked" };

@@ -12,7 +12,7 @@ export function renderVersionTab() {
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.6.0 Update – QuickServe Pavilion Complete</h3>
+      <h3>🍦 v0.6.6 Update – TentsUpCarsParked</h3>
       <p>
         – ♾️ Infinity Lake Mode now fully playable — intro screen, Triplet jam, math problems, XP, and high scores<br>
         – 🎶 Background music shuffles from curated Infinity tracks — reshuffles every loop for eternal vibes<br>
@@ -24,6 +24,12 @@ export function renderVersionTab() {
         – ⏱️ Time played now reported at end-of-game popup — no more guessing your grind<br>
         – 🧃 Clean problem generator handles Add/Sub, Mult/Div, and Algebra with smooth fake answer logic<br>
         – 🧽 Fixed missing answer button values — blue and violet buttons now update properly every time<br>
+        – 🏕️ Kids Camping Parking Game now **fully complete** — all 11 cars, ordinal bonus logic, and one-minute finale scoring<br>
+        – 🔊 New <code>honk1</code> to <code>honk5</code> SFX system plays sequential honks based on car’s honk count<br>
+        – 🎺 Honk memory persists if user skips cars — resumes honk where it left off<br>
+        – 🧠 50pt ordinal bonus and 100pt under-one-minute bonus fully wired and awarded<br>
+        – 🌈 Final “All Parked!” overlay locks & fades before soft reset — looks crispy on mobile<br>
+        – 🚀 PNG preloader added for parking sprites — eliminates first-load image delay<br>
       </p>
 
     </div>
