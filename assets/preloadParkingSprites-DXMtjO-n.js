@@ -1,0 +1,1 @@
+const t=["car1.png","car2.png","dinoBus.png","iceCreamTruck.png","golfCart.png","jeep.png","tentVan.png","campWagon.png","festivalFloat.png","tinyUFO.png","colorfulCuteThankYouLetter.png"];function g(){const n="/SnowCone-MathFest/assets/img/characters/kidsCamping/";t.forEach(a=>{const e=new Image;e.src=n+a})}export{g as preloadParkingSprites};
