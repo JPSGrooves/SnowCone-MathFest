@@ -6,36 +6,13 @@
 }
 
 
-.kc-grid {
-  display: grid;
-  grid-template-areas:
-    "title title title title title"
-    "scroller scroller tent tent tent"
-    "match match tent tent tent"
-    "slider slider slider slider slider"
-    "popper popper popper popper popper";
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  grid-template-rows:
-    auto
-    minmax(10%, 1fr)
-    minmax(10%, 1fr)
-    minmax(10%, 1fr)
-    minmax(14%, auto);
-  gap: clamp(0.3rem, 1vw, 1rem);
-  padding: clamp(0.5rem, 2vw, 1.5rem);
-  position: absolute;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.2);
-  max-width: 100vw;
-  overflow-x: hidden;
-}
+
+
+
 
 .kc-grid > div {
   border: 1px solid #00ffee88;
-  padding: 0.5rem;
+  padding: 0.5rem; /* Internal padding for content */
   color: white;
   font-family: monospace;
   background: rgba(0, 0, 0, 0.3);
@@ -54,7 +31,6 @@
 .kc-title { grid-area: title; }
 .kc-scroller-cell { grid-area: scroller; }
 .kc-tent-cell { grid-area: tent; }
-.kc-match-cell { grid-area: match; }
 .kc-slider-cell { grid-area: slider; }
 .kc-popper-cell { grid-area: popper; }
 
@@ -120,14 +96,14 @@
 }
 /* 🧱 Lock .kc-popper-cell so nothing jumps */
 .kc-popper-cell {
-  min-height: clamp(100px, 18vh, 260px);
+  min-height: clamp(40px, 10vh, 140px); /* 🔧 LOWERED from 18vh */
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: visible;
-  
+
 }
 
 .kc-popper-lineup {
@@ -136,12 +112,14 @@
   align-items: center;
   flex-wrap: nowrap;
   gap: clamp(0.5rem, 2vw, 1.5rem);
-  padding: 0 clamp(1rem, 2vw, 2rem);
   width: 100%;
   max-width: 680px;   /* 🔐 hard boundary */
+  max-height: 100%;
+  height: 100%;
   margin: 0 auto;     /* 🎯 center inside parent */
   box-sizing: border-box;
   overflow: hidden;
+
 }
 
 
@@ -151,6 +129,7 @@
   align-items: center;
   justify-content: center;
   min-width: clamp(80px, 10vw, 140px);
+
 }
 
 .kc-score-wrap {
@@ -253,38 +232,6 @@
 
 
 
-/*#mushroomPopper {
-  background: radial-gradient(circle at 50% 30%, #00ffee, #00ccdd);
-  color: black;
-  font-weight: bold;
-  font-size: clamp(0.8rem, 1.5vw, 1.1rem);
-  border: none;
-  border-radius: 999px;
-  padding: clamp(0.4rem, 1vw, 0.6rem) clamp(1rem, 2vw, 1.4rem);
-  box-shadow:
-    0 0 12px #00ffee88,
-    inset 0 0 6px #ccffff;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-#mushroomPopper:hover {
-  transform: scale(1.08);
-  box-shadow:
-    0 0 18px #00ffeecc,
-    inset 0 0 10px #ccffff;
-}
-
-#mushroomPopper:active {
-  transform: scale(0.95);
-  box-shadow:
-    0 0 8px #00ffeeaa,
-    inset 0 0 4px #aaffff;
-}*/
-
-
 .kc-score-box {
   display: flex;
   flex-direction: column;
@@ -306,7 +253,7 @@
 
 /* kidsCamping.css (Updated for BG centering, speech fix, button equality) */
 
-/* Aspect Wrap (Modeled after IL) */
+/* Ensure parents support full height */
 .kc-aspect-wrap {
   width: auto;
   height: 100svh;
@@ -318,10 +265,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto; /* 🧲 🧲 double-lock horizontal centering */
+  margin: 0 auto;
   padding: 0;
 }
-
 
 /* 🍧 Frame inside aspect wrap */
 .kc-game-frame {
@@ -331,7 +277,6 @@
   grid-template-rows: auto 1fr;
   position: relative;
   overflow: hidden;
-  contain: layout style; /* 🧱 isolate layout */
 }
 /* Background - Center Fix (Direct from IL model) */
 .background-fill.kc-bg-img {
@@ -368,6 +313,7 @@
   white-space: normal; /* Allow wrap */
   word-break: break-word;
 }
+
 
 @keyframes fadeInBubble {
   from { opacity: 0; transform: translateY(-10px); }
@@ -485,86 +431,80 @@
   grid-template-areas:
     "title title title title title"
     "scroller scroller tent tent tent"
-    "match match tent tent tent"
+    "scroller scroller tent tent tent"
     "slider slider slider slider slider"
     "popper popper popper popper popper";
   grid-template-columns: repeat(5, minmax(0, 1fr));
   grid-template-rows:
     auto
-    minmax(10%, 1fr)
-    minmax(15%, 1fr) /* Increase height for tent area */
-    minmax(10%, 1fr)
-    minmax(14%, auto);
+    minmax(20%, 1fr) /* Tall scroller */
+    minmax(20%, 1fr) /* Increased tent height to restore visibility */
+    minmax(25%, 1fr) /* Stretched slider */
+    minmax(5%, auto); /* Reduced popper */
   gap: clamp(0.3rem, 1vw, 1rem);
-  padding: clamp(0.5rem, 2vw, 1.5rem);
+  padding: 0.25rem; /* Sliver of space */
   position: absolute;
   z-index: 2;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   background: rgba(0, 0, 0, 0.2);
-  max-width: 100vw;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow-x: hidden;
 }
 
-/* kidsCamping.css - Tent Section */
+/* Apply padding to individual zones */
+.kc-ant-attack-zone,
+.kc-tent-zone,
+.kc-slider-cell,
+.kc-popper-cell {
+  padding: 0 0.5rem; /* Tad bit of padding on left and right */
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+}
 
-/* kidsCamping.css - Tent Section */
+.kc-grid > div:not(.kc-title):not(.kc-popper-cell) {
+  padding-left: clamp(0.2rem, 0.8vw, 0.6rem);
+  padding-right: clamp(0.2rem, 0.8vw, 0.6rem);
+  box-sizing: border-box;
+}
+
 
 /* Tent zone - no clipping */
+/* Keep the tent area from clipping, but center its content */
 .kc-tent-zone {
   grid-area: tent;
-  display: block;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  overflow: visible;
   position: relative;
-}
-
-/* Wrapper for alignment */
-.kc-tent-wrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: flex;                 /* center child */
   align-items: center;
-  justify-content: flex-start;
-  position: relative;
-}
-
-/* Tent grid - 4x6 */
-.kc-tent-grid {
-  width: 100%;
-  height: auto;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(6, minmax(0, 1fr)); /* 6 rows */
-  grid-auto-flow: row;
-  gap: 0.05rem;
-  padding: 0.1rem;
-  box-sizing: border-box;
-  min-height: 0;
-  min-width: 0;
-  max-height: 90%; /* Space for below */
-  background: transparent;
-  position: relative;
-  overflow: visible; /* Ensure SVG isn't clipped */
-}
-
-
-/* Inner cells */
-.kc-tent-inner-cell {
-  display: flex;
   justify-content: center;
-  align-items: center;
   width: 100%;
-  height: 100%;
+  height: 100%;                  /* fill the grid row */
+  overflow: visible;             /* we want glow */
+  padding: 0;                    /* no extra vertical growth */
+}
+
+
+
+/* The grid keeps aspect, but can’t grow taller than its row */
+
+
+/* Cells are square inside whatever size the grid ends up */
+.kc-tent-inner-cell {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  width: 100%;
   cursor: pointer;
   overflow: hidden;
   box-sizing: border-box;
-  position: relative; /* Ensure higher than SVG */
-  z-index: 2; /* Explicit for stacking */
   touch-action: manipulation;
 }
 
@@ -577,20 +517,22 @@
 }
 
 
-/* Images scaled */
+
+/* Images no longer control layout; they just fit inside the square cell */
 .kc-tent-img {
-  width: 100%;
-  height: 100%;
+  display: block;   /* kill baseline gap */
+  width: 90%;
+  height: 90%;
   object-fit: contain;
   pointer-events: none;
   transition: filter 0.2s;
 }
-
+/* drop-in replace */
 .kc-dino-icon {
-  height: clamp(60px, 16vh, 112px);      /* 🌈 SCALE TO HEIGHT */
-  width: auto;                          /* Let it scale naturally */
-  max-height: 22vh;                     /* Cap it cleanly */
-  max-width: 90%;                       /* Respect side bounds */
+  height: clamp(36px, 12vh, 90px);  /* was 60px → 16vh → 112px */
+  width: auto;
+  max-height: 22vh;                  /* unchanged cap */
+  max-width: 90%;
   object-fit: contain;
   flex-shrink: 1;
   align-self: center;
@@ -601,17 +543,8 @@
 }
 
 
-.kc-tent-space-below {
-  flex-grow: 1;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  padding-top: clamp(0.5rem, 2vh, 2rem);
-  padding-bottom: clamp(0.5rem, 2vh, 2rem);
-  min-height: clamp(80px, 14vh, 200px); /* 🌟 This is the magic line */
-  max-height: 30vh;
-}
+
+
 
 
 
@@ -641,17 +574,20 @@
 }
 
 
-/* Glow overlay - below tents */
+/* Keep SVG below tents */
+/* SVG stays underneath, full-bleed within the grid box */
 .kc-glow-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
-  z-index: 1; /* Below tents */
-  overflow: visible !important;  /* remove is global issues!! */
+  z-index: 1;
+  overflow: visible !important;
+  will-change: transform, filter;
+  isolation: isolate;          /* keep filter compositing sane */
+  contain: paint layout size;  /* sandbox layout churn */
 }
+
+
 
 /* Flash animation */
 .tent-flash {
@@ -673,12 +609,94 @@
   to { opacity: 1; }
 }
 
+/* Reserve a predictable slice for the dino/message
+   and make the tent grid fit what's left */
+.kc-tent-zone {
+  grid-area: tent;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;              /* fill the grid row */
+  overflow: visible;         /* keep glow visible */
+}
+
+/* One knob to rule the layout below the tents */
+.kc-tent-wrap {
+  --tent-below-h: clamp(70px, 12vh, 140px);  /* adjust to taste */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;    /* grid on top, dino below */
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Tent grid uses all remaining height in the row */
+.kc-tent-grid {
+  position: relative;
+  width: 100%;
+  height: auto;                              /* let aspect-ratio compute height */
+  min-height: 120px; /* just to prevent a transient zero */
+  max-height: calc(100% - var(--tent-below-h));  /* <-- stay inside row */
+  aspect-ratio: 4 / 6;                       /* stable geometry for line math */
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  grid-auto-flow: row;
+  gap: 0.05rem;
+  padding: 0.1rem;
+  box-sizing: border-box;
+  background: transparent;
+  overflow: visible;
+}
+
+
+/* The below area now has a fixed, reserved height */
+.kc-tent-space-below {
+  flex: 0 0 var(--tent-below-h);             /* take only what we budgeted */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;                         /* stays in flow, no overflow */
+}
+
+/* Keep SVG below tents, within the grid box */
+.kc-glow-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;                                 /* under images */
+  overflow: visible !important;
+  will-change: transform, filter;
+}
+
+/* Cells stay square and above the SVG */
+.kc-tent-inner-cell {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  cursor: pointer;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+
 /*parkcargame*/
 
 .kc-parking-intro {
   grid-area: intro;
   text-align: center;
-  font-size: clamp(1.4rem, 3.4vh, 3.2rem);
+  font-size: clamp(1.4rem, 3vh, 2.8rem);
   font-family: 'Orbitron', sans-serif;
   color: #ffee00;
   white-space: nowrap;         /* ✅ Prevent stacking */
@@ -788,6 +806,7 @@
 
 
 
+/* Parking Zone Adjustments */
 .kc-slider-cell {
   display: flex;
   justify-content: space-between;
@@ -795,10 +814,11 @@
   padding: clamp(0.4rem, 1vw, 1rem);
   gap: clamp(0.5rem, 2vw, 2rem);
   min-height: clamp(80px, 14vh, 120px);
-  max-height: 20vh;
+  /* Removed max-height to allow stretching */
   overflow: hidden;
   width: 100%;
   box-sizing: border-box;
+  height: 100%; /* Ensure it uses full allocated row height */
 }
 
 .kc-park-image-btn {
@@ -984,7 +1004,7 @@
   justify-self: start;
   padding-left: clamp(0.5rem, 1.5vw, 1rem);
   text-align: left;
-  margin-top: -6vh; /* 💥 just enough lift */
+  margin-top: -3vh; /* 💥 just enough lift */
   min-height: 4.5em; /* 🧱 Hold vertical layout shape */
 }
 
@@ -992,4 +1012,482 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* 🐜 Ant Attack Unified Layout – CSS Grid for full tug-of-war zone */
+
+.kc-scroller-cell {
+  grid-area: scroller;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 📏 Ant Attack responsive scaling for small viewports */
+@media (max-height: 700px) {
+  .kc-ant-zone .food-plate-img { max-height: 16vh; }
+  .kc-ant-zone .ant1-img { max-height: 16vh; }
+  .kc-ant-zone .ant2-img { max-height: 16vh; }
+  .kc-ant-zone .ant-sprite { width: clamp(16px, 1.8vh, 24px); }
+}
+
+@media (max-height: 600px) {
+  .kc-ant-zone .food-plate-img { max-height: 14vh; }
+  .kc-ant-zone .ant1-img { max-height: 14vh; }
+  .kc-ant-zone .ant2-img { max-height: 14vh; }
+  .kc-ant-zone .ant-sprite { width: clamp(14px, 1.6vh, 20px); }
+}
+
+@media (max-height: 520px) {
+  .kc-ant-zone .food-plate-img { max-height: 12vh; }
+  .kc-ant-zone .ant1-img  { max-height: 12vh; }
+  .kc-ant-zone .ant2-img  { max-height: 12vh; }
+  .kc-ant-zone .ant-sprite { width: clamp(12px, 1.4vh, 18px); }
+}
+
+
+/* Ensure ant attack zone uses the scroller area */
+.kc-ant-attack-zone {
+  grid-area: scroller;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: clamp(0.5rem, 1.5vh, 1rem); /* Internal padding */
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  background: rgba(0, 0, 0, 0.25); /* Visual cue */
+}
+
+/* 🔥 Match tent layout behavior */
+.ant-attack-wrapper {
+  grid-area: scroller;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: clamp(0.5rem, 1.5vh, 2rem);
+  box-sizing: border-box;
+  overflow: visible;
+  position: relative;
+  background: transparent; /* or use a dev debug color to test layout */
+}
+
+
+/* Ant Attack Unified Layout – CSS Grid for full tug-of-war zone */
+.kc-ant-zone {
+  flex: 1;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  min-height: 200px;
+  position: relative; /* For absolute positioning */
+}
+
+.kc-ant-zone {
+  position: relative;
+  background: url('picnicBlanket.png') center/cover no-repeat;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); /* ✨ softer, lighter */
+}
+
+.kc-ant-zone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3); /* ✨ half halo */
+  pointer-events: none;
+}
+
+
+.ant-base img.ant-hill-img {
+  width: clamp(40px, 10vw, 70px);
+  height: auto;
+}
+
+.ant-base.red .ant-hill-img {
+  position: absolute;
+  top: 0;
+  left: 25%;
+  transform: translateY(-50%);
+  width: clamp(40px, 10vw, 70px);
+  height: auto;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+}
+
+
+.ant-base.red {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 1;
+}
+
+
+.ant-base.red img.ant2-img {
+  width: 60px; /* Adjusted size */
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0;
+}
+
+.ant2-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: clamp(48px, 8vw, 72px);
+  height: auto;
+  z-index: 5;
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
+  transform: translate(-30%, -20%); /* Optional: extra lean into corner */
+}
+
+.ant1-img {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: clamp(48px, 8vw, 72px);
+  height: auto;
+  z-index: 5;
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
+  transform: translate(5%, 5%); /* snug into corner */
+}
+
+
+
+.ant-base.black {
+  align-self: flex-end;
+  margin-bottom: 0;
+  width: 100%;
+  position: absolute;
+  bottom: 10px; /* Align with button */
+  right: 10px; /* Right side with button */
+}
+
+.ant-hill-img {
+  position: absolute;
+  bottom: 0;
+  right: 25%;
+  transform: translateY(40%);
+  width: clamp(40px, 10vw, 70px);
+  height: auto;
+  z-index: 1;
+  filter:
+    drop-shadow(0 0 1px rgb(255, 255, 255))
+    drop-shadow(0 0 2px rgba(229, 235, 255, 0.869));
+}
+
+
+.ant-food-center {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.food-zone {
+  position: absolute;
+  top: 50%; /* Airtight middle with viewport calc */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Full width for stacking */
+  height: auto;
+  z-index: 4;
+}
+
+.food-plate-img {
+  max-height: 20vh;
+  width: auto;
+  height: 120px;
+  object-fit: contain;
+  position: relative;
+  z-index: 4; /* Below ants */
+  transition: transform 0.1s ease; /* For movement */
+}
+
+.food-with-overlay {
+  position: relative;
+  display: inline-block;
+}
+
+.food-weight-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%); /* hover just above the food */
+  font-size: clamp(28px, 4.5vh, 48px);
+  font-weight: bold;
+  color: #00ff44;
+  text-shadow: 0 0 4px #003300;
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* kidsCamping.css */
+.big-snowcone {
+  transform: scale(1.25);
+}
+/* ===== Ant Glows ===== */
+/* Base: let glows animate smoothly and not get clipped */
+.ant-sprite {
+  will-change: transform, filter;
+  /* no default filter so we can layer specific glows by role */
+}
+
+.ant-glow-pink {
+  filter:
+    drop-shadow(0 0 1px rgba(252, 0, 8, 0.7))
+    drop-shadow(0 0 2px rgba(255, 1, 22, 0.35));
+}
+
+.ant-glow-white {
+  filter:
+    drop-shadow(0 0 1px rgba(0, 153, 248, 0.7))
+    drop-shadow(0 0 2px rgba(20, 66, 232, 0.35));
+}
+
+.ant-btn img.glow-pink {
+  filter:
+    drop-shadow(0 0 1px rgba(252, 0, 8, 0.7))
+    drop-shadow(0 0 2px rgba(255, 1, 22, 0.35));
+}
+
+.ant-btn img.glow-white {
+  filter:
+    drop-shadow(0 0 1px rgba(0, 153, 248, 0.7))
+    drop-shadow(0 0 2px rgba(20, 66, 232, 0.35));
+}
+
+
+/* Safety: ensure glow isn’t clipped by parent */
+.kc-ant-zone,
+.food-zone,
+.food-container {
+  overflow: visible;
+}
+
+
+.ant-btn-wrap {
+  margin-top: 0.5rem;
+}
+
+
+/* Standardize ant sizes */
+.ant-sprite {
+  width: clamp(18px, 2vh, 28px);
+  height: auto;
+  object-fit: contain;
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes crawlAnt {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(-1px, 1px) rotate(-2deg); }
+  50%  { transform: translate(1px, -1px) rotate(2deg); }
+  75%  { transform: translate(-1px, 1px) rotate(-2deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.ant-entering {
+  animation: crawlAnt 0.3s ease-in-out;
+}
+
+
+
+@keyframes floatUp {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-150px); /* or -12vh or whatever */
+    opacity: 1;
+  }
+}
+
+
+
+
+
+/* Ant count overlay on button – doubled size */
+.ant-count {
+  position: absolute;
+
+  /* anchor offsets scale with viewport height (and stay negative) */
+  bottom: clamp(-12px, -1.6vh, -6px);
+  right:  clamp(-12px, -1.6vh, -6px);
+
+  background: rgba(0, 0, 0, 0.585);
+  color: rgb(0, 255, 4);
+
+  /* allow further downscale on small phones; same vibe as before */
+  font-size: clamp(0.75rem, 1.9vh, 1.5rem);
+
+  font-weight: bold;
+
+  /* use em so padding scales with the font (and thus with vh) */
+  padding: 0.5em 0.9em;
+
+  border-radius: 50%;
+  box-shadow: 0 0 6px #00000066;
+  z-index: 10;
+  filter:
+    drop-shadow(0 0 1px rgba(0, 153, 248, 0.7))
+    drop-shadow(0 0 2px rgba(20, 66, 232, 0.35));
+}
+
+
+
+
+/* Flash animation for bonus */
+.bonus-flash {
+  position: absolute;
+  bottom: -20px; /* Above the count */
+  right: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffff00; /* Yellow */
+  opacity: 0;
+  animation: flash 0.5s ease-out forwards;
+}
+
+@keyframes flash {
+  0% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1); }
+}
+/* Ant Attack!*/
+
+.food-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+}
+
+
+.kc-round-msg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: Orbitron, sans-serif;
+  font-size: 2.2em;
+  font-weight: bold;
+  padding: 0.5em 1em;
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 99;
+  color:  #00ff00;;
+  text-shadow: 0 0 4px #000;
+}
+
+.kc-round-msg.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+
+.score-overlay {
+  position: absolute;
+  bottom: clamp(6px, 1.2vh, 14px);
+  left:  clamp(6px, 1.2vh, 14px);
+  background: rgb(0, 0, 0);
+
+  /* ⬆️ min from 8px → 9px (tiny tad) */
+  font-size: clamp(9px, 2.1vh, 18px);
+
+  /* ⬆️ mins: 3px→4px and 4px→5px to keep proportions */
+  padding: clamp(4px, 1vh, 10px) clamp(5px, 1.2vh, 14px);
+
+  /* ⬆️ min radius: 3px → 4px */
+  border-radius: clamp(4px, 1vh, 10px);
+
+  color: rgb(13, 255, 0);
+  font-family: 'Orbitron', monospace;
+  z-index: 15;
+  filter:
+    drop-shadow(0 0 1px #fff)
+    drop-shadow(0 0 2px rgba(229,235,255,0.869));
+}
+
+/* put this at the END of your CSS */
+@media (max-width: 430px) and (orientation: portrait) {
+  .kc-ant-zone .score-overlay {
+    transform-origin: bottom left;
+    transform: scale(0.8); /* 👈 20% smaller on mobile only */
+    will-change: transform; /* smoother on iOS */
+  }
+}
+
+
+
+
+/* Ant button styling */
+.ant-btn {
+  position: absolute;
+  bottom: 5px;
+  right: -5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ant-btn img {
+  width: clamp(40px, 8vh, 60px);
+  height: auto;
+  object-fit: contain;
+}
+
+
+.ant-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ant-feedback {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  color: #14ff94;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ant-feedback.visible {
+  opacity: 1;
 }

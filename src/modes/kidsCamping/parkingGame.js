@@ -3,6 +3,7 @@
 import { Howl } from 'howler';
 import { appState } from '../../data/appState.js';
 
+
 const parkingSprites = [
   'car1.png', 'car2.png', 'dinoBus.png', 'iceCreamTruck.png',
   'golfCart.png', 'jeep.png', 'tentVan.png', 'campWagon.png',
@@ -357,6 +358,7 @@ function resetGame() {
   parkingRoot.innerHTML = '';
   initParkingGame(parkingRoot);
 }
+
 
 
 function startGameTimer() {

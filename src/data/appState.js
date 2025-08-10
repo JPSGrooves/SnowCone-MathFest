@@ -1,3 +1,4 @@
+// appState.js
 import { makeAutoObservable, autorun, runInAction } from 'mobx';
 
 class AppState {
@@ -70,7 +71,6 @@ class AppState {
 
     return amount; // ✅ This makes it future-safe
   }
-
 
   setUsername(name) {
     this.profile.username = name;
@@ -188,8 +188,6 @@ class AppState {
     return this.settings.gameMode;
   }
 
-
-
   //////////////////////////////////////
   // 🔮 MOOD ENGINE (XP DRIVEN)
   //////////////////////////////////////
@@ -216,8 +214,8 @@ class AppState {
 
   incrementPopCount(amount = 1) {
     this.popCount += amount;
+    document.dispatchEvent(new CustomEvent('campScoreUpdated', { detail: this.popCount })); // Notify UI
   }
-
 
   //////////////////////////////////////
   // 🧠 STORY MEMORY (PERSISTENT)
@@ -283,7 +281,6 @@ class AppState {
     localStorage.setItem('snowcone_save_data', JSON.stringify(dataToSave));
   }
 
-
   loadFromStorage() {
     const raw = localStorage.getItem('snowcone_save_data');
     if (raw) {
@@ -312,14 +309,10 @@ class AppState {
 
 export const appState = new AppState();
 
-/////////////////////////////////
 // 💾 AUTO SAVE MACHINE
-/////////////////////////////////
 autorun(() => {
   appState.saveToStorage();
 });
 
-/////////////////////////////////
 // 🧪 DEV FLAG
-/////////////////////////////////
 window.devFlags = { build: "v0.6.6-TentsUpCarsParked" };

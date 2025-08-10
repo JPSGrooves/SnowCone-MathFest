@@ -1,20 +1,26 @@
 // kidsCamping.js
-
 import './kidsCamping.css';
-import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
+import { applyBackgroundTheme } from '../../managers/backgroundManager.js'; // Removed duplicate swapModeBackground
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { createTentLineGame, initGameLine } from './kidsCampingTentLineGame.js';
 import { runInAction } from 'mobx';
 import { cleanupTentLineGame } from './kidsCampingTentLineGame.js';
-import { stopTrack, playTrack } from '../../managers/musicManager.js'; // 🎶 add this
+import { stopTrack, playTrack } from '../../managers/musicManager.js';
 import { initParkingGame } from './parkingGame.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
+import { initAntButtonManager } from './antButtonManager.js';
+import { showRoundMessage } from './roundFeedback.js';
+import { Howl } from 'howler';
 
+let currentHowl = null;
+let currentId = null;
 
-
-
+const TRACKS = {
+  sc90: `${import.meta.env.BASE_URL}assets/audio/sc90.mp3`,
+  // add other ids...
+};
 
 export function loadKidsMode() {
   runInAction(() => {
@@ -36,7 +42,7 @@ export function loadKidsMode() {
   }
 
   console.log('🏕️ Loading Kids Camping Mode');
-  stopTrack(); // 💥 shut down current music (jukebox etc)
+  stopTrack();
   updatePopUI?.();
   appState.setMode('kids');
 
@@ -47,20 +53,15 @@ export function loadKidsMode() {
   gameContainer.classList.remove('hidden');
   gameContainer.style.display = 'flex';
 
-  // ✅ Load background *first*
-  setTimeout(() => swapModeBackground('assets/img/modes/kidsCamping/kidsBG.png'), 0);
-
-  // 🍧 PRELOAD PNGs BEFORE UI RENDERS
+  setTimeout(() => applyBackgroundTheme('assets/img/modes/kidsCamping/kidsBG.png'), 0); // Use applyBackgroundTheme instead
   import('./preloadParkingSprites.js').then(mod => mod.preloadParkingSprites());
 
-  // 🏁 Then show the UI
   renderIntroScreen();
   setupIntroEventHandlers();
 }
 
-
 export function stopKidsMode() {
-  stopTrack(); // ⛔ fade out camping music
+  stopTrack();
   cleanupTentLineGame();
 
   const container = document.getElementById('game-container');
@@ -79,25 +80,11 @@ function renderIntroScreen() {
   container.innerHTML = `
     <div class="kc-aspect-wrap">
       <div class="kc-game-frame">
-        <img 
-          id="modeBackground" 
-          class="background-fill kc-bg-img" 
-          src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/kidsBG.png" 
-          alt="Kids Camping Background" 
-        />
-
+        <img id="modeBackground" class="background-fill kc-bg-img" src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/kidsBG.png" alt="Kids Camping Background" />
         <div class="kc-intro">
           <div class="kc-intro-stack">
-            <div class="kc-speech">
-              Hello! We're the Dino Dividers! Let's play some camping games! They are intended for little ones, but are fun for all ages!
-            </div>
-            <div class="director-wrapper">
-              <img 
-                id="directorSpriteIntro" 
-                class="director-img" 
-                src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/directors_intro.png" 
-              />
-            </div>
+            <div class="kc-speech">Hello! We're the Dino Dividers! Let's play some camping games! They are intended for little ones, but are fun for all ages!</div>
+            <div class="director-wrapper"><img id="directorSpriteIntro" class="director-img" src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/directors_intro.png" /></div>
             <button id="startCamping" class="kc-intro-btn kc-btn-large start-camp-btn">⛺ Get to Camping! ⛺</button>
             <button id="backToMenuIntro" class="kc-intro-btn kc-btn-large back-to-menu-btn">🔙 Back to Menu</button>
           </div>
@@ -109,32 +96,26 @@ function renderIntroScreen() {
 
 function setupIntroEventHandlers() {
   document.querySelector('#backToMenuIntro')?.addEventListener('click', returnToMenu);
-  document.querySelector('#startCamping')?.addEventListener('click', () => {
+  document.querySelector('#startCamping')?.addEventListener('click', async () => {
     const introEl = document.querySelector('.kc-intro');
     if (introEl) {
       introEl.classList.add('fade-out');
-      setTimeout(() => {
+      setTimeout(async () => {
         renderUI();
         setupEventHandlers();
-        startGame();
-
-        // 💥 Defer initGameLine reliably, fade-in or not
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            initGameLine(); // <- clean and guaranteed after DOM paints
-          });
-        });
+        await startGame();
+        requestAnimationFrame(() => requestAnimationFrame(() => initGameLine()));
       }, 450);
     }
   });
   document.querySelector('#backToMenuIntro')?.addEventListener('click', () => {
-    stopTrack(); // 🔇 just in case
-    returnToMenu(); 
+    stopTrack();
+    returnToMenu();
   });
 }
 
 function renderUI() {
-  playTrack('sc90'); // 🔊 let the camping begin
+  playTrack('sc90');
   const container = document.getElementById('game-container');
   container.innerHTML = `
     <div class="kc-aspect-wrap">
@@ -146,29 +127,23 @@ function renderUI() {
             <span class="kc-title-text">Kids Camping</span>
             <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/triceriVider.png" class="kc-icon kc-right-title" />
           </div>
-          <div class="kc-scroller-cell">Scroller</div>
+          <div class="kc-ant-attack-zone" id="antZone"></div>
           <div class="kc-tent-zone"></div>
-          <div class="kc-match-cell">Match</div>
           <div class="kc-slider-cell" id="parkingZone"></div>
           <div class="kc-popper-cell">
-          <div class="kc-popper-lineup">
-            <!-- Left Spacer -->
-            <div class="kc-popper-slot">
-              <button id="backToMenu">🔙<br/>Menu</button>
-            </div>
-
-            <!-- Center Score Wrap -->
-            <div class="kc-score-wrap">
-              <div class="kc-score-box">
-                <div class="kc-score-label">Camping Score</div>
-                <span id="popCount">0</span>
+            <div class="kc-popper-lineup">
+              <div class="kc-popper-slot">
+                <button id="backToMenu">🔙<br/>Menu</button>
               </div>
-            </div>
-
-            <!-- Right Park + Mute Controls -->
-            <!-- 🍉 Right Spacer -->
-            <div class="kc-popper-slot">
-              <button id="muteToggle" class="mute-btn">🔊<br/>Mute?</button>
+              <div class="kc-score-wrap">
+                <div class="kc-score-box">
+                  <div class="kc-score-label">Camping Score</div>
+                  <span id="popCount">0</span>
+                </div>
+              </div>
+              <div class="kc-popper-slot">
+                <button id="muteToggle" class="mute-btn">🔊<br/>Mute?</button>
+              </div>
             </div>
           </div>
         </div>
@@ -181,12 +156,11 @@ function renderUI() {
 function setupEventHandlers() {
   const popBtn = document.getElementById('parkTrigger');
   if (popBtn) {
-    const triggerPop = () => {
+    popBtn.addEventListener('pointerdown', () => {
       appState.incrementPopCount(1);
       updatePopUI();
       animatePopCount();
-    };
-    popBtn.addEventListener('pointerdown', triggerPop);
+    });
   }
 
   const muteBtn = document.getElementById('muteToggle');
@@ -196,25 +170,21 @@ function setupEventHandlers() {
       muteBtn.innerHTML = isMuted ? '🔇<br/>Muted' : '🔊<br/>Mute?';
       muteBtn.classList.toggle('muted', isMuted);
     };
-
     muteBtn.addEventListener('click', () => {
-      const isMuted = Howler._muted;
-      Howler.mute(!isMuted);
+      Howler.mute(!Howler._muted);
       updateMuteVisual();
     });
-
-    updateMuteVisual(); // 💡 Initialize UI state
+    updateMuteVisual();
   }
 
   document.querySelectorAll('.kc-icon, .kc-title img.kc-icon').forEach(icon => {
     icon.addEventListener('click', () => {
       icon.classList.remove('twisting');
-      void icon.offsetWidth; // Force reflow
+      void icon.offsetWidth;
       icon.classList.add('twisting');
     });
   });
 }
-
 
 function cleanupEventHandlers() {}
 
@@ -226,18 +196,16 @@ function returnToMenu() {
   });
 }
 
-function startGame() {
+async function startGame() {
   const tentZone = document.querySelector('.kc-tent-zone');
   if (tentZone) {
     tentZone.innerHTML = '';
     console.log('Tent zone found, clearing and rendering');
-
     const tentGameEl = createTentLineGame((score) => {
       appState.incrementPopCount(score);
       updatePopUI();
       animatePopCount();
     });
-
     tentZone.appendChild(tentGameEl);
     console.log('Tent game element appended');
   } else {
@@ -251,10 +219,23 @@ function startGame() {
   } else {
     console.warn('⚠️ parkingZone not found in .kc-slider-cell');
   }
+
+  const antZone = document.getElementById('antZone');
+  if (antZone) {
+    try {
+      const { initAntAttackGame } = await import('./antAttack.js');
+      initAntAttackGame(antZone, updatePopUI); // Pass updatePopUI as callback
+      initAntButtonManager();
+      console.log('🐜 Ant attack game initialized!');
+    } catch (error) {
+      console.error('Failed to initialize ant attack game:', error);
+    }
+  } else {
+    console.warn('⚠️ antZone not found!');
+  }
 }
 
-
-function updatePopUI() {
+export function updatePopUI() {
   const popSpan = document.getElementById('popCount');
   if (popSpan) popSpan.textContent = appState.popCount;
 }
@@ -268,3 +249,4 @@ function animatePopCount() {
     el.style.transform = 'scale(1)';
   }, 200);
 }
+
