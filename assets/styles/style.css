@@ -370,20 +370,4 @@ html, body {
   }
 }
 
-/* Soft gate if viewport gets below 400×500 */
-.kc-too-small {
-  position: absolute; inset: 0;
-  display: none;
-  align-items: center; justify-content: center;
-  text-align: center;
-  background: rgba(0,0,0,0.8);
-  color: #00ffee;
-  font-family: 'Orbitron', monospace;
-  padding: 1rem;
-  z-index: 9999;
-}
-@media (max-width: 399px), (max-height: 499px) {
-  .kc-too-small { display: flex; }
-  .kc-game-frame { filter: blur(1px); pointer-events: none; }
-}
 
