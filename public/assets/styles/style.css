@@ -370,4 +370,46 @@ html, body {
   }
 }
 
+/* 🌎 Global "too small" gate – CSS only, no HTML changes */
+@media (max-width: 399px), (max-height: 499px) {
+  /* lock background from scrolling */
+  html, body { overflow: hidden; }
+
+  /* softly blur main UIs if present (safe if not) */
+  .menu-frame,
+  .kc-game-frame { filter: blur(1px); }
+
+  /* reduce-motion folks: skip the blur */
+  @media (prefers-reduced-motion: reduce) {
+    .menu-frame, .kc-game-frame { filter: none; }
+  }
+
+  /* full-screen overlay message */
+  body::after {
+    content: "For the full picnic, make the window bigger or rotate your device 🌈🍧";
+    position: fixed;
+    inset: 0;                 /* cover everything */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    /* iOS safe areas, plus comfy padding */
+    padding:
+      calc(env(safe-area-inset-top, 0px) + 1rem)
+      calc(env(safe-area-inset-right, 0px) + 1rem)
+      calc(env(safe-area-inset-bottom, 0px) + 1rem)
+      calc(env(safe-area-inset-left, 0px) + 1rem);
+
+    background: rgba(0,0,0,0.82);
+    color: #00ffee;
+    font-family: 'Orbitron', monospace;
+
+    /* scales nicely on tiny screens */
+    font-size: clamp(12px, 2.2vh, 18px);
+    line-height: 1.2;
+    z-index: 2147483647; /* above everything */
+    pointer-events: auto; /* absorb taps */
+  }
+}
 

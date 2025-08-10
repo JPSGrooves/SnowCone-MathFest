@@ -315,4 +315,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: "v0.6.6-TentsUpCarsParked" };
+window.devFlags = { build: "v0.7.0-KidsCampingOpen" };

@@ -6,32 +6,28 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.6.6</h3>
+      <h3>🧠 SnowCone MathFest v0.7.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.6.6 Update – TentsUpCarsParked</h3>
+      <h3>🍦 v0.7.0 Update – TentsUpCarsParked</h3>
       <p>
-        – ♾️ Infinity Lake Mode now fully playable — intro screen, Triplet jam, math problems, XP, and high scores<br>
-        – 🎶 Background music shuffles from curated Infinity tracks — reshuffles every loop for eternal vibes<br>
-        – 🔊 Mute button now syncs with Howler state — works via mouse or keyboard (M key)<br>
-        – 🧠 Mode switching with <strong>J / K / L</strong> keys fully functional — updates visuals and generates new problems<br>
-        – 💫 Mode button glow now reflects current selection — both mouse and keyboard stay in sync<br>
-        – 💥 3–6–9 streak SFX burst added — Triplet hype plays alternating sound effects at key intervals<br>
-        – 🎉 High score and longest streak are tracked and celebrated with confetti explosions<br>
-        – ⏱️ Time played now reported at end-of-game popup — no more guessing your grind<br>
-        – 🧃 Clean problem generator handles Add/Sub, Mult/Div, and Algebra with smooth fake answer logic<br>
-        – 🧽 Fixed missing answer button values — blue and violet buttons now update properly every time<br>
-        – 🏕️ Kids Camping Parking Game now **fully complete** — all 11 cars, ordinal bonus logic, and one-minute finale scoring<br>
-        – 🔊 New <code>honk1</code> to <code>honk5</code> SFX system plays sequential honks based on car’s honk count<br>
-        – 🎺 Honk memory persists if user skips cars — resumes honk where it left off<br>
-        – 🧠 50pt ordinal bonus and 100pt under-one-minute bonus fully wired and awarded<br>
-        – 🌈 Final “All Parked!” overlay locks & fades before soft reset — looks crispy on mobile<br>
-        – 🚀 PNG preloader added for parking sprites — eliminates first-load image delay<br>
+        – 🏕️ <strong>Kids Camping v0.7.0 locked</strong> — Tent Lines, Parking, Ant Attack, and the new Mosquito mini-game all live<br>
+        – 🚗 Parking Game: all 11 cars, ordinal bonus (+50) and under-one-minute bonus (+100), smooth festival-pace drive-offs, zero jank<br>
+        – 🎺 Honk system v2: <code>honk1…honk5</code> sequence per car, honk memory persists if you skip and come back<br>
+        – 🖼️ Sprite preloader for parking art — first load stutter gone; intro lane drive-by anim toggles off on first tap<br>
+        – 🐜 Ant Attack rewrite: pure count-based tug-of-war; food moves at weight; player wins ties; direction can flip mid-pull; every round scores<br>
+        – 🧯 “Ghost score” + late red-spawn bugs squashed; clean tween redirects; food weight overlay + big snowcone polish<br>
+        – ⛺ Tent Lines: resilient SVG glow (retries, filter refresh, solid-stroke fallback), solve-all path awards +100, mobile-safe scaling<br>
+        – 🦟 Mosquito mini-game: spawns every 7s, smooth slide-in + drift, tap-to-splat at exact touch, +50 Camping Score reward<br>
+        – 🔊 SFX: <code>mosquito.mp3</code> on splat at 30% volume, respects global mute; no “haunting” — fully scoped to Kids canvas and killed on exit<br>
+        – 🎚️ Mute button synced with Howler state; AudioContext auto-unlock on first touch/click for mobile reliability<br>
+        – 🧮 XP flow: earn <strong>100 XP per 1000</strong> Camping Score (auto-tracked with MobX reaction)🎖️<br>
+        – 📱 Mobile polish: double-tap-zoom prevention, vh/clamp sizing audit, centered background, grid row locks, tidy score pop animation<br>
+        – 🧼 Cleanup discipline: global mosquito kill-switch, timers/RAF/disposers cleared, handlers unwired — no leaks, no leftovers<br>
       </p>
-
     </div>
 
     <div class="settings-block">

@@ -647,7 +647,7 @@ function clearTentGrid() {
 function playCorrect() {
   const sfx = new Howl({
     src: [`${import.meta.env.BASE_URL}assets/audio/SFX/tentSuccess.mp3`],
-    volume: 0.1
+    volume: 0.18
   });
   sfx.play();
 }

@@ -1,13 +1,69 @@
 ## 🔮 Version Roadmap (2025)
 
-- ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**
-- ✅ **v0.5.6 – QuickServe Keyboard Ascension**
-- ✅ **v0.6.0 – Infinity Mode Complete**
-- ✅ **v0.6.6 – TentsUpCarsParked**
-- 🔜 **v0.7.0 – Kids Mode Complete**
-- 🔜 **v0.8.0 – Story Mode + Narratives**
-- 🔜 **v0.9.0 – Math Tips Mode Complete**
-- 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**
+* ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**
+* ✅ **v0.5.6 – QuickServe Keyboard Ascension**
+* ✅ **v0.6.0 – Infinity Mode Complete**
+* ✅ **v0.6.6 – TentsUpCarsParked**
+* ✅ **v0.7.0 – Kids Mode Complete**
+* 🔜 **v0.8.0 – Story Mode + Narratives**
+* 🔜 **v0.9.0 – Math Tips Mode Complete**
+* 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**
+
+---
+
+## v0.7.0 — *“Bugs Swatted, Snacks Won.”* (August 8, 2025)
+
+### 🏕️ Kids Camping — Mode Complete
+
+* ✅ **Three (and mosquito) mini-games live & linked**: Tent Lines, Parking, Ant Attack — unified UI, shared score, clean transitions.
+* ✅ **Mosquito mini-game added** — drifts into the play area, tap to splat, exact-touch splat graphic, +50 Camping Score.
+
+### 🚗 Parking Game — Final Polish
+
+* Smooth, festival-pace **drive-offs** (move holder, not img; eased; longer travel off-screen).
+* All **11 cars** with ordinal flow; **+50** for correct order; **+100** if all parked **< 1 minute**.
+* **Honk engine v2**: sequential `honk1–honk5`, progress remembered per car, victory honk on park.
+* **Sprite preloader** eliminates first-load stutter; intro lane drive-by cancels on first input.
+
+### 🐜 Ant Attack — Count Wins
+
+* Pure **count-based tug-of-war**: food moves when weight met; **player wins ties**; direction can flip mid-pull.
+* Every round ends with a score; **no ghost rounds**; late AI spawns cleared on round end.
+* Weight overlay & “big snowcone” visual polish; UI synced with score updates.
+
+### ⛺ Tent Lines — Resilient Glow
+
+* Scoped SVG overlay per grid; retry & filter refresh for GPU hiccups; **solid-stroke fallback** if effects fail.
+* “Solve-all” path awards **+100** and regenerates; mobile scaling & layout locks tightened.
+
+### 🦟 Mosquito — Scoped, Chill, and Killable
+
+* **Spawns every \~7s** (initial + respawn), gentle drift with bounce-bounds inside the **Kids canvas only**.
+* **30% SFX volume** on `mosquito.mp3`, respects global mute; AudioContext unlock on first touch/click.
+* Hard **kill-switch on mode exit** (timers, RAFs, DOM, and global registry cleared) — no more hauntings.
+
+### 🧠 Scoring & XP
+
+* Camping Score unified across minigames.
+* **+100 XP per 1000 Camping Score** (MobX reaction; batches safely; no double awards).
+* Score pop animation and HUD kept stable on small viewports.
+
+### 🔊 Audio & Controls
+
+* Mute button **synced with Howler**; keyboard/touch friendly.
+* Double-tap-zoom prevention across core wrappers; buttons sized via `vh`/`clamp()` for phone comfort.
+
+### 📱 Mobile Polish
+
+* Background image truly centered; grid rows locked (no layout jumps).
+* Hit-areas tuned; animations reduced gracefully with `prefers-reduced-motion`.
+
+---
+
+### 📌 Dev Notes
+
+> *“Kids Mode finally feels like a campsite: cars cruise in, ants brawl over snacks, and that mosquito learns respect. Clean loops, no leaks, tight scaling, buttery exits. Ship it.”*
+
 
 ---
 

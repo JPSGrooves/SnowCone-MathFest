@@ -26,12 +26,108 @@ let awardedXP = 0;
 
 let parkingRoot = null;
 let previousPopCount = 0; // stores last known XP state
+// ===== Parking Intro (Mario Kart-style) =====
+let introController = null;
+let nextButtonHonkIdx = 0;
+
+function prefersReducedMotion() {
+  try { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  catch { return false; }
+}
+
+function buildIntroDOM(wrapEl) {
+  const lane = document.createElement('div');
+  lane.id = 'parkingIntroLane';
+  lane.className = 'kc-parking-intro-lane';
+  // force full row span (bulletproof)
+  lane.style.gridColumn = '1 / -1';
+  lane.style.gridRow = '2 / 3';
+  lane.style.justifySelf = 'stretch';
+  lane.style.alignSelf = 'stretch';
+
+  const carArea = wrapEl.querySelector('.kc-car-zone');
+  if (carArea?.parentNode) {
+    carArea.parentNode.insertBefore(lane, carArea);
+  } else {
+    wrapEl.appendChild(lane);
+  }
+  return lane;
+}
+
+function startParkingIntro(wrapEl) {
+  const lane = buildIntroDOM(wrapEl);
+  let stopped = false;
+  let order = shuffle([...parkingSprites]);   // random non-repeating order
+  let idx = 0;
+
+  const baseDur = prefersReducedMotion() ? 6 : 3.2;
+
+  function spawnOne() {
+    if (stopped) return;
+
+    // wrapper that actually moves across full width
+    const wrap = document.createElement('div');
+    wrap.className = 'kc-intro-car-wrap';
+    wrap.style.setProperty('--drive-dur', (baseDur + (Math.random()*0.6 - 0.3)).toFixed(2) + 's');
+
+    // pivot: flips to face-left so it’s not “driving backwards”
+    const pivot = document.createElement('div');
+    pivot.className = 'kc-intro-car-pivot';
+
+    // sprite (with bobble animation)
+    const img = document.createElement('img');
+    img.className = 'kc-intro-car';
+    img.alt = 'Rolling to the lot…';
+    img.src = `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/${order[idx] || 'car1.png'}`;
+    img.onerror = () => { img.src = `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/car1.png`; };
+
+    pivot.appendChild(img);
+    wrap.appendChild(pivot);
+    lane.appendChild(wrap);
+
+    // when the pass finishes, remove and queue the next sprite
+    const cleanupAndNext = () => {
+      wrap.remove();
+      if (stopped) return;
+      idx = (idx + 1) % order.length;
+      if (idx === 0) order = shuffle(order); // reshuffle each cycle
+      spawnOne();
+    };
+
+    wrap.addEventListener('animationend', cleanupAndNext, { once: true });
+
+    // just-in-case fallback (if animationend is ever missed)
+    const safety = setTimeout(cleanupAndNext, (parseFloat(wrap.style.getPropertyValue('--drive-dur')) * 1000) + 200);
+    wrap.addEventListener('animationend', () => clearTimeout(safety), { once: true });
+  }
+
+  spawnOne();
+
+  return {
+    stop() {
+      if (stopped) return;
+      stopped = true;
+      lane.style.transition = 'opacity 220ms ease';
+      lane.style.opacity = '0';
+      setTimeout(() => lane.remove(), 240);
+    }
+  };
+}
+
+// simple Fisher-Yates
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 
 
 
 export function initParkingGame(container) {
-  // Save reference to reset into later
+  // reset session state
   parkingRoot = container;
   honkMap.clear();
   parkedCars.clear();
@@ -49,6 +145,8 @@ export function initParkingGame(container) {
         <div class="kc-parking-intro">Park the Cars!</div>
       </div>
 
+      <!-- 🛣️ intro lane gets injected before the real car zone -->
+
       <div id="honkLabel" class="kc-honk-label kc-hidden" style="grid-area: label;"></div>
       <div id="carContainer" class="kc-car-zone kc-hidden" style="grid-area: car;"></div>
 
@@ -59,39 +157,117 @@ export function initParkingGame(container) {
     </div>
   `;
 
-  carZone = document.getElementById('carContainer');
-  honkLabel = document.getElementById('honkLabel');
-  parkBtn = document.getElementById('parkingCycleBtn');
+  const wrapEl   = container.querySelector('.kc-parking-wrap');
+  carZone        = document.getElementById('carContainer');
+  honkLabel      = document.getElementById('honkLabel');
+  parkBtn        = document.getElementById('parkingCycleBtn');
 
-  parkBtn?.addEventListener('pointerdown', () => {
+  // intro styling + animation
+  wrapEl?.setAttribute('data-intro', 'on');
+  introController = startParkingIntro(wrapEl);
+
+  // single clean handler
+  const onParkTap = () => {
+    playButtonHonk();
+
+    // tiny click pop (no duplicate)
+    parkBtn.classList.add('clicked');
+    setTimeout(() => parkBtn.classList.remove('clicked'), 140);
+
+    // tiny point tick (keeps kids rewarded)
     sessionPoints += 1;
     appState.incrementPopCount(1);
     updatePopUI?.();
 
-    parkBtn.classList.add('clicked');
-    setTimeout(() => parkBtn.classList.remove('clicked'), 200); // ⏱️ faster reset
+    // stop intro first time we interact
+    if (introController) {
+      introController.stop();
+      introController = null;
+      wrapEl?.removeAttribute('data-intro');
+    }
 
     if (!gameStarted) {
       startGameTimer();
-      document.getElementById('parkingIntro')?.classList.add('fade-out');
+      const introRow = document.getElementById('parkingIntro');
+      introRow?.classList.add('fade-out');
 
       setTimeout(() => {
-        document.getElementById('parkingIntro')?.remove();
+        introRow?.remove();
         cycleNextCar();
+        carZone?.classList.remove('kc-hidden');
+        honkLabel?.classList.remove('kc-hidden');
       }, 300);
     } else {
       cycleNextCar();
     }
+  };
+
+  parkBtn?.addEventListener('pointerdown', onParkTap, { passive: true });
+}
+
+
+// wrap the live car so we can animate the wrapper for a smooth exit
+function showCar(index) {
+  carZone.innerHTML = '';
+
+  const holder = document.createElement('div');
+  holder.className = 'kc-live-car-holder';
+  carZone.appendChild(holder);
+
+  const car = document.createElement('img');
+  const carSprite = parkingSprites[index];
+  car.src = `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/${carSprite}`;
+  car.className = 'kc-car-img';
+  car.alt = `Car ${index + 1}`;
+  car.onerror = () => {
+    console.error('🚫 Failed to load:', car.src);
+    holder.remove();                // clean the holder too
+    parkedCars.add(index);          // auto-park broken ones
+    cycleNextCar();
+  };
+
+  car.addEventListener('pointerdown', () => handleHonk(index, car));
+  holder.appendChild(car);
+
+  const honks = honkMap.get(index) || 0;
+  const arrivalText = arrivalOrder[index] || `${index + 1}th`;
+
+  honkLabel?.classList.remove('kc-hidden');
+  carZone?.classList.remove('kc-hidden');
+  honkLabel.innerHTML = renderHonkHTML(arrivalText, index, honks);
+}
+
+
+// ultra-smooth drive-out: pause bobble, then animate the wrapper left
+function driveOutCar(carEl) {
+  return new Promise((resolve) => {
+    const holder = carEl.closest('.kc-live-car-holder') || carEl;
+
+    // stop bobble/float on the IMG itself
+    carEl.style.animation = 'none';
+    carEl.style.willChange = 'auto';
+    carEl.style.pointerEvents = 'none';
+
+    // force style flush so the next animation starts clean
+    // (avoids a 1-frame jump on Safari/iOS)
+    void carEl.offsetWidth;
+
+    // GPU nudge on the wrapper + run exit anim
+    holder.style.transform = 'translateZ(0)';
+    holder.classList.add('drive-out-left');
+    holder.addEventListener('animationend', resolve, { once: true });
   });
 }
 
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
+function playButtonHonk() {
+  const sfx = new Howl({
+    src: [`${import.meta.env.BASE_URL}assets/audio/SFX/${honkSounds[nextButtonHonkIdx]}`],
+    volume: 0.15
+  });
+  sfx.play();
+  nextButtonHonkIdx = (nextButtonHonkIdx + 1) % honkSounds.length;
 }
+
 
 function cycleNextCar() {
   const totalCars = parkingSprites.length;
@@ -186,40 +362,6 @@ function triggerFinalCelebration() {
 
 
 
-
-
-
-
-function showCar(index) {
-  carZone.innerHTML = '';
-
-  const car = document.createElement('img');
-  const carSprite = parkingSprites[index];
-  car.src = `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/${carSprite}`;
-  car.className = 'kc-car-img';
-  car.alt = `Car ${index + 1}`;
-  car.onerror = () => {
-    console.error('🚫 Failed to load:', car.src);
-    car.remove(); // 🧼 cut the bad egg
-    parkedCars.add(index); // auto-park broken ones
-    cycleNextCar(); // move along!
-  };
-
-
-  car.addEventListener('pointerdown', () => handleHonk(index, car));
-  carZone.appendChild(car);
-
-  const honks = honkMap.get(index) || 0;
-  const arrivalText = arrivalOrder[index] || `${index + 1}th`;
-
-  honkLabel?.classList.remove('kc-hidden');
-  carZone?.classList.remove('kc-hidden');
-
-  honkLabel.innerHTML = renderHonkHTML(arrivalText, index, honks);
-}
-
-
-
 function handleHonk(index, carEl) {
   if (parkedCars.has(index)) return;
 
@@ -253,16 +395,18 @@ function handleHonk(index, carEl) {
     checkXPBatchAwardFromTotal();
 
     setTimeout(() => {
+      // instead of setTimeout(() => { carEl?.remove(); ... }, 800)
+      driveOutCar(carEl).then(() => { 
       carEl?.remove();
-
       if (parkedCars.size >= parkingSprites.length) {
-        // 🏁 Game done!
-        honkLabel.classList.add('kc-hidden');
-        parkBtn?.classList.add('kc-hidden');
-        triggerFinalCelebration();
+          honkLabel.classList.add('kc-hidden');
+          parkBtn?.classList.add('kc-hidden');
+          triggerFinalCelebration();
       } else {
-        cycleNextCar();
+          cycleNextCar();
       }
+      });
+
     }, 800);
   }
 }
@@ -377,7 +521,7 @@ function playHonkForCar(index) {
   const soundIndex = honksSoFar % honkSounds.length;
   const sfx = new Howl({
     src: [`${import.meta.env.BASE_URL}assets/audio/SFX/${honkSounds[soundIndex]}`],
-    volume: 0.15
+    volume: 0.18
   });
   sfx.play();
 }
