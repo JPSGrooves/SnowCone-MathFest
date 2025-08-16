@@ -254,8 +254,6 @@
 
 
 
-
-
 .il-speech {
   /* let content size the box, but cap it */
   height: auto;                /* ⬅️ was 100% */
@@ -265,7 +263,7 @@
   line-height: 1.15;
 
   /* fluid, slightly smaller baseline */
-  font-size: clamp(0.95rem, 1.3vh + 0.4rem, 1.6rem);
+  font-size: clamp(1rem, 3vh, 2rem);  /* ⬅️ THIS is the scaling fix */
 
   /* existing styles… */
   width: 100%;

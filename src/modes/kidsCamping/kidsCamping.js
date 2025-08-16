@@ -1,3 +1,4 @@
+
 // /src/modes/kidsCamping/kidsCamping.js
 import './kidsCamping.css';
 import { applyBackgroundTheme } from '../../managers/backgroundManager.js';
@@ -235,7 +236,7 @@ function renderMainUI() {
         <div class="kc-grid">
           <div class="kc-title">
             <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/rexVider.png" class="kc-icon kc-left-title" />
-            <span class="kc-title-text">Kids Camping</span>
+            <span class="kc-title-text">Camping Games</span>
             <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/triceriVider.png" class="kc-icon kc-right-title" />
           </div>
 
@@ -399,3 +400,4 @@ function returnToMenu() {
     applyBackgroundTheme();
   });
 }
+

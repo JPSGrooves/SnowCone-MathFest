@@ -386,7 +386,7 @@ html, body {
 
   /* full-screen overlay message */
   body::after {
-    content: "For the full picnic, make the window bigger or rotate your device 🌈🍧";
+    content: "For the full festival, make the window bigger or rotate your device 🍧";
     position: fixed;
     inset: 0;                 /* cover everything */
     display: flex;

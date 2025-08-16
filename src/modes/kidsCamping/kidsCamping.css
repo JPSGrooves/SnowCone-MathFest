@@ -1,3 +1,21 @@
+/* minimal: only the game frame */
+.kc-game-frame, .kc-game-frame * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;     /* no iOS press menu */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* if you need copyable text somewhere, opt-in with this */
+.allow-select {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+
+
 /* kidsCamping.css */
 .kc-wrap-hidden {
   opacity: 0;
@@ -1471,6 +1489,10 @@
   width: clamp(40px, 8vh, 60px);
   height: auto;
   object-fit: contain;
+  background: radial-gradient(circle at 30% 20%, #7b84ff, #66ff82);
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.35);
+  border-radius: 999px;
 }
 
 
@@ -1513,14 +1535,10 @@
   left: 0; right: 0; bottom: 0.5vh;
   width: 100%;
   will-change: transform;
-  animation: kc-drive-left var(--drive-dur, 3.2s) linear 1 both;
+  animation: kc-drive-left var(--drive-dur, 8.2s) linear 1 both;
 }
 
-/* RIGHT → LEFT across full lane width */
-@keyframes kc-drive-left {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(-100%); }
-}
+
 
 /* pivot handles facing; image handles bobble */
 .kc-intro-car-pivot {
@@ -1547,10 +1565,6 @@
   100% { transform: translateY(0) rotate(0deg); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .kc-intro-car-wrap { animation-duration: 6s !important; }
-  .kc-intro-car      { animation-duration: 3s !important; }
-}
 
 /* perk up the Park button while intro is active */
 .kc-parking-wrap[data-intro="on"] .kc-park-image-btn { animation-duration: 1.8s; }
@@ -1643,5 +1657,32 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mosq-sprite { animation-duration: 2.4s !important; }
+}
+
+.kc-ant-zone .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  cursor: pointer;
+  background: radial-gradient(circle at 30% 20%, #7b84ff, #66ff82);
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.35);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* pressed/toggled state */
+.kc-ant-zone .ant-btn:active {
+  transform: translateY(2px) scale(0.96);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+.kc-ant-zone .ant-btn img {
+  width: clamp(40px, 8vh, 60px);
+  height: auto;
+  object-fit: contain;
+  border-radius: 999px;
+  pointer-events: none;
 }
 
