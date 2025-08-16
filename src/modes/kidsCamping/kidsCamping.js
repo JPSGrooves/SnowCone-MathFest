@@ -1,4 +1,3 @@
-
 // /src/modes/kidsCamping/kidsCamping.js
 import './kidsCamping.css';
 import { applyBackgroundTheme } from '../../managers/backgroundManager.js';
@@ -36,6 +35,8 @@ const HANDLERS = {
   onMuteClick: null,
   onIconTwist: null,
 };
+
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 export function loadKidsMode() {
@@ -207,8 +208,9 @@ function wireAudioUnlockOnce() {
     HANDLERS.unlockAudioOnce = null;
   };
 
-  document.body.addEventListener('touchstart', HANDLERS.unlockAudioOnce, { once: false });
-  document.body.addEventListener('click', HANDLERS.unlockAudioOnce, { once: false });
+  // one-time unlock is cleaner; we remove manually in the handler above
+  document.body.addEventListener('touchstart', HANDLERS.unlockAudioOnce, { once: true });
+  document.body.addEventListener('click', HANDLERS.unlockAudioOnce, { once: true });
 }
 
 function unwireAudioUnlock() {
@@ -351,7 +353,10 @@ async function bootGames() {
   // Mosquito — LOCKED to the game container
   const host = document.querySelector(SELECTORS.container);
   if (host) {
-    mosquitoCtrl?.cleanup?.();
+    // Clean prior instance if somehow present
+    try { mosquitoCtrl?.disable?.(); } catch {}
+    try { mosquitoCtrl?.cleanup?.(); } catch {}
+
     mosquitoCtrl = initMosquitoGame({
       zoneEl: host,          // ⬅️ confined here
       spawnDelayMs: 7000,    // ⏱️ 7s
@@ -400,4 +405,3 @@ function returnToMenu() {
     applyBackgroundTheme();
   });
 }
-

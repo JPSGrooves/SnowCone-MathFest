@@ -714,7 +714,7 @@
 .kc-parking-intro {
   grid-area: intro;
   text-align: center;
-  font-size: clamp(1.4rem, 3vh, 2.8rem);
+  font-size: clamp(1rem, 2.5vh, 2rem);
   font-family: 'Orbitron', sans-serif;
   color: #ffee00;
   white-space: nowrap;         /* ✅ Prevent stacking */
@@ -726,6 +726,7 @@
   padding: 0.2rem 0.5rem;
   max-width: 100%;
   transform: translateY(12vh);
+  
 }
 
 
@@ -757,7 +758,7 @@
 
 .kc-parking-intro.fade-out {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-20px);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -1532,7 +1533,7 @@
 /* wrapper moves across ENTIRE lane width */
 .kc-intro-car-wrap {
   position: absolute;
-  left: 0; right: 0; bottom: 0.5vh;
+  left: 0; right: 0; bottom: 3.5vh;
   width: 100%;
   will-change: transform;
   animation: kc-drive-left var(--drive-dur, 8.2s) linear 1 both;

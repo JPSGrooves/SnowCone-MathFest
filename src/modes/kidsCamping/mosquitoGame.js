@@ -32,11 +32,15 @@ export function initMosquitoGame(opts = {}) {
   const timers = [];
 
   let host = zoneEl;
-  let mosq = null;      // <img>
+  let holder = null;   // <div> we translate
+  let mosq = null;     // <img> mosquito sprite
   let x = 0, y = -80;
   let vx = 0, vy = 0;
   let lastT = 0;
   let swatted = false;
+
+  // Generation token — cancels late callbacks from previous runs.
+  let gen = 0;
 
   // Watch host removal so we can self-destruct if the mode is torn down
   let hostObserver = null;
@@ -47,12 +51,14 @@ export function initMosquitoGame(opts = {}) {
   function enable() {
     if (running || !hostIsValid()) return;
     running = true;
-    schedule(spawnDelayMs, spawnOnce);
+    gen++; // new life
+    schedule(spawnDelayMs, spawnOnce, gen);
     watchHostDetach();
   }
 
   function disable() {
     running = false;
+    gen++; // invalidate any in-flight callbacks
     stopRAF();
     clearTimers();
     unwatchHostDetach();
@@ -79,10 +85,8 @@ export function initMosquitoGame(opts = {}) {
   function watchHostDetach() {
     if (hostObserver || !hostIsValid()) return;
     hostObserver = new MutationObserver(() => {
-      if (!hostIsValid()) {
-        // Host got detached → kill immediately.
-        disable();
-      }
+      // If host is removed, or its subtree nuked between frames, bail hard.
+      if (!hostIsValid()) disable();
     });
     // Observe document for subtree changes so we can notice when host leaves DOM
     hostObserver.observe(document.documentElement, { childList: true, subtree: true });
@@ -93,11 +97,11 @@ export function initMosquitoGame(opts = {}) {
     hostObserver = null;
   }
 
-  function schedule(ms, fn) {
+  function schedule(ms, fn, bornGen) {
     const id = setTimeout(() => {
       removeTimer(id);
-      if (!running || !hostIsValid()) return;
-      fn();
+      if (!running || !hostIsValid() || bornGen !== gen) return;
+      fn(bornGen);
     }, ms);
     timers.push(id);
   }
@@ -115,8 +119,9 @@ export function initMosquitoGame(opts = {}) {
   }
 
   function startRAF(loop) {
+    const bornGen = gen;
     const step = () => {
-      if (!running || !hostIsValid()) return;
+      if (!running || !hostIsValid() || bornGen !== gen) return;
       rafId = requestAnimationFrame(step);
       loop();
     };
@@ -134,14 +139,14 @@ export function initMosquitoGame(opts = {}) {
     return { x: r.left, y: r.top, w: r.width, h: r.height };
   }
 
-  function spawnOnce() {
-    if (!running || !hostIsValid()) return;
-    if (mosq) despawn();
+  function spawnOnce(bornGen = gen) {
+    if (!running || !hostIsValid() || bornGen !== gen) return;
+    despawn(); // safety (cleans prior holder/mosq if any)
 
     const b = bounds();
 
     // Holder we translate around inside host
-    const holder = document.createElement('div');
+    holder = document.createElement('div');
     holder.className = 'mosq-holder';
     holder.style.position = 'absolute'; // relative to host (host is positioned)
     holder.style.left = '0';
@@ -187,7 +192,7 @@ export function initMosquitoGame(opts = {}) {
 
     // Tap to splat
     mosq.onpointerdown = (e) => {
-      if (swatted || !running || !hostIsValid()) return;
+      if (swatted || !running || !hostIsValid() || bornGen !== gen) return;
       swatted = true;
 
       stopRAF();
@@ -200,9 +205,13 @@ export function initMosquitoGame(opts = {}) {
       mosq.style.pointerEvents = 'none';
 
       mosq.addEventListener('animationend', () => {
+        // Guard against late-calls after disable()
+        if (bornGen !== gen) return;
         despawn();
         try { onSwat?.(); } catch {}
-        if (running && hostIsValid()) schedule(respawnDelayMs, spawnOnce);
+        if (running && hostIsValid() && bornGen === gen) {
+          schedule(respawnDelayMs, spawnOnce, bornGen);
+        }
       }, { once: true });
     };
 
@@ -211,10 +220,13 @@ export function initMosquitoGame(opts = {}) {
   }
 
   function despawn() {
-    if (mosq && mosq.parentNode) {
-      const holder = mosq.parentNode;
+    if (mosq) {
+      mosq.onpointerdown = null;
+    }
+    if (holder && holder.parentNode) {
       holder.remove();
     }
+    holder = null;
     mosq = null;
   }
 
@@ -248,7 +260,6 @@ export function initMosquitoGame(opts = {}) {
     if (y < pad)     { y = pad;     vy = Math.abs(vy); }
     if (y > H - pad) { y = H - pad; vy = -Math.abs(vy); }
 
-    const holder = mosq?.parentNode;
     if (holder) {
       holder.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
     }
