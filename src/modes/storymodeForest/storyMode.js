@@ -27,7 +27,9 @@ const SFX = {
   p25: `${BASE}assets/audio/QuikServe points25.mp3`,
   p100: `${BASE}assets/audio/QuikServe points100.mp3`,
 };
-const PRO_IMG = (name) => `${BASE}assets/img/prologue/${name}`;
+// Put this where PRO_IMG is defined
+const PRO_IMG = (name) => `${import.meta.env.BASE_URL}assets/img/characters/storyMode/${name}`;
+
 
 // ---- Prologue pages: text / image(+caption) / practice(reveal items) ----
 const PROLOGUE_PAGES = [

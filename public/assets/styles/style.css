@@ -413,3 +413,34 @@ html, body {
   }
 }
 
+/* strongest cross-browser block for iOS selection + loupe + highlights */
+:root,
+:root *:not(.allow-select):not(input):not(textarea) {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important; /* no iOS press menu */
+  -webkit-tap-highlight-color: transparent !important;
+  caret-color: transparent !important;
+}
+
+/* kill double-tap/pinch; iOS honors 'none' better than 'manipulation' */
+#game-container,
+#game-container * {
+  touch-action: none !important;
+}
+
+/* if anything ever does get selected, make it invisible */
+#game-container ::selection,
+#game-container *::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* if you need copyable text somewhere, opt-in */
+.allow-select,
+.allow-select * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+  caret-color: auto !important;
+}

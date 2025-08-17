@@ -346,3 +346,39 @@
 .sm-reveal-answer { display: none; color: #9ff; text-shadow: 0 0 8px rgba(0,255,238,.45); font-family: "Orbitron", system-ui, sans-serif; }
 .sm-reveal-answer.is-open { display: block; }
 
+/* --- simple, global shrink for story mode (no JS, no vars) --- */
+
+
+/* prologue typing screen (the big one) */
+.sm-type {
+  font-size: clamp(0.95rem, 1vh + .75rem, 2rem);
+  line-height: 1.22;
+}
+
+/* slide text after typing */
+.sm-slide-text {
+  font-size: clamp(0.95rem, 0.85vh + 0.75rem, 1.20rem);
+  line-height: 1.22;
+}
+
+/* practice prompts */
+.sm-reveal-prompt {
+  font-size: clamp(0.9rem, 0.8vh + 0.45rem, 1.10rem);
+}
+
+/* chapter title */
+.sm-chapter-title {
+  font-size: clamp(1.0rem, 1.0vh + 0.55rem, 1.30rem);
+}
+
+/* buttons */
+.sm-btn {
+  font-size: clamp(0.85rem, 0.85vh + 0.35rem, 1.00rem);
+}
+
+/* optional: tiny screens get an extra nudge down */
+@media (max-width: 380px), (max-height: 640px) {
+  .sm-slide-text   { font-size: clamp(0.90rem, 0.8vh + 0.45rem, 1.05rem); }
+  .sm-speech       { font-size: clamp(0.90rem, 1.0vh + 0.40rem, 1.05rem); }
+  .sm-btn          { font-size: clamp(0.80rem, 0.8vh + 0.30rem, 0.95rem); }
+}

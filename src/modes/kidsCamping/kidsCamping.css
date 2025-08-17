@@ -1686,4 +1686,36 @@
   border-radius: 999px;
   pointer-events: none;
 }
+/* add/keep this */
+.kc-no-zoom, .kc-no-zoom * {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
 
+.kc-no-select, .kc-no-select *:not(.allow-select):not(input):not(textarea) {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important; /* iOS long-press menu */
+}
+
+/* make selection overlay invisible just in case */
+.kc-no-select ::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+.kc-no-select *::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+.kc-no-drag img, .kc-no-drag a, .kc-no-drag svg {
+  -webkit-user-drag: none; user-drag: none;
+}
+
+html.kc-no-zoom, body.kc-no-zoom { overscroll-behavior: contain; }
+
+.allow-select {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+}

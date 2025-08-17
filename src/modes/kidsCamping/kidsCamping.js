@@ -10,6 +10,8 @@ import { stopTrack, playTrack } from '../../managers/musicManager.js';
 import { initParkingGame } from './parkingGame.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 import { initMosquitoGame } from './mosquitoGame.js';
+import { enableGestureCage, disableGestureCage } from '../../utils/gestureCage.js';
+import { enableIosLoupeKiller, disableIosLoupeKiller } from '../../utils/iosLoupeKiller.js';
 
 // ────────────────────────────────────────────────────────────────────────────────
 // State
@@ -35,10 +37,14 @@ const HANDLERS = {
 // Public API
 // ────────────────────────────────────────────────────────────────────────────────
 export function loadKidsMode() {
+  enableIosLoupeKiller(document.getElementById('game-container'));
+  enableGestureCage();                 // ⬅️ turn the cage on
   // Reset score & set mode
   runInAction(() => { appState.popCount = 0; });
   appState.setMode('kids');
   updatePopUI();
+
+  disableNoSelectForKids();
 
   // Show container, hide menu
   const container = document.querySelector(SELECTORS.container);
@@ -70,6 +76,9 @@ export function loadKidsMode() {
 }
 
 export async function stopKidsMode() {
+  disableIosLoupeKiller(document.getElementById('game-container'));
+  disableGestureCage();                // ⬅️ lift the cage
+  disableNoSelectForKids();
   try { stopTrack(); } catch {}
   try { cleanupTentLineGame(); } catch {}
 
@@ -144,7 +153,7 @@ function renderIntroScreen() {
         <div class="kc-intro">
           <div class="kc-intro-stack">
             <div class="kc-speech">
-              Hello! We're the Dino Dividers! Let's play some camping games!
+              Heyo! We're the Dino Dividers! Let's chill out and play some camping games!
             </div>
             <div class="director-wrapper">
               <img id="directorSpriteIntro" class="director-img"
@@ -438,3 +447,33 @@ function returnToMenu() {
   });
 }
 
+// at module scope
+const NOSEL = (globalThis.__KC_NOSEL__ ||= {});
+
+function enableNoSelectForKids() {
+  document.documentElement.classList.add('kc-no-select', 'kc-no-drag');
+
+  // Block context menu / selection / drag (but allow inside .allow-select and form fields)
+  NOSEL.blockCtx = (e) => e.preventDefault();
+  NOSEL.blockSelect = (e) => {
+    const t = e.target;
+    if (t.closest('.allow-select')) return;
+    if (/INPUT|TEXTAREA/.test(t.tagName)) return;
+    e.preventDefault();
+  };
+  NOSEL.blockDrag = (e) => e.preventDefault();
+
+  document.addEventListener('contextmenu', NOSEL.blockCtx);
+  document.addEventListener('selectstart', NOSEL.blockSelect);
+  document.addEventListener('dragstart', NOSEL.blockDrag);
+}
+
+function disableNoSelectForKids() {
+  document.documentElement.classList.remove('kc-no-select', 'kc-no-drag');
+
+  document.removeEventListener('contextmenu', NOSEL.blockCtx);
+  document.removeEventListener('selectstart', NOSEL.blockSelect);
+  document.removeEventListener('dragstart', NOSEL.blockDrag);
+
+  NOSEL.blockCtx = NOSEL.blockSelect = NOSEL.blockDrag = null;
+}
