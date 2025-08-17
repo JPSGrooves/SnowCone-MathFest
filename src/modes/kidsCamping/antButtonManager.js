@@ -1,10 +1,11 @@
+/*
 // src/modes/kidsCamping/antButtonManager.js
+// Commented out as it's not needed; antAttack.js handles ant deployment fully
 let readyAnts = 10;
 const maxAnts = 10;
 
-// Update DOM refs to match class, not ID
 const antButton = document.getElementById('kc-ant-button');
-const antOverlay = document.querySelector('.ant-count'); // Changed to class
+const antOverlay = document.querySelector('.ant-count');
 
 export function initAntButtonManager() {
   if (!antOverlay) {
@@ -25,13 +26,13 @@ function onAntClick() {
 }
 
 function updateAntOverlay() {
-  antOverlay.textContent = `${readyAnts}/10`; // Update to show current count
+  antOverlay.textContent = `${readyAnts}/10`;
   antButton.classList.toggle('disabled', readyAnts <= 0);
 }
 
 export function regenAnts(resultType) {
   let bonus = { great: 5, good: 4, loss: 3 }[resultType] || 0;
-  readyAnts = Math.min(maxAnts, readyAnts + bonus); // Cap at 10
+  readyAnts = Math.min(maxAnts, readyAnts + bonus);
   updateAntOverlay();
 }
 
@@ -39,3 +40,4 @@ export function resetAntPool() {
   readyAnts = maxAnts;
   updateAntOverlay();
 }
+*/

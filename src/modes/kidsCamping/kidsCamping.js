@@ -9,11 +9,10 @@ import { runInAction, reaction } from 'mobx';
 import { stopTrack, playTrack } from '../../managers/musicManager.js';
 import { initParkingGame } from './parkingGame.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
-import { initAntButtonManager } from './antButtonManager.js';
 import { initMosquitoGame } from './mosquitoGame.js';
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Module-level state
+// State
 // ────────────────────────────────────────────────────────────────────────────────
 let mosquitoCtrl = null;
 let xpDisposer   = null;
@@ -24,10 +23,6 @@ const SELECTORS = {
   menuWrapper: '.menu-wrapper',
 };
 
-const TRACKS = {
-  sc90: `${import.meta.env.BASE_URL}assets/audio/sc90.mp3`,
-};
-
 const HANDLERS = {
   unlockAudioOnce: null,
   onStartCamping: null,
@@ -36,8 +31,8 @@ const HANDLERS = {
   onIconTwist: null,
 };
 
-
-
+// ────────────────────────────────────────────────────────────────────────────────
+// Public API
 // ────────────────────────────────────────────────────────────────────────────────
 export function loadKidsMode() {
   // Reset score & set mode
@@ -70,44 +65,52 @@ export function loadKidsMode() {
   // XP watcher (100 XP / 1000 score)
   startXPWatcher();
 
-  // Defensive tap-zoom prevention
+  // Prevent accidental zoom
   document.querySelectorAll('.kc-aspect-wrap, .kc-game-frame').forEach(preventDoubleTapZoom);
 }
 
-export function stopKidsMode() {
-  // Stop music and tent game
-  stopTrack();
-  cleanupTentLineGame();
+export async function stopKidsMode() {
+  try { stopTrack(); } catch {}
+  try { cleanupTentLineGame(); } catch {}
 
-  // Mosquito: confined to #game-container, but still cancel timers/raf
+  // 🔴 HARD KILL Ant Attack
+  const container = document.querySelector(SELECTORS.container);
+  try {
+    const antMod = await import('./antAttack.js');
+    const antZone = container?.querySelector('#antZone');
+    if (antZone && typeof antMod.destroyAntAttackGame === 'function') {
+      antMod.destroyAntAttackGame(antZone);
+    }
+    antMod.forceKillAntAttack?.();   // double-tap kill (timers/session)
+  } catch {}
+
+  // Mosquito
   try { mosquitoCtrl?.disable?.(); } catch {}
   try { mosquitoCtrl?.cleanup?.(); } catch {}
   mosquitoCtrl = null;
 
   // Unwire handlers
-  unwireIntroHandlers();
-  unwireMainHandlers();
-  unwireAudioUnlock();
+  try { unwireIntroHandlers(); } catch {}
+  try { unwireMainHandlers(); } catch {}
+  try { unwireAudioUnlock(); } catch {}
 
-  // Clear container (removes any leftover mosq holders/splats because they’re children)
-  const container = document.querySelector(SELECTORS.container);
-  if (container) {
-    container.innerHTML = '';
-    container.classList.add('hidden');
-    container.style.display = 'none';
-  }
+  // Clear container
+  try {
+    if (container) {
+      container.innerHTML = '';
+      container.classList.add('hidden');
+      container.style.display = 'none';
+    }
+  } catch {}
 
-  // Stop XP watcher and reset score
   try { xpDisposer?.(); } catch {}
   xpDisposer = null;
   appState.popCount = 0;
   updatePopUI();
 
-  // Restore menu bg
-  applyBackgroundTheme();
-
   console.log('🏕️ Kids Camping Mode cleaned up!');
 }
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // XP watcher
@@ -166,6 +169,9 @@ function wireIntroHandlers() {
   };
 
   HANDLERS.onStartCamping = async () => {
+    if (globalThis.__KC_BOOT_LOCK__) return;  // prevent double-boot
+    globalThis.__KC_BOOT_LOCK__ = true;
+
     const introEl = document.querySelector('.kc-intro');
     if (!introEl) return;
     introEl.classList.add('fade-out');
@@ -208,7 +214,6 @@ function wireAudioUnlockOnce() {
     HANDLERS.unlockAudioOnce = null;
   };
 
-  // one-time unlock is cleaner; we remove manually in the handler above
   document.body.addEventListener('touchstart', HANDLERS.unlockAudioOnce, { once: true });
   document.body.addEventListener('click', HANDLERS.unlockAudioOnce, { once: true });
 }
@@ -311,64 +316,82 @@ function unwireMainHandlers() {
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Boot games (now mosquito is confined to #game-container)
+// Boot games (mosquito confined to #game-container)
 // ────────────────────────────────────────────────────────────────────────────────
 async function bootGames() {
-  // Tent Line
-  const tentZone = document.querySelector('.kc-tent-zone');
-  if (tentZone) {
-    tentZone.innerHTML = '';
-    const tentGameEl = createTentLineGame((score) => {
-      appState.incrementPopCount(score);
-      updatePopUI();
-      animatePopCount();
-    });
-    tentZone.appendChild(tentGameEl);
-  } else {
-    console.warn('⚠️ .kc-tent-zone not found');
-  }
+  // local guard (survives HMR via global)
+  const R = (globalThis.__KC_RUNTIME__ ||= { booting:false, booted:false });
 
-  // Parking
-  const parkingZone = document.getElementById('parkingZone');
-  if (parkingZone) {
-    initParkingGame(parkingZone);
-  } else {
-    console.warn('⚠️ #parkingZone not found in .kc-slider-cell');
+  if (R.booting) {
+    console.warn('[kc] bootGames: already booting — skip');
+    return;
   }
+  R.booting = true;
+  console.log('[kc] bootGames: enter');
 
-  // Ant Attack
-  const antZone = document.getElementById('antZone');
-  if (antZone) {
+  try {
+    // 0) Ant Attack: kill any leftover timers/tweens before init (idempotent)
     try {
-      const { initAntAttackGame } = await import('./antAttack.js');
-      initAntAttackGame(antZone, updatePopUI);
-      initAntButtonManager();
-    } catch (err) {
-      console.error('Failed to initialize ant attack game:', err);
-    }
-  } else {
-    console.warn('⚠️ #antZone not found');
-  }
+      const antMod = await import('./antAttack.js');
+      antMod.forceKillAntAttack?.();
+    } catch {}
 
-  // Mosquito — LOCKED to the game container
-  const host = document.querySelector(SELECTORS.container);
-  if (host) {
-    // Clean prior instance if somehow present
-    try { mosquitoCtrl?.disable?.(); } catch {}
-    try { mosquitoCtrl?.cleanup?.(); } catch {}
-
-    mosquitoCtrl = initMosquitoGame({
-      zoneEl: host,          // ⬅️ confined here
-      spawnDelayMs: 7000,    // ⏱️ 7s
-      respawnDelayMs: 7000,  // ⏱️ 7s
-      baseSpeed: 80,
-      onSwat() {
-        appState.incrementPopCount(50);  // +50 reward
+    // 1) Tent Line
+    const tentZone = document.querySelector('.kc-tent-zone');
+    if (tentZone) {
+      tentZone.innerHTML = '';
+      const tentGameEl = createTentLineGame((score) => {
+        appState.incrementPopCount(score);
         updatePopUI();
         animatePopCount();
+      });
+      tentZone.appendChild(tentGameEl);
+    }
+
+    // 2) Parking
+    const parkingZone = document.getElementById('parkingZone');
+    if (parkingZone) {
+      initParkingGame(parkingZone);
+    }
+
+    // 3) Ant Attack — build UI once
+    const antZone = document.getElementById('antZone');
+    if (antZone) {
+      try {
+        const { initAntAttackGame } = await import('./antAttack.js');
+        if (!antZone.dataset.kcAntInit) {
+          antZone.dataset.kcAntInit = '1';
+          initAntAttackGame(antZone, updatePopUI);
+        }
+      } catch (err) {
+        console.error('[kc] bootGames: antAttack init failed', err);
       }
-    });
-    mosquitoCtrl.enable();
+    }
+
+    // 4) Mosquito — confined to the game container
+    const host = document.querySelector(SELECTORS.container);
+    if (host) {
+      try { mosquitoCtrl?.disable?.(); } catch {}
+      try { mosquitoCtrl?.cleanup?.(); } catch {}
+      mosquitoCtrl = initMosquitoGame({
+        zoneEl: host,
+        spawnDelayMs: 7000,
+        respawnDelayMs: 7000,
+        baseSpeed: 80,
+        onSwat() {
+          appState.incrementPopCount(50);
+          updatePopUI();
+          animatePopCount();
+        }
+      });
+      mosquitoCtrl.enable();
+    }
+
+    console.log('[kc] bootGames: done');
+  } finally {
+    R.booting = false;
+    R.booted  = true;
+    globalThis.__KC_BOOT_LOCK__ = false; // allow future clicks
   }
 }
 
@@ -399,9 +422,19 @@ function applyMuteVisual(btn) {
 // Navigation
 // ────────────────────────────────────────────────────────────────────────────────
 function returnToMenu() {
-  playTransition(() => {
-    stopKidsMode();
+  playTransition(async () => {
+    try {
+      await stopKidsMode();
+      // extra hard stop in case anything was mid-tick
+      try {
+        const { forceKillAntAttack } = await import('./antAttack.js');
+        forceKillAntAttack?.();
+      } catch {}
+    } catch (e) {
+      console.error('[kc] returnToMenu: stopKidsMode error', e);
+    }
     document.querySelector(SELECTORS.menuWrapper)?.classList.remove('hidden');
     applyBackgroundTheme();
   });
 }
+
