@@ -6,15 +6,25 @@ let rafId = null;
 const fadeDuration = 1000;
 
 // 🔥 Track List
+// managers/musicManager.js
+// ...existing imports & code...
+
+// 🔥 Track List
 const tracks = [
-  { id: 'quikserve', name: 'QuikServe OG', file: 'quikserveST_OG.mp3' },
-  { id: 'kktribute', name: 'KK Tribute', file: 'KKtribute.mp3' },
-  { id: 'softdown', name: 'Soft Down Math Vibes', file: 'softDownMathVibes.mp3' },
-  { id: 'infadd', name: 'Infinity Addition', file: 'InfinityAddition.mp3' },
-  { id: 'sc90', name: 'SnowCone 90', file: 'sc_90.mp3' },
-  { id: 'nothingorg', name: 'Nothing Organic', file: 'nothing_organic.mp3' },
-  { id: 'secrets', name: 'Secrets of Math', file: 'secretsOfMath.mp3' },
+  { id: 'quikserve',  name: 'QuikServe OG',         file: 'quikserveST_OG.mp3' },
+  { id: 'kktribute',  name: 'KK Tribute',           file: 'KKtribute.mp3' },
+  { id: 'softdown',   name: 'Soft Down Math Vibes', file: 'softDownMathVibes.mp3' },
+  { id: 'infadd',     name: 'Infinity Addition',    file: 'InfinityAddition.mp3' },
+  { id: 'sc90',       name: 'SnowCone 90',          file: 'sc_90.mp3' },
+  { id: 'nothingorg', name: 'Nothing Organic',      file: 'nothing_organic.mp3' },
+  { id: 'secrets',    name: 'Secrets of Math',      file: 'secretsOfMath.mp3' },
+
+  // ➕ ADD THIS:
+  { id: 'prologue',   name: 'Story Prologue',       file: 'prologueTrack.mp3' },
 ];
+
+// ...rest of file unchanged...
+
 
 let looping = false;
 let shuffling = false;
@@ -36,7 +46,7 @@ export function playTrack(id = getFirstTrackId()) {
     currentTrack = new Howl({
       src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${track.file}`],
       loop: looping,
-      volume: Howler._muted ? 0 : 1,
+      volume: 1,//*changed from volume: Howler._muted ? 0 : 1, *//      
       html5: true,
 
       onplay: () => {

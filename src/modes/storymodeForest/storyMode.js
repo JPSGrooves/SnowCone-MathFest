@@ -2,8 +2,20 @@ import './storyMode.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
-
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
+// top of storyMode.js imports:
+// storyMode.js (top)
+import {
+  playTrack,
+  stopTrack,
+  toggleMute,
+  isMuted,
+  toggleLoop,
+  getLooping,
+  currentTrackId,
+  isPlaying,
+} from '../../managers/musicManager.js';
+
 
 
 
@@ -15,12 +27,13 @@ const SELECTORS = {
 let elRoot = null;  // .sm-aspect-wrap in current screen
 let keyHandler = null;
 let clickHandler = null;
+let smAudioUnlockOnce = null;
 
 // Assets
 const BASE = import.meta.env.BASE_URL;
 const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
 const DIRECTOR_SRC = `${BASE}assets/img/characters/storyMode/jehnk.png`;
-const PROLOGUE_TRACK = `${BASE}assets/audio/prologueTrack.mp3`; // <— drop your file here
+
 
 // ---- Prologue assets (adjust if your paths differ) ----
 const SFX = {
@@ -38,7 +51,7 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.4em; color: yellow;">Why Math? Why Now? 🤔</strong><br>
+        <strong style="font-size:1.4em; color: yellow;">How it all Started..</strong><br>
         I hated math when I was young.<br>
         It was cold 🥶. It was lifeless 💀. It was just numbers 🔢.<br>
         I needed it to move 🕺💃. To sing 🎶🎤. To matter ❤️.<br>
@@ -275,19 +288,6 @@ const PROLOGUE_PAGES = [
   { type: 'image', src: PRO_IMG('finalsnowconepicture.png'), caption: "Galileo and Newton are ready for a SnowCone!" },
 ];
 
-// Simple audio handle (start after user gesture)
-let bgm;
-/** safe music start on user gesture */
-function ensureMusic() {
-  try {
-    if (!bgm) {
-      bgm = new Audio(PROLOGUE_TRACK);
-      bgm.loop = true;
-      bgm.volume = 0.55;
-    }
-    bgm.play().catch(() => {/* mobile needs further UI tap; that's OK */});
-  } catch {}
-}
 
 // Typing helper
 function typeInto(node, text, { cps = 35, onDone } = {}) {
@@ -372,22 +372,31 @@ function loadStoryMode() {
   }
 
   renderIntroScreen();
-  // ✅ add this line to harden mobile taps
+  wireHandlersForCurrentRoot();
   document.querySelectorAll('.sm-aspect-wrap, .sm-game-frame, .sm-intro').forEach(preventDoubleTapZoom);
 
-  wireHandlersForCurrentRoot();
+  // 🔓 Make sure Howler is unlockable on first tap
+  wireSMAudioUnlockOnce();
 }
 
 export function stopStoryMode() {
   unwireHandlers();
+  unwireSMAudioUnlock();
+
+  try { stopTrack(); } catch {}
+
+  // reset loop so other modes behave normally
+  try { if (getLooping()) toggleLoop(); } catch {}
+
   const container = document.querySelector(SELECTORS.container);
   if (container) {
     container.classList.add('hidden');
     container.style.display = 'none';
   }
-  try { bgm?.pause(); } catch {}
   applyBackgroundTheme();
 }
+
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Screens
@@ -472,8 +481,12 @@ function renderChapterMenu() {
             Pick Prologue to begin. The others will unlock soon.
           </div>
 
-          <div class="sm-intro-buttons" style="margin-top: auto;">
-            <button id="smBackToMenu" class="sm-btn sm-btn-secondary">🔙 Back to Menu</button>
+          <!-- Bottom utility bar: left=Back, right=Mute (last chance) -->
+          <div class="sm-bottom-bar">
+            <button id="smBackToMenu" class="sm-square-btn sm-left">🔙</button>
+            <button id="smMute" class="sm-square-btn sm-right ${isMuted() ? 'muted' : ''}">
+              ${isMuted() ? '🔇' : '🔊'}
+            </button>
           </div>
         </section>
       </div>
@@ -482,7 +495,17 @@ function renderChapterMenu() {
 
   elRoot = container.querySelector('.sm-aspect-wrap');
   repaintBackground();
+
+  // ✅ Start prologue music only if not already playing
+  if (!(isPlaying() && currentTrackId() === 'prologue')) {
+    playTrackUnlocked('prologue');
+    if (!getLooping()) toggleLoop(); // loop Prologue
+  }
+
+  // ✅ Let the global handler own all clicks/keys
+  wireHandlersForCurrentRoot();
 }
+
 
 function renderPrologueReader() {
   const container = document.querySelector(SELECTORS.container);
@@ -501,7 +524,7 @@ function renderPrologueReader() {
           </div>
           <div class="sm-prologue-controls">
             <button id="smSkipType" class="sm-btn sm-btn-secondary">⏩ Skip</button>
-            <button id="smReady" class="sm-btn sm-btn-primary" style="display:none">🎵 I’m Ready</button>
+            <button id="smReady" class="sm-btn sm-btn-primary" style="display:none">I’m Ready</button>
           </div>
         </section>
       </div>
@@ -511,52 +534,56 @@ function renderPrologueReader() {
   elRoot = container.querySelector('.sm-aspect-wrap');
   repaintBackground();
 
+
+  // ⌨️ Typewriter effect
   const node = elRoot.querySelector('#smTypeNode');
   const doneFast = typeInto(node, PROLOGUE_SCRIPT.trim(), {
     cps: 40,
     onDone: () => {
       const ready = elRoot.querySelector('#smReady');
       const skip  = elRoot.querySelector('#smSkipType');
-      if (skip) skip.style.display = 'none';
+      if (skip)  skip.style.display  = 'none';
       if (ready) ready.style.display = '';
     }
   });
 
-  // Wire the local buttons for this screen
-  unwireHandlers();
-  clickHandler = (e) => {
-    if (e.target.closest('#smSkipType')) {
-      doneFast();
-    } else if (e.target.closest('#smReady')) {
-      ensureMusic();     // start music on user gesture
-      renderPrologueSlides();
-      wireHandlersForCurrentRoot();
-    } else if (e.target.closest('#smBackToMenu')) {
-      backToMainMenu();
-    }
-  };
-  window.addEventListener('keydown', keyHandler = (e) => {
-    if (e.key === 'Enter') {
-      const ready = elRoot.querySelector('#smReady');
-      if (ready && ready.style.display !== 'none') {
-        ready.click();
-      } else {
-        const skip = elRoot.querySelector('#smSkipType');
-        skip?.click();
-      }
-      e.preventDefault();
-    } else if (e.key === 'Escape') {
-      backToMainMenu();
-      e.preventDefault();
-    }
-  });
-  elRoot?.addEventListener('click', clickHandler);
+  // Make Skip button callable from global handler
+  elRoot.__smDoneFast = doneFast;
+
+  // 🌍 Single handler wiring
+  wireHandlersForCurrentRoot();
 }
+
+
 
 let slideIndex = 0;
 function renderPrologueSlides() {
   slideIndex = 0;
   drawSlide();
+}
+
+function wireSMAudioUnlockOnce() {
+  if (smAudioUnlockOnce) return;
+  smAudioUnlockOnce = () => {
+    try {
+      const H = window.Howler ?? globalThis.Howler;
+      if (H?.ctx && H.ctx.state === 'suspended') {
+        H.ctx.resume().then(() => console.log('🔓 [SM] Howler AudioContext unlocked'));
+      }
+    } catch {}
+    document.body.removeEventListener('touchstart', smAudioUnlockOnce);
+    document.body.removeEventListener('click', smAudioUnlockOnce);
+    smAudioUnlockOnce = null;
+  };
+  document.body.addEventListener('touchstart', smAudioUnlockOnce, { once: true });
+  document.body.addEventListener('click', smAudioUnlockOnce, { once: true });
+}
+
+function unwireSMAudioUnlock() {
+  if (!smAudioUnlockOnce) return;
+  document.body.removeEventListener('touchstart', smAudioUnlockOnce);
+  document.body.removeEventListener('click', smAudioUnlockOnce);
+  smAudioUnlockOnce = null;
 }
 
 function drawSlide() {
@@ -646,6 +673,15 @@ function wireHandlersForCurrentRoot() {
       backToMainMenu();
       return;
     }
+    if (e.target.closest('#smMute')) {
+      const muted = toggleMute();
+      const btn = elRoot.querySelector('#smMute');
+      if (btn) {
+        btn.textContent = muted ? '🔇' : '🔊';
+        btn.classList.toggle('muted', muted);
+      }
+      return;
+    }
     if (e.target.closest('#smHearStory')) {
       renderChapterMenu();
       wireHandlersForCurrentRoot();
@@ -655,6 +691,16 @@ function wireHandlersForCurrentRoot() {
       renderPrologueReader();
       return;
     }
+    // 🆕 Prologue typing screen
+    if (e.target.closest('#smSkipType')) {
+      elRoot?.__smDoneFast?.();
+      return;
+    }
+    if (e.target.closest('#smReady')) {
+      renderPrologueSlides();
+      return;
+    }
+    // Slides
     if (e.target.closest('#smNext')) {
       slideIndex++;
       drawSlide();
@@ -671,12 +717,46 @@ function wireHandlersForCurrentRoot() {
     if (e.key === 'Escape') {
       backToMainMenu();
       e.preventDefault();
-    } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
-      const next = elRoot.querySelector('#smNext');
+      return;
+    }
+
+    // 🆕 Handle Enter across contexts
+    if (e.key === 'Enter') {
+      // 1) Typing screen: prefer Ready if visible, else Skip
+      const ready = elRoot?.querySelector('#smReady');
+      const skip  = elRoot?.querySelector('#smSkipType');
+      if (ready && ready.style.display !== 'none') {
+        ready.click();
+        e.preventDefault();
+        return;
+      }
+      if (skip) {
+        skip.click();
+        e.preventDefault();
+        return;
+      }
+      // 2) Slides: Next
+      const next = elRoot?.querySelector('#smNext');
+      if (next) {
+        next.click();
+        e.preventDefault();
+        return;
+      }
+      // 3) Intro / Chapter menu fallback
+      const pro = elRoot?.querySelector('#smPrologue') || elRoot?.querySelector('#smHearStory');
+      if (pro) {
+        pro.click();
+        e.preventDefault();
+        return;
+      }
+    }
+
+    if (e.key === 'ArrowRight') {
+      const next = elRoot?.querySelector('#smNext') || elRoot?.querySelector('#smPrologue');
       next?.click();
       e.preventDefault();
     } else if (e.key === 'ArrowLeft') {
-      const prev = elRoot.querySelector('#smPrev');
+      const prev = elRoot?.querySelector('#smPrev');
       prev?.click();
       e.preventDefault();
     }
@@ -685,6 +765,7 @@ function wireHandlersForCurrentRoot() {
   elRoot?.addEventListener('click', clickHandler);
   window.addEventListener('keydown', keyHandler);
 }
+
 
 function unwireHandlers() {
   if (elRoot && clickHandler) elRoot.removeEventListener('click', clickHandler);
@@ -718,3 +799,21 @@ function repaintBackground() {
 
 // ensure named exports exist
 export { loadStoryMode };
+
+function playTrackUnlocked(id) {
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+
+    // Make sure master is unmuted before constructing/playing the Howl
+    if (H && H._muted) H.mute(false);
+
+    // Best-effort WebAudio unlock (does nothing if html5:true, but harmless)
+    if (H?.ctx && H.ctx.state === 'suspended') {
+      // Don't await; keep synchronous gesture timing
+      H.ctx.resume().catch(() => {});
+    }
+  } catch {}
+
+  // Play immediately in the same click stack
+  try { playTrack(id); } catch {}
+}
