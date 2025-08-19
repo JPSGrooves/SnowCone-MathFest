@@ -15,6 +15,8 @@ import {
   currentTrackId,
   isPlaying,
 } from '../../managers/musicManager.js';
+// managers/sfxManager.js
+import { Howl } from 'howler';
 
 
 
@@ -29,6 +31,10 @@ let keyHandler = null;
 let clickHandler = null;
 let smAudioUnlockOnce = null;
 
+let __smAudioCtx = null;
+let __lastInterval = '';
+let __lastPlayTs = 0;
+
 // Assets
 const BASE = import.meta.env.BASE_URL;
 const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
@@ -36,7 +42,7 @@ const DIRECTOR_SRC = `${BASE}assets/img/characters/storyMode/jehnk.png`;
 
 
 // ---- Prologue assets (adjust if your paths differ) ----
-const SFX = {
+const SFX_PATHS = {
   p25: `${BASE}assets/audio/QuikServe points25.mp3`,
   p100: `${BASE}assets/audio/QuikServe points100.mp3`,
 };
@@ -47,21 +53,32 @@ const PRO_IMG = (name) => `${import.meta.env.BASE_URL}assets/img/characters/stor
 // ---- Prologue pages: text / image(+caption) / practice(reveal items) ----
 const PROLOGUE_PAGES = [
   // Page 1 — Why Math? Why Now?
-  {
-    type: 'html',
-    html: `
+{
+  type: 'html',
+  html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.4em; color: yellow;">How it all Started..</strong><br>
         I hated math when I was young.<br>
         It was cold 🥶. It was lifeless 💀. It was just numbers 🔢.<br>
         I needed it to move 🕺💃. To sing 🎶🎤. To matter ❤️.<br>
         That's why I started the SnowCone MathFest 🍧🚚🎉.<br>
-        After the first year... strange things happened 🌌.<br><br>
-        Ghosts started arriving 👻✨ — ancient, glowing numbers whispering in the wind.<br>
+        <img src="${PRO_IMG('boredJehnk.png')}" alt="Jehnk bored in math class" class="sm-slide-image">
+      </div>`
+  },
+
+  // Page 1A — after the first year
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style="font-size:1.4em; color: yellow;">After the first year...</strong><br>
+        ... strange things started happening 🌌.<br><br>
+        Ghosts arrived 👻✨ — ancient, glowing numbers whispering in the wind.<br>
         I realized I had been seeing them my whole life, hidden in the columns before me...<br>
-        but only now were they seeing me too 👀🔮.<br>
+        but now, they were seeing me too 👀🔮.<br><br>
         As I stood at the gates 🏰🍧, slinging SnowCones to the masses in the mystical moist night-air 🎊🍦,
         I heard the first ghost walk by and say… 🎶👂
+        <img src="${PRO_IMG('iceyTruck.png')}" alt="crystal ice truck" class="sm-slide-image">
       </div>`
   },
 
@@ -70,75 +87,105 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.2em; color: yellow;">Pythagorus - Song of Fractions</strong><br>
-        <span style="color:#00ccff;">"Music is the math you already know 🎶 — deep in your bones 💀🎸.
+        <strong style="font-size:1.2em; color: yellow;">Pythagorus - Song of Fractions</strong><br><br>
+        <span style="color:#00ccff;">"Music is the math you already know 🎶 — deep in your bones 💀🎸.<br><br>
         When you go up the string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️,
-        yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint.
-        It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points."</span><br><br>
-        I served him a SnowCone 🍧 and knew that here at SnowCone MathFest 🌈🎉,
-        every neon beat is an octave you’ve already unlocked 🎵🔓 —
+        yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint.<br><br>
+        It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points."</span>
+      </div>`
+  },
+  // Page 3 — Pythagorus image
+  { type: 'image', src: PRO_IMG('pythagoraspicture.png'), caption: "Pythagorus Eyes the Gates" },
+    // Page 2A — Pythagorus text response
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <img src="${PRO_IMG('cosmicCone.png')}" 
+            alt="cosmic cone" 
+            class="sm-slide-image sm-cosmic">
+        <strong style="font-size:1.2em; color: yellow;">I served him a SnowCone 🍧...</strong><br>
+        ...and knew that here at SnowCone MathFest 🌈🎉,
+        every neon beat is an octave you’ve already unlocked 🎵🔓 —<br><br>
         Maybe we're always just halfway to the next octave, but we can always discover the hidden frequencies
         singing along our path 👆🎶.
       </div>`
   },
 
-  // Page 3 — Pythagorus image
-  { type: 'image', src: PRO_IMG('pythagoraspicture.png'), caption: "Pythagorus Eyes the Gates" },
 
   // Page 4 — Pythagorus practice
+  // Page 4 — Pythagorus practice (spiced)
   {
     type: 'practice',
-    title: "Practice Problems 🎸🎵",
+    title: "Pythagorus Problems 🎸🎵",
     items: [
       {
-        prompt: "A guitar string is 60 cm long 🎸. Press exactly halfway (30 cm) — what fraction of the original length vibrates?",
+        prompt: "Halfway on the 60cm string?",
         answer: "1/2 (Half the string, twice the pitch — an octave higher! 🎵)",
-        sfx: SFX.p25
+        sfx: 'smDing'
       },
       {
-        prompt: "Now press 20 cm up the 60 cm string. What fraction vibrates?",
-        answer: "2/3 (60 − 20 = 40; 40/60 = 2/3)",
-        sfx: SFX.p100
+        prompt: "Press at 20cm?",
+        answer: "2/3 (vibrates, creating a fifth above the original note! 🎶)",
+        sfx: 'smDing2'
       }
-    ]
+    ],
+    interactive: {
+      length: 60, // cm
+      defaultPress: 25
+    }
   },
+
+
 
   // Page 5 — Euclid text
   {
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.3em; color: yellow;">Euclid — Architect of Reality</strong><br>
+        <strong style="font-size:1.3em; color: yellow;">Euclid Approches the Truck</strong><br>
         <span style="color:#00ccff;">"All structure, seen or unseen, begins with a line ✏️➡️📏."</span>
         He paused, tracing his proofs and figures through the void —
         <span style="color:#00ccff;">"The simplest gesture births every shape, every temple, every constellation above.
         Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement."</span><br><br>
+      </div>`
+  },
+  // Page 6 — Euclid image
+  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid Perfects the Cone" },
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style="font-size:1.3em; color: yellow;">Euclid — Architect of Reality</strong><br>
         By connecting the two dots in front of him, Euclid wasn’t merely drawing — he was weaving the very fabric of
         existence into patterns the mind could grasp. He almost didn't see the SnowCone I was handing him 🍧 —
         but the glistening crystals in the concert light were enough to catch his eye.
       </div>`
   },
 
-  // Page 6 — Euclid image
-  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid Perfects the Cone" },
-
   // Page 7 — Euclid practice
   {
     type: 'practice',
-    title: "Practice Problems 🍧🚀",
+    title: "Euclid Problems 🍧🚀",
     items: [
       {
-        prompt: "Right triangle with legs 3 cm and 4 cm. What’s the hypotenuse?",
-        answer: "5 cm (3² + 4² = 9 + 16 = 25 → √25 = 5)",
-        sfx: SFX.p25
+        prompt:
+          "Euclid immediately notices the odd‑shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. " +
+          "<span style='color:#00ccff'>“What’s the hypotenuse length?”</span> 🤔📐",
+        answer: "5 cm is the longest side, opposite the right angle (3² + 4² = 9 + 16 = 25 → √25 = 5)",
+        sfx: 'smDing'
       },
       {
-        prompt: "Isosceles: sides 6, 6, top 4. What’s the perimeter?",
-        answer: "16 cm (6 + 6 + 4 = 16)",
-        sfx: SFX.p100
+        prompt:
+          "<strong style='font-size:1.1em; color: yellow;'>Follow‑Up 🍧🔍</strong><br>" +
+          "Next, Euclid sketches the perfect SnowCone: two equal sides of 6 cm and a top edge of 4 cm. " +
+          "<span style='color:#00ccff'>“What’s the perimeter of this neon triangle?”</span> 🤔📏",
+        answer: "5 cm <span style='color:#00ccff;'>▽</span> oughtta do it!",
+        sfx: 'smDing2'
       }
-    ]
+    ],
   },
+
 
   // Page 8 — Galileo & Newton text
   {
@@ -163,12 +210,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "The cone truck traveled 60 miles in 2 hours. What’s the average speed?",
         answer: "30 mph (Speed = Distance ÷ Time = 60 ÷ 2)",
-        sfx: SFX.p25
+        sfx: SFX_PATHS.p25
       },
       {
         prompt: "At that speed, how far in 5 hours?",
         answer: "150 miles (30 × 5)",
-        sfx: SFX.p100
+        sfx: SFX_PATHS.p100
       }
     ]
   },
@@ -196,12 +243,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "Turing’s f(x) = 2x + 1. What is f(3) scoops?",
         answer: "2×3 + 1 = 7 🍧",
-        sfx: SFX.p25
+        sfx: SFX_PATHS.p25
       },
       {
         prompt: "What happens when a whole scoop is multiplied by 0?",
         answer: "It melts into nothing! (Zero wipes it out.)",
-        sfx: SFX.p100
+        sfx: SFX_PATHS.p100
       }
     ]
   },
@@ -228,12 +275,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "What is √(−1)?",
         answer: "i (Imaginary)",
-        sfx: SFX.p25
+        sfx: SFX_PATHS.p25
       },
       {
         prompt: "What is i²?",
         answer: "−1 (loops back negative)",
-        sfx: SFX.p100
+        sfx: SFX_PATHS.p100
       }
     ]
   },
@@ -261,12 +308,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "Thunder repeats every 5s. How many repeats in 20s?",
         answer: "4 (20 ÷ 5)",
-        sfx: SFX.p25
+        sfx: SFX_PATHS.p25
       },
       {
         prompt: "One drop every 0.25s. In 2.5s, how many drops?",
         answer: "10 (2.5 ÷ 0.25)",
-        sfx: SFX.p25
+        sfx: SFX_PATHS.p25
       }
     ]
   },
@@ -538,7 +585,7 @@ function renderPrologueReader() {
   // ⌨️ Typewriter effect
   const node = elRoot.querySelector('#smTypeNode');
   const doneFast = typeInto(node, PROLOGUE_SCRIPT.trim(), {
-    cps: 40,
+    cps: 30,
     onDone: () => {
       const ready = elRoot.querySelector('#smReady');
       const skip  = elRoot.querySelector('#smSkipType');
@@ -609,6 +656,7 @@ function drawSlide() {
         <div class="sm-slide-text" style="margin-bottom:.5rem;">
           <strong style="font-size:1.2em; color: yellow;">${page.title ?? 'Practice'}</strong>
         </div>
+
         <div class="sm-reveal-list">
           ${page.items.map((it, idx) => `
             <div class="sm-reveal-block" data-i="${idx}">
@@ -620,8 +668,22 @@ function drawSlide() {
             </div>
           `).join('')}
         </div>
+
+        ${page.interactive ? `
+        <div class="sm-fret-wrap">
+          <div class="sm-fret-title">🎛️ Try it yourself</div>
+          <div class="sm-fret-meta">String length: <strong>${page.interactive.length} cm</strong></div>
+          <input id="smFret" class="sm-fret-range" type="range" min="0" max="${page.interactive.length}" value="${page.interactive.defaultPress ?? 0}" step="1" />
+          <div class="sm-fret-readout">
+            Press at <span id="smPressVal">0</span> cm →
+            vibrating length <span id="smVibeLen">0</span> cm =
+            <span id="smFrac">—</span>
+            <span id="smInterval" class="sm-interval-tag"></span>
+          </div>
+        </div>` : ``}
       </div>`;
   }
+
 
   container.innerHTML = `
     <div class="sm-aspect-wrap">
@@ -651,13 +713,63 @@ function drawSlide() {
           // Play SFX
           const item = PROLOGUE_PAGES[slideIndex].items[i];
           if (item?.sfx) {
-            try { new Audio(item.sfx).play(); } catch {}
+            playSFX(item.sfx);
           }
         }
         btn.setAttribute('disabled', 'true');
       }, { once: true });
     });
   }
+  // Optional interactive fretboard
+  if (page.type === 'practice' && page.interactive) {
+    const L = page.interactive.length || 60;
+    const fret = elRoot.querySelector('#smFret');
+    const pressOut = elRoot.querySelector('#smPressVal');
+    const vibeLenOut = elRoot.querySelector('#smVibeLen');
+    const fracOut = elRoot.querySelector('#smFrac');
+    const intervalOut = elRoot.querySelector('#smInterval');
+
+    const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b]} return a||1; };
+    const simp = (n,d) => {
+      const g = gcd(n,d);
+      return `${(n/g)}/${(d/g)}`;
+    };
+    const intervalLabel = (press, len) => {
+      const remain = len - press;
+      const r = remain / len; // fraction vibrating
+      // simple landmarks
+      if (press === len/2) return 'Octave ↑';
+      if (Math.abs(r - 2/3) < 0.001) return 'Perfect Fifth ↑';
+      if (Math.abs(r - 3/4) < 0.001) return 'Perfect Fourth ↑';
+      if (Math.abs(r - 3/5) < 0.001) return 'Major Third-ish ↑';
+      return '';
+    };
+
+    const update = () => {
+      const p = Number(fret.value);
+      const vib = Math.max(0, L - p);
+      pressOut.textContent = p.toString();
+      vibeLenOut.textContent = vib.toString();
+      fracOut.textContent = simp(vib, L);
+
+      const label = intervalLabel(p, L);
+      intervalOut.textContent = label ? `• ${label}` : '';
+      intervalOut.classList.toggle('is-emph', !!label);
+
+      // 🔔 Play a quick tone when you newly hit a landmark (throttled)
+      const now = performance.now();
+      if (label && label !== __lastInterval && (now - __lastPlayTs > 350)) {
+        playIntervalBeep(label);
+        __lastInterval = label;
+        __lastPlayTs = now;
+      }
+    };
+
+
+    fret?.addEventListener('input', update);
+    update();
+  }
+
 
   wireHandlersForCurrentRoot();
 }
@@ -817,3 +929,58 @@ function playTrackUnlocked(id) {
   // Play immediately in the same click stack
   try { playTrack(id); } catch {}
 }
+// 🔔 Local SFX Howls
+const smDing = new Howl({
+  src: [`${import.meta.env.BASE_URL}assets/audio/SFX/smDing.mp3`],
+  volume: .25
+});
+
+const smDing2 = new Howl({
+  src: [`${import.meta.env.BASE_URL}assets/audio/SFX/smDing2.mp3`],
+  volume: .25
+});
+
+// Helper to pick the right one
+function playSFX(name) {
+  if (name === 'smDing') smDing.play();
+  else if (name === 'smDing2') smDing2.play();
+}
+
+function playIntervalBeep(label) {
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+    __smAudioCtx = (__smAudioCtx || H?.ctx || new (window.AudioContext || window.webkitAudioContext)());
+    if (__smAudioCtx.state === 'suspended') __smAudioCtx.resume().catch(() => {});
+  } catch {}
+
+  const ac = __smAudioCtx;
+  if (!ac) return;
+
+  const now = ac.currentTime;
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+
+  // Map label → frequency multiple of a base note
+  const baseHz = 220; // A3 feels nice
+  const mult =
+    label.includes('Octave')        ? 2.0 :
+    label.includes('Perfect Fifth') ? 3/2 :
+    label.includes('Perfect Fourth')? 4/3 :
+    label.includes('Major Third')   ? 5/4 :
+    1.0;
+
+  osc.type = 'sine';
+  osc.frequency.value = baseHz * mult;
+
+  // Short clickless envelope
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.12, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+
+  osc.connect(gain);
+  gain.connect(ac.destination);
+
+  osc.start(now);
+  osc.stop(now + 0.4);
+}
+

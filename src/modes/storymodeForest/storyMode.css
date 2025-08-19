@@ -299,6 +299,16 @@
 }
 @keyframes sm-caret { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
 
+/* Story slide inline images */
+.sm-slide-image {
+  display: block;              /* puts it on its own line */
+  max-width: 80%;              /* scales nicely inside the slide */
+  height: auto;                /* keeps proportions */
+  margin: 2vh auto 0 auto;     /* centers horizontally + a little top space */
+  border-radius: 1rem;         /* soft corners (optional) */
+  box-shadow: 0 0 12px rgba(0,0,0,0.4); /* subtle depth */
+}
+
 .sm-prologue-controls {
   display: grid;
   gap: clamp(8px, 1.2vh, 12px);
@@ -357,13 +367,13 @@
 
 /* slide text after typing */
 .sm-slide-text {
-  font-size: clamp(0.95rem, 0.85vh + 0.75rem, 1.20rem);
+  font-size: clamp(1.2rem, 0.85vh + 0.75rem, 1.20rem);
   line-height: 1.22;
 }
 
 /* practice prompts */
 .sm-reveal-prompt {
-  font-size: clamp(0.9rem, 0.8vh + 0.45rem, 1.10rem);
+  font-size: clamp(1.1rem, 0.8vh + 0.45rem, 1.10rem);
 }
 
 /* chapter title */
@@ -435,4 +445,56 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
+}
+/* Mini fretboard block */
+.sm-fret-wrap {
+  width: 92%;
+  max-width: 820px;
+  margin: 12px auto 0;
+  padding: clamp(10px, 1.2vh, 14px);
+  border-radius: 12px;
+  background: rgba(0,0,0,.35);
+  box-shadow: 0 0 10px #00ffee44;
+}
+.sm-fret-title {
+  color: #eaffff;
+  font-family: "Orbitron", system-ui, sans-serif;
+  font-size: clamp(1rem, 0.9vh + 0.8rem, 1.15rem);
+  margin-bottom: 6px;
+}
+.sm-fret-meta {
+  color: #9ff;
+  font-size: clamp(0.9rem, 0.8vh + 0.6rem, 1rem);
+  margin-bottom: 6px;
+  opacity: .9;
+}
+.sm-fret-range {
+  width: 100%;
+  margin: 6px 0 8px;
+  accent-color: #00ffee;
+}
+.sm-fret-readout {
+  color: #eaffff;
+  font-family: "Orbitron", system-ui, sans-serif;
+  font-size: clamp(0.95rem, 0.85vh + 0.7rem, 1.05rem);
+}
+.sm-interval-tag {
+  margin-left: .5ch;
+  color: #ffe08a;
+  text-shadow: 0 0 8px rgba(255,224,138,.35);
+}
+.sm-interval-tag.is-emph {
+  font-weight: 700;
+}
+.sm-slide-image {
+  display: block;
+  margin: 0.5rem auto;
+  max-width: 80%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* Special case for cosmic cone */
+.sm-slide-image.sm-cosmic {
+  max-width: 40%;   /* 👈 shrink only this one */
 }
