@@ -200,9 +200,9 @@ const PROLOGUE_PAGES = [
     html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.2em; color: yellow;">Galileo &amp; Newton — Symphony of Motion</strong><br>
-        <span style="color:white;">Galileo:</span> <span style="color:#00ccff;">"Everything moves if you watch carefully enough 🎵🔭..."</span><br>
-        <span style="color:white;">Newton:</span> <span style="color:#00ccff;">"And every motion has a cause 🪐⚙️..."</span><br><br>
-        I slung them neon SnowCones 🍧🍧 and wondered how to measure the speed of their cosmic stroll. 🚶🚶‍♂️
+        <span style='color: white;'>Galileo:</span> <span style='color: #00ccff;'>\"Everything moves if you watch carefully enough 🎵🔭. Even what seems at rest is weaving through space at unimaginable speeds—the Earth spins, the Moon orbits, and light itself races across the void. Observation is the instrument that reveals the hidden dance of the cosmos.\"</span><br>
+        <span style='color: white;'>Newton:</span> <span style='color: #00ccff;'>\"And every motion has a cause 🪐⚙️. Forces sculpt the tapestry of reality: gravity pulls apples and planets alike, inertia resists every change, and for every action there’s an equal echo. Even the unseen hand of attraction shapes the universe’s grand ballet.\"</span><br><br>
+        I slung two neon SnowCones 🍧🍧 and wondered how to measure the speed of their cosmic stroll. 🚶🚶‍♂️
       </div>`
   },
 
@@ -215,14 +215,15 @@ const PROLOGUE_PAGES = [
     title: "Practice Problems 🍧🚀",
     items: [
       {
-        prompt: "The cone truck traveled 60 miles in 2 hours. What’s the average speed?",
-        answer: "30 mph (Speed = Distance ÷ Time = 60 ÷ 2)",
-        sfx: SFX_PATHS.p25
+        prompt: "I informed Galileo that my neon snow cone truck cruised to the MathFest at a steady pace: I traveled 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>",
+        answer: "30 mph (Speed = Distance ÷ Time = 60 ÷ 2)<br> Dude, that’s like a cosmic cruise! 🚀",
+        sfx: 'smDing'
       },
       {
-        prompt: "At that speed, how far in 5 hours?",
-        answer: "150 miles (30 × 5)",
-        sfx: SFX_PATHS.p100
+        prompt: "<strong style='font-size:1.1em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
+        "Newton asked, <span style='color: #00ccff;'>\"If you kept rolling at that speed, how far would you cruise in 5 hours?\"</span> 🤔📏<br>",
+        answer: "150 miles (30 × 5)<br> tis but a cosmic hop! 🌌",
+        sfx: 'smDing2'
       }
     ]
   },
@@ -233,9 +234,10 @@ const PROLOGUE_PAGES = [
     html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.2em; color: yellow;">Turing &amp; Brahmagupta — Secrets and Silence</strong><br>
-        Turing: <span style="color:#00ccff;">"Every puzzle is a hidden message…"</span>
-        Brahmagupta: <span style="color:#00ccff;">"Every silence is full of numbers…"</span><br><br>
-        I realized gaps and zeros are clues, not emptiness. Math is the story of life, waiting to be unfolded.
+        I almost lost myself in the motion of the music, but then I heard Turing speak softly,
+        <span style='color: #00ccff;'>\"Every puzzle is a hidden message, encoded in the patterns of the world. From the fluttering of a breeze to the circuits of a machine. Each mathematical proof, carries its own secret that reveals the logic behind chaos.\"</span><br><br>
+        Brahmagupta smiled and spoke more softly, <span style='color: #00ccff;'>\"And every silence is full of numbers, each pause a zero, each gap a canvas for infinity. By listening to the stillness, we trace the balance of forces that govern both sand-grains and galaxies.\"</span><br><br>
+        I quickly realized that gaps and zeros in life are clues, not emptiness. Math isn't just numbers; it’s the story of life itself, waiting for a curious mind to unfold it.
       </div>`
   },
 
@@ -248,14 +250,14 @@ const PROLOGUE_PAGES = [
     title: "Practice Problems 🍧🚀",
     items: [
       {
-        prompt: "Turing’s f(x) = 2x + 1. What is f(3) scoops?",
-        answer: "2×3 + 1 = 7 🍧",
-        sfx: SFX_PATHS.p25
+        prompt: "Turing was excited to see the SnowCones and said, <span style='color: #00ccff;'>\"I would like to have 7 scoops.\"</span> Remembering his doubling-plus-one function as f(x) = 2x + 1, he asked, <span style='color: #00ccff;'>\"What is f(3) scoops?\"</span> 🤔<br>",
+        answer: "2 × 3 + 1 = 7 = f(3) 🍧",
+        sfx: 'smDing'
       },
       {
-        prompt: "What happens when a whole scoop is multiplied by 0?",
-        answer: "It melts into nothing! (Zero wipes it out.)",
-        sfx: SFX_PATHS.p100
+        prompt: "Brahmagupta heard me say I couldn't stack that many scoops and asked Turing: <span style='color: #00ccff;'>\"What happens when a whole scoop is multiplied or divided by 0?\"</span> 🤔<br>",
+        answer: "It melts into nothing! (ZThe scoops are reduced by the silence.)",
+        sfx: 'smDing2'
       }
     ]
   },
@@ -266,8 +268,9 @@ const PROLOGUE_PAGES = [
     html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.2em; color: yellow;">Euclid Returns to Meet Bombelli</strong><br>
-        Bombelli: <span style="color:#00ccff;">"What you call impossible... we call architecture..."</span><br><br>
-        Imaginary numbers build real dreams.
+        Bombelli arrived later than the rest, but the familiar voice of Euclid ran back to understand the shifting shape of the world around us.<br><br>
+        <span style='color: white;'>Bombelli:</span> <span style='color: #00ccff;'>\"What you call impossible... we call architecture. We draft cathedrals in the abstract, where each imaginary unit is a soaring arch and every complex plane lays the foundation for realms unseen. In our hands, ‘i’ becomes brick, and infinity our blueprint. Here, the dream of numbers carves space itself, and what others dismiss as folly reveals its hidden symmetry and strength.\"</span><br><br>" 
+        My mind was tossed in a sprightly dance and I concluded that imaginary numbers build real dreams.
       </div>`
   },
 
@@ -1003,4 +1006,3 @@ function playIntervalBeep(label) {
   osc.start(now);
   osc.stop(now + 0.4);
 }
-
