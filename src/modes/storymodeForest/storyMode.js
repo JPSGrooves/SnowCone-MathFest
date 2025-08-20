@@ -120,12 +120,12 @@ const PROLOGUE_PAGES = [
     title: "Pythagorus Problems 🎸🎵",
     items: [
       {
-        prompt: "Halfway on the 60cm string?",
+        prompt: "🎸 When Pythagorus presses a 60cm string exactly halfway ⏱️ (30 cm), what fraction of the original length is vibrating? 🤔➗",
         answer: "1/2 (Half the string, twice the pitch — an octave higher! 🎵)",
         sfx: 'smDing'
       },
       {
-        prompt: "Press at 20cm?",
+        prompt: "And when he presses at 20cm?",
         answer: "2/3 (vibrates, creating a fifth above the original note! 🎶)",
         sfx: 'smDing2'
       }
@@ -147,7 +147,10 @@ const PROLOGUE_PAGES = [
         <span style="color:#00ccff;">"All structure, seen or unseen, begins with a line ✏️➡️📏."</span>
         He paused, tracing his proofs and figures through the void —
         <span style="color:#00ccff;">"The simplest gesture births every shape, every temple, every constellation above.
-        Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement."</span><br><br>
+        Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement.<br><br>
+        Even a circle is but a promise kept — every point faithful to its center 🌀.<br>
+        A proof is a path through the fog, where reason becomes lantern-light 🏮.<br>
+        Infinity itself is a patient horizon, waiting for steady interpretation to arrive 🌌."</span>
       </div>`
   },
   // Page 6 — Euclid image
@@ -156,13 +159,15 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.3em; color: yellow;">Euclid — Architect of Reality</strong><br>
+        <strong style="font-size:1.3em; color: yellow;">Euclid Recieves the Cone</strong><br>
         By connecting the two dots in front of him, Euclid wasn’t merely drawing — he was weaving the very fabric of
         existence into patterns the mind could grasp. He almost didn't see the SnowCone I was handing him 🍧 —
         but the glistening crystals in the concert light were enough to catch his eye.
+        <img src="${PRO_IMG('euclidCone.png')}"alt="Euclid with Cone" class="sm-slide-image sm-slide-euclid">
       </div>`
   },
 
+  // Page 7 — Euclid practice
   // Page 7 — Euclid practice
   {
     type: 'practice',
@@ -170,20 +175,22 @@ const PROLOGUE_PAGES = [
     items: [
       {
         prompt:
-          "Euclid immediately notices the odd‑shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. " +
+          "Euclid immediately notices the odd-shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. " +
           "<span style='color:#00ccff'>“What’s the hypotenuse length?”</span> 🤔📐",
-        answer: "5 cm is the longest side, opposite the right angle (3² + 4² = 9 + 16 = 25 → √25 = 5)",
+        answer: `5 cm is the longest side, opposite the right angle (3² + 4² = 9 + 16 = 25 → √25 = 5)`,
         sfx: 'smDing'
       },
       {
         prompt:
-          "<strong style='font-size:1.1em; color: yellow;'>Follow‑Up 🍧🔍</strong><br>" +
+          "<strong style='font-size:1.1em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
           "Next, Euclid sketches the perfect SnowCone: two equal sides of 6 cm and a top edge of 4 cm. " +
           "<span style='color:#00ccff'>“What’s the perimeter of this neon triangle?”</span> 🤔📏",
-        answer: "5 cm <span style='color:#00ccff;'>▽</span> oughtta do it!",
+        answer: `16 cm (6 + 6 + 4 = 16) <span style='color:#00ccff;'>▽</span>!!
+                <br>
+                <img src="${PRO_IMG('cosmicCone.png')}" alt="cosmic cone" class="sm-cone-inline">`,
         sfx: 'smDing2'
       }
-    ],
+    ]
   },
 
 
@@ -640,7 +647,7 @@ function drawSlide() {
   const page = PROLOGUE_PAGES[slideIndex];
   if (!page) { backToChapterMenu(); return; }
 
-  // Build page inner
+  // Build the inner content for the slide type
   let inner = '';
   if (page.type === 'html') {
     inner = `<div class="sm-slide sm-fade-in">${page.html}</div>`;
@@ -652,18 +659,18 @@ function drawSlide() {
       </div>`;
   } else if (page.type === 'practice') {
     inner = `
-      <div class="sm-slide sm-fade-in">
+      <div class="sm-slide sm-fade-in sm-practice">
         <div class="sm-slide-text" style="margin-bottom:.5rem;">
           <strong style="font-size:1.2em; color: yellow;">${page.title ?? 'Practice'}</strong>
         </div>
 
         <div class="sm-reveal-list">
           ${page.items.map((it, idx) => `
-            <div class="sm-reveal-block" data-i="${idx}">
-              <div class="sm-reveal-prompt">${it.prompt}</div>
+            <div class="sm-reveal-block sm-practice-item" data-i="${idx}">
+              <div class="sm-reveal-prompt sm-prompt">${it.prompt}</div>
               <div class="sm-reveal-controls">
-                <button class="sm-btn sm-btn-primary js-reveal" data-i="${idx}">Click to Reveal</button>
-                <div class="sm-reveal-answer" id="ans-${idx}">${it.answer}</div>
+                <button class="sm-btn sm-btn-primary js-reveal sm-reveal" data-i="${idx}">Click to Reveal</button>
+                <div class="sm-reveal-answer sm-answer" id="ans-${idx}">${it.answer ?? ''}</div>
               </div>
             </div>
           `).join('')}
@@ -682,18 +689,35 @@ function drawSlide() {
           </div>
         </div>` : ``}
       </div>`;
+  } else {
+    // Fallback: plain wrapper
+    inner = `<div class="sm-slide sm-fade-in"></div>`;
   }
 
-
+  // Frame markup:
+  // - Keep content in .sm-typewrap
+  // - Keep only Prev/Next in the center controls row (smaller, frees height)
+  // - Dock 🔙 Menu (left) + 🔊/🔇 Mute (right) in a bottom bar like chapter select
   container.innerHTML = `
     <div class="sm-aspect-wrap">
       <div class="sm-game-frame sm-is-intro">
+        <img id="modeBackground" class="sm-bg-img" src="${BG_SRC}" alt="Story Mode Background"/>
+
         <section class="sm-prologue">
           <div class="sm-typewrap">${inner}</div>
+
           <div class="sm-prologue-controls">
             <button id="smPrev" class="sm-btn sm-btn-secondary" ${slideIndex === 0 ? 'disabled' : ''}>⬅️ Back</button>
-            <button id="smNext" class="sm-btn sm-btn-primary">${slideIndex === PROLOGUE_PAGES.length - 1 ? 'Finish' : 'Next ➡️'}</button>
-            <button id="smBackToMenu" class="sm-btn sm-btn-secondary">🔙 Menu</button>
+            <button id="smNext" class="sm-btn sm-btn-primary">
+              ${slideIndex === PROLOGUE_PAGES.length - 1 ? 'Finish' : 'Next ➡️'}
+            </button>
+          </div>
+
+          <div class="sm-bottom-bar">
+            <button id="smBackToMenu" class="sm-square-btn sm-left">🔙</button>
+            <button id="smMute" class="sm-square-btn sm-right ${isMuted() ? 'muted' : ''}">
+              ${isMuted() ? '🔇' : '🔊'}
+            </button>
           </div>
         </section>
       </div>
@@ -702,7 +726,7 @@ function drawSlide() {
 
   elRoot = container.querySelector('.sm-aspect-wrap');
 
-  // Reveal events (if practice)
+  // Practice: wire reveal buttons to open answers + play SFX (per item)
   if (page.type === 'practice') {
     elRoot.querySelectorAll('.js-reveal').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -710,67 +734,63 @@ function drawSlide() {
         const ans = elRoot.querySelector(`#ans-${i}`);
         if (ans && !ans.classList.contains('is-open')) {
           ans.classList.add('is-open');
-          // Play SFX
           const item = PROLOGUE_PAGES[slideIndex].items[i];
-          if (item?.sfx) {
-            playSFX(item.sfx);
-          }
+          if (item?.sfx) playSFX(item.sfx);
         }
         btn.setAttribute('disabled', 'true');
       }, { once: true });
     });
+
+    // Optional interactive fretboard (kept exactly as your logic expects)
+    if (page.interactive) {
+      const L = page.interactive.length || 60;
+      const fret = elRoot.querySelector('#smFret');
+      const pressOut = elRoot.querySelector('#smPressVal');
+      const vibeLenOut = elRoot.querySelector('#smVibeLen');
+      const fracOut = elRoot.querySelector('#smFrac');
+      const intervalOut = elRoot.querySelector('#smInterval');
+
+      const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b]} return a||1; };
+      const simp = (n,d) => {
+        const g = gcd(n,d);
+        return `${(n/g)}/${(d/g)}`;
+      };
+      const intervalLabel = (press, len) => {
+        const remain = len - press;
+        const r = remain / len; // fraction vibrating
+        if (press === len/2) return 'Octave ↑';
+        if (Math.abs(r - 2/3) < 0.001) return 'Perfect Fifth ↑';
+        if (Math.abs(r - 3/4) < 0.001) return 'Perfect Fourth ↑';
+        if (Math.abs(r - 3/5) < 0.001) return 'Major Third-ish ↑';
+        return '';
+      };
+
+      const update = () => {
+        const p = Number(fret.value);
+        const vib = Math.max(0, L - p);
+        pressOut.textContent = p.toString();
+        vibeLenOut.textContent = vib.toString();
+        fracOut.textContent = simp(vib, L);
+
+        const label = intervalLabel(p, L);
+        intervalOut.textContent = label ? `• ${label}` : '';
+        intervalOut.classList.toggle('is-emph', !!label);
+
+        // Beep when newly hitting a landmark (throttled)
+        const now = performance.now();
+        if (label && label !== __lastInterval && (now - __lastPlayTs > 350)) {
+          playIntervalBeep(label);
+          __lastInterval = label;
+          __lastPlayTs = now;
+        }
+      };
+
+      fret?.addEventListener('input', update);
+      update();
+    }
   }
-  // Optional interactive fretboard
-  if (page.type === 'practice' && page.interactive) {
-    const L = page.interactive.length || 60;
-    const fret = elRoot.querySelector('#smFret');
-    const pressOut = elRoot.querySelector('#smPressVal');
-    const vibeLenOut = elRoot.querySelector('#smVibeLen');
-    const fracOut = elRoot.querySelector('#smFrac');
-    const intervalOut = elRoot.querySelector('#smInterval');
 
-    const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b]} return a||1; };
-    const simp = (n,d) => {
-      const g = gcd(n,d);
-      return `${(n/g)}/${(d/g)}`;
-    };
-    const intervalLabel = (press, len) => {
-      const remain = len - press;
-      const r = remain / len; // fraction vibrating
-      // simple landmarks
-      if (press === len/2) return 'Octave ↑';
-      if (Math.abs(r - 2/3) < 0.001) return 'Perfect Fifth ↑';
-      if (Math.abs(r - 3/4) < 0.001) return 'Perfect Fourth ↑';
-      if (Math.abs(r - 3/5) < 0.001) return 'Major Third-ish ↑';
-      return '';
-    };
-
-    const update = () => {
-      const p = Number(fret.value);
-      const vib = Math.max(0, L - p);
-      pressOut.textContent = p.toString();
-      vibeLenOut.textContent = vib.toString();
-      fracOut.textContent = simp(vib, L);
-
-      const label = intervalLabel(p, L);
-      intervalOut.textContent = label ? `• ${label}` : '';
-      intervalOut.classList.toggle('is-emph', !!label);
-
-      // 🔔 Play a quick tone when you newly hit a landmark (throttled)
-      const now = performance.now();
-      if (label && label !== __lastInterval && (now - __lastPlayTs > 350)) {
-        playIntervalBeep(label);
-        __lastInterval = label;
-        __lastPlayTs = now;
-      }
-    };
-
-
-    fret?.addEventListener('input', update);
-    update();
-  }
-
-
+  // Global handlers (you already wire clicks/keys elsewhere)
   wireHandlersForCurrentRoot();
 }
 

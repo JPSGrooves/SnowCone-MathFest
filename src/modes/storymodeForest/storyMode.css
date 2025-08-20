@@ -404,6 +404,12 @@
   align-items: end;
   pointer-events: none; /* buttons turn it back on */
   padding: 0 1.2vh;
+  bottom: max(1.2vh, env(safe-area-inset-bottom));
+}
+
+.sm-prologue-controls .sm-btn {
+  padding: clamp(0.4rem, 1.2vh, 0.7rem) clamp(0.7rem, 1.8vh, 1rem);
+  font-size: clamp(0.85rem, 0.8vh + 0.35rem, 1rem);
 }
 
 /* Square button base */
@@ -498,3 +504,27 @@
 .sm-slide-image.sm-cosmic {
   max-width: 40%;   /* 👈 shrink only this one */
 }
+.sm-slide-euclid {
+  max-width: 40%;  /* or 150px fixed */
+  height: auto;
+  margin: 1em auto;
+}
+/* make the practice slide a positioning context */
+.sm-slide.sm-practice { 
+  position: relative;
+}
+
+/* make the practice slide a positioning context + reserve space for cone */
+.sm-slide.sm-practice {
+  --cone-size: clamp(40px, 6vh, 64px);   /* one source of truth */
+  position: relative;
+  padding-bottom: calc(var(--cone-size) + 16px); /* respect the cone space */
+}
+.sm-cone-inline {
+  display: block;
+  width: clamp(36px, 5.5vh, 56px);
+  height: auto;
+  margin: 6px auto 0;
+  pointer-events: none; /* don't steal taps */
+}
+
