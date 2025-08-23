@@ -143,7 +143,7 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.3em; color: yellow;">Euclid Approches the Truck</strong><br>
+        <strong style="font-size:1.3em; color: yellow;">Euclid Nears the Truck</strong><br>
         <span style="color:#00ccff;">"All structure, seen or unseen, begins with a line ✏️➡️📏."</span>
         He paused, tracing his proofs and figures through the void —
         <span style="color:#00ccff;">"The simplest gesture births every shape, every temple, every constellation above.
@@ -154,13 +154,13 @@ const PROLOGUE_PAGES = [
       </div>`
   },
   // Page 6 — Euclid image
-  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid Perfects the Cone" },
+  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid Almost Doesn't Hear My Call..." },
   {
     type: 'html',
     html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.3em; color: yellow;">Euclid Recieves the Cone</strong><br>
-        By connecting the two dots in front of him, Euclid wasn’t merely drawing — he was weaving the very fabric of
+        By connecting the two dots between us, Euclid wasn’t merely drawing — he was weaving the very fabric of
         existence into patterns the mind could grasp. He almost didn't see the SnowCone I was handing him 🍧 —
         but the glistening crystals in the concert light were enough to catch his eye.
         <img src="${PRO_IMG('euclidCone.png')}"alt="Euclid with Cone" class="sm-slide-image sm-slide-euclid">
@@ -186,7 +186,6 @@ const PROLOGUE_PAGES = [
           "Next, Euclid sketches the perfect SnowCone: two equal sides of 6 cm and a top edge of 4 cm. " +
           "<span style='color:#00ccff'>“What’s the perimeter of this neon triangle?”</span> 🤔📏",
         answer: `16 cm (6 + 6 + 4 = 16) <span style='color:#00ccff;'>▽</span>!!
-                <br>
                 <img src="${PRO_IMG('cosmicCone.png')}" alt="cosmic cone" class="sm-cone-inline">`,
         sfx: 'smDing2'
       }
@@ -199,15 +198,45 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.2em; color: yellow;">Galileo &amp; Newton — Symphony of Motion</strong><br>
-        <span style='color: white;'>Galileo:</span> <span style='color: #00ccff;'>\"Everything moves if you watch carefully enough 🎵🔭. Even what seems at rest is weaving through space at unimaginable speeds—the Earth spins, the Moon orbits, and light itself races across the void. Observation is the instrument that reveals the hidden dance of the cosmos.\"</span><br>
-        <span style='color: white;'>Newton:</span> <span style='color: #00ccff;'>\"And every motion has a cause 🪐⚙️. Forces sculpt the tapestry of reality: gravity pulls apples and planets alike, inertia resists every change, and for every action there’s an equal echo. Even the unseen hand of attraction shapes the universe’s grand ballet.\"</span><br><br>
-        I slung two neon SnowCones 🍧🍧 and wondered how to measure the speed of their cosmic stroll. 🚶🚶‍♂️
+        <strong style="font-size:1.2em; color: yellow;">Galileo Awaits Newton</strong><br>
+        <img src="${PRO_IMG('galileoStar.png')}" alt="Gstars"
+            class="sm-slide-image sm-slide-legend sm-bump-galileo">
+        <span style='color: white;'>Galileo:</span>
+        <span style='color: #00ccff;'>\"Everything moves if you watch carefully enough 🎵🔭. Even what seems at rest is weaving through space at unimaginable speeds—the Earth spins, the Moon orbits, and light itself races across the void. Observation is the instrument that reveals the hidden dance of the cosmos.\"</span><br>
       </div>`
   },
 
+
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style="font-size:1.2em; color: yellow;">Newton Arrives!</strong><br><br>
+        <span style='color: white;'>Newton:</span> <span style='color: #00ccff;'>\"And every motion has a cause 🪐⚙️. Forces sculpt the tapestry of reality: gravity pulls apples and planets alike, inertia resists every change, and for every action there’s an equal echo. Even the unseen hand of attraction shapes the universe’s grand ballet.\"</span><br>
+        <img src="${PRO_IMG('newtonSky.png')}" alt="newton" class="sm-slide-image sm-slide-legend">
+      </div>`
+  },
+
+
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style="font-size:1.2em; color: yellow;">SnowCone Solutions!</strong><br>
+        I slung two neon SnowCones 🍧🍧 and wondered how they would ever measure the speed of their cosmic stroll. 🚶🚶‍♂️<br>
+
+        <img src="${PRO_IMG('jehnk2Cones.png')}" alt="2 cones" class="sm-slide-image sm-slide-legend">
+
+        It was at that point I felt the festival’s math begin click into place:  
+        <em>observe → compare → solve</em>.  
+        The heat of the festival pushes the cone, the chill of the cone pushes back — equal echoes, opposite ways ♻️.  
+        <span style="color:#9ff;">(action ⇄ reaction)</span>
+      </div>`
+  },
+
+
   // Page 9 — Galileo & Newton image
-  { type: 'image', src: PRO_IMG('galileonewtonpicture.png'), caption: "Galileo & Newton discussing motion" },
+  { type: 'image', src: PRO_IMG('galileonewtonpicture.png'), caption: "Galileo & Newton discussing how we all got there..." },
 
   // Page 10 — Galileo/Newton practice
   {
@@ -215,14 +244,14 @@ const PROLOGUE_PAGES = [
     title: "Practice Problems 🍧🚀",
     items: [
       {
-        prompt: "I informed Galileo that my neon snow cone truck cruised to the MathFest at a steady pace: I traveled 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>",
-        answer: "30 mph (Speed = Distance ÷ Time = 60 ÷ 2)<br> Dude, that’s like a cosmic cruise! 🚀",
+        prompt: "I informed Galileo that my neon SnowCone truck cruised to the entrance at a steady pace: I traveled 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>",
+        answer: "30 mph (Speed = Distance ÷ Time = 60 ÷ 2)<br> Dude, I thought I'de never get in! 🚀",
         sfx: 'smDing'
       },
       {
         prompt: "<strong style='font-size:1.1em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
-        "Newton asked, <span style='color: #00ccff;'>\"If you kept rolling at that speed, how far would you cruise in 5 hours?\"</span> 🤔📏<br>",
-        answer: "150 miles (30 × 5)<br> tis but a cosmic hop! 🌌",
+        "Newton asked, <span style='color: #00ccff;'>\"If you kept rolling at 30mph, how far would you cruise in 5 hours?\"</span> 🤔📏<br>",
+        answer: "150 miles (30 × 5)<br> Glad the line wasn't that long! 🌌",
         sfx: 'smDing2'
       }
     ]
@@ -233,16 +262,31 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.2em; color: yellow;">Turing &amp; Brahmagupta — Secrets and Silence</strong><br>
-        I almost lost myself in the motion of the music, but then I heard Turing speak softly,
+        <strong style="font-size:1.2em; color: yellow;">Turing &amp; A Friend Walk On By</strong><br>
+        <img src="${PRO_IMG('breeze.png')}"alt="breeze" class="sm-slide-image sm-slide-euclid">
+        I almost lost myself in the motion of the music, but then I heard Turing speaking softly,
         <span style='color: #00ccff;'>\"Every puzzle is a hidden message, encoded in the patterns of the world. From the fluttering of a breeze to the circuits of a machine. Each mathematical proof, carries its own secret that reveals the logic behind chaos.\"</span><br><br>
-        Brahmagupta smiled and spoke more softly, <span style='color: #00ccff;'>\"And every silence is full of numbers, each pause a zero, each gap a canvas for infinity. By listening to the stillness, we trace the balance of forces that govern both sand-grains and galaxies.\"</span><br><br>
+      </div>`
+  },  
+  
+  // Page 11A — Turing & Brahmagupta text
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style="font-size:1.2em; color: yellow;">The Friend, Brahmagupta, Smiled...</strong><br>
+        <img 
+          src="${PRO_IMG('bram.png')}" 
+          alt="bram" 
+          class="sm-slide-image sm-slide-image-bram"
+        />
+        ...and spoke even more softly, <span style='color: #00ccff;'>\"Every silence is full of numbers, each pause a zero, each gap a canvas for infinity. By listening to the stillness, we trace the balance of forces that govern both sand-grains and galaxies.\"</span><br><br>
         I quickly realized that gaps and zeros in life are clues, not emptiness. Math isn't just numbers; it’s the story of life itself, waiting for a curious mind to unfold it.
       </div>`
   },
 
   // Page 12 — Turing/Brahmagupta image
-  { type: 'image', src: PRO_IMG('turingbrahmaguptapicture.png'), caption: "Turing & Brahmagupta: the chaos of nothingness" },
+  { type: 'image', src: PRO_IMG('turingbrahmaguptapicture.png'), caption: "Turing & Brahmagupta ponder the chaos of nothingness..." },
 
   // Page 13 — Turing/Brahmagupta practice
   {
@@ -256,7 +300,7 @@ const PROLOGUE_PAGES = [
       },
       {
         prompt: "Brahmagupta heard me say I couldn't stack that many scoops and asked Turing: <span style='color: #00ccff;'>\"What happens when a whole scoop is multiplied or divided by 0?\"</span> 🤔<br>",
-        answer: "It melts into nothing! (ZThe scoops are reduced by the silence.)",
+        answer: "It melts into nothing! (The scoops are reduced by the silence.)",
         sfx: 'smDing2'
       }
     ]
@@ -581,7 +625,7 @@ function renderPrologueReader() {
           </div>
           <div class="sm-prologue-controls">
             <button id="smSkipType" class="sm-btn sm-btn-secondary">⏩ Skip</button>
-            <button id="smReady" class="sm-btn sm-btn-primary" style="display:none">I’m Ready</button>
+            <button id="smReady" class="sm-btn sm-btn-primary" style="display:none">I’m Ready 🎵</button>
           </div>
         </section>
       </div>

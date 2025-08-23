@@ -527,3 +527,60 @@
   margin: 6px auto 0;
   pointer-events: none; /* don't steal taps */
 }
+
+.sm-slide-image-bram {
+  width: clamp(200px, 30vw, 280px); /* bigger just for Bram */
+  max-height: 45vh;
+  object-fit: contain;
+}
+/* Slightly larger hero images for specific story slides */
+.sm-slide-image.sm-slide-legend {
+  /* comfortably bigger than default Euclid shrink, still within text width */
+  max-width: 76%;
+  /* keep proportions & center */
+  height: auto;
+  margin: 1.2vh auto 0;
+}
+
+/* Optionally, nudge up a hair on taller screens */
+@media (min-height: 780px) {
+  .sm-slide-image.sm-slide-legend { max-width: 78%; }
+}
+.sm-slide-image[alt="Gstars"] {
+  max-width: 80% !important;
+}
+
+
+/* Galileo PNG likely has transparent margins; give him a visual boost */
+.sm-bump-galileo {
+  transform: scale(1.18);          /* subtle, looks natural */
+  transform-origin: center center;
+}
+
+/* Tall screens can handle a hair more */
+@media (min-height: 800px) {
+  .sm-bump-galileo { transform: scale(1.24); }
+}
+
+/* Absolute last-resort specificity nuke (if some other CSS still wins) */
+.sm-slide-text .sm-slide-image.sm-slide-legend.sm-bump-galileo {
+  max-width: 88% !important;
+}
+/* Extra breathing room for the bigger "legend" portraits */
+.sm-slide-image.sm-slide-legend {
+  max-width: 86% !important;
+  height: auto;
+  margin: 1.2vh auto 2.2vh;  /* ⬅️ bottom margin pushes text down */
+  display: block;
+}
+
+/* Galileo’s boosted version gets even more space */
+.sm-slide-image.sm-bump-galileo {
+  transform: scale(1.18);
+  transform-origin: center center;
+  margin-bottom: 5vh;  /* give text more clearance */
+}
+/* Add breathing room between slide titles and their image */
+.sm-slide-text strong + br + .sm-slide-image {
+  margin-top: 4vh;   /* adjust to taste */
+}
