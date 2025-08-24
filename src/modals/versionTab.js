@@ -6,27 +6,29 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.7.7</h3>
+      <h3>🧠 SnowCone MathFest v0.8.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.7.7-Prologuing the Inevitable</h3>
+      <h3>🍦 v0.8.0 — Prologuing the Inevitable is Done</h3>
       <p>
         – 📖 <strong>Story Mode (Prologue) online</strong> — centered chapter menu, bigger title, typewriter screen, clean Prev/Next flow<br>
         – 🖼️ <strong>Legend image system</strong>: new <code>.sm-slide-legend</code> sizing + Galileo bump class; title→image spacing fix; crisp margins<br>
-        – 🌌 New art drops: Galileo/Newton night skies (landscape), Ada storm spiral (landscape), Gauss rain‑arcs (landscape), Jehnk 2‑Cones (portrait), festival variants with transparent edges<br>
-        – 🧊 Bram image re‑exported @2× for retina; optional <code>image-rendering: crisp-edges</code> hook added<br>
-        – 🧩 Practice slides: cone art now <em>pinned</em> (abs‑pos) with reserved space — no button push‑down on mobile<br>
-        – 📱 Viewport prep pass: clamp + vh audit, safe‑area bottom bar, iOS tap highlight off, double‑tap zoom prevention kept<br>
-        – 🔊 Audio: Howler one‑tap unlock preserved; mute sync; interval‑beep throttle; sfx wiring stays scoped to Story canvas<br>
+        – 🌌 New art drops: Galileo/Newton night skies (landscape), Ada storm spiral (landscape), Gauss rain-arcs (landscape), Jehnk 2-Cones (portrait), festival variants with transparent edges<br>
+        – 🧊 Bram image re-exported @2× for retina; optional <code>image-rendering: crisp-edges</code> hook added<br>
+        – 🧩 Practice slides: cone art now <em>pinned</em> (abs-pos) with reserved space — no button push-down on mobile<br>
+        – 📱 Viewport prep pass: clamp + vh audit, safe-area bottom bar, iOS tap highlight off, double-tap zoom prevention kept<br>
+        – 🔊 Audio: Howler one-tap unlock preserved; mute sync; interval-beep throttle; sfx wiring stays scoped to Story canvas<br>
         – ⚙️ Perf: sprite & image preloads tuned; lazy-in slide art; background repaint helper keeps cache fresh without layout thrash<br>
-        – 🐛 Fixes: title/text underlap beneath images, Galileo “too small” PNG, reveal button double‑fires, Back/Mute alignment, pointer‑events on bottom bar<br>
+        – 🐛 Fixes: title/text underlap beneath images, Galileo “too small” PNG, reveal button double-fires, Back/Mute alignment, pointer-events on bottom bar<br>
         – 🧯 Cleanup discipline: listeners/RAF/timers fully unwired on exit; no leaks between Kids/Story canvases<br>
-        – 🧮 XP: Camping XP unchanged; Story XP counters stubbed (hidden) pending chapter unlocks<br>
+        – 🧮 <strong>XP</strong>: +25 XP per Reveal; +500 XP on Prologue “Finish”; single subtle popup anchored to the pressed button (no duplicate toast); capture-before-nav so XP always saves; badges coming later ⭐️<br>
+        – 🧰 Dev: centralized <code>awardXP(amount, { anchor, reason })</code> and <code>showXPPopup(text, anchor)</code>; removed duplicate inline popup calls in <code>drawSlide()</code>
       </p>
     </div>
+
 
     <div class="settings-block">
       <h3>📲 App Info</h3>

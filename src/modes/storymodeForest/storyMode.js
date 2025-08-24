@@ -35,6 +35,7 @@ let __smAudioCtx = null;
 let __lastInterval = '';
 let __lastPlayTs = 0;
 
+
 // Assets
 const BASE = import.meta.env.BASE_URL;
 const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
@@ -182,7 +183,7 @@ const PROLOGUE_PAGES = [
           "Euclid immediately notices the odd-shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. " +
           "<span style='color:#00ccff'>“What’s the hypotenuse length?”</span> 🤔📐",
         answer: `5 cm is the longest side, opposite the right angle (3² + 4² = 9 + 16 = 25 → √25 = 5)`,
-        sfx: 'smDing'
+        sfx: 'smDing2'
       },
       {
         prompt:
@@ -190,7 +191,7 @@ const PROLOGUE_PAGES = [
           "Next, Euclid sketches the perfect SnowCone: two equal sides of 6 cm and a top edge of 4 cm. " +
           "<span style='color:#00ccff'>“What’s the perimeter of this neon triangle?”</span> 🤔📏",
         answer: `16 cm (6 + 6 + 4 = 16) <span style='color:#00ccff;'>▽</span>!!`,
-        sfx: 'smDing2'
+        sfx: 'smDing'
       }
     ]
   },
@@ -299,12 +300,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "Turing was excited to see the SnowCones and said, <span style='color: #00ccff;'>\"I would like to have f(3) scoops using my doubling-plus-one function of f(x) = 2x + 1.\"</span> 🤔🍧<br>",
         answer: "2 × 3 + 1 = 7 = f(3) = 7 scoops!!🍧",
-        sfx: 'smDing'
+        sfx: 'smDing2'
       },
       {
         prompt: "Brahmagupta heard me say I couldn't stack that many scoops and asked Turing: <span style='color: #00ccff;'>\"What happens when a whole scoop is multiplied or divided by 0?\"</span> 🤔<br>",
         answer: "It melts to nothing! (The scoops are reduced by the silence.)",
-        sfx: 'smDing2'
+        sfx: 'smDing'
       }
     ]
   },
@@ -397,12 +398,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "Before snagging a SnowCone, Lovelace pondered whether the weather might cancel the MathFest: <span style='color: #00ccff;'>\"If thunder repeats every 5 seconds, how many repeats happen in 20 seconds?\"🤔</span><br>",
         answer: "4 repitions (20 ÷ 5)",
-        sfx: SFX_PATHS.p25
+        sfx: 'smDing2'
       },
       {
         prompt: "Gauss knew he wasn't leaving without a SnowCone. He mused at the neon rain, noting that a drop fell every 0.25 seconds: <br> <span style='color: #00ccff;'>\"If the storm lasts 2.5 seconds, how many drops hit the ground?\"</span> 🤔<br>",
         answer: "10 drops = (2.5 ÷ 0.25)",
-        sfx: SFX_PATHS.p25
+        sfx: 'smDing'
       }
     ]
   },
@@ -411,7 +412,7 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style='font-size:1.2em; color: yellow;'>Drops of Understanding<br>Battling the Storms</strong><br>
+        <strong style='font-size:1.2em; color: yellow;'>Drops of Understanding</strong><br>
         My heart raced as the musical tempest around me felt impossibly ordered; I realized chaos is merely a tapestry of patterns too vast for my untrained eyes.
         <img 
           src="${PRO_IMG('jehnkTransparent.png')}" 
@@ -746,7 +747,7 @@ function drawSlide() {
   const page = PROLOGUE_PAGES[slideIndex];
   if (!page) { backToChapterMenu(); return; }
 
-  // Build the inner content for the slide type
+  // --- build slide inner ------------------------------------------------------
   let inner = '';
   if (page.type === 'html') {
     inner = `<div class="sm-slide sm-fade-in">${page.html}</div>`;
@@ -789,14 +790,10 @@ function drawSlide() {
         </div>` : ``}
       </div>`;
   } else {
-    // Fallback: plain wrapper
     inner = `<div class="sm-slide sm-fade-in"></div>`;
   }
 
-  // Frame markup:
-  // - Keep content in .sm-typewrap
-  // - Keep only Prev/Next in the center controls row (smaller, frees height)
-  // - Dock 🔙 Menu (left) + 🔊/🔇 Mute (right) in a bottom bar like chapter select
+  // --- frame markup -----------------------------------------------------------
   container.innerHTML = `
     <div class="sm-aspect-wrap">
       <div class="sm-game-frame sm-is-intro">
@@ -825,22 +822,29 @@ function drawSlide() {
 
   elRoot = container.querySelector('.sm-aspect-wrap');
 
-  // Practice: wire reveal buttons to open answers + play SFX (per item)
+  // --- practice wiring (reveal SFX + XP + popup + fretboard) ------------------
   if (page.type === 'practice') {
+    // per-item reveal
     elRoot.querySelectorAll('.js-reveal').forEach(btn => {
       btn.addEventListener('click', () => {
         const i = +btn.dataset.i;
         const ans = elRoot.querySelector(`#ans-${i}`);
         if (ans && !ans.classList.contains('is-open')) {
           ans.classList.add('is-open');
+
+          // SFX
           const item = PROLOGUE_PAGES[slideIndex].items[i];
           if (item?.sfx) playSFX(item.sfx);
+
+          // XP + popup
+          awardXP(25, { anchor: btn, reason: 'practice reveal' });
+
         }
         btn.setAttribute('disabled', 'true');
       }, { once: true });
     });
 
-    // Optional interactive fretboard (kept exactly as your logic expects)
+    // optional interactive fretboard
     if (page.interactive) {
       const L = page.interactive.length || 60;
       const fret = elRoot.querySelector('#smFret');
@@ -850,13 +854,10 @@ function drawSlide() {
       const intervalOut = elRoot.querySelector('#smInterval');
 
       const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b]} return a||1; };
-      const simp = (n,d) => {
-        const g = gcd(n,d);
-        return `${(n/g)}/${(d/g)}`;
-      };
+      const simp = (n,d) => { const g = gcd(n,d); return `${(n/g)}/${(d/g)}`; };
       const intervalLabel = (press, len) => {
         const remain = len - press;
-        const r = remain / len; // fraction vibrating
+        const r = remain / len;
         if (press === len/2) return 'Octave ↑';
         if (Math.abs(r - 2/3) < 0.001) return 'Perfect Fifth ↑';
         if (Math.abs(r - 3/4) < 0.001) return 'Perfect Fourth ↑';
@@ -875,7 +876,6 @@ function drawSlide() {
         intervalOut.textContent = label ? `• ${label}` : '';
         intervalOut.classList.toggle('is-emph', !!label);
 
-        // Beep when newly hitting a landmark (throttled)
         const now = performance.now();
         if (label && label !== __lastInterval && (now - __lastPlayTs > 350)) {
           playIntervalBeep(label);
@@ -889,9 +889,20 @@ function drawSlide() {
     }
   }
 
-  // Global handlers (you already wire clicks/keys elsewhere)
+  // --- final slide: +500 XP on Finish before navigation -----------------------
+  const nextBtn = elRoot.querySelector('#smNext');
+  if (nextBtn && slideIndex === PROLOGUE_PAGES.length - 1) {
+    // capture so it fires before global Next handler re-renders
+    nextBtn.addEventListener('click', () => {
+      awardXP(500, { anchor: nextBtn, reason: 'prologue complete' });
+    }, { once: true, capture: true });
+  }
+
+  // --- global handlers (as before) --------------------------------------------
   wireHandlersForCurrentRoot();
 }
+
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Wiring
@@ -1101,4 +1112,58 @@ function playIntervalBeep(label) {
 
   osc.start(now);
   osc.stop(now + 0.4);
+}
+
+function awardXP(amount, opts = {}) {
+  // opts: { anchor?: HTMLElement, noPopup?: boolean, reason?: string }
+  const { anchor = null, noPopup = false, reason = '' } = opts;
+  try {
+    appState.addXP(amount);
+    console.log(`✨ [StoryMode] +${amount} XP ${reason}`);
+    if (!noPopup) showXPPopup(`+${amount} XP`, anchor);
+  } catch (err) {
+    console.warn('XP award failed:', err);
+  }
+}
+
+function showXPPopup(text, anchorEl) {
+  const container = document.body; // render fixed to body
+  const popup = document.createElement('div');
+  popup.className = 'sm-xp-popup';
+  popup.textContent = text;
+
+  Object.assign(popup.style, {
+    position: 'fixed',
+    zIndex: 9999,
+    fontFamily: '"Orbitron", sans-serif',
+    fontSize: 'clamp(1rem, 1.2vh + 0.6rem, 1.4rem)',
+    color: '#9ff',
+    textShadow: '0 0 8px rgba(0,255,238,0.55)',
+    pointerEvents: 'none',
+    opacity: '0',
+    transition: 'transform 0.9s ease, opacity 1.2s ease',
+  });
+
+  if (anchorEl) {
+    const rect = anchorEl.getBoundingClientRect();
+    popup.style.left = rect.left + rect.width/2 + 'px';
+    popup.style.top = rect.top - 10 + 'px';
+    popup.style.transform = 'translate(-50%, 0)';
+  } else {
+    popup.style.left = '50%';
+    popup.style.bottom = '12vh';
+    popup.style.transform = 'translateX(-50%)';
+  }
+
+  container.appendChild(popup);
+
+  requestAnimationFrame(() => {
+    popup.style.opacity = '1';
+    popup.style.transform += ' translateY(-24px)';
+    setTimeout(() => {
+      popup.style.opacity = '0';
+      popup.style.transform += ' translateY(-44px)';
+    }, 900);
+    setTimeout(() => popup.remove(), 1600);
+  });
 }

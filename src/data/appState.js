@@ -315,4 +315,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: "v0.7.7-Prologuing the Inevitable" };
+window.devFlags = { build: "v0.8.0-Prologuing the Inevitable is Done" };

@@ -590,3 +590,80 @@
 /* Small tidy so the reveal list doesn't add surprise bottom space */
 .sm-reveal-list { margin-bottom: 6px; }
 .sm-reveal-answer { padding-bottom: 0; }
+
+/* ───────────────────────────────
+   Desktop-only scaling for practice slides
+   (shrinks slightly under short heights)
+   ─────────────────────────────── */
+@media (pointer: fine) and (max-height: 760px) {
+  .sm-slide.sm-practice {
+    padding-bottom: clamp(6px, 1vh, 12px);
+  }
+
+  .sm-slide.sm-practice .sm-slide-text {
+    font-size: clamp(1rem, 0.8vh + 0.7rem, 1.1rem);
+    line-height: 1.2;
+  }
+
+  .sm-slide.sm-practice .sm-reveal-block {
+    padding: clamp(8px, 1vh, 12px);
+  }
+
+  .sm-slide.sm-practice .sm-reveal-prompt {
+    font-size: clamp(0.95rem, 0.75vh + 0.5rem, 1.05rem);
+  }
+
+  .sm-slide.sm-practice .sm-reveal-answer {
+    font-size: clamp(0.9rem, 0.7vh + 0.45rem, 1rem);
+  }
+
+  .sm-slide.sm-practice .sm-fret-wrap {
+    padding: clamp(8px, 1vh, 12px);
+  }
+
+  .sm-slide.sm-practice .sm-fret-title {
+    font-size: clamp(0.9rem, 0.75vh + 0.5rem, 1.05rem);
+  }
+
+  .sm-slide.sm-practice .sm-fret-readout {
+    font-size: clamp(0.85rem, 0.7vh + 0.45rem, 0.95rem);
+  }
+
+  /* Controls/buttons scale down slightly */
+  .sm-prologue-controls .sm-btn {
+    padding: clamp(0.35rem, 1vh, 0.6rem) clamp(0.6rem, 1.6vh, 0.9rem);
+    font-size: clamp(0.8rem, 0.7vh + 0.35rem, 0.95rem);
+  }
+  .sm-square-btn {
+    width: clamp(40px, 5.5vh, 72px);
+    height: clamp(40px, 5.5vh, 72px);
+    font-size: clamp(16px, 2.5vh, 22px);
+  }
+}
+
+
+/* XP popup */
+.sm-xp-popup {
+  position: absolute;
+  left: 50%;
+  bottom: 12vh; /* sits above bottom bar */
+  transform: translateX(-50%) translateY(0);
+  font-family: "Orbitron", system-ui, sans-serif;
+  font-size: clamp(1rem, 1.2vh + 0.6rem, 1.4rem);
+  color: #9ff;
+  text-shadow: 0 0 8px rgba(0,255,238,0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.sm-xp-popup.is-active {
+  animation: xpFloat 1.5s ease forwards;
+}
+
+@keyframes xpFloat {
+  0%   { opacity: 0; transform: translate(-50%, 0); }
+  15%  { opacity: 1; }
+  80%  { opacity: 1; transform: translate(-50%, -40px); }
+  100% { opacity: 0; transform: translate(-50%, -50px); }
+}

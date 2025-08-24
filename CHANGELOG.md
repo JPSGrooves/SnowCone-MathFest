@@ -6,11 +6,75 @@
 * ✅ **v0.6.6 – TentsUpCarsParked**
 * ✅ **v0.7.0 – Kids Mode Complete**
 * ✅ **v0.7.7 – Prologuing the Inevitable**
-* 🔜 **v0.8.0 – Story Mode + Narratives**
+* ✅ **v0.8.0 – Story Mode Prologue Finished**
 * 🔜 **v0.9.0 – Math Tips Mode Complete**
 * 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**
 
 ---
+
+## v0.8.0 — *“Story Mode Prologue Finished”* (August 24, 2025)
+
+### 📖 Story Mode — Prologue, Locked
+
+* Typewriter intro ➜ slides flow with clean **Prev/Next**.
+* Centered **Chapter Menu** with “Story Mode Forest” title; safe-area bottom bar (**Back/Mute**).
+* Background **contain/center** inside 11:16 stage; portrait band enlarged; no weird crops.
+
+### 🧮 XP & Toasts (new!)
+
+* **+25 XP per Reveal** (practice items).
+* **+500 XP on “Finish”** (last slide), awarded **before navigation** via capture listener.
+* **Single subtle toast**, anchored to the pressed button (no duplicate bottom-screen pop).
+* Central helpers:
+
+  * `awardXP(amount, { anchor, reason })`
+  * `showXPPopup(text, anchor)`
+* XP writes to `appState.addXP(...)`; console logs `✨ +XP` for traceability.
+
+### 🧩 Practice Slides
+
+* Reveal buttons open answers once (double-fire guarded).
+* Per-item SFX (`smDing`, `smDing2`) play on first reveal.
+* Optional **fretboard mini-sim**: simplified fraction readout + interval labels; **interval-beep** with throttle.
+
+### 🖼️ Legend Image System
+
+* New `.sm-slide-legend` sizing with tuned margins; **Galileo bump** option.
+* Special image rules: `.sm-cosmic`, `.sm-slide-image-bram`, Euclid cone tweaks.
+* Title→image spacing and text underlap fixes.
+
+### 📱 Viewport & CSS Polish
+
+* Clamp-driven typography; no scroll needed, no line-clamp truncation.
+* Bottom bar respects `env(safe-area-inset-bottom)`.
+* iOS tap-highlight off; double-tap zoom prevention on core wrappers.
+* Director portrait pinned to bottom; shoes never cropped.
+
+### 🔊 Audio
+
+* Howler **one-tap unlock** retained.
+* Mute sync across canvases.
+* Interval beep uses WebAudio with short, clickless envelope.
+
+### ⚙️ Cleanup & Stability
+
+* Global handlers (click/keydown) **unwired on exit**; no leaks between Kids/Story.
+* Background repaint helper avoids layout thrash.
+* Lazy slide rendering with minimal DOM churn.
+
+### 🐛 Fixes
+
+* Removed duplicate XP popup path (no second toast near bottom).
+* Guarded reveal buttons from re-award/rehit.
+* Final “Finish” XP fires exactly once.
+
+### ⭐ Coming Next
+
+* **Completion badge** for Prologue finish.
+* Chapter 1 unlock prep (target per chapter menu note).
+* v0.9.0: **Math Tips Mode Complete**.
+
+___
 
 ## v0.7.7 — *“Prologue Sparks, Legends Awake.”* (August 23, 2025)
 
