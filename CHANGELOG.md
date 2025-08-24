@@ -5,9 +5,60 @@
 * ✅ **v0.6.0 – Infinity Mode Complete**
 * ✅ **v0.6.6 – TentsUpCarsParked**
 * ✅ **v0.7.0 – Kids Mode Complete**
+* ✅ **v0.7.7 – Prologuing the Inevitable**
 * 🔜 **v0.8.0 – Story Mode + Narratives**
 * 🔜 **v0.9.0 – Math Tips Mode Complete**
 * 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**
+
+---
+
+## v0.7.7 — *“Prologue Sparks, Legends Awake.”* (August 23, 2025)
+
+### 📖 Story Mode — First Steps
+
+* ✅ **Prologue complete** — narrative flow locked in, typewriter intro, clean Prev/Next navigation.  
+* ✅ **Chapter menu polish** — centered vertically, bigger “Story Mode Forest” title, buttons tidy + responsive.  
+* ✅ **Legend portraits** — Galileo, Newton, Bram, Ada, Gauss, Jehnk all wired in; new `.sm-slide-legend` scaling system makes them shine.  
+* ✅ **Spacing fixes** — title→image padding, bottom margins, and no underlapping text.  
+
+### 🖼️ Art Integration
+
+* Cosmic festival portraits generated + dropped in:  
+  * Galileo night sky 🌌  
+  * Newton’s force-laden ballet 🪐⚙️  
+  * Ada storm spiral ⚡🎶  
+  * Gauss tracing rain-arcs 🌧️➗  
+  * Jehnk 2-Cones 🍧🍧 (tie-dye, sunnies)  
+* Transparent-edge festival art for surreal storm moments — fades clean into the void.  
+* Bram asset re-exported at 2× resolution — no more blur on retina.  
+
+### 🧩 Practice Slides
+
+* SnowCone art pinned absolutely with reserved space — no more button push-downs on mobile.  
+* Reveal answers show cleanly with cone inline, buttons stable across devices.  
+
+### 📱 Viewport Prep
+
+* Clamp/vh audits for text + buttons across slides.  
+* iOS double-tap zoom suppression still solid.  
+* Bottom bar pinned (Back/Mute), safe-area padding respected.  
+
+### 🔊 Audio
+
+* Howler sync + mute toggle steady across Kids + Story.  
+* AudioContext auto-unlocks on first touch/click.  
+* SFX placeholders scoped for Story (no leaks).  
+
+### 🧼 Cleanup Discipline
+
+* RAF, timers, event handlers unwired on exit.  
+* Legend image scaling + preload optimized; no ghost listeners.  
+
+---
+
+### 📌 Dev Notes  
+
+> *“Story Mode breathes now. Galileo whispers, Newton counters, Ada storms, Gauss arcs — and Jehnk hands out cones like wisdom. Phone looks good. Desktop scaling’s the last puzzle before v0.8.0. The forest is alive.”*  
 
 ---
 

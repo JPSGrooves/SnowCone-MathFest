@@ -87,7 +87,7 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.2em; color: yellow;">Pythagorus - Song of Fractions</strong><br><br>
+        <strong style="font-size:1.2em; color: yellow;">Pythagorus Explains the Song of Fractions</strong><br><br>
         <span style="color:#00ccff;">"Music is the math you already know 🎶 — deep in your bones 💀🎸.<br><br>
         When you go up the string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️,
         yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint.<br><br>
@@ -148,13 +148,17 @@ const PROLOGUE_PAGES = [
         He paused, tracing his proofs and figures through the void —
         <span style="color:#00ccff;">"The simplest gesture births every shape, every temple, every constellation above.
         Each angle is a handshake between points 🤝, each intersection a moment of cosmic agreement.<br><br>
+        <img 
+          src="${PRO_IMG('infinity.png')}" 
+          alt="bram" 
+          class="sm-slide-image sm-slide-image-bram"
+        />
         Even a circle is but a promise kept — every point faithful to its center 🌀.<br>
-        A proof is a path through the fog, where reason becomes lantern-light 🏮.<br>
-        Infinity itself is a patient horizon, waiting for steady interpretation to arrive 🌌."</span>
+        Infinity itself is a patient horizon, waiting for steady interpretation through the stars 🌌."</span>
       </div>`
   },
   // Page 6 — Euclid image
-  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid Almost Doesn't Hear My Call..." },
+  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid Almost Didn't Hear My Call..." },
   {
     type: 'html',
     html: `
@@ -185,8 +189,7 @@ const PROLOGUE_PAGES = [
           "<strong style='font-size:1.1em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
           "Next, Euclid sketches the perfect SnowCone: two equal sides of 6 cm and a top edge of 4 cm. " +
           "<span style='color:#00ccff'>“What’s the perimeter of this neon triangle?”</span> 🤔📏",
-        answer: `16 cm (6 + 6 + 4 = 16) <span style='color:#00ccff;'>▽</span>!!
-                <img src="${PRO_IMG('cosmicCone.png')}" alt="cosmic cone" class="sm-cone-inline">`,
+        answer: `16 cm (6 + 6 + 4 = 16) <span style='color:#00ccff;'>▽</span>!!`,
         sfx: 'smDing2'
       }
     ]
@@ -241,7 +244,7 @@ const PROLOGUE_PAGES = [
   // Page 10 — Galileo/Newton practice
   {
     type: 'practice',
-    title: "Practice Problems 🍧🚀",
+    title: "Motion Math 🍧🚀",
     items: [
       {
         prompt: "I informed Galileo that my neon SnowCone truck cruised to the entrance at a steady pace: I traveled 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>",
@@ -291,16 +294,16 @@ const PROLOGUE_PAGES = [
   // Page 13 — Turing/Brahmagupta practice
   {
     type: 'practice',
-    title: "Practice Problems 🍧🚀",
+    title: "f(0) Problems 🍧🚀",
     items: [
       {
-        prompt: "Turing was excited to see the SnowCones and said, <span style='color: #00ccff;'>\"I would like to have 7 scoops.\"</span> Remembering his doubling-plus-one function as f(x) = 2x + 1, he asked, <span style='color: #00ccff;'>\"What is f(3) scoops?\"</span> 🤔<br>",
-        answer: "2 × 3 + 1 = 7 = f(3) 🍧",
+        prompt: "Turing was excited to see the SnowCones and said, <span style='color: #00ccff;'>\"I would like to have f(3) scoops using my doubling-plus-one function of f(x) = 2x + 1.\"</span> 🤔🍧<br>",
+        answer: "2 × 3 + 1 = 7 = f(3) = 7 scoops!!🍧",
         sfx: 'smDing'
       },
       {
         prompt: "Brahmagupta heard me say I couldn't stack that many scoops and asked Turing: <span style='color: #00ccff;'>\"What happens when a whole scoop is multiplied or divided by 0?\"</span> 🤔<br>",
-        answer: "It melts into nothing! (The scoops are reduced by the silence.)",
+        answer: "It melts to nothing! (The scoops are reduced by the silence.)",
         sfx: 'smDing2'
       }
     ]
@@ -311,30 +314,41 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.2em; color: yellow;">Euclid Returns to Meet Bombelli</strong><br>
-        Bombelli arrived later than the rest, but the familiar voice of Euclid ran back to understand the shifting shape of the world around us.<br><br>
-        <span style='color: white;'>Bombelli:</span> <span style='color: #00ccff;'>\"What you call impossible... we call architecture. We draft cathedrals in the abstract, where each imaginary unit is a soaring arch and every complex plane lays the foundation for realms unseen. In our hands, ‘i’ becomes brick, and infinity our blueprint. Here, the dream of numbers carves space itself, and what others dismiss as folly reveals its hidden symmetry and strength.\"</span><br><br>" 
-        My mind was tossed in a sprightly dance and I concluded that imaginary numbers build real dreams.
+        <strong style="font-size:1.2em; color: yellow;">Euclid Returns<br> to Meet Bombelli...</strong><br>
+        <img 
+          src="${PRO_IMG('bombellieuclidpicture.png')}" 
+          alt="bram" 
+          class="sm-slide-image sm-slide-image-bram"
+        />
+        Bombelli arrived later than the rest, but the familiar voice of Euclid ran back to gain a better understanding of the shifting shapes of the world around us.<br>
       </div>`
   },
 
-  // Page 15 — Bombelli image
-  { type: 'image', src: PRO_IMG('bombellieuclidpicture.png'), caption: "Bombelli’s imaginary stance" },
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style="font-size:1.2em; color: yellow;">Bombelli Explains...</strong><br>
+        <span style='color: #00ccff;'>\"What you call impossible... we call architecture. We draft cathedrals in the abstract, where each imaginary unit is a soaring arch and every complex plane lays the foundation for realms unseen. In our hands, ‘i’ becomes brick, and infinity our blueprint. Here, the dream of numbers carves space itself, and what others dismiss as folly reveals its hidden symmetry and strength.\"</span><br><br> 
+        My mind was tossed in a sprightly dance by the Bombelli Bombs, and I concluded that imaginary numbers could explode into real Snowcones.
+      </div>`
+  },
+
 
   // Page 16 — Bombelli practice
   {
     type: 'practice',
-    title: "Practice Problems 🍧🚀",
+    title: "Bombelli Bombs 🍧🚀",
     items: [
       {
-        prompt: "What is √(−1)?",
-        answer: "i (Imaginary)",
-        sfx: SFX_PATHS.p25
+        prompt: "Stepping up for his first Snowcone of the MathFest, Bombelli, was trying to figure out how to get an impossible SnowCone and asked, <span style='color: #00ccff;'>What is the square root of −1?🤔</span><br>",
+        answer: "i (Imaginary, but essential for an impossible SnowCones.)",
+        sfx: 'smDing'
       },
       {
-        prompt: "What is i²?",
-        answer: "−1 (loops back negative)",
-        sfx: SFX_PATHS.p100
+        prompt: "Euclid, figuring out how he could offer ME an imaginary Snowcone, asked, <span style='color: #00ccff;'>Can I have i² SnowCones?</span><br>",
+        answer: "That's −1! (He looped it right back to me!)",
+        sfx: 'smDing2'
       }
     ]
   },
@@ -344,32 +358,69 @@ const PROLOGUE_PAGES = [
     type: 'html',
     html: `
       <div class="sm-slide-text">
-        <strong style="font-size:1.2em; color: yellow;">Lovelace &amp; Gauss — Rhythm in the Storm</strong><br>
-        Ada: <span style="color:#00ccff;">"Find the rhythm hidden in the storm…"</span>
-        Gauss: <span style="color:#00ccff;">"They dance between the numbers…"</span><br><br>
-        Chaos is a tapestry of patterns too vast for untrained eyes.
+        <strong style='font-size:1.2em; color: yellow;'>Lovelace Reflects On<br>Battling the Storms</strong><br>
+        Eyeing a swirling mist over the MathFest, Ada Lovelace bent close to the dancing SnowCones...<br>
+        <span style='color: #00ccff;'>\"Find the rhythm hidden in the storm. Let each thunderclap be the drumbeat of your code and every spiral of wind the loop that composes our melody.\"</span><br>
+        <img 
+          src="${PRO_IMG('lovelace.png')}" 
+          alt="Lovelace" 
+          class="sm-slide-image sm-slide-image-bram"
+        />
+     </div>`
+  },
+
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style='font-size:1.2em; color: yellow;'>Gauss Goes On<br>Battling the Storms</strong><br>
+        <img 
+          src="${PRO_IMG('guassLesson.png')}" 
+          alt="Guass" 
+          class="sm-slide-image sm-slide-image-bram"
+        />
+        At the edge of a wind-whipped SnowCone, her new friend, Gauss, traced arcs in the raindrops falling like decimal points... <br>
+        <span style='color: #00ccff;'>\"They dance between the numbers, gliding through what seems to be randomness, but in every step lies a formula of fate waiting to be unveiled.\"</span><br><br>
       </div>`
   },
 
+
+
   // Page 18 — Lovelace/Gauss image
-  { type: 'image', src: PRO_IMG('lovelacegausspicture.png'), caption: "Patterns in the rain" },
+  { type: 'image', src: PRO_IMG('lovelacegausspicture.png'), caption: "Lovelace and Guass Counting the Drops of Rain" },
 
   // Page 19 — Lovelace/Gauss practice
   {
     type: 'practice',
-    title: "Practice Problems 🍧🚀",
+    title: "Love Problems 🍧🚀",
     items: [
       {
-        prompt: "Thunder repeats every 5s. How many repeats in 20s?",
-        answer: "4 (20 ÷ 5)",
+        prompt: "Before snagging a SnowCone, Lovelace pondered whether the weather might cancel the MathFest: <span style='color: #00ccff;'>\"If thunder repeats every 5 seconds, how many repeats happen in 20 seconds?\"🤔</span><br>",
+        answer: "4 repitions (20 ÷ 5)",
         sfx: SFX_PATHS.p25
       },
       {
-        prompt: "One drop every 0.25s. In 2.5s, how many drops?",
-        answer: "10 (2.5 ÷ 0.25)",
+        prompt: "Gauss knew he wasn't leaving without a SnowCone. He mused at the neon rain, noting that a drop fell every 0.25 seconds: <br> <span style='color: #00ccff;'>\"If the storm lasts 2.5 seconds, how many drops hit the ground?\"</span> 🤔<br>",
+        answer: "10 drops = (2.5 ÷ 0.25)",
         sfx: SFX_PATHS.p25
       }
     ]
+  },
+
+  {
+    type: 'html',
+    html: `
+      <div class="sm-slide-text">
+        <strong style='font-size:1.2em; color: yellow;'>Drops of Understanding<br>Battling the Storms</strong><br>
+        My heart raced as the musical tempest around me felt impossibly ordered; I realized chaos is merely a tapestry of patterns too vast for my untrained eyes.
+        <img 
+          src="${PRO_IMG('jehnkTransparent.png')}" 
+          alt="Jehnky" 
+          class="sm-slide-image sm-slide-image-bram"
+        />
+        Lovelace and Gauss were teaching me to see the hidden order in the storm, to find the code in the chaos, and to dance with the patterns of the universe itself.
+      </div>`
+      
   },
 
   // Page 20 — Final Reflection
@@ -381,7 +432,8 @@ const PROLOGUE_PAGES = [
         We jammed with Pythagoras 🎵🍧; walked Euclid & Bombelli’s arches 🏛️🔮; moved with Galileo & Newton 🚀🎶;
         decoded Turing’s echoes 🤖➕1; heard Brahmagupta’s zeros 0️⃣🤫; chased Lovelace’s rhythms 💻🌩️ and Gauss’s patterns 🔢🎉.<br><br>
         Math is more than numbers—it's music, architecture, motion, code, and the dreams that bind them together.<br>
-        Keep practicing in Quick Serve Mode, and I’ll see you in Story Mode soon!
+        Keep practicing at QuickServe Pavilion and Infinity Lake, and don't forget about MAthTips Village and the Camping Games!<br> 
+        I hope to see you soon in Chapter 1!!
       </div>`
   },
 
@@ -566,20 +618,20 @@ function renderChapterMenu() {
             <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue</button>
 
             <button class="sm-btn sm-btn-secondary is-disabled" id="smCh1" disabled>
-              Chapter 1 — Coming Day One
+              Chapter 1 — FREE on Day One!
             </button>
 
             <button class="sm-btn sm-btn-secondary is-disabled" id="smCh2" disabled>
-              🔒 Chapter 2 — Paid
+              🔒 Chapter 2 — Paid Content
             </button>
 
             <button class="sm-btn sm-btn-secondary is-disabled" id="smCh3" disabled>
-              🔒 Chapter 3 — Paid
+              🔒 Chapter 3 — Paid Content
             </button>
           </div>
 
           <div class="sm-chapter-note">
-            Pick Prologue to begin. The others will unlock soon.
+            Pick Prologue to begin! <br> Chapter 1 will release 1/1/26, and the rest will come if people keep returning to SnowCone MathFest!
           </div>
 
           <!-- Bottom utility bar: left=Back, right=Mute (last chance) -->

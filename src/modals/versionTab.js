@@ -6,27 +6,25 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.7.0</h3>
+      <h3>🧠 SnowCone MathFest v0.7.7</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.7.0 Update – TentsUpCarsParked</h3>
+      <h3>🍦 v0.7.7-Prologuing the Inevitable</h3>
       <p>
-        – 🏕️ <strong>Kids Camping v0.7.0 locked</strong> — Tent Lines, Parking, Ant Attack, and the new Mosquito mini-game all live<br>
-        – 🚗 Parking Game: all 11 cars, ordinal bonus (+50) and under-one-minute bonus (+100), smooth festival-pace drive-offs, zero jank<br>
-        – 🎺 Honk system v2: <code>honk1…honk5</code> sequence per car, honk memory persists if you skip and come back<br>
-        – 🖼️ Sprite preloader for parking art — first load stutter gone; intro lane drive-by anim toggles off on first tap<br>
-        – 🐜 Ant Attack rewrite: pure count-based tug-of-war; food moves at weight; player wins ties; direction can flip mid-pull; every round scores<br>
-        – 🧯 “Ghost score” + late red-spawn bugs squashed; clean tween redirects; food weight overlay + big snowcone polish<br>
-        – ⛺ Tent Lines: resilient SVG glow (retries, filter refresh, solid-stroke fallback), solve-all path awards +100, mobile-safe scaling<br>
-        – 🦟 Mosquito mini-game: spawns every 7s, smooth slide-in + drift, tap-to-splat at exact touch, +50 Camping Score reward<br>
-        – 🔊 SFX: <code>mosquito.mp3</code> on splat at 30% volume, respects global mute; no “haunting” — fully scoped to Kids canvas and killed on exit<br>
-        – 🎚️ Mute button synced with Howler state; AudioContext auto-unlock on first touch/click for mobile reliability<br>
-        – 🧮 XP flow: earn <strong>100 XP per 1000</strong> Camping Score (auto-tracked with MobX reaction)🎖️<br>
-        – 📱 Mobile polish: double-tap-zoom prevention, vh/clamp sizing audit, centered background, grid row locks, tidy score pop animation<br>
-        – 🧼 Cleanup discipline: global mosquito kill-switch, timers/RAF/disposers cleared, handlers unwired — no leaks, no leftovers<br>
+        – 📖 <strong>Story Mode (Prologue) online</strong> — centered chapter menu, bigger title, typewriter screen, clean Prev/Next flow<br>
+        – 🖼️ <strong>Legend image system</strong>: new <code>.sm-slide-legend</code> sizing + Galileo bump class; title→image spacing fix; crisp margins<br>
+        – 🌌 New art drops: Galileo/Newton night skies (landscape), Ada storm spiral (landscape), Gauss rain‑arcs (landscape), Jehnk 2‑Cones (portrait), festival variants with transparent edges<br>
+        – 🧊 Bram image re‑exported @2× for retina; optional <code>image-rendering: crisp-edges</code> hook added<br>
+        – 🧩 Practice slides: cone art now <em>pinned</em> (abs‑pos) with reserved space — no button push‑down on mobile<br>
+        – 📱 Viewport prep pass: clamp + vh audit, safe‑area bottom bar, iOS tap highlight off, double‑tap zoom prevention kept<br>
+        – 🔊 Audio: Howler one‑tap unlock preserved; mute sync; interval‑beep throttle; sfx wiring stays scoped to Story canvas<br>
+        – ⚙️ Perf: sprite & image preloads tuned; lazy-in slide art; background repaint helper keeps cache fresh without layout thrash<br>
+        – 🐛 Fixes: title/text underlap beneath images, Galileo “too small” PNG, reveal button double‑fires, Back/Mute alignment, pointer‑events on bottom bar<br>
+        – 🧯 Cleanup discipline: listeners/RAF/timers fully unwired on exit; no leaks between Kids/Story canvases<br>
+        – 🧮 XP: Camping XP unchanged; Story XP counters stubbed (hidden) pending chapter unlocks<br>
       </p>
     </div>
 

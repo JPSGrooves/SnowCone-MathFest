@@ -315,4 +315,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: "v0.7.0-KidsCampingOpen" };
+window.devFlags = { build: "v0.7.7-Prologuing the Inevitable" };
