@@ -344,6 +344,12 @@ function deployPlayerAnt(container) {
   playerAntPool--;
   updateAntCount(container);
 
+  // 🔔 milestone: full team attached
+  if (playerAntsAttached >= MAX_ANTS_PER_SIDE) {
+    container?.dispatchEvent(new CustomEvent('kcAntsFull', { bubbles: true }));
+  }
+
+
   const targetX = centerX + offsetX - 16;
   const targetY = centerY + offsetY - 16;
   startCrawlWiggle(ant, spawnX, spawnY, targetX, targetY);

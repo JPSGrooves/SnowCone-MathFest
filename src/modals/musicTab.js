@@ -1,3 +1,4 @@
+// /src/settings/musicTab.js (or wherever this lives)
 import { Howler } from 'howler';
 import {
   playTrack,
@@ -17,6 +18,10 @@ import {
 } from '../managers/musicManager.js';
 
 import { appState } from '../data/appState.js';
+import { awardBadge } from '../managers/badgeManager.js'; // 🏅 NEW
+
+// one-time guard so we only award once per session (badgeManager also de-dupes)
+let _awardedPlayMusic = false;
 
 //////////////////////////////
 // 🔥 Render Music Tab
@@ -95,7 +100,6 @@ export function setupMusicTabUI() {
 
   document.body.classList.toggle('neon-progress', glowToggle?.checked);
 
-
   //////////////////////////////
   // 🔇 Mute
   //////////////////////////////
@@ -123,29 +127,40 @@ export function setupMusicTabUI() {
   });
 
   //////////////////////////////
-  // ⏯️ Play / Pause
+  // ⏯️ Play / Pause  (🏅 badge hooks here)
   //////////////////////////////
   playPauseBtn?.addEventListener('click', () => {
+    const wasPlaying = (playPauseBtn.dataset.playing === '1') || isPlaying();
+
     togglePlayPause();
-    syncButtonStates();
+
+    // Optimistic UI: if it was paused, show ⏸️ right away; if it was playing, show ▶️
+    const nowPlaying = !wasPlaying;
+    setPlayButtonUI(nowPlaying);
+
+    // 🏅 Badge only when we transition into playing via this button
+    if (!_awardedPlayMusic && !wasPlaying && nowPlaying) {
+      try { awardBadge('play_music'); } catch {}
+      _awardedPlayMusic = true;
+    }
+
+    // Final sync once the audio state actually settles
+    settleUISoon();
   });
+
 
   //////////////////////////////
   // ⏭️ Next
   //////////////////////////////
   nextBtn?.addEventListener('click', () => {
     skipNext();
-    syncButtonStates();
+    settleUISoon();
   });
 
-  //////////////////////////////
-  // ⏮️ Prev
-  //////////////////////////////
   prevBtn?.addEventListener('click', () => {
     skipPrev();
-    syncButtonStates();
+    settleUISoon();
   });
-
   //////////////////////////////
   // 🔁 Loop
   //////////////////////////////
@@ -168,7 +183,8 @@ export function setupMusicTabUI() {
   trackSelect?.addEventListener('change', () => {
     const selectedTrack = trackSelect.value;
     playTrack(selectedTrack);
-    syncButtonStates();
+    // (No badge here; button-only per your spec)
+    settleUISoon();
   });
 
   //////////////////////////////
@@ -196,10 +212,7 @@ function updateTrackLabel() {
 }
 
 function updatePlayPauseButton() {
-  const btn = document.getElementById('btnPlayPause');
-  if (btn) {
-    btn.textContent = isPlaying() ? '⏸️' : '▶️';
-  }
+  setPlayButtonUI(isPlaying());
 }
 
 //////////////////////////////
@@ -208,4 +221,18 @@ function updatePlayPauseButton() {
 export function stopMusicPlayer() {
   stopTrack();
   syncButtonStates();
+}
+function setPlayButtonUI(playing) {
+  const btn = document.getElementById('btnPlayPause');
+  if (!btn) return;
+  btn.dataset.playing = playing ? '1' : '0';
+  btn.textContent = playing ? '⏸️' : '▶️';
+}
+
+function settleUISoon(delay = 120) {
+  // Let Howler/musicManager finish flipping state, then sync for real
+  setTimeout(() => {
+    updateTrackLabel();
+    setPlayButtonUI(isPlaying());
+  }, delay);
 }

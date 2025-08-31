@@ -7,6 +7,8 @@ import { autorun } from 'mobx';
 import { appState } from './data/appState.js';
 import { setupMenu } from './menu/menu.js'; // ⬅️ this wires transitions
 import { playTransition } from './managers/transitionManager.js'; // still available if needed
+import { initBadgeManager } from './managers/badgeManager.js';
+import { startAchievementsWatcher } from './achievementsWatcher.js';
 
 // 🍧 Anti–Double-Tap Zoom Shield (esp. iOS Safari)
 let lastTouchTime = 0;
@@ -52,9 +54,34 @@ links.forEach(attrs => {
   document.head.appendChild(link);
 });
 
-// 🌀 Init after DOM is ready
-window.addEventListener('DOMContentLoaded', () => {
-  console.log("📦 DOM ready. Starting app...");
+// ✅ OPTIONAL: tiny in-file test kit (so you don't need a separate file)
+function attachDevHarness() {
+  const w = (globalThis || window);
+  w.appState = appState; // <-- console: appState.setTheme('summer')
+
+  // lightweight badge/xp helpers
+  w.scTest = {
+    award: id => (import('./managers/badgeManager.js').then(m => m.awardBadge(id))),
+    playJukebox: () => document.dispatchEvent(new Event('sc:jukebox-play', { bubbles: true })),
+    addStory: n => appState.addStoryXP(n),
+    addKids:  n => appState.addKidsCampingXP(n),
+    addQS:    n => appState.addQuickServeXP(n),
+    addInf:   n => appState.addInfinityXP(n),
+    breakdown: async () => {
+      const { computeCompletionBreakdown } = await import('./managers/completionManager.js');
+      const b = computeCompletionBreakdown(appState);
+      console.table(b.xp.buckets); console.log(b);
+      return b;
+    }
+  };
+  console.log('✅ Dev globals: appState, scTest');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('📦 DOM ready. Starting app...');
+  initBadgeManager(appState);          // 1) init badge store
+  startAchievementsWatcher(appState);  // 2) wire autoruns AFTER manager
+  if (import.meta.env.DEV) attachDevHarness();
 
   applyBackgroundTheme();
   console.log("🎨 Background applied.");
@@ -83,4 +110,3 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 600);
   }, 2500);
 });
-

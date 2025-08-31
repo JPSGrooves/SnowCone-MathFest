@@ -12,13 +12,28 @@ import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 import { initMosquitoGame } from './mosquitoGame.js';
 import { enableGestureCage, disableGestureCage } from '../../utils/gestureCage.js';
 import { enableIosLoupeKiller, disableIosLoupeKiller } from '../../utils/iosLoupeKiller.js';
+import { awardBadge } from '../../managers/badgeManager.js';
 
-// ────────────────────────────────────────────────────────────────────────────────
+
+
 // State
 // ────────────────────────────────────────────────────────────────────────────────
 let mosquitoCtrl = null;
 let xpDisposer   = null;
 let lastScoreBucket = 0;
+
+// ✅ local once-only guards (awardBadge is idempotent, this just avoids noise)
+const _awarded = {
+  cars: false,
+  camp10k: false,
+  mosquito: false,
+  ants10: false,
+  tentsAll: false,
+};
+
+const PARKING_FAST_MS = 60_000; // 60s target
+
+
 
 const SELECTORS = {
   container: '#game-container',
@@ -32,7 +47,44 @@ const HANDLERS = {
   onMuteClick: null,
   onIconTwist: null,
 };
+// add near HANDLERS:
+HANDLERS.onAntsFull = null;
+HANDLERS.onParkingComplete = null;
 
+// kidsCamping.js
+function wireKidsBadgeListeners() {
+  unwireKidsBadgeListeners();
+
+  HANDLERS.onAntsFull = () => {
+    if (!_awarded.ants10) { _awarded.ants10 = true; awardBadge('kids_ants10'); }
+  };
+  document.addEventListener('kcAntsFull', HANDLERS.onAntsFull);
+
+  HANDLERS.onParkingComplete = (ev) => {
+    const elapsedMs = ev?.detail?.elapsedMs ?? Infinity;
+    // 🏁 “speed” badge → only if finished within 60s
+    if (elapsedMs <= PARKING_FAST_MS && !_awarded.cars) {
+      _awarded.cars = true;
+      awardBadge('kids_cars_speed');   // ✅ your real ID
+      // console.log('[kids] awarded kids_cars_speed in', elapsedMs, 'ms');
+    }
+  };
+  document.addEventListener('kcParkingComplete', HANDLERS.onParkingComplete);
+}
+
+function unwireKidsBadgeListeners() {
+  if (HANDLERS.onAntsFull)          document.removeEventListener('kcAntsFull', HANDLERS.onAntsFull);
+  if (HANDLERS.onParkingComplete)    document.removeEventListener('kcParkingComplete', HANDLERS.onParkingComplete);
+  HANDLERS.onAntsFull = HANDLERS.onParkingComplete = null;
+}
+
+
+
+function emitCampScore() {
+  try {
+    document.dispatchEvent(new CustomEvent('campScoreUpdated', { detail: appState.popCount }));
+  } catch {}
+}
 // ────────────────────────────────────────────────────────────────────────────────
 // Public API
 // ────────────────────────────────────────────────────────────────────────────────
@@ -286,6 +338,18 @@ function renderMainUI() {
   document.querySelectorAll('.kc-aspect-wrap, .kc-game-frame, .kc-grid').forEach(preventDoubleTapZoom);
 }
 
+
+function onTentsAll() {
+  if (_awarded.tentsAll) return;
+  _awarded.tentsAll = true;
+  requestAnimationFrame(() => setTimeout(() => awardBadge('kids_tents_all'), 0));
+}
+
+
+// and in unwireMainHandlers() (or stopKidsMode) remove if you didn’t use { once: true }:
+// container?.removeEventListener('kc:tents-all', onTentsAll);
+
+
 function wireMainHandlers() {
   // Mute toggle
   const muteBtn = document.getElementById('muteToggle');
@@ -309,6 +373,9 @@ function wireMainHandlers() {
   document.querySelectorAll('.kc-icon, .kc-title img.kc-icon').forEach(el => {
     el.addEventListener('click', HANDLERS.onIconTwist);
   });
+  wireKidsBadgeListeners(); // <— add this
+  const container = document.querySelector(SELECTORS.container);
+  container?.addEventListener('kc:tents-all', onTentsAll, { once: true, passive: true });
 }
 
 function unwireMainHandlers() {
@@ -322,6 +389,9 @@ function unwireMainHandlers() {
     });
   }
   HANDLERS.onIconTwist = null;
+  unwireKidsBadgeListeners(); // <— add this
+  const container = document.querySelector(SELECTORS.container);
+  container?.removeEventListener('kc:tents-all', onTentsAll);
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -391,6 +461,10 @@ async function bootGames() {
           appState.incrementPopCount(50);
           updatePopUI();
           animatePopCount();
+          if (!_awarded.mosquito) {
+            _awarded.mosquito = true;
+            awardBadge('kids_mosquito');
+          }
         }
       });
       mosquitoCtrl.enable();
@@ -410,6 +484,14 @@ async function bootGames() {
 export function updatePopUI() {
   const popSpan = document.getElementById('popCount');
   if (popSpan) popSpan.textContent = appState.popCount;
+
+  emitCampScore(); // ✅ let the Kids XP listener run
+
+  // 10k camping score → badge (once)
+  if (!_awarded.camp10k && (appState.popCount || 0) >= 10_000) {
+    _awarded.camp10k = true;
+    awardBadge('kids_camp_10k'); // alias to your canonical id if needed
+  }
 }
 
 function animatePopCount() {
@@ -477,3 +559,28 @@ function disableNoSelectForKids() {
 
   NOSEL.blockCtx = NOSEL.blockSelect = NOSEL.blockDrag = null;
 }
+(function wireCampXPIncrement() {
+  const POINTS_PER_XP = 10;
+  let creditedXPFromPop = 0;
+
+  const onCampScoreUpdated = (ev) => {
+    const currentPop = Number(ev.detail) || 0;
+
+    // bucketed Kids XP
+    const shouldHaveXP = Math.floor(currentPop / POINTS_PER_XP);
+    const delta = shouldHaveXP - creditedXPFromPop;
+    if (delta > 0) {
+      appState.addKidsCampingXP(delta);  // fills Kids bucket (cap 1000)
+      creditedXPFromPop += delta;
+    }
+
+    // 10k badge here too, so Parking’s local UI still awards it
+    if (!_awarded.camp10k && currentPop >= 10_000) {
+      _awarded.camp10k = true;
+      awardBadge('kids_camp_10k');
+    }
+  };
+
+  document.removeEventListener('campScoreUpdated', onCampScoreUpdated);
+  document.addEventListener('campScoreUpdated', onCampScoreUpdated);
+})();

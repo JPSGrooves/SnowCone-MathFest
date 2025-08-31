@@ -10,9 +10,7 @@ import { activateInputHandler } from '../../managers/inputManager.js';
 import { launchConfetti } from '../../utils/confetti.js';
 import { runInAction } from 'mobx';
 import { playInfinityLoop } from '../../managers/musicManager.js';
-
-
-
+import { awardBadge } from '../../managers/badgeManager.js';
 
 
 
@@ -35,6 +33,17 @@ let streakFlipFlop = true; // Alternates SFX: true = milestone, false = points10
 const sfxIntervals = [3, 6, 9, 6, 3, 6, 9]; // Your exact pattern: 3 6 9 6 3 6 9 etc
 let patternIndex = 0;
 let nextTrigger = sfxIntervals[0];
+// state near the other lets
+let solvedCount = 0;     // how many problems the player solved this run
+let currentMode = 'addsub'; // you use this but never declared it
+
+function checkInfinityBadges() {
+  const seconds = Math.floor((Date.now() - startTime) / 1000);
+  if (solvedCount >= 25  && seconds <= 60)   awardBadge('inf_25_1min');
+  if (solvedCount >= 50  && seconds <= 120)  awardBadge('inf_50_2min');
+  if (solvedCount >= 100 && seconds <= 240)  awardBadge('inf_100_4min');
+  if (solvedCount >= 250 && seconds <= 600)  awardBadge('inf_250_10min');
+}
 
 
 
@@ -181,10 +190,10 @@ function renderIntroScreen() {
 
 function switchMode(mode) {
   currentMode = mode;
-
-  updateModeButtonUI(); // ✨ maybe change button glows
-  generateNewProblem(); // ✅ this must happen
+  updateModeButtonUI();
+  newProblem();               // ⬅️ was generateNewProblem(); fix the name
 }
+
 
 function renderUI() {
   const container = document.getElementById('game-container');
@@ -356,6 +365,7 @@ function startGame() {
   score = 0;
   streak = 0;
   maxStreak = 0; // Reset session max
+  solvedCount = 0;            // ⬅️ reset
   streakFlipFlop = true; // Start with milestone SFX
   patternIndex = 0;
   nextTrigger = sfxIntervals[0]; // First trigger at 3
@@ -512,6 +522,8 @@ function handleCorrect() {
 
   score += points;
   streak++; // 🥳 Increment streak
+  solvedCount++;              // ⬅️ bump problem counter
+  checkInfinityBadges();      // ⬅️ evaluate time-gated badges
 
   // 🎯 Interval-Based Burst Logic
   console.log(`🌈 Streak now at: ${streak}`);
@@ -706,3 +718,19 @@ export {
 };
 
 
+export function finalizeInfinityRun(stats) {
+  // stats.seconds should be the total active-run seconds
+  const seconds = Math.max(0, Number(stats.seconds) || 0);
+
+  // 600s → 1000 XP  => XP = seconds * (1000/600) = seconds * 5/3
+  const xp = Math.round((seconds * 5) / 3);
+
+  appState.addInfinityXP(xp);  // ✅ fills Infinity bucket (cap 1000)
+  appState.addInfinityTime(seconds);
+
+  // badge ideas (hook to your real counters as needed)
+  if (stats.correct >= 25 && seconds <= 60)   awardBadge('inf_25_1min');
+  if (stats.correct >= 50 && seconds <= 120)  awardBadge('inf_50_2min');
+  if (stats.correct >= 100 && seconds <= 240) awardBadge('inf_100_4min');
+  if (stats.correct >= 250 && seconds <= 600) awardBadge('inf_250_10min');
+}

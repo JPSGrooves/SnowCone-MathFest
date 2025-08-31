@@ -48,6 +48,25 @@ Modify core files like:
 
 ---
 
+
+// Theme swap
+appState.setTheme('summer'); appState.profile.badges.includes('theme_swap');
+
+// Music
+scTest.playJukebox(); appState.profile.badges.includes('listened_music');
+
+// Mode tour (touch all)
+scTest.award('quick_25');
+scTest.award('inf_25_1min');
+scTest.award('kids_mosquito');
+appState.addStoryXP(5);
+scTest.award('talk_grampy');
+appState.profile.badges.includes('mode_tour');
+
+// Completion breakdown (watch buckets fill + total%)
+scTest.breakdown();
+
+
 ## 🌐 3. Deploy to GitHub Pages
 
 ```bash

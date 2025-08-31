@@ -7,9 +7,82 @@
 * ✅ **v0.7.0 – Kids Mode Complete**
 * ✅ **v0.7.7 – Prologuing the Inevitable**
 * ✅ **v0.8.0 – Story Mode Prologue Finished**
-* 🔜 **v0.9.0 – Math Tips Mode Complete**
-* 🎯 **v1.0.0 – Final Polish + Launch Ready ✨**
+* ✅ **v0.8.8 – The Grampy P Badge**
+* 🔜 **v0.9.0 – Math Tips Mode Complete & Badge/Theme Implementd**
+* 🎯 **v1.0.0 – Final Polish + Launch Ready (Maybe Chapter 1)✨**
 
+---
+
+## v0.8.8 — *“The Grampy P Badge”* (August 30, 2025)
+
+### 🎖️ Badges — Phase 1 (Event-Driven & One-Shot)
+
+* **Grampy P**: awarded on the **first chat send** in Math Tips Village (`talk_grampy`).
+* **Play Music**: awarded **only** when the **Jukebox ▶️ button** successfully starts playback the first time (`play_music`). (Not tied to auto-play or track-select.)
+* **Change Theme**: awarded on the **first non-default theme** selection (`change_theme`) via a MobX reaction.
+* **Try Modes**: lightweight “first visit” unlocks when entering a mode for the first time (per-mode ids like `try_qs`, `try_infinity`, `try_kids`, `try_story`, `try_mathtips`).
+* **Kids Camping set** (all event-backed, idempotent):
+
+  * `kids_cars_speed`: all cars parked **≤ 60s** (emits `kcParkingComplete` with `elapsedMs`).
+  * `kids_camp_10k`: Camping Score **≥ 10,000** (MobX reaction on `appState.popCount`).
+  * `kids_mosquito`: first mosquito swat (`onSwat()` callback).
+  * `kids_ants_streak10`: red-ant win streak **≥ 10** (`kcAntStreak` event).
+  * `kids_tents_all`: all tents lit (`kcTentsAllLit` event).
+
+> Implementation notes: awards now happen **inside game/UI events**, not at module top level. Every badge check is guarded so it can’t double-award or throw on undefined vars.
+
+---
+
+### 🎧 Jukebox UX (Play/Pause Now Snappy)
+
+* **Immediate button flip** on first Play: the ▶️ → ⏸️ label updates **right away**, then re-syncs on Howler `play/pause` events.
+* “Now Playing” label updates reliably on play/pause/skip.
+* Badge hook lives **in the Jukebox Play handler** and fires only on the first successful play.
+
+---
+
+### 🅿️ Parking Mini-Game Integration
+
+* Fixed `initParkingGame` **named export** and wiring from `kidsCamping.js`.
+* Parking emits **`kcParkingComplete`** with `{ elapsedMs }`; Kids mode listens and awards `kids_cars_speed` when `elapsedMs ≤ 60000`.
+
+---
+
+### 🛡️ Stability & Cleanup
+
+* Removed stray, top-level `awardBadge(...)` calls that referenced **undefined** values (`count`, `seconds`, etc.).
+* Centralized ambient unlocks in a tiny **achievements watcher**; disposers run on mode exit/HMR.
+* Kids mode: all badge listeners are scoped to the Kids canvas and unwired on teardown.
+
+---
+
+### 🧪 QA Checklist (fast pass)
+
+* **Math Tips**: send one message → “Grampy P” badge appears once.
+* **Jukebox**: press ▶️ once → playback starts, button flips to ⏸️, “Play Music” badge appears. (Track-select alone should **not** award.)
+* **Themes**: switch off default once → “Change Theme” badge.
+* **Modes**: entering each mode once → “Try \*” badge for that mode.
+* **Kids**:
+
+  * Park all cars in < 60s → `kids_cars_speed`.
+  * Reach 10,000 Camping Score (any mix) → `kids_camp_10k`.
+  * Swat a mosquito once → `kids_mosquito`.
+  * Hit ant streak 10 → `kids_ants_streak10`.
+  * Light all tents → `kids_tents_all`.
+
+---
+
+### 📌 Dev Notes
+
+> *“Badges were noisy; now they’re musical. Everything unlocks from real events, exactly once, and never at import time. The Jukebox play hook finally feels right — and yes, the button flips on the very first click.”*
+
+---
+
+### ⭐ Next
+
+* End-of-run milestone badges for **Infinity** & **QuickServe** (score, streak, time buckets).
+* Optional **confetti/banner** per unlock with rate-limit.
+---
 ---
 
 ## v0.8.0 — *“Story Mode Prologue Finished”* (August 24, 2025)

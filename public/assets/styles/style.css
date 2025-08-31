@@ -444,3 +444,10 @@ html, body {
   -webkit-touch-callout: default !important;
   caret-color: auto !important;
 }
+/* somewhere global */
+.badge-banner{
+  position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
+  background:rgba(0,0,0,.85); color:#fff; padding:10px 14px;
+  border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.35);
+  font-weight:600; z-index:9999; backdrop-filter:saturate(140%) blur(4px);
+}

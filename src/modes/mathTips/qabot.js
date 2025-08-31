@@ -1,250 +1,156 @@
 // /src/modes/mathTips/qabot.js
-// Grampy P: tiny rule-based chatbot for Math Tips Village.
-// Mode-scoped, predictable, and easy to extend.
+import { matcher, matcherAnyMath } from './matcher.js';
+import data from './qabotDATA.js';
+import { fallbackLogger } from './fallbackLogger.js';
+import { appState } from '../../data/appState.js';
+import { composeReply } from './conversationPolicy.js';
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Utilities
-// ────────────────────────────────────────────────────────────────────────────────
+// ——— Utilities ———
 function escapeHTML(s) {
   return String(s)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'",'&#39;');
 }
+function html(s){ return escapeHTML(s); }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function n(x,d=0){ const v=+x; return Number.isFinite(v)?v:d; }
 
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function safeNumber(n, def = 0) {
-  const x = Number(n);
-  return Number.isFinite(x) ? x : def;
-}
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Tiny, safe math helpers
-// ────────────────────────────────────────────────────────────────────────────────
-// Accept only digits, + - * / ^ . ( ) and spaces; short length guard.
+// ——— Math safety ———
 const SAFE_EXPR = /^[\d\s+\-*/^().]+$/;
-
-function evalSafeExpression(expr) {
-  const raw = String(expr).trim();
-  if (!raw || raw.length > 120) throw new Error('Too long');
-  if (!SAFE_EXPR.test(raw)) throw new Error('Unsafe characters');
-
-  // Convert ^ to ** for JS exponent
-  const jsExpr = raw.replaceAll('^', '**');
-
-  // Disallow weird consecutive operators (except minus for negatives)
-  if (/[*\/+]{2,}/.test(jsExpr)) throw new Error('Bad operator sequence');
-
-  // Final safety: evaluate inside Function; no identifiers allowed because regex forbids letters.
+function evalSafeExpression(expr){
+  const raw=String(expr).trim();
+  if(!raw||raw.length>120) throw new Error('Too long');
+  if(!SAFE_EXPR.test(raw)) throw new Error('Unsafe chars');
+  const jsExpr = raw.replaceAll('^','**');
+  if (/[*\/+]{2,}/.test(jsExpr)) throw new Error('Bad operator seq');
   // eslint-disable-next-line no-new-func
-  const fn = new Function(`"use strict"; return (${jsExpr});`);
-  const val = fn();
-  if (!Number.isFinite(val)) throw new Error('Not finite');
+  const val = Function(`"use strict"; return (${jsExpr});`)();
+  if(!Number.isFinite(val)) throw new Error('Not finite');
   return val;
 }
-
-function tryPercentOf(text) {
-  // patterns like "15% of 80" or "what is 7.5% of 120?"
-  const m = /(-?\d+(?:\.\d+)?)\s*%\s*of\s*(-?\d+(?:\.\d+)?)/i.exec(text);
-  if (!m) return null;
-  const p = parseFloat(m[1]);
-  const n = parseFloat(m[2]);
-  if (!Number.isFinite(p) || !Number.isFinite(n)) return null;
-  const ans = (p / 100) * n;
-  return { p, n, ans };
+function tryPercentOf(text){
+  const m=/(-?\d+(?:\.\d+)?)\s*%\s*of\s*(-?\d+(?:\.\d+)?)/i.exec(text);
+  if(!m) return null;
+  const p=parseFloat(m[1]); const num=parseFloat(m[2]);
+  if(!Number.isFinite(p)||!Number.isFinite(num)) return null;
+  return { p, n:num, ans:(p/100)*num };
+}
+function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a||1; }
+function lcm(a,b){ return Math.abs(a*b)/gcd(a,b); }
+function simplifyFractionText(a,b){
+  if(!Number.isFinite(a)||!Number.isFinite(b)||b===0) return "That fraction is undefined, amigo.";
+  const g=gcd(a,b); return `${a}/${b} → ${a/g}/${b/g}`;
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-const TIP_BANK = [
-  "Write your *own* example right after learning one. Memory sticks when your hand moves.",
-  "Big problems? Break into 3 bite-sized steps and do step 1 *badly but now*.",
-  "Say the steps out loud. Sound makes sequences stick. 🎤",
-  "If you can’t teach it, you don’t know it yet. Explain to your pillow for 60 seconds.",
-  "Space your practice: 10–15 minutes now, again tonight, again tomorrow. 📅",
-  "When stuck: define every noun in the question. Clarity unlocks moves.",
-  "Draw it. Even ugly sketches beat perfect thoughts. ✏️",
-  "Estimate first, calculate second. Answers that smell wrong usually are.",
-];
+// ——— Confidence scoring ———
+function scoreIntent(input) {
+  const lower = input.toLowerCase();
 
-const GREETS = ["yo", "hey", "heyy", "hello", "hi", "sup", "howdy", "hola", "what’s up", "wassup"];
+  // Strong signals
+  if (/^\/?(help|commands|stats|tip|clear|reset)\b/.test(lower)) return { guess:'command', score:0.99, arg:lower.match(/^\/?(\w+)/)?.[1] };
 
-// Module-local state (mode-scoped, not global app)
-const botState = {
-  lastIntent: null,
-  tipIndex: 0,
-};
+  if (tryPercentOf(lower)) return { guess:'percent', score:0.95 };
+  if (SAFE_EXPR.test(lower)) return { guess:'calc', score:0.9 };
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Response builders
-// ────────────────────────────────────────────────────────────────────────────────
-function reply(text) {
-  return escapeHTML(text);
+  // Matcher buckets
+  if (matcher(lower, 'who_are_you')) return { guess:'who', score:0.8 };
+  if (matcher(lower, 'greetings'))  return { guess:'greet', score:0.75 };
+  if (matcherAnyMath(lower))        return { guess:'math_general', score:0.7 };
+  if (matcher(lower, 'jokes'))      return { guess:'joke', score:0.7 };
+  if (matcher(lower, 'lore_badges'))return { guess:'badges', score:0.65 };
+  if (matcher(lower, 'lore_cones') || matcher(lower,'lore_snowcone') || matcher(lower,'lore_festival'))
+    return { guess:'lore', score:0.6 };
+
+  return { guess:'unknown', score:0.2 };
 }
 
-function greetLine(appStateLike) {
-  const name = appStateLike?.player?.name || "friend";
-  const lvl  = safeNumber(appStateLike?.player?.level, 1);
-  return reply(`Hey ${name}! Grampy P reporting for duty—level ${lvl} vibes only. 🍧`);
-}
+// ——— Public API: single-bubble response ———
+export function getResponse(userText, appStateLike = appState) {
+  const text = String(userText||'');
+  const { guess, score, arg } = scoreIntent(text);
 
-function statsLine(appStateLike) {
-  const xp   = safeNumber(appStateLike?.player?.xp, 0);
-  const lvl  = safeNumber(appStateLike?.player?.level, Math.floor(xp / 100) + 1);
-  const tips = safeNumber(appStateLike?.progress?.mathtips?.completedTips, 0);
-  const total= safeNumber(appStateLike?.progress?.mathtips?.totalTips, Math.max(10, tips));
-  return reply(`Stats: Level ${lvl}, XP ${xp}, Tips ${tips}/${total}. Keep scooping! 🍨`);
-}
-
-function tipLine() {
-  const tip = TIP_BANK[botState.tipIndex % TIP_BANK.length];
-  botState.tipIndex++;
-  return reply(`Tip: ${tip}`);
-}
-
-function helpLines() {
-  return [
-    reply("Try: `7*8+12`, `15% of 80`, `factor 36`, `gcf 18 24`, `simplify 12/18`."),
-    reply("Or say `tip`, `study`, `help`, `stats`. I’m chill, but exact."),
-  ];
-}
-
-// Quick number helpers
-function gcd(a, b) {
-  a = Math.abs(a); b = Math.abs(b);
-  while (b) [a, b] = [b, a % b];
-  return a || 1;
-}
-function lcm(a, b) {
-  return Math.abs(a * b) / gcd(a, b);
-}
-function simplifyFractionText(a, b) {
-  if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) return "That fraction is undefined, amigo.";
-  const g = gcd(a, b);
-  const na = a / g, nb = b / g;
-  return `${a}/${b} → ${na}/${nb}`;
-}
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Intent router
-// ────────────────────────────────────────────────────────────────────────────────
-function routeIntent(userTextRaw) {
-  const t = String(userTextRaw).trim();
-  const lower = t.toLowerCase();
-
-  // greetings
-  if (GREETS.some(g => lower === g || lower.startsWith(g + ' '))) return 'greet';
-
-  // commands
-  if (/^\/?(help|commands)\b/.test(lower)) return 'help';
-  if (/^\/?(stats)\b/.test(lower)) return 'stats';
-  if (/^\/?(tip|study)\b/.test(lower)) return 'tip';
-
-  // mathy
-  if (tryPercentOf(lower)) return 'percent-of';
-  if (SAFE_EXPR.test(lower)) return 'calc';
-
-  // factor / gcf / lcm / simplify
-  if (/^factor\s+(-?\d+)\s*$/i.test(lower)) return 'factor';
-  if (/^gcf\s+(-?\d+)\s+(-?\d+)\s*$/i.test(lower)) return 'gcf';
-  if (/^lcm\s+(-?\d+)\s+(-?\d+)\s*$/i.test(lower)) return 'lcm';
-  if (/^simplify\s+(-?\d+)\s*\/\s*(-?\d+)\s*$/i.test(lower)) return 'simplify';
-
-  // encouragement / stuck
-  if (/(stuck|lost|confused|idk|don'?t know)/i.test(lower)) return 'encourage';
-
-  // default
-  return 'fallback';
-}
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Public API
-// ────────────────────────────────────────────────────────────────────────────────
-export function getResponse(userText, appStateLike) {
-  const text = String(userText || '');
-  const intent = routeIntent(text);
-  botState.lastIntent = intent;
-
-  try {
-    switch (intent) {
-      case 'greet':
-        return `${greetLine(appStateLike)}<br>${tipLine()}`;
-
+  // Commands: still handled, but we render via the composer so it feels natural.
+  if (guess === 'command') {
+    let line = '';
+    switch (arg) {
       case 'help':
-        return helpLines().join('<br>');
-
-      case 'stats':
-        return statsLine(appStateLike);
-
-      case 'tip':
-        // Optional: tiny XP bump for engaging with tips (defensive guard)
-        if (appStateLike && typeof appStateLike.incrementXP === 'function') {
-          try { appStateLike.incrementXP(1); } catch (_) {}
-        }
-        return tipLine();
-
-      case 'percent-of': {
-        const p = tryPercentOf(text);
-        const ans = p.ans;
-        const clean = Number.isInteger(ans) ? ans : Number(ans.toFixed(4));
-        return reply(`${p.p}% of ${p.n} = <strong>${clean}</strong>`);
+      case 'commands':
+        line = "Try `15% of 80`, `7*8+12`, `simplify 12/18`, or ask about cones/badges. Keep it tiny.";
+        break;
+      case 'stats': {
+        const xp = n(appStateLike?.profile?.xp);
+        const lvl = n(appStateLike?.profile?.level, Math.floor(xp/100)+1);
+        const tips = n(appStateLike?.progress?.mathtips?.completedTips);
+        const total= n(appStateLike?.progress?.mathtips?.totalTips, Math.max(10,tips));
+        line = `Level ${lvl}, XP ${xp}, Tips ${tips}/${total}.`;
+        break;
       }
+      case 'tip':
+        line = pick(data.math_general) || "Write the next step, even if messy.";
+        try { if (typeof appStateLike.addXP==='function') appStateLike.addXP(1); } catch {}
+        break;
+      case 'clear':
+        // soft clear handled by UI elsewhere; here we just acknowledge
+        line = "Cleared my short-term memory.";
+        break;
+      case 'reset':
+        line = "Fresh slate. Let’s roll.";
+        break;
+      default:
+        line = "Command unknown. Try `/help`.";
+    }
+    return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(line) }, askAllowed:true }) };
+  }
 
-      case 'calc': {
+  // High-confidence math
+  if (guess === 'percent' || guess === 'calc') {
+    try {
+      if (guess === 'percent') {
+        const p = tryPercentOf(text);
+        const clean = Number.isInteger(p.ans) ? p.ans : Number(p.ans.toFixed(4));
+        const ans = `${p.p}% of ${p.n} = <strong>${clean}</strong>`;
+        return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(ans) }, askAllowed:true }) };
+      } else {
         const val = evalSafeExpression(text);
         const clean = Number.isInteger(val) ? val : Number(val.toFixed(6));
-        return reply(`${escapeHTML(text)} = <strong>${clean}</strong>`);
+        const ans = `${escapeHTML(text)} = <strong>${clean}</strong>`;
+        return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(ans) }, askAllowed:true }) };
       }
-
-      case 'factor': {
-        const m = /^factor\s+(-?\d+)\s*$/i.exec(text);
-        const n = Math.abs(parseInt(m[1], 10));
-        if (n === 0) return reply("Every number divides 0. Kinda wild.");
-        const facts = [];
-        for (let i = 1; i * i <= n; i++) {
-          if (n % i === 0) {
-            facts.push(i);
-            if (i !== n / i) facts.push(n / i);
-          }
-        }
-        facts.sort((a, b) => a - b);
-        return reply(`Factors of ${n}: ${facts.join(', ')}`);
-      }
-
-      case 'gcf': {
-        const m = /^gcf\s+(-?\d+)\s+(-?\d+)\s*$/i.exec(text);
-        const a = parseInt(m[1], 10), b = parseInt(m[2], 10);
-        return reply(`gcf(${a}, ${b}) = ${gcd(a, b)}`);
-      }
-
-      case 'lcm': {
-        const m = /^lcm\s+(-?\d+)\s+(-?\d+)\s*$/i.exec(text);
-        const a = parseInt(m[1], 10), b = parseInt(m[2], 10);
-        return reply(`lcm(${a}, ${b}) = ${lcm(a, b)}`);
-      }
-
-      case 'simplify': {
-        const m = /^simplify\s+(-?\d+)\s*\/\s*(-?\d+)\s*$/i.exec(text);
-        const a = parseInt(m[1], 10), b = parseInt(m[2], 10);
-        return reply(simplifyFractionText(a, b));
-      }
-
-      case 'encourage':
-        return reply("You’re not stuck—you’re pre-moving. Define every noun, draw a 10-second sketch, then try one tiny move. I’m here. 🍧");
-
-      case 'fallback':
-      default:
-        return [
-          reply("I felt that. Try a thing like:"),
-          reply("• `15% of 80`  • `7*8+12`  • `simplify 12/18`  • `gcf 18 24`"),
-          reply("or say `tip` for a study booster."),
-        ].join('<br>');
+    } catch (err) {
+      const freeze = `Brain freeze: ${escapeHTML(err.message)}.`;
+      return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(freeze) }, askAllowed:false }) };
     }
-  } catch (err) {
-    return reply(`My brain had a brain freeze 🥶: ${escapeHTML(err.message)}. Try \`help\`.`);
   }
+
+  // Mid-confidence: answer from your banks (no re-intro), short and warm
+  if (score >= 0.6) {
+    let line = '';
+    switch (guess) {
+      case 'who':   line = pick(data.who_are_you); break;
+      case 'greet': line = pick(data.greetings);   break;
+      case 'joke':  line = pick(data.jokes);       break;
+      case 'badges':line = pick(data.lore_badges); break;
+      case 'lore':  line = pick([...data.lore_cones, ...data.lore_snowcone, ...data.lore_festival]); break;
+      case 'math_general':
+        line = pick([
+          ...data.math_general,
+          ...data.math_arithmetic,
+          ...data.math_algebra,
+          ...data.math_geometry,
+          ...data.math_trigonometry,
+          ...data.math_calculus
+        ]);
+        break;
+      default:
+        line = "Let’s keep it tiny — what’s the goal?";
+    }
+    return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(line) }, askAllowed:true }) };
+  }
+
+  // Low-confidence: TEACH by 2 examples, not a manual
+  try { fallbackLogger.add(text); } catch {}
+  const topicGuess = /%/.test(text) ? 'percent'
+                    : /\/|simplify|fraction/.test(text) ? 'fractions'
+                    : 'arithmetic';
+  return { html: composeReply({ userText:text, part:{ kind:'teach', html:'', topicGuess }, askAllowed:true }) };
 }

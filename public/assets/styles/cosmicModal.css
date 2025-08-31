@@ -560,3 +560,8 @@ body.neon-progress #trackProgress::-webkit-slider-thumb {
 body.neon-progress #trackTimer {
   color: #00ffee;
 }
+.modal .badge-grid .badge-tile{
+  height: auto;            /* let content decide */
+  min-height: 96px;        /* tiny floor for consistency */
+  aspect-ratio: auto;      /* stop forcing short cards */
+}

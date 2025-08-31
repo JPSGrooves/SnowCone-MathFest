@@ -19,6 +19,7 @@ import {
 
 import { playQSRandomTrack, stopQS } from './quickServeMusic.js';
 import { activateInputHandler } from '../../managers/inputManager.js';
+import { awardBadge } from '../../managers/badgeManager.js';
 
 
 
@@ -340,3 +341,24 @@ function clearFeedback() {
 //////////////////////////////
 export { stopGameLogic as stopQuickServeGame } from './quickServeGame.js';
 export { startGameLogic as startQuickServeGame } from './quickServeGame.js';
+function checkQSBadges() {
+  if (score >= 25)  awardBadge('quick_25');
+  if (score >= 50)  awardBadge('quick_50');
+  if (score >= 75)  awardBadge('quick_75');
+  if (score >= 100) awardBadge('quick_100');
+}
+// call checkQSBadges() right after you bump score
+export function finalizeQuickServeRun(runScore) {
+  // pacing: ~1 XP per 2 points (tune as you like)
+  const QS_XP_PER_POINT = 0.5;
+  const xp = Math.max(0, Math.floor(runScore * QS_XP_PER_POINT));
+
+  appState.addQuickServeXP(xp);      // ✅ fills QuickServe bucket (cap 500)
+  appState.updateQuickServeHighScore(runScore);
+
+  // sample badge thresholds you already planned
+  if (runScore >= 25)  awardBadge('quick_25');
+  if (runScore >= 50)  awardBadge('quick_50');
+  if (runScore >= 75)  awardBadge('quick_75');
+  if (runScore >= 100) awardBadge('quick_100');
+}

@@ -1,3 +1,5 @@
+import { Howl } from 'howler';
+
 // 🧠 Module-scoped state (replace your globals at the top)
 const GRID_SIZE = 24; // 4x6
 let selectedTents = new Set();
@@ -586,6 +588,15 @@ function checkIfSolved() {
       msg.textContent = '';
       if (dinoIcon) dinoIcon.style.opacity = '1';
     }, 800);
+  }
+
+  if (solvedByAll) {
+    // emit after the current frame so it won't jank the animation
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        refs.wrapper?.dispatchEvent(new CustomEvent('kc:tents-all', { bubbles: true }));
+      }, 0);
+    });
   }
 
   // 🔧 slight delay, then reset + redraw

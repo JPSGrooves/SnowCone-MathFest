@@ -308,108 +308,121 @@ function cycleNextCar() {
 
 function triggerFinalCelebration() {
   if (!gameStarted) return;
-  gameStarted = false; // ✅ Prevent duplicate calls
+  gameStarted = false; // ✅ prevent duplicate calls
+
   console.log("🎉 triggerFinalCelebration() fired");
   console.log("🏁 parkedCars:", [...parkedCars]);
   console.log("🏁 sessionPoints:", sessionPoints);
 
+  // speed bonus only — do NOT re-award sessionPoints
   const elapsed = Date.now() - startTime;
-  if (elapsed < 60000) {
-    sessionPoints += 100;
+  const speedBonus = elapsed < 60000 ? 100 : 0;
+  if (speedBonus) {
+    appState.incrementPopCount(speedBonus);
+    checkXPBatchAwardFromTotal();
+    updatePopUI?.();
   }
-
-  appState.incrementPopCount(sessionPoints);
-  checkXPBatchAwardFromTotal();
-  updatePopUI?.();
 
   triggerConfetti();
-  // 💨 Hide UI during finale
+
+  // hide UI during finale
   if (honkLabel) {
     honkLabel.classList.add('kc-hidden');
-    honkLabel.innerHTML = ''; // ✨💨 wipe it clean!
+    honkLabel.innerHTML = '';
   }
+  parkBtn?.classList.add('kc-hidden');
 
-  if (parkBtn) {
-    parkBtn.classList.add('kc-hidden');
-  }
-
-
-
-  // 🎊 Reuse classic overlay for finale, but hold longer
+  // finale overlay
   const finale = document.createElement('div');
   finale.className = 'kc-parked-overlay';
   finale.textContent = '🏁 All Parked!';
   carZone.appendChild(finale);
 
-  // 🎛️ Extend duration manually (override fadeOut timing)
-  finale.style.animation = 'none'; // 🚫 cancel default
+  // extend visibility slightly
+  finale.style.animation = 'none';
   requestAnimationFrame(() => {
     finale.style.opacity = '1';
     finale.style.transition = 'opacity 0.4s ease';
   });
 
-  // 🕓 Hold for 2s, then fade and remove
+  // bubble the completion event (listeners on document will receive it)
+  const elapsedMs = Date.now() - (startTime || Date.now());
+  parkingRoot?.dispatchEvent(new CustomEvent('kcParkingComplete', {
+    detail: { elapsedMs },
+    bubbles: true
+  }));
+
+  // fade out + cleanup
   setTimeout(() => {
     finale.style.opacity = '0';
     setTimeout(() => finale.remove(), 400);
   }, 2000);
 
-  // ⏳ Final reset
-  setTimeout(() => {
-    resetGame();
-  }, 2500);
+  // reset back to intro
+  setTimeout(() => { resetGame(); }, 2500);
 }
 
 
 
 function handleHonk(index, carEl) {
+  // already parked? ignore
   if (parkedCars.has(index)) return;
 
   let honks = honkMap.get(index) || 0;
-
   const honkLimit = index + 1;
   if (honks >= honkLimit) return;
 
+  // count a honk
   honks++;
   honkMap.set(index, honks);
 
-  // 🎶 Play progression honk (loops 1–5)
+  // sfx + label
   playHonkForCar(index);
+  const arrivalText = arrivalOrder[index] || ordinalSuffix(index + 1);
+  if (honkLabel) {
+    honkLabel.innerHTML = renderHonkHTML(arrivalText, index, honks);
+  }
 
-  const arrivalText = arrivalOrder[index] || `${index + 1}th`;
-
-  honkLabel.innerHTML = renderHonkHTML(arrivalText, index, honks);
-
+  // reached the needed honks => park this car
   if (honks === honkLimit) {
     parkedCars.add(index);
-    sessionPoints += 10;
 
-    if (arrivalOrder[index] === `${ordinalSuffix(index + 1)}`) {
-      sessionPoints += 50;
-    }
+    // points: award only the delta for THIS car
+    const base = 10;
+    const ordinalBonus = (arrivalOrder[index] === ordinalSuffix(index + 1)) ? 50 : 0;
+    const delta = base + ordinalBonus;
 
-    showParkedOverlay('🚗 PARKED!');
-    playVictoryHonk(); // 🎺 Honk of Glory
-    appState.incrementPopCount(sessionPoints);
+    sessionPoints += delta;               // track session total for display/summary
+    appState.incrementPopCount(delta);    // award just this car’s delta
     updatePopUI?.();
     checkXPBatchAwardFromTotal();
 
+    // refresh label once more so the parked count reflects the new state
+    if (honkLabel) {
+      honkLabel.innerHTML = renderHonkHTML(arrivalText, index, honks);
+    }
+
+    showParkedOverlay('🚗 PARKED!');
+    playVictoryHonk();
+
+    // let the PARKED overlay breathe, then drive out + continue or finish
     setTimeout(() => {
-      // instead of setTimeout(() => { carEl?.remove(); ... }, 800)
-      driveOutCar(carEl).then(() => { 
-      carEl?.remove();
-      if (parkedCars.size >= parkingSprites.length) {
-          honkLabel.classList.add('kc-hidden');
+      const proceed = () => {
+        if (parkedCars.size >= parkingSprites.length) {
+          honkLabel?.classList.add('kc-hidden');
           parkBtn?.classList.add('kc-hidden');
           triggerFinalCelebration();
-      } else {
+        } else {
           cycleNextCar();
-      }
-      });
+        }
+      };
 
+      if (!carEl) { proceed(); return; }
+      driveOutCar(carEl).then(() => { try { carEl.remove(); } catch {} proceed(); });
     }, 800);
   }
 }
+
 
 
 
@@ -538,4 +551,6 @@ function playVictoryHonk() {
 function updatePopUI() {
   const popSpan = document.getElementById('popCount');
   if (popSpan) popSpan.textContent = appState.popCount;
+  try { document.dispatchEvent(new CustomEvent('campScoreUpdated', { detail: appState.popCount })); } catch {}
 }
+

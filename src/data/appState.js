@@ -1,20 +1,28 @@
 // appState.js
 import { makeAutoObservable, autorun, runInAction } from 'mobx';
+import {
+  getCompletionPercent as computeCompletionPercent,
+  computeCompletionBreakdown
+} from '../managers/completionManager.js';
 
 class AppState {
   profile = {
     // ... existing
+    unlockedThemes: [],     // 🆕 stash of unlocked backgrounds
     infinityHighScore: 0,
     infinityLongestStreak: 0,
-    username: 'Guest',
+    username: 'Friend',
     xp: 0,
     level: 1,
     qsHighScore: 0, // 🏁 Add this!
     badges: [],
     completedModes: [],
     lastPlayed: null,
-    seenIntro: false
+    seenIntro: false,
+    streakDays: 0,
+    lastStreakDayKey: null // 'YYYY-MM-DD' in America/New_York
   };
+  
 
   settings = {
     theme: 'menubackground',
@@ -35,6 +43,15 @@ class AppState {
     currentChapter: 0,
     seenPanels: []
   };
+
+  // ✅ Per-mode XP that feeds completion math (clamped by completionManager caps)
+  progress = {
+    story:       { xp: 0 },   // cap 800
+    kidsCamping: { xp: 0 },   // cap 1000
+    quickServe:  { xp: 0 },   // cap 500
+    infinity:    { xp: 0 },   // cap 1000
+  };
+
 
   uiState = {
     pendingBadgePopup: null,
@@ -72,19 +89,45 @@ class AppState {
     return amount; // ✅ This makes it future-safe
   }
 
+  // ---------- Mode XP helpers (feed completion buckets) ----------
+  _addXPNumber(n) { return Number.isFinite(+n) ? Math.max(0, +n) : 0; }
+
+  addStoryXP(amount) {
+    const n = this._addXPNumber(amount);
+    if (!n) return 0;
+    this.addXP(n);
+    this.progress.story.xp += n;
+    return n;
+  }
+  addKidsCampingXP(amount) {
+    const n = this._addXPNumber(amount);
+    if (!n) return 0;
+    this.addXP(n);
+    this.progress.kidsCamping.xp += n;
+    return n;
+  }
+  addQuickServeXP(amount) {
+    const n = this._addXPNumber(amount);
+    if (!n) return 0;
+    this.addXP(n);
+    this.progress.quickServe.xp += n;
+    return n;
+  }
+  addInfinityXP(amount) {
+    const n = this._addXPNumber(amount);
+    if (!n) return 0;
+    this.addXP(n);
+    this.progress.infinity.xp += n;
+    return n;
+  }
+
+
   setUsername(name) {
     this.profile.username = name;
   }
 
   setLastPlayed(timestamp = Date.now()) {
     this.profile.lastPlayed = timestamp;
-  }
-
-  unlockBadge(id) {
-    if (!this.profile.badges.includes(id)) {
-      this.profile.badges.push(id);
-      this.setPendingBadge(id);
-    }
   }
 
   markModeComplete(mode) {
@@ -178,7 +221,23 @@ class AppState {
 
   setMode(mode) {
     this.setCurrentMode(mode);
+
+    // 🔥 Count daily streak on real gameplay modes only
+    const gameplayModes = new Set([
+      'mathtips',
+      'quickserve',
+      'infinity',
+      'story',
+      'kids',
+      'camping'
+      // add/remove to match your actual mode ids
+    ]);
+
+    if (gameplayModes.has(mode)) {
+      try { this.touchDailyStreak(`enter:${mode}`); } catch {}
+    }
   }
+
 
   setGameMode(mode) {
     this.settings.gameMode = mode;
@@ -191,21 +250,40 @@ class AppState {
   //////////////////////////////////////
   // 🔮 MOOD ENGINE (XP DRIVEN)
   //////////////////////////////////////
+  // ---------- Completion & Mood ----------
   getCompletionPercent() {
-    const xp = this.profile.xp;
-    const maxXP = 500;
-    return Math.min((xp / maxXP) * 100, 100);
+    try {
+      // 🔥 real model: 70% XP + 25% badges + 5% legend
+      return computeCompletionPercent(this);
+    } catch {
+      // fallback if manager isn't loaded yet
+      return Math.min(Math.round((this.profile.xp / 4000) * 100), 100);
+    }
+  }
+
+  // (optional) expose full breakdown for debugging / UI badges page
+  getCompletionBreakdown() {
+    try {
+      return computeCompletionBreakdown(this);
+    } catch {
+      return {
+        totalPercent: Math.min(Math.round((this.profile.xp / 4000) * 100), 100),
+        xp: { xpFrac: (this.profile.xp / 4000), buckets: { story:0, kids:0, quickServe:0, infinity:0, extra:0 } },
+        badgesFrac: 0, legendDone: false
+      };
+    }
   }
 
   getMood() {
     const pct = this.getCompletionPercent();
     if (pct >= 100) return 'cosmic';
-    if (pct >= 80) return 'elated';
-    if (pct >= 60) return 'hyped';
-    if (pct >= 40) return 'silly';
-    if (pct >= 20) return 'curious';
+    if (pct >= 80)  return 'elated';
+    if (pct >= 60)  return 'hyped';
+    if (pct >= 40)  return 'silly';
+    if (pct >= 20)  return 'curious';
     return 'happy';
   }
+
 
   //////////////////////////////////////
   // 🍄 POP COUNT (Kids Camping)
@@ -268,6 +346,9 @@ class AppState {
   //////////////////////////////////////
   // 💾 STORAGE
   //////////////////////////////////////
+   // 💾 STORAGE (patch both methods)
+
+  // saveToStorage()
   saveToStorage() {
     const dataToSave = {
       profile: this.profile,
@@ -276,11 +357,13 @@ class AppState {
       storyProgress: this.storyProgress,
       storyMemory: this.storyMemory,
       chatLogs: this.chatLogs,
-      popCount: this.popCount // 🆕 ADD THIS
+      popCount: this.popCount,
+      progress: this.progress,              // ✅ add this
     };
     localStorage.setItem('snowcone_save_data', JSON.stringify(dataToSave));
   }
 
+  // loadFromStorage()
   loadFromStorage() {
     const raw = localStorage.getItem('snowcone_save_data');
     if (raw) {
@@ -294,6 +377,14 @@ class AppState {
           Object.assign(this.storyMemory, data.storyMemory);
           this.chatLogs = data.chatLogs || [];
           this.popCount = data.popCount || 0;
+
+          // ✅ merge progress safely (keep defaults if missing)
+          if (data.progress) {
+            this.progress.story       = { xp: 0, ...(data.progress.story || {}) };
+            this.progress.kidsCamping = { xp: 0, ...(data.progress.kidsCamping || {}) };
+            this.progress.quickServe  = { xp: 0, ...(data.progress.quickServe || {}) };
+            this.progress.infinity    = { xp: 0, ...(data.progress.infinity || {}) };
+          }
         });
       } catch (err) {
         console.warn('⚠️ Bad save data. Resetting to defaults.', err);
@@ -301,11 +392,76 @@ class AppState {
     }
   }
 
+
   resetAllData() {
     localStorage.removeItem('snowcone_save_data');
     window.location.reload();
   }
-}
+
+  //////////////////////////////////////
+  // 🔥 DAILY STREAK (America/New_York)
+  //////////////////////////////////////
+  getNYDayKey(ts = Date.now()) {
+    const d = new Date(ts);
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/New_York',
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(d);
+    const y = parts.find(p => p.type === 'year')?.value || '0000';
+    const m = parts.find(p => p.type === 'month')?.value || '00';
+    const dd = parts.find(p => p.type === 'day')?.value || '00';
+    return `${y}-${m}-${dd}`;
+  }
+
+  // Call this on meaningful activity (e.g., solved rep).
+  touchDailyStreak(reason = 'activity') {
+    const today = this.getNYDayKey();
+    const last  = this.profile.lastStreakDayKey;
+
+    if (!last) {
+      this.profile.lastStreakDayKey = today;
+      this.profile.streakDays = 1; // first real activity = day 1
+      return this.profile.streakDays;
+    }
+
+    if (last === today) return this.profile.streakDays; // already counted today
+
+    const yest = this.getNYDayKey(Date.now() - 86400000);
+    this.profile.streakDays = (last === yest) ? (this.profile.streakDays + 1) : 1;
+    this.profile.lastStreakDayKey = today;
+    return this.profile.streakDays;
+  }
+  // ✅ quick checks
+  hasBadge(id) {
+    return Array.isArray(this.profile.badges) && this.profile.badges.includes(id);
+  }
+
+  hasTheme(themeId) {
+    const base = ['menubackground', 'freedom']; // always usable
+    const unlocked = this.profile.unlockedThemes || [];
+    return base.includes(themeId) || unlocked.includes(themeId);
+  }
+
+  // ✅ unlock a theme (id from allBadges[id].unlocks)
+  unlockTheme(themeId) {
+    if (!themeId) return false;
+    const arr = this.profile.unlockedThemes || (this.profile.unlockedThemes = []);
+    if (!arr.includes(themeId)) {
+      arr.push(themeId);
+      console.log(`🎨 Theme unlocked: ${themeId}`);
+      return true;
+    }
+    return false;
+  }
+
+  // ✅ badge inventory (kept simple; badgeManager does the theme side)
+  unlockBadge(id) {
+    if (!this.profile.badges.includes(id)) {
+      this.profile.badges.push(id);
+      this.setPendingBadge(id); // banner hook
+    }
+  }
+} // ← make sure this is the actual end of the class
 
 export const appState = new AppState();
 
@@ -315,4 +471,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: "v0.8.0-Prologuing the Inevitable is Done" };
+window.devFlags = { build: "v0.8.8-The Grampy P Badge" };

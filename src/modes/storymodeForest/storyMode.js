@@ -17,6 +17,8 @@ import {
 } from '../../managers/musicManager.js';
 // managers/sfxManager.js
 import { Howl } from 'howler';
+import { awardBadge } from '../../managers/badgeManager.js';
+
 
 
 
@@ -895,6 +897,7 @@ function drawSlide() {
     // capture so it fires before global Next handler re-renders
     nextBtn.addEventListener('click', () => {
       awardXP(500, { anchor: nextBtn, reason: 'prologue complete' });
+      awardBadge('story_prologue');
     }, { once: true, capture: true });
   }
 
@@ -1166,4 +1169,13 @@ function showXPPopup(text, anchorEl) {
     }, 900);
     setTimeout(() => popup.remove(), 1600);
   });
+}
+export function onPrologueCompleteOnce() {
+  // guard: only award once
+  if (!appState.profile.completedModes.includes('story')) {
+    appState.addStoryXP(800);       // ✅ counts toward Story bucket (cap 800)
+    appState.markModeComplete('story');
+  }
+  // If you still want replay XP that DOESN'T affect completion:
+  // appState.addXP(25); // pure global XP (goes to "extra" only if not from the 4 mode buckets)
 }

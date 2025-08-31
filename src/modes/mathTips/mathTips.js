@@ -2,12 +2,15 @@
 import './mathTips.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
-import { getResponse } from './qabot.js';
 import { getIntroMessage } from './intro.js';
 import { appState } from '../../data/appState.js';
+import { randomGreeting } from './greetings.js';
+import { getResponse } from './grampyBrainV2.js';
+import { awardBadge } from '../../managers/badgeManager.js';
 
 // === 🔥 Mode-local state (no globals)
 let inputEl, outputEl, sendBtn, returnBtn;
+let copyBtn, exportBtn;
 
 const MT = {
   containerSel: '#game-container',
@@ -19,6 +22,8 @@ const MT = {
     sendClick: null,
     keydown: null,
     backMain: null,
+    copyTx: null,
+    expJson: null,
   }
 };
 
@@ -27,7 +32,6 @@ export function loadMathTips() {
   appState.setMode('mathtips');
 
   // lock in the new mobile bg (no filters on top)
-  // (use swapModeBackground if you map keys internally; else apply explicit path)
   try {
     swapModeBackground('mathTips');
   } catch {
@@ -86,8 +90,8 @@ function renderIntroScreen() {
             </div>
 
             <div class="mt-intro-bottom-btns">
-              <button id="mtBack"   class="mt-btn mt-btn-pink">🔙 Return to Menu</button>
-              <button id="mtStart"  class="mt-btn mt-btn-cyan">🍧 Get Some Tips!</button>
+              <button id="mtBack"   class="mt-btn mt-btn-pink">🔙 Main Menu</button>
+              <button id="mtStart"  class="mt-btn mt-btn-cyan">🍧 Math Tips!</button>
             </div>
           </div>
         </div>
@@ -155,7 +159,11 @@ function renderMainUI() {
           </div>
 
           <div class="mt-footer">
-            <button id="returnToMenu" class="mt-btn mt-btn-pink">🔙 Return to Menu</button>
+            <div style="display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center;">
+              <button id="copyTranscript" class="mt-btn mt-btn-cyan">📋 Copy Transcript</button>
+              <button id="exportChatJson" class="mt-btn mt-btn-cyan">📤 Export JSON</button>
+              <button id="returnToMenu" class="mt-btn mt-btn-pink">🔙 Return to Menu</button>
+            </div>
           </div>
         </div>
       </div>
@@ -167,6 +175,8 @@ function renderMainUI() {
   outputEl  = document.getElementById('chatOutput');
   sendBtn   = document.getElementById('sendBtn');
   returnBtn = document.getElementById('returnToMenu');
+  copyBtn   = document.getElementById('copyTranscript');
+  exportBtn = document.getElementById('exportChatJson');
 
   // first line
   startChat();
@@ -176,55 +186,81 @@ function wireMainHandlers() {
   MT.handlers.sendClick = () => handleSend();
   MT.handlers.keydown   = (e) => { if (e.key === 'Enter') handleSend(); };
   MT.handlers.backMain  = () => returnToMenu();
+  MT.handlers.copyTx    = () => copyTranscript();
+  MT.handlers.expJson   = () => exportChatJson();
 
   sendBtn?.addEventListener('click', MT.handlers.sendClick);
   inputEl?.addEventListener('keydown', MT.handlers.keydown);
   returnBtn?.addEventListener('click', MT.handlers.backMain);
+  copyBtn?.addEventListener('click', MT.handlers.copyTx);
+  exportBtn?.addEventListener('click', MT.handlers.expJson);
 }
 
 function unwireMainHandlers() {
   sendBtn?.removeEventListener('click', MT.handlers.sendClick);
   inputEl?.removeEventListener('keydown', MT.handlers.keydown);
   returnBtn?.removeEventListener('click', MT.handlers.backMain);
+  copyBtn?.removeEventListener('click', MT.handlers.copyTx);
+  exportBtn?.removeEventListener('click', MT.handlers.expJson);
   MT.handlers.sendClick = MT.handlers.keydown = MT.handlers.backMain = null;
+  MT.handlers.copyTx = MT.handlers.expJson = null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Chat logic (unchanged vibe)
+// Chat logic
 // ────────────────────────────────────────────────────────────────────────────────
 function startChat() {
   if (!outputEl) return;
-  // seed the chat window with the same intro “brain” used on the splash
-  outputEl.innerHTML = `<div class="cat-reply">🍧 ${getIntroMessage(appState)}</div>`;
+  outputEl.innerHTML = '';
+  const greet = randomGreeting(appState);
+  appendMessage('bot', greet, /* alreadyHtml */ false);
   scrollToBottom();
 }
 
-
-function handleSend() {
+async function handleSend() {
   const raw = inputEl?.value ?? '';
   const userText = raw.trim();
   if (!userText) return;
 
-  // show user line (escaped inside appendMessage)
   appendMessage('user', userText);
-
-  // get bot reply (HTML produced but sanitized in builder)
-  const replyHtml = getResponse(userText, appState);
-
-  // append bot line
-  appendMessage('bot', replyHtml, /* alreadyHtml */ true);
-
-  // clear
   inputEl.value = '';
   inputEl.focus();
+
+  // 🏅 First-time chat with Grampy P → award badge once via badgeManager (handles popups/themes)
+  try {
+    if (!(appState.hasBadge?.('talk_grampy') || appState.profile.badges?.includes('talk_grampy'))) {
+      awardBadge('talk_grampy');
+      console.log('🏅 Badge earned: talk_grampy');
+    }
+  } catch (_) {}
+
+  try {
+    const res = getResponse(userText, appState); // { html, meta? }
+    const html = typeof res === 'string' ? res : res?.html;
+    const intent = typeof res === 'object' && res?.meta ? (res.meta.intent || 'unknown') : 'unknown';
+
+    if (!html) {
+      console.warn('🐛 getResponse returned nothing or wrong shape:', res);
+      appendMessage('bot', "Small brain freeze — try that again in simpler words? I’m listening.", false);
+      return;
+    }
+
+    appendMessage('bot', html, /* alreadyHtml */ true);
+
+    // ✅ Log to appState.chatLogs for JSON export/dev review
+    try { appState.logChat(userText, intent, htmlToText(html)); } catch (e) { console.warn('logChat failed', e); }
+  } catch (err) {
+    console.error('💥 getResponse threw:', err);
+    appendMessage('bot', `Brain freeze 🥶: ${String(err?.message || err)}. Try “15% of 80” or “simplify 12/18”.`, false);
+  }
 }
 
 function appendMessage(sender, textOrHtml, alreadyHtml = false) {
   const msgClass = sender === 'user' ? 'user-msg' : 'cat-reply';
-  const prefix = sender === 'user' ? '🧠' : '🍧';
+  const prefix = sender === 'user' ? '🍧' : '😺';
 
   const safe = alreadyHtml
-    ? String(textOrHtml) // qabot already escaped/sanitized its HTML output
+    ? String(textOrHtml)
     : String(textOrHtml)
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
@@ -238,6 +274,48 @@ function appendMessage(sender, textOrHtml, alreadyHtml = false) {
 
 function scrollToBottom() {
   outputEl.scrollTop = outputEl.scrollHeight;
+}
+
+function htmlToText(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = String(html);
+  return tmp.textContent || tmp.innerText || '';
+}
+
+async function copyTranscript() {
+  if (!outputEl) return;
+  const lines = [...outputEl.querySelectorAll('.user-msg, .cat-reply')]
+    .map(el => el.textContent.trim())
+    .filter(Boolean);
+  const stamp = new Date().toISOString();
+  const header = `Grampy P — Math Tips transcript (${stamp})`;
+  const text = `${header}\n\n${lines.join('\n')}`;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('%c📋 Transcript copied to clipboard', 'color:#00ffee;');
+  } catch {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, 999999);
+    try { document.execCommand('copy'); } catch {}
+    document.body.removeChild(ta);
+    console.log('%c📋 Transcript copied (fallback)', 'color:#00ffee;');
+  }
+}
+
+function exportChatJson() {
+  try {
+    if (typeof appState.exportChatLogs === 'function') {
+      appState.exportChatLogs();
+    } else {
+      console.warn('exportChatLogs() not found on appState.');
+    }
+  } catch (e) {
+    console.error('Export JSON failed:', e);
+  }
 }
 
 // ────────────────────────────────────────────────────────────────────────────────

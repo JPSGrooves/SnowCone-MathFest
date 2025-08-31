@@ -6,29 +6,31 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.8.0</h3>
+      <h3>🧠 SnowCone MathFest v0.8.8</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.8.0 — Prologuing the Inevitable is Done</h3>
+      <h3>🍦 v0.8.8 — The Grampy P Badge</h3>
       <p>
-        – 📖 <strong>Story Mode (Prologue) online</strong> — centered chapter menu, bigger title, typewriter screen, clean Prev/Next flow<br>
-        – 🖼️ <strong>Legend image system</strong>: new <code>.sm-slide-legend</code> sizing + Galileo bump class; title→image spacing fix; crisp margins<br>
-        – 🌌 New art drops: Galileo/Newton night skies (landscape), Ada storm spiral (landscape), Gauss rain-arcs (landscape), Jehnk 2-Cones (portrait), festival variants with transparent edges<br>
-        – 🧊 Bram image re-exported @2× for retina; optional <code>image-rendering: crisp-edges</code> hook added<br>
-        – 🧩 Practice slides: cone art now <em>pinned</em> (abs-pos) with reserved space — no button push-down on mobile<br>
-        – 📱 Viewport prep pass: clamp + vh audit, safe-area bottom bar, iOS tap highlight off, double-tap zoom prevention kept<br>
-        – 🔊 Audio: Howler one-tap unlock preserved; mute sync; interval-beep throttle; sfx wiring stays scoped to Story canvas<br>
-        – ⚙️ Perf: sprite & image preloads tuned; lazy-in slide art; background repaint helper keeps cache fresh without layout thrash<br>
-        – 🐛 Fixes: title/text underlap beneath images, Galileo “too small” PNG, reveal button double-fires, Back/Mute alignment, pointer-events on bottom bar<br>
-        – 🧯 Cleanup discipline: listeners/RAF/timers fully unwired on exit; no leaks between Kids/Story canvases<br>
-        – 🧮 <strong>XP</strong>: +25 XP per Reveal; +500 XP on Prologue “Finish”; single subtle popup anchored to the pressed button (no duplicate toast); capture-before-nav so XP always saves; badges coming later ⭐️<br>
-        – 🧰 Dev: centralized <code>awardXP(amount, { anchor, reason })</code> and <code>showXPPopup(text, anchor)</code>; removed duplicate inline popup calls in <code>drawSlide()</code>
+        – 🎖️ <strong>Badges system, phase 1</strong> — event-driven & idempotent (no top-level checks or undefined refs)<br>
+        – 🗨️ <strong>The “Grampy P” badge</strong>: awarded on first chat send in Math Tips Village<br>
+        – 🎵 <strong>“Play Music” badge</strong>: tied to the Jukebox ▶️ button (first successful play), not auto-play<br>
+        – 🎨 <strong>“Change Theme” badge</strong>: first non-default theme via MobX reaction on settings<br>
+        – 🚪 <strong>“Try Modes” badges</strong>: awarded on first entry (single or per-mode variant supported)<br>
+        – 🏕️ <strong>Kids Camping set</strong>: cars ≤60s, camp score ≥10k, first mosquito swat, ants streak ≥10, all tents lit — all via in-mode events<br>
+        – 🧰 <code>achievementsWatcher.js</code>: centralized reactions for first-time/ambient unlocks; clean startup/teardown<br>
+        – ⏯️ <strong>Jukebox UX</strong>: play/pause flips immediately, then re-syncs; “Now Playing” label updates reliably<br>
+        – 🅿️ <strong>Parking mini-game</strong>: fixed <code>initParkingGame</code> export + <code>kcParkingComplete</code> event wiring<br>
+        – 🐛 <strong>Crashes fixed</strong>: removed pre-init <code>awardBadge</code> uses & stray <code>count</code>/<code>seconds</code> checks; intro lockups<br>
+        – 🔊 <strong>Audio</strong>: one-tap Howler unlock preserved; mute sync; optional neon progress glow toggle<br>
+        – 💾 <strong>Persistence</strong>: autosave via MobX autorun; badge awards persist; unlocks are one-shot by design<br>
+        – 🧯 <strong>Cleanup</strong>: listeners/timers unwired on exit; HMR-safe one-shot guards inside modes<br>
+        – 🧪 <strong>QA checklist</strong> added (music, theme, modes, Math Tips, Camping cases) for quick regression passes<br>
+        – 🚧 <strong>Next</strong>: wire Infinity/QuickServe milestone badges at end-of-run; optional confetti/banner per unlock<br>
       </p>
     </div>
-
 
     <div class="settings-block">
       <h3>📲 App Info</h3>

@@ -14,6 +14,13 @@ export function applyBackgroundTheme() {
     appState.setSetting('theme', theme);
   }
 
+   // 🚧 guard: if locked, fall back to default
+  if (!appState.hasTheme(theme)) {
+    console.warn('🔒 Theme locked, falling back:', theme);
+    theme = 'menubackground';
+    appState.setSetting('theme', theme);
+  }
+
   bg.src = `assets/img/branding/${theme}.png`;
   console.log('🧊 Background set to:', theme);
 
