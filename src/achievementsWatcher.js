@@ -4,34 +4,24 @@ import { awardBadge } from './managers/badgeManager.js';
 
 let wired = false;
 
-/**
- * Wire achievement reactions. Must be called AFTER appState exists.
- * Idempotent: no double-wiring during HMR.
- */
 export function startAchievementsWatcher(appStateRef) {
-  if (!appStateRef) {
-    console.warn('startAchievementsWatcher: missing appStateRef');
-    return;
-  }
+  if (!appStateRef) { console.warn('startAchievementsWatcher: missing appStateRef'); return; }
   if (wired) return;
   wired = true;
 
-  const s = appStateRef; // <-- bind once, no “store is not defined” drama
+  const s = appStateRef;
 
-  // 🖌️ Theme change → theme_swap (first non-default theme)
-  const DEFAULT_THEME = 'menubackground';
+  // 🖌️ Theme badge …
   autorun(() => {
-    // read observables so MobX tracks deps:
     const theme = s.settings?.theme;
     const badges = s.profile?.badges || [];
     const hasThemeBadge = badges.includes('theme_swap');
-
-    if (!hasThemeBadge && theme && theme !== DEFAULT_THEME) {
+    if (!hasThemeBadge && theme && theme !== 'menubackground') {
       awardBadge('theme_swap');
     }
   });
 
-  // 🧭 Mode tour → mode_tour after all tried at least once
+  // 🧭 Mode tour …
   autorun(() => {
     const badgesArr = s.profile?.badges || [];
     const badges = new Set(badgesArr);
@@ -44,11 +34,18 @@ export function startAchievementsWatcher(appStateRef) {
     const triedTips  = badges.has('talk_grampy');
 
     const allTried = triedQS && triedInf && triedKids && triedStory && triedTips;
-    if (allTried && !badges.has('mode_tour')) {
-      awardBadge('mode_tour');
-    }
+    if (allTried && !badges.has('mode_tour')) awardBadge('mode_tour');
   });
 
-  // (Optional) Log once so you know we’re live
+  // 🏅 XP milestones — fires for ANY mode that adds XP
+  autorun(() => {
+    const xp = Number(s.profile?.xp) || 0;
+    const owned = new Set(s.profile?.badges || []);
+
+    // 📌 your canon names:
+    if (xp >= 1 && !owned.has('first_steps')) awardBadge('first_steps');   // “Get XP”
+    if (xp >= 1000 && !owned.has('math_zen')) awardBadge('math_zen');      // “1000 XP”
+  });
+
   console.log('✅ achievementsWatcher wired.');
 }

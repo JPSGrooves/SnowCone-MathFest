@@ -11,6 +11,10 @@ import { stopQS, playQSRandomTrack } from './quickServeMusic.js';
 import { renderGameUI } from './quickServe.js'; // 💥 Need to export this!
 import { generateProblem } from '../../logic/mathBrain.js';
 import { launchConfetti } from '../../utils/confetti.js';
+import { maybeAwardQuickServeBadges, finalizeQuickServeRun } from './quickServeBadges.js';
+import { awardBadge } from '../../managers/badgeManager.js';
+
+
 
 
 //////////////////////////////
@@ -149,6 +153,7 @@ function startTimer() {
     timerDisplay.textContent = formatTime(timeRemaining);
 
     if (timeRemaining <= 0) {
+      finalizeQuickServeRun(score);
       clearInterval(timerInterval);
       endGame();
     }
@@ -161,14 +166,12 @@ function endGame() {
   phil.philCelebrate();
   gridFX.stopGridPulse();
 
-  const isNewHighScore = score > appState.profile.qsHighScore;
-  appState.setQuickServeHighScore(score);
-
-  if (isNewHighScore) {
-    launchConfetti(); // 🌽💥🌈 math party activated
-  }
+  // ✅ finalizeQuickServeRun(score) already ran in the timer branch.
+  // that function updates XP, badges, and high score.
+  // just render the results UI off of the now-updated appState.
   showResultScreen();
 }
+
 
 
 //////////////////////////////
@@ -214,18 +217,27 @@ function submitAnswer() {
 
 
 function handleCorrect() {
+  // 🎯 score exactly by mode points (no double bump)
   score += currentPoints;
   updateScore();
-  const xpEarned = appState.addXP(currentXP);
-  totalSessionXP += xpEarned; // 🧠 track it
-  showResultMsg(true, xpEarned);
 
+  // 🏅 award QS milestone badges at live score
+  maybeAwardQuickServeBadges(score);
+
+  // 🍧 XP: trust the configured mode XP; don't assume addXP returns a delta
+  appState.addXP(currentXP);
+  totalSessionXP += currentXP;
+
+  // ✨ feedback + juice
+  showResultMsg(true, currentXP);
   gridFX.bumpGridGlow();
   phil.bumpJam();
   playCorrect();
 
+  // (optional) keep your global XP-based cone badge
   checkBadgeUnlock();
 
+  // 🔁 next problem
   currentAnswer = '';
   updateAnswerDisplay();
   renderProblem();
@@ -289,11 +301,13 @@ function showResultMsg(isCorrect, xp = 0) {
 
 
 function checkBadgeUnlock() {
-  if (appState.profile.xp >= 100 && !appState.profile.badges.includes('cone_master')) {
-    appState.unlockBadge('cone_master');
-    console.log('🏅 Badge unlocked: cone_master');
+  const xp = Number(appState.profile?.xp) || 0;
+  const has = (appState.profile?.badges || []).includes('cone_master');
+  if (xp >= 100 && !has) {
+    awardBadge('cone_master');
   }
 }
+
 
 //////////////////////////////
 // 🏆 Result Screen
@@ -305,9 +319,10 @@ function showResultScreen() {
     return;
   }
 
-  const isNewHighScore = score > appState.profile.qsHighScore;
-  appState.setQuickServeHighScore(score);
+  // pull final state after finalizeQuickServeRun
+  const isNewHighScore = score > (appState.profile.qsHighScore ?? 0);
 
+  // if you want confetti only when it’s truly a new HS (after finalizer set):
   if (isNewHighScore) {
     launchConfetti();
   }
@@ -324,11 +339,12 @@ function showResultScreen() {
   playAgainBtn?.addEventListener('click', handlePlayAgain);
   menuBtn?.addEventListener('click', handleReturnToMenu);
 
-  // Optional: focus on Play Again for keyboard flow
   playAgainBtn?.focus();
 }
 
+
 function buildResultHTML(isNewHighScore) {
+  const highScore = appState.profile.qsHighScore ?? 0;
   const highScoreMsg = isNewHighScore
     ? `<p class="new-highscore-msg">🎉 New High Score!</p>`
     : '';
@@ -337,7 +353,7 @@ function buildResultHTML(isNewHighScore) {
     <h2>🍧 Show Complete!</h2>
     <p>Score: ${score}</p>
     ${highScoreMsg}
-    <p>High Score: ${appState.profile.qsHighScore}</p>
+    <p>High Score: ${highScore}</p>
     <p>XP Earned: ${totalSessionXP}</p>
     <button id="playAgainBtn" class="play-again-btn">🎧 Play Again</button>
     <button id="menuBtn" class="back-to-menu-btn">🔙 Menu</button>

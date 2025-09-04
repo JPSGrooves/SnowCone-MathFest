@@ -533,6 +533,19 @@ function endRound(container, result, foodWrapper) {
     showRoundMessage('loss');
   }
 
+  // 🔔 NEW: broadcast round result & running margin
+  try {
+    const margin = playerScore - aiScore;
+    document.dispatchEvent(new CustomEvent('kcAntRoundResult', {
+      detail: {
+        result,                // 'win' | 'loss'
+        playerWins: playerScore,
+        aiWins: aiScore,
+        margin                 // playerWins - aiWins
+      }
+    }));
+  } catch {}
+
   updateScores(container);
   updateAntCount(container);
 

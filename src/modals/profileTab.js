@@ -44,23 +44,23 @@ export function renderProfileTab() {
     </div>
   `;
 }
-function getCompletionPercent(totalBadges) {
-  const p = appState.profile;
-  const s = appState.stats;
-  const story = appState.storyProgress;
+function getCompletionPercent(nonLegendTotal) {
+  const { xp = 0, badges = [] } = appState.profile || {};
+  const caps = COMPLETION_CONFIG.xpCaps;
 
-  let pct = 0;
-  pct += Math.min(p.xp, 100) * 0.5;
-  pct += (p.badges.length / totalBadges) * 20;
+  // 70% comes from total XP vs global cap
+  const xpPct = Math.min(xp, caps.global) / caps.global * 70;
 
-  if (s.story.chapter >= 5) pct += 15;
-  if (s.quickServe.topScore >= 50) pct += 10;
+  // 25% comes from unlocking all non-legend badges
+  const nonLegendUnlocked = badges.filter(id => id !== 'legend').length;
+  const badgePct = (nonLegendUnlocked / nonLegendTotal) * 25;
 
-  const triedAll = s.quickServe.sessions > 0 && s.infinity.timeSpent > 0 && story.seenPanels.length > 0;
-  if (triedAll) pct += 5;
+  // 5% comes from the Legend badge
+  const legendPct = badges.includes('legend') ? 5 : 0;
 
-  return Math.min(100, Math.round(pct));
+  return Math.round(Math.min(100, xpPct + badgePct + legendPct));
 }
+
 
 export function setupProfileTabUI() {
   const input = document.getElementById('profileNameInput');

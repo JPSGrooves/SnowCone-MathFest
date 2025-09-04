@@ -9,18 +9,18 @@ import { stopTrack, toggleMute } from '../../managers/musicManager.js';
 import * as phil from './quickServePhil.js';
 import * as gridFX from './quickServeGridFX.js';
 import { setupKeypad, generateKeypadHTML } from './quickServeKeypad.js';
-import { 
-  startGameLogic, 
-  stopGameLogic, 
-  resetCurrentAnswer 
+import {
+  startGameLogic,
+  stopGameLogic,
+  resetCurrentAnswer
 } from './quickServeGame.js';
-
-
 
 import { playQSRandomTrack, stopQS } from './quickServeMusic.js';
 import { activateInputHandler } from '../../managers/inputManager.js';
-import { awardBadge } from '../../managers/badgeManager.js';
 
+// ❌ no need to import awardBadge or finalizeQuickServeRun here
+// import { awardBadge } from '../../managers/badgeManager.js';
+// import { finalizeQuickServeRun } from './quickServeBadges.js';
 
 
 

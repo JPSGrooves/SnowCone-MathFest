@@ -37,26 +37,17 @@ let nextTrigger = sfxIntervals[0];
 let solvedCount = 0;     // how many problems the player solved this run
 let currentMode = 'addsub'; // you use this but never declared it
 
-function checkInfinityBadges() {
+// ⬇️ replace the old checkInfinityBadges() with this
+function checkInfinityBadgesByScore() {
   const seconds = Math.floor((Date.now() - startTime) / 1000);
-  if (solvedCount >= 25  && seconds <= 60)   awardBadge('inf_25_1min');
-  if (solvedCount >= 50  && seconds <= 120)  awardBadge('inf_50_2min');
-  if (solvedCount >= 100 && seconds <= 240)  awardBadge('inf_100_4min');
-  if (solvedCount >= 250 && seconds <= 600)  awardBadge('inf_250_10min');
+
+  // 🏅 time-gated, score-based thresholds
+  // (keeping numeric thresholds identical to your old attempt counts: 25, 50, 100, 250 — now interpreted as POINTS)
+  if (score >= 25  && seconds <= 60)   awardBadge('inf_25_1min');
+  if (score >= 50  && seconds <= 120)  awardBadge('inf_50_2min');
+  if (score >= 100 && seconds <= 240)  awardBadge('inf_100_4min');
+  if (score >= 250 && seconds <= 600)  awardBadge('inf_250_10min');
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 export function loadInfinityMode() {
@@ -521,22 +512,22 @@ function handleCorrect() {
   }
 
   score += points;
-  streak++; // 🥳 Increment streak
-  solvedCount++;              // ⬅️ bump problem counter
-  checkInfinityBadges();      // ⬅️ evaluate time-gated badges
+  streak++; 
+  solvedCount++; // ✅ safe to keep for analytics if you still want attempts tracked
 
-  // 🎯 Interval-Based Burst Logic
+  // ⬇️ score-based badge checks (replaces the attempts-based call)
+  checkInfinityBadgesByScore();
+
+  // 🎯 Interval SFX logic (unchanged)
   console.log(`🌈 Streak now at: ${streak}`);
   if (streak === nextTrigger) {
     console.log('💥 Triggering SFX burst!');
     playStreakBurst();
-
-    // Advance pattern and update next cumulative trigger
     patternIndex = (patternIndex + 1) % sfxIntervals.length;
     nextTrigger += sfxIntervals[patternIndex];
   }
 
-  if (streak > maxStreak) maxStreak = streak; // Track session peak
+  if (streak > maxStreak) maxStreak = streak;
 
   appState.addXP(xp);
   updateScore();
@@ -544,6 +535,7 @@ function handleCorrect() {
   showResult(`✅ +${points} pt, +${xp} XP`, '#00ffee');
   newProblem();
 }
+
 
 function handleIncorrect() {
   streak = 0;
@@ -719,18 +711,19 @@ export {
 
 
 export function finalizeInfinityRun(stats) {
-  // stats.seconds should be the total active-run seconds
   const seconds = Math.max(0, Number(stats.seconds) || 0);
 
   // 600s → 1000 XP  => XP = seconds * (1000/600) = seconds * 5/3
   const xp = Math.round((seconds * 5) / 3);
 
-  appState.addInfinityXP(xp);  // ✅ fills Infinity bucket (cap 1000)
+  appState.addInfinityXP(xp);
   appState.addInfinityTime(seconds);
 
-  // badge ideas (hook to your real counters as needed)
-  if (stats.correct >= 25 && seconds <= 60)   awardBadge('inf_25_1min');
-  if (stats.correct >= 50 && seconds <= 120)  awardBadge('inf_50_2min');
-  if (stats.correct >= 100 && seconds <= 240) awardBadge('inf_100_4min');
-  if (stats.correct >= 250 && seconds <= 600) awardBadge('inf_250_10min');
+  // ⬇️ score-based mirror (keeps identical time gates & numeric thresholds)
+  const sc = Math.max(0, Number(stats.score) || 0);
+
+  if (sc >= 25  && seconds <= 60)   awardBadge('inf_25_1min');
+  if (sc >= 50  && seconds <= 120)  awardBadge('inf_50_2min');
+  if (sc >= 100 && seconds <= 240)  awardBadge('inf_100_4min');
+  if (sc >= 250 && seconds <= 600)  awardBadge('inf_250_10min');
 }

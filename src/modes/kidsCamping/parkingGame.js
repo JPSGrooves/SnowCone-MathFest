@@ -29,6 +29,8 @@ let previousPopCount = 0; // stores last known XP state
 // ===== Parking Intro (Mario Kart-style) =====
 let introController = null;
 let nextButtonHonkIdx = 0;
+let finalElapsedMs = null; // ⏱️ frozen when the 11th car is parked
+
 
 function prefersReducedMotion() {
   try { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
@@ -135,6 +137,7 @@ export function initParkingGame(container) {
   startTime = null;
   currentCarIndex = -1;
   sessionPoints = 0;
+  finalElapsedMs = null; // ⬅️ add this
 
   const ordinals = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th'];
   arrivalOrder = shuffle([...ordinals]);
@@ -205,8 +208,6 @@ export function initParkingGame(container) {
   parkBtn?.addEventListener('pointerdown', onParkTap, { passive: true });
 }
 
-
-// wrap the live car so we can animate the wrapper for a smooth exit
 function showCar(index) {
   carZone.innerHTML = '';
 
@@ -219,10 +220,21 @@ function showCar(index) {
   car.src = `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/${carSprite}`;
   car.className = 'kc-car-img';
   car.alt = `Car ${index + 1}`;
+
+  // If a sprite fails, auto-park that slot so the run can still complete.
   car.onerror = () => {
     console.error('🚫 Failed to load:', car.src);
-    holder.remove();                // clean the holder too
-    parkedCars.add(index);          // auto-park broken ones
+    try { holder.remove(); } catch {}
+    parkedCars.add(index);
+
+    // If that auto-park finished the set, freeze elapsed now and celebrate.
+    if (parkedCars.size >= parkingSprites.length && startTime) {
+      finalElapsedMs = Math.max(0, Date.now() - startTime);
+      triggerFinalCelebration();
+      return;
+    }
+
+    // Otherwise keep flowing
     cycleNextCar();
   };
 
@@ -307,48 +319,49 @@ function cycleNextCar() {
 }
 
 function triggerFinalCelebration() {
+  // guard against re-entry
   if (!gameStarted) return;
-  gameStarted = false; // ✅ prevent duplicate calls
+  gameStarted = false;
 
-  console.log("🎉 triggerFinalCelebration() fired");
-  console.log("🏁 parkedCars:", [...parkedCars]);
-  console.log("🏁 sessionPoints:", sessionPoints);
+  // Prefer the frozen time (captured when the 11th car was parked)
+  const elapsed = (finalElapsedMs != null && Number.isFinite(finalElapsedMs))
+    ? finalElapsedMs
+    : (startTime ? (Date.now() - startTime) : Infinity);
 
-  // speed bonus only — do NOT re-award sessionPoints
-  const elapsed = Date.now() - startTime;
-  const speedBonus = elapsed < 60000 ? 100 : 0;
+  // “≤ 60s” earns a bonus
+  const speedBonus = elapsed <= 60_000 ? 100 : 0;
   if (speedBonus) {
     appState.incrementPopCount(speedBonus);
     checkXPBatchAwardFromTotal();
     updatePopUI?.();
   }
 
+  // 🎉 mini finale
   triggerConfetti();
 
-  // hide UI during finale
+  // hide live UI
   if (honkLabel) {
     honkLabel.classList.add('kc-hidden');
     honkLabel.innerHTML = '';
   }
   parkBtn?.classList.add('kc-hidden');
 
-  // finale overlay
+  // overlay
   const finale = document.createElement('div');
   finale.className = 'kc-parked-overlay';
   finale.textContent = '🏁 All Parked!';
   carZone.appendChild(finale);
 
-  // extend visibility slightly
+  // fade in overlay (avoid CSS race)
   finale.style.animation = 'none';
   requestAnimationFrame(() => {
     finale.style.opacity = '1';
     finale.style.transition = 'opacity 0.4s ease';
   });
 
-  // bubble the completion event (listeners on document will receive it)
-  const elapsedMs = Date.now() - (startTime || Date.now());
+  // 🔔 dispatch completion once with the elapsed
   parkingRoot?.dispatchEvent(new CustomEvent('kcParkingComplete', {
-    detail: { elapsedMs },
+    detail: { elapsedMs: elapsed },
     bubbles: true
   }));
 
@@ -361,6 +374,7 @@ function triggerFinalCelebration() {
   // reset back to intro
   setTimeout(() => { resetGame(); }, 2500);
 }
+
 
 
 
@@ -386,6 +400,11 @@ function handleHonk(index, carEl) {
   // reached the needed honks => park this car
   if (honks === honkLimit) {
     parkedCars.add(index);
+
+    // ⏱️ if that was the final car, freeze the elapsed now (before any overlay/animations)
+    if (parkedCars.size >= parkingSprites.length && startTime) {
+      finalElapsedMs = Math.max(0, Date.now() - startTime);
+    }
 
     // points: award only the delta for THIS car
     const base = 10;

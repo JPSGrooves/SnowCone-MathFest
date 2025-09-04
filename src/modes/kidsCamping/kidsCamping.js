@@ -50,32 +50,51 @@ const HANDLERS = {
 // add near HANDLERS:
 HANDLERS.onAntsFull = null;
 HANDLERS.onParkingComplete = null;
-
 // kidsCamping.js
+
+// put this near your other HANDLERS keys
+HANDLERS.onAntRoundProgress = null;
+
 function wireKidsBadgeListeners() {
   unwireKidsBadgeListeners();
 
-  HANDLERS.onAntsFull = () => {
-    if (!_awarded.ants10) { _awarded.ants10 = true; awardBadge('kids_ants10'); }
-  };
-  document.addEventListener('kcAntsFull', HANDLERS.onAntsFull);
+  HANDLERS.onAntRoundProgress = (ev) => {
+    const d = ev?.detail || {};
+    const p = Number.isFinite(+d.playerWins) ? +d.playerWins : 0;
+    const a = Number.isFinite(+d.aiWins)     ? +d.aiWins     : 0;
+    const margin = Number.isFinite(+d.margin) ? +d.margin : (p - a);
 
+    // dev visibility (remove later)
+    console.log('[kc] kcAntRoundResult:', { p, a, margin });
+
+    if (!_awarded.ants10 && margin >= 10) {
+      _awarded.ants10 = true;
+      // tiny defer so we never collide with round UI updates
+      requestAnimationFrame(() => setTimeout(() => awardBadge('kids_ants_streak10'), 0));
+    }
+  };
+
+  document.addEventListener('kcAntRoundResult', HANDLERS.onAntRoundProgress);
+
+  // existing parking listener stays the same
   HANDLERS.onParkingComplete = (ev) => {
     const elapsedMs = ev?.detail?.elapsedMs ?? Infinity;
-    // 🏁 “speed” badge → only if finished within 60s
     if (elapsedMs <= PARKING_FAST_MS && !_awarded.cars) {
       _awarded.cars = true;
-      awardBadge('kids_cars_speed');   // ✅ your real ID
-      // console.log('[kids] awarded kids_cars_speed in', elapsedMs, 'ms');
+      awardBadge('kids_cars_speed');
     }
   };
   document.addEventListener('kcParkingComplete', HANDLERS.onParkingComplete);
 }
 
 function unwireKidsBadgeListeners() {
-  if (HANDLERS.onAntsFull)          document.removeEventListener('kcAntsFull', HANDLERS.onAntsFull);
-  if (HANDLERS.onParkingComplete)    document.removeEventListener('kcParkingComplete', HANDLERS.onParkingComplete);
-  HANDLERS.onAntsFull = HANDLERS.onParkingComplete = null;
+  if (HANDLERS.onAntRoundProgress)
+    document.removeEventListener('kcAntRoundResult', HANDLERS.onAntRoundProgress);
+  if (HANDLERS.onParkingComplete)
+    document.removeEventListener('kcParkingComplete', HANDLERS.onParkingComplete);
+
+  HANDLERS.onAntRoundProgress = null;
+  HANDLERS.onParkingComplete  = null;
 }
 
 
