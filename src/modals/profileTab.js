@@ -1,16 +1,15 @@
-// profileTab.js — MOBX REFRACTOR, as per OUR ACTUAL CODE
+// /src/tabs/profileTab.js — single-source completion (badges-only model)
 
 import { appState } from '../data/appState.js';
 import { renderBadgeGrid, allBadges } from '../managers/badgeManager.js';
 import { COMPLETION_CONFIG } from '../managers/completionManager.js';
 
-
 export function renderProfileTab() {
+  // For the “how to” copy only:
+  const caps = COMPLETION_CONFIG?.xpCaps || { global: 5000, story: 0, kidsCamping: 0, quickServe: 0, infinity: 0 };
+  const extraCap = Math.max(0, (caps.global || 0) - ((caps.story || 0) + (caps.kidsCamping || 0) + (caps.quickServe || 0) + (caps.infinity || 0)));
+
   const nonLegendTotal = Object.keys(allBadges).filter(id => id !== 'legend').length;
-  const caps = COMPLETION_CONFIG.xpCaps;
-  const extraCap = caps.global - (caps.story + caps.kidsCamping + caps.quickServe + caps.infinity);
-
-
 
   return `
     <div class="settings-block">
@@ -31,38 +30,19 @@ export function renderProfileTab() {
       <div id="badgeGrid" class="badge-wrapper"></div>
     </div>
 
-    <!-- 🔻 New: concise 100% guide -->
+    <!-- 🔻 Concise 100% guide (copy only; actual % comes from appState.getCompletionPercent()) -->
     <div class="settings-block">
       <h3>🎯 How to reach 100%</h3>
       <ul class="completion-brief">
-        <li><strong>XP (70%)</strong> — Earn <strong>${caps.global} XP</strong> across modes:
-            Story ${caps.story}, Camping Games ${caps.kidsCamping}, QS ${caps.quickServe},
-            Infinity ${caps.infinity}, Extra ${extraCap}.</li>
-        <li><strong>Badges (25%)</strong> — Unlock all <strong>${nonLegendTotal}</strong> non-legend badges.</li>
-        <li><strong>Legend (5%)</strong> — After the above, the <em>Legend</em> badge finishes the bar.</li>
+        <li><strong>Badges (95%)</strong> — Unlock all <strong>${nonLegendTotal}</strong> non-legend badges.</li>
+        <li><strong>Legend (5%)</strong> — After that, the <em>Legend</em> badge completes the bar.</li>
       </ul>
     </div>
   `;
 }
-function getCompletionPercent(nonLegendTotal) {
-  const { xp = 0, badges = [] } = appState.profile || {};
-  const caps = COMPLETION_CONFIG.xpCaps;
-
-  // 70% comes from total XP vs global cap
-  const xpPct = Math.min(xp, caps.global) / caps.global * 70;
-
-  // 25% comes from unlocking all non-legend badges
-  const nonLegendUnlocked = badges.filter(id => id !== 'legend').length;
-  const badgePct = (nonLegendUnlocked / nonLegendTotal) * 25;
-
-  // 5% comes from the Legend badge
-  const legendPct = badges.includes('legend') ? 5 : 0;
-
-  return Math.round(Math.min(100, xpPct + badgePct + legendPct));
-}
-
 
 export function setupProfileTabUI() {
+  // name editing UX
   const input = document.getElementById('profileNameInput');
   if (input) {
     input.value = appState.profile.username || 'Guest';
@@ -102,13 +82,13 @@ export function setupProfileTabUI() {
     };
   }
 
-  const totalBadges = Object.keys(allBadges).length;
-  const percent = getCompletionPercent(totalBadges);
-
+  // 🔥 Single source of truth for completion:
+  const percent = appState.getCompletionPercent();
   const bar = document.getElementById('xpBar');
   const text = document.getElementById('xpPercentText');
   if (bar) bar.style.width = `${percent}%`;
   if (text) text.textContent = `${percent}%`;
 
+  // Render badges grid
   renderBadgeGrid();
 }

@@ -6,29 +6,28 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.8.8</h3>
+      <h3>🧠 SnowCone MathFest v0.9.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.8.8 — The Grampy P Badge</h3>
+      <h3>🍦 v0.9.0 — Legendary Badges</h3>
       <p>
-        – 🎖️ <strong>Badges system, phase 1</strong> — event-driven & idempotent (no top-level checks or undefined refs)<br>
-        – 🗨️ <strong>The “Grampy P” badge</strong>: awarded on first chat send in Math Tips Village<br>
-        – 🎵 <strong>“Play Music” badge</strong>: tied to the Jukebox ▶️ button (first successful play), not auto-play<br>
-        – 🎨 <strong>“Change Theme” badge</strong>: first non-default theme via MobX reaction on settings<br>
-        – 🚪 <strong>“Try Modes” badges</strong>: awarded on first entry (single or per-mode variant supported)<br>
-        – 🏕️ <strong>Kids Camping set</strong>: cars ≤60s, camp score ≥10k, first mosquito swat, ants streak ≥10, all tents lit — all via in-mode events<br>
-        – 🧰 <code>achievementsWatcher.js</code>: centralized reactions for first-time/ambient unlocks; clean startup/teardown<br>
-        – ⏯️ <strong>Jukebox UX</strong>: play/pause flips immediately, then re-syncs; “Now Playing” label updates reliably<br>
-        – 🅿️ <strong>Parking mini-game</strong>: fixed <code>initParkingGame</code> export + <code>kcParkingComplete</code> event wiring<br>
-        – 🐛 <strong>Crashes fixed</strong>: removed pre-init <code>awardBadge</code> uses & stray <code>count</code>/<code>seconds</code> checks; intro lockups<br>
-        – 🔊 <strong>Audio</strong>: one-tap Howler unlock preserved; mute sync; optional neon progress glow toggle<br>
-        – 💾 <strong>Persistence</strong>: autosave via MobX autorun; badge awards persist; unlocks are one-shot by design<br>
-        – 🧯 <strong>Cleanup</strong>: listeners/timers unwired on exit; HMR-safe one-shot guards inside modes<br>
-        – 🧪 <strong>QA checklist</strong> added (music, theme, modes, Math Tips, Camping cases) for quick regression passes<br>
-        – 🚧 <strong>Next</strong>: wire Infinity/QuickServe milestone badges at end-of-run; optional confetti/banner per unlock<br>
+        – 🏆 <strong>Legend badge</strong>: auto-awards once all non-legend badges are unlocked (95%), adds the final 5% for 100% completion<br>
+        – 📊 <strong>Completion system simplified</strong>: badge-driven only (95% non-legend + 5% legend); XP still fuels levels but no longer affects completion<br>
+        – 🗨️ <strong>“Grampy P” badge</strong>: first chat in Math Tips Village (working + persisted)<br>
+        – 🎵 <strong>“Play Music” badge</strong>: awarded on first jukebox play (manual, not auto-play)<br>
+        – 🎨 <strong>“Change Theme” badge</strong>: unlocked via first non-default theme change (MobX reaction)<br>
+        – 🎪 <strong>“Tour” badge</strong>: awarded once all major modes (QS, Infinity, Kids, Story, Tips) have been sampled<br>
+        – 🏕️ <strong>Kids Camping set</strong>: cars ≤60s, camp score ≥10k, first mosquito swat, ants streak ≥10, all tents lit — all event-driven, idempotent<br>
+        – 🅿️ <strong>Parking mini-game</strong>: fixed celebration flow, time freeze, and <code>kcParkingComplete</code> dispatch<br>
+        – 🐜 <strong>Ant streak badge</strong>: corrected ID to <code>kids_ants_streak10</code>; now fires properly at ≥10 margin<br>
+        – 🔊 <strong>Audio</strong>: one-tap Howler unlock stable; mute toggle synced; consistent SFX playback across games<br>
+        – 💾 <strong>Persistence</strong>: autosave via MobX autorun; badge unlocks and progress persist correctly across reloads<br>
+        – 🧯 <strong>Cleanup</strong>: all event listeners/timers unwired on exit; HMR-safe one-shot guards in each mode<br>
+        – 🧪 <strong>QA checklist expanded</strong>: music, theme, Grampy P chat, mode tour, Camping set, ant streak, legend completion<br>
+        – 🚧 <strong>Next</strong>: wire Infinity/QuickServe milestone badges (end-of-run triggers); add unlock confetti/banner polish<br>
       </p>
     </div>
 

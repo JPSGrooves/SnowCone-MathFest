@@ -8,10 +8,81 @@
 * ✅ **v0.7.7 – Prologuing the Inevitable**
 * ✅ **v0.8.0 – Story Mode Prologue Finished**
 * ✅ **v0.8.8 – The Grampy P Badge**
-* 🔜 **v0.9.0 – Math Tips Mode Complete & Badge/Theme Implementd**
-* 🎯 **v1.0.0 – Final Polish + Launch Ready (Maybe Chapter 1)✨**
+* ✅ **v0.9.0 – Legendary Badges/Badge/Theme Implemented****
+* 🔜 **v0.9.1 – MathTips Village Complete/Polished**
+* 🔜 **v0.9.2 – QuickServe Pavillion Complete/Polished**
+* 🔜 **v0.9.3 – Infinity Lake Complete/Polished**
+* 🔜 **v0.9.4 – Camping Games Complete/Polished**
+* 🔜 **v0.9.5 – Story Mode Forest Complete/Polished**
+* 🔜 **v0.9.6 – Badges (add 5?) Complete/Polished**
+* 🔜 **v0.9.7 – Music/SFX Complete/Polished**
+* 🔜 **v0.9.8 – Celebrations Complete/Polished**
+* 🔜 **v0.9.9 – Code Complete/Polished**
+* 🎯 **v1.0.0 – Final Polish + Launch Ready✨**
 
 ---
+
+## v0.9.0 — *“Legendary Badges”* (September 4, 2025)
+
+### 🏆 Legendary Badge & Completion Overhaul
+
+* **Legend badge**: auto-awards once **all non-legend badges** are unlocked (95%), adds the final **+5%** for 100% completion.
+* **Completion percent**: now **badge-driven only** → 95% from non-legend badge progress + 5% from the Legend badge.
+* **XP caps** (Story 800, Camping 1000, QS 500, Infinity 1000, Extra 1700) remain in place for **levels & score pacing**, but no longer affect the completion bar.
+
+---
+
+### 🎖️ Badge System — Phase 2
+
+* **Ant streak badge**: corrected ID → `kids_ants_streak10`; now fires properly when margin ≥10.
+* **Grampy P**: still awarded on first chat send in Math Tips Village.
+* **Play Music**: tied to first manual jukebox ▶️ press (not auto-play).
+* **Change Theme**: awarded on first non-default theme (MobX reaction).
+* **Tour**: awarded after sampling all major modes (QS, Infinity, Kids, Story, MathTips).
+* **Kids Camping set** (all event-backed, one-shot):
+
+  * `kids_cars_speed`: park all cars ≤60s (`kcParkingComplete`).
+  * `kids_camp_10k`: Camping Score ≥10,000 (reaction on `popCount`).
+  * `kids_mosquito`: first mosquito swat.
+  * `kids_ants_streak10`: ant streak margin ≥10.
+  * `kids_tents_all`: all tents lit (`kc:tents-all`).
+
+---
+
+### 🛠️ Stability & Cleanup
+
+* **Unified completion percent** across Math Tips, profile tab, and Grampy P → all call `appState.getCompletionPercent()`.
+* **Parking mini-game**: celebration flow fixed; `finalElapsedMs` frozen correctly; dispatch of `kcParkingComplete` stable.
+* **Event unwiring**: Kids mode disposers guaranteed on exit; no dangling listeners.
+* **Autosave**: badges and progress persist cleanly via MobX autorun.
+
+---
+
+### 🧪 QA Checklist (Legendary Pass)
+
+* Unlock all non-legend badges → completion shows **95%**.
+* After Legend auto-awards → completion shows **100%**.
+* Ant streak ≥10 margin → `kids_ants_streak10` unlocks once.
+* Verify persistence: reload after unlocking → badges remain unlocked.
+
+---
+
+### 📌 Dev Notes
+
+> *“Completion is now pure badge-alchemy. 95% comes from the grind, 5% from the crown. XP still keeps the vibes flowing for levels, but the bar belongs to the badges. Ant Nemesis now fires true, and the Legend unlock finally feels earned.”*
+
+---
+
+### ⭐ Next
+
+* Wire **Infinity** & **QuickServe** milestone badges (end-of-run triggers).
+* Add **confetti/banner polish** for badge unlocks (rate-limited).
+* Begin polish passes for MathTips Village (v0.9.1).
+
+
+___
+
+
 
 ## v0.8.8 — *“The Grampy P Badge”* (August 30, 2025)
 

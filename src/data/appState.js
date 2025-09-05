@@ -1,9 +1,6 @@
 // appState.js
 import { makeAutoObservable, autorun, runInAction } from 'mobx';
-import {
-  getCompletionPercent as computeCompletionPercent,
-  computeCompletionBreakdown
-} from '../managers/completionManager.js';
+import { allBadges as BADGES } from '../managers/badgeManager.js';
 
 class AppState {
   profile = {
@@ -251,28 +248,59 @@ class AppState {
   // 🔮 MOOD ENGINE (XP DRIVEN)
   //////////////////////////////////////
   // ---------- Completion & Mood ----------
+  // ---------- Completion (BADGE-ONLY: 95% non-legend, 5% legend) ----------
   getCompletionPercent() {
     try {
-      // 🔥 real model: 70% XP + 25% badges + 5% legend
-      return computeCompletionPercent(this);
+      const owned = new Set(this.profile?.badges || []);
+      const allIds = Object.keys(BADGES || {});
+      const nonLegendIds = allIds.filter(id => id !== 'legend');
+
+      const nonLegendOwned = nonLegendIds.filter(id => owned.has(id)).length;
+      const haveLegend = owned.has('legend');
+
+      const nonLegendFrac = nonLegendIds.length ? (nonLegendOwned / nonLegendIds.length) : 0;
+      const pct = (nonLegendFrac * 95) + (haveLegend ? 5 : 0);
+
+      return Math.round(Math.min(100, Math.max(0, pct)));
     } catch {
-      // fallback if manager isn't loaded yet
-      return Math.min(Math.round((this.profile.xp / 4000) * 100), 100);
+      // super-safe fallback
+      const haveLegend = !!this.profile?.badges?.includes?.('legend');
+      const total = (this.profile?.badges || []).length;
+      const nonLegendOwned = haveLegend ? (total - 1) : total;
+      const approx = (nonLegendOwned / Math.max(1, total)) * 95 + (haveLegend ? 5 : 0);
+      return Math.round(Math.min(100, Math.max(0, approx)));
     }
   }
 
-  // (optional) expose full breakdown for debugging / UI badges page
+  // Optional: keep a breakdown for UIs / debugging
   getCompletionBreakdown() {
-    try {
-      return computeCompletionBreakdown(this);
-    } catch {
-      return {
-        totalPercent: Math.min(Math.round((this.profile.xp / 4000) * 100), 100),
-        xp: { xpFrac: (this.profile.xp / 4000), buckets: { story:0, kids:0, quickServe:0, infinity:0, extra:0 } },
-        badgesFrac: 0, legendDone: false
-      };
-    }
+    const owned = new Set(this.profile?.badges || []);
+    const allIds = Object.keys(BADGES || {});
+    const nonLegendIds = allIds.filter(id => id !== 'legend');
+
+    const nonLegendOwned = nonLegendIds.filter(id => owned.has(id)).length;
+    const haveLegend = owned.has('legend');
+
+    const nonLegendFrac = nonLegendIds.length ? (nonLegendOwned / nonLegendIds.length) : 0;
+
+    const badgesFrac = nonLegendFrac; // 0..1 of non-legend
+    const legendDone = haveLegend;
+
+    const totalPercent = Math.round(
+      Math.min(100, (badgesFrac * 95) + (legendDone ? 5 : 0))
+    );
+
+    return {
+      totalPercent,
+      badges: {
+        nonLegendTotal: nonLegendIds.length,
+        nonLegendOwned,
+        badgesFrac // 0..1
+      },
+      legendDone
+    };
   }
+
 
   getMood() {
     const pct = this.getCompletionPercent();
@@ -471,4 +499,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: "v0.8.8-The Grampy P Badge" };
+window.devFlags = { build: "v0.9.0-Legendary Badges" };
