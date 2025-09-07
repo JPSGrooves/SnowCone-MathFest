@@ -15,7 +15,8 @@
     "lint": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "prepare": "husky && husky install"
+    "prepare": "husky && husky install",
+    "test:mt": "NODE_ENV=test node --import ./scripts/dom-shim.mjs ./scripts/mt_golden_test.mjs"
   },
   "lint-staged": {
     "*.js": [
@@ -82,7 +83,9 @@
     "@vitejs/plugin-react": "^4.5.1",
     "eslint-plugin-import": "^2.31.0",
     "gh-pages": "^6.0.0",
+    "happy-dom": "^18.0.1",
     "husky": "^8.0.0",
+    "jsdom": "^26.1.0",
     "lint-staged": "^16.1.0",
     "prettier-plugin-tailwindcss": "^0.6.12",
     "vite": "6.3.5",

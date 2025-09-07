@@ -6,7 +6,10 @@ const qabotData = {
     "Greetings, cosmic traveler! Ready to vibe with some math?",
     "Hey there! Ready to stack some cones and solve some mysteries?",
     "Welcome to the MathTips Village! Where every cone has a story.",
-    "Ahoy, fellow math adventurer! Ready to crunch some numbers?"
+    "Ahoy, fellow math adventurer! Ready to crunch some numbers?",
+    "Yo — you bring quesadillas or should I?",
+    "Spicy mango snowcone run after this?",
+    "Campfire nachos, then fractions — priorities."
   ],
 
   how_are_you: [
@@ -17,7 +20,10 @@ const qabotData = {
     "Pythagorus Cat never rests... but always vibes.",
     "Neon’s glowing. Syrup’s flowing. All is well.",
     "Living that cosine dream, bruh.",
-    "One hypotenuse at a time... I'm thriving."
+    "One hypotenuse at a time... I'm thriving.",
+    "Powered by quesadillas and kind vibes.",
+    "Feeling like a spicy mango snowcone on a hot day.",
+    "Campfire nacho level: melty."
   ],
 
   farewells: [

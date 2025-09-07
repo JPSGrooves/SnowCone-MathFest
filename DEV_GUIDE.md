@@ -66,6 +66,34 @@ appState.profile.badges.includes('mode_tour');
 // Completion breakdown (watch buckets fill + total%)
 scTest.breakdown();
 
+jeremy@Jeremys-MacBook-Pro-2 SnowCone-MathFest % 
+
+
+AI TESTER!!!!
+
+
+> snowcone-mathfest@0.1.0 test:mt
+> NODE_ENV=test node --import ./scripts/dom-shim.mjs ./scripts/mt_golden_test.mjs
+
+❌ what's your name 
+   got: meowth is right.<br>triangle whisperer. snowcone sage. your study cat.<br>want a quick % rep? 
+   exp: Grampy P 
+
+❌ .345345 * 1/7 
+   got: 345345 * 1/7 = <strong>49335</strong> 
+   exp: 0.0493349 
+
+❌ 1/2 / 1/2 
+   got: 1/2 / 1/2 = <strong>0.25</strong> 
+   exp:  = 1 
+
+✅ 7 passed, ❌ 3 failed, total 10
+jeremy@Jeremys-MacBook-Pro-2 SnowCone-MathFest % 
+
+```bash
+npm run test:mt
+```
+
 
 ## 🌐 3. Deploy to GitHub Pages
 

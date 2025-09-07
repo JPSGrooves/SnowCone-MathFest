@@ -1,123 +1,106 @@
 // /src/modes/mathTips/tiles/tileEngine.js
-// 🌌 Tiny tile engine: score → pick → render (one bubble).
-// Intent packs still handle math; tiles handle small coaching/teach vibes.
+// Lightweight tile matcher with cooldown + clean HTML joiner.
 
-import tiles from './tiles.core.js';
+import bank from './tiles.core.js';
+import { appState } from '../../../data/appState.js';
+import { runInAction } from 'mobx';
 
-// ephemeral state (per reload). If you want persistence later, we can MobX it.
-const tileState = {
-  turn: 0,
-  cooldowns: new Map() // key -> remaining turns
-};
+const THRESH = bank.threshold ?? 0.55;
 
-function decCooldowns() {
-  for (const [k, v] of tileState.cooldowns) {
-    const nv = Math.max(0, (v || 0) - 1);
-    if (nv === 0) tileState.cooldowns.delete(k);
-    else tileState.cooldowns.set(k, nv);
-  }
+function ensureCooldowns() {
+  runInAction(() => {
+    if (!appState.progress) appState.progress = {};
+    if (!appState.progress.mathtips) appState.progress.mathtips = {};
+    if (!appState.progress.mathtips.cooldowns) appState.progress.mathtips.cooldowns = {};
+  });
+  return appState.progress.mathtips.cooldowns;
 }
 
-function onPicked(key, cd = 2) {
-  if (cd > 0) tileState.cooldowns.set(key, cd);
+function tickCooldowns() {
+  const cd = ensureCooldowns();
+  runInAction(() => {
+    for (const k of Object.keys(cd)) {
+      const v = Math.max(0, (cd[k] | 0) - 1);
+      if (v <= 0) delete cd[k];
+      else cd[k] = v;
+    }
+  });
 }
 
-function isMathyLine(text) {
-  const t = String(text || '').trim();
-  if (!t) return false;
-  const SAFE_EXPR = /^[\d\s+\-*/^().]+$/;
-  if (SAFE_EXPR.test(t)) return true;
-  if (/^simplify\s+(-?\d+)\s*\/\s*(-?\d+)/i.test(t)) return true;
-  if (/^(gcf|lcm|factor)\b/i.test(t)) return true;
-  if (/-?\d+(?:\.\d+)?\s*%\s*of\s*-?\d+(?:\.\d+)?/i.test(t)) return true;
+function setCooldown(key, turns = 2) {
+  const cd = ensureCooldowns();
+  runInAction(() => { cd[key] = Math.max(1, turns | 0); });
+}
+
+function matchTrigger(tr, textLower) {
+  if (!tr) return false;
+  if (typeof tr === 'string') return textLower.includes(tr.toLowerCase());
+  if (tr instanceof RegExp) return tr.test(textLower);
   return false;
 }
 
-function testTriggers(tile, lower) {
-  let best = 0;
-  for (const trig of tile.triggers) {
-    if (typeof trig === 'string') {
-      if (lower.includes(trig)) best = Math.max(best, 0.8);
-    } else if (trig instanceof RegExp) {
-      if (trig.test(lower)) best = Math.max(best, 1.0);
-    } else if (typeof trig === 'function') {
-      best = Math.max(best, Number(trig(lower)) || 0);
-    }
+function scoreTile(tile, textLower) {
+  let hits = 0;
+  for (const tr of (tile.triggers || [])) {
+    if (matchTrigger(tr, textLower)) hits += 1;
   }
-  return best;
+  if (!hits) return 0;
+  const w = tile.weight ?? 1;
+  return hits * w;
 }
 
-function scoreTile(tile, lower) {
-  if (tileState.cooldowns.has(tile.key)) return -1;
-  const match = testTriggers(tile, lower);
-  if (match <= 0) return 0;
-  const qBoost = (/\?\s*$/.test(lower) && tile.qOK) ? 0.1 : 0;
-  const weight = tile.weight ?? 1;
-  return (match + qBoost) * weight;
+function code(x) { return `<code>${x}</code>`; }
+function bold(x) { return `<strong>${x}</strong>`; }
+
+function examplesToLine(examples = []) {
+  if (!examples.length) return '';
+  const parts = examples.map(({ in: inp, out }) => {
+    if (out === null || typeof out === 'undefined') return code(inp);
+    const pretty = typeof out === 'number' ? bold(out) : bold(String(out));
+    return `${code(inp)} → ${pretty}`;
+  });
+  return parts.join(' • ');
 }
 
-function pick(arr, seed) {
-  if (Array.isArray(arr) && arr.length) {
-    if (typeof seed === 'number') return arr[seed % arr.length];
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-  return '';
-}
+function buildHtml(tile) {
+  const insight = tile.teach?.insight ? String(tile.teach.insight) : '';
+  const exLine  = examplesToLine(tile.teach?.examples || []);
+  const flavor  = Array.isArray(tile.flavor) ? tile.flavor[0] : (tile.flavor || '');
+  const invite  = Array.isArray(tile.invite) ? tile.invite[0] : (tile.invite || '');
 
-function renderTile(tile, seed = 0) {
   const lines = [];
-  const askedQ = !!tile._askedQ;
-
-  if (!askedQ && tile.flavor?.length) lines.push(pick(tile.flavor, seed));
-
-  if (tile.teach?.insight) lines.push(tile.teach.insight);
-
-  if (tile.teach?.examples?.length) {
-    const ex = tile.teach.examples.map(e => {
-      const lhs = `<code>${e.in}</code>`;
-      const rhs = e.out != null ? ` → <strong>${e.out}</strong>` : '';
-      return `${lhs}${rhs}`;
-    }).join(' • ');
-    lines.push(ex);
-  }
-
-  if (tile.invite?.length) lines.push(pick(tile.invite, seed + 1));
+  if (flavor) lines.push(flavor.replace(/\s+$/,''));
+  if (insight) lines.push(insight);
+  if (exLine) lines.push(exLine);
+  if (invite) lines.push(invite);
 
   return lines.filter(Boolean).join('<br>');
 }
 
-// Public: returns { html, meta } or null
-export function tileReply(userText) {
-  const text = String(userText || '');
-  const lower = text.trim().toLowerCase();
-  if (!lower) return null;
-  if (isMathyLine(lower)) return null; // let math packs handle
+export function tileReply(textRaw) {
+  const textLower = String(textRaw || '').toLowerCase().trim();
+  if (!textLower) return null;
 
-  decCooldowns();
-  let best = { tile: null, score: 0 };
+  tickCooldowns();
+  const cd = ensureCooldowns();
 
-  for (const t of tiles.predictive) {
-    const s = scoreTile(t, lower);
-    if (s > best.score) best = { tile: t, score: s };
-  }
-  if (!best.tile || best.score < 0.6) {
-    for (const t of tiles.eggs) {
-      const s = scoreTile(t, lower);
-      if (s > best.score) best = { tile: t, score: s };
+  const all = ([]).concat(bank.predictive || [], bank.eggs || []);
+  let best = null, bestScore = 0;
+
+  for (const t of all) {
+    if (cd[t.key] > 0) continue;
+    const sc = scoreTile(t, textLower);
+    if (sc >= THRESH && sc > bestScore) {
+      best = t; bestScore = sc;
     }
   }
 
-  if (!best.tile || best.score < (tiles.threshold ?? 0.55)) {
-    return null;
-  }
+  if (!best) return null;
 
-  const askedQ = /\?\s*$/.test(lower);
-  const seed = ++tileState.turn;
-  best.tile._askedQ = askedQ;
-  const html = renderTile(best.tile, seed);
-  onPicked(best.tile.key, best.tile.cooldownTurns ?? 2);
+  const html = buildHtml(best);
+  setCooldown(best.key, best.cooldownTurns ?? 2);
 
-  return { html, meta: { intent: `tile:${best.tile.key}`, topic: best.tile.topic || null, score: best.score } };
+  return { html, meta: { intent: best.key, topic: best.topic || 'teach' } };
 }
 
 export default { tileReply };

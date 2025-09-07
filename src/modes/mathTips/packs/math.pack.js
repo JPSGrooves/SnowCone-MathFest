@@ -8,6 +8,10 @@ import { registerIntent, M } from '../intentEngine.js';
 import { composeReply } from '../conversationPolicy.js';
 import { SAFE_EXPR, evalSafeExpression, tryPercentOf, simplifyFractionText, gcd, lcm } from '../mathSafe.js';
 import { appState } from '../../../data/appState.js';
+import {
+  parseLooseFraction, simplifyFraction, addFrac, subFrac, mulFrac, divFrac,
+  toMixedString, toSimpleString
+} from '../mathSafe.js';
 
 const esc = (s)=>String(s)
   .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
@@ -332,6 +336,167 @@ registerIntent({
         part: { kind: 'answer', html: `brain freeze: ${String(e.message)}` },
         noAck: true
       });
+    }
+  }
+});
+// Pretty formatter: show both improper and mixed (when meaningful)
+function prettyFracBoth(fr) {
+  const imp = toSimpleString(fr);
+  const mixed = toMixedString(fr);
+  return (imp === mixed) ? `<strong>${imp}</strong>` : `<strong>${imp}</strong> (<em>${mixed}</em>)`;
+}
+
+// ---- Phrase maps for ops -----------------------------------------------------
+const PLUS_WORDS  = ['plus','add','and','sum'];
+const MINUS_WORDS = ['minus','subtract','less'];
+const TIMES_WORDS = ['times','multiplied by','multiply','x','*'];
+const DIV_WORDS   = ['divided by','over','÷','/','divide'];
+
+// Build loose regex for “a/b <word> c/d” and natural text like “what is ...”
+function opRegex(words){
+  const w = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+  // capture any number-ish token (mixed, fraction, decimal, percent)
+  const NUM = '([\\d\\s]+\\/[\\d\\s]+|\\d+\\s+\\d+\\s*\\/\\s*\\d+|-?\\d+(?:\\.\\d+)?%?)';
+  return new RegExp(`(?:what\\s+is\\s+|calc\\s+|compute\\s+)?${NUM}\\s+(?:${w})\\s+${NUM}`, 'i');
+}
+
+// Unified handler factory
+function handleOpFactory(kind) {
+  const re = kind === 'add'    ? opRegex(PLUS_WORDS)
+          : kind === 'sub'    ? opRegex(MINUS_WORDS)
+          : kind === 'mul'    ? opRegex(TIMES_WORDS)
+          :                       opRegex(DIV_WORDS);
+
+  const op = kind === 'add' ? addFrac
+          : kind === 'sub' ? subFrac
+          : kind === 'mul' ? mulFrac
+          :                  divFrac;
+
+  return ({ text }) => {
+    const m = text.match(re);
+    if (!m) return composeReply({ userText: text, part: teach('fractions') });
+    try {
+      const a = parseLooseFraction(m[1]);
+      const b = parseLooseFraction(m[2]);
+      const out = op(a, b);
+      const lhs = `${toSimpleString(a)} ${kind==='add'?'+':kind==='sub'?'-':kind==='mul'?'×':'÷'} ${toSimpleString(b)}`;
+      return composeReply({
+        userText: text,
+        part: answer(`${lhs} = ${prettyFracBoth(out)}`)
+      });
+    } catch (e) {
+      return composeReply({ userText: text, part: answer(`Brain freeze: ${String(e.message)}.`), askAllowed:false });
+    }
+  };
+}
+
+// Register four ops with loose language
+registerIntent({ key: 'frac_add', tests: [ M.predicate(t=>opRegex(PLUS_WORDS).test(t), 0.9) ], base: 0.0, handler: handleOpFactory('add') });
+registerIntent({ key: 'frac_sub',  tests: [ M.predicate(t=>opRegex(MINUS_WORDS).test(t),0.9) ], base: 0.0, handler: handleOpFactory('sub') });
+registerIntent({ key: 'frac_mul',  tests: [ M.predicate(t=>opRegex(TIMES_WORDS).test(t),0.9) ], base: 0.0, handler: handleOpFactory('mul') });
+registerIntent({ key: 'frac_div',  tests: [ M.predicate(t=>opRegex(DIV_WORDS).test(t), 0.9) ], base: 0.0, handler: handleOpFactory('div') });
+
+// ---- “X of Y” (scaling/portion) e.g., "1/2 of 2/3 cup" ----------------------
+registerIntent({
+  key: 'frac_of',
+  tests: [ M.regex(/(-?\d+(?:\.\d+)?%?|\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+)\s+of\s+(-?\d+(?:\.\d+)?%?|\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+)(?:\s+([a-z]+))?/i) ],
+  base: 0.0,
+  handler: ({ text }) => {
+    const m = text.match(/(-?\d+(?:\.\d+)?%?|\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+)\s+of\s+(-?\d+(?:\.\d+)?%?|\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+)(?:\s+([a-z]+))?/i);
+    if (!m) return composeReply({ userText:text, part: teach('fractions') });
+    try {
+      const a = parseLooseFraction(m[1]); // portion
+      const b = parseLooseFraction(m[2]); // base
+      const unit = (m[3] || '').trim();
+      const out = mulFrac(a, b);
+      const lhs = `${toSimpleString(a)} of ${toSimpleString(b)}${unit ? ' '+unit : ''}`;
+      return composeReply({ userText:text, part: answer(`${lhs} = ${prettyFracBoth(out)}${unit ? ' '+unit : ''}`) });
+    } catch(e) {
+      return composeReply({ userText:text, part: answer(`Brain freeze: ${String(e.message)}.`), askAllowed:false });
+    }
+  }
+});
+
+// ---- Improper ↔ Mixed --------------------------------------------------------
+registerIntent({
+  key: 'to_mixed',
+  tests: [
+    M.regex(/(?:to|as)\s+mixed\s+(-?\d+\s*\/\s*\d+)\s*$/i),
+    M.regex(/^mixed\s+(-?\d+\s*\/\s*\d+)\s*$/i)
+  ],
+  base: 0.0,
+  handler: ({ text }) => {
+    const m = text.match(/-?\d+\s*\/\s*\d+/);
+    if (!m) return composeReply({ userText:text, part: teach('fractions') });
+    try {
+      const f = parseLooseFraction(m[0]);
+      return composeReply({ userText:text, part: answer(`${toSimpleString(f)} → <strong>${toMixedString(f)}</strong>`) });
+    } catch(e) {
+      return composeReply({ userText:text, part: answer(`Brain freeze: ${String(e.message)}.`), askAllowed:false });
+    }
+  }
+});
+
+registerIntent({
+  key: 'to_improper',
+  tests: [
+    // "to improper 2 3/4", "improper of 1 1/2"
+    M.regex(/(?:to|as)\s+improper\s+(-?\d+\s+\d+\s*\/\s*\d+)\s*$/i),
+    M.regex(/^improper\s+(?:of\s+)?(-?\d+\s+\d+\s*\/\s*\d+)\s*$/i)
+  ],
+  base: 0.0,
+  handler: ({ text }) => {
+    const m = text.match(/-?\d+\s+\d+\s*\/\s*\d+/);
+    if (!m) return composeReply({ userText:text, part: teach('fractions') });
+    try {
+      const f = parseLooseFraction(m[0]); // parser already returns improper form internally
+      return composeReply({ userText:text, part: answer(`${m[0]} → <strong>${toSimpleString(f)}</strong>`) });
+    } catch(e) {
+      return composeReply({ userText:text, part: answer(`Brain freeze: ${String(e.message)}.`), askAllowed:false });
+    }
+  }
+});
+
+// ---- Compare & Order ---------------------------------------------------------
+registerIntent({
+  key: 'frac_compare',
+  tests: [
+    M.regex(/(which|what)\s+(?:is|one\s+is)\s+(?:bigger|greater|larger)\b/i),
+    M.regex(/compare\s+[-\s\d/%.,]+/i)
+  ],
+  base: 0.0,
+  handler: ({ text }) => {
+    // pull two tokens (fractions/decimals/percents/integers)
+    const nums = Array.from(text.matchAll(/-?\d+(?:\.\d+)?%?|\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+/g)).map(m=>m[0]);
+    if (nums.length < 2) return composeReply({ userText:text, part: teach('fractions') });
+    try {
+      const a = parseLooseFraction(nums[0]);
+      const b = parseLooseFraction(nums[1]);
+      const cmp = a.n * b.d - b.n * a.d;
+      const A = toSimpleString(a), B = toSimpleString(b);
+      const msg = cmp === 0 ? `${A} = ${B}` : (cmp > 0 ? `${A} > ${B}` : `${A} < ${B}`);
+      return composeReply({ userText:text, part: answer(`<strong>${msg}</strong>`) });
+    } catch(e) {
+      return composeReply({ userText:text, part: answer(`Brain freeze: ${String(e.message)}.`), askAllowed:false });
+    }
+  }
+});
+
+registerIntent({
+  key: 'frac_order',
+  tests: [ M.regex(/^order\s+(.+)$/i), M.regex(/sort\s+these\s+(.+)$/i) ],
+  base: 0.0,
+  handler: ({ text }) => {
+    // collect all number-ish tokens
+    const tokens = Array.from(text.matchAll(/-?\d+(?:\.\d+)?%?|\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+/g)).map(m=>m[0]);
+    if (tokens.length < 2) return composeReply({ userText:text, part: teach('fractions') });
+    try {
+      const frs = tokens.map(t => ({ t, f: parseLooseFraction(t) }));
+      frs.sort((A,B) => (A.f.n * B.f.d) - (B.f.n * A.f.d));
+      const out = frs.map(({f}) => toSimpleString(f)).join(' < ');
+      return composeReply({ userText:text, part: answer(`<strong>${out}</strong>`) });
+    } catch(e) {
+      return composeReply({ userText:text, part: answer(`Brain freeze: ${String(e.message)}.`), askAllowed:false });
     }
   }
 });
