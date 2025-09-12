@@ -371,7 +371,7 @@ html, body {
 }
 
 /* 🌎 Global "too small" gate – CSS only, no HTML changes */
-@media (max-width: 399px), (max-height: 499px) {
+@media (max-width: 339px), (max-height: 599px) {
   /* lock background from scrolling */
   html, body { overflow: hidden; }
 
