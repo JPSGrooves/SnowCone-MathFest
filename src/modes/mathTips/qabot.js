@@ -1,156 +1,567 @@
-// /src/modes/mathTips/qabot.js
+// src/modes/mathTips/qabot.js
 import { matcher, matcherAnyMath } from './matcher.js';
-import data from './qabotDATA.js';
-import { fallbackLogger } from './fallbackLogger.js';
 import { appState } from '../../data/appState.js';
-import { composeReply } from './conversationPolicy.js';
+import { composeReply, PERSONA } from './conversationPolicy.js';
+import { getMode, setMode, MODES } from './modeManager.js';
+import { interpret } from './phrasebook.js';
+import { renderBoothsHelp } from './modes/status.js';
 
-// ——— Utilities ———
+// route directly through the registry we export
+import * as MODEx from './modes/index.js'; // ensure this is at top
+
+function callMode(modeKey, text, extra = {}) {
+  const mod = MODEx[modeKey];
+  if (!mod) return { text: `<p>${modeKey} booth not found.</p>` };
+  const fn =
+    (typeof mod.handle === 'function' && mod.handle) ||
+    (typeof mod.run === 'function' && mod.run) ||
+    (typeof mod.start === 'function' && mod.start);
+  if (!fn) return { text: `<p>${modeKey} booth has no handler.</p>` };
+  return fn(text, extra);
+}
+
+
+// Response banks
+const RESPONSES = {
+  greetings: [
+    "Howdy! What's the vibe today, traveler?",
+    "Bruh... the sine lines led you here. What's good?",
+    "Yo, cosmic traveler! Ready to vibe with some math?",
+    "Hey there! Time to stack some cones and solve mysteries?",
+    "Welcome to MathTips Village! Every cone’s got a story."
+  ],
+  how_are_you: [
+    "Vibin' like a sine wave, traveler!",
+    "Feelin’ as crisp as a mango snowcone.",
+    "Pythagorus Cat’s always got that cosmic crunch.",
+    "Neon’s glowin’, syrup’s flowin’. I’m good!",
+    "Powered by quesadillas and math vibes."
+  ],
+  who_are_you: [
+    "I’m Pythagorus Cat, triangle sorcerer and snowcone sage.",
+    "P-Cat, keeper of the hypotenuse, lover of melted cheese.",
+    "Just a cosmic cat slingin’ math and good vibes."
+  ],
+  jokes: [
+    "Why’d the obtuse angle skip the party? Never right.",
+    "Parallel lines? So much in common, but they’ll never meet.",
+    "Six is scared of seven ‘cause seven ate nine. Math humor!"
+  ],
+  math_general: [
+    "Math’s the rhythm of the cosmos, bruh.",
+    "Pure sine wave energy. What’s the next step?",
+    "Math turns chaos into cone patterns."
+  ],
+  math_arithmetic: [
+    "Arithmetic’s the base of all math... and good snowcones.",
+    "Add, subtract, multiply, divide — stack those cones right."
+  ],
+  math_algebra: [
+    "Algebra’s cone-stacking with variables, yo.",
+    "Solve for x or chase those cosmic vibes."
+  ],
+  math_geometry: [
+    "Geometry’s sacred. Circles, triangles, cones.",
+    "Triangles? Strongest shape in the cosmos."
+  ],
+  math_calculus: [
+    "Calculus is the math of change, like melting cones.",
+    "Derivatives? That’s instant cone speed."
+  ],
+  math_trigonometry: [
+    "Trig’s triangle magic, my dude.",
+    "Sine’s the flavor curve, cosine’s the edge."
+  ]
+};
+
+// Utilities
 function escapeHTML(s) {
   return String(s)
-    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
-    .replaceAll('"','&quot;').replaceAll("'",'&#39;');
+    .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 }
-function html(s){ return escapeHTML(s); }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function n(x,d=0){ const v=+x; return Number.isFinite(v)?v:d; }
+function html(s) { return escapeHTML(s); }
+function pick(arr) {
+  if (!arr?.length) return '💀 Yo... my brain froze.';
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+function n(x, d = 0) { const v = +x; return Number.isFinite(v) ? v : d; }
 
-// ——— Math safety ———
+// Bot-context stash
+function ensureBC() {
+  if (!appState.progress) appState.progress = {};
+  if (!appState.progress.mathtips) appState.progress.mathtips = {};
+  if (!appState.progress.mathtips.botContext) appState.progress.mathtips.botContext = {};
+  return appState.progress.mathtips.botContext;
+}
+function setPendingSwitch(toMode, lastText) {
+  const bc = ensureBC();
+  bc.pendingSwitch = { to: toMode, at: Date.now(), lastText: String(lastText || '') };
+}
+function consumePendingSwitch() {
+  const bc = ensureBC();
+  const p = bc.pendingSwitch || null;
+  bc.pendingSwitch = null;
+  return p;
+}
+function isAffirmative(s) { return /\b(yes|yep|yeah|sure|ok|okay|do it|go|switch|please|y)\b/i.test(s); }
+function isNegative(s) { return /\b(no|nah|nope|stay|hold|not now|keep|later|n)\b/i.test(s); }
+
+// Math safety
 const SAFE_EXPR = /^[\d\s+\-*/^().]+$/;
-function evalSafeExpression(expr){
-  const raw=String(expr).trim();
-  if(!raw||raw.length>120) throw new Error('Too long');
-  if(!SAFE_EXPR.test(raw)) throw new Error('Unsafe chars');
-  const jsExpr = raw.replaceAll('^','**');
-  if (/[*\/+]{2,}/.test(jsExpr)) throw new Error('Bad operator seq');
-  // eslint-disable-next-line no-new-func
-  const val = Function(`"use strict"; return (${jsExpr});`)();
-  if(!Number.isFinite(val)) throw new Error('Not finite');
+function evalSafeExpression(expr) {
+  const raw = String(expr).trim();
+  if (!raw || raw.length > 120) throw new Error('Too long');
+  if (!SAFE_EXPR.test(raw)) throw new Error('Unsafe chars');
+  const js = raw.replaceAll('^', '**');
+  if (/[*\/+]{2,}/.test(js)) throw new Error('Bad operator seq');
+  const val = Function(`"use strict"; return (${js});`)();
+  if (!Number.isFinite(val)) throw new Error('Not finite');
   return val;
 }
-function tryPercentOf(text){
-  const m=/(-?\d+(?:\.\d+)?)\s*%\s*of\s*(-?\d+(?:\.\d+)?)/i.exec(text);
-  if(!m) return null;
-  const p=parseFloat(m[1]); const num=parseFloat(m[2]);
-  if(!Number.isFinite(p)||!Number.isFinite(num)) return null;
-  return { p, n:num, ans:(p/100)*num };
+function tryPercentOf(text) {
+  const m = /(-?\d+(?:\.\d+)?)\s*%\s*of\s*(-?\d+(?:\.\d+)?)/i.exec(text);
+  if (!m) return null;
+  const p = parseFloat(m[1]); const num = parseFloat(m[2]);
+  if (!Number.isFinite(p) || !Number.isFinite(num)) return null;
+  return { p, n: num, ans: (p / 100) * num };
 }
-function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a||1; }
-function lcm(a,b){ return Math.abs(a*b)/gcd(a,b); }
-function simplifyFractionText(a,b){
-  if(!Number.isFinite(a)||!Number.isFinite(b)||b===0) return "That fraction is undefined, amigo.";
-  const g=gcd(a,b); return `${a}/${b} → ${a/g}/${b/g}`;
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }
+function simplifyFractionText(a, b) {
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) return "That fraction’s undefined, amigo.";
+  const g = gcd(a, b); return `${a}/${b} → ${a/g}/${b/g}`;
 }
 
-// ——— Confidence scoring ———
+// Intent scoring
 function scoreIntent(input) {
   const lower = input.toLowerCase();
-
-  // Strong signals
-  if (/^\/?(help|commands|stats|tip|clear|reset)\b/.test(lower)) return { guess:'command', score:0.99, arg:lower.match(/^\/?(\w+)/)?.[1] };
-
-  if (tryPercentOf(lower)) return { guess:'percent', score:0.95 };
-  if (SAFE_EXPR.test(lower)) return { guess:'calc', score:0.9 };
-
-  // Matcher buckets
-  if (matcher(lower, 'who_are_you')) return { guess:'who', score:0.8 };
-  if (matcher(lower, 'greetings'))  return { guess:'greet', score:0.75 };
-  if (matcherAnyMath(lower))        return { guess:'math_general', score:0.7 };
-  if (matcher(lower, 'jokes'))      return { guess:'joke', score:0.7 };
-  if (matcher(lower, 'lore_badges'))return { guess:'badges', score:0.65 };
-  if (matcher(lower, 'lore_cones') || matcher(lower,'lore_snowcone') || matcher(lower,'lore_festival'))
-    return { guess:'lore', score:0.6 };
-
-  return { guess:'unknown', score:0.2 };
+  if (/^\/?(help|commands|stats|tip|clear|reset)\b/.test(lower)) return { guess: 'command', score: 0.99, arg: lower.match(/^\/?(\w+)/)?.[1] };
+  if (tryPercentOf(lower)) return { guess: 'percent', score: 0.95 };
+  if (SAFE_EXPR.test(lower)) return { guess: 'calc', score: 0.9 };
+  if (matcher(lower, 'who_are_you') || /\bwhat['’]?s\s*your\s*name\b/i.test(lower)) return { guess: 'who', score: 0.8 };
+  if (matcher(lower, 'greetings') || /\b(yo|hey|hi|what['’]?s\s*up|nm\s*man)\b/i.test(lower)) return { guess: 'greet', score: 0.75 };
+  if (/\bhow\s*are\s*you\b/i.test(lower)) return { guess: 'how_are_you', score: 0.75 };
+  if (/\bmath\b/.test(lower)) return { guess: 'math_general', score: 0.75 };
+  if (/\bfractions?\b/.test(lower)) return { guess: 'quiz_fractions', score: 0.7 };
+  if (/\bpercent\b/.test(lower)) return { guess: 'quiz_percent', score: 0.7 };
+  if (matcher(lower, 'jokes')) return { guess: 'joke', score: 0.7 };
+  if (matcher(lower, 'lore_badges')) return { guess: 'badges', score: 0.65 };
+  if (matcher(lower, 'lore_cones') || matcher(lower, 'lore_snowcone') || matcher(lower, 'lore_festival')) return { guess: 'lore', score: 0.6 };
+  return { guess: 'unknown', score: 0.2 };
 }
 
-// ——— Public API: single-bubble response ———
+// Soft off-topic hinting
+const SOFT_MODE_HINTS = {
+  lessons: [/teach|lesson|show me|explain|how to/i],
+  quiz: [/quiz|deal|question|practice|test me|drill/i],
+  lore: [/lore|story|festival|characters?|backstory|canon/i],
+  recipes: [/recipe|cook|food|quesadilla|snack|kitchen/i],
+  calculator: [/calc|calculator|compute|evaluate|=|answer/i],
+};
+function softModeTarget(text) {
+  const t = String(text || '');
+  for (const [mode, regexes] of Object.entries(SOFT_MODE_HINTS)) {
+    if (regexes.some(r => r.test(t))) return mode;
+  }
+  return null;
+}
+function maybeOffTopicRedirect(userText, currentMode) {
+  const t = String(userText || '').toLowerCase().trim();
+  const softTo = softModeTarget(t);
+  if (softTo && softTo !== currentMode) {
+    setPendingSwitch(softTo, userText);
+    return composeReply({
+      userText,
+      part: { kind: 'answer', html: `Hey, that sounds like ${softTo} booth stuff. Ready to rock into ${softTo}?` },
+    });
+  }
+  return null;
+}
+
+// Router adapter
+function renderRouterResultToHTML(routerRes, userText) {
+  if (!routerRes || typeof routerRes !== 'object') return null;
+  const lines = [];
+  if (routerRes.text) lines.push(html(routerRes.text));
+  if (Array.isArray(routerRes.deck) && routerRes.deck.length) {
+    const qs = routerRes.deck.map((q, i) => {
+      const num = i + 1;
+      const prompt = html(q?.prompt ?? '');
+      return `<div class="mt-response-item">Q${num}. ${prompt}</div>`;
+    }).join('');
+    lines.push(`<div class="mt-response-list">${qs}</div>`);
+  }
+  const merged = lines.join('<br/>');
+  if (!merged) return null;
+  return {
+    html: composeReply({
+      userText,
+      part: { kind: 'answer', html: merged },
+      askAllowed: true
+    }),
+    meta: { intent: 'router' }
+  };
+}
+function adaptModeOutput(out, userText, intentTag) {
+  if (!out) return null;
+  if (typeof out === 'string') {
+    return {
+      html: out,
+      meta: { intent: intentTag }
+    };
+  }
+  const adapted = renderRouterResultToHTML(out, userText);
+  if (adapted) {
+    adapted.meta = Object.assign({ intent: intentTag }, adapted.meta || {});
+    return adapted;
+  }
+  return {
+    html: composeReply({ userText, part: { kind: 'answer', html: html(String(out)) }, askAllowed: true }),
+    meta: { intent: intentTag }
+  };
+}
+function routeUtterance(utterance) {
+  const cmd = interpret(utterance);
+  if (cmd) {
+    if (cmd === 'help') return { text: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>` };
+    if (cmd === 'exit') { setMode(MODES.none); return { text: '<p>👋 Back to the village center. Say help for options.</p>' }; }
+    if (cmd === 'quiz fractions 3') { setMode(MODES.quiz); return MODEx.quiz.start({ topic: 'fractions', count: 3 }); }
+    if (cmd === 'quiz percent 3') { setMode(MODES.quiz); return MODEx.quiz.start({ topic: 'percent', count: 3 }); }
+  }
+  const mode = getMode();
+  if (mode === MODES.lessons) return callMode('lessons', utterance, {}) || { text: '' };
+  if (mode === MODES.quiz) return callMode('quiz', utterance, {}) || { text: '' };
+  if (mode === MODES.lore) return callMode('lore', utterance, {}) || { text: '' };
+  if (mode === MODES.recipes) return callMode('recipes', utterance, {}) || { text: '' };
+  if (mode === MODES.calculator) return callMode('calculator', utterance, {}) || { text: '' };
+  return { text: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>` };
+}
+
+
+
+// Algebra intercepts
+function algebraIntercept(text) {
+  const t = String(text || '').toLowerCase().trim();
+  if (/y\s*\+?\s*m\s*x\s*\+\s*b/.test(t) || /y\s*=\s*m\s*x\s*\+\s*b/.test(t)) {
+    return composeReply({
+      userText: text,
+      part: { kind: 'answer', html: '<p>That’s slope-intercept form: y = mx + b. m is slope, b is y-intercept. Wanna dive deeper into equations?</p>' },
+      noAck: true
+    });
+  }
+  if (/\ba\s*(?:squared|2)\s*\+\s*b\s*(?:squared|2)\s*=\s*c\s*(?:squared|2)\b/.test(t)) {
+    return composeReply({
+      userText: text,
+      part: { kind: 'answer', html: '<p>Pythagorean theorem: a² + b² = c² for right triangles. Want to explore more geometry?</p>' },
+      noAck: true
+    });
+  }
+  return null;
+}
+
+// Public API
 export function getResponse(userText, appStateLike = appState) {
-  const text = String(userText||'');
+  const text = String(userText || '');
+  const t = text.toLowerCase().trim();
+  const userName = appStateLike?.profile?.name || 'traveler';
+
+  // 0a) Handle pending booth switch
+  const bc0 = ensureBC();
+  if (bc0.pendingSwitch) {
+    const ans = t.trim();
+    if (isAffirmative(ans)) {
+      const p = consumePendingSwitch();
+      const to = p?.to || 'none';
+      setMode(MODES[to] || MODES.none);
+      let prompt = '';
+      if (to === 'lessons') prompt = `<p>Sweet. In lessons booth — what topic first: fractions, percent, or equations?</p>`;
+      else if (to === 'quiz') prompt = `<p>Alright, quiz booth time! Want fractions, percent, or a mix?</p>`;
+      else if (to === 'lore') prompt = `<p>Lore booth vibes! Wanna hear about the festival or the snowcone sages?</p>`;
+      else if (to === 'recipes') prompt = `<p>Recipes booth, let’s cook! Quesadillas or snowcones today?</p>`;
+      else if (to === 'calculator') prompt = `<p>Calculator booth ready! Toss me a math problem like 15% of 80.</p>`;
+      else prompt = `<p>Back in the village center. Pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+      if (p?.lastText) {
+        const mod = MODEx[to];
+        if (mod?.handle) {
+          const replay = adaptModeOutput(mod.handle(p.lastText), p.lastText, `booth:${to}`);
+          if (replay) return replay;
+        }
+      }
+      return {
+        html: composeReply({
+          userText,
+          part: { kind: 'answer', html: `<p>Jumped into the ${to} booth!</p>${prompt}` }
+        }),
+        meta: { intent: 'booth-switch-confirm', to }
+      };
+    }
+    if (isNegative(ans)) {
+      consumePendingSwitch();
+      return {
+        html: composeReply({
+          userText,
+          part: { kind: 'answer', html: '<p>Cool breeze, staying put. What’s next?</p>' }
+        }),
+        meta: { intent: 'booth-switch-decline' }
+      };
+    }
+    return {
+      html: composeReply({
+        userText,
+        part: { kind: 'answer', html: `<p>Yo ${userName}, quick yes or no to jump into that booth?</p>` }
+      }),
+      meta: { intent: 'booth-switch-clarify' }
+    };
+  }
+
+  // 0b) Global intercepts
+  if (t === 'help' || t === '/help') {
+    return {
+      html: composeReply({
+        userText: text,
+        part: {
+          kind: 'answer',
+          html: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>`,
+          noAck: true
+        },
+        askAllowed: false
+      }),
+      meta: { intent: 'help' }
+    };
+  }
+  if (t === 'exit' || t === '/exit') {
+    setMode(MODES.none);
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: `<p>Back to the village center, ${userName}. Pick a booth: lessons booth, quiz booth, lore booth, recipes booth, or calculator booth.</p>` }
+      }),
+      meta: { intent: 'exit' }
+    };
+  }
+  const m = t.match(/\b(lessons|quiz|lore|recipes|calculator)\s*booth\b/i);
+  if (m) {
+    const to = m[1];
+    setPendingSwitch(to, text);
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: `Ready to rock into ${to} booth?` }
+      }),
+      meta: { intent: 'booth-switch', to }
+    };
+  }
+  const booth1 = t.match(/\b(lessons?|quiz|lore|recipes?|calculator)\s+(?:booth|room|kiosk|station)\b/);
+  const booth2 = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipes?|calculator)\s*(?:booth|room|kiosk|station)?\b/);
+  const norm = (w) => {
+    if (!w) return null;
+    if (/calculator/.test(w)) return 'calculator';
+    if (/lesson/.test(w)) return 'lessons';
+    if (/quiz/.test(w)) return 'quiz';
+    if (/lore|story|festival/.test(w)) return 'lore';
+    if (/recipe/.test(w)) return 'recipes';
+    return null;
+  };
+  const toBooth = norm((booth1 && booth1[1]) || (booth2 && booth2[1]));
+  if (toBooth) {
+    setPendingSwitch(toBooth, text);
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: `Ready to rock into ${toBooth} booth?` }
+      }),
+      meta: { intent: 'booth-switch', to: toBooth }
+    };
+  }
+  const q = t.match(/\bquiz( me)?( on)?\s*(fractions?|percent)?\s*(\d+)?\b/);
+  if (q) {
+    const topic = /percent/.test(q[3] || '') ? 'percent' : (/frac/.test(q[3] || '') ? 'fractions' : 'fractions');
+    const count = q[4] ? parseInt(q[4], 10) : 3;
+    setMode(MODES.quiz);
+    return adaptModeOutput(MODEx.quiz.start({ topic, count, userText: text }), text, 'quiz_start');
+  }
+
+  // 0c) Algebra intercepts
+  const alg = algebraIntercept(text);
+  if (alg) return { html: alg, meta: { intent: 'algebra', topic: 'algebra' } };
+
+  // 1) Active booth with off-topic guard
+  const currentMode = getMode();
+  if (currentMode !== MODES.none) {
+    const ask = maybeOffTopicRedirect(text, currentMode);
+    if (ask) {
+      return { html: ask, meta: { intent: 'offTopicAsk', from: currentMode } };
+    }
+    const out = callMode(currentMode, text, {});
+    if (out) {
+      const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
+      if (adapted) return adapted;
+    }
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: `<p>Yo ${userName}, that’s not quite clicking in ${currentMode} booth. Try something like ${currentMode === 'lessons' ? 'fractions' : currentMode === 'quiz' ? 'answer the question' : currentMode === 'lore' ? 'festival story' : currentMode === 'recipes' ? 'quesadilla recipe' : '15% of 80'}, or say help.</p>` },
+        askAllowed: true
+      }),
+      meta: { intent: `booth:${currentMode}:no-handler` }
+    };
+  }
+
+  // 1b) Idle mode: handle specific intents
   const { guess, score, arg } = scoreIntent(text);
-
-  // Commands: still handled, but we render via the composer so it feels natural.
-  if (guess === 'command') {
-    let line = '';
-    switch (arg) {
-      case 'help':
-      case 'commands':
-        line = "Try `15% of 80`, `7*8+12`, `simplify 12/18`, or ask about cones/badges. Keep it tiny.";
-        break;
-      case 'stats': {
-        const xp = n(appStateLike?.profile?.xp);
-        const lvl = n(appStateLike?.profile?.level, Math.floor(xp/100)+1);
-        const tips = n(appStateLike?.progress?.mathtips?.completedTips);
-        const total= n(appStateLike?.progress?.mathtips?.totalTips, Math.max(10,tips));
-        line = `Level ${lvl}, XP ${xp}, Tips ${tips}/${total}.`;
-        break;
-      }
-      case 'tip':
-        line = pick(data.math_general) || "Write the next step, even if messy.";
-        try { if (typeof appStateLike.addXP==='function') appStateLike.addXP(1); } catch {}
-        break;
-      case 'clear':
-        // soft clear handled by UI elsewhere; here we just acknowledge
-        line = "Cleared my short-term memory.";
-        break;
-      case 'reset':
-        line = "Fresh slate. Let’s roll.";
-        break;
-      default:
-        line = "Command unknown. Try `/help`.";
-    }
-    return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(line) }, askAllowed:true }) };
-  }
-
-  // High-confidence math
-  if (guess === 'percent' || guess === 'calc') {
-    try {
-      if (guess === 'percent') {
-        const p = tryPercentOf(text);
-        const clean = Number.isInteger(p.ans) ? p.ans : Number(p.ans.toFixed(4));
-        const ans = `${p.p}% of ${p.n} = <strong>${clean}</strong>`;
-        return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(ans) }, askAllowed:true }) };
-      } else {
-        const val = evalSafeExpression(text);
-        const clean = Number.isInteger(val) ? val : Number(val.toFixed(6));
-        const ans = `${escapeHTML(text)} = <strong>${clean}</strong>`;
-        return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(ans) }, askAllowed:true }) };
-      }
-    } catch (err) {
-      const freeze = `Brain freeze: ${escapeHTML(err.message)}.`;
-      return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(freeze) }, askAllowed:false }) };
-    }
-  }
-
-  // Mid-confidence: answer from your banks (no re-intro), short and warm
   if (score >= 0.6) {
     let line = '';
     switch (guess) {
-      case 'who':   line = pick(data.who_are_you); break;
-      case 'greet': line = pick(data.greetings);   break;
-      case 'joke':  line = pick(data.jokes);       break;
-      case 'badges':line = pick(data.lore_badges); break;
-      case 'lore':  line = pick([...data.lore_cones, ...data.lore_snowcone, ...data.lore_festival]); break;
-      case 'math_general':
-        line = pick([
-          ...data.math_general,
-          ...data.math_arithmetic,
-          ...data.math_algebra,
-          ...data.math_geometry,
-          ...data.math_trigonometry,
-          ...data.math_calculus
-        ]);
+      case 'command':
+        switch (arg) {
+          case 'stats': {
+            const xp = n(appStateLike?.profile?.xp);
+            const lvl = n(appStateLike?.profile?.level, Math.floor(xp / 100) + 1);
+            const tips = n(appStateLike?.progress?.mathtips?.completedTips);
+            const total = n(appStateLike?.progress?.mathtips?.totalTips, Math.max(10, tips));
+            line = `<p>Level ${lvl}, XP ${xp}, Tips ${tips}/${total}. Jump into status booth for more!</p>`;
+            break;
+          }
+          case 'tip':
+            line = `<p>${pick(RESPONSES.math_general)} Try lessons booth for deeper dives.</p>`;
+            try { if (typeof appStateLike.addXP === 'function') appStateLike.addXP(1); } catch {}
+            break;
+          case 'clear':
+            line = `<p>Cleared my short-term memory, ${userName}. Ready for quiz booth?</p>`;
+            break;
+          case 'reset':
+            line = `<p>Fresh slate, ${userName}. Pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+            break;
+          default:
+            line = `<p>Command’s not clicking, ${userName}. Say help for options.</p>`;
+        }
         break;
+      case 'who':
+        line = `<p>${pick(RESPONSES.who_are_you)} Ready to vibe, ${userName}? Try lessons booth or quiz fractions 3.</p>`;
+        break;
+      case 'greet':
+        line = `<p>${pick(RESPONSES.greetings)} Let’s roll, ${userName} — pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+        break;
+      case 'how_are_you':
+        line = `<p>${pick(RESPONSES.how_are_you)} What’s next, ${userName}? Lessons booth, quiz booth, or something else?</p>`;
+        break;
+      case 'joke':
+        line = `<p>${pick(RESPONSES.jokes)} More laughs, ${userName}? Try lore booth for festival tales.</p>`;
+        break;
+      case 'badges':
+        line = `<p>Badges mark your math and snowcone swagger, ${userName}. Check status booth for yours!</p>`;
+        break;
+      case 'lore':
+        setMode(MODES.lore);
+        {
+          const out = callMode('lore', text, {});
+          if (out) return adaptModeOutput(out, text, 'booth:lore');
+          return {
+            html: composeReply({
+              userText: text,
+              part: { kind: 'answer', html: `<p>Lore booth’s warming up, ${userName}. Wanna hear about the festival or snowcone sages?</p>` },
+              askAllowed: true
+            }),
+            meta: { intent: 'booth:lore' }
+          };
+        }
+      case 'math_general':
+        setMode(MODES.lessons);
+        return adaptModeOutput(MODEx.lessons.handle(text), text, 'booth:lessons');
+      case 'quiz_fractions': {
+        setMode(MODES.quiz);
+        const out = callMode('quiz', 'start fractions 3', { topic: 'fractions', count: 3, userText: text }) || MODEx.quiz?.start?.({ topic: 'fractions', count: 3, userText: text });
+        return adaptModeOutput(out, text, 'quiz_start');
+      }
+      case 'quiz_percent':
+        setMode(MODES.quiz);
+        return adaptModeOutput(MODEx.quiz.start({ topic: 'percent', count: 3, userText: text }), text, 'quiz_start');
+      case 'percent': {
+        const p = tryPercentOf(t);
+        if (p) {
+          setMode(MODES.calculator);
+          return {
+            html: composeReply({
+              userText: text,
+              part: { kind: 'answer', html: `<p>${p.p}% of ${p.n} is ${p.ans}. More math in calculator booth, ${userName}?</p>` }
+            }),
+            meta: { intent: 'percent', topic: 'calculator' }
+          };
+        }
+        break;
+      }
+      case 'calc': {
+        try {
+          const result = evalSafeExpression(t);
+          setMode(MODES.calculator);
+          return {
+            html: composeReply({
+              userText: text,
+              part: { kind: 'answer', html: `<p>${t} = ${result}. Toss another in calculator booth, ${userName}?</p>` }
+            }),
+            meta: { intent: 'calc', topic: 'calculator' }
+          };
+        } catch {
+          return {
+            html: composeReply({
+              userText: text,
+              part: { kind: 'answer', html: `<p>That math’s a bit wild, ${userName}. Try something like 15% of 80 or jump to calculator booth.</p>` }
+            }),
+            meta: { intent: 'calc-fail' }
+          };
+        }
+      }
       default:
-        line = "Let’s keep it tiny — what’s the goal?";
+        line = `<p>Sorry, not on my wave length, ${userName}. Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!</p>`;
     }
-    return { html: composeReply({ userText:text, part:{ kind:'answer', html: html(line) }, askAllowed:true }) };
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: line },
+        askAllowed: true
+      }),
+      meta: { intent: guess }
+    };
   }
 
-  // Low-confidence: TEACH by 2 examples, not a manual
-  try { fallbackLogger.add(text); } catch {}
-  const topicGuess = /%/.test(text) ? 'percent'
-                    : /\/|simplify|fraction/.test(text) ? 'fractions'
-                    : 'arithmetic';
-  return { html: composeReply({ userText:text, part:{ kind:'teach', html:'', topicGuess }, askAllowed:true }) };
+  // 2) Router fallback
+  try {
+    const routed = routeUtterance(text);
+    const adapted = renderRouterResultToHTML(routed, text);
+    if (adapted && adapted.html) return adapted;
+  } catch (e) {
+    console.warn('[router adapter] fell through:', e);
+  }
+
+  // 3) Final fallback
+  return {
+    html: composeReply({
+      userText: text,
+      part: {
+        kind: 'answer',
+        html: `<p>Sorry, not on my wave length, ${userName}. Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!</p>`
+      },
+      askAllowed: true
+    }),
+    meta: { intent: 'fallback' }
+  };
+}
+
+// Scrolling logic
+export function scrollToBottom() {
+  if (typeof document === 'undefined') return;
+  const chatWindow = document.querySelector('.chat-window');
+  if (chatWindow) {
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+}
+
+export function attachAutoScroller(containerId = 'chat-window') {
+  if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+  const el = document.getElementById(containerId) || document.querySelector('.chat-window');
+  if (!el) return;
+  const mo = new MutationObserver(() => scrollToBottom());
+  mo.observe(el, { childList: true, subtree: true });
+  scrollToBottom();
+  return () => mo.disconnect();
 }

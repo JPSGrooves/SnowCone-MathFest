@@ -1,12 +1,12 @@
-// /src/modes/mathTips/mathTips.js
 import './mathTips.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { getIntroMessage } from './intro.js';
 import { appState } from '../../data/appState.js';
-import { randomGreeting } from './greetings.js';
-import { getResponse } from './grampyBrainV2.js';
+import { getResponse } from './qabot.js';
 import { awardBadge } from '../../managers/badgeManager.js';
+
+
 
 // === 🔥 Mode-local state (no globals)
 let inputEl, outputEl, sendBtn, returnBtn;
@@ -26,6 +26,62 @@ const MT = {
     expJson: null,
   }
 };
+
+// ── universal mode handler resolver ─────────────────────────────────────
+function resolveModeHandler(modeKey) {
+  const mod = MODEx?.[modeKey];
+  if (!mod) return null;
+
+  // case A: module itself is a function
+  if (typeof mod === 'function') return mod;
+
+  // case B: common method names
+  if (typeof mod.handle === 'function') return mod.handle.bind(mod);
+  if (typeof mod.start === 'function')  return mod.start.bind(mod);
+  if (typeof mod.reply === 'function')  return mod.reply.bind(mod);
+  if (typeof mod.run === 'function')    return mod.run.bind(mod);
+
+  // case C: nothing usable
+  return null;
+}
+
+// call a mode defensively; return null if not callable
+function callMode(modeKey, text, extra = {}) {
+  try {
+    const fn = resolveModeHandler(modeKey);
+    if (!fn) return null;
+    // many of your modules accept (text, ctx) — pass both safely
+    return fn(text, extra);
+  } catch (err) {
+    console.warn(`[callMode] ${modeKey} crashed:`, err);
+    return {
+      text: `<div class="mt-response-card"><p>${modeKey} booth hiccuped. try again or say <code>help</code>.</p></div>`
+    };
+  }
+}
+function menuHTML(name, prefix) {
+  const who = (name || 'friend').trim() || 'friend';
+  const lead = prefix ? `<p>${prefix}</p>` : '';
+  return `
+    ${lead}
+    <p>Hey ${who}! What part of your MathBrain do you wanna explore today?</p>
+    <ul class="mt-menu">
+      <li>lessons booth</li>
+      <li>quiz booth</li>
+      <li>lore booth</li>
+      <li>recipes booth</li>
+      <li>calculator booth</li>
+    </ul>
+    <p>or type help to understand me better!</p>
+    <p>Say one of those and I'll get you going.</p>
+  `;
+}
+
+function idkHTML() {
+  const name = (appState?.profile?.name || appState?.playerName || 'friend').trim();
+  return menuHTML(name, `Sorry, not on my wave length of understanding... Wanna jump into a booth?`);
+}
+
 
 export function loadMathTips() {
   console.log('🧠 Loading Math Tips Mode');
@@ -71,27 +127,29 @@ function renderIntroScreen() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="mt-aspect-wrap">
-      <div class="mt-game-frame">
-        <img id="modeBackground" class="background-fill mt-bg-img"
-             src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png"
-             alt="MathTips Background"/>
+    <div class="mt-root">
+      <div class="mt-aspect-wrap">
+        <div class="mt-game-frame">
+          <img id="modeBackground" class="background-fill mt-bg-img"
+               src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png"
+               alt="MathTips Background"/>
 
-        <div class="mt-intro">
-          <div class="mt-intro-stack">
-            <div class="mt-speech allow-select">
-              ${getIntroMessage(appState)}
-            </div>
+          <div class="mt-intro">
+            <div class="mt-intro-stack">
+              <div class="mt-speech allow-select">
+                ${getIntroMessage(appState)}
+              </div>
 
-            <div class="mt-avatar-wrap">
-              <img class="mt-avatar mt-avatar--xxl"
-                   src="${import.meta.env.BASE_URL}assets/img/characters/mathTips/grampyP.png"
-                   alt="Grampy P"/>
-            </div>
+              <div class="mt-avatar-wrap">
+                <img class="mt-avatar mt-avatar--xxl"
+                     src="${import.meta.env.BASE_URL}assets/img/characters/mathTips/grampyP.png"
+                     alt="Grampy P"/>
+              </div>
 
-            <div class="mt-intro-bottom-btns">
-              <button id="mtBack"   class="mt-btn mt-btn-pink">🔙 Main Menu</button>
-              <button id="mtStart"  class="mt-btn mt-btn-cyan">🍧 Math Tips!</button>
+              <div class="mt-intro-bottom-btns">
+                <button id="mtBack"   class="mt-btn mt-btn-pink">🔙 Main Menu</button>
+                <button id="mtStart"  class="mt-btn mt-btn-cyan">🍧 Math Tips!</button>
+              </div>
             </div>
           </div>
         </div>
@@ -139,30 +197,33 @@ function renderMainUI() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="mt-aspect-wrap">
-      <div class="mt-game-frame">
-        <img id="modeBackground" class="background-fill mt-bg-img"
-             src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png"
-             alt="MathTips Background"/>
+    <div class="mt-root">
+      <div class="mt-aspect-wrap">
+        <div class="mt-game-frame">
+          <img id="modeBackground" class="background-fill mt-bg-img"
+               src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png"
+               alt="MathTips Background"/>
 
-        <div class="mt-grid"><!-- slimmer, no heavy blur -->
-          <div class="mt-header">
-            <h1>🧠 Math Tips Village</h1>
-          </div>
-
-          <div class="mt-content">
-            <div class="chat-window" id="chatOutput"></div>
-            <div class="chat-input-zone">
-              <input id="userInput" type="text" placeholder="Ask something cosmic…" />
-              <button id="sendBtn">Send</button>
+          <div class="mt-grid">
+            <div class="mt-header">
+              <h1>🧠 Math Tips Village</h1>
             </div>
-          </div>
 
-          <div class="mt-footer">
-            <div style="display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center;">
-              <button id="copyTranscript" class="mt-btn mt-btn-cyan">📋 Copy Transcript</button>
-              <button id="exportChatJson" class="mt-btn mt-btn-cyan">📤 Export JSON</button>
-              <button id="returnToMenu" class="mt-btn mt-btn-pink">🔙 Return to Menu</button>
+            <div class="mt-content">
+              <div class="chat-window" id="chatOutput"></div>
+              <div class="chat-input-zone">
+                <input id="userInput" type="text" placeholder="Ask something cosmic…"/>
+                <button id="sendBtn">Send</button>
+              </div>
+            </div>
+
+
+            <div class="mt-footer">
+              <div style="display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center;">
+                <button id="copyTranscript" class="mt-btn mt-btn-cyan">📋 Copy Transcript</button>
+                <button id="exportChatJson" class="mt-btn mt-btn-cyan">📤 Export JSON</button>
+                <button id="returnToMenu" class="mt-btn mt-btn-pink">🔙 Return to Menu</button>
+              </div>
             </div>
           </div>
         </div>
@@ -172,15 +233,16 @@ function renderMainUI() {
 
   // cache
   inputEl   = document.getElementById('userInput');
-  outputEl  = document.getElementById('chatOutput');
+  outputEl  = document.getElementById('chatOutput');   // ✅ now exists
   sendBtn   = document.getElementById('sendBtn');
   returnBtn = document.getElementById('returnToMenu');
   copyBtn   = document.getElementById('copyTranscript');
   exportBtn = document.getElementById('exportChatJson');
 
-  // first line
   startChat();
 }
+
+
 
 function wireMainHandlers() {
   MT.handlers.sendClick = () => handleSend();
@@ -209,13 +271,75 @@ function unwireMainHandlers() {
 // ────────────────────────────────────────────────────────────────────────────────
 // Chat logic
 // ────────────────────────────────────────────────────────────────────────────────
+
+
 function startChat() {
   if (!outputEl) return;
   outputEl.innerHTML = '';
-  const greet = randomGreeting(appState);
-  appendMessage('bot', greet, /* alreadyHtml */ false);
-  scrollToBottom();
+  const name = (appState?.profile?.name || appState?.playerName || 'friend').trim();
+  appendMessage('bot', menuHTML(name), /* alreadyHtml */ true);
 }
+
+// ...then use: appendMessage('bot', idkHTML(), true)
+
+
+// Safe fallback if renderBoothsHelp wasn't imported for any reason
+function mtFallbackBoothCards() {
+  return `
+    <div class="booth-grid">
+      <div class="booth-card">
+        <h3><span class="emoji">🧮</span> Calculator Booth</h3>
+        <ul>
+          <li><code>7*8+12</code> → 68</li>
+          <li><code>.5 * 1/7</code> → 0.0714…</li>
+          <li><code>sqrt 5 * sqrt 7</code></li>
+        </ul>
+      </div>
+      <div class="booth-card">
+        <h3><span class="emoji">📚</span> Lessons Booth</h3>
+        <ul>
+          <li><code>simplify 12/18</code> → 2/3</li>
+          <li><code>1/2 + 1/3</code> → 5/6</li>
+          <li><code>25% of 40</code> → 10</li>
+        </ul>
+      </div>
+      <div class="booth-card">
+        <h3><span class="emoji">🧩</span> Quiz Booth</h3>
+        <ul>
+          <li><code>quiz fractions 3</code></li>
+          <li><code>quiz percent 3</code></li>
+          <li><code>score</code> · <code>end quiz</code></li>
+        </ul>
+      </div>
+      <div class="booth-card">
+        <h3><span class="emoji">🎟️</span> Status Booth</h3>
+        <ul>
+          <li><code>my badges</code> · <code>streak</code></li>
+          <li><code>what should i study?</code></li>
+        </ul>
+      </div>
+      <div class="booth-card">
+        <h3><span class="emoji">🌲</span> Lore Booth</h3>
+        <ul>
+          <li><code>tell festival lore</code></li>
+        </ul>
+      </div>
+      <div class="booth-card">
+        <h3><span class="emoji">🌮</span> Recipes Booth</h3>
+        <ul>
+          <li><code>quesadilla wisdom</code></li>
+          <li><code>mango snowcone mode</code></li>
+          <li><code>nacho night energy</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="help-footer">
+      tip: say <code>help</code> anytime · switch with <code>calculator booth</code>, <code>lessons booth</code>, etc.  
+      say <code>exit</code> to leave a booth.
+    </div>
+  `;
+}
+
 
 async function handleSend() {
   const raw = inputEl?.value ?? '';
@@ -255,26 +379,31 @@ async function handleSend() {
   }
 }
 
+function isNearBottom(el, slack = 32) {
+  return (el.scrollHeight - el.scrollTop - el.clientHeight) <= slack;
+}
+
 function appendMessage(sender, textOrHtml, alreadyHtml = false) {
+  const atBottom = isNearBottom(outputEl);
+
   const msgClass = sender === 'user' ? 'user-msg' : 'cat-reply';
   const prefix = sender === 'user' ? '🍧' : '😺';
+  const safe = alreadyHtml ? String(textOrHtml) : String(textOrHtml)
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'",'&#39;');
 
-  const safe = alreadyHtml
-    ? String(textOrHtml)
-    : String(textOrHtml)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
+  const div = document.createElement('div');
+  div.className = msgClass;
+  div.innerHTML = `${prefix} ${safe}`;
+  outputEl.appendChild(div);
 
-  outputEl.innerHTML += `<div class="${msgClass}">${prefix} ${safe}</div>`;
-  scrollToBottom();
+  if (atBottom) outputEl.scrollTop = outputEl.scrollHeight; // ✅ only if pinned already
 }
 
-function scrollToBottom() {
-  outputEl.scrollTop = outputEl.scrollHeight;
-}
+
+
+
+
 
 function htmlToText(html) {
   const tmp = document.createElement('div');
@@ -326,3 +455,52 @@ function returnToMenu() {
     applyBackgroundTheme(); // return to menu theme
   });
 }
+// ── PATCH: message appending + smart autoscroll bottom pin ─────────────
+const CHAT_SEL = '.chat-window';
+function getChatEl() {
+  return document.querySelector(CHAT_SEL);
+}
+
+// only scroll if the user is already near the bottom (don’t yank during scrollback)
+function smartScrollToBottom(container) {
+  if (!container) return;
+  const slack = 32; // px threshold
+  const atBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) <= slack;
+  if (atBottom) {
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+// create a bubble and append to the bottom
+export function pushMessage({ html, role = 'cat' }) {
+  const box = getChatEl();
+  if (!box) return;
+  const wasNearBottom = (box.scrollHeight - box.scrollTop - box.clientHeight) <= 32;
+
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'user-msg' : 'cat-reply';
+  div.innerHTML = html;
+  box.appendChild(div);
+
+  // trigger CSS animation class if you want a delayed kick (optional)
+  // div.classList.add('mt-pop'); // not needed; we use keyframes on base class
+
+  if (wasNearBottom) box.scrollTop = box.scrollHeight;
+}
+
+// optional: observe DOM changes to keep bottom pinned on render bursts
+export function attachChatAutoScroller() {
+  const box = document.querySelector('.chat-window');
+  if (!box || typeof MutationObserver === 'undefined') return;
+  const mo = new MutationObserver(() => {
+    if (isNearBottom(box)) box.scrollTop = box.scrollHeight;
+  });
+  mo.observe(box, { childList: true });
+  box.scrollTop = box.scrollHeight; // initial pin
+  return () => mo.disconnect();
+}
+
+
+// call once after UI mounts
+attachChatAutoScroller();
+

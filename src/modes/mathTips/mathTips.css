@@ -1,5 +1,14 @@
+
 /* /src/modes/mathTips/mathTips.css
-   Mode-scoped only: .mt-*  |  No global filters on the new BG */
+   Mode-scoped only: .mt-* | No global filters on the new BG
+   Updated:
+   - Changed .chat-window border from dashed to solid.
+   - Added scrollbar-width: none and ::-webkit-scrollbar { display: none; } to .chat-window for no mobile scrollbars.
+   - Set .chat-window and .chat-scroll to flex-direction: column-reverse for bottom-to-top messages.
+   - Updated mtFadeIn animation to slide up from bottom.
+   - Added .mt-response-list and .mt-response-card for bullet points and card responses.
+   - Ensured .chat-scroll supports bottom-to-top stacking with flex-grow: 1.
+*/
 
 /* Aspect wrapper like Kids Camping (11:16) */
 .mt-aspect-wrap {
@@ -39,7 +48,6 @@
 }
 
 /* ───────────────── INTRO ───────────────── */
-
 .mt-intro {
   position: absolute;
   inset: 0;
@@ -147,7 +155,6 @@
 }
 
 /* ───────────────── MAIN (lightweight panel) ───────────────── */
-
 .mt-grid {
   position: absolute;
   inset: 0;
@@ -160,8 +167,6 @@
   gap: clamp(0.5rem, 1.4vh, 1rem);
   padding: clamp(0.5rem, 1.6vh, 1rem);
   box-sizing: border-box;
-
-  /* 🧽 softer: no backdrop-filter; minimal tint for legibility */
   background: rgba(0, 0, 0, 0.18);
   z-index: 2;
 }
@@ -186,36 +191,16 @@
 .mt-content {
   grid-area: content;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto; /* ⬅️ allows the chat to truly fill */
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 0.6rem;
   align-content: start;
-
-  /* prevent right-side push on mobile */
   width: 100%;
   max-width: 100%;
   overflow: hidden;
 }
 
-.chat-window {
-  width: 100%;
-  min-height: 0;     /* critical for grid children */
-  height: 100%;      /* fill the 1fr track */
-  overflow-y: auto;
-  background: rgba(0,0,0,0.6);
-  padding: 0.8rem;
-  border-radius: 12px;
-  border: 1px dashed #00ffee88;
-  box-sizing: border-box;
-  /* 🔓 selection allowed ONLY here */
-  -webkit-user-select: text;
-  user-select: text;
-}
 
-/* ensure selection for all descendants (some frameworks set user-select: none globally) */
-.chat-window * {
-  -webkit-user-select: text;
-  user-select: text;
-}
+
 
 .chat-input-zone {
   display: grid;
@@ -223,12 +208,12 @@
   gap: 0.5rem;
   width: 100%;
   max-width: 100%;
-  align-self: end; /* hugs the bottom row nicely */
+  align-self: end;
 }
 
 #userInput {
   width: 100%;
-  min-width: 0;           /* ⬅️ fixes overflow push */
+  min-width: 0;
   padding: 0.7rem 0.9rem;
   font-size: 1.1rem;
   border: 2px solid #00ffee;
@@ -251,6 +236,7 @@
   box-shadow: 0 0 10px #00ffee88;
   transition: background 0.2s ease;
 }
+
 #sendBtn:hover { background-color: #33ffff; }
 
 .mt-footer {
@@ -264,20 +250,20 @@
   margin: 0.5rem 0;
   animation: mtFadeIn 0.25s ease forwards;
 }
-.user-msg { color: #00ffee; }
-.cat-reply { color: #ffdd55; }
+
+.user-msg { color: #00ffee; align-self: flex-end; }
+.cat-reply { color: #ffdd55; align-self: flex-start; }
 
 @keyframes mtFadeIn {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-/* ───────── INTRO LAYOUT: let bubble grow fully; avatar takes the rest ───────── */
 
+/* ───────── INTRO LAYOUT: let bubble grow fully; avatar takes the rest ───────── */
 .mt-intro-stack {
   width: 100%;
   height: 100%;
   display: grid;
-  /* speech = auto height; avatar = take remaining; buttons = auto */
   grid-template-rows: auto minmax(0, 1fr) auto;
   align-items: center;
   justify-items: center;
@@ -285,21 +271,17 @@
   padding: clamp(0.4rem, 2vh, 1rem);
 }
 
-/* ✅ No cap, no scrollbars — we honor the "no scroll in text boxes" rule */
 .mt-speech {
   width: 92%;
   max-width: 760px;
-  /* let it size to content */
   height: auto;
-  max-height: none;         /* ⬅️ remove previous cap */
-  overflow: visible;        /* ⬅️ show it all */
+  max-height: none;
+  overflow: visible;
   white-space: normal;
   word-break: break-word;
-
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(0.95rem, 1.8vh + .4rem, 1.75rem);
   line-height: 1.25;
-
   text-align: center;
   padding: clamp(0.6rem, 2.2vh, 1.2rem);
   background: rgba(0,0,0,0.85);
@@ -311,15 +293,13 @@
   animation: mtBubbleIn 0.6s ease forwards;
 }
 
-/* The avatar row can now flex; this wrapper must allow shrinking */
 .mt-avatar-wrap {
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: 0;            /* ⬅️ critical so the 1fr row can shrink if the bubble is long */
+  min-height: 0;
 }
 
-/* Baseline avatar behavior; height-based sizing keeps ratios perfect */
 .mt-avatar {
   height: auto;
   width: auto;
@@ -327,8 +307,6 @@
   filter: drop-shadow(0 0 8px #00ffeeaa);
 }
 
-
-/* Buttons: Return left, Start right */
 .mt-intro-bottom-btns {
   width: 92%;
   margin-inline: auto;
@@ -349,6 +327,7 @@
 .mt-aspect-wrap {
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
+
 /* prettier math inline */
 .cat-reply code, .user-msg code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -357,24 +336,13 @@
   padding: 0 0.25em;
   border-radius: 6px;
 }
-/* ── Readability: spacing, measure, bubbles ───────────────────────────── */
 
-.chat-window {
-  /* was a plain block; switch to a column flex so `gap` works */
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;                       /* space between messages */
-  padding: 0.9rem;                   /* a tad more breathing room */
-  line-height: 1.4;                  /* easier scan */
-  scroll-behavior: smooth;
-}
 
-/* keep a readable line-length; 60–70ch is the traditional sweet spot */
+
 :root {
-  --mt-measure: 66ch;                /* tweak to taste */
+  --mt-measure: 66ch;
 }
 
-/* Turn messages into bubbles with limited width and good contrast */
 .user-msg,
 .cat-reply {
   max-width: min(var(--mt-measure), 92%);
@@ -384,11 +352,10 @@
   background: rgba(0,0,0,0.72);
   box-shadow: 0 2px 10px rgba(0,0,0,0.3);
   white-space: normal;
-  overflow-wrap: anywhere;           /* never overflow the bubble */
+  overflow-wrap: anywhere;
   hyphens: auto;
 }
 
-/* Differentiate sides + colors */
 .user-msg {
   align-self: flex-end;
   background: rgba(0, 20, 20, 0.82);
@@ -403,7 +370,6 @@
   color: #ffe9a6;
 }
 
-/* Slightly smaller, calmer monospace for inline math/examples */
 .user-msg code,
 .cat-reply code {
   font-size: 0.95em;
@@ -412,19 +378,16 @@
   border-radius: 6px;
 }
 
-/* Optional: subtle separators when a message is really long */
 .cat-reply p,
 .user-msg p {
-  margin: 0.35rem 0;                 /* paragraph rhythm if you use <p> later */
+  margin: 0.35rem 0;
 }
 
-/* A compact style for the “examples” chunk when present */
 .mt-examples {
   margin-top: 0.35rem;
   opacity: 0.95;
 }
 
-/* “Show more” foldout styling (optional feature below) */
 .mt-more summary {
   cursor: pointer;
   margin-top: 0.25rem;
@@ -435,59 +398,440 @@
   border-left: 2px solid #00ffee44;
   padding-left: 0.5rem;
 }
-/* bubbles: wrap only when needed; never hyphenate */
+
 .user-msg,
 .cat-reply {
-  /* was: overflow-wrap:anywhere; hyphens:auto; */
-  overflow-wrap: break-word;   /* only if truly needed */
-  word-break: normal;          /* don’t break inside words */
-  hyphens: manual;             /* never auto-hyphenate */
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
 }
 
-/* inline code/math: keep tokens intact; allow gentle horizontal scroll if a
-   single token is too long (e.g., a huge fraction) */
 .user-msg code,
 .cat-reply code {
-  word-break: keep-all;        /* no breaks inside tokens */
-  overflow-wrap: normal;       /* don’t force-wrap code */
-  white-space: pre-wrap;       /* respect spaces/newlines */
-  display: inline-block;       /* enable x-scroll within code only */
+  word-break: keep-all;
+  overflow-wrap: normal;
+  white-space: pre-wrap;
+  display: inline-block;
   max-width: 100%;
-  overflow-x: auto;            /* scroll tiny area instead of breaking token */
+  overflow-x: auto;
 }
 
-/* examples block: prefer normal breaks (at spaces), not anywhere */
 .mt-examples {
   word-break: normal;
   overflow-wrap: break-word;
   hyphens: manual;
 }
-/* 1) Make chat use the same face everywhere (pick your brand font) */
+
 .chat-window,
 .user-msg,
 .cat-reply {
   font-family: 'Orbitron', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
-/* 2) Inline math tokens: match the chat font, no tinted box, no shadow */
 .user-msg code,
 .cat-reply code {
-  font-family: inherit;     /* 🔁 no monospace jump */
-  font-weight: 600;         /* give it a little emphasis */
-  background: transparent;  /* kill the grey chip */
-  padding: 0;               /* no pill padding */
+  font-family: inherit;
+  font-weight: 600;
+  background: transparent;
+  padding: 0;
   border-radius: 0;
   box-shadow: none;
-  word-break: keep-all;     /* keep tokens intact */
+  word-break: keep-all;
   overflow-wrap: normal;
-  white-space: normal;      /* wrap at spaces like text */
+  white-space: normal;
 }
 
-/* 3) Answer emphasis stays clean + consistent */
 .user-msg strong,
 .cat-reply strong {
   font-weight: 700;
-  color: #fffbe6;           /* soft highlight against cat bubble */
+  color: #fffbe6;
 }
 
-/* (from earlier) bubbles already have line-length cap + contrast */
+/* Bullet point list for responses */
+.mt-response-list {
+  margin-top: 0.4rem;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.95em;
+  line-height: 1.3;
+}
+
+.mt-response-list .mt-response-item {
+  position: relative;
+  padding-left: 0.6rem;
+}
+
+.mt-response-list .mt-response-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #00ffee;
+}
+
+/* Card system for responses */
+.mt-response-card {
+  background: rgba(0,0,0,0.72);
+  border: 1px solid #00ffee55;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.mt-response-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #ffe9a6;
+}
+
+/* Quiz deck bubble styling */
+.mt-quiz-list {
+  margin-top: 0.4rem;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.95em;
+  line-height: 1.3;
+}
+
+.mt-quiz-list .mt-quiz-item {
+  position: relative;
+  padding-left: 0.6rem;
+}
+
+.mt-quiz-list .mt-quiz-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #00ffee;
+}
+
+/* Booths */
+.booth-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 8px 0 6px;
+}
+
+.booth-card {
+  border: 1px solid var(--line, #e6e6e6);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--bg-2, #fff);
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+}
+
+.booth-card h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  opacity: .85;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.booth-card .emoji { font-size: 18px; }
+.booth-card ul { margin: 0; padding-left: 18px; }
+.booth-card li { margin: 2px 0; }
+.help-footer {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: .8;
+}
+
+/* App & chat layout (mobile-first) */
+html, body { height: 100%; }
+body { margin: 0; }
+
+:root {
+  --bg: #0b0c10;
+  --panel: #121318;
+  --border: #1e2130;
+  --ink: #e9e9ef;
+  --ink-dim: #b7b9c6;
+}
+
+.app-shell {
+  height: 100dvh;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.chat-scroll {
+  flex: 1 1 auto;
+  flex-grow: 1; /* Ensure it fills space */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 12px 12px 96px;
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.chat-scroll::-webkit-scrollbar { width: 10px; }
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: #1b1f30; border-radius: 8px; border: 2px solid transparent; background-clip: content-box;
+}
+
+.chat-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.chat-row .bubble {
+  max-width: min(680px, 92%);
+  padding: 10px 12px;
+  border-radius: 14px;
+  line-height: 1.45;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  background: #181b24;
+  border: 1px solid #212536;
+  color: var(--ink);
+}
+
+.chat-row.user .bubble {
+  background: #f4f5f9;
+  color: #0e1020;
+  border-color: #e7e9f2;
+}
+
+.chat-row .bubble code {
+  background: #0f1220;
+  border: 1px solid #1c2136;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  color: #e6e9ff;
+}
+
+.chat-row.user .bubble code {
+  background: #eef0f6;
+  border-color: #dfe3f0;
+  color: #1a1c2b;
+}
+
+.chat-footer {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  background: linear-gradient(180deg, rgba(11,12,16,0), var(--bg) 32px);
+  padding: 16px 12px calc(env(safe-area-inset-bottom, 0) + 12px);
+  border-top: 1px solid var(--border);
+}
+
+.chat-footer .input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-footer input[type="text"],
+.chat-footer textarea {
+  flex: 1 1 auto;
+  min-height: 42px;
+  max-height: 30svh;
+  resize: none;
+  border-radius: 10px;
+  border: 1px solid #24283a;
+  background: #0f1220;
+  color: var(--ink);
+  padding: 10px 12px;
+  outline: none;
+}
+
+.chat-footer button {
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #2a2f46;
+  background: #192037;
+  color: #e6e9ff;
+  height: 42px;
+}
+
+/* Commands block tidy */
+.bubble pre, .bubble .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .95em;
+  background: #0f1220;
+  border: 1px solid #1c2136;
+  padding: 10px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+}
+/* ── PATCH: make the chat fill and pin to bottom in normal flow ───────── */
+.mt-grid, .mt-content { min-height: 0; }              /* prevent scroll trapping */
+
+/* fresh bottom-up pop animation */
+@keyframes mtPopUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.user-msg, .cat-reply {
+  animation: mtPopUp 220ms ease-out both;
+}
+
+/* ensure message bubbles don’t force weird breaks */
+.user-msg, .cat-reply {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+}
+
+/* belt + suspenders for parents so the scroller gets real height */
+.mt-content, .mt-grid { overflow: hidden; }
+
+/* if you previously hid scrollbars with ::-webkit-scrollbar { display:none } 
+   it can mask issues on desktop. keep scrollbars visible while we tune. */
+
+/* pop-in from bottom vibe (reuse your animation) */
+.user-msg, .cat-reply {
+  margin: 0.5rem 0;
+  animation: mtFadeInUp 0.22s ease both;
+}
+@keyframes mtFadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+.mt-menu { 
+  margin:.4rem 0 .25rem; 
+  padding-left:1.1rem; 
+}
+.mt-menu li { 
+  margin:.15rem 0; 
+  line-height:1.35; 
+}
+.mt-grid, .mt-content { min-height: 0; }   /* prevents scroll trapping */
+.mt-content { grid-template-rows: minmax(0,1fr) auto; }
+
+.chat-window{
+  display:flex;
+  flex-direction:column;       /* normal DOM order */
+  justify-content:flex-end;    /* hugs bottom when content is short */
+  gap:.6rem;
+
+  width:100%;
+  min-height:0;
+  height:100%;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+
+  background:rgba(0,0,0,.6);
+  padding:.9rem;
+  border-radius:12px;
+  border:1px solid #00ffee88;
+  box-sizing:border-box;
+}
+
+/* bullets for the menu list */
+.mt-menu { margin:.4rem 0 .25rem; padding-left:1.1rem; list-style:disc; }
+.mt-menu li { margin:.15rem 0; line-height:1.35; }
+
+/* optional: keep scrollbars hidden */
+.chat-window::-webkit-scrollbar { display:none; }
+.chat-window { scrollbar-width: none; }
+/* Mini-lecture styling */
+.mt-lecture-card {
+  background: rgba(0,0,0,0.72);
+  border: 1px solid #00ffee55;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+.mt-lecture-card h3 {
+  margin: 0 0 6px;
+  font-size: 0.98rem;
+  letter-spacing: .2px;
+  color: #fffbe6;
+}
+.mt-lecture-bullets {
+  margin: 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: .35rem;
+}
+.mt-lecture-bullets li { line-height: 1.35; }
+
+/* “Would you like to know more?” footer */
+.mt-lecture-foot {
+  margin-top: 8px;
+  border-top: 1px dashed #00ffee44;
+  padding-top: 6px;
+  font-size: 0.92rem;
+  color: #ffe9a6;
+}
+.mt-dim { opacity: .8; }
+
+/* Effects */
+@keyframes mtHue {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+.mt-rainbow {
+  display:inline-block;
+  background: linear-gradient(90deg,#ff6,#6ff,#f6f,#6f6,#f66,#6cf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mtHue 6s linear infinite;
+  font-weight: 700;
+}
+@keyframes mtPulse {
+  0%,100% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+  50%     { text-shadow: 0 0 8px rgba(255,255,255,.55); }
+}
+.mt-sparkle { animation: mtPulse 1.6s ease-in-out infinite; }
+/* FINAL chat scroller */
+.mt-grid, .mt-content, .chat-window { min-height: 0 !important; }
+
+.mt-content {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto !important; /* chat | input */
+  overflow: hidden;                                    /* parent can clip, child scrolls */
+}
+
+.chat-window {
+  display: flex !important;
+  flex-direction: column !important;  /* normal top→bottom order */
+  justify-content: flex-start !important;
+  gap: .6rem;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;                      /* critical inside CSS grid */
+  overflow-y: auto !important;        /* <-- manual scroll happens here */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto;              /* no auto-scroll magic */
+  touch-action: pan-y;
+
+  background: rgba(0,0,0,.6);
+  padding: .9rem;
+  border-radius: 12px;
+  border: 1px solid #00ffee88;
+  box-sizing: border-box;
+
+  /* show scrollbar while debugging */
+  scrollbar-width: auto;
+}
+.chat-window::-webkit-scrollbar { display: initial; }
+
