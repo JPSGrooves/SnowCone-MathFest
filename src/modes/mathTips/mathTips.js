@@ -384,21 +384,35 @@ function isNearBottom(el, slack = 32) {
 }
 
 function appendMessage(sender, textOrHtml, alreadyHtml = false) {
+  if (!outputEl) return; // safety: container not mounted yet
+
+  // prefer .html if an object with an html field was passed
+  const source = (typeof textOrHtml === 'object' && textOrHtml?.html)
+    ? textOrHtml.html
+    : textOrHtml;
+
   const atBottom = isNearBottom(outputEl);
 
   const msgClass = sender === 'user' ? 'user-msg' : 'cat-reply';
   const prefix = sender === 'user' ? '🍧' : '😺';
-  const safe = alreadyHtml ? String(textOrHtml) : String(textOrHtml)
-    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
-    .replaceAll('"','&quot;').replaceAll("'",'&#39;');
+
+  const safe = alreadyHtml
+    ? String(source)
+    : String(source)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
 
   const div = document.createElement('div');
   div.className = msgClass;
   div.innerHTML = `${prefix} ${safe}`;
   outputEl.appendChild(div);
 
-  if (atBottom) outputEl.scrollTop = outputEl.scrollHeight; // ✅ only if pinned already
+  if (atBottom) outputEl.scrollTop = outputEl.scrollHeight; // pin if user was at bottom
 }
+
 
 
 

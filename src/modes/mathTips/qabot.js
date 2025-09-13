@@ -172,7 +172,9 @@ function maybeOffTopicRedirect(userText, currentMode) {
     setPendingSwitch(softTo, userText);
     return composeReply({
       userText,
-      part: { kind: 'answer', html: `Hey, that sounds like ${softTo} booth stuff. Ready to rock into ${softTo}?` },
+      part: { kind: 'confirm', html: `Ready to rock into ${softTo} booth?` },
+      askAllowed: false
+
     });
   }
   return null;
@@ -308,7 +310,8 @@ export function getResponse(userText, appStateLike = appState) {
     return {
       html: composeReply({
         userText,
-        part: { kind: 'answer', html: `<p>Yo ${userName}, quick yes or no to jump into that booth?</p>` }
+        part: { kind: 'confirm', html: `<p>Yo ${userName}, quick yes or no to jump into that booth?</p>` },
+        askAllowed: false
       }),
       meta: { intent: 'booth-switch-clarify' }
     };
@@ -346,7 +349,8 @@ export function getResponse(userText, appStateLike = appState) {
     return {
       html: composeReply({
         userText: text,
-        part: { kind: 'answer', html: `Ready to rock into ${to} booth?` }
+        part: { kind: 'confirm', html: `Ready to rock into ${to} booth?` },
+        askAllowed: false
       }),
       meta: { intent: 'booth-switch', to }
     };
@@ -368,7 +372,8 @@ export function getResponse(userText, appStateLike = appState) {
     return {
       html: composeReply({
         userText: text,
-        part: { kind: 'answer', html: `Ready to rock into ${toBooth} booth?` }
+        part: { kind: 'confirm', html: `Ready to rock into ${toBooth} booth?` },
+        askAllowed: false
       }),
       meta: { intent: 'booth-switch', to: toBooth }
     };

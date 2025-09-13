@@ -1,48 +1,83 @@
-// Simple lessons booth — lightweight help + tiny demos
+// /src/modes/mathTips/modes/lessons.js
+import { composeReply } from '../conversationPolicy.js';
+import { makeSession, readAffirmative, helpCard } from './_kit.js';
 
-function menu() {
-  return `
-    <div class="mt-lecture-card">
-      <h3>Lessons Menu</h3>
-      <ul class="mt-lecture-bullets">
-        <li>fractions — try: <code>simplify 12/18</code></li>
-        <li>percent — try: <code>25% of 40</code></li>
-        <li>equations — ask about <code>y = mx + b</code></li>
-      </ul>
-      <div class="mt-lecture-foot mt-dim">Say: fractions · percent · equations</div>
-    </div>
-  `;
+const S = makeSession({ capMin: 3, capMax: 4 });
+
+const LESSONS = {
+  fractions: [
+    `<p><strong>Simplify:</strong> divide top/bottom by their GCD. Example: <code>12/18 → 2/3</code>.</p>`,
+    `<p><strong>Add:</strong> same denom? add tops. different? common denom first. <code>1/2 + 1/3 = 5/6</code>.</p>`,
+    `<p><strong>Mixed to improper:</strong> <code>2 1/3 = 7/3</code>. Improper to mixed? divide and remainder.</p>`,
+    `<p><strong>Compare:</strong> cross-multiply or normalize. <code>3/5 vs 2/3 → 9/15 vs 10/15</code>.</p>`
+  ],
+  percent: [
+    `<p><strong>Of:</strong> <code>p% of n = (p/100)*n</code>. Example: <code>25% of 40 = 10</code>.</p>`,
+    `<p><strong>Percent change:</strong> <code>(new-old)/old × 100%</code>. Direction matters.</p>`,
+    `<p><strong>Tip tax discount:</strong> round smart. 10% easy; 15% = 10% + half again.</p>`,
+    `<p><strong>Reverse percent:</strong> if 10 is 25% of n ➜ <code>n = 10 / 0.25 = 40</code>.</p>`
+  ],
+  equations: [
+    `<p><strong>Slope-intercept:</strong> <code>y = mx + b</code>. m = slope, b = y-intercept.</p>`,
+    `<p><strong>Point-slope:</strong> <code>y - y1 = m(x - x1)</code> to build lines fast from a point.</p>`,
+    `<p><strong>Two points to slope:</strong> <code>m = (y2 - y1) / (x2 - x1)</code>.</p>`,
+    `<p><strong>Standard form:</strong> <code>Ax + By = C</code>. You can convert between forms.</p>`
+  ]
+};
+
+function pickTopic(t) {
+  const k = String(t || '').toLowerCase();
+  if (/percent/.test(k)) return 'percent';
+  if (/equation|mx\s*\+\s*b/.test(k)) return 'equations';
+  return 'fractions';
 }
 
-export function handle(text = '', _ctx = {}) {
-  const t = String(text).toLowerCase().trim();
-  if (!t || t === 'help' || t === 'menu') {
-    return { html: menu() };
+export function start({ topic } = {}) {
+  S.reset();
+  const key = pickTopic(topic);
+  const first = LESSONS[key][0];
+  return composeReply({ part: { kind:'answer', html: first }, askAllowed: true, mode:'lessons' });
+}
+
+export function handle(text = '') {
+  // help?
+  if (/^help\b/i.test(text)) {
+    const card = helpCard(
+      'Lessons Help',
+      [
+        'say: fractions · percent · equations',
+        'examples: "simplify 12/18", "25% of 40", "y = mx + b"',
+        'type "menu" to see lesson menu again'
+      ],
+      'tip: say "exit" to leave lessons.'
+    );
+    return { html: composeReply({ part: { kind:'answer', html: card }, askAllowed: false, mode:'lessons' }) };
   }
 
-  // tiny fraction simplifier
-  const simp = /simplify\s+(-?\d+)\s*\/\s*(-?\d+)/i.exec(t);
-  if (simp) {
-    const a = Math.abs(parseInt(simp[1], 10));
-    const b = Math.abs(parseInt(simp[2], 10));
-    const g = ((x, y) => { while (y) [x, y] = [y, x % y]; return x || 1; })(a, b);
-    return { html: `<p>${a}/${b} → ${a/g}/${b/g}</p>` };
+  // read intent: want another?
+  const yn = readAffirmative(text);
+  if (yn === 'no') {
+    return {
+      html: composeReply({
+        part: { html: `<p>cool breeze. stay or switch — lessons, quiz, lore, recipes, calculator.</p>` },
+        askAllowed: false
+      })
+    };
   }
 
-  // tiny percent helper
-  const p = /(-?\d+(?:\.\d+)?)\s*%\s*of\s*(-?\d+(?:\.\d+)?)/i.exec(t);
-  if (p) {
-    const ans = (parseFloat(p[1]) / 100) * parseFloat(p[2]);
-    return { html: `<p>${p[1]}% of ${p[2]} = ${ans}</p>` };
+  // pick topic from the user’s text for the next drop
+  const key = pickTopic(text);
+  if (S.shouldBlock(text)) {
+    return { html: composeReply({ part: { html: `<p>one at a time, friend.</p>` }, askAllowed: false }) };
   }
 
-  if (/\bequations?\b/.test(t)) {
-    return { html: `<p>Equations basics: <code>y = mx + b</code> (slope-intercept). Ask about slope or intercept!</p>` };
+  S.bump();
+  const idx = S.count() % LESSONS[key].length;
+  const chunk = LESSONS[key][idx];
+
+  if (S.isCapReached()) {
+    return { html: composeReply({ part: { kind:'answer', html: `${chunk}<p>that’s most...` }, askAllowed: false, mode:'lessons' }) };
   }
 
-  if (/\bfractions?\b/.test(t) || /\bpercent\b/.test(t)) {
-    return { html: menu() };
-  }
-
-  return { html: `<p>Lessons booth didn’t catch that. Try: <code>simplify 12/18</code> or <code>25% of 40</code> or say <code>menu</code>.</p>` };
+  return { html: composeReply({ part: { kind:'answer', html: chunk }, askAllowed: true, mode:'lessons' }) };
 }

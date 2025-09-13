@@ -24,6 +24,11 @@ export const PERSONA = {
   ]
 };
 
+// tiny util so we can pass raw HTML or plain text
+function safe(s) {
+  return String(s);
+}
+function chooseOne(arr) { return arr[Math.floor(Math.random() * arr.length)] || ""; }
 // ───────────────────────────────────────────────────────────────────────────────
 // 🧠 Tiny bot context helpers (confusion counter)
 // ───────────────────────────────────────────────────────────────────────────────
@@ -84,7 +89,7 @@ const BANKS = {
   }
 };
 function BANK(name){ const pack = BANKS[STYLE] || BANKS.default; return pack[name] || []; }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
 
 // ───────────────────────────────────────────────────────────────────────────────
 // 🗣️ Composer
@@ -93,40 +98,46 @@ function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 // - part.noAck (optional): true → suppress courtesy opener *and* nudge
 // - askAllowed (optional): false → suppress nudge only (keep courtesy opener)
 // ───────────────────────────────────────────────────────────────────────────────
-export function composeReply({ userText, part, askAllowed = true }) {
-  ensureCtx(); // make sure context exists
+export function composeReply({
+  userText = '',
+  part = {},
+  askAllowed = true,
+  askText = '',
+  mode = '',
+}) {
+  const askedQ    = /\?\s*$/.test(String(userText || ''));
+  const noAck     = !!part?.noAck;
+  const isConfirm = (part?.kind === 'confirm') || (part?.confirm === true);
 
-  const askedQ = /\?\s*$/.test(String(userText||''));
-  const noAck  = !!part?.noAck;
+  // Decide whether to include ACK and/or Nudge
+  const includeAck   = !askedQ && !noAck && !isConfirm;
+  const includeNudge = askAllowed && !askedQ && !noAck && !isConfirm;
 
-  const segs = [];
+  // Mode-specific nudge defaults
+  const modeNudges = {
+    lore:     "wanna hear more?",
+    quiz:     "wanna try another?",
+    lessons:  "want one more lesson nugget?",
+  };
+  const nudgeText = askText || modeNudges[mode] || chooseOne(PERSONA.NUDGES);
 
-  // ACK: only when not a question and not explicitly suppressed
-  if (!askedQ && !noAck) segs.push(pick(BANK('ACKS')));
-
-  // DO:
-  if (part?.kind === 'answer') {
-    resetConfusion();
-    segs.push(String(part.html || ''));
-  } else {
-    noteConfusion();
-    const hint = pick(BANK('HEDGES'));
-    const ex = examplesFor(part?.topicGuess);
-    segs.push(`${hint}: ${ex[0]} • ${ex[1]}`);
+  // Build the main single card (ACK + content)
+  const mainBits = [];
+  if (includeAck) {
+    const ack = chooseOne(PERSONA.ACKS);
+    if (ack) mainBits.push(`<p>${ack}</p>`);
+  }
+  if (part?.html) {
+    mainBits.push(safe(part.html));
   }
 
-  // NUDGE: only if allowed, not a question, and not explicitly suppressed
-  if (askAllowed && !askedQ && !noAck) {
-    segs.push(pick(BANK('NUDGES')));
+  const out = [];
+  out.push(`<div class="mt-response-card">${mainBits.join('\n')}</div>`);
+
+  // Optional dim nudge footer card
+  if (includeNudge) {
+    out.push(`<div class="mt-response-card mt-dim"><p>${nudgeText}</p></div>`);
   }
 
-  // Light connector sprinkle
-  const withConnectors = [];
-  for (let i=0;i<segs.length;i++){
-    const s = segs[i];
-    if (i===1 && Math.random()<0.35) withConnectors.push(`${pick(BANK('CONNECT'))} — ${s}`);
-    else withConnectors.push(s);
-  }
-
-  return withConnectors.join(' ');
+  return out.join('\n');
 }
