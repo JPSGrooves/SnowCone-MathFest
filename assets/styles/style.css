@@ -370,21 +370,17 @@ html, body {
   }
 }
 
-/* 🌎 Global "too small" gate – CSS only, no HTML changes */
-@media (max-width: 399px), (max-height: 499px) {
-  /* lock background from scrolling */
+@media (max-width: 319px), (max-height: 519px) {  /* was 399 / 499 */
   html, body { overflow: hidden; }
 
-  /* softly blur main UIs if present (safe if not) */
   .menu-frame,
   .kc-game-frame { filter: blur(1px); }
 
-  /* reduce-motion folks: skip the blur */
+  /* keep your reduced-motion bit as-is if it worked yesterday */
   @media (prefers-reduced-motion: reduce) {
     .menu-frame, .kc-game-frame { filter: none; }
   }
 
-  /* full-screen overlay message */
   body::after {
     content: "For the full festival, make the window bigger or rotate your device 🍧";
     position: fixed;
