@@ -1,36 +1,30 @@
 // /src/modes/mathTips/conversationPolicy.js
-// Single-bubble composer: ACK ➜ DO (answer or teach) ➜ NUDGE (optional).
-// Persona banks + mode guards live here so every reply sounds like Grampy P.
+// Purpose: one place to shape Grampy P's voice + single-card reply framing
+// so CSS stays aligned and all booths share the same soft follow-up rhythm.
 
 import { appState } from '../../data/appState.js';
 import { runInAction } from 'mobx';
 
 // ───────────────────────────────────────────────────────────────────────────────
 // 🎭 Persona (gifted 8-year-old vibes, adult brain)
-// Use PERSONA.GUARDS + PERSONA.FALLBACKS from anywhere (modes, brain, etc.)
 // ───────────────────────────────────────────────────────────────────────────────
 export const PERSONA = {
-  ACKS:   ["easy now.", "alright, friend.", "cool breeze.", "i hear ya.", "we're here."],
-  HEDGES: ["here’s a little riff", "one small groove", "tiny roadmap", "short trail"],
-  NUDGES: ["want another little riff?", "one more pass?", "feel like one more?"],
+  ACKS:   ["Roger that...", "Alright, ${userName}...", "Like a cool breeze...", "I'm here for it....", "Vaminos...", "You got it...", "Right on...", "Cool vibes...", "Sounds good...", "On it..."],
+  HEDGES: ["Here’s a little riff I know,", "One small groove I'll play", "I got the tiny roadmap in my mind...", "So here's a short path...", "Here's a quick little something...", "Let me drop a quick beat...", "Here's a popcorn-size nugget...", "Here's a small piece..."],
+  NUDGES: ["Wanna here the next one?", "One more rotation?", "Feel like one more?", "Want another?", "Care for another?", "Another round?", "One more time?", "How about one more?", "You down for another?", "Another quick one?", "Want to keep going?"], 
   GUARDS: {
-    offTopicAsk: (from,to)=>`i’m riffing in **${from}**. switch to **${to}** and keep going?`,
+    offTopicAsk: (from,to)=>`I’m cooking in **${from}**. you wanna switch to **${to}** and keep going?`,
     switched: (to)=>`rolled into **${to}**.`
   },
   FALLBACKS: [
-    "old cat ears missed that. try `help` or `mode lessons`.",
-    "i don’t speak that dialect yet. say `help` or `exit` to switch modes.",
-    "hmm—i can try if you say it my way. `help` shows the grammar."
+    "My old cat ears missed that. try `help` or `lore booth`.",
+    "I don’t speak that dialect yet. say `help` or `exit` to switch booths.",
+    "Hmm—I can try if you say it my way. `help` shows the grammar."
   ]
 };
 
-// tiny util so we can pass raw HTML or plain text
-function safe(s) {
-  return String(s);
-}
-function chooseOne(arr) { return arr[Math.floor(Math.random() * arr.length)] || ""; }
 // ───────────────────────────────────────────────────────────────────────────────
-// 🧠 Tiny bot context helpers (confusion counter)
+// 🧠 tiny bot context (optional: confusion counter used by other modules)
 // ───────────────────────────────────────────────────────────────────────────────
 function ensureCtx() {
   runInAction(() => {
@@ -42,102 +36,47 @@ function ensureCtx() {
   });
   return appState.progress.mathtips.botContext;
 }
+export function noteConfusion(){ try { ensureCtx().confusionCount++; } catch {} }
+export function resetConfusion(){ try { ensureCtx().confusionCount = 0; } catch {} }
 
-export function noteConfusion() {
-  try {
-    const bc = ensureCtx();
-    runInAction(() => { bc.confusionCount += 1; });
-  } catch {}
+// ───────────────────────────────────────────────────────────────────────────────
+// 🔧 utils (ensure these are declared ONCE in this file)
+// ───────────────────────────────────────────────────────────────────────────────
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+function formatStr(s, vars) {
+  return String(s).replace(/\$\{(\w+)\}/g, (_, k) => (vars?.[k] ?? ''));
 }
-
-export function resetConfusion() {
-  try {
-    const bc = ensureCtx();
-    runInAction(() => { bc.confusionCount = 0; });
-  } catch {}
-}
+function safe(s) { return String(s ?? ''); }
 
 // ───────────────────────────────────────────────────────────────────────────────
-// 🧩 Example suggester (used by teach fallback)
+// 🗣️ Single-card composer
+// - Always returns ONE .mt-response-card containing ack (optional), body, and nudge (optional)
+// - Options:
+//   part.html    → inner HTML for the body (required for answers)
+//   askAllowed   → show the nudge footer line in same card
+//   askText      → override default nudge (persona-based if omitted)
+//   noAck        → hide the courtesy opener
+//   vars.userName→ allows ${userName} templating in ACK/NUDGE (defaults from appState)
 // ───────────────────────────────────────────────────────────────────────────────
-function examplesFor(topicGuess) {
-  switch (topicGuess) {
-    case 'percent':    return ["`15% of 80` → 12", "`7.5% of 120` → 9"];
-    case 'fractions':  return ["`simplify 12/18` → 2/3", "`1/2 + 1/3` → 5/6"];
-    case 'arithmetic': return ["`7*8+12` → 68", "`(30-12)/3` → 6"];
-    default:           return ["`15% of 80` → 12", "`simplify 12/18` → 2/3"];
-  }
-}
+export function composeReply({ userText = '', part = {}, askAllowed = true, askText = '', noAck = false, vars = {} }) {
+  // pull name from vars or appState
+  const userName = vars.userName || appState?.profile?.name || 'friend';
 
-// ───────────────────────────────────────────────────────────────────────────────
-// 🎸 Style banks (kept for light connective flavor)
-// Switch via appState.settings.mtStyle = 'default' | 'jam_sage'
-// ───────────────────────────────────────────────────────────────────────────────
-const STYLE = (appState?.settings?.mtStyle || 'jam_sage');
-const BANKS = {
-  default: {
-    ACKS:   ["Gotcha.", "Heard.", "Cool.", "Right on.", "I’m with you."],
-    HEDGES: ["Looks like this", "One way to see it", "Try this shape", "Quick blueprint", "Tiny map"],
-    CONNECT:["So", "Then", "From there", "Next", "After that"],
-    NUDGES: ["Want 2 more like that?", "Spin one more?", "Try another?", "Run it back?", "One more rep?"]
-  },
-  jam_sage: {
-    ACKS:   PERSONA.ACKS,
-    HEDGES: [...PERSONA.HEDGES, "try this shape"],
-    CONNECT:["and then", "from there", "roll on", "next up", "after that"],
-    NUDGES: [...PERSONA.NUDGES, "spin one more bar?", "take another lap?"]
-  }
-};
-function BANK(name){ const pack = BANKS[STYLE] || BANKS.default; return pack[name] || []; }
+  // courtesy opener
+  const ack = noAck ? '' : formatStr(pick(PERSONA.ACKS), { userName });
 
+  // core HTML (already styled by caller when needed)
+  const body = safe(part?.html);
 
-// ───────────────────────────────────────────────────────────────────────────────
-// 🗣️ Composer
-// - part.kind: 'answer' | 'teach'
-// - part.html: HTML string
-// - part.noAck (optional): true → suppress courtesy opener *and* nudge
-// - askAllowed (optional): false → suppress nudge only (keep courtesy opener)
-// ───────────────────────────────────────────────────────────────────────────────
-export function composeReply({
-  userText = '',
-  part = {},
-  askAllowed = true,
-  askText = '',
-  mode = '',
-}) {
-  const askedQ    = /\?\s*$/.test(String(userText || ''));
-  const noAck     = !!part?.noAck;
-  const isConfirm = (part?.kind === 'confirm') || (part?.confirm === true);
+  // soft follow-up
+  const nudge = askAllowed ? formatStr(askText || pick(PERSONA.NUDGES), { userName }) : '';
 
-  // Decide whether to include ACK and/or Nudge
-  const includeAck   = !askedQ && !noAck && !isConfirm;
-  const includeNudge = askAllowed && !askedQ && !noAck && !isConfirm;
-
-  // Mode-specific nudge defaults
-  const modeNudges = {
-    lore:     "wanna hear more?",
-    quiz:     "wanna try another?",
-    lessons:  "want one more lesson nugget?",
-  };
-  const nudgeText = askText || modeNudges[mode] || chooseOne(PERSONA.NUDGES);
-
-  // Build the main single card (ACK + content)
-  const mainBits = [];
-  if (includeAck) {
-    const ack = chooseOne(PERSONA.ACKS);
-    if (ack) mainBits.push(`<p>${ack}</p>`);
-  }
-  if (part?.html) {
-    mainBits.push(safe(part.html));
-  }
-
-  const out = [];
-  out.push(`<div class="mt-response-card">${mainBits.join('\n')}</div>`);
-
-  // Optional dim nudge footer card
-  if (includeNudge) {
-    out.push(`<div class="mt-response-card mt-dim"><p>${nudgeText}</p></div>`);
-  }
-
-  return out.join('\n');
+  // single card with optional lines
+  return `
+    <div class="mt-response-card">
+      ${ack ? `<p>${ack}</p>` : ''}
+      ${body}
+      ${nudge ? `<p class="mt-dim">${nudge}</p>` : ''}
+    </div>
+  `;
 }

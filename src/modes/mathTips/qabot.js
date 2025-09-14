@@ -165,6 +165,7 @@ function softModeTarget(text) {
   }
   return null;
 }
+
 function maybeOffTopicRedirect(userText, currentMode) {
   const t = String(userText || '').toLowerCase().trim();
   const softTo = softModeTarget(t);
@@ -172,12 +173,61 @@ function maybeOffTopicRedirect(userText, currentMode) {
     setPendingSwitch(softTo, userText);
     return composeReply({
       userText,
-      part: { kind: 'confirm', html: `Ready to rock into ${softTo} booth?` },
-      askAllowed: false
-
+      part: { kind: 'confirm', html: `Ready to roll into ${softTo} booth?` },
+      askAllowed: false,
+      noAck: true
     });
   }
   return null;
+}
+
+
+
+function adaptModeOutput(out, userText, intentTag) {
+  if (!out) return null;
+
+  // string → wrap once as a single card
+  if (typeof out === 'string') {
+    return {
+      html: composeReply({
+        userText,
+        part: { kind: 'answer', html: out },
+        askAllowed: true
+      }),
+      meta: { intent: intentTag }
+    };
+  }
+
+  // object from a booth: respect fields if present
+  if (typeof out === 'object' && 'html' in out) {
+    return {
+      html: composeReply({
+        userText,
+        part: { kind: 'answer', html: out.html },
+        askAllowed: out.askAllowed !== false,
+        askText: out.askText || '',
+        noAck: !!out.noAck
+      }),
+      meta: { intent: intentTag }
+    };
+  }
+
+  // router-shaped (text/deck)
+  const adapted = renderRouterResultToHTML(out, userText);
+  if (adapted) {
+    adapted.meta = Object.assign({ intent: intentTag }, adapted.meta || {});
+    return adapted;
+  }
+
+  // last resort
+  return {
+    html: composeReply({
+      userText,
+      part: { kind: 'answer', html: String(out) },
+      askAllowed: true
+    }),
+    meta: { intent: intentTag }
+  };
 }
 
 // Router adapter
@@ -204,24 +254,7 @@ function renderRouterResultToHTML(routerRes, userText) {
     meta: { intent: 'router' }
   };
 }
-function adaptModeOutput(out, userText, intentTag) {
-  if (!out) return null;
-  if (typeof out === 'string') {
-    return {
-      html: out,
-      meta: { intent: intentTag }
-    };
-  }
-  const adapted = renderRouterResultToHTML(out, userText);
-  if (adapted) {
-    adapted.meta = Object.assign({ intent: intentTag }, adapted.meta || {});
-    return adapted;
-  }
-  return {
-    html: composeReply({ userText, part: { kind: 'answer', html: html(String(out)) }, askAllowed: true }),
-    meta: { intent: intentTag }
-  };
-}
+
 function routeUtterance(utterance) {
   const cmd = interpret(utterance);
   if (cmd) {
@@ -266,6 +299,14 @@ export function getResponse(userText, appStateLike = appState) {
   const text = String(userText || '');
   const t = text.toLowerCase().trim();
   const userName = appStateLike?.profile?.name || 'traveler';
+  // 🔑 stable per-chat id; persists in appState to keep booth state
+  if (!appStateLike?.progress) appStateLike.progress = {};
+  if (!appStateLike.progress.mathtips) appStateLike.progress.mathtips = {};
+  const SESSION_ID =
+    appStateLike.progress.mathtips.sessionId ||
+    (appStateLike.progress.mathtips.sessionId =
+      `mt-${Date.now()}-${Math.random().toString(36).slice(2,8)}`);
+
 
   // 0a) Handle pending booth switch
   const bc0 = ensureBC();
@@ -282,13 +323,20 @@ export function getResponse(userText, appStateLike = appState) {
       else if (to === 'recipes') prompt = `<p>Recipes booth, let’s cook! Quesadillas or snowcones today?</p>`;
       else if (to === 'calculator') prompt = `<p>Calculator booth ready! Toss me a math problem like 15% of 80.</p>`;
       else prompt = `<p>Back in the village center. Pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+
       if (p?.lastText) {
         const mod = MODEx[to];
-        if (mod?.handle) {
-          const replay = adaptModeOutput(mod.handle(p.lastText), p.lastText, `booth:${to}`);
+        // start the booth instead of re-parsing the last command
+        if (mod?.start) {
+          const replay = adaptModeOutput(mod.start({ userText, sessionId: SESSION_ID }), userText, `booth:${to}`);
+          if (replay) return replay;
+        } else if (mod?.handle) {
+          const replay = adaptModeOutput(mod.handle('start', { userText, sessionId: SESSION_ID }), userText, `booth:${to}`);
           if (replay) return replay;
         }
       }
+
+
       return {
         html: composeReply({
           userText,
@@ -311,7 +359,8 @@ export function getResponse(userText, appStateLike = appState) {
       html: composeReply({
         userText,
         part: { kind: 'confirm', html: `<p>Yo ${userName}, quick yes or no to jump into that booth?</p>` },
-        askAllowed: false
+        askAllowed: false,
+        noAck: true
       }),
       meta: { intent: 'booth-switch-clarify' }
     };
@@ -324,14 +373,15 @@ export function getResponse(userText, appStateLike = appState) {
         userText: text,
         part: {
           kind: 'answer',
-          html: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>`,
-          noAck: true
+          html: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>`
         },
-        askAllowed: false
+        askAllowed: false,
+        noAck: true
       }),
       meta: { intent: 'help' }
     };
   }
+
   if (t === 'exit' || t === '/exit') {
     setMode(MODES.none);
     return {
@@ -349,8 +399,9 @@ export function getResponse(userText, appStateLike = appState) {
     return {
       html: composeReply({
         userText: text,
-        part: { kind: 'confirm', html: `Ready to rock into ${to} booth?` },
-        askAllowed: false
+        part: { kind: 'confirm', html: `Ready to roll into ${to} booth?` },
+        askAllowed: false,
+        noAck: true
       }),
       meta: { intent: 'booth-switch', to }
     };
@@ -372,8 +423,9 @@ export function getResponse(userText, appStateLike = appState) {
     return {
       html: composeReply({
         userText: text,
-        part: { kind: 'confirm', html: `Ready to rock into ${toBooth} booth?` },
-        askAllowed: false
+        part: { kind: 'confirm', html: `Ready to roll into ${toBooth} booth?` },
+        askAllowed: false,
+        noAck: true
       }),
       meta: { intent: 'booth-switch', to: toBooth }
     };
@@ -383,7 +435,7 @@ export function getResponse(userText, appStateLike = appState) {
     const topic = /percent/.test(q[3] || '') ? 'percent' : (/frac/.test(q[3] || '') ? 'fractions' : 'fractions');
     const count = q[4] ? parseInt(q[4], 10) : 3;
     setMode(MODES.quiz);
-    return adaptModeOutput(MODEx.quiz.start({ topic, count, userText: text }), text, 'quiz_start');
+    return adaptModeOutput(MODEx.quiz.start({ topic, count, userText: text, sessionId: SESSION_ID }), text, 'quiz_start');
   }
 
   // 0c) Algebra intercepts
@@ -391,26 +443,80 @@ export function getResponse(userText, appStateLike = appState) {
   if (alg) return { html: alg, meta: { intent: 'algebra', topic: 'algebra' } };
 
   // 1) Active booth with off-topic guard
+  // 1) Active booth with off-topic guard
   const currentMode = getMode();
   if (currentMode !== MODES.none) {
+
+    // 🔮 calculator is global: answer percents/expressions without switching
+    {
+      const pcent = tryPercentOf(t);
+      if (pcent) {
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: `<p>${pcent.p}% of ${pcent.n} is ${pcent.ans}.</p>` }
+          }),
+          meta: { intent: 'calc-inline', topic: 'calculator' }
+        };
+      }
+      if (SAFE_EXPR.test(t)) {
+        try {
+          const result = evalSafeExpression(t);
+          return {
+            html: composeReply({
+              userText: text,
+              part: { kind: 'answer', html: `<p>${t} = ${result}</p>` }
+            }),
+            meta: { intent: 'calc-inline', topic: 'calculator' }
+          };
+        } catch { /* fall through to booth */ }
+      }
+    }
+
     const ask = maybeOffTopicRedirect(text, currentMode);
     if (ask) {
       return { html: ask, meta: { intent: 'offTopicAsk', from: currentMode } };
     }
-    const out = callMode(currentMode, text, {});
+
+    const out = callMode(currentMode, text, { sessionId: SESSION_ID });
     if (out) {
       const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
-      if (adapted) return adapted;
+      // if a booth signals it has ended, drop back to the center
+      if (adapted) {
+        if (adapted?.meta?.end) setMode(MODES.none);
+        return adapted;
+      }
     }
-    return {
-      html: composeReply({
-        userText: text,
-        part: { kind: 'answer', html: `<p>Yo ${userName}, that’s not quite clicking in ${currentMode} booth. Try something like ${currentMode === 'lessons' ? 'fractions' : currentMode === 'quiz' ? 'answer the question' : currentMode === 'lore' ? 'festival story' : currentMode === 'recipes' ? 'quesadilla recipe' : '15% of 80'}, or say help.</p>` },
-        askAllowed: true
-      }),
-      meta: { intent: `booth:${currentMode}:no-handler` }
-    };
+    // ... keep your existing fallback
   }
+
+
+  // 🔮 calculator is global: answer percent or safe expressions without switching modes
+  {
+    const p = tryPercentOf(t);
+    if (p) {
+      return {
+        html: composeReply({
+          userText: text,
+          part: { kind: 'answer', html: `<p>${p.p}% of ${p.n} is ${p.ans}.</p>` },
+        }),
+        meta: { intent: 'calc-inline', topic: 'calculator' }
+      };
+    }
+    if (SAFE_EXPR.test(t)) {
+      try {
+        const result = evalSafeExpression(t);
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: `<p>${t} = ${result}</p>` },
+          }),
+          meta: { intent: 'calc-inline', topic: 'calculator' }
+        };
+      } catch { /* ignore and continue booth */ }
+    }
+  }
+
 
   // 1b) Idle mode: handle specific intents
   const { guess, score, arg } = scoreIntent(text);
@@ -441,25 +547,76 @@ export function getResponse(userText, appStateLike = appState) {
             line = `<p>Command’s not clicking, ${userName}. Say help for options.</p>`;
         }
         break;
-      case 'who':
-        line = `<p>${pick(RESPONSES.who_are_you)} Ready to vibe, ${userName}? Try lessons booth or quiz fractions 3.</p>`;
-        break;
-      case 'greet':
-        line = `<p>${pick(RESPONSES.greetings)} Let’s roll, ${userName} — pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
-        break;
-      case 'how_are_you':
-        line = `<p>${pick(RESPONSES.how_are_you)} What’s next, ${userName}? Lessons booth, quiz booth, or something else?</p>`;
-        break;
-      case 'joke':
-        line = `<p>${pick(RESPONSES.jokes)} More laughs, ${userName}? Try lore booth for festival tales.</p>`;
-        break;
-      case 'badges':
-        line = `<p>Badges mark your math and snowcone swagger, ${userName}. Check status booth for yours!</p>`;
-        break;
+            case 'who': {
+        const line = `<p>${pick(RESPONSES.who_are_you)} Ready to vibe, ${userName}? Try lessons booth or quiz fractions 3.</p>`;
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: line },
+            askAllowed: false, // no nudge
+            noAck: true        // no "alright, friend."
+          }),
+          meta: { intent: guess }
+        };
+      }
+
+      case 'greet': {
+        const line = `<p>${pick(RESPONSES.greetings)} Let’s roll, ${userName} — pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: line },
+            askAllowed: false,
+            noAck: true
+          }),
+          meta: { intent: guess }
+        };
+      }
+
+      case 'how_are_you': {
+        const line = `<p>${pick(RESPONSES.how_are_you)} What’s next, ${userName}? Lessons booth, quiz booth, or something else?</p>`;
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: line },
+            askAllowed: false,
+            noAck: true
+          }),
+          meta: { intent: guess }
+        };
+      }
+
+      case 'joke': {
+        const line = `<p>${pick(RESPONSES.jokes)} More laughs, ${userName}? Try lore booth for festival tales.</p>`;
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: line },
+            askAllowed: false,
+            noAck: true
+          }),
+          meta: { intent: guess }
+        };
+      }
+
+      case 'badges': {
+        const line = `<p>Badges mark your math and snowcone swagger, ${userName}. Check status booth for yours!</p>`;
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: line },
+            askAllowed: false,
+            noAck: true
+          }),
+          meta: { intent: guess }
+        };
+      }
+
+
       case 'lore':
         setMode(MODES.lore);
         {
-          const out = callMode('lore', text, {});
+          const out = callMode('lore', text, { sessionId: SESSION_ID });
           if (out) return adaptModeOutput(out, text, 'booth:lore');
           return {
             html: composeReply({
