@@ -18,11 +18,11 @@ const tracks = [
   { id: 'sc90',       name: 'SnowCone 90',          file: 'sc_90.mp3' },
   { id: 'nothingorg', name: 'Nothing Organic',      file: 'nothing_organic.mp3' },
   { id: 'secrets',    name: 'Secrets of Math',      file: 'secretsOfMath.mp3' },
-
-  // ➕ ADD THIS:
   { id: 'prologue',   name: 'Story Prologue',       file: 'prologueTrack.mp3' },
-];
 
+  // ➕ NEW: MathTips Village loop
+  { id: 'kittyPaws',  name: 'Kitty Paws',           file: 'kittyPaws.mp3' },
+];
 // ...rest of file unchanged...
 
 

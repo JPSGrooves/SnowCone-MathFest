@@ -1,0 +1,5 @@
+[
+  ["lore joke", ".+"],
+  ["tell festival lore", ".+"],
+  ["who is grampy p", "(^|\\b)grampy p(\\b|$)"]
+]
