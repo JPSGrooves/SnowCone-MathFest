@@ -6,29 +6,26 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.9.0</h3>
+      <h3>🧠 SnowCone MathFest v0.9.0.5</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.9.0 — Legendary Badges</h3>
+      <h3>🍦 v0.9.0.5 — musical kitty paws</h3>
       <p>
+        – 🧠 <strong>Math Tips Village UI refresh</strong>: full-bleed background restored, 11:16 aspect wrapper, single scroll area that hugs the bottom, smoother pop-in animations, safe-area padding, and mobile scrollbars hidden<br>
+        – 🏷️ <strong>Header cleanup</strong>: title is text-only (“Math Tips Village”) — no panel/border — neon glow retained<br>
+        – 💬 <strong>Response styling</strong>: new <code>.mt-response-card</code>, <code>.mt-response-list</code>, and mini-lecture blocks (<code>.mt-lecture-card</code>) for consistent lesson/lore rendering + tidy inline <code>code</code> tokens<br>
+        – 🧭 <strong>Bottom utility bar</strong>: fixed Back / Copy / Export / Mute pinned to corners; pointer-events fixes so center actions stay clickable on intro & main screens<br>
+        – 🧱 <strong>CSS dedupe & layout hardening</strong>: one scroller owns overflow (<code>min-height:0</code> grid fixes), fewer duplicate rules, and HMR-safe animations<br>
+        – 📖 <strong>Lore mode expansion</strong>: added “Festival lore” (Hypotenuse Gate beat), “Who is Grampy P?” identity blurb, and a lightweight “lore joke” path; all use the new card/footer pattern (“Would you like to know more?”) with polished copy<br>
+        – 🎵 <strong>MathTips music flow</strong>: reliable one-tap Howler unlock, <code>kittyPaws</code> auto-resume on re-entry, loop toggled on enter/exit, and stop only if the current track belongs to this mode; mute UI stays in sync<br>
         – 🏆 <strong>Legend badge</strong>: auto-awards once all non-legend badges are unlocked (95%), adds the final 5% for 100% completion<br>
         – 📊 <strong>Completion system simplified</strong>: badge-driven only (95% non-legend + 5% legend); XP still fuels levels but no longer affects completion<br>
         – 🗨️ <strong>“Grampy P” badge</strong>: first chat in Math Tips Village (working + persisted)<br>
-        – 🎵 <strong>“Play Music” badge</strong>: awarded on first jukebox play (manual, not auto-play)<br>
-        – 🎨 <strong>“Change Theme” badge</strong>: unlocked via first non-default theme change (MobX reaction)<br>
-        – 🎪 <strong>“Tour” badge</strong>: awarded once all major modes (QS, Infinity, Kids, Story, Tips) have been sampled<br>
-        – 🏕️ <strong>Kids Camping set</strong>: cars ≤60s, camp score ≥10k, first mosquito swat, ants streak ≥10, all tents lit — all event-driven, idempotent<br>
-        – 🅿️ <strong>Parking mini-game</strong>: fixed celebration flow, time freeze, and <code>kcParkingComplete</code> dispatch<br>
-        – 🐜 <strong>Ant streak badge</strong>: corrected ID to <code>kids_ants_streak10</code>; now fires properly at ≥10 margin<br>
-        – 🔊 <strong>Audio</strong>: one-tap Howler unlock stable; mute toggle synced; consistent SFX playback across games<br>
-        – 💾 <strong>Persistence</strong>: autosave via MobX autorun; badge unlocks and progress persist correctly across reloads<br>
-        – 🧯 <strong>Cleanup</strong>: all event listeners/timers unwired on exit; HMR-safe one-shot guards in each mode<br>
-        – 🧪 <strong>QA checklist expanded</strong>: music, theme, Grampy P chat, mode tour, Camping set, ant streak, legend completion<br>
-        – 🚧 <strong>Next</strong>: wire Infinity/QuickServe milestone badges (end-of-run triggers); add unlock confetti/banner polish<br>
       </p>
+
     </div>
 
     <div class="settings-block">

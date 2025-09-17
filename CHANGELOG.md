@@ -9,6 +9,7 @@
 * ✅ **v0.8.0 – Story Mode Prologue Finished**
 * ✅ **v0.8.8 – The Grampy P Badge**
 * ✅ **v0.9.0 – Legendary Badges/Badge/Theme Implemented****
+* ✅ **v0.9.0.5 – MathTips Village Kitty Paws**
 * 🔜 **v0.9.1 – MathTips Village Complete/Polished**
 * 🔜 **v0.9.2 – QuickServe Pavillion Complete/Polished**
 * 🔜 **v0.9.3 – Infinity Lake Complete/Polished**
@@ -21,6 +22,56 @@
 * 🎯 **v1.0.0 – Final Polish + Launch Ready✨**
 
 ---
+
+## v0.9.0.5 — *“Math Tips Village: Kitty Paws & Polish”* (September 16, 2025)
+
+### 🧠 Math Tips Village — UI/UX Refresh
+
+* **Full-bleed background** restored (11:16 aspect wrapper; intro + main share center/contain rules).
+* **Single chat scroller** that hugs the bottom (no nested scroll areas); `min-height: 0` grid fix prevents scroll-trap.
+* **Header cleanup:** title is **text-only** (“Math Tips Village”) — no panel/border — neon glow preserved.
+* **Response patterns:** added `.mt-response-card`, `.mt-response-list`, `.mt-lecture-card`; tidy inline `code` styling.
+* **Softer motion:** bottom-up pop animation, tightened spacing, consistent Orbitron font; mobile scrollbars hidden when appropriate.
+* **Safe-area polish:** respects `env(safe-area-inset-bottom)`; tap targets sized with `clamp()`.
+
+### 🎛️ Bottom Utility Bar (Story-Parity)
+
+* Pinned **Back** (left), **Mute** (right), **Copy/Export** centered.
+* Fixed pointer-events so center actions are clickable on **intro** and **main** screens.
+* Chat input never overlaps the bar on short devices.
+
+### 🎵 “Kitty Paws” Music Flow
+
+* **Reliable re-entry playback**: one-tap Howler unlock + guarded `__mtMusicStarted`; auto-resume on entering Math Tips.
+* **Loop discipline:** loop enabled on enter; **stop only if** current track is Math Tips; loop state reset on exit.
+* **Mute UI** stays in sync with Howler’s mute state.
+
+### 📖 Lore Additions
+
+* **Festival lore** (Hypotenuse Gate beat) delivered via mini-lecture card.
+* **“Who is Grampy P?”** identity blurb aligned to the new response layout.
+* Light **lore joke** path; shared “Would you like to know more?” footer.
+
+### 🧼 Dedupe & Cleanup
+
+* **CSS deduped**: single source of truth for `.mt-grid`, `.mt-content`, `.chat-window`.
+* **One scroller owns overflow**; grid parents use `min-height: 0`.
+* **Event wiring hardened**: single global Back/Mute handler, full unwire on exit, HMR-safe guards.
+
+### 🧪 QA Checklist (v0.9.0.5)
+
+* Background shows on **intro and main**; header has **no box**.
+* Enter Tips → **Kitty Paws** plays; leave & re-enter → **plays once** (no double-start).
+* Mute toggles icon/state correctly from both screens.
+* Chat stacks top→bottom, smooth pop-in; scroller stays at bottom for short logs.
+* **Copy** copies transcript text; **Export** calls `appState.exportChatLogs()`.
+
+### 📌 Dev Notes
+
+> *“One scroller, a real bottom bar, and music that respects your vibe on re-entry. Cards and lists give lessons + lore a steady voice, and the header is finally just glow on night.”*
+
+
+____
 
 ## v0.9.0 — *“Legendary Badges”* (September 4, 2025)
 
