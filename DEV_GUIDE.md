@@ -113,6 +113,14 @@ git add -A
 git commit -m "🌈 Locking in current dev state"
 git push origin main
 ```
+
+```bash
+git add -A
+git commit -m "🌈 Locking in current dev state" --no-verify
+git push origin main --no-verify
+```
+
+
 feat: transition system + startup screen + mode launch polish
 ---
 

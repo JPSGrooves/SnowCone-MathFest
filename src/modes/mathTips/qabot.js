@@ -8,6 +8,27 @@ import { renderBoothsHelp } from './modes/status.js';
 
 // route directly through the registry we export
 import * as MODEx from './modes/index.js'; // ensure this is at top
+import { runInAction } from 'mobx';
+
+const act = (fn) => { try { runInAction(fn); } catch { fn(); } };
+
+
+
+// Layered booth menu card used by fallbacks/help (no extra "Alright, friend..." ack)
+// ⬇️ Replace your boothMenuCard with this
+function boothMenuHTML(lead = 'Here’s the map — wanna jump into a booth?') {
+  return `
+    <p>${html(lead)}</p>
+    <ul class="mt-menu">
+      <li>lessons booth</li>
+      <li>quiz booth</li>
+      <li>lore booth</li>
+      <li>recipes booth</li>
+      <li>calculator booth</li>
+    </ul>
+    <p class="mt-dim">Say one of those and I’ll get you going.</p>
+  `;
+}
 
 
 function callMode(modeKey, text, extra = {}) {
@@ -89,22 +110,42 @@ function pick(arr) {
 function n(x, d = 0) { const v = +x; return Number.isFinite(v) ? v : d; }
 
 // Bot-context stash
+function ensureProgressRoot(app = appState) {
+  // read fast path
+  const have = app?.progress?.mathtips?.botContext;
+  if (have) return have;
+
+  // create missing branches inside an action
+  runInAction(() => {
+    if (!app.progress) app.progress = {};
+    if (!app.progress.mathtips) app.progress.mathtips = {};
+    if (!app.progress.mathtips.botContext) app.progress.mathtips.botContext = {};
+  });
+  return app.progress.mathtips.botContext;
+}
+
 function ensureBC() {
-  if (!appState.progress) appState.progress = {};
-  if (!appState.progress.mathtips) appState.progress.mathtips = {};
-  if (!appState.progress.mathtips.botContext) appState.progress.mathtips.botContext = {};
+  act(() => {
+    if (!appState.progress) appState.progress = {};
+    if (!appState.progress.mathtips) appState.progress.mathtips = {};
+    if (!appState.progress.mathtips.botContext) appState.progress.mathtips.botContext = {};
+  });
   return appState.progress.mathtips.botContext;
 }
+
 function setPendingSwitch(toMode, lastText) {
   const bc = ensureBC();
-  bc.pendingSwitch = { to: toMode, at: Date.now(), lastText: String(lastText || '') };
+  act(() => { bc.pendingSwitch = { to: toMode, at: Date.now(), lastText: String(lastText || '') }; });
 }
+
 function consumePendingSwitch() {
   const bc = ensureBC();
   const p = bc.pendingSwitch || null;
-  bc.pendingSwitch = null;
+  act(() => { bc.pendingSwitch = null; });
   return p;
 }
+
+
 function isAffirmative(s) { return /\b(yes|yep|yeah|sure|ok|okay|do it|go|switch|please|y)\b/i.test(s); }
 function isNegative(s) { return /\b(no|nah|nope|stay|hold|not now|keep|later|n)\b/i.test(s); }
 
@@ -221,11 +262,14 @@ function adaptModeOutput(out, userText, intentTag) {
     (typeof out === 'string') ? out :
     String(out ?? '');
 
-  // For booths: render exactly like lore (single card), no global ack
+  // For booths: render like lore (single card), no global ack.
+  // BUT: don't double-wrap if the booth already returned a card.
   if (boothy) {
-    const cardHTML = `<div class="mt-response-card">${innerHTML}</div>`;
-    return { html: cardHTML, meta: { intent: intentTag } };
+    if (isAlreadyLayered(innerHTML)) {
+      return { html: innerHTML, meta: { intent: intentTag } };
+    }
   }
+
 
   // Non-booth: keep your persona wrapper & ask flow
   if (typeof out === 'object' && 'html' in out) {
@@ -257,6 +301,14 @@ function adaptModeOutput(out, userText, intentTag) {
 function renderRouterResultToHTML(routerRes, userText) {
   if (!routerRes || typeof routerRes !== 'object') return null;
 
+  // NEW: if a booth already produced HTML (layered card, etc.), just pass it through.
+  if (typeof routerRes.html === 'string' && routerRes.html.trim()) {
+    return {
+      html: routerRes.html,
+      meta: { intent: 'router' }
+    };
+  }
+
   const pieces = [];
   if (routerRes.text) pieces.push(paraWrap(html(routerRes.text)));
 
@@ -273,7 +325,6 @@ function renderRouterResultToHTML(routerRes, userText) {
 
   if (!pieces.length) return null;
 
-  // We don't know the intent here; adaptor will add it.
   const merged = pieces.join('');
   const finalHtml = wrapLayerCard(merged, { tone: 'cyan' });
 
@@ -291,19 +342,39 @@ function renderRouterResultToHTML(routerRes, userText) {
 function routeUtterance(utterance) {
   const cmd = interpret(utterance);
   if (cmd) {
-    if (cmd === 'help') return { text: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>` };
+    if (cmd === 'help') {
+      return {
+        html: composeReply({
+          userText: utterance,
+          part: { kind: 'answer', html: boothMenuHTML("Here’s the map — wanna jump into a booth?") },
+          askAllowed: false,
+          noAck: true
+        })
+      };
+    }
     if (cmd === 'exit') { setMode(MODES.none); return { text: '<p>👋 Back to the village center. Say help for options.</p>' }; }
     if (cmd === 'quiz fractions 3') { setMode(MODES.quiz); return MODEx.quiz.start({ topic: 'fractions', count: 3 }); }
     if (cmd === 'quiz percent 3') { setMode(MODES.quiz); return MODEx.quiz.start({ topic: 'percent', count: 3 }); }
   }
+
   const mode = getMode();
-  if (mode === MODES.lessons) return callMode('lessons', utterance, {}) || { text: '' };
-  if (mode === MODES.quiz) return callMode('quiz', utterance, {}) || { text: '' };
-  if (mode === MODES.lore) return callMode('lore', utterance, {}) || { text: '' };
-  if (mode === MODES.recipes) return callMode('recipes', utterance, {}) || { text: '' };
-  if (mode === MODES.calculator) return callMode('calculator', utterance, {}) || { text: '' };
-  return { text: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>` };
+  if (mode === MODES.lessons)    return callMode('lessons',    utterance, {}) || { html: '' };
+  if (mode === MODES.quiz)       return callMode('quiz',       utterance, {}) || { html: '' };
+  if (mode === MODES.lore)       return callMode('lore',       utterance, {}) || { html: '' };
+  if (mode === MODES.recipes)    return callMode('recipes',    utterance, {}) || { html: '' };
+  if (mode === MODES.calculator) return callMode('calculator', utterance, {}) || { html: '' };
+
+  // ⬇️ default: also return a composed bubble (not a layered card)
+  return {
+    html: composeReply({
+      userText: utterance,
+      part: { kind: 'answer', html: boothMenuHTML("Here’s the map — wanna jump into a booth?") },
+      askAllowed: false,
+      noAck: true
+    })
+  };
 }
+
 
 
 
@@ -333,12 +404,18 @@ export function getResponse(userText, appStateLike = appState) {
   const t = text.toLowerCase().trim();
   const userName = appStateLike?.profile?.name || 'traveler';
   // 🔑 stable per-chat id; persists in appState to keep booth state
-  if (!appStateLike?.progress) appStateLike.progress = {};
-  if (!appStateLike.progress.mathtips) appStateLike.progress.mathtips = {};
-  const SESSION_ID =
-    appStateLike.progress.mathtips.sessionId ||
-    (appStateLike.progress.mathtips.sessionId =
-      `mt-${Date.now()}-${Math.random().toString(36).slice(2,8)}`);
+  // stable per-chat id
+  act(() => {
+    if (!appStateLike.progress) appStateLike.progress = {};
+    if (!appStateLike.progress.mathtips) appStateLike.progress.mathtips = {};
+    if (!appStateLike.progress.mathtips.sessionId) {
+      appStateLike.progress.mathtips.sessionId =
+        `mt-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+    }
+  });
+  const SESSION_ID = appStateLike.progress.mathtips.sessionId;
+
+
 
 
   // 0a) Handle pending booth switch
@@ -404,16 +481,14 @@ export function getResponse(userText, appStateLike = appState) {
     return {
       html: composeReply({
         userText: text,
-        part: {
-          kind: 'answer',
-          html: `<p>Sorry, not on my wave length of understanding...Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!<br/>Say one of those and I'll get you going.</p>`
-        },
+        part: { kind: 'answer', html: boothMenuHTML() },
         askAllowed: false,
         noAck: true
       }),
       meta: { intent: 'help' }
     };
   }
+
 
   if (t === 'exit' || t === '/exit') {
     setMode(MODES.none);
@@ -662,7 +737,7 @@ export function getResponse(userText, appStateLike = appState) {
         }
       case 'math_general':
         setMode(MODES.lessons);
-        return adaptModeOutput(MODEx.lessons.handle(text), text, 'booth:lessons');
+        return adaptModeOutput(MODEx.lessons.start({ userText: text }), text, 'booth:lessons');
       case 'quiz_fractions': {
         setMode(MODES.quiz);
         const out = callMode('quiz', 'start fractions 3', { topic: 'fractions', count: 3, userText: text }) || MODEx.quiz?.start?.({ topic: 'fractions', count: 3, userText: text });
@@ -706,41 +781,50 @@ export function getResponse(userText, appStateLike = appState) {
           };
         }
       }
-      default:
-        line = `<p>Sorry, not on my wave length, ${userName}. Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!</p>`;
-    }
-    return {
-      html: composeReply({
-        userText: text,
-        part: { kind: 'answer', html: line },
-        askAllowed: true
-      }),
-      meta: { intent: guess }
+
+      default: {
+        const htmlBlock = boothMenuHTML(`Wanna jump into a booth, ${userName}?`);
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: htmlBlock },
+            askAllowed: true
+          }),
+          meta: { intent: 'fallback' }
+        };
+      }
     };
   }
+
 
   // 2) Router fallback
   try {
     const routed = routeUtterance(text);
+
+    // ⬇️ If routeUtterance already returned a composed bubble, just use it.
+    if (routed && typeof routed.html === 'string' && routed.html) {
+      return { html: routed.html, meta: { intent: 'router' } };
+    }
+
     const adapted = renderRouterResultToHTML(routed, text);
     if (adapted && adapted.html) return adapted;
   } catch (e) {
     console.warn('[router adapter] fell through:', e);
   }
 
+
   // 3) Final fallback
   return {
     html: composeReply({
       userText: text,
-      part: {
-        kind: 'answer',
-        html: `<p>Sorry, not on my wave length, ${userName}. Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!</p>`
-      },
-      askAllowed: false,   // no follow-up ack bubble
+      part: { kind: 'answer', html: boothMenuHTML(`Wanna jump into a booth, ${userName}?`) },
+      askAllowed: false,
       noAck: true
     }),
     meta: { intent: 'fallback' }
   };
+
+
 }
 
 // Scrolling logic
