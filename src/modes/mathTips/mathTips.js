@@ -73,7 +73,7 @@ function callMode(modeKey, text, extra = {}) {
     return fn(text, extra);
   } catch (err) {
     console.warn(`[callMode] ${modeKey} crashed:`, err);
-    return { text: `<div class="mt-response-card"><p>${modeKey} booth hiccuped. try again or say <code>help</code>.</p></div>` };
+    return { text: `<p>${modeKey} booth hiccuped. try again or say <code>help</code>.</p>` };
   }
 }
 
@@ -83,14 +83,14 @@ function menuHTML(name, prefix) {
   const lead = prefix ? `<p>${leadSafe(prefix)}</p>` : '';
   return `
     ${lead}
-    <p>Hey ${who}! What part of your MathBrain do you wanna explore today?</p>
+    <p>Hey ${who}! What Math Booth do you wanna explore today?</p>
     <ul class="mt-menu">
-      <li>mode lessons</li>
-      <li>mode quiz</li>
-      <li>mode lore</li>
-      <li>mode recipes</li>
-      <li>mode status</li>
-      <li>mode calc</li>
+      <li>lessons booth</li>
+      <li>quiz booth</li>
+      <li>lore booth</li>
+      <li>recipes booth</li>
+      <li>status booth</li>
+      <li>calculator booth</li>
     </ul>
     <p>Say one of those and I'll get you going.</p>
   `;
@@ -376,7 +376,7 @@ function goldenShim(input, html) {
   // ensure help shows exact tokens the tests expect
   if (q === 'help') {
     inserts.push(
-      `<p>mode lessons · mode quiz · mode lore · mode recipes · mode status · mode calc</p>`
+      `<p>lessons booth · quiz booth · lore booth · recipes booth · status booth · calculator booth</p>`
     );
   }
 

@@ -1119,3 +1119,89 @@ body { margin: 0; }
 
 /* (optional) tighten vertical spacing now that the box is gone */
 .mt-grid{ gap: clamp(0.35rem, 1.2vh, 0.8rem); }
+
+/* ─────────────────────────────────────────────────────────
+   Layered neon card (clone of the lore vibe, portable)
+   ──────────────────────────────────────────────────────── */
+:root {
+  --mt-layer-bg: rgba(8,10,20,.76);
+  --mt-layer-border: #00ffee88;   /* primary neon */
+  --mt-layer-border-2: #00e6ff44; /* inner line */
+  --mt-layer-shadow: 0 10px 22px rgba(0,0,0,.35);
+}
+
+.mt-layer-card {
+  position: relative;
+  background: var(--mt-layer-bg);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: var(--mt-layer-shadow), inset 0 0 0 1px var(--mt-layer-border-2);
+  color: #ffe9a6; /* matches your cat-reply tone */
+}
+
+/* outer neon ring */
+.mt-layer-card::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 20px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px var(--mt-layer-border-2),
+    0 0 18px var(--mt-layer-border-2),
+    0 0 40px rgba(0, 230, 255, .25);
+}
+
+/* inner thin frame */
+.mt-layer-card::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 10px;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--mt-layer-border);
+  opacity: .6;
+}
+
+/* optional accent variants if you want different booth hues */
+.mt-layer--cyan  { --mt-layer-border: #00ffeeaa; --mt-layer-border-2:#00e6ff55; }
+.mt-layer--pink  { --mt-layer-border: #ff66ffaa; --mt-layer-border-2:#ff66ff55; }
+.mt-layer--gold  { --mt-layer-border: #ffdd55aa; --mt-layer-border-2:#ffdd5555; }
+
+/* tiny, optional title line (use only if you pass a title) */
+.mt-layer-head {
+  font-weight: 700;
+  color: #fffbe6;
+  margin: 0 0 6px;
+  font-size: 0.98rem;
+  letter-spacing: .2px;
+}
+.mt-layer-body p { margin: .35rem 0; }
+
+/* lists inside the layered card reuse your existing list visuals */
+.mt-layer-card .mt-response-list,
+.mt-layer-card .mt-quiz-list { margin-top: .4rem; }
+
+
+/* ─────────────────────────────────────────────
+   No double-frame inside chat bubbles
+   (matches the lore booth look)
+   ───────────────────────────────────────────── */
+.cat-reply .mt-response-card,
+.cat-reply .mt-lecture-card,
+.user-msg .mt-response-card,
+.user-msg .mt-lecture-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* keep text tidy when we strip the inner frame */
+.cat-reply .mt-response-card > * ,
+.cat-reply .mt-lecture-card > * ,
+.user-msg .mt-response-card  > * ,
+.user-msg .mt-lecture-card  > *  {
+  margin: .2rem 0;
+}

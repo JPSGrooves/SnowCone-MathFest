@@ -9,6 +9,7 @@ import { renderBoothsHelp } from './modes/status.js';
 // route directly through the registry we export
 import * as MODEx from './modes/index.js'; // ensure this is at top
 
+
 function callMode(modeKey, text, extra = {}) {
   const mod = MODEx[modeKey];
   if (!mod) return { text: `<p>${modeKey} booth not found.</p>` };
@@ -132,6 +133,32 @@ function simplifyFractionText(a, b) {
   const g = gcd(a, b); return `${a}/${b} → ${a/g}/${b/g}`;
 }
 
+// ========== Layered card helpers (clone lore look for other booths) ==========
+function isAlreadyLayered(s) {
+  const str = String(s || '');
+  // don't double-wrap if a booth already emits a formatted block
+  return /class="(?:mt-layer-card|mt-lecture-card|mt-response-card)\b/.test(str);
+}
+function isBlockyHtml(s) {
+  return /^<(div|ul|ol|section|article|aside)\b/i.test(String(s || '').trim());
+}
+function paraWrap(s) {
+  const t = String(s || '').trim();
+  if (!t) return '';
+  if (isBlockyHtml(t)) return t;
+  if (/^<p[\s>]/i.test(t) && /<\/p>\s*$/.test(t)) return t;
+  return `<p>${t}</p>`;
+}
+function wrapLayerCard(inner, { tone = 'cyan', title = '' } = {}) {
+  const head = title ? `<div class="mt-layer-head">${html(title)}</div>` : '';
+  return `<div class="mt-layer-card mt-layer--${tone}"><div class="mt-layer-body">${head}${paraWrap(inner)}</div></div>`;
+}
+function shouldBypassLayer(intentTag) {
+  // leave lore completely alone; it already has its perfected presentation
+  return typeof intentTag === 'string' && /(^|:)lore\b/.test(intentTag);
+}
+
+
 // Intent scoring
 function scoreIntent(input) {
   const lower = input.toLowerCase();
@@ -186,19 +213,21 @@ function maybeOffTopicRedirect(userText, currentMode) {
 function adaptModeOutput(out, userText, intentTag) {
   if (!out) return null;
 
-  // string → wrap once as a single card
-  if (typeof out === 'string') {
-    return {
-      html: composeReply({
-        userText,
-        part: { kind: 'answer', html: out },
-        askAllowed: true
-      }),
-      meta: { intent: intentTag }
-    };
+  const boothy = isBoothIntent(intentTag);
+
+  // Normalize inner html regardless of shape
+  const innerHTML =
+    (typeof out === 'object' && out && 'html' in out) ? String(out.html ?? '') :
+    (typeof out === 'string') ? out :
+    String(out ?? '');
+
+  // For booths: render exactly like lore (single card), no global ack
+  if (boothy) {
+    const cardHTML = `<div class="mt-response-card">${innerHTML}</div>`;
+    return { html: cardHTML, meta: { intent: intentTag } };
   }
 
-  // object from a booth: respect fields if present
+  // Non-booth: keep your persona wrapper & ask flow
   if (typeof out === 'object' && 'html' in out) {
     return {
       html: composeReply({
@@ -212,48 +241,52 @@ function adaptModeOutput(out, userText, intentTag) {
     };
   }
 
-  // router-shaped (text/deck)
-  const adapted = renderRouterResultToHTML(out, userText);
-  if (adapted) {
-    adapted.meta = Object.assign({ intent: intentTag }, adapted.meta || {});
-    return adapted;
-  }
-
-  // last resort
+  // String → simple composer-wrapped answer w/ ask
   return {
     html: composeReply({
       userText,
-      part: { kind: 'answer', html: String(out) },
+      part: { kind: 'answer', html: innerHTML },
       askAllowed: true
     }),
     meta: { intent: intentTag }
   };
 }
 
+
 // Router adapter
 function renderRouterResultToHTML(routerRes, userText) {
   if (!routerRes || typeof routerRes !== 'object') return null;
-  const lines = [];
-  if (routerRes.text) lines.push(html(routerRes.text));
+
+  const pieces = [];
+  if (routerRes.text) pieces.push(paraWrap(html(routerRes.text)));
+
   if (Array.isArray(routerRes.deck) && routerRes.deck.length) {
-    const qs = routerRes.deck.map((q, i) => {
+    const quizish = /quiz|fraction|percent|practice/i.test(routerRes.text || '');
+    const cls = quizish ? 'mt-quiz-list' : 'mt-response-list';
+    const rows = routerRes.deck.map((q, i) => {
       const num = i + 1;
-      const prompt = html(q?.prompt ?? '');
-      return `<div class="mt-response-item">Q${num}. ${prompt}</div>`;
+      const txt = html(q?.prompt ?? q?.text ?? q ?? '');
+      return `<div class="${quizish ? 'mt-quiz-item' : 'mt-response-item'}">Q${num}. ${txt}</div>`;
     }).join('');
-    lines.push(`<div class="mt-response-list">${qs}</div>`);
+    pieces.push(`<div class="${cls}">${rows}</div>`);
   }
-  const merged = lines.join('<br/>');
-  if (!merged) return null;
+
+  if (!pieces.length) return null;
+
+  // We don't know the intent here; adaptor will add it.
+  const merged = pieces.join('');
+  const finalHtml = wrapLayerCard(merged, { tone: 'cyan' });
+
   return {
     html: composeReply({
       userText,
-      part: { kind: 'answer', html: merged },
+      part: { kind: 'answer', html: finalHtml },
       askAllowed: true
     }),
     meta: { intent: 'router' }
   };
 }
+
 
 function routeUtterance(utterance) {
   const cmd = interpret(utterance);
@@ -454,7 +487,7 @@ export function getResponse(userText, appStateLike = appState) {
         return {
           html: composeReply({
             userText: text,
-            part: { kind: 'answer', html: `<p>${pcent.p}% of ${pcent.n} is ${pcent.ans}.</p>` }
+            part: { kind: 'answer', html: wrapLayerCard(`<p>${pcent.p}% of ${pcent.n} is ${pcent.ans}.</p>`) }
           }),
           meta: { intent: 'calc-inline', topic: 'calculator' }
         };
@@ -465,7 +498,7 @@ export function getResponse(userText, appStateLike = appState) {
           return {
             html: composeReply({
               userText: text,
-              part: { kind: 'answer', html: `<p>${t} = ${result}</p>` }
+              part: { kind: 'answer', html: wrapLayerCard(`<p>${t} = ${result}</p>`) }
             }),
             meta: { intent: 'calc-inline', topic: 'calculator' }
           };
@@ -703,7 +736,8 @@ export function getResponse(userText, appStateLike = appState) {
         kind: 'answer',
         html: `<p>Sorry, not on my wave length, ${userName}. Wanna jump into a booth?<br/>lessons booth<br/>quiz booth<br/>lore booth<br/>recipes booth<br/>calculator booth<br/>or type help to understand me better!</p>`
       },
-      askAllowed: true
+      askAllowed: false,   // no follow-up ack bubble
+      noAck: true
     }),
     meta: { intent: 'fallback' }
   };
@@ -726,4 +760,12 @@ export function attachAutoScroller(containerId = 'chat-window') {
   mo.observe(el, { childList: true, subtree: true });
   scrollToBottom();
   return () => mo.disconnect();
+}
+// Treat these as "booth-style" responses that should render as a single card (no global ack)
+function isBoothIntent(tag = '') {
+  return /^booth:/.test(tag)            // booth:lessons, booth:quiz, booth:lore, booth:recipes, booth:calculator
+      || tag === 'quiz_start'           // initial quiz deck
+      || tag === 'calc-inline'          // inline calc while inside a booth
+      || tag === 'percent'              // percent inline while inside a booth
+      || tag === 'router';              // router/deck blocks we render as a card
 }
