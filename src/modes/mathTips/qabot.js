@@ -10,6 +10,8 @@ import { renderBoothsHelp } from './modes/status.js';
 import * as MODEx from './modes/index.js'; // ensure this is at top
 import { runInAction } from 'mobx';
 
+
+
 const act = (fn) => { try { runInAction(fn); } catch { fn(); } };
 
 
@@ -24,11 +26,13 @@ function boothMenuHTML(lead = 'Here’s the map — wanna jump into a booth?') {
       <li>quiz booth</li>
       <li>lore booth</li>
       <li>recipes booth</li>
+     <li>status booth</li>
       <li>calculator booth</li>
     </ul>
     <p class="mt-dim">Say one of those and I’ll get you going.</p>
   `;
 }
+
 
 
 function callMode(modeKey, text, extra = {}) {
@@ -59,11 +63,14 @@ const RESPONSES = {
     "Neon’s glowin’, syrup’s flowin’. I’m good!",
     "Powered by quesadillas and math vibes."
   ],
+  // before: "Ready to vibe, traveler? Try lessons booth or quiz fractions 3."
   who_are_you: [
     "I’m Pythagorus Cat, triangle sorcerer and snowcone sage.",
     "P-Cat, keeper of the hypotenuse, lover of melted cheese.",
     "Just a cosmic cat slingin’ math and good vibes."
   ],
+  // when you build the reply, use: “…try lessons booth or quiz fractions.” instead of “…3.”
+
   jokes: [
     "Why’d the obtuse angle skip the party? Never right.",
     "Parallel lines? So much in common, but they’ll never meet.",
@@ -363,6 +370,8 @@ function routeUtterance(utterance) {
   if (mode === MODES.lore)       return callMode('lore',       utterance, {}) || { html: '' };
   if (mode === MODES.recipes)    return callMode('recipes',    utterance, {}) || { html: '' };
   if (mode === MODES.calculator) return callMode('calculator', utterance, {}) || { html: '' };
+  if (mode === MODES.status)     return callMode('status',     utterance, {}) || { html: '' };
+
 
   // ⬇️ default: also return a composed bubble (not a layered card)
   return {
@@ -500,9 +509,21 @@ export function getResponse(userText, appStateLike = appState) {
       meta: { intent: 'exit' }
     };
   }
-  const m = t.match(/\b(lessons|quiz|lore|recipes|calculator)\s*booth\b/i);
-  if (m) {
-    const to = m[1];
+  // B) booth phrase guard: if already in that booth, don’t confirm/restart
+  const mBooth = t.match(/\b(lessons|quiz|lore|recipes|calculator)\s*booth\b/i);
+  if (mBooth) {
+    const to = mBooth[1];
+    const cur = getMode();
+
+    if (MODES[to] && cur === MODES[to]) {
+      // already here — re-emit current step instead of confirming
+      if (to === 'quiz' && MODEx.quiz?.handle) {
+        return adaptModeOutput(MODEx.quiz.handle('again', { sessionId: SESSION_ID }), text, 'booth:quiz');
+      }
+      const out = callMode(to, 'start', { sessionId: SESSION_ID });
+      return adaptModeOutput(out, text, `booth:${to}`);
+    }
+
     setPendingSwitch(to, text);
     return {
       html: composeReply({
@@ -514,8 +535,9 @@ export function getResponse(userText, appStateLike = appState) {
       meta: { intent: 'booth-switch', to }
     };
   }
-  const booth1 = t.match(/\b(lessons?|quiz|lore|recipes?|calculator)\s+(?:booth|room|kiosk|station)\b/);
-  const booth2 = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipes?|calculator)\s*(?:booth|room|kiosk|station)?\b/);
+
+  const booth1 = t.match(/\b(lessons?|quiz|lore|recipes?|calculator|status)\s+(?:booth|room|kiosk|station)\b/);
+  const booth2 = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipes?|calculator|status)\s*(?:booth|room|kiosk|station)?\b/);
   const norm = (w) => {
     if (!w) return null;
     if (/calculator/.test(w)) return 'calculator';
@@ -523,8 +545,10 @@ export function getResponse(userText, appStateLike = appState) {
     if (/quiz/.test(w)) return 'quiz';
     if (/lore|story|festival/.test(w)) return 'lore';
     if (/recipe/.test(w)) return 'recipes';
+    if (/status/.test(w)) return 'status';
     return null;
   };
+
   const toBooth = norm((booth1 && booth1[1]) || (booth2 && booth2[1]));
   if (toBooth) {
     setPendingSwitch(toBooth, text);
@@ -538,13 +562,19 @@ export function getResponse(userText, appStateLike = appState) {
       meta: { intent: 'booth-switch', to: toBooth }
     };
   }
-  const q = t.match(/\bquiz( me)?( on)?\s*(fractions?|percent)?\s*(\d+)?\b/);
-  if (q) {
-    const topic = /percent/.test(q[3] || '') ? 'percent' : (/frac/.test(q[3] || '') ? 'fractions' : 'fractions');
-    const count = q[4] ? parseInt(q[4], 10) : 3;
+  // A) direct start: "quiz fractions" (count optional; defaults to 3)
+  const mQuizStart = t.match(/^quiz(?:\s+(fractions?|percent))?(?:\s+(\d+))?$/i);
+  if (mQuizStart) {
+    const topic = (mQuizStart[1] || 'fractions');
+    const count = mQuizStart[2] ? Math.max(1, Math.min(5, parseInt(mQuizStart[2],10))) : 3;
     setMode(MODES.quiz);
-    return adaptModeOutput(MODEx.quiz.start({ topic, count, userText: text, sessionId: SESSION_ID }), text, 'quiz_start');
+    return adaptModeOutput(
+      MODEx.quiz.start({ topic, count, userText: text, sessionId: SESSION_ID }),
+      text,
+      'quiz_start'
+    );
   }
+
 
   // 0c) Algebra intercepts
   const alg = algebraIntercept(text);
@@ -827,24 +857,61 @@ export function getResponse(userText, appStateLike = appState) {
 
 }
 
-// Scrolling logic
-export function scrollToBottom() {
-  if (typeof document === 'undefined') return;
-  const chatWindow = document.querySelector('.chat-window');
-  if (chatWindow) {
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  }
+// qabot.js
+
+// Utility: are we near the bottom?
+function _isPinned(el, pad = 8) {
+  // how far from bottom in px
+  const gap = el.scrollHeight - (el.scrollTop + el.clientHeight);
+  return gap <= pad;
 }
 
+// Only export scrollToBottom for one-off programmatic jumps.
+export function scrollToBottom() {
+  const chatWindow = (typeof document !== 'undefined')
+    ? (document.querySelector('.chat-window') || document.getElementById('chat-window'))
+    : null;
+  if (!chatWindow) return;
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// Auto-scroller that *respects user scroll* (no “yo-yo” on phones)
 export function attachAutoScroller(containerId = 'chat-window') {
   if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
-  const el = document.getElementById(containerId) || document.querySelector('.chat-window');
+
+  const el =
+    document.getElementById(containerId) ||
+    document.querySelector('.chat-window');
   if (!el) return;
-  const mo = new MutationObserver(() => scrollToBottom());
+
+  // start pinned; user can unpin by scrolling up
+  let autoPin = true;
+
+  const onScroll = () => {
+    // user moved: only keep pinning if they’re still at/near bottom
+    autoPin = _isPinned(el);
+  };
+
+  // IMPORTANT on iOS: passive touch scroll listener
+  el.addEventListener('scroll', onScroll, { passive: true });
+
+  const mo = new MutationObserver(() => {
+    // only snap when pinned; otherwise respect the user’s scroll position
+    if (autoPin) el.scrollTop = el.scrollHeight;
+  });
+
   mo.observe(el, { childList: true, subtree: true });
-  scrollToBottom();
-  return () => mo.disconnect();
+
+  // initial pin to bottom on mount
+  el.scrollTop = el.scrollHeight;
+
+  // cleanup handle
+  return () => {
+    try { el.removeEventListener('scroll', onScroll); } catch {}
+    try { mo.disconnect(); } catch {}
+  };
 }
+
 // Treat these as "booth-style" responses that should render as a single card (no global ack)
 function isBoothIntent(tag = '') {
   return /^booth:/.test(tag)            // booth:lessons, booth:quiz, booth:lore, booth:recipes, booth:calculator

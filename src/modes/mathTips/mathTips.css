@@ -1205,3 +1205,62 @@ body { margin: 0; }
 .user-msg .mt-lecture-card  > *  {
   margin: .2rem 0;
 }
+/* Flatten layered neon cards when they live inside chat bubbles (no double frame) */
+.cat-reply .mt-layer-card,
+.user-msg .mt-layer-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Keep headings/body readable after flattening */
+.cat-reply .mt-layer-card .mt-layer-head,
+.user-msg .mt-layer-card .mt-layer-head { 
+  margin: 0 0 6px;
+}
+.cat-reply .mt-layer-card .mt-layer-body p,
+.user-msg .mt-layer-card .mt-layer-body p { 
+  margin: .35rem 0;
+}
+/* the only scrolling surface */
+.chat-window {
+  display: flex !important;
+  flex-direction: column !important;   /* top→bottom order */
+  justify-content: flex-start !important;
+  gap: .6rem;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;                       /* critical in CSS grid */
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;   /* iOS momentum */
+  touch-action: pan-y;                 /* prevents weird horizontal grabs */
+  overscroll-behavior: contain;        /* avoid rubber-band pulling parents */
+}
+
+/* parents must not choke the child scroller */
+.mt-game-frame,
+.mt-grid,
+.mt-content {
+  min-height: 0 !important;
+}
+
+/* grid lays out: chat (scrolls) | input (fixed) */
+.mt-content {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;                    /* parent clips; child scrolls */
+}
+
+/* when the intro fades, it must stop intercepting taps/scrolls */
+.mt-intro.fade-out {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity .4s ease, transform .4s ease;
+  pointer-events: none;                /* ← this is the fix */
+}
+
+/* if you still have any old reverse stacks, neutralize them */
+.chat-scroll { flex-direction: column !important; }
