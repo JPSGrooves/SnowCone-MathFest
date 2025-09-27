@@ -51,21 +51,17 @@ function pickTopic(t) {
 }
 
 function menuCard() {
-  return `
-    <div class="mt-layer-card mt-layer--cyan">
-      <div class="mt-layer-head">Lore Menu</div>
-      <div class="mt-layer-body">
-        <ul class="mt-response-list">
-          <li class="mt-response-item"><strong>festival</strong> — gates · cones · tunnels</li>
-          <li class="mt-response-item"><strong>origins</strong> — how it all began</li>
-          <li class="mt-response-item"><strong>pcat</strong> — yes/no myths</li>
-          <li class="mt-response-item"><strong>easter</strong> — secrets & unlocks</li>
-        </ul>
-        <p class="mt-dim">say a topic (“festival”, “origins”, “pcat”, “easter”) or <em>more</em> / <em>stop</em>.</p>
-      </div>
-    </div>
-  `;
-}
+   return `
+     <p><strong>Lore Menu</strong></p>
+     <ul class="mt-menu">
+       <li><strong>festival</strong> — gates · cones · tunnels</li>
+       <li><strong>origins</strong> — how it all began</li>
+       <li><strong>pcat</strong> — yes/no myths</li>
+       <li><strong>easter</strong> — secrets & unlocks</li>
+     </ul>
+     <p class="mt-dim">say a topic (“festival”, “origins”, “pcat”, “easter”) or <em>more</em> / <em>stop</em>.</p>
+   `;
+ }
 
 function currentList() {
   return LORE[Gate.topicKey] || LORE.festival;
@@ -74,26 +70,21 @@ function currentList() {
 function emitDrop(idx) {
   const arr = currentList();
   const i = Math.max(0, Math.min(idx, arr.length - 1));
-  const html = `<div class="mt-layer-card mt-layer--gold">${arr[i]}</div>`;
+  const html = `${arr[i]}`; // already <p>…</p> in content
   return composeReply({ part: { kind: 'answer', html }, askAllowed: true, mode: 'lore', noAck: true });
 }
 
 function endCard() {
   const html = `
-    <div class="mt-layer-card mt-layer--pink">
-      <div class="mt-layer-head">that’s the tale… for now</div>
-      <div class="mt-layer-body">
-        <p>pick another booth to keep rolling:</p>
-        <ul class="mt-response-list">
-          <li class="mt-response-item">lessons booth</li>
-          <li class="mt-response-item">quiz booth</li>
-          <li class="mt-response-item">lore booth</li>
-          <li class="mt-response-item">recipes booth</li>
-          <li class="mt-response-item">calculator booth</li>
-        </ul>
-        <p class="mt-dim">or just ask a math question.</p>
-      </div>
-    </div>
+    <p>that’s the tale… for now.</p>
+    <ul class="mt-response-list">
+      <li class="mt-response-item">lessons booth</li>
+      <li class="mt-response-item">quiz booth</li>
+      <li class="mt-response-item">lore booth</li>
+      <li class="mt-response-item">recipes booth</li>
+      <li class="mt-response-item">calculator booth</li>
+    </ul>
+    <p class="mt-dim">or just ask a math question.</p>
   `;
   return composeReply({ part: { kind: 'answer', html }, askAllowed: false, mode: 'lore', noAck: true });
 }

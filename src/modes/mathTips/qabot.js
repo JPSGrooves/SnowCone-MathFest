@@ -9,10 +9,28 @@ import { renderBoothsHelp } from './modes/status.js';
 // route directly through the registry we export
 import * as MODEx from './modes/index.js'; // ensure this is at top
 import { runInAction } from 'mobx';
+import * as quiz from './modes/quiz.js';
+import { classifySmallTalk, respondSmallTalk } from './smalltalk.js';
+
+
+const getSessionId = (app) =>
+  app?.progress?.mathtips?.sessionId   // ✅ use the same id quiz.js uses
+  || app?.profile?.id
+  || app?.sessionId
+  || 'default';
 
 
 
 const act = (fn) => { try { runInAction(fn); } catch { fn(); } };
+
+// ── Card detection (treat these as already "layered") ─────────────────
+// put this near other tiny helpers in mathTips.js
+export function alreadyHasCard(html = '') {
+  const s = String(html);
+  return /\bmt-(?:response|layer|lecture)-card\b/.test(s)
+      || /\bmt-quiz-list\b/.test(s)
+      || /\bbooth-card\b/.test(s);
+}
 
 
 
@@ -261,47 +279,58 @@ function maybeOffTopicRedirect(userText, currentMode) {
 function adaptModeOutput(out, userText, intentTag) {
   if (!out) return null;
 
-  const boothy = isBoothIntent(intentTag);
-
-  // Normalize inner html regardless of shape
-  const innerHTML =
-    (typeof out === 'object' && out && 'html' in out) ? String(out.html ?? '') :
-    (typeof out === 'string') ? out :
-    String(out ?? '');
-
-  // For booths: render like lore (single card), no global ack.
-  // BUT: don't double-wrap if the booth already returned a card.
-  if (boothy) {
-    if (isAlreadyLayered(innerHTML)) {
-      return { html: innerHTML, meta: { intent: intentTag } };
+  // case: booth returned a raw string
+  if (typeof out === 'string') {
+    // pass through if it's already a card
+    if (alreadyHasCard(out)) {
+      return { html: out, meta: { intent: intentTag, layered: true } };
     }
-  }
-
-
-  // Non-booth: keep your persona wrapper & ask flow
-  if (typeof out === 'object' && 'html' in out) {
+    // otherwise compose one clean card
     return {
       html: composeReply({
         userText,
-        part: { kind: 'answer', html: out.html },
-        askAllowed: out.askAllowed !== false,
-        askText: out.askText || '',
-        noAck: !!out.noAck
+        part: { kind: 'answer', html: out },
+        askAllowed: true
       }),
       meta: { intent: intentTag }
     };
   }
 
-  // String → simple composer-wrapped answer w/ ask
+  // case: booth returned an object { html }
+  if (out && typeof out.html === 'string') {
+    if (alreadyHasCard(out.html)) {
+      // don’t add ACK or nudge; let the booth card stand alone
+      return { html: out.html, meta: { intent: intentTag, layered: true } };
+    }
+    return {
+      html: composeReply({
+        userText,
+        part: { kind: 'answer', html: out.html },
+        askAllowed: true
+      }),
+      meta: { intent: intentTag }
+    };
+  }
+
+  // fallback stringification (rare)
+  const raw = String(out);
+  if (alreadyHasCard(raw)) {
+    return { html: raw, meta: { intent: intentTag, layered: true } };
+  }
   return {
     html: composeReply({
       userText,
-      part: { kind: 'answer', html: innerHTML },
+      part: { kind: 'answer', html: raw },
       askAllowed: true
     }),
     meta: { intent: intentTag }
   };
 }
+
+function replyCard(html) {
+  return composeReply({ part: { html }, askAllowed: false, noAck: true });
+}
+
 
 
 // Router adapter
@@ -424,8 +453,19 @@ export function getResponse(userText, appStateLike = appState) {
   });
   const SESSION_ID = appStateLike.progress.mathtips.sessionId;
 
-
-
+  // 🔒 Quiz takes precedence over everything (prevents Calculator hijack)
+  if (quiz.isActive?.(SESSION_ID)) {
+    return quiz.handle(text, { sessionId: SESSION_ID });
+  }
+  // 🔸 Small-talk intercept (lightweight, non-modal)
+  {
+    const st = respondSmallTalk(userText, {
+      name: appStateLike?.profile?.name || 'traveler'
+    });
+    if (st && st.html) {
+      return { html: st.html, meta: { intent: 'smalltalk' } };
+    }
+  }
 
   // 0a) Handle pending booth switch
   const bc0 = ensureBC();
@@ -586,8 +626,8 @@ export function getResponse(userText, appStateLike = appState) {
   if (currentMode !== MODES.none) {
 
     // 🔮 calculator is global: answer percents/expressions without switching
-    {
-      const pcent = tryPercentOf(t);
+      if (!quiz.isActive?.(SESSION_ID)) {
+        const pcent = tryPercentOf(t);
       if (pcent) {
         return {
           html: composeReply({
@@ -630,8 +670,8 @@ export function getResponse(userText, appStateLike = appState) {
 
 
   // 🔮 calculator is global: answer percent or safe expressions without switching modes
-  {
-    const p = tryPercentOf(t);
+    if (!quiz.isActive?.(SESSION_ID)) {
+      const p = tryPercentOf(t);
     if (p) {
       return {
         html: composeReply({
@@ -859,58 +899,56 @@ export function getResponse(userText, appStateLike = appState) {
 
 // qabot.js
 
-// Utility: are we near the bottom?
+// qabot.js
+
 function _isPinned(el, pad = 8) {
-  // how far from bottom in px
   const gap = el.scrollHeight - (el.scrollTop + el.clientHeight);
   return gap <= pad;
 }
 
-// Only export scrollToBottom for one-off programmatic jumps.
+// Only export scrollToBottom for one-off jumps.
 export function scrollToBottom() {
-  const chatWindow = (typeof document !== 'undefined')
+  const el = (typeof document !== 'undefined')
     ? (document.querySelector('.chat-window') || document.getElementById('chat-window'))
     : null;
-  if (!chatWindow) return;
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+  if (!el) return;
+  el.scrollTop = el.scrollHeight;
 }
 
-// Auto-scroller that *respects user scroll* (no “yo-yo” on phones)
+// Sticky auto-scroller that respects user scroll and layout reflows
 export function attachAutoScroller(containerId = 'chat-window') {
-  if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+  if (typeof document === 'undefined') return;
 
-  const el =
-    document.getElementById(containerId) ||
-    document.querySelector('.chat-window');
+  const el = document.getElementById(containerId) || document.querySelector('.chat-window');
   if (!el) return;
 
-  // start pinned; user can unpin by scrolling up
-  let autoPin = true;
+  // must be a normal top→bottom scroller
+  el.style.scrollBehavior = 'auto';
 
-  const onScroll = () => {
-    // user moved: only keep pinning if they’re still at/near bottom
-    autoPin = _isPinned(el);
-  };
-
-  // IMPORTANT on iOS: passive touch scroll listener
+  let pinned = true;
+  const onScroll = () => { pinned = _isPinned(el); };
   el.addEventListener('scroll', onScroll, { passive: true });
 
-  const mo = new MutationObserver(() => {
-    // only snap when pinned; otherwise respect the user’s scroll position
-    if (autoPin) el.scrollTop = el.scrollHeight;
-  });
+  const snap = () => { if (pinned) el.scrollTop = el.scrollHeight; };
 
+  // New: also react to size changes (images, fonts, async HTML)
+  const ro = (typeof ResizeObserver !== 'undefined') ? new ResizeObserver(snap) : null;
+  if (ro) ro.observe(el);
+
+  const mo = new MutationObserver(snap);
   mo.observe(el, { childList: true, subtree: true });
 
-  // initial pin to bottom on mount
-  el.scrollTop = el.scrollHeight;
+  // initial pin on mount
+  snap();
 
-  // cleanup handle
+  // cleanup
   return () => {
     try { el.removeEventListener('scroll', onScroll); } catch {}
     try { mo.disconnect(); } catch {}
+    try { ro && ro.disconnect(); } catch {}
   };
 }
+
 
 // Treat these as "booth-style" responses that should render as a single card (no global ack)
 function isBoothIntent(tag = '') {

@@ -38,6 +38,7 @@ function makeQs(topic='fractions', count=3) {
   return qs;
 }
 const normTopic = (s='') => /percent/i.test(s) ? 'percent' : 'fractions';
+const clampCount = (n) => Math.max(1, Math.min(5, n|0 || 3));
 
 /* ───────── correctness ───────── */
 function isCorrectAnswer(userText, q) {
@@ -62,34 +63,20 @@ function canonicalAnswerString(q) {
   return s;
 }
 
-/* ───────── UI helpers ───────── */
+/* ───────── UI helpers (plain bubbles) ───────── */
 const controlsLine = () =>
   `<p class="mt-dim">controls: <code>hint</code> · <code>skip</code> · <code>again</code> · <code>end quiz</code> · <code>menu</code></p>`;
 
 const menuCard = () => `
-  <div class="mt-layer-card mt-layer--cyan">
-    <div class="mt-layer-head">Quiz Menu</div>
-    <div class="mt-layer-body">
-      <ul class="mt-response-list">
-        <li class="mt-response-item"><strong>fractions</strong> — add small fractions</li>
-        <li class="mt-response-item"><strong>percent</strong> — percent of a number</li>
-      </ul>
-      <p class="mt-dim">start: <code>quiz fractions</code> or <code>quiz percent</code></p>
-    </div>
-  </div>
+  <p><strong>Quiz Menu</strong></p>
+  <ul class="mt-menu">
+    <li><strong>fractions</strong> — add small fractions</li>
+    <li><strong>percent</strong> — percent of a number</li>
+  </ul>
+  <p class="mt-dim">start: <code>quiz fractions</code> or <code>quiz percent</code></p>
 `;
-const qCard = (head, body) => `
-  <div class="mt-layer-card mt-layer--cyan">
-    <div class="mt-layer-head">${head}</div>
-    <div class="mt-layer-body">${body}${controlsLine()}</div>
-  </div>
-`;
-const endCard = (score,total,tail='') => `
-  <div class="mt-layer-card mt-layer--gold">
-    <div class="mt-layer-head">Quiz complete</div>
-    <div class="mt-layer-body"><p>Score ${score}/${total}.</p>${tail}</div>
-  </div>
-`;
+const qCard = (_head, body) => `${body}${controlsLine()}`;
+const endCard = (score,total,tail='') => `<p><strong>Quiz complete</strong> — ${score}/${total}.</p>${tail}`;
 
 /* ───────── public API ───────── */
 export function start({ topic, count=3, sessionId='default' } = {}) {
@@ -99,7 +86,7 @@ export function start({ topic, count=3, sessionId='default' } = {}) {
   }
   S.reset();
   const t = normTopic(topic);
-  const deck = makeQs(t, Math.max(1, Math.min(5, count|0)));
+  const deck = makeQs(t, clampCount(count));
   QUIZ_SESS.set(sessionId, { topic: t, idx: 0, deck, score: 0 });
 
   const q1 = deck[0];
@@ -114,13 +101,14 @@ export function handle(text = '', ctx = {}) {
   const msg = String(text || '').trim();
   const sessionId = ctx.sessionId || 'default';
 
+  // help + menu
   if (/^help\b/i.test(msg)) {
     const card = helpCard(
       'Quiz Help',
       [
         'start: "quiz fractions" or "quiz percent"',
-        'controls: hint · skip · again · end quiz · menu',
-        'answers: fractions (e.g., 5/6) or numbers (e.g., 7.5)'
+        'also works: "fractions", "fractions 4", "percent 5"',
+        'controls: hint · skip · again · end quiz · menu'
       ],
       'tip: say "exit" to leave the quiz booth.'
     );
@@ -129,20 +117,34 @@ export function handle(text = '', ctx = {}) {
   if (/^menu\b/i.test(msg)) {
     return { html: composeReply({ part:{ kind:'answer', html: menuCard() }, askAllowed:false, mode:'quiz', noAck:true }) };
   }
-  // allow restarting inside quiz: “quiz percent [N]”
-  const mStart = msg.match(/^quiz\b(?:\s+(fractions?|percent))?(?:\s+(\d+))?$/i);
-  if (mStart) {
-    const t = normTopic(mStart[1] || 'fractions');
-    const c = mStart[2] ? Math.max(1, Math.min(5, parseInt(mStart[2],10))) : 3;
+
+  // allow bare topic to start (e.g., "fractions" or "percent [N]")
+  const mTopicOnly = msg.match(/^(fractions?|percent)\b(?:\s+(\d+))?$/i);
+  if (mTopicOnly) {
+    const t = normTopic(mTopicOnly[1]);
+    const c = clampCount(parseInt(mTopicOnly[2] || '3', 10));
     return start({ topic: t, count: c, sessionId });
   }
+
+  // still support "quiz fractions [N]" and "start ..."
+  const mStart = msg.match(/^quiz\b(?:\s+(fractions?|percent))?(?:\s+(\d+))?$/i)
+             || msg.match(/^start\b(?:\s+(fractions?|percent))?(?:\s+(\d+))?$/i);
+  if (mStart) {
+    const t = normTopic(mStart[1] || 'fractions');
+    const c = clampCount(parseInt(mStart[2] || '3', 10));
+    return start({ topic: t, count: c, sessionId });
+  }
+
   if (/^end\s+quiz\b/i.test(msg)) {
     QUIZ_SESS.delete(sessionId);
     return { html: composeReply({ part:{ kind:'answer', html: `<p>quiz ended. want another booth?</p>` }, askAllowed:false, mode:'quiz', noAck:true }) };
   }
 
   const s = QUIZ_SESS.get(sessionId);
-  if (!s) return { html: composeReply({ part:{ kind:'answer', html: menuCard() }, askAllowed:false, mode:'quiz', noAck:true }) };
+  if (!s) {
+    // No active deck → show menu until they pick a topic
+    return { html: composeReply({ part:{ kind:'answer', html: menuCard() }, askAllowed:false, mode:'quiz', noAck:true }) };
+  }
 
   if (S?.shouldBlock?.(msg)) {
     return { html: composeReply({ part:{ html:`<p>one at a time, friend.</p>` }, askAllowed:false, noAck:true }) };
@@ -156,18 +158,22 @@ export function handle(text = '', ctx = {}) {
   }
 
   if (/^again\b/i.test(msg)) {
-    const head = `Quiz: ${s.topic}`;
     const body = `<p>Q${s.idx+1} of ${s.deck.length}: <strong>${q.prompt}</strong></p>`;
-    return { html: composeReply({ part:{ html: qCard(head, body) }, askAllowed:false, noAck:true }) };
+    return { html: composeReply({ part:{ html: qCard('Quiz', body) }, askAllowed:false, noAck:true }) };
   }
+
+  // ✅ FIXED: clean, separate paragraphs (no nested <p>)
   if (/^hint\b/i.test(msg)) {
-    const tip = (q.topic === 'fractions')
-      ? `<p>common denom: <code>${q.a}/${q.b} + ${q.c}/${q.d} = (${q.a}×${q.d} + ${q.c}×${q.b})/(${q.b}×${q.d})</code>. then simplify.</p>`
-      : `<p>formula: <code>p% of n = (p/100) × n</code>. plug in and multiply.</p>`;
-    const head = `Quiz: ${s.topic}`;
-    const body = `<p><em>hint:</em> ${tip}</p><p>Q${s.idx+1} of ${s.deck.length}: <strong>${q.prompt}</strong></p>`;
-    return { html: composeReply({ part:{ html: qCard(head, body) }, askAllowed:false, noAck:true }) };
+    const tipText = (q.topic === 'fractions')
+      ? `common denom: <code>${q.a}/${q.b} + ${q.c}/${q.d} = (${q.a}×${q.d} + ${q.c}×${q.b})/(${q.b}×${q.d})</code>. then simplify.`
+      : `formula: <code>p% of n = (p/100) × n</code>. plug in and multiply.`;
+    const body = `
+      <p><em>hint:</em> ${tipText}</p>
+      <p>Q${s.idx+1} of ${s.deck.length}: <strong>${q.prompt}</strong></p>
+    `;
+    return { html: composeReply({ part:{ html: qCard('Quiz', body) }, askAllowed:false, noAck:true }) };
   }
+
   if (/^skip\b/i.test(msg)) {
     s.idx++;
     const next = s.deck[s.idx];
@@ -176,9 +182,8 @@ export function handle(text = '', ctx = {}) {
       QUIZ_SESS.delete(sessionId);
       return { html: composeReply({ part:{ html }, askAllowed:true, askText:'another short set?', noAck:true }) };
     }
-    const head = `Quiz: ${s.topic}`;
     const body = `<p><span class="mt-dim">skipped.</span></p><p>Q${s.idx+1} of ${s.deck.length}: <strong>${next.prompt}</strong></p>`;
-    return { html: composeReply({ part:{ html: qCard(head, body) }, askAllowed:false, noAck:true }) };
+    return { html: composeReply({ part:{ html: qCard('Quiz', body) }, askAllowed:false, noAck:true }) };
   }
 
   // grade
@@ -186,7 +191,8 @@ export function handle(text = '', ctx = {}) {
   if (ok) s.score++;
   s.idx++;
 
-  const feedback = ok ? '✅ correct.' : `❌ close. answer was <code>${canonicalAnswerString(q)}</code>.`;
+  const feedback = ok ? '✅ correct.' : `❌ close — answer: <code>${canonicalAnswerString(q)}</code>.`;
+
   const next = s.deck[s.idx];
   if (!next) {
     const html = endCard(s.score, s.deck.length, `<p>${feedback}</p>`);
@@ -199,9 +205,14 @@ export function handle(text = '', ctx = {}) {
     return { html: composeReply({ part:{ kind:'answer', html }, askAllowed:true, mode:'quiz', noAck:true }) };
   }
 
-  const html = qCard('Quiz: ' + s.topic, `
+  const html = qCard('Quiz', `
     <p>${feedback}</p>
     <p>Q${s.idx + 1} of ${s.deck.length}: <strong>${next.prompt}</strong></p>
   `);
   return { html: composeReply({ part:{ html }, askAllowed:false, noAck:true }) };
+}
+
+/* ───────── expose active state so router can prioritize quiz over calculator ───────── */
+export function isActive(sessionId='default') {
+  return QUIZ_SESS.has(sessionId);
 }

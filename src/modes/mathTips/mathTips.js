@@ -21,9 +21,13 @@ import {
   isPlaying,
 } from '../../managers/musicManager.js';
 
+import { attachAutoScroller, alreadyHasCard } from './qabot.js';
+import { composeReply } from './conversationPolicy.js';
+
 // === 🔥 Mode-local state (no globals)
 let inputEl, outputEl, sendBtn;
 let copyBtn, exportBtn;
+let detachAutoScroll; // cleanup handle returned by attachAutoScroller()
 
 let __mtMusicStarted = false; // prevents double-starts across re-renders
 
@@ -77,13 +81,23 @@ function callMode(modeKey, text, extra = {}) {
   }
 }
 
-// replace your current menuHTML with this version
+// layered card wrapper to match other replies
+function wrapLayer(inner, { tone = 'cyan', title = '' } = {}) {
+  const head = title ? `<div class="mt-layer-head">${leadSafe(title)}</div>` : '';
+  return `<div class="mt-layer-card mt-layer--${tone}">
+            <div class="mt-layer-body">${head}${inner}</div>
+          </div>`;
+}
+
+
 function menuHTML(name, prefix) {
   const who = (name || 'friend').trim() || 'friend';
-  const lead = prefix ? `<p>${leadSafe(prefix)}</p>` : '';
+  const lead = prefix ? `<p class="mt-dim">${leadSafe(prefix)}</p>` : '';
+
+  // plain markup (NO mt-layer-card wrapper) so it renders in the normal bot bubble
   return `
     ${lead}
-    <p>Hey ${who}! What Math Booth do you wanna explore today?</p>
+    <p><strong>Hey ${who}!</strong> What Math Booth do you wanna explore today?</p>
     <ul class="mt-menu">
       <li>lessons booth</li>
       <li>quiz booth</li>
@@ -92,9 +106,12 @@ function menuHTML(name, prefix) {
       <li>status booth</li>
       <li>calculator booth</li>
     </ul>
-    <p>Say one of those and I'll get you going.</p>
+    <p class="mt-dim">Say one of those and I'll get you going.</p>
   `;
 }
+
+
+
 function leadSafe(s){ return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function idkHTML() {
@@ -128,6 +145,8 @@ export function stopMathTips() {
   unwireIntroHandlers();
   unwireMainHandlers();
   unwireGlobalClick();
+  try { detachAutoScroll?.(); detachAutoScroll = null; } catch {}
+
 
   // 🎵 stop only if we’re actually in this mode’s track
   try {
@@ -203,13 +222,17 @@ function wireIntroHandlers() {
     MT.bootLock = true;
 
     const intro = document.querySelector('.mt-intro');
-    intro?.classList.add('fade-out');
-    setTimeout(() => {
-      renderMainUI();
-      wireMainHandlers();
-      MT.bootLock = false;
-    }, 420);
-  };
+  if (intro) {
+    intro.classList.add('fade-out');
+    intro.style.pointerEvents = 'none';
+  }
+  setTimeout(() => {
+    renderMainUI();
+    wireMainHandlers();
+    intro?.remove?.();      // 💡 remove the overlay after the transition
+    MT.bootLock = false;
+  }, 420);
+ };
 
   start?.addEventListener('click', MT.handlers.startIntro);
   wireGlobalClick();
@@ -277,6 +300,10 @@ function renderMainUI() {
   sendBtn   = document.getElementById('sendBtn');
   copyBtn   = document.getElementById('copyTranscript');
   exportBtn = document.getElementById('exportChatJson');
+
+  // 🔽 enable respectful auto-scroll (pinned to bottom until user scrolls up)
+  try { detachAutoScroll = attachAutoScroller('chatOutput'); } catch {}
+
 
   // 🎵 ensure MathTips soundtrack is running for this session
   try {
@@ -353,9 +380,21 @@ function unwireGlobalClick() {
 function startChat() {
   if (!outputEl) return;
   outputEl.innerHTML = '';
+
   const name = (appState?.profile?.name || appState?.playerName || 'friend').trim();
-  appendMessage('bot', menuHTML(name), /* alreadyHtml */ true);
+
+  // Render opening menu as a NORMAL response card (not the layered style)
+  const cardHtml = composeReply({
+    part: { kind: 'answer', html: menuHTML(name) },
+    askAllowed: false,
+    noAck: true,
+    mode: 'center'
+  });
+
+  appendMessage('bot', cardHtml, /* alreadyHtml */ true);
 }
+
+
 
 function decodeEntities(s) {
   return String(s)
@@ -453,25 +492,45 @@ function isNearBottom(el, slack = 32) {
   return (el.scrollHeight - el.scrollTop - el.clientHeight) <= slack;
 }
 function appendMessage(sender, textOrHtml, alreadyHtml = false) {
-  const raw = (textOrHtml && typeof textOrHtml === 'object' && 'html' in textOrHtml)
-    ? textOrHtml.html : textOrHtml;
+  if (!outputEl) return;
 
-  const atBottom = isNearBottom(outputEl);
-  const msgClass = sender === 'user' ? 'user-msg' : 'cat-reply';
-  const prefix   = sender === 'user' ? '🍧' : '😺';
+  const raw = String(textOrHtml ?? '');
 
+  // Respect pre-styled “card” HTML (no emoji on those).
+  const hasCardHelper = typeof alreadyHasCard === 'function';
+  const isCard = alreadyHtml && (
+    hasCardHelper
+      ? alreadyHasCard(raw)
+      : /\bmt-(?:response|layer|lecture)-card\b|\bmt-quiz-list\b|\bbooth-card\b/.test(raw)
+  );
+
+  // Escape only when we’re rendering plain text.
   const safe = alreadyHtml
-    ? String(raw ?? '')
-    : String(raw ?? '')
-        .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
-        .replaceAll('"','&quot;').replaceAll("'",'&#39;');
+    ? raw
+    : raw
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
 
+  // Build bubble.
   const div = document.createElement('div');
-  div.className = msgClass;
-  div.innerHTML = `${prefix} ${safe}`;
+  div.className = sender === 'user' ? 'user-msg' : 'cat-reply';
+  const emoji = sender === 'user' ? '🍧' : '😺';
+  div.innerHTML = isCard ? safe : `${emoji} ${safe}`;
   outputEl.appendChild(div);
-  if (atBottom) outputEl.scrollTop = outputEl.scrollHeight;
+
+  // Auto-scroll only if user is pinned near bottom.
+  const pinned = isNearBottom(outputEl, 48);
+  if (pinned) {
+    requestAnimationFrame(() => {
+      outputEl.scrollTop = outputEl.scrollHeight;
+    });
+  }
 }
+
+
 
 function htmlToText(html) {
   const tmp = document.createElement('div');
