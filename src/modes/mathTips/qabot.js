@@ -11,6 +11,7 @@ import * as MODEx from './modes/index.js'; // ensure this is at top
 import { runInAction } from 'mobx';
 import * as quiz from './modes/quiz.js';
 import { classifySmallTalk, respondSmallTalk } from './smalltalk.js';
+import { maybeHandleSmallTalk } from './smalltalk.js';
 
 
 const getSessionId = (app) =>
@@ -375,43 +376,147 @@ function renderRouterResultToHTML(routerRes, userText) {
 }
 
 
+// ─────────────────────────────────────────────────────────────────────────────
+// routeUtterance — lean router for explicit commands / booth intents only
+// Notes:
+// • Small-talk is handled earlier in getResponse() — we do NOT call it here.
+// • We respect quiz precedence elsewhere (getResponse checks quiz.isActive()).
+// • We avoid double cards by emitting either an already-layered card string,
+//   or a plain {text/deck} that renderRouterResultToHTML will wrap once.
+// ─────────────────────────────────────────────────────────────────────────────
 function routeUtterance(utterance) {
-  const cmd = interpret(utterance);
-  if (cmd) {
-    if (cmd === 'help') {
+  const raw = String(utterance ?? '');
+  const text = raw.trim();
+  const t = text.toLowerCase();
+
+  // 0) fast commands (help/exit/explicit quiz starts)
+  if (t === 'help' || t === '/help') {
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: boothMenuHTML("Here’s the map — wanna jump into a booth?") },
+        askAllowed: false,
+        noAck: true
+      })
+    };
+  }
+  if (t === 'exit' || t === '/exit') {
+    setMode(MODES.none);
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: `<p>👋 Back to the village center. Say <b>help</b> for options.</p>` }
+      })
+    };
+  }
+
+  // 1) explicit quiz start: "quiz fractions 3" | "quiz percent 3"
+  {
+    const mQuizStart = t.match(/^quiz(?:\s+(fractions?|percent))?(?:\s+(\d+))?$/i);
+    if (mQuizStart) {
+      const topic = (mQuizStart[1] || 'fractions');
+      const count = mQuizStart[2] ? Math.max(1, Math.min(5, parseInt(mQuizStart[2], 10))) : 3;
+      setMode(MODES.quiz);
+      const out = MODEx.quiz.start({ topic, count });
+      return adaptModeOutput(out, text, 'quiz_start') || { html: '' };
+    }
+  }
+
+  // 2) “<booth> booth” (with typo forgiveness for calculator)
+  {
+    // normalize “claculator booth”, “calc booth”, etc.
+    const mBooth = t.match(/\b(lessons|quiz|lore|recipes|status|calculator|claculator|calcuator|calc)\s*booth\b/);
+    if (mBooth) {
+      let b = mBooth[1];
+      if (/^clac|^calcu|^calc/.test(b)) b = 'calculator';
+
+      const cur = getMode();
+      if (MODES[b] && cur === MODES[b]) {
+        // already there — re-emit current step (prevents confirm spam & double cards)
+        if (b === 'quiz' && MODEx.quiz?.handle) {
+          return adaptModeOutput(MODEx.quiz.handle('again', {}), text, 'booth:quiz') || { html: '' };
+        }
+        const out = callMode(b, 'start', {});
+        return adaptModeOutput(out, text, `booth:${b}`) || { html: '' };
+      }
+
+      setPendingSwitch(b, text);
       return {
         html: composeReply({
-          userText: utterance,
-          part: { kind: 'answer', html: boothMenuHTML("Here’s the map — wanna jump into a booth?") },
+          userText: text,
+          part: { kind: 'confirm', html: `Ready to roll into ${b} booth?` },
           askAllowed: false,
           noAck: true
         })
       };
     }
-    if (cmd === 'exit') { setMode(MODES.none); return { text: '<p>👋 Back to the village center. Say help for options.</p>' }; }
-    if (cmd === 'quiz fractions 3') { setMode(MODES.quiz); return MODEx.quiz.start({ topic: 'fractions', count: 3 }); }
-    if (cmd === 'quiz percent 3') { setMode(MODES.quiz); return MODEx.quiz.start({ topic: 'percent', count: 3 }); }
   }
 
-  const mode = getMode();
-  if (mode === MODES.lessons)    return callMode('lessons',    utterance, {}) || { html: '' };
-  if (mode === MODES.quiz)       return callMode('quiz',       utterance, {}) || { html: '' };
-  if (mode === MODES.lore)       return callMode('lore',       utterance, {}) || { html: '' };
-  if (mode === MODES.recipes)    return callMode('recipes',    utterance, {}) || { html: '' };
-  if (mode === MODES.calculator) return callMode('calculator', utterance, {}) || { html: '' };
-  if (mode === MODES.status)     return callMode('status',     utterance, {}) || { html: '' };
+  // 3) “go to <booth>”, “open <booth>”, etc. (room/kiosk/station synonyms)
+  {
+    const m = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipes?|status|calculator|claculator|calcuator|calc)\b/);
+    if (m) {
+      let key = m[1];
+      if (/lesson/.test(key)) key = 'lessons';
+      if (/recipe/.test(key)) key = 'recipes';
+      if (/^clac|^calcu|^calc/.test(key)) key = 'calculator';
+      setPendingSwitch(key, text);
+      return {
+        html: composeReply({
+          userText: text,
+          part: { kind: 'confirm', html: `Ready to roll into ${key} booth?` },
+          askAllowed: false,
+          noAck: true
+        })
+      };
+    }
+  }
 
+  // 4) “recipes <topic>” and topic shorthands (“snowcone”, “nachos”, “quesadilla”, “cocoa”)
+  {
+    const topicOnly = t.match(/^(snowcone|nachos|quesadilla|cocoa|mango snowcone)\b/);
+    const recipeCmd = t.match(/^recipes?\s+(snowcone|nachos|quesadilla|cocoa|mango snowcone)\b/);
 
-  // ⬇️ default: also return a composed bubble (not a layered card)
+    const topic = (recipeCmd && recipeCmd[1]) || (topicOnly && topicOnly[1]);
+    if (topic) {
+      setMode(MODES.recipes);
+      // prefer .start with topic payload if available
+      const payload = { topic: topic.replace('mango ', '') }; // “mango snowcone” -> “snowcone”
+      const mod = MODEx.recipes;
+      let out = null;
+
+      if (typeof mod?.start === 'function') out = mod.start(payload);
+      else if (typeof mod?.handle === 'function') out = mod.handle(payload.topic, payload);
+
+      return adaptModeOutput(out, text, 'booth:recipes') || {
+        html: composeReply({
+          userText: text,
+          part: { kind: 'answer', html: `<p>Recipes booth warming up. Pick: <b>snowcone</b>, <b>nachos</b>, <b>quesadilla</b>, or <b>cocoa</b>.</p>` }
+        })
+      };
+    }
+  }
+
+  // 5) Algebra quick intercepts (kept here so standalone callers get it)
+  {
+    const alg = algebraIntercept(text);
+    if (alg) return { html: alg };
+  }
+
+  // 6) direct calculator expressions? — defer to higher layer (getResponse handles inline calc)
+  //    we keep routeUtterance pure for command routing.
+
+  // 7) default → booth menu (single clean card, no extra ack)
   return {
     html: composeReply({
-      userText: utterance,
+      userText: text,
       part: { kind: 'answer', html: boothMenuHTML("Here’s the map — wanna jump into a booth?") },
       askAllowed: false,
       noAck: true
     })
   };
 }
+
 
 
 
