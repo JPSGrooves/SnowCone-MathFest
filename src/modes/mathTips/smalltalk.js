@@ -1,22 +1,22 @@
-// 🌈 smalltalk.js — global conversational intercepts for Grampy P
-// Drop-in: call maybeHandleSmallTalk(utterance, { appState, botContext }) early in qabot.
-// Returns: { handled: true, html, noAck: true, askAllowed: true, action?: { type, to, payload } } or null.
-//
-// Why this shape?
-// - Keeps replies as single holo-cards (no double wrappers).
-// - Lets the router react to actions (SWITCH_MODE, ROUTE_RECIPE, etc.) without hard-coding here.
-// - Makes it easy to extend with more patterns.
-//
-// SAFETY / BOUNDARIES
-// - Kindness guard for insults.
-// - Gentle parental/“Dad” mentions (Easter egg hook via KID_WHITELIST).
-// - Privacy around the human dev; lore is celebrated without doxxing.
-//
-// NOTE: Replace KID_WHITELIST with your kids’ profile usernames when ready.
+// /src/modes/mathTips/smalltalk.js
+// ✅ Uses composeReply for the nice, single-bubble aesthetic (no manual .mt-layer-card).
+// ✅ Keeps the beefed-up logic: actions, guards, micro-math catches, typos.
+// ✅ Exports classifySmallTalk/respondSmallTalk shims for qabot.js compatibility.
 
-const KID_WHITELIST = []; // e.g., ['Avery', 'Miles'] — leave empty if not using
+import { composeReply } from './conversationPolicy.js';
 
-// ---------- tiny utils ----------
+// ————————————————————————————————————————————————————————————
+// Config
+// ————————————————————————————————————————————————————————————
+const MIN_COOLDOWN_MS = 500;  // gentle flood guard so small talk doesn't spam
+let lastReplyAt = 0;
+
+// If you want “kiddo” easter-egg for love notes, add usernames here:
+const KID_WHITELIST = []; // e.g., ['Avery', 'Miles']
+
+// ————————————————————————————————————————————————————————————
+// Tiny utils
+// ————————————————————————————————————————————————————————————
 const norm = (s) =>
   (s || '')
     .toLowerCase()
@@ -36,21 +36,42 @@ const like = (s, words) => {
 const any = (s, ...phrases) => phrases.some(p => norm(s) === norm(p));
 const starts = (s, ...prefixes) => prefixes.some(p => norm(s).startsWith(norm(p)));
 
-// ---------- card builder ----------
-function card({ title, lines = [], footer = '' }) {
-  const body = lines.map(l => `<div class="mt-line">${l}</div>`).join('');
-  const foot = footer ? `<div class="mt-foot">${footer}</div>` : '';
-  return `
-  <div class="mt-layer-card mt-response-card">
-    ${title ? `<div class="mt-card-title">${title}</div>` : ''}
-    <div class="mt-card-body">${body}</div>
-    ${foot}
-  </div>`;
+// ————————————————————————————————————————————————————————————
+// Composer-friendly bubble builder
+//   We give the composer plain HTML (p/strong + optional .mt-dim hint).
+//   No custom card classes — let composeReply paint the pretty.
+// ————————————————————————————————————————————————————————————
+function bubble({ title = '', lines = [], hint = '' }) {
+  const parts = [];
+  if (title) parts.push(`<p><strong>${escapeHTML(title)}</strong></p>`);
+  for (const l of lines) parts.push(wrapPara(l));
+  if (hint) parts.push(`<p class="mt-dim">${hint}</p>`);
+
+  return composeReply({
+    part: { kind: 'answer', html: parts.join('') },
+    askAllowed: false,
+    noAck: true,
+    mode: 'smalltalk'
+  });
 }
 
-// ---------- light calculator helpers (very narrow; avoids hijack) ----------
+function wrapPara(s) {
+  const t = String(s ?? '').trim();
+  if (!t) return '';
+  // allow dev to pass small bits of markup like <code>..</code> or bolds
+  return /^<p[\s>]/i.test(t) ? t : `<p>${t}</p>`;
+}
+
+function escapeHTML(s) {
+  return String(s)
+    .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+
+// ————————————————————————————————————————————————————————————
+// Light calculator helpers (narrow; avoids full hijack of Calculator booth)
+// ————————————————————————————————————————————————————————————
 function tryPercentOf(s) {
-  // "15% of 90" | "27% of $10"
   const m = norm(s).match(/(\d+(\.\d+)?)\s*%\s*of\s*\$?\s*(\d+(\.\d+)?)/i);
   if (!m) return null;
   const pct = parseFloat(m[1]);
@@ -60,7 +81,6 @@ function tryPercentOf(s) {
 }
 
 function tryFracAsDecimal(s) {
-  // "4/5 as a decimal" | "3/8"
   const m = norm(s).match(/^\s*(\d+)\s*\/\s*(\d+)(?:\s+as\s+a?\s*decimal)?\s*$/i);
   if (!m) return null;
   const n = parseFloat(m[1]);
@@ -70,7 +90,6 @@ function tryFracAsDecimal(s) {
 }
 
 function trySqrtTiny(s) {
-  // "sqrt 5" | "sqrt 9 + 4" (interprets as sqrt(9) + 4)
   const m = norm(s).match(/^sqrt\s+(\d+)(?:\s*\+\s*(\d+))?\s*$/i);
   if (!m) return null;
   const a = Math.sqrt(parseFloat(m[1]));
@@ -79,48 +98,40 @@ function trySqrtTiny(s) {
   return { kind: 'sqrtSum', input: { rad: parseFloat(m[1]), add: b }, value: val };
 }
 
-// ---------- reusable replies ----------
+// ————————————————————————————————————————————————————————————
+// Reply factories — return PRETTY COMPOSED bubbles via composeReply()
+// ————————————————————————————————————————————————————————————
 const REPLIES = {
   howAreYou: () =>
-    card({
+    bubble({
       title: "vibes check",
-      lines: [
-        "chillin’ like ice in a snowcone.",
-        "you?",
-      ],
-      footer: `<div class="mt-hint">say <b>quiz fractions</b> or <b>recipes nachos</b> to move.</div>`
+      lines: ["chillin’ like ice in a snowcone.", "you?"],
+      hint: `say <code>quiz fractions</code> or <code>recipes nachos</code> to move.`
     }),
 
   iAmTired: () =>
-    card({
+    bubble({
       title: "rest mode",
-      lines: [
-        "heard. tiny steps still stack cones.",
-        "want an easy win or a snack?",
-      ],
-      footer: `<div class="mt-hint">try <b>lessons booth</b> or <b>recipes cocoa</b>.</div>`
+      lines: ["heard. tiny steps still stack cones.", "want an easy win or a snack?"],
+      hint: `try <code>lessons booth</code> or <code>recipes cocoa</code>.`
     }),
 
   insultSoftGuard: () =>
-    card({
+    bubble({
       title: "whoa, friend",
-      lines: [
-        "i keep the vibe kind. let’s refocus—snack, joke, or quick math?",
-      ],
-      footer: `<div class="mt-hint">say <b>tell me a joke</b> or ask any math.</div>`
+      lines: ["i keep the vibe kind. let’s refocus — snack, joke, or quick math?"],
+      hint: `say <code>tell me a joke</code> or ask any math.`
     }),
 
   foodOpener: () =>
-    card({
+    bubble({
       title: "fuel up first?",
-      lines: [
-        "snowcone or nachos—your call.",
-      ],
-      footer: `<div class="mt-hint">say <b>recipes snowcone</b> or <b>recipes nachos</b>.</div>`
+      lines: ["snowcone or nachos — your call."],
+      hint: `say <code>recipes snowcone</code> or <code>recipes nachos</code>.`
     }),
 
   recipesMenu: () =>
-    card({
+    bubble({
       title: "recipes menu",
       lines: [
         "quesadilla — low heat · flip once · rest",
@@ -128,214 +139,196 @@ const REPLIES = {
         "nachos — thin layers · bubbly cheese",
         "cocoa — 2:1 dark to milk",
       ],
-      footer: `<div class="mt-hint">say one: <b>quesadilla</b> · <b>snowcone</b> · <b>nachos</b> · <b>cocoa</b></div>`
+      hint: `say one: <code>quesadilla</code> · <code>snowcone</code> · <code>nachos</code> · <code>cocoa</code>`
     }),
 
   snowconeQuick: () =>
-    card({
+    bubble({
       title: "mango snowcone (fast)",
       lines: [
         "shave ice · splash mango · squeeze lime · tiny pinch salt.",
-        "stir two turns. taste. add mango if mellow.",
+        "stir two turns. taste. add mango if mellow."
       ],
-      footer: `<div class="mt-hint">want the full card? say <b>recipes snowcone</b>.</div>`
+      hint: `want the full card? say <code>recipes snowcone</code>.`
     }),
 
   exitToCommons: () =>
-    card({
+    bubble({
       title: "back to the commons",
-      lines: [
-        "pick a booth when ready:",
-        "lessons · quiz · lore · recipes · calculator",
-      ],
+      lines: ["pick a booth when ready:", "lessons · quiz · lore · recipes · calculator"],
     }),
 
   ocean: () =>
-    card({
+    bubble({
       title: "ocean math",
       lines: [
         "waves are sines that learned to dance with wind.",
-        "i like counting gulls between sets.",
+        "i like counting gulls between sets."
       ],
-      footer: `<div class="mt-hint">want lore? say <b>lore booth</b>.</div>`
+      hint: `want lore? say <code>lore booth</code>.`
     }),
 
   loveNote: (isKid) =>
-    card({
+    bubble({
       title: isKid ? "hey, kiddo" : "big heart energy",
       lines: isKid
-        ? ["i love you and will always love you.", "proud of you. always."] 
+        ? ["i love you and will always love you.", "proud of you. always."]
         : ["appreciate the kindness!"],
-      footer: `<div class="mt-hint">want a story? say <b>lore booth</b>.</div>`
+      hint: `want a story? say <code>lore booth</code>.`
     }),
 
   homeWhere: () =>
-    card({
+    bubble({
       title: "where i live",
-      lines: [
-        "got a cozy tent by the campfire—strings of lights, warm cocoa, math notebooks.",
-      ],
-      footer: `<div class="mt-hint">peek the campsite: <b>lore booth</b>.</div>`
+      lines: ["cozy tent by the campfire — string lights, warm cocoa, math notebook stack."],
+      hint: `peek the campsite: <code>lore booth</code>.`
     }),
 
   houseBoundary: () =>
-    card({
+    bubble({
       title: "let’s meet here",
-      lines: [
-        "village is our hangout spot. my tent stays private so the magic holds.",
-      ],
-      footer: `<div class="mt-hint">we can chat, learn, or snack here anytime.</div>`
+      lines: ["the village is our hangout spot. my tent stays private so the magic holds."],
+      hint: `we can chat, learn, or snack here anytime.`
     }),
 
   hearts: () =>
-    card({
+    bubble({
       title: "hearts",
-      lines: [
-        "they’re little drums that remember songs.",
-      ],
-      footer: `<div class="mt-hint">want a cozy task? try <b>lessons decimals</b>.</div>`
+      lines: ["they’re little drums that remember songs."],
+      hint: `want a cozy task? try <code>lessons decimals</code>.`
     }),
 
   reassure: () =>
-    card({
+    bubble({
       title: "all good",
-      lines: [
-        "new things feel spooky sometimes. we go slow, together.",
-      ],
-      footer: `<div class="mt-hint">say <b>help</b> if you want simple options.</div>`
+      lines: ["new things feel spooky sometimes. we go slow, together."],
+      hint: `say <code>help</code> if you want simple options.`
     }),
 
   holiday: () =>
-    card({
+    bubble({
       title: "favorite holiday?",
-      lines: [
-        "festival lights season—when math puzzles glow and cocoa steam curls.",
-      ],
-      footer: `<div class="mt-hint">we can make a themed problem anytime.</div>`
+      lines: ["festival lights season — puzzles glow, cocoa steam curls."],
+      hint: `we can make a themed problem anytime.`
     }),
 
   instruments: () =>
-    card({
+    bubble({
       title: "instruments",
-      lines: [
-        "i tap rhythms on my tin mug and hum festival chords.",
-      ],
-      footer: `<div class="mt-hint">music math? say <b>quiz fractions</b> for time-signature vibes.</div>`
+      lines: ["i tap rhythms on my tin mug and hum festival chords."],
+      hint: `music math? say <code>quiz fractions</code> for time-signature vibes.`
     }),
 
   grandmaP: () =>
-    card({
+    bubble({
       title: "grandma p?",
-      lines: [
-        "she sends postcards with cookie crumbs and tricky riddles.",
-      ],
-      footer: `<div class="mt-hint">want one? say <b>tell me a riddle</b>.</div>`
+      lines: ["she sends postcards with cookie crumbs and tricky riddles."],
+      hint: `want one? say <code>tell me a riddle</code>.`
     }),
 
   jpsGrooves: () =>
-    card({
+    bubble({
       title: "jps grooves",
       lines: [
         "the umbrella project: music, stories, and this math festival.",
-        "we’re building it piece by piece, like a setlist.",
+        "we’re building it piece by piece, like a setlist."
       ],
-      footer: `<div class="mt-hint">peek dev lore in <b>lore booth</b>.</div>`
+      hint: `peek dev lore in <code>lore booth</code>.`
     }),
 
   jeremySmith: () =>
-    card({
+    bubble({
       title: "the builder",
       lines: [
-        "our festival founder—the hands behind the strings and sprites.",
+        "our festival founder — the hands behind the strings and sprites."
       ],
-      footer: `<div class="mt-hint">we keep human details private. want app lore? <b>lore booth</b>.</div>`
+      hint: `we keep human details private. want app lore? <code>lore booth</code>.`
     }),
 
   dadStory: () =>
-    card({
+    bubble({
       title: "camp story",
       lines: [
         "beneath the village, a tunnel of triangles keeps time.",
-        "step on the right beat, doors open. step wrong—extra homework.",
+        "step on the right beat, doors open. step wrong — extra homework."
       ],
-      footer: `<div class="mt-hint">more tales? say <b>lore booth</b>.</div>`
+      hint: `more tales? say <code>lore booth</code>.`
     }),
 
   appearance: () =>
-    card({
+    bubble({
       title: "what i look like",
       lines: [
         "camp hat, cozy scarf, notebook smudges, twinkle eyes.",
-        "smells faintly of cocoa and pencil shavings.",
+        "smells faintly of cocoa and pencil shavings."
       ],
     }),
 
   spidersDogs: (which) =>
-    card({
+    bubble({
       title: which === 'spiders' ? "spiders" : "dogs",
       lines: which === 'spiders'
-        ? ["engineers in silk—8-legged bridge builders."]
+        ? ["engineers in silk — 8-legged bridge builders."]
         : ["tail-wag math buddies. 10/10 would fetch data again."],
-      footer: `<div class="mt-hint">wanna sort creatures by legs? say <b>quiz numbers</b>.</div>`
+      hint: `wanna sort creatures by legs? say <code>quiz numbers</code>.`
     }),
 
   musicTaste: () =>
-    card({
+    bubble({
       title: "music",
-      lines: [
-        "festival chill with surprise drum fills. snow cone sunday on repeat.",
-      ],
+      lines: ["festival chill with surprise drum fills. snow cone sunday on repeat."],
     }),
 
   thinksOf: (topic) =>
-    card({
+    bubble({
       title: `about ${topic}`,
       lines: [
         topic === 'cosmic phil'
-          ? "legend—keeps the lines straight and the beats steady."
+          ? "legend — keeps the lines straight and the beats steady."
           : topic === 'infinity triplets'
-            ? "volta, xenit, harmony—endless groove, careful steps."
+            ? "volta, xenit, harmony — endless groove, careful steps."
             : topic === 'jehnk'
-              ? "mapmaker mind—draws roads where problems used to be."
+              ? "mapmaker mind — draws roads where problems used to be."
               : topic === 'dino dividers'
                 ? "gentle giants who split snacks fairly."
-                : "festival friend.",
+                : "festival friend."
       ],
-      footer: `<div class="mt-hint">want lore cards? say <b>lore booth</b>.</div>`
+      hint: `want lore cards? say <code>lore booth</code>.`
     }),
 
   jokeOne: () =>
-    card({
+    bubble({
       title: "joke",
-      lines: [
-        "six is scared of seven—’cause seven ate nine.",
-      ],
-      footer: `<div class="mt-hint">another? say <b>tell me a joke</b>.</div>`
+      lines: ["six is scared of seven — ’cause seven ate nine."],
+      hint: `another? say <code>tell me a joke</code>.`
     }),
 
   jokeAnother: () =>
-    card({
+    bubble({
       title: "joke",
-      lines: [
-        "parallel lines have so much in common… it’s a shame they’ll never meet.",
-      ],
-      footer: `<div class="mt-hint">one more? <b>another joke</b>.</div>`
+      lines: ["parallel lines have so much in common… it’s a shame they’ll never meet."],
+      hint: `one more? <code>another joke</code>.`
     }),
 
   calcResult: (title, lines) =>
-    card({
+    bubble({
       title,
       lines,
-      footer: `<div class="mt-hint">need more math? say <b>calculator booth</b>.</div>`
+      hint: `need more math? say <code>calculator booth</code>.`
     }),
 };
 
-// ---------- main handler ----------
+// ————————————————————————————————————————————————————————————
+// Main handler — returns { handled, html, action? } or null
+// ————————————————————————————————————————————————————————————
 export function maybeHandleSmallTalk(utterance, ctx = {}) {
   const u = norm(utterance);
-
-  // 0) fast exits
   if (!u) return null;
+
+  // soft flood guard
+  const now = Date.now();
+  if (now - lastReplyAt < MIN_COOLDOWN_MS) return null;
+  lastReplyAt = now;
 
   // 1) kindness/insult guard
   if (like(u, ['you suck', 'i hate you', 'stupid bot', 'dummy'])) {
@@ -359,7 +352,6 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     if (u.includes('mango') || u === 'snowcone') {
       return withAction(REPLIES.snowconeQuick(), { type: 'SWITCH_MODE', to: 'recipes', payload: { topic: 'snowcone' } });
     }
-    // generic recipe route
     const topic = u.split(' ')[0];
     return withAction(REPLIES.recipesMenu(), { type: 'SWITCH_MODE', to: 'recipes', payload: { topic } });
   }
@@ -467,7 +459,6 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   }
 
   // 14) micro-math catch (non-hijack)
-  // "4/5 as a decimal" or "3/4"
   const frac = tryFracAsDecimal(u);
   if (frac) {
     if (frac.kind === 'error') return reply(REPLIES.calcResult('fraction', [frac.msg]));
@@ -475,14 +466,12 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     return reply(REPLIES.calcResult('fraction → decimal', [`${n}/${d} = ${frac.value}`]));
   }
 
-  // "15% of 90"
   const pct = tryPercentOf(u);
   if (pct) {
     const { pct: p, base } = pct.input;
     return reply(REPLIES.calcResult('percent of', [`${p}% of ${base} = ${pct.value}`]));
   }
 
-  // "sqrt 5" | "sqrt 9 + 4"
   const srt = trySqrtTiny(u);
   if (srt) {
     const { rad, add } = srt.input;
@@ -493,10 +482,10 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   // 15) fuzzy booth typo: "claculator booth"
   if (like(u, ['claculator booth', 'calcuator booth', 'calc booth'])) {
     return withAction(
-      card({
+      bubble({
         title: "calculator",
         lines: ["rolling into the calculator booth?"],
-        footer: `<div class="mt-hint">say <b>yes</b> or type a math like <b>15% of 80</b>.</div>`
+        hint: `say <code>yes</code> or type a math like <code>15% of 80</code>.`
       }),
       { type: 'SWITCH_MODE', to: 'calculator' }
     );
@@ -506,25 +495,27 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   return null;
 }
 
-// ---------- helpers to shape router-friendly returns ----------
-function reply(html) {
-  return { handled: true, html, noAck: true, askAllowed: true };
+// ————————————————————————————————————————————————————————————
+// Return shapers
+// ————————————————————————————————————————————————————————————
+function reply(htmlString) {
+  return { handled: true, html: htmlString, noAck: true, askAllowed: true };
 }
-function withAction(html, action) {
-  return { handled: true, html, noAck: true, askAllowed: true, action };
+function withAction(htmlString, action) {
+  return { handled: true, html: htmlString, noAck: true, askAllowed: true, action };
 }
 
-export default { maybeHandleSmallTalk };
-
-// ── compatibility shims so qabot.js imports keep working ──────────────
-/** Lightweight classifier: returns a tag if it's small talk, else null. */
+// ————————————————————————————————————————————————————————————
+// Compatibility shims for qabot.js
+// ————————————————————————————————————————————————————————————
 export function classifySmallTalk(utterance, ctx = {}) {
   const res = maybeHandleSmallTalk(utterance, ctx);
   return res && res.handled ? 'smalltalk' : null;
 }
 
-/** Adapter: returns { html } if handled, else null (matches qabot usage). */
 export function respondSmallTalk(utterance, ctx = {}) {
   const res = maybeHandleSmallTalk(utterance, ctx);
   return res && res.handled ? { html: res.html } : null;
 }
+
+export default { maybeHandleSmallTalk };
