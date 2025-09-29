@@ -201,10 +201,7 @@ export function handle(text = '') {
       return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
     }
 
-    // rate-limit
-    if (S.shouldBlock?.(msg)) {
-      return { html: composeReply({ part: { html: `<p>one snack at a time, legend.</p>` }, askAllowed: false, noAck: true, mode: 'recipe' }) };
-    }
+
 
     const r = RECIPES[Gate.topicKey] || RECIPES.quesadilla;
 

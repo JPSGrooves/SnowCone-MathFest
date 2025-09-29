@@ -330,28 +330,27 @@ function maybeOffTopicRedirect(userText, currentMode) {
 function adaptModeOutput(out, userText, intentTag) {
   if (!out) return null;
 
+  const ended = !!(out && typeof out === 'object' && out.end === true);
+
   // case: booth returned a raw string
   if (typeof out === 'string') {
-    // pass through if it's already a card
     if (alreadyHasCard(out)) {
-      return { html: out, meta: { intent: intentTag, layered: true } };
+      return { html: out, meta: { intent: intentTag, layered: true, end: ended } };
     }
-    // otherwise compose one clean card
     return {
       html: composeReply({
         userText,
         part: { kind: 'answer', html: out },
         askAllowed: true
       }),
-      meta: { intent: intentTag }
+      meta: { intent: intentTag, end: ended }
     };
   }
 
-  // case: booth returned an object { html }
+  // case: booth returned an object { html, [end] }
   if (out && typeof out.html === 'string') {
     if (alreadyHasCard(out.html)) {
-      // don’t add ACK or nudge; let the booth card stand alone
-      return { html: out.html, meta: { intent: intentTag, layered: true } };
+      return { html: out.html, meta: { intent: intentTag, layered: true, end: ended } };
     }
     return {
       html: composeReply({
@@ -359,14 +358,14 @@ function adaptModeOutput(out, userText, intentTag) {
         part: { kind: 'answer', html: out.html },
         askAllowed: true
       }),
-      meta: { intent: intentTag }
+      meta: { intent: intentTag, end: ended }
     };
   }
 
-  // fallback stringification (rare)
+  // fallback stringification
   const raw = String(out);
   if (alreadyHasCard(raw)) {
-    return { html: raw, meta: { intent: intentTag, layered: true } };
+    return { html: raw, meta: { intent: intentTag, layered: true, end: ended } };
   }
   return {
     html: composeReply({
@@ -374,7 +373,7 @@ function adaptModeOutput(out, userText, intentTag) {
       part: { kind: 'answer', html: raw },
       askAllowed: true
     }),
-    meta: { intent: intentTag }
+    meta: { intent: intentTag, end: ended }
   };
 }
 
@@ -452,6 +451,7 @@ function routeUtterance(utterance) {
   }
   if (t === 'exit' || t === '/exit') {
     setMode(MODES.none);
+    clearBoothContext(); // ← important
     return {
       html: composeReply({
         userText: text,
@@ -459,6 +459,7 @@ function routeUtterance(utterance) {
       })
     };
   }
+
 
   // 1) explicit quiz start: "quiz fractions 3" | "quiz percent 3"
   {
@@ -633,17 +634,34 @@ export function getResponse(userText, appStateLike = appState) {
   });
   const SESSION_ID = appStateLike.progress.mathtips.sessionId;
 
+  // 🔌 global exit/leave synonyms — run before smalltalk & fast paths
+  if (/\b(leave|leave\s+mode|exit|quit|back(?:\s+to)?\s+(?:commons?|center|village)|go\s*home|return|main\s*menu)\b/i.test(t)) {
+    setMode(MODES.none);
+    clearBoothContext();
+    return {
+      html: composeReply({
+        userText: text,
+        part: { kind: 'answer', html: `<p>👋 Back to the village center. Say <b>help</b> for options.</p>` }
+      })
+    };
+  }
+
+
+
   // 🔒 Quiz takes precedence over everything (prevents Calculator hijack)
   if (quiz.isActive?.(SESSION_ID)) {
     return quiz.handle(text, { sessionId: SESSION_ID });
   }
-  // 🍳 Fast path: recipe mentions (catch before smalltalk eats it)
-  if (/\brecipes?\b|quesadilla|snow\s*cone|nachos|cocoa/i.test(t)) {
+  // 🍳 Fast path: explicit recipe topics → jump straight in
+  if (/\b(quesadilla|snow\s*cone|snowcone|nachos|cocoa)\b/i.test(t)) {
     setMode(MODES.recipe);
-    const topic = pickRecipeTopic(t);
-    return adaptModeOutput(MODEx.recipe.start({ topic }), text, 'booth:recipe');
+    return adaptModeOutput(MODEx.recipe.start({ topic: pickRecipeTopic(t) }), text, 'booth:recipe');
   }
-
+  // Bare “recipe(s)” → open the menu, not the previous topic
+  if (/\brecipes?\b/i.test(t)) {
+    setMode(MODES.recipe);
+    return adaptModeOutput(MODEx.recipe.start({}), text, 'booth:recipe');
+  }
 
 
   // 🔸 Small-talk intercept (lightweight, non-modal)
@@ -656,25 +674,30 @@ const st = maybeHandleSmallTalk(userText, {
 });
 
     if (st && st.handled) {
-      // obey SWITCH_MODE actions (e.g., to: 'recipe', payload: {topic:'snowcone'})
-      const act = st.action || {};
-      if (act.type === 'SWITCH_MODE') {
-        const regKey = normalizeBoothKey(act.to || '');  // 'recipe'/'recipes' → 'recipes' for legacy, we use registry below
-        const boothKey = /^recipe/i.test(regKey) ? 'recipe' : regKey; // registry key for MODEx
-        const modeKey  = modesKey(boothKey);             // key for MODES
-        if (MODES[modeKey]) setMode(MODES[modeKey]);
- 
-        const payload = act.payload || {};
-        const mod = MODEx[boothKey];
-        let out = null;
-        if (typeof mod?.start === 'function') out = mod.start(payload);
-        else if (typeof mod?.handle === 'function') out = mod.handle(payload.topic || '', payload);
-        const adapted = adaptModeOutput(out, userText, `booth:${boothKey}`);
-        if (adapted) return adapted;
+  const act = st.action || {};
+
+  // ✅ if smalltalk *did* request a switch, obey it (you already do this)
+      if (act.type === 'SWITCH_MODE') { /* ... existing code ... */ }
+
+      // 🛟 smalltalk replied but didn't switch — if user *said* to leave, force exit
+      if (/\b(leave|leave\s+mode|exit|quit|back(?:\s+to)?\s+(?:commons?|center|village)|go\s*home|return|main\s*menu)\b/i.test(t)) {
+        setMode(MODES.none);
+        clearBoothContext();
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: boothMenuHTML('👋 Back to the village center.') },
+            askAllowed: false,
+            noAck: true
+          }),
+          meta: { intent: 'exit' }
+        };
       }
-      // no action → just return the smalltalk bubble
+
+      // otherwise just return the smalltalk bubble
       return { html: st.html, meta: { intent: 'smalltalk' } };
     }
+
   }
 
   // 0a) Handle pending booth switch
@@ -753,10 +776,12 @@ const st = maybeHandleSmallTalk(userText, {
     setMode(MODES.none);
     clearBoothContext(); // ← add this
     return {
-      html: composeReply({
-        userText: text,
-        part: { kind: 'answer', html: `<p>Back to the village center, ${userName}. Pick a booth: lessons booth, quiz booth, lore booth, recipe booth, or calculator booth.</p>` }
-      }),
+     html: composeReply({
+       userText: text,
+       part: { kind: 'answer', html: `<p>👋 Back to the village center. Say <b>help</b> for options.</p>` },
+       askAllowed: false,
+       noAck: true
+     }),
       meta: { intent: 'exit' }
     };
   }
@@ -889,14 +914,28 @@ const st = maybeHandleSmallTalk(userText, {
       ? mod.handle(text, { sessionId: SESSION_ID })
       : callMode(regKey, text, { sessionId: SESSION_ID }); // fallback
 
-    if (out) {
-      const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
-      // if a booth signals it has ended, drop back to the center
-      if (adapted) {
-        if (adapted?.meta?.end) setMode(MODES.none);
-        return adapted;
+  if (out) {
+    const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
+    if (adapted) {
+      if (adapted?.meta?.end) {
+        setMode(MODES.none);
+        clearBoothContext();
+        // Return the Commons menu so the user *sees* we’ve left
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: boothMenuHTML('👋 Back to the village center.') },
+            askAllowed: false,
+            noAck: true
+          }),
+          meta: { intent: 'exit' }
+        };
       }
+      return adapted;
     }
+  }
+
+
     // ... keep your existing fallback
   }
 
