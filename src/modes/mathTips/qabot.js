@@ -12,6 +12,8 @@ import { runInAction } from 'mobx';
 import * as quiz from './modes/quiz.js';
 import { classifySmallTalk, respondSmallTalk } from './smalltalk.js';
 import { maybeHandleSmallTalk } from './smalltalk.js';
+import { pickRecipeTopic } from './modes/recipes.js';
+
 
 
 const getSessionId = (app) =>
@@ -35,7 +37,6 @@ export function alreadyHasCard(html = '') {
 
 // Map user/registry keys to the modeManager key for MODES
 function modesKey(k = '') {
-  // If your modeManager uses MODES.recipe use that; else fall back to MODES.recipes
   if (/^recipe(s)?$/i.test(k)) return (MODES.recipe ? 'recipe' : 'recipes');
   return k;
 }
@@ -176,6 +177,16 @@ function ensureBC() {
   });
   return appState.progress.mathtips.botContext;
 }
+
+// put near ensureBC()
+function clearBoothContext() {
+  const bc = ensureBC();
+  act(() => {
+    bc.lastBooth = null;
+    bc.pendingSwitch = null;
+  });
+}
+
 
 function setPendingSwitch(toMode, lastText) {
   const bc = ensureBC();
@@ -537,6 +548,16 @@ function routeUtterance(utterance) {
       };
     }
   }
+  // 4b) raw topic only: "snowcone" | "nachos" | "quesadilla" | "cocoa"
+  {
+    const rawTopic = t.match(/^(snow\s*cone|snowcone|nachos|quesadilla|cocoa)\b/);
+    if (rawTopic) {
+      setMode(MODES[modesKey('recipe')]);
+      const topic = pickRecipeTopic(rawTopic[1]);
+      return adaptModeOutput(MODEx.recipe.start({ topic }), text, 'booth:recipe');
+    }
+  }
+
   // Shorthand openers: "show me a recipe", "show me some recipes", "see recipes"
   {
     if (/\b(show|see|view|open|display|gimme|give me|bring)\b.*\brecipes?\b/i.test(t)) {
@@ -619,16 +640,21 @@ export function getResponse(userText, appStateLike = appState) {
   // 🍳 Fast path: recipe mentions (catch before smalltalk eats it)
   if (/\brecipes?\b|quesadilla|snow\s*cone|nachos|cocoa/i.test(t)) {
     setMode(MODES.recipe);
-    return adaptModeOutput(MODEx.recipe.start({}), text, 'booth:recipe');
+    const topic = pickRecipeTopic(t);
+    return adaptModeOutput(MODEx.recipe.start({ topic }), text, 'booth:recipe');
   }
+
+
 
   // 🔸 Small-talk intercept (lightweight, non-modal)
   {
-    const st = maybeHandleSmallTalk(userText, {
-      name: appStateLike?.profile?.name || 'traveler',
-      appState: appStateLike,
-      botContext: ensureBC()
-    });
+const st = maybeHandleSmallTalk(userText, {
+  name: appStateLike?.profile?.name || 'traveler',
+  appState: appStateLike,
+  botContext: ensureBC(),
+  currentMode: getMode()               // ← add this
+});
+
     if (st && st.handled) {
       // obey SWITCH_MODE actions (e.g., to: 'recipe', payload: {topic:'snowcone'})
       const act = st.action || {};
@@ -725,6 +751,7 @@ export function getResponse(userText, appStateLike = appState) {
 
   if (t === 'exit' || t === '/exit') {
     setMode(MODES.none);
+    clearBoothContext(); // ← add this
     return {
       html: composeReply({
         userText: text,
@@ -733,6 +760,7 @@ export function getResponse(userText, appStateLike = appState) {
       meta: { intent: 'exit' }
     };
   }
+
   // B) booth phrase guard: if already in that booth, don’t confirm/restart
   const mBooth = t.match(/\b(lessons|quiz|lore|recipe|calculator)\s*booth\b/i);
   if (mBooth) {
@@ -944,7 +972,7 @@ export function getResponse(userText, appStateLike = appState) {
 
 
       case 'greet': {
-        const line = `<p>${pick(RESPONSES.greetings)} Let’s roll, ${userName} — pick a booth: lessons, quiz, lore, recipe, or calculator.</p>`;
+        const line = `<p>${pick(RESPONSES.greetings)} Let’s roll, ${userName} — pick a booth: lessons, quiz, lore, recipe, status, or calculator.</p>`;
         return {
           html: composeReply({
             userText: text,
@@ -1166,5 +1194,6 @@ function isBoothIntent(tag = '') {
 function normalizeBoothKey(k = '') {
   return /^recipe(s)?$/i.test(k) ? 'recipe' : k;
 }
+
 
 

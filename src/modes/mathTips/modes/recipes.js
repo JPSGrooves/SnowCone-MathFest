@@ -49,14 +49,16 @@ const RECIPES = {
   }
 };
 
-function pickTopic(t = '') {
+export function pickRecipeTopic(t = '') {
   const k = String(t).toLowerCase();
   if (/quesa|quesa?dilla|cheese/.test(k)) return 'quesadilla';
   if (/snow\s*cone|mango|shave/.test(k)) return 'snowcone';
   if (/nacho|chips/.test(k)) return 'nachos';
   if (/cocoa|cacao|hot\s*choc/.test(k)) return 'cocoa';
-  return Gate.topicKey || null; // ← no forced default
+  // if nothing matched, just return the existing topic (if any), else null
+  return Gate.topicKey ? Gate.topicKey : null;
 }
+
 
 
 function menuCard() {
@@ -96,7 +98,7 @@ function endToMenuHtml() {
 // ───────── ENTRY ─────────
 export function start({ topic } = {}) {
   S.reset();
-  const picked = topic ? pickTopic(topic) : null;
+  const picked = topic ? pickRecipeTopic(topic) : null;
   Gate = { topicKey: picked, index: 0 };
 
   if (picked) {
@@ -126,6 +128,7 @@ export function start({ topic } = {}) {
 
 
 // ───────── LOOP ─────────
+// ───────── LOOP ─────────
 export function handle(text = '') {
   const msg = String(text || '').trim();
 
@@ -146,12 +149,29 @@ export function handle(text = '') {
     return { html: composeReply({ part: { html: card }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
 
-  // stop / exit
-  // stop → stay in recipe booth (show menu)
-  // exit/quit/leave → leave the booth
-  if (/\b(exit|quit|leave)\b/i.test(msg)) {
+  // ─── TOPIC PICK ALWAYS WINS ────────────────────────────────────────────────
+  const maybeTopic = pickRecipeTopic(msg);
+  if (maybeTopic && maybeTopic !== Gate.topicKey) {
+    Gate.topicKey = maybeTopic;
+    Gate.index = 0;
+    S.reset?.();
+    const html = stepHtml(Gate.topicKey, Gate.index);
     return {
-      html: composeReply({ part: { html: endHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }),
+      html: composeReply({
+        part: { html },
+        askAllowed: true,
+        askText: 'want another step?',
+        noAck: true,
+        mode: 'recipe'
+      })
+    };
+  }
+
+  // stop / exit
+  if (/\b(exit|quit|leave)\b/i.test(msg)) {
+    // ✅ use endToMenuHtml, do NOT call the old endHtml()
+    return {
+      html: composeReply({ part: { html: endToMenuHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }),
       end: true
     };
   }
@@ -159,87 +179,56 @@ export function handle(text = '') {
   if (/\b(stop|pause|later|enough)\b/i.test(msg) || /\b(no thanks|not really)\b/i.test(msg)) {
     S.reset?.();
     Gate.index = 0;
-    // optional: clear topic so a bare “more” won’t repeat the last recipe
-    // Gate.topicKey = null;
+    // optional: keep topic or clear it; clearing avoids accidental “more” repeat
+    Gate.topicKey = null;
     return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
 
-
   // explicit menu
   if (/^menu\b/i.test(msg)) {
-    const html = menuCard();
-    return { html: composeReply({ part: { html }, askAllowed: false, noAck: true, mode: 'recipe' }) };
+    return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
 
-  // --- NEW: interpret yes/more BEFORE topic switching ---
+  // yes/more BEFORE any other fallbacks
   const yn = readAffirmative(msg);
   const wantsMore = yn === 'yes' || /\b(more|next|again|continue|step|go|gimme|another)\b/i.test(msg);
 
   if (wantsMore) {
-    // inside: if (wantsMore) { ... }
-    const r = RECIPES[Gate.topicKey] || RECIPES.quesadilla;
-    if (S.isCapReached() || Gate.index >= r.steps.length - 1) {
-    // reset stepper and clear topic so stray “more” won’t repeat
-    S.reset?.();
-    Gate.index = 0;
-    Gate.topicKey = null;
-
-    return {
-        html: composeReply({
-        part: { html: menuCard() }, // ← go straight to the menu
-        askAllowed: false,
-        noAck: true,
-        mode: 'recipe'
-        })
-        // no `end:true` — we remain inside recipe booth
-    };
-
-
-  }
-
+    // no active topic? show menu instead of faking progress
+    if (!Gate.topicKey) {
+      S.reset?.();
+      Gate.index = 0;
+      return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
+    }
 
     // rate-limit
     if (S.shouldBlock?.(msg)) {
       return { html: composeReply({ part: { html: `<p>one snack at a time, legend.</p>` }, askAllowed: false, noAck: true, mode: 'recipe' }) };
     }
 
-    // progress / end
+    const r = RECIPES[Gate.topicKey] || RECIPES.quesadilla;
+
+    // last step reached? bounce to the menu but STAY IN BOOTH (no end:true)
     if (S.isCapReached() || Gate.index >= r.steps.length - 1) {
-      return { html: composeReply({ part: { html: endHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }), end: true };
+      S.reset?.();
+      Gate.index = 0;
+      Gate.topicKey = null;
+      return { html: composeReply({ part: { html: endToMenuHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
     }
+
+    // advance normally
     S.bump?.();
     Gate.index = Math.min(Gate.index + 1, r.steps.length - 1);
     const html = stepHtml(Gate.topicKey, Gate.index);
     return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
   }
 
-
   if (yn === 'no') {
     S.reset?.();
     Gate.index = 0;
-    // optional: clear topic to be extra safe
-    // Gate.topicKey = null;
-    return {
-      html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' })
-    };
-  }
-
-  // --- end NEW block ---
-
-  // topic switch (emit first step right away)
-  const maybeTopic = pickTopic(msg);
-  if (maybeTopic !== Gate.topicKey) {
-    Gate.topicKey = maybeTopic;
-    Gate.index = 0;
-    S.reset();
-    const html = stepHtml(Gate.topicKey, Gate.index);
-    return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
-  }
-  // If we have no active topic (e.g., after finishing), any “more/yes” should show the menu
-  if (!Gate.topicKey) {
+    Gate.topicKey = null;
     return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
-
 
   // gentle nudge
   return {

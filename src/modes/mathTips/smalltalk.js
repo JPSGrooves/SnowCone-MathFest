@@ -324,6 +324,18 @@ const REPLIES = {
 export function maybeHandleSmallTalk(utterance, ctx = {}) {
   const u = norm(utterance);
   if (!u) return null;
+  // If we're already in the Recipe booth, don't smalltalk-intercept recipe words.
+const inRecipe = String(ctx?.currentMode || '').toLowerCase() === 'recipe';
+if (inRecipe) {
+  // Skip the “direct snack words” intercept below
+  // by returning null here and letting the Recipe mode handle it.
+  // (We still keep jokes/feelings/etc. outside recipe keywords.)
+  // Only bail when the message looks like a recipe-topic intent.
+  if (/(?:^|\b)(nachos?|quesadillas?|snow\s*cones?|cocoa|hot\s*choc)/i.test(u)) {
+    return null;
+  }
+}
+
 
   // soft flood guard
   const now = Date.now();
