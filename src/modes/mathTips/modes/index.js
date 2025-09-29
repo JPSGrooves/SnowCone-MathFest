@@ -5,12 +5,12 @@
 import * as lessons from './lessons.js';
 import * as quiz from './quiz.js';
 import * as lore from './lore.js';
-import * as recipes from './recipes.js';
+import * as recipe from './recipes.js';
 import * as calculator from './calculator.js';
 import * as status from './status.js';
 
 // Local registry
-const registry = { lessons, quiz, lore, recipes, calculator, status };
+const registry = { lessons, quiz, lore, recipe, calculator, status };
 
 /** Map fuzzy/legacy keys to canonical mode ids. */
 function canonicalModeKey(k) {
@@ -24,7 +24,7 @@ function canonicalModeKey(k) {
   if (/^lessons(\s+booth)?$/.test(t)) return 'lessons';
   if (/^quiz(\s+booth)?$/.test(t)) return 'quiz';
   if (/^lore(\s+booth)?$/.test(t)) return 'lore';
-  if (/^recipes?(\s+booth)?$/.test(t)) return 'recipes';
+  if (/^recipe?(\s+booth)?$/.test(t)) return 'recipe';
   if (/^status(\s+booth)?$/.test(t)) return 'status';
   if (/^(calc|calculator)(\s+booth)?$/.test(t)) return 'calculator';
 
@@ -95,7 +95,7 @@ export function callMode(modeKey, text = '', ctx = {}) {
 }
 
 // Named exports (best for: `import * as MODEx from './modes/index.js'`)
-export { lessons, quiz, lore, recipes, calculator, status };
+export { lessons, quiz, lore, recipe, calculator, status };
 
 // Default export for older code that did `import MODEx from ...`
-export default { lessons, quiz, lore, recipes, calculator, status, callMode };
+export default { lessons, quiz, lore, recipe, calculator, status, callMode };

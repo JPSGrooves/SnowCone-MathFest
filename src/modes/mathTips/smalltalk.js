@@ -106,14 +106,14 @@ const REPLIES = {
     bubble({
       title: "vibes check",
       lines: ["chillin’ like ice in a snowcone.", "you?"],
-      hint: `say <code>quiz fractions</code> or <code>recipes nachos</code> to move.`
+      hint: `say <code>fractions quiz</code> or <code>nachos recipe</code> to move.`
     }),
 
   iAmTired: () =>
     bubble({
       title: "rest mode",
       lines: ["heard. tiny steps still stack cones.", "want an easy win or a snack?"],
-      hint: `try <code>lessons booth</code> or <code>recipes cocoa</code>.`
+      hint: `try <code>lessons booth</code> or <code>cocoa recipe</code>.`
     }),
 
   insultSoftGuard: () =>
@@ -127,7 +127,7 @@ const REPLIES = {
     bubble({
       title: "fuel up first?",
       lines: ["snowcone or nachos — your call."],
-      hint: `say <code>recipes snowcone</code> or <code>recipes nachos</code>.`
+      hint: `say <code>snowcone recipe</code> or <code>nachos recipe</code>.`
     }),
 
   recipesMenu: () =>
@@ -149,13 +149,13 @@ const REPLIES = {
         "shave ice · splash mango · squeeze lime · tiny pinch salt.",
         "stir two turns. taste. add mango if mellow."
       ],
-      hint: `want the full card? say <code>recipes snowcone</code>.`
+      hint: `want the full card? say <code>snowcone recipe</code>.`
     }),
 
   exitToCommons: () =>
     bubble({
       title: "back to the commons",
-      lines: ["pick a booth when ready:", "lessons · quiz · lore · recipes · calculator"],
+      lines: ["pick a booth when ready:", "lessons · quiz · lore · recipe · calculator"],
     }),
 
   ocean: () =>
@@ -216,7 +216,7 @@ const REPLIES = {
     bubble({
       title: "instruments",
       lines: ["i tap rhythms on my tin mug and hum festival chords."],
-      hint: `music math? say <code>quiz fractions</code> for time-signature vibes.`
+      hint: `music math? say <code>fractions quiz</code> for time-signature vibes.`
     }),
 
   grandmaP: () =>
@@ -350,20 +350,28 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   // direct snack words
   if (any(u, 'nachos', 'quesadilla', 'snowcone', 'cocoa', 'mango snowcone')) {
     if (u.includes('mango') || u === 'snowcone') {
-      return withAction(REPLIES.snowconeQuick(), { type: 'SWITCH_MODE', to: 'recipes', payload: { topic: 'snowcone' } });
+      return withAction(REPLIES.snowconeQuick(), { type: 'SWITCH_MODE', to: 'recipe', payload: { topic: 'snowcone' } });
     }
     const topic = u.split(' ')[0];
-    return withAction(REPLIES.recipesMenu(), { type: 'SWITCH_MODE', to: 'recipes', payload: { topic } });
+    return withAction(REPLIES.recipesMenu(), { type: 'SWITCH_MODE', to: 'recipe', payload: { topic } });
   }
-  if (starts(u, 'recipes ')) {
-    const topic = u.replace(/^recipes\s+/i, '').trim() || null;
-    return withAction(REPLIES.recipesMenu(), { type: 'SWITCH_MODE', to: 'recipes', payload: topic ? { topic } : {} });
+  if (starts(u, 'recipe ')) {
+    // strip and validate: only forward real topics (avoid "recipe booth" → "booth")
+    const raw = u.replace(/^recipes?\s+(?:for\s+)?/i, '').trim();
+    const allowed = ['quesadilla','snowcone','nachos','cocoa'];
+    const topic = allowed.includes(raw) ? raw : null;
+    return withAction(
+      REPLIES.recipesMenu(),
+      { type: 'SWITCH_MODE', to: 'recipe', payload: topic ? { topic } : {} }
+    );
   }
 
   // 4) exit/common center
-  if (any(u, 'exit', 'stop', 'back to commons', 'back to the commons', 'definitely stop')) {
-    return reply(REPLIES.exitToCommons());
+  // NOTE: do NOT include "stop" here — booths own that word.
+  if (any(u, 'exit', 'exit booth', 'leave', 'commons', 'back to commons', 'back to the commons', 'definitely stop')) {
+    return reply(REPLIES.exitToCommons()); 
   }
+
 
   // 5) ocean / places
   if (like(u, ['been to the ocean', 'ocean', 'beach'])) {

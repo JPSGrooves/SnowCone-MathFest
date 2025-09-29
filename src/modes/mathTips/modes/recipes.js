@@ -1,5 +1,5 @@
 // /src/modes/mathTips/modes/recipes.js
-// Recipes booth — short, cozy breaks between math beats.
+// Recipe booth — short, cozy breaks between math beats.
 // Menu → topic steps (3–4) → gentle outro. Mirrors Lessons/Lore pacing.
 
 import { composeReply } from '../conversationPolicy.js';
@@ -55,12 +55,13 @@ function pickTopic(t = '') {
   if (/snow\s*cone|mango|shave/.test(k)) return 'snowcone';
   if (/nacho|chips/.test(k)) return 'nachos';
   if (/cocoa|cacao|hot\s*choc/.test(k)) return 'cocoa';
-  return Gate.topicKey || 'quesadilla';
+  return Gate.topicKey || null; // ← no forced default
 }
+
 
 function menuCard() {
   return `
-    <p><strong>Recipes Menu</strong></p>
+    <p><strong>Recipe Menu</strong></p>
     <ul class="mt-menu">
       <li><strong>quesadilla</strong> — low heat · flip once · rest</li>
       <li><strong>snowcone</strong> — mango · lime · pinch of salt</li>
@@ -83,39 +84,53 @@ function stepHtml(topicKey, idx) {
   `;
 }
 
-function endHtml() {
+// replace your current endHtml() with this:
+function endToMenuHtml() {
   return `
-    <p>that’s the snack break for now.</p>
-    <ul class="mt-response-list">
-      <li class="mt-response-item">lessons booth</li>
-      <li class="mt-response-item">quiz booth</li>
-      <li class="mt-response-item">lore booth</li>
-      <li class="mt-response-item">recipes booth</li>
-      <li class="mt-response-item">calculator booth</li>
-    </ul>
-    <p class="mt-dim">or just ask a math question.</p>
+    <p>that’s the snack break for now — pick another recipe?</p>
+    ${menuCard()}
   `;
 }
+
 
 // ───────── ENTRY ─────────
 export function start({ topic } = {}) {
   S.reset();
-  Gate = { topicKey: pickTopic(topic), index: 0 };
-  // clean single bubble: plain menu (no inner card chrome)
-  return composeReply({
-    part: { kind: 'answer', html: menuCard() },
-    askAllowed: false,
-    noAck: true,
-    mode: 'recipes'
-  });
+  const picked = topic ? pickTopic(topic) : null;
+  Gate = { topicKey: picked, index: 0 };
+
+  if (picked) {
+    // user came in with a specific recipe
+    const html = stepHtml(picked, 0);
+    return {
+      html: composeReply({
+        part: { html },
+        askAllowed: true,
+        askText: 'want another step?',
+        noAck: true,
+        mode: 'recipe'
+      })
+    };
+  }
+
+  // otherwise, plain menu
+  return {
+    html: composeReply({
+      part: { kind: 'answer', html: menuCard() },
+      askAllowed: false,
+      noAck: true,
+      mode: 'recipe'
+    })
+  };
 }
+
 
 // ───────── LOOP ─────────
 export function handle(text = '') {
   const msg = String(text || '').trim();
 
   // router sometimes calls "start"
-  if (/^start\b/i.test(msg)) return start({ topic: Gate.topicKey });
+  if (/^start\b/i.test(msg)) return start({});
 
   // help
   if (/^help\b/i.test(msg)) {
@@ -128,18 +143,88 @@ export function handle(text = '') {
       ],
       'say "exit" to leave recipes.'
     );
-    return { html: composeReply({ part: { html: card }, askAllowed: false, noAck: true, mode: 'recipes' }) };
+    return { html: composeReply({ part: { html: card }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
 
   // stop / exit
-  if (/\b(stop|quit|pause|later|enough|exit)\b/i.test(msg)) {
-    return { html: composeReply({ part: { html: endHtml() }, askAllowed: false, noAck: true, mode: 'recipes' }), end: true };
+  // stop → stay in recipe booth (show menu)
+  // exit/quit/leave → leave the booth
+  if (/\b(exit|quit|leave)\b/i.test(msg)) {
+    return {
+      html: composeReply({ part: { html: endHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }),
+      end: true
+    };
   }
+
+  if (/\b(stop|pause|later|enough)\b/i.test(msg) || /\b(no thanks|not really)\b/i.test(msg)) {
+    S.reset?.();
+    Gate.index = 0;
+    // optional: clear topic so a bare “more” won’t repeat the last recipe
+    // Gate.topicKey = null;
+    return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
+  }
+
 
   // explicit menu
   if (/^menu\b/i.test(msg)) {
-    return composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipes' });
+    const html = menuCard();
+    return { html: composeReply({ part: { html }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
+
+  // --- NEW: interpret yes/more BEFORE topic switching ---
+  const yn = readAffirmative(msg);
+  const wantsMore = yn === 'yes' || /\b(more|next|again|continue|step|go|gimme|another)\b/i.test(msg);
+
+  if (wantsMore) {
+    // inside: if (wantsMore) { ... }
+    const r = RECIPES[Gate.topicKey] || RECIPES.quesadilla;
+    if (S.isCapReached() || Gate.index >= r.steps.length - 1) {
+    // reset stepper and clear topic so stray “more” won’t repeat
+    S.reset?.();
+    Gate.index = 0;
+    Gate.topicKey = null;
+
+    return {
+        html: composeReply({
+        part: { html: menuCard() }, // ← go straight to the menu
+        askAllowed: false,
+        noAck: true,
+        mode: 'recipe'
+        })
+        // no `end:true` — we remain inside recipe booth
+    };
+
+
+  }
+
+
+    // rate-limit
+    if (S.shouldBlock?.(msg)) {
+      return { html: composeReply({ part: { html: `<p>one snack at a time, legend.</p>` }, askAllowed: false, noAck: true, mode: 'recipe' }) };
+    }
+
+    // progress / end
+    if (S.isCapReached() || Gate.index >= r.steps.length - 1) {
+      return { html: composeReply({ part: { html: endHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }), end: true };
+    }
+    S.bump?.();
+    Gate.index = Math.min(Gate.index + 1, r.steps.length - 1);
+    const html = stepHtml(Gate.topicKey, Gate.index);
+    return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
+  }
+
+
+  if (yn === 'no') {
+    S.reset?.();
+    Gate.index = 0;
+    // optional: clear topic to be extra safe
+    // Gate.topicKey = null;
+    return {
+      html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' })
+    };
+  }
+
+  // --- end NEW block ---
 
   // topic switch (emit first step right away)
   const maybeTopic = pickTopic(msg);
@@ -148,32 +233,13 @@ export function handle(text = '') {
     Gate.index = 0;
     S.reset();
     const html = stepHtml(Gate.topicKey, Gate.index);
-    return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipes' }) };
+    return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
+  }
+  // If we have no active topic (e.g., after finishing), any “more/yes” should show the menu
+  if (!Gate.topicKey) {
+    return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
 
-  // yes/no semantics
-  const yn = readAffirmative(msg);
-  if (yn === 'no') {
-    return { html: composeReply({ part: { html: `<p>gotcha. want another booth?</p>` }, askAllowed: false, noAck: true, mode: 'recipes' }) };
-  }
-  const wantsMore = yn === 'yes' || !msg || /\b(more|next|again|continue|y)\b/i.test(msg);
-
-  // rate-limit
-  if (S.shouldBlock?.(msg)) {
-    return { html: composeReply({ part: { html: `<p>one snack at a time, legend.</p>` }, askAllowed: false, noAck: true, mode: 'recipes' }) };
-  }
-
-  // progress step
-  if (wantsMore) {
-    const r = RECIPES[Gate.topicKey] || RECIPES.quesadilla;
-    if (S.isCapReached() || Gate.index >= r.steps.length - 1) {
-      return { html: composeReply({ part: { html: endHtml() }, askAllowed: false, noAck: true, mode: 'recipes' }), end: true };
-    }
-    S.bump?.();
-    Gate.index = Math.min(Gate.index + 1, r.steps.length - 1);
-    const html = stepHtml(Gate.topicKey, Gate.index);
-    return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipes' }) };
-  }
 
   // gentle nudge
   return {
@@ -181,7 +247,7 @@ export function handle(text = '') {
       part: { html: `<p>recipes vibe — say <strong>more</strong>, <strong>stop</strong>, or pick: <em>quesadilla · snowcone · nachos · cocoa</em>.</p>` },
       askAllowed: false,
       noAck: true,
-      mode: 'recipes'
+      mode: 'recipe'
     })
   };
 }

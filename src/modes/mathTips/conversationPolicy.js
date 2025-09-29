@@ -4,6 +4,7 @@
 
 import { appState } from '../../data/appState.js';
 import { runInAction } from 'mobx';
+import { alreadyHasCard } from './qabot.js';
 
 // ───────────────────────────────────────────────────────────────────────────────
 // 🎭 Persona (gifted 8-year-old vibes, adult brain)
@@ -83,11 +84,7 @@ function resolveHtml(part) {
   return '';
 }
 
-// NEW: detect if the HTML already brings its own card chrome
-function alreadyHasCard(html = '') {
-  // any of our “full chrome” cards should bypass wrapping + ack/nudge
-  return /mt-(response|lecture|layer)-card/.test(html);
-}
+
 
 // ───────────────────────────────────────────────────────────────────────────────
 // 🗣️ Single-card composer (SMART WRAP)
@@ -120,8 +117,10 @@ export function composeReply({
 
   // If content is a full card, return it raw (no ack/nudge wrappers).
   if (hasCard) {
-    return body;
+  // ensure we truly pass through without adding any stray whitespace
+    return String(body);
   }
+
 
   // Otherwise produce a single, cozy response card with optional ack + nudge.
   const ack = noAck ? '' : formatStr(pick(PERSONA.ACKS), { userName });

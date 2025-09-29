@@ -168,7 +168,7 @@ export function handle(text = '') {
     Gate.waiting = false;
     return {
       html: composeReply({
-        part: { html: `<p>cool breeze. stay or switch — lessons, quiz, lore, recipes, calculator.</p>` },
+        part: { html: `<p>cool breeze. stay or switch — lessons, quiz, lore, recipe, calculator.</p>` },
         askAllowed: false
       })
     };

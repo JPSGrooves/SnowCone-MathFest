@@ -81,7 +81,7 @@ function endCard() {
       <li class="mt-response-item">lessons booth</li>
       <li class="mt-response-item">quiz booth</li>
       <li class="mt-response-item">lore booth</li>
-      <li class="mt-response-item">recipes booth</li>
+      <li class="mt-response-item">recipe booth</li>
       <li class="mt-response-item">calculator booth</li>
     </ul>
     <p class="mt-dim">or just ask a math question.</p>

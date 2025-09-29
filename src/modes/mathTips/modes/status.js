@@ -16,7 +16,7 @@ export function renderBoothsHelp() {
       <li>lessons booth</li>
       <li>quiz booth</li>
       <li>lore booth</li>
-      <li>recipes booth</li>
+      <li>recipe booth</li>
       <li>status booth</li>
       <li>calculator booth</li>
     </ul>
@@ -90,7 +90,7 @@ function statusHelp() {
     'Status Booth',
     [
       'say: "my badges", "streak", "level", "what should i study?"',
-      'switch booths: "lessons booth", "quiz booth", "lore booth", "recipes booth", "calculator booth"'
+      'switch booths: "lessons booth", "quiz booth", "lore booth", "recipe booth", "calculator booth"'
     ],
     'tip: status is read-only and instant.'
   );

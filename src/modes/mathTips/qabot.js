@@ -33,6 +33,13 @@ export function alreadyHasCard(html = '') {
       || /\bbooth-card\b/.test(s);
 }
 
+// Map user/registry keys to the modeManager key for MODES
+function modesKey(k = '') {
+  // If your modeManager uses MODES.recipe use that; else fall back to MODES.recipes
+  if (/^recipe(s)?$/i.test(k)) return (MODES.recipe ? 'recipe' : 'recipes');
+  return k;
+}
+
 
 
 // Layered booth menu card used by fallbacks/help (no extra "Alright, friend..." ack)
@@ -44,7 +51,7 @@ function boothMenuHTML(lead = 'Here’s the map — wanna jump into a booth?') {
       <li>lessons booth</li>
       <li>quiz booth</li>
       <li>lore booth</li>
-      <li>recipes booth</li>
+      <li>recipe booth</li>
      <li>status booth</li>
       <li>calculator booth</li>
     </ul>
@@ -57,13 +64,24 @@ function boothMenuHTML(lead = 'Here’s the map — wanna jump into a booth?') {
 function callMode(modeKey, text, extra = {}) {
   const mod = MODEx[modeKey];
   if (!mod) return { text: `<p>${modeKey} booth not found.</p>` };
-  const fn =
-    (typeof mod.handle === 'function' && mod.handle) ||
-    (typeof mod.run === 'function' && mod.run) ||
-    (typeof mod.start === 'function' && mod.start);
-  if (!fn) return { text: `<p>${modeKey} booth has no handler.</p>` };
-  return fn(text, extra);
+
+  const t = String(text ?? '').trim().toLowerCase();
+  const isStartish = !t || t === 'start';
+
+  // If we have real user input (e.g., "yes", "more"), route to handle/run first.
+  if (!isStartish) {
+    if (typeof mod.handle === 'function') return mod.handle(text, extra);
+    if (typeof mod.run    === 'function') return mod.run(text, extra);
+  }
+
+  // Fresh boot / explicit start
+  if (typeof mod.start === 'function') return mod.start(extra);
+  if (typeof mod.run   === 'function') return mod.run(text, extra);
+  if (typeof mod.handle=== 'function') return mod.handle(text, extra);
+
+  return { text: `<p>${modeKey} booth has no handler.</p>` };
 }
+
 
 
 // Response banks
@@ -84,9 +102,9 @@ const RESPONSES = {
   ],
   // before: "Ready to vibe, traveler? Try lessons booth or quiz fractions 3."
   who_are_you: [
-    "I’m Pythagorus Cat, triangle sorcerer and snowcone sage.",
-    "P-Cat, keeper of the hypotenuse, lover of melted cheese.",
-    "Just a cosmic cat slingin’ math and good vibes."
+    "I’m Pythagorus Cat! But my friends call me Grampy P, cousin of Cheshire Cat.",
+    "Pythagorus Cat, Grampy P, keeper of the hypotenuse, lover of melted cheese.",
+    "The name's Grampy P. Just a cosmic cat slingin’ math and good vibes."
   ],
   // when you build the reply, use: “…try lessons booth or quiz fractions.” instead of “…3.”
 
@@ -172,7 +190,14 @@ function consumePendingSwitch() {
 }
 
 
-function isAffirmative(s) { return /\b(yes|yep|yeah|sure|ok|okay|do it|go|switch|please|y)\b/i.test(s); }
+function isAffirmative(s) {
+  const t = String(s).toLowerCase();
+  return (
+    /\b(y(?:es+|ea|ep|up)|yeah|yea|yessir|sure|ok(?:ay)?|alright|bet|roger|10 4|indeed|affirmative)\b/.test(t) ||
+    /\b(let'?s\s+go|sounds\s+good|do\s+it|go|switch|please)\b/.test(t) ||
+    /^\s*y\s*$/.test(t)
+  );
+}
 function isNegative(s) { return /\b(no|nah|nope|stay|hold|not now|keep|later|n)\b/i.test(s); }
 
 // Math safety
@@ -236,6 +261,7 @@ function scoreIntent(input) {
   if (matcher(lower, 'greetings') || /\b(yo|hey|hi|what['’]?s\s*up|nm\s*man)\b/i.test(lower)) return { guess: 'greet', score: 0.75 };
   if (/\bhow\s*are\s*you\b/i.test(lower)) return { guess: 'how_are_you', score: 0.75 };
   if (/\bmath\b/.test(lower)) return { guess: 'math_general', score: 0.75 };
+  if (/\bfraction(s)?\s+quiz\b/i.test(lower) || /\bpercent(s)?\s+quiz\b/i.test(lower)) return { guess: 'quiz_fractions', score: 0.7 };
   if (/\bfractions?\b/.test(lower)) return { guess: 'quiz_fractions', score: 0.7 };
   if (/\bpercent\b/.test(lower)) return { guess: 'quiz_percent', score: 0.7 };
   if (matcher(lower, 'jokes')) return { guess: 'joke', score: 0.7 };
@@ -249,16 +275,29 @@ const SOFT_MODE_HINTS = {
   lessons: [/teach|lesson|show me|explain|how to/i],
   quiz: [/quiz|deal|question|practice|test me|drill/i],
   lore: [/lore|story|festival|characters?|backstory|canon/i],
-  recipes: [/recipe|cook|food|quesadilla|snack|kitchen/i],
+  recipe: [/recipe|recipes|cook|food|quesadilla|snack|kitchen/i], // ← add “recipes”
   calculator: [/calc|calculator|compute|evaluate|=|answer/i],
 };
+
 function softModeTarget(text) {
-  const t = String(text || '');
-  for (const [mode, regexes] of Object.entries(SOFT_MODE_HINTS)) {
-    if (regexes.some(r => r.test(t))) return mode;
+  const t = String(text || '').toLowerCase();
+
+  // 1) hard hints — if any recipe-y word appears, choose recipe first
+  if (/(?:\brecipe(?:s)?\b|quesadilla|snow\s*cone|snowcone|nachos|cocoa|cook|kitchen|snack|food)/i.test(t)) {
+    return 'recipe';
   }
+
+  // 2) other booths, in sensible order
+  if (/(quiz|question|practice|test me|drill)/i.test(t)) return 'quiz';
+  if (/(lore|story|festival|characters?|backstory|canon)/i.test(t)) return 'lore';
+  if (/(calc|calculator|compute|evaluate|=|answer)/i.test(t)) return 'calculator';
+
+  // 3) lessons last — let "show me" live here only if it didn't contain recipe words
+  if (/(teach|lesson|lessons|explain|how to|show me)/i.test(t)) return 'lessons';
+
   return null;
 }
+
 
 function maybeOffTopicRedirect(userText, currentMode) {
   const t = String(userText || '').toLowerCase().trim();
@@ -425,13 +464,15 @@ function routeUtterance(utterance) {
   // 2) “<booth> booth” (with typo forgiveness for calculator)
   {
     // normalize “claculator booth”, “calc booth”, etc.
-    const mBooth = t.match(/\b(lessons|quiz|lore|recipes|status|calculator|claculator|calcuator|calc)\s*booth\b/);
+    const mBooth = t.match(/\b(lessons|quiz|lore|recipe|recipes|status|calculator|claculator|calcuator|calc)\s*booth\b/);
     if (mBooth) {
-      let b = mBooth[1];
+      let b = normalizeBoothKey(mBooth[1]); // returns "recipes" for any recipe*
       if (/^clac|^calcu|^calc/.test(b)) b = 'calculator';
+      if (/^recipe/.test(b)) b = 'recipe';   // registry key for MODEx
 
-      const cur = getMode();
-      if (MODES[b] && cur === MODES[b]) {
+        const cur = getMode();
+        const mkey = modesKey(b);
+        if (MODES[mkey] && cur === MODES[mkey]) {
         // already there — re-emit current step (prevents confirm spam & double cards)
         if (b === 'quiz' && MODEx.quiz?.handle) {
           return adaptModeOutput(MODEx.quiz.handle('again', {}), text, 'booth:quiz') || { html: '' };
@@ -454,13 +495,13 @@ function routeUtterance(utterance) {
 
   // 3) “go to <booth>”, “open <booth>”, etc. (room/kiosk/station synonyms)
   {
-    const m = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipes?|status|calculator|claculator|calcuator|calc)\b/);
+    const m = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipe?|status|calculator|claculator|calcuator|calc)\b/);
     if (m) {
       let key = m[1];
       if (/lesson/.test(key)) key = 'lessons';
-      if (/recipe/.test(key)) key = 'recipes';
+      if (/recipe/.test(key)) key = 'recipe';
       if (/^clac|^calcu|^calc/.test(key)) key = 'calculator';
-      setPendingSwitch(key, text);
+      setPendingSwitch(normalizeBoothKey(key), text);
       return {
         html: composeReply({
           userText: text,
@@ -474,28 +515,41 @@ function routeUtterance(utterance) {
 
   // 4) “recipes <topic>” and topic shorthands (“snowcone”, “nachos”, “quesadilla”, “cocoa”)
   {
-    const topicOnly = t.match(/^(snowcone|nachos|quesadilla|cocoa|mango snowcone)\b/);
-    const recipeCmd = t.match(/^recipes?\s+(snowcone|nachos|quesadilla|cocoa|mango snowcone)\b/);
+    // 4) “<topic> recipe” and “recipe <topic>”
+    const topicCmd1 = t.match(/^(snowcone|nachos|quesadilla|cocoa)\s+recipe\b/);
+    const topicCmd2 = t.match(/^recipe\s+(snowcone|nachos|quesadilla|cocoa)\b/);
 
-    const topic = (recipeCmd && recipeCmd[1]) || (topicOnly && topicOnly[1]);
+    const topic = (topicCmd1 && topicCmd1[1]) || (topicCmd2 && topicCmd2[1]);
     if (topic) {
-      setMode(MODES.recipes);
-      // prefer .start with topic payload if available
-      const payload = { topic: topic.replace('mango ', '') }; // “mango snowcone” -> “snowcone”
-      const mod = MODEx.recipes;
+      setMode(MODES[modesKey('recipe')]);
+      const payload = { topic };
+      const mod = MODEx.recipe;
       let out = null;
 
       if (typeof mod?.start === 'function') out = mod.start(payload);
       else if (typeof mod?.handle === 'function') out = mod.handle(payload.topic, payload);
 
-      return adaptModeOutput(out, text, 'booth:recipes') || {
+      return adaptModeOutput(out, text, 'booth:recipe') || {
         html: composeReply({
           userText: text,
-          part: { kind: 'answer', html: `<p>Recipes booth warming up. Pick: <b>snowcone</b>, <b>nachos</b>, <b>quesadilla</b>, or <b>cocoa</b>.</p>` }
+          part: { kind: 'answer', html: `<p>Recipe booth warming up. Pick: <b>snowcone</b>, <b>nachos</b>, <b>quesadilla</b>, or <b>cocoa</b>.</p>` }
         })
       };
     }
   }
+  // Shorthand openers: "show me a recipe", "show me some recipes", "see recipes"
+  {
+    if (/\b(show|see|view|open|display|gimme|give me|bring)\b.*\brecipes?\b/i.test(t)) {
+      setMode(MODES[modesKey('recipe')]);
+      return adaptModeOutput(MODEx.recipe.start({}), text, 'booth:recipe');
+    }
+    // bare "recipe" / "recipes" as a quick alias
+    if (/^\s*recipes?\s*$/i.test(t)) {
+      setMode(MODES[modesKey('recipe')]);
+      return adaptModeOutput(MODEx.recipe.start({}), text, 'booth:recipe');
+    }
+  }
+
 
   // 5) Algebra quick intercepts (kept here so standalone callers get it)
   {
@@ -562,12 +616,37 @@ export function getResponse(userText, appStateLike = appState) {
   if (quiz.isActive?.(SESSION_ID)) {
     return quiz.handle(text, { sessionId: SESSION_ID });
   }
+  // 🍳 Fast path: recipe mentions (catch before smalltalk eats it)
+  if (/\brecipes?\b|quesadilla|snow\s*cone|nachos|cocoa/i.test(t)) {
+    setMode(MODES.recipe);
+    return adaptModeOutput(MODEx.recipe.start({}), text, 'booth:recipe');
+  }
+
   // 🔸 Small-talk intercept (lightweight, non-modal)
   {
-    const st = respondSmallTalk(userText, {
-      name: appStateLike?.profile?.name || 'traveler'
+    const st = maybeHandleSmallTalk(userText, {
+      name: appStateLike?.profile?.name || 'traveler',
+      appState: appStateLike,
+      botContext: ensureBC()
     });
-    if (st && st.html) {
+    if (st && st.handled) {
+      // obey SWITCH_MODE actions (e.g., to: 'recipe', payload: {topic:'snowcone'})
+      const act = st.action || {};
+      if (act.type === 'SWITCH_MODE') {
+        const regKey = normalizeBoothKey(act.to || '');  // 'recipe'/'recipes' → 'recipes' for legacy, we use registry below
+        const boothKey = /^recipe/i.test(regKey) ? 'recipe' : regKey; // registry key for MODEx
+        const modeKey  = modesKey(boothKey);             // key for MODES
+        if (MODES[modeKey]) setMode(MODES[modeKey]);
+ 
+        const payload = act.payload || {};
+        const mod = MODEx[boothKey];
+        let out = null;
+        if (typeof mod?.start === 'function') out = mod.start(payload);
+        else if (typeof mod?.handle === 'function') out = mod.handle(payload.topic || '', payload);
+        const adapted = adaptModeOutput(out, userText, `booth:${boothKey}`);
+        if (adapted) return adapted;
+      }
+      // no action → just return the smalltalk bubble
       return { html: st.html, meta: { intent: 'smalltalk' } };
     }
   }
@@ -579,14 +658,14 @@ export function getResponse(userText, appStateLike = appState) {
     if (isAffirmative(ans)) {
       const p = consumePendingSwitch();
       const to = p?.to || 'none';
-      setMode(MODES[to] || MODES.none);
+      setMode(MODES[modesKey(to)] || MODES.none);
       let prompt = '';
       if (to === 'lessons') prompt = `<p>Sweet. In lessons booth — what topic first: fractions, percent, or equations?</p>`;
       else if (to === 'quiz') prompt = `<p>Alright, quiz booth time! Want fractions, percent, or a mix?</p>`;
       else if (to === 'lore') prompt = `<p>Lore booth vibes! Wanna hear about the festival or the snowcone sages?</p>`;
-      else if (to === 'recipes') prompt = `<p>Recipes booth, let’s cook! Quesadillas or snowcones today?</p>`;
+      else if (to === 'recipe') prompt = `<p>Recipe booth, let’s cook! Quesadillas or snowcones today?</p>`;
       else if (to === 'calculator') prompt = `<p>Calculator booth ready! Toss me a math problem like 15% of 80.</p>`;
-      else prompt = `<p>Back in the village center. Pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+      else prompt = `<p>Back in the village center. Pick a booth: lessons, quiz, lore, recipe, or calculator.</p>`;
 
       if (p?.lastText) {
         const mod = MODEx[to];
@@ -649,13 +728,13 @@ export function getResponse(userText, appStateLike = appState) {
     return {
       html: composeReply({
         userText: text,
-        part: { kind: 'answer', html: `<p>Back to the village center, ${userName}. Pick a booth: lessons booth, quiz booth, lore booth, recipes booth, or calculator booth.</p>` }
+        part: { kind: 'answer', html: `<p>Back to the village center, ${userName}. Pick a booth: lessons booth, quiz booth, lore booth, recipe booth, or calculator booth.</p>` }
       }),
       meta: { intent: 'exit' }
     };
   }
   // B) booth phrase guard: if already in that booth, don’t confirm/restart
-  const mBooth = t.match(/\b(lessons|quiz|lore|recipes|calculator)\s*booth\b/i);
+  const mBooth = t.match(/\b(lessons|quiz|lore|recipe|calculator)\s*booth\b/i);
   if (mBooth) {
     const to = mBooth[1];
     const cur = getMode();
@@ -681,15 +760,15 @@ export function getResponse(userText, appStateLike = appState) {
     };
   }
 
-  const booth1 = t.match(/\b(lessons?|quiz|lore|recipes?|calculator|status)\s+(?:booth|room|kiosk|station)\b/);
-  const booth2 = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipes?|calculator|status)\s*(?:booth|room|kiosk|station)?\b/);
+  const booth1 = t.match(/\b(lessons?|quiz|lore|recipe?|calculator|status)\s+(?:booth|room|kiosk|station)\b/);
+  const booth2 = t.match(/\b(?:go|take me|switch|enter|open|head|send)\s*(?:me)?\s*(?:to|into)?\s*(?:the)?\s*(lessons?|quiz|lore|recipe?|calculator|status)\s*(?:booth|room|kiosk|station)?\b/);
   const norm = (w) => {
     if (!w) return null;
     if (/calculator/.test(w)) return 'calculator';
     if (/lesson/.test(w)) return 'lessons';
     if (/quiz/.test(w)) return 'quiz';
     if (/lore|story|festival/.test(w)) return 'lore';
-    if (/recipe/.test(w)) return 'recipes';
+    if (/recipe/.test(w)) return 'recipe';
     if (/status/.test(w)) return 'status';
     return null;
   };
@@ -707,17 +786,32 @@ export function getResponse(userText, appStateLike = appState) {
       meta: { intent: 'booth-switch', to: toBooth }
     };
   }
-  // A) direct start: "quiz fractions" (count optional; defaults to 3)
-  const mQuizStart = t.match(/^quiz(?:\s+(fractions?|percent))?(?:\s+(\d+))?$/i);
-  if (mQuizStart) {
-    const topic = (mQuizStart[1] || 'fractions');
-    const count = mQuizStart[2] ? Math.max(1, Math.min(5, parseInt(mQuizStart[2],10))) : 3;
-    setMode(MODES.quiz);
-    return adaptModeOutput(
-      MODEx.quiz.start({ topic, count, userText: text, sessionId: SESSION_ID }),
-      text,
-      'quiz_start'
-    );
+  // A) direct start: supports both orders
+  //    "quiz fractions 3" | "quiz percent" | "fraction quiz 4" | "percent quiz"
+  //    plurals optional; count optional (1..5, default 3)
+  {
+    const mA = t.match(/^quiz(?:\s+(fractions?|fraction|percents?|percent))?(?:\s+(\d+))?$/i);
+    const mB = t.match(/^(fractions?|fraction|percents?|percent)\s+quiz(?:\s+(\d+))?$/i);
+
+    let topic = null, count = null;
+    if (mA) {
+      topic = (mA[1] || 'fractions');
+      count = mA[2];
+    } else if (mB) {
+      topic = (mB[1] || 'fractions');
+      count = mB[2];
+    }
+
+    if (topic) {
+      topic = /perc/i.test(topic) ? 'percent' : 'fractions';
+      const n = count ? Math.max(1, Math.min(5, parseInt(count, 10))) : 3;
+      setMode(MODES.quiz);
+      return adaptModeOutput(
+        MODEx.quiz.start({ topic, count: n, userText: text, sessionId: SESSION_ID }),
+        text,
+        'quiz_start'
+      );
+    }
   }
 
 
@@ -729,6 +823,7 @@ export function getResponse(userText, appStateLike = appState) {
   // 1) Active booth with off-topic guard
   const currentMode = getMode();
   if (currentMode !== MODES.none) {
+    const regKey = (/recipe/i.test(String(currentMode)) ? 'recipe' : currentMode);
 
     // 🔮 calculator is global: answer percents/expressions without switching
       if (!quiz.isActive?.(SESSION_ID)) {
@@ -761,7 +856,11 @@ export function getResponse(userText, appStateLike = appState) {
       return { html: ask, meta: { intent: 'offTopicAsk', from: currentMode } };
     }
 
-    const out = callMode(currentMode, text, { sessionId: SESSION_ID });
+    const mod = MODEx[regKey];
+    const out = (mod?.handle)
+      ? mod.handle(text, { sessionId: SESSION_ID })
+      : callMode(regKey, text, { sessionId: SESSION_ID }); // fallback
+
     if (out) {
       const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
       // if a booth signals it has ended, drop back to the center
@@ -824,27 +923,28 @@ export function getResponse(userText, appStateLike = appState) {
             line = `<p>Cleared my short-term memory, ${userName}. Ready for quiz booth?</p>`;
             break;
           case 'reset':
-            line = `<p>Fresh slate, ${userName}. Pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+            line = `<p>Fresh slate, ${userName}. Pick a booth: lessons, quiz, lore, recipe, or calculator.</p>`;
             break;
           default:
             line = `<p>Command’s not clicking, ${userName}. Say help for options.</p>`;
         }
         break;
             case 'who': {
-        const line = `<p>${pick(RESPONSES.who_are_you)} Ready to vibe, ${userName}? Try lessons booth or quiz fractions 3.</p>`;
-        return {
-          html: composeReply({
-            userText: text,
-            part: { kind: 'answer', html: line },
-            askAllowed: false, // no nudge
-            noAck: true        // no "alright, friend."
-          }),
-          meta: { intent: guess }
-        };
-      }
+              const line = `<p>${pick(RESPONSES.who_are_you)}</p>`;
+              return {
+                html: composeReply({
+                  userText: text,
+                  part: { kind: 'answer', html: line },
+                  askAllowed: false, // no follow-up nudge
+                  noAck: true        // no “Alright...” preface
+                }),
+                meta: { intent: guess }
+              };
+            }
+
 
       case 'greet': {
-        const line = `<p>${pick(RESPONSES.greetings)} Let’s roll, ${userName} — pick a booth: lessons, quiz, lore, recipes, or calculator.</p>`;
+        const line = `<p>${pick(RESPONSES.greetings)} Let’s roll, ${userName} — pick a booth: lessons, quiz, lore, recipe, or calculator.</p>`;
         return {
           html: composeReply({
             userText: text,
@@ -1057,9 +1157,14 @@ export function attachAutoScroller(containerId = 'chat-window') {
 
 // Treat these as "booth-style" responses that should render as a single card (no global ack)
 function isBoothIntent(tag = '') {
-  return /^booth:/.test(tag)            // booth:lessons, booth:quiz, booth:lore, booth:recipes, booth:calculator
+  return /^booth:/.test(tag)            // booth:lessons, booth:quiz, booth:lore, booth:recipe, booth:calculator
       || tag === 'quiz_start'           // initial quiz deck
       || tag === 'calc-inline'          // inline calc while inside a booth
       || tag === 'percent'              // percent inline while inside a booth
       || tag === 'router';              // router/deck blocks we render as a card
 }
+function normalizeBoothKey(k = '') {
+  return /^recipe(s)?$/i.test(k) ? 'recipe' : k;
+}
+
+

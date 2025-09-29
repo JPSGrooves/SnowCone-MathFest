@@ -38,12 +38,23 @@ export function makeSession(opts = {}) {
 
 // Lightweight “yes/no” read for “want another?”
 // returns "yes" | "no" | null
-export function readAffirmative(s) {
-  const t = String(s || '').toLowerCase();
-  if (/\b(yes|y|sure|ok|okay|do it|another|one more|more)\b/.test(t)) return 'yes';
-  if (/\b(no|n|stop|enough|later|nah|nope)\b/.test(t)) return 'no';
+// _kit.js
+// /src/modes/mathTips/modes/_kit.js
+export function readAffirmative(s = '') {
+  const t = String(s).trim().toLowerCase();
+
+  // broader yes slang
+  const YES = /\b(yes|yeah|yea|yep|yup|sure|ok|okay|alright|bet|yessir|mhmm|mhm|absolutely|for sure|do it|go|next|whatever|whateva|more)\b/;
+
+  // polite/soft no
+  const NO = /\b(no|nope|nah|not now|maybe later|not really|no thanks|pass)\b/;
+
+  if (YES.test(t)) return 'yes';
+  if (NO.test(t))  return 'no';
   return null;
 }
+
+
 
 // A tiny card helper for mode-specific help
 export function helpCard(title, bullets = [], foot = '') {

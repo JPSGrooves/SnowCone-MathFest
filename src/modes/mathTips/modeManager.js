@@ -10,7 +10,7 @@ export const MODES = Object.freeze({
   lessons: 'lessons',
   quiz: 'quiz',
   lore: 'lore',
-  recipes: 'recipes',
+  recipe: 'recipe',
   status: 'status',
   calc: 'calc',
 });

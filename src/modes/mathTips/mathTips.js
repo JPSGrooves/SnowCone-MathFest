@@ -71,15 +71,17 @@ function resolveModeHandler(modeKey) {
 }
 
 function callMode(modeKey, text, extra = {}) {
-  try {
-    const fn = resolveModeHandler(modeKey);
-    if (!fn) return null;
-    return fn(text, extra);
-  } catch (err) {
-    console.warn(`[callMode] ${modeKey} crashed:`, err);
-    return { text: `<p>${modeKey} booth hiccuped. try again or say <code>help</code>.</p>` };
-  }
+  const mod = MODEx[modeKey];
+  if (!mod) return { text: `<p>${modeKey} booth not found.</p>` };
+
+  // Prefer a clean boot so “recipe booth” opens the menu, not step 1.
+  if (typeof mod.start === 'function') return mod.start(extra);
+  if (typeof mod.run   === 'function') return mod.run(text, extra);
+  if (typeof mod.handle=== 'function') return mod.handle(text, extra);
+
+  return { text: `<p>${modeKey} booth has no handler.</p>` };
 }
+
 
 // layered card wrapper to match other replies
 function wrapLayer(inner, { tone = 'cyan', title = '' } = {}) {
@@ -102,7 +104,7 @@ function menuHTML(name, prefix) {
       <li>lessons booth</li>
       <li>quiz booth</li>
       <li>lore booth</li>
-      <li>recipes booth</li>
+      <li>recipe booth</li>
       <li>status booth</li>
       <li>calculator booth</li>
     </ul>
@@ -403,48 +405,6 @@ function decodeEntities(s) {
     .replaceAll('&amp;','&');
 }
 
-function goldenShim(input, html) {
-  const q = String(input).trim().toLowerCase();
-  let patched = html;
-
-  // If getResponse double-escaped inner HTML, render it correctly.
-  if (/[&]lt;.+?[&]gt;/.test(patched)) patched = decodeEntities(patched);
-
-  const inserts = [];
-
-  // ensure help shows exact tokens the tests expect
-  if (q === 'help') {
-    inserts.push(
-      `<p>lessons booth · quiz booth · lore booth · recipes booth · status booth · calculator booth</p>`
-    );
-  }
-
-  // name check expects "grampy p" somewhere
-  if (/what(?:'| i)s your name|who are you/.test(q)) {
-    inserts.push(`<p>grampy p</p>`);
-  }
-
-  // exit phrase
-  if (/^(exit|back)$/.test(q)) {
-    inserts.push(`<p>back to the commons</p>`);
-  }
-
-  // two calc goldens:
-  if (/^\s*1\/2\s*\/\s*1\/2\s*$/.test(q)) {
-    inserts.push(`<p>= <strong>1</strong></p>`);
-  }
-  if (/sqrt\s*5\s*\*\s*sqrt\s*7/.test(q)) {
-    inserts.push(`<p>&asymp; 5.91608</p>`);
-  }
-
-  if (!inserts.length) return patched;
-
-  // append safely right before the closing of the outermost card if present
-  const idx = patched.lastIndexOf('</div>');
-  return idx > -1
-    ? patched.slice(0, idx) + inserts.join('') + patched.slice(idx)
-    : patched + inserts.join('');
-}
 
 
 async function handleSend() {
@@ -475,7 +435,7 @@ async function handleSend() {
     }
 
     // 🔧 make output golden-friendly + decode double-escaped inner HTML
-    const patched = goldenShim(userText, html);
+    const patched = decodeEntities(html); // keep only the de-escape
     appendMessage('bot', patched, /* alreadyHtml */ true);
 
     // chat log write → inside action
