@@ -1246,3 +1246,17 @@ body { margin: 0; }
 /* kill any old reverse stacks */
 .chat-scroll { flex-direction: column !important; }
 /* keep intro bubble width tidy */
+/* MathTips: restore vertical pan inside the chat ONLY, defeating the global kill switch */
+#game-container .mt-root .chat-window,
+#game-container .mt-root .chat-window * {
+  touch-action: pan-y !important;       /* ← outranks #game-container * { touch-action:none !important } */
+  -ms-touch-action: pan-y !important;   /* old Edge, harmless elsewhere */
+}
+
+/* keep your existing scroller behaviors */
+#game-container .mt-root .chat-window {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  min-height: 0;
+}

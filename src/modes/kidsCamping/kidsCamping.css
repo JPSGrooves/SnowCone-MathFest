@@ -1719,3 +1719,14 @@ html.kc-no-zoom, body.kc-no-zoom { overscroll-behavior: contain; }
   user-select: text !important;
   -webkit-touch-callout: default !important;
 }
+/* 📜 MathTips-only mobile scroll */
+.mt-root .chat-window,
+.mt-root .mt-content {
+  overflow-y: auto;                   /* ← enable scrolling */
+  -webkit-overflow-scrolling: touch;  /* ← iOS momentum */
+  touch-action: pan-y !important;     /* ← allow finger scroll */
+  overscroll-behavior: contain;       /* ← stop parent rubberband */
+}
+
+/* (optional) hide scrollbar but keep it working */
+.mt-root .chat-window::-webkit-scrollbar { display: none; }

@@ -108,6 +108,21 @@ const REPLIES = {
       lines: ["chillin’ like ice in a snowcone.", "you?"],
       hint: `say <code>fractions quiz</code> or <code>nachos recipe</code> to move.`
     }),
+    
+  friendsYes: () =>
+    bubble({
+      title: 'friends',
+      lines: ["for sure — i’m your math buddy now.", "we’ll stack cones together."],
+      hint: `pick a booth: <code>lessons</code> · <code>quiz</code> · <code>recipe</code>`
+    }),
+
+  happy: () =>
+    bubble({
+      title: 'mood',
+      lines: ["today’s a good day — glowing like the neon sign."],
+      hint: `quick win: <code>quiz percent 3</code>`
+    }),
+
 
   iAmTired: () =>
     bubble({
@@ -342,8 +357,39 @@ if (inRecipe) {
   if (now - lastReplyAt < MIN_COOLDOWN_MS) return null;
   lastReplyAt = now;
 
+  // —— name capture: "my name is X" | "call me X" | "i'm X" | "i am X"
+  {
+    const m = (utterance || '').match(/\b(?:my\s+name\s+is|call\s+me|i(?:'m| am))\s+([a-z][a-z '-]{1,20})\b/i);
+    if (m) {
+      const name = m[1].replace(/\b\w/g, c => c.toUpperCase()).trim();
+      try {
+        const app = ctx?.appState;
+        if (app) {
+          if (!app.profile) app.profile = {};
+          app.profile.name = name;        // used in MathTips copies
+          app.profile.username = name;    // used in Profile tab UI
+        }
+      } catch {}
+      return reply(bubble({
+        title: 'nice to meet you',
+        lines: [`welcome, <strong>${escapeHTML(name)}</strong>!`],
+        hint: `say <code>quiz fractions</code> or <code>snowcone recipe</code> to roll.`
+      }));
+    }
+  }
+
+  // —— friends / happy
+  if (like(u, ['can we be friends','be my friend','will you be my friend'])) {
+    return reply(REPLIES.friendsYes());
+  }
+  if (like(u, ['are you happy','are you ok','are you okay','are you sad'])) {
+    return reply(REPLIES.happy());
+  }
+  
+
+
   // 1) kindness/insult guard
-  if (like(u, ['you suck', 'i hate you', 'stupid bot', 'dummy'])) {
+  if (like(u, ['you suck', 'i hate you', 'stupid bot', 'dummy', 'fuck you', 'shut up', 'dumb bot', 'you are dumb', 'youre dumb', "you're dumb"])) {
     return reply(REPLIES.insultSoftGuard());
   }
 

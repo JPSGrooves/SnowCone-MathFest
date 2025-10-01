@@ -476,10 +476,11 @@ function routeUtterance(utterance) {
   // 2) “<booth> booth” (with typo forgiveness for calculator)
   {
     // normalize “claculator booth”, “calc booth”, etc.
-    const mBooth = t.match(/\b(lessons|quiz|lore|recipe|recipes|status|calculator|claculator|calcuator|calc)\s*booth\b/);
+    const mBooth = t.match(/\b(lessons|quiz|lore|recipe|recipes|status|staus|calculator|claculator|calcuator|calc)\s*booth\b/);
     if (mBooth) {
       let b = normalizeBoothKey(mBooth[1]); // returns "recipes" for any recipe*
       if (/^clac|^calcu|^calc/.test(b)) b = 'calculator';
+      if (/^staus$/i.test(b)) b = 'status';
       if (/^recipe/.test(b)) b = 'recipe';   // registry key for MODEx
 
         const cur = getMode();
@@ -635,7 +636,7 @@ export function getResponse(userText, appStateLike = appState) {
   const SESSION_ID = appStateLike.progress.mathtips.sessionId;
 
   // 🔌 global exit/leave synonyms — run before smalltalk & fast paths
-  if (/\b(leave|leave\s+mode|exit|quit|back(?:\s+to)?\s+(?:commons?|center|village)|go\s*home|return|main\s*menu)\b/i.test(t)) {
+  if (/\b(leave|leave\s+mode|exit|quit|out|back(?:\s+to)?\s+(?:commons?|center|village)|go\s*home|return|main\s*menu)\b/i.test(t)) {
     setMode(MODES.none);
     clearBoothContext();
     return {
@@ -662,6 +663,20 @@ export function getResponse(userText, appStateLike = appState) {
     setMode(MODES.recipe);
     return adaptModeOutput(MODEx.recipe.start({}), text, 'booth:recipe');
   }
+
+  // 🔎 Quick Status intent: "status", "my status", "what's my status?"
+  {
+    const isStatusQuick = /^\s*(?:what(?:'s|\s+is)\s+my\s+status|my\s+status|status)\s*\??\s*$/i.test(t);
+    if (isStatusQuick) {
+      setMode(MODES.status);
+      return adaptModeOutput(
+        MODEx.status.start({ sessionId: SESSION_ID }),
+        text,
+        'booth:status'
+      );
+    }
+  }
+
 
 
   // 🔸 Small-talk intercept (lightweight, non-modal)
@@ -747,6 +762,30 @@ const st = maybeHandleSmallTalk(userText, {
         meta: { intent: 'booth-switch-decline' }
       };
     }
+    // NEW: explain the target if user asks "what is it/what's that"
+    if (/\b(what(?:'s|\s+is)\s+(?:it|that))\b/i.test(ans)) {
+      const to = bc0.pendingSwitch?.to || 'lessons';
+      const oneLiners = {
+        lessons:    'Lessons booth gives short, guided mini-lessons with examples.',
+        quiz:       'Quiz booth drills bite-size questions — fast reps, instant feedback.',
+        lore:       'Lore booth drops short festival stories and worldbuilding cards.',
+        recipe:     'Recipe booth serves cozy snack cards like snowcones and quesadillas.',
+        calculator: 'Calculator booth answers quick math like 15% of 80.',
+        status:     'Status booth shows your level, streak, badges, and what to do next.'
+      };
+      const desc = oneLiners[to] || 'A handy booth to keep you moving.';
+      return {
+        html: composeReply({
+          userText: text,
+          part: { kind: 'confirm', html: `<p>${desc}</p><p>Jump into <b>${to}</b> booth?</p>` },
+          askAllowed: false,
+          noAck: true
+        }),
+        meta: { intent: 'booth-switch-explain', to }
+      };
+    }
+
+
     return {
       html: composeReply({
         userText,
@@ -787,7 +826,7 @@ const st = maybeHandleSmallTalk(userText, {
   }
 
   // B) booth phrase guard: if already in that booth, don’t confirm/restart
-  const mBooth = t.match(/\b(lessons|quiz|lore|recipe|calculator)\s*booth\b/i);
+  const mBooth = t.match(/\b(lessons|quiz|lore|recipe|calculator|status)\s*booth\b/i);
   if (mBooth) {
     const to = mBooth[1];
     const cur = getMode();
@@ -1231,7 +1270,9 @@ function isBoothIntent(tag = '') {
       || tag === 'router';              // router/deck blocks we render as a card
 }
 function normalizeBoothKey(k = '') {
-  return /^recipe(s)?$/i.test(k) ? 'recipe' : k;
+  if (/^recipe(s)?$/i.test(k)) return 'recipe';
+  if (/^staus$/i.test(k))      return 'status';
+  return k;
 }
 
 
