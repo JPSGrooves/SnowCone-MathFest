@@ -187,6 +187,12 @@ function clearBoothContext() {
   });
 }
 
+// place near other tiny helpers
+function lastLessonTopicOrDefault() {
+  try { return appState?.progress?.mathtips?.botContext?.lastLessonTopic || 'fractions'; }
+  catch { return 'fractions'; }
+}
+
 
 function setPendingSwitch(toMode, lastText) {
   const bc = ensureBC();
@@ -423,6 +429,15 @@ function renderRouterResultToHTML(routerRes, userText) {
     meta: { intent: 'router' }
   };
 }
+// ——— inline Calculator helper (reuse the booth's solvers) ———
+function inlineCalcHTML(text) {
+  try {
+    const html = MODEx?.calculator?.quickSolve?.(text);
+    return (typeof html === 'string' && html.trim()) ? html : null;
+  } catch { 
+    return null; 
+  }
+}
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -462,16 +477,22 @@ function routeUtterance(utterance) {
 
 
   // 1) explicit quiz start: "quiz fractions 3" | "quiz percent 3"
+  // 1) explicit quiz start: "quiz …" (topic optional)
   {
-    const mQuizStart = t.match(/^quiz(?:\s+(fractions?|percent))?(?:\s+(\d+))?$/i);
+    const mQuizStart = t.match(/^quiz\b(?:\s+(fractions?|percent|equations?))?(?:\s+(\d+))?$/i);
     if (mQuizStart) {
-      const topic = (mQuizStart[1] || 'fractions');
+      const raw = mQuizStart[1];
+      const topic = raw
+        ? (/perc/i.test(raw) ? 'percent' : /equation/i.test(raw) ? 'equations' : 'fractions')
+        : lastLessonTopicOrDefault();                // ✅ respect lessons topic
       const count = mQuizStart[2] ? Math.max(1, Math.min(5, parseInt(mQuizStart[2], 10))) : 3;
+
       setMode(MODES.quiz);
       const out = MODEx.quiz.start({ topic, count });
       return adaptModeOutput(out, text, 'quiz_start') || { html: '' };
     }
   }
+
 
   // 2) “<booth> booth” (with typo forgiveness for calculator)
   {
@@ -637,6 +658,7 @@ export function getResponse(userText, appStateLike = appState) {
 
   // 🔌 global exit/leave synonyms — run before smalltalk & fast paths
   if (/\b(leave|leave\s+mode|exit|quit|out|back(?:\s+to)?\s+(?:commons?|center|village)|go\s*home|return|main\s*menu)\b/i.test(t)) {
+    try { quiz.end?.(SESSION_ID); } catch {}     // ← NEW: kill any active quiz deck
     setMode(MODES.none);
     clearBoothContext();
     return {
@@ -651,7 +673,14 @@ export function getResponse(userText, appStateLike = appState) {
 
   // 🔒 Quiz takes precedence over everything (prevents Calculator hijack)
   if (quiz.isActive?.(SESSION_ID)) {
-    return quiz.handle(text, { sessionId: SESSION_ID });
+    // if user tries a booth switch while quizzing, end quiz and let router handle it
+    if (/\b(lessons|quiz|lore|recipe|status|calculator)\s*booth\b/i.test(t)
+        || /\b(go|take me|switch|enter|open|head|send)\b/i.test(t)) {
+      try { quiz.end?.(SESSION_ID); } catch {}
+      // fall through to normal routing (don’t return here)
+    } else {
+      return quiz.handle(text, { sessionId: SESSION_ID });
+    }
   }
   // 🍳 Fast path: explicit recipe topics → jump straight in
   if (/\b(quesadilla|snow\s*cone|snowcone|nachos|cocoa)\b/i.test(t)) {
@@ -881,21 +910,26 @@ const st = maybeHandleSmallTalk(userText, {
   // A) direct start: supports both orders
   //    "quiz fractions 3" | "quiz percent" | "fraction quiz 4" | "percent quiz"
   //    plurals optional; count optional (1..5, default 3)
+  // A) direct start: supports "quiz …" and "<topic> quiz"
   {
-    const mA = t.match(/^quiz(?:\s+(fractions?|fraction|percents?|percent))?(?:\s+(\d+))?$/i);
-    const mB = t.match(/^(fractions?|fraction|percents?|percent)\s+quiz(?:\s+(\d+))?$/i);
+    const mA = t.match(/^quiz(?:\s+(fractions?|fraction|percents?|percent|equations?))?(?:\s+(\d+))?$/i);
+    const mB = t.match(/^(fractions?|fraction|percents?|percent|equations?)\s+quiz(?:\s+(\d+))?$/i);
 
     let topic = null, count = null;
+
     if (mA) {
-      topic = (mA[1] || 'fractions');
+      const raw = mA[1];
+      topic = raw
+        ? (/perc/i.test(raw) ? 'percent' : /equation/i.test(raw) ? 'equations' : 'fractions')
+        : lastLessonTopicOrDefault();                // ✅ respect lessons topic
       count = mA[2];
     } else if (mB) {
-      topic = (mB[1] || 'fractions');
+      const raw = mB[1];
+      topic = /perc/i.test(raw) ? 'percent' : /equation/i.test(raw) ? 'equations' : 'fractions';
       count = mB[2];
     }
 
     if (topic) {
-      topic = /perc/i.test(topic) ? 'percent' : 'fractions';
       const n = count ? Math.max(1, Math.min(5, parseInt(count, 10))) : 3;
       setMode(MODES.quiz);
       return adaptModeOutput(
@@ -907,101 +941,83 @@ const st = maybeHandleSmallTalk(userText, {
   }
 
 
+
   // 0c) Algebra intercepts
   const alg = algebraIntercept(text);
   if (alg) return { html: alg, meta: { intent: 'algebra', topic: 'algebra' } };
 
   // 1) Active booth with off-topic guard
   // 1) Active booth with off-topic guard
+  // 1) Active booth with off-topic guard
   const currentMode = getMode();
+  const regKey = (/recipe/i.test(String(currentMode)) ? 'recipe' : currentMode);
+
   if (currentMode !== MODES.none) {
-    const regKey = (/recipe/i.test(String(currentMode)) ? 'recipe' : currentMode);
-
-    // 🔮 calculator is global: answer percents/expressions without switching
-      if (!quiz.isActive?.(SESSION_ID)) {
-        const pcent = tryPercentOf(t);
-      if (pcent) {
-        return {
-          html: composeReply({
-            userText: text,
-            part: { kind: 'answer', html: wrapLayerCard(`<p>${pcent.p}% of ${pcent.n} is ${pcent.ans}.</p>`) }
-          }),
-          meta: { intent: 'calc-inline', topic: 'calculator' }
-        };
-      }
-      if (SAFE_EXPR.test(t)) {
-        try {
-          const result = evalSafeExpression(t);
-          return {
-            html: composeReply({
-              userText: text,
-              part: { kind: 'answer', html: wrapLayerCard(`<p>${t} = ${result}</p>`) }
-            }),
-            meta: { intent: 'calc-inline', topic: 'calculator' }
-          };
-        } catch { /* fall through to booth */ }
-      }
-    }
-
-    const ask = maybeOffTopicRedirect(text, currentMode);
-    if (ask) {
-      return { html: ask, meta: { intent: 'offTopicAsk', from: currentMode } };
-    }
-
-    const mod = MODEx[regKey];
-    const out = (mod?.handle)
-      ? mod.handle(text, { sessionId: SESSION_ID })
-      : callMode(regKey, text, { sessionId: SESSION_ID }); // fallback
-
-  if (out) {
-    const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
-    if (adapted) {
-      if (adapted?.meta?.end) {
-        setMode(MODES.none);
-        clearBoothContext();
-        // Return the Commons menu so the user *sees* we’ve left
-        return {
-          html: composeReply({
-            userText: text,
-            part: { kind: 'answer', html: boothMenuHTML('👋 Back to the village center.') },
-            askAllowed: false,
-            noAck: true
-          }),
-          meta: { intent: 'exit' }
-        };
-      }
-      return adapted;
-    }
-  }
-
-
-    // ... keep your existing fallback
-  }
-
-
-  // 🔮 calculator is global: answer percent or safe expressions without switching modes
+    // 🔮 calculator is global: quick calcs (discount/tip/tax/split/change/…) win early
     if (!quiz.isActive?.(SESSION_ID)) {
-      const p = tryPercentOf(t);
-    if (p) {
-      return {
-        html: composeReply({
-          userText: text,
-          part: { kind: 'answer', html: `<p>${p.p}% of ${p.n} is ${p.ans}.</p>` },
-        }),
-        meta: { intent: 'calc-inline', topic: 'calculator' }
-      };
+      const calcHtml = inlineCalcHTML(t);
+      if (calcHtml) {
+        return {
+          html: composeReply({ userText: text, part: { kind:'answer', html: calcHtml } }),
+          meta: { intent:'calc-inline', topic:'calculator' }
+        };
+      }
     }
+
+    // plain safe expression (e.g., "2+3*8")
     if (SAFE_EXPR.test(t)) {
       try {
         const result = evalSafeExpression(t);
         return {
           html: composeReply({
             userText: text,
-            part: { kind: 'answer', html: `<p>${t} = ${result}</p>` },
+            part: { kind: 'answer', html: `<p>${t} = ${result}</p>` }
           }),
           meta: { intent: 'calc-inline', topic: 'calculator' }
         };
-      } catch { /* ignore and continue booth */ }
+      } catch {/* fall through */}
+    }
+
+
+    // hand off to the active booth
+    const mod = MODEx[regKey];
+    const out = (mod?.handle)
+      ? mod.handle(text, { sessionId: SESSION_ID })
+      : callMode(regKey, text, { sessionId: SESSION_ID });
+
+    if (out) {
+      const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
+      if (adapted) {
+        if (adapted?.meta?.end) {
+          setMode(MODES.none);
+          clearBoothContext();
+          // Return the Commons menu so the user *sees* we’ve left
+          return {
+            html: composeReply({
+              userText: text,
+              part: { kind: 'answer', html: boothMenuHTML('👋 Back to the village center.') },
+              askAllowed: false,
+              noAck: true
+            }),
+            meta: { intent: 'exit' }
+          };
+        }
+        return adapted;
+      }
+    }
+    // ... fall through; global inline-calc check below still runs
+  }
+
+
+
+  // 🔮 calculator is global: catch quick calcs *before* percent→quiz intent
+  if (!quiz.isActive?.(SESSION_ID)) {
+    const calcHtml = inlineCalcHTML(t);
+    if (calcHtml) {
+      return {
+        html: composeReply({ userText: text, part:{ kind:'answer', html: calcHtml } }),
+        meta: { intent:'calc-inline', topic:'calculator' }
+      };
     }
   }
 
@@ -1128,39 +1144,39 @@ const st = maybeHandleSmallTalk(userText, {
         setMode(MODES.quiz);
         return adaptModeOutput(MODEx.quiz.start({ topic: 'percent', count: 3, userText: text }), text, 'quiz_start');
       case 'percent': {
-        const p = tryPercentOf(t);
-        if (p) {
+        const raw = MODEx.calculator?.quickSolve?.(text) || '';
+        if (raw) {
           setMode(MODES.calculator);
           return {
             html: composeReply({
               userText: text,
-              part: { kind: 'answer', html: `<p>${p.p}% of ${p.n} is ${p.ans}. More math in calculator booth, ${userName}?</p>` }
+              part: { kind: 'answer', html: wrapLayerCard(raw) }
             }),
-            meta: { intent: 'percent', topic: 'calculator' }
+            meta: { intent: 'calc-inline', topic: 'calculator' }
           };
         }
         break;
       }
       case 'calc': {
-        try {
-          const result = evalSafeExpression(t);
+        const raw = MODEx.calculator?.quickSolve?.(text) || '';
+        if (raw) {
           setMode(MODES.calculator);
           return {
             html: composeReply({
               userText: text,
-              part: { kind: 'answer', html: `<p>${t} = ${result}. Toss another in calculator booth, ${userName}?</p>` }
+              part: { kind: 'answer', html: wrapLayerCard(raw) }
             }),
-            meta: { intent: 'calc', topic: 'calculator' }
-          };
-        } catch {
-          return {
-            html: composeReply({
-              userText: text,
-              part: { kind: 'answer', html: `<p>That math’s a bit wild, ${userName}. Try something like 15% of 80 or jump to calculator booth.</p>` }
-            }),
-            meta: { intent: 'calc-fail' }
+            meta: { intent: 'calc-inline', topic: 'calculator' }
           };
         }
+        // pretty fail, but still a single card
+        return {
+          html: composeReply({
+            userText: text,
+            part: { kind: 'answer', html: wrapLayerCard(`<p>couldn’t parse that one. try <code>27% off $10</code> or <code>3/8 as decimal</code>.</p>`) }
+          }),
+          meta: { intent: 'calc-fail' }
+        };
       }
 
       default: {

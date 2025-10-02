@@ -1,6 +1,7 @@
 // /src/modes/mathTips/modes/lessons.js
 import { composeReply } from '../conversationPolicy.js';
 import { makeSession, readAffirmative, helpCard } from './_kit.js';
+import { appState } from '../../../data/appState.js';
 
 // Session still caps “next” advances so we don’t rattle on forever.
 const S = makeSession({ capMin: 3, capMax: 4 });
@@ -48,7 +49,7 @@ function menuCard() {
       <li><strong>percent</strong> — of · change · tip/tax/discount · reverse %</li>
       <li><strong>equations</strong> — y=mx+b · point-slope · two-point slope · standard</li>
     </ul>
-    <p class="mt-dim">say a topic (“fractions”, “percent”, “equations”) or <em>next</em> / <em>again</em> / <em>quiz me</em>.</p>
+    <p class="mt-dim">say a topic (“fractions”, “percent”, “equations”) or <em>quiz me</em> to practice this topic now.</p>
   `;
 }
 
@@ -71,6 +72,15 @@ function emitChunk(key, idx) {
   return composeReply({ part: { kind: 'answer', html }, askAllowed: true, mode: 'lessons' });
 }
 
+function rememberLessonTopic(k) {
+  try {
+    if (!appState.progress) appState.progress = {};
+    if (!appState.progress.mathtips) appState.progress.mathtips = {};
+    if (!appState.progress.mathtips.botContext) appState.progress.mathtips.botContext = {};
+    appState.progress.mathtips.botContext.lastLessonTopic = k; // 'fractions'|'percent'|'equations'
+  } catch {}
+}
+
 /* ───────────────── ENTRY ───────────────── */
 /**
  * Start now shows the menu first (single bubble), then waits for the user
@@ -79,6 +89,7 @@ function emitChunk(key, idx) {
 export function start({ topic } = {}) {
   S.reset();
   Gate = { waiting: true, topicKey: pickTopic(topic), index: 0 };
+  rememberLessonTopic(Gate.topicKey);              // ← NEW
 
   // show only one bubble: the menu itself
   return composeReply({
@@ -158,7 +169,7 @@ export function handle(text = '') {
     Gate.topicKey = maybeTopic;
     Gate.index = 0;
     Gate.waiting = true;
-    // emit first slide of the chosen topic right away (feels snappier than re-showing menu)
+    rememberLessonTopic(Gate.topicKey);              // ← NEW
     return { html: emitChunk(Gate.topicKey, Gate.index) };
   }
 

@@ -106,28 +106,28 @@ const REPLIES = {
     bubble({
       title: "vibes check",
       lines: ["chillin’ like ice in a snowcone.", "you?"],
-      hint: `say <code>fractions quiz</code> or <code>nachos recipe</code> to move.`
+      hint: `say <code>fractions quiz</code> or <code>nachos recipe</code> to make a move.`
     }),
     
   friendsYes: () =>
     bubble({
       title: 'friends',
       lines: ["for sure — i’m your math buddy now.", "we’ll stack cones together."],
-      hint: `pick a booth: <code>lessons</code> · <code>quiz</code> · <code>recipe</code>`
+      hint: `maybe pick a booth? <code>lessons</code> · <code>quiz</code> · <code>recipe</code>`
     }),
 
   happy: () =>
     bubble({
       title: 'mood',
-      lines: ["today’s a good day — glowing like the neon sign."],
-      hint: `quick win: <code>quiz percent 3</code>`
+      lines: ["today’s been a good day — I'm glowing like the neon signs used in the first prompt!"],
+      hint: `learn more about this place: <code>lore booth</code>`
     }),
 
 
   iAmTired: () =>
     bubble({
       title: "rest mode",
-      lines: ["heard. tiny steps still stack cones.", "want an easy win or a snack?"],
+      lines: ["heard. just remember that tiny steps still stack the cones.", "want an easy win or a snack?"],
       hint: `try <code>lessons booth</code> or <code>cocoa recipe</code>.`
     }),
 
@@ -135,7 +135,7 @@ const REPLIES = {
     bubble({
       title: "whoa, friend",
       lines: ["i keep the vibe kind. let’s refocus — snack, joke, or quick math?"],
-      hint: `say <code>tell me a joke</code> or ask any math.`
+      hint: `say <code>tell me a joke</code> or visit the calculator booth.`
     }),
 
   foodOpener: () =>
