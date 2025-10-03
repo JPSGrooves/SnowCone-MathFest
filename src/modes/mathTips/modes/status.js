@@ -124,6 +124,11 @@ export function start() {
 export function handle(text = '') {
   const t = String(text || '').toLowerCase().trim();
 
+  // ignore pure acknowledgments so we don't echo stats for "awesome/thanks/goodbye"
+  if (/^\s*(awesome|cool|thanks|thank you|goodbye|bye|later|peace out)\s*!*\s*$/i.test(t)) {
+    return null;
+  }
+
   // help → same as start() (keeps card count tight)
   if (/^help\b/.test(t)) return { html: start() };
 

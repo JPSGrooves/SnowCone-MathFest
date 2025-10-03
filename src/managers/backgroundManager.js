@@ -64,28 +64,29 @@ const labelColorMap = {
     options:  '#cccccc'
   },
   spring: {
-    kids:     '#cc66ff',
-    quick:    '#00cc99',
-    tips:     '#ffcc66',
-    story:    '#ff66aa',
-    infinity: '#66ddff',
-    options:  '#9999cc'
+    kids:     '#ebc2ff',
+    quick:    '#29ffc9',
+    tips:     '#ffebc2',
+    story:    '#ffc2dd',
+    infinity: '#c2f1ff',
+    options:  '#d4d4ed'
   },
   summer: {
-    kids:     '#ffdd00',
-    quick:    '#ff6600',
-    tips:     '#33cc33',
-    story:    '#ff3399',
-    infinity: '#00ddff',
-    options:  '#ff9933'
+    kids:     '#ffdd00',  // same
+    quick:    '#ff8f2b',  // a tad brighter than #ff7a1a
+    tips:     '#3ad63a',  // just a tad brighter than #33cc33
+    story:    '#ff99e6',  // brighter than #ff66cc
+    infinity: '#00ddff',  // same
+    options:  '#fff2e6'   // basically white (soft warm tint)
   },
+
   fall: {
     kids:     '#ffaa00',
     quick:    '#ff6600',
     tips:     '#66cc33',
     story:    '#cc6633',
     infinity: '#ffffff',
-    options:  '#663300'
+    options:  '#a377cc'
   },
   winter: {
     kids:     '#aaddff',

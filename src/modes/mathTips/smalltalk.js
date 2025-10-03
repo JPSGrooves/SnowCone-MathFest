@@ -12,7 +12,7 @@ const MIN_COOLDOWN_MS = 500;  // gentle flood guard so small talk doesn't spam
 let lastReplyAt = 0;
 
 // If you want “kiddo” easter-egg for love notes, add usernames here:
-const KID_WHITELIST = []; // e.g., ['Avery', 'Miles']
+
 
 // ————————————————————————————————————————————————————————————
 // Tiny utils
@@ -35,6 +35,19 @@ const like = (s, words) => {
 
 const any = (s, ...phrases) => phrases.some(p => norm(s) === norm(p));
 const starts = (s, ...prefixes) => prefixes.some(p => norm(s).startsWith(norm(p)));
+
+// If you want “kiddo” easter-egg for love notes, add usernames here:
+// 🔝 put this near the top of smalltalk.js, above isKidContext()
+const KID_WHITELIST = []; // e.g., ['Avery', 'Miles']
+
+function isKidContext(u, ctx) {
+  const username = (ctx?.appState?.profile?.username || ctx?.name || '').trim();
+  // “Dad ...” messages should flip to kid mode regardless of username
+  if (/\bdad\b/i.test(String(u))) return true;
+  // or explicit names you trust
+  return KID_WHITELIST.includes(username);
+}
+
 
 // ————————————————————————————————————————————————————————————
 // Composer-friendly bubble builder
@@ -183,14 +196,21 @@ const REPLIES = {
       hint: `want lore? say <code>lore booth</code>.`
     }),
 
-  loveNote: (isKid) =>
+  // ——— in REPLIES ———
+  loveNoteKid: () =>
     bubble({
-      title: isKid ? "hey, kiddo" : "big heart energy",
-      lines: isKid
-        ? ["i love you and will always love you.", "proud of you. always."]
-        : ["appreciate the kindness!"],
+      title: "hey, kiddo",
+      lines: ["i love you and will always love you.", "proud of you. always."],
       hint: `want a story? say <code>lore booth</code>.`
     }),
+
+  loveNoteNotKid: () =>
+    bubble({
+      title: "big heart energy",
+      lines: ["appreciate the kindness!"],
+      hint: `want a story? say <code>lore booth</code>.`
+    }),
+
 
   homeWhere: () =>
     bubble({
@@ -385,11 +405,21 @@ if (inRecipe) {
   if (like(u, ['are you happy','are you ok','are you okay','are you sad'])) {
     return reply(REPLIES.happy());
   }
+  if (like(u, ['awesome','cool thanks','thanks so much','thank you','thanks'])) {
+    return reply(REPLIES.thanks ? REPLIES.thanks() : bubble({
+      title: "you got it",
+      lines: ["want another? i can do tips, tax, discounts, or fraction mashups."]
+    }));
+  }
+
   
 
 
   // 1) kindness/insult guard
   if (like(u, ['you suck', 'i hate you', 'stupid bot', 'dummy', 'fuck you', 'shut up', 'dumb bot', 'you are dumb', 'youre dumb', "you're dumb"])) {
+    return reply(REPLIES.insultSoftGuard());
+  }
+  if (like(u, ['bitch','asshole','jerk','loser'])) {
     return reply(REPLIES.insultSoftGuard());
   }
 
@@ -399,6 +429,12 @@ if (inRecipe) {
   }
   if (like(u, ['i am tired', "i’m tired", "im tired", "man i am tired", "man i'm tired", "man im tired"])) {
     return reply(REPLIES.iAmTired());
+  }
+  if (like(u, [
+    'how are you','how r u','hru','how you feeling',
+    'how ya doin', 'how ya doing', "how ya doin?"
+  ])) {
+    return reply(REPLIES.howAreYou());
   }
 
   // 3) food & recipes nudge
@@ -435,21 +471,50 @@ if (inRecipe) {
   if (like(u, ['been to the ocean', 'ocean', 'beach'])) {
     return reply(REPLIES.ocean());
   }
+  if (like(u, ['been to the ocean', 'ocean', 'beach'])) {
+    return reply(REPLIES.ocean());
+  }
+  // stars / planet variants (cover: "you ever look at the stars?", "what's your favorite planet?")
+  if (like(u, ['look at the stars','the stars','stars','stargaze'])) {
+    return reply(bubble({
+      title: "night sky",
+      lines: ["every clear night is a geometry lesson. constellations = polygons with better PR."],
+      hint: `want lore? say <code>lore booth</code>.`
+    }));
+  }
+  if (like(u, ['favorite planet','what is your favorite planet',"what's your favorite planet",'planet'])) {
+    return reply(bubble({
+      title: "planet pick",
+      lines: ["saturn — fashion icon. those rings? infinite drip."]
+    }));
+  }
+
 
   // 6) love / family easter hook
   if (like(u, ['i love you', 'love you'])) {
-    const name = ctx?.appState?.profile?.username || '';
-    const isKid = KID_WHITELIST.includes(name);
-    return reply(REPLIES.loveNote(isKid));
+    return reply(isKidContext(utterance, ctx) ? REPLIES.loveNoteKid() : REPLIES.loveNoteNotKid());
   }
   if (like(u, ['dad i love you', 'dad i miss you'])) {
-    const name = ctx?.appState?.profile?.username || '';
-    const isKid = KID_WHITELIST.includes(name);
-    return reply(REPLIES.loveNote(isKid));
+    // force kid mode when “Dad …” appears
+    return reply(REPLIES.loveNoteKid());
   }
+  if (like(u, ['do you love me','u love me','do u love me','love me?'])) {
+    // mirror your “do you love me” path with the same kid detection
+    return reply(
+      isKidContext(utterance, ctx)
+        ? REPLIES.loveNoteKid()
+        : bubble({
+            title: "love check",
+            lines: ["i’m a cat — i love in concentric circles of purr. let’s learn something together."],
+            hint: `say <code>lore booth</code> for a cozy tale.`
+          })
+    );
+  }
+
   if (like(u, ['dad tell me a story'])) {
     return reply(REPLIES.dadStory());
   }
+
 
   // 7) where live / boundaries
   if (like(u, ['where do you live', 'what is your address'])) {
@@ -516,6 +581,9 @@ if (inRecipe) {
   if (like(u, ['what do you think of the dino dividers', 'dino dividers'])) {
     return reply(REPLIES.thinksOf('dino dividers'));
   }
+  if (like(u, ['cosmic phil','cosmis phil','do you know cosmic phil','do you know cosmis phil'])) {
+    return reply(REPLIES.thinksOf('cosmic phil'));
+  }
 
   // 13) jokes
   if (like(u, ['know any jokes', 'tell me a joke', 'another joke'])) {
@@ -556,6 +624,49 @@ if (inRecipe) {
       { type: 'SWITCH_MODE', to: 'calculator' }
     );
   }
+
+  // sports
+  if (like(u, [
+    'sport','sports','do you like sports','do you like sport','you like sports','like sports'
+  ])) {
+    return reply(bubble({
+      title: "sports",
+      lines: ["i keep score by streaks and streaks by grit. wanna race numbers?"],
+      hint: `say <code>percent quiz</code> or <code>fractions quiz</code>.`
+    }));
+  }
+
+  // origin
+  if (like(u, [
+    'how did you get here','how did u get here','how did ya get here','how you get here'
+  ])) {
+    return reply(bubble({
+      title: "arrival",
+      lines: ["followed a sine line through the gate and took a left at the cocoa tent."],
+      hint: `stories live in <code>lore booth</code>.`
+    }));
+  }
+  // “i don't want to go to a booth!”
+  if (like(u, ["i don't want to go to a booth","i dont want to go to a booth","no booth","no booths"])) {
+    return reply(bubble({
+      title: "chill mode",
+      lines: ["all good — we can just chat right here."],
+      hint: `ask me anything, or say <code>help</code> when you want the map.`
+    }));
+  }
+  if (like(u, [
+    'goodbye','bye','bye!','later','see ya','peace out',
+    'hasta luego','adios','cya','gotta go','i gotta go','got to go','see you'
+  ])) {
+    return reply(bubble({
+      title: "farewell",
+      lines: ["catch you under the string lights, traveler."],
+      hint: `say <code>help</code> if you want the map next time.`
+    }));
+  }
+
+
+
 
   // not handled
   return null;

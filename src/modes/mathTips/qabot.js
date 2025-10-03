@@ -709,40 +709,37 @@ export function getResponse(userText, appStateLike = appState) {
 
 
   // 🔸 Small-talk intercept (lightweight, non-modal)
+  // allow small-talk unless a quiz is live
   {
-const st = maybeHandleSmallTalk(userText, {
-  name: appStateLike?.profile?.name || 'traveler',
-  appState: appStateLike,
-  botContext: ensureBC(),
-  currentMode: getMode()               // ← add this
-});
+    const allowSmall = !(quiz.isActive?.(SESSION_ID));
+    if (allowSmall) {
+      const st = maybeHandleSmallTalk(userText, {
+        name: appStateLike?.profile?.name || 'traveler',
+        appState: appStateLike,
+        botContext: ensureBC(),
+        currentMode: getMode()
+      });
 
-    if (st && st.handled) {
-  const act = st.action || {};
-
-  // ✅ if smalltalk *did* request a switch, obey it (you already do this)
-      if (act.type === 'SWITCH_MODE') { /* ... existing code ... */ }
-
-      // 🛟 smalltalk replied but didn't switch — if user *said* to leave, force exit
-      if (/\b(leave|leave\s+mode|exit|quit|back(?:\s+to)?\s+(?:commons?|center|village)|go\s*home|return|main\s*menu)\b/i.test(t)) {
-        setMode(MODES.none);
-        clearBoothContext();
-        return {
-          html: composeReply({
-            userText: text,
-            part: { kind: 'answer', html: boothMenuHTML('👋 Back to the village center.') },
-            askAllowed: false,
-            noAck: true
-          }),
-          meta: { intent: 'exit' }
-        };
+      if (st && st.handled) {
+        const stAction = st.action || {};
+        if (stAction.type === 'SWITCH_MODE') {
+          const keyRaw = stAction.to || stAction.modeKey || '';
+          const key = normalizeBoothKey(keyRaw);
+          if (key && MODEx[key]) {
+            setMode(MODES[key] || MODES.none);
+            const out = (typeof MODEx[key]?.start === 'function')
+              ? MODEx[key].start(stAction.payload || {})
+              : MODEx[key]?.handle?.('start', stAction.payload || {}) || '';
+            const adapted = adaptModeOutput(out, userText, `switch:${key}`);
+            if (adapted) return adapted;
+          }
+        }
+        // handled, no switch requested → just use the bubble
+        return { html: st.html, meta: { intent: 'smalltalk' } };
       }
-
-      // otherwise just return the smalltalk bubble
-      return { html: st.html, meta: { intent: 'smalltalk' } };
     }
-
   }
+
 
   // 0a) Handle pending booth switch
   const bc0 = ensureBC();
@@ -1210,16 +1207,17 @@ const st = maybeHandleSmallTalk(userText, {
   }
 
 
-  // 3) Final fallback
+  // 3) Final fallback — no unsolicited map
   return {
     html: composeReply({
       userText: text,
-      part: { kind: 'answer', html: boothMenuHTML(`Wanna jump into a booth, ${userName}?`) },
+      part: { kind: 'answer', html: `<p>we can chill here. ask me anything, or say <b>help</b> for the map.</p>` },
       askAllowed: false,
       noAck: true
     }),
     meta: { intent: 'fallback' }
   };
+
 
 
 }
