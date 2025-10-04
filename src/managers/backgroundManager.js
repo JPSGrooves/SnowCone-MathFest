@@ -65,11 +65,11 @@ const labelColorMap = {
   },
   spring: {
     kids:     '#ebc2ff',
-    quick:    '#29ffc9',
-    tips:     '#ffebc2',
-    story:    '#ffc2dd',
-    infinity: '#c2f1ff',
-    options:  '#d4d4ed'
+    quick:    '#ffebc2',
+    tips:     '#c2f1ff',
+    story:    '#c2f1ff',
+    infinity: '#d4d4ed',
+    options:  '#ffc2dd'
   },
   summer: {
     kids:     '#ffdd00',  // same
@@ -90,11 +90,11 @@ const labelColorMap = {
   },
   winter: {
     kids:     '#aaddff',
-    quick:    '#ffffff',
+    quick:    '#ccccff',
     tips:     '#66ffff',
     story:    '#ddddff',
-    infinity: '#66ccff',
-    options:  '#ccccff'
+    infinity: '#ffffff',
+    options:  '#66ccff'
   },
   freedom: {
     kids:     '#ff4444',
@@ -113,12 +113,12 @@ const labelColorMap = {
     options:  '#ff4444'
   },
   harvest: {
-    kids:     '#ffcc00',
-    quick:    '#996633',
-    tips:     '#cc9900',
-    story:    '#993300',
-    infinity: '#ffffff',
-    options:  '#333300'
+    kids:     '#ffcc00',   // (keep)
+    quick:    '#FFF2CC',   // ← creamy light so it pops
+    tips:     '#FFE9A6',   // ← warm pale gold
+    story:    '#FFD27F',   // ← peachy light
+    infinity: '#ffffff',   // (keep)
+    options:  '#FFD8B0'  // ← true near-black for real contrast
   },
   christmas: {
     kids:     '#00dd00',
@@ -126,23 +126,23 @@ const labelColorMap = {
     tips:     '#ffffff',
     story:    '#ff66cc',
     infinity: '#aaaaaa',
-    options:  '#006600'
+    options:  '#ccccff'
   },
   newyear: {
-    kids:     '#ffffff',
-    quick:    '#ffcc00',
-    tips:     '#999999',
-    story:    '#330066',
-    infinity: '#ff00ff',
-    options:  '#111111'
+    kids:     '#A98BEF', // good
+    quick:    '#ffcc00', // good
+    tips:     '#ffcc00', // was #999999 → lighter, closer to white
+    story:    '#A98BEF', // was #330066 → much lighter purple
+    infinity: '#ff00ff', // good
+    options:  '#E0E0E0'  // was #111111 → light gray for dark bg
   },
   valentine: {
-    kids:     '#ff6699',
-    quick:    '#cc0066',
+    kids:     '#ffe6f0',
+    quick:    '#ffe6f0',
     tips:     '#ffcccc',
-    story:    '#990033',
+    story:    '#ffcccc',
     infinity: '#ffe6f0',
-    options:  '#660033'
+    options:  '#ff6699'
   },
   cosmic_01: {
     kids:     '#cc66ff',
@@ -174,7 +174,7 @@ const labelColorMap = {
     tips:     '#66ccff',
     story:    '#99ccff',
     infinity: '#33ccff',
-    options:  '#005577'
+    options:  '#66ccff'
   },
   cosmic_05: {
     kids:     '#ffcc00',
@@ -185,21 +185,22 @@ const labelColorMap = {
     options:  '#ff0066'
   },
   cosmic_06: {
-    kids:     '#000000',
+    kids:     '#7BAFD4', // Tar Heel blue (Carolina)
     quick:    '#ff0000',
     tips:     '#ffccff',
-    story:    '#330033',
+    story:    '#D8A0B2', // very light maroon/rose
     infinity: '#ff99ff',
-    options:  '#9900cc'
+    options:  '#C47AE6'  // lighter purple than #9900cc
   },
-  cosmic_07: {
-    kids:     '#ffffff',
-    quick:    '#ffffff',
-    tips:     '#ffffff',
-    story:    '#ffffff',
-    infinity: '#ffffff',
-    options:  '#ffffff'
-  }
+cosmic_07: {
+  kids:     '#F2F8FF', // near-white, whisper of blue
+  quick:    '#F2F8FF',
+  tips:     '#F2F8FF',
+  story:    '#EDF5FF', // hair darker for readability
+  infinity: '#F7FBFF', // almost pure white
+  options:  '#EDF6FF'
+}
+
 };
 
 export const themeLabels = {
