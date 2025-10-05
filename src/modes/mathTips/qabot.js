@@ -35,6 +35,12 @@ export function alreadyHasCard(html = '') {
       || /\bbooth-card\b/.test(s);
 }
 
+// put this helper near other tiny helpers
+function clearSmalltalkThread() {
+  try { ensureBC().lastSTopic = null; } catch {}
+}
+
+
 // Map user/registry keys to the modeManager key for MODES
 function modesKey(k = '') {
   if (/^recipe(s)?$/i.test(k)) return (MODES.recipe ? 'recipe' : 'recipes');
@@ -762,6 +768,7 @@ export function getResponse(userText, appStateLike = appState) {
   // 🍳 Fast path: explicit recipe topics → jump straight in
   if (/\b(quesadilla|snow\s*cone|snowcone|nachos|cocoa)\b/i.test(t)) {
     setMode(MODES.recipe);
+    clearSmalltalkThread();
     return adaptModeOutput(MODEx.recipe.start({ topic: pickRecipeTopic(t) }), text, 'booth:recipe');
   }
   // Bare “recipe(s)” → open the menu, not the previous topic
@@ -775,6 +782,7 @@ export function getResponse(userText, appStateLike = appState) {
     const isStatusQuick = /^\s*(?:what(?:'s|\s+is)\s+my\s+status|my\s+status|status)\s*\??\s*$/i.test(t);
     if (isStatusQuick) {
       setMode(MODES.status);
+      clearSmalltalkThread();
       return adaptModeOutput(
         MODEx.status.start({ sessionId: SESSION_ID }),
         text,
@@ -826,6 +834,7 @@ export function getResponse(userText, appStateLike = appState) {
       const p = consumePendingSwitch();
       const to = p?.to || 'none';
       setMode(MODES[modesKey(to)] || MODES.none);
+      clearSmalltalkThread();
       let prompt = '';
       if (to === 'lessons') prompt = `<p>Sweet. In lessons booth — what topic first: fractions, percent, or equations?</p>`;
       else if (to === 'quiz') prompt = `<p>Alright, quiz booth time! Want fractions, percent, or a mix?</p>`;
@@ -1006,6 +1015,7 @@ export function getResponse(userText, appStateLike = appState) {
     if (topic) {
       const n = count ? Math.max(1, Math.min(5, parseInt(count, 10))) : 3;
       setMode(MODES.quiz);
+      clearSmalltalkThread();
       return adaptModeOutput(
         MODEx.quiz.start({ topic, count: n, userText: text, sessionId: SESSION_ID }),
         text,
@@ -1166,17 +1176,26 @@ export function getResponse(userText, appStateLike = appState) {
       }
 
       case 'joke': {
+        const sm = respondSmallTalk('tell me a joke', {
+          name: userName,
+          appState: appStateLike,
+          botContext: ensureBC(),
+          currentMode: getMode()
+        });
+        if (sm && sm.html) {
+          return {
+            html: sm.html,
+            meta: { intent: guess }
+          };
+        }
+        // fallback if smalltalk didn’t handle (unlikely)
         const line = `<p>${pickUnique('jokes', RESPONSES.jokes, getSessionId(appStateLike))} More laughs, ${userName}? Try lore booth for festival tales.</p>`;
         return {
-          html: composeReply({
-            userText: text,
-            part: { kind: 'answer', html: line },
-            askAllowed: false,
-            noAck: true
-          }),
+          html: composeReply({ userText: text, part: { kind: 'answer', html: line }, askAllowed: false, noAck: true }),
           meta: { intent: guess }
         };
       }
+
 
 
       case 'badges': {
@@ -1195,6 +1214,7 @@ export function getResponse(userText, appStateLike = appState) {
 
       case 'lore':
         setMode(MODES.lore);
+        clearSmalltalkThread();
         {
           const out = callMode('lore', text, { sessionId: SESSION_ID });
           if (out) return adaptModeOutput(out, text, 'booth:lore');
@@ -1209,6 +1229,7 @@ export function getResponse(userText, appStateLike = appState) {
         }
       case 'math_general':
         setMode(MODES.lessons);
+        clearSmalltalkThread();
         return adaptModeOutput(MODEx.lessons.start({ userText: text }), text, 'booth:lessons');
       case 'quiz_fractions': {
         setMode(MODES.quiz);
@@ -1222,6 +1243,7 @@ export function getResponse(userText, appStateLike = appState) {
         const raw = MODEx.calculator?.quickSolve?.(text) || '';
         if (raw) {
           setMode(MODES.calculator);
+          clearSmalltalkThread();
           return {
             html: composeReply({
               userText: text,

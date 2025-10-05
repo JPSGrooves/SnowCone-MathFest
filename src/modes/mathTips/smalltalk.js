@@ -46,7 +46,8 @@ const clean = x => String(x || '').replace(/\s*[.!?,'"]+\s*$/, '');
 
 // Common guards
 const GREETING_ONLY = /^(hi|hey|hello|yo|hiya|sup)[!.?]*$/i;
-const BARE_CONFIRM = /^(yes|yep|yeah|right on|sure|ok|okay)$/i;
+const BARE_CONFIRM = /^(yes|yep|yeah|yea|yup|right on|sure|next|ok|okay)$/i;
+
 
 const startsWithQuestionVerb = /^(tell|what|who|why|how|do|does|is|are|can|should|could|would|where|give|show|play|about)\b/i;
 
@@ -173,6 +174,73 @@ function nextJoke(ctx) {
 // Reply factories — PRETTY bubbles via composeReply()
 // ————————————————————————————————————————————————————————————
 const REPLIES = {
+
+  jokeExplain: () => bubble({
+    title: "joke explainer",
+    lines: [
+      "most math jokes lean on symbols or definitions.",
+      "like: ‘n’ means any number — the gag is being vague on purpose."
+    ],
+    hint: `want another? say <code>another joke</code>.`
+  }),
+
+  bored: () => bubble({
+    title: "bored?",
+    lines: ["let’s snag a 10-sec win or a snack idea."],
+    hint: `try <code>percent quiz</code> or <code>snowcone recipe</code>.`
+  }),
+
+  stressed: () => bubble({
+    title: "breather",
+    lines: ["inhale 4 · hold 4 · exhale 4 — then one tiny problem?"],
+    hint: `say <code>fractions quiz</code> or <code>cocoa recipe</code>.`
+  }),
+
+  badAtMath: () => bubble({
+    title: "you can do this",
+    lines: ["we chunk it small. mistakes = data, not drama."],
+    hint: `start with <code>lessons fractions</code> or say <code>help</code>.`
+  }),
+
+  favNumber: () => bubble({
+    title: "favorite number",
+    lines: ["13 — a rebellious prime with good rhythm."],
+    hint: `what’s yours?`
+  }),
+
+  favColor: () => bubble({
+    title: "favorite color",
+    lines: ["neon mango — snowcone-sunset vibes."],
+    hint: `want a mango problem? say <code>percent quiz</code>.`
+  }),
+
+  clarifyShort: () => bubble({
+    title: "tl;dr mode",
+    lines: ["i’ll keep replies short + simple for a bit."],
+    hint: `say <code>more detail</code> when you want extra.`
+  }),
+
+  holaES: () => bubble({
+    title: "hola",
+    lines: ["¡hola! puedo contarte un chiste o practicar fracciones."],
+    hint: `di <code>quiz fractions</code> o <code>snowcone recipe</code>.`
+  }),
+
+  boundaryGentle: () => bubble({
+    title: "keeping it cozy",
+    lines: ["i keep things school-friendly and kind."],
+    hint: `wanna pivot to <code>lore booth</code> or a quick <code>percent quiz</code>?`
+  }),
+
+  storyCamp: () => bubble({
+    title: "camp story",
+    lines: [
+      "by the cocoa tent, a lantern flickers prime numbers.",
+      "blink on the beats and a paper door opens to puzzle alley."
+    ],
+    hint: `more tales? say <code>lore booth</code>.`
+  }),
+  
   whoAmI: () => bubble({
     title: "who i am",
     lines: ["i’m Pythagorus Cat — friends call me Grampy P. i run the math festival and pour the cocoa."],
@@ -193,9 +261,10 @@ const REPLIES = {
 
   happy: () => bubble({
     title: 'mood',
-    lines: ["today’s been a good day — I'm glowing like the neon signs used in the first prompt!"],
+    lines: ["today’s been a good day — glowing like the string lights by the cocoa tent."],
     hint: `learn more about this place: <code>lore booth</code>`
   }),
+
 
   thanks: () => bubble({
     title: 'you got it',
@@ -342,7 +411,8 @@ const REPLIES = {
       ],
       hint: `want more tales? say <code>lore booth</code>.`
     }),
-  storyCamp: () => 
+  // rename the second one:
+  storyLantern: () => 
     bubble({
       title: "lantern story",
       lines: [
@@ -351,6 +421,9 @@ const REPLIES = {
       ],
       hint: `want deeper lore? say <code>lore booth</code>.`
     }),
+  storyAny: () => (Math.random() < 0.5 ? REPLIES.storyCamp() : REPLIES.storyLantern()),
+
+
 
 
 
@@ -451,28 +524,27 @@ const REPLIES = {
 // Main handler — returns { handled, html, action? } or null
 // ————————————————————————————————————————————————————————————
 export function maybeHandleSmallTalk(utterance, ctx = {}) {
+  // near the top of maybeHandleSmallTalk()
+  const mode = String(ctx?.currentMode || '').toLowerCase();
+  const inRecipe = mode === 'recipe';
+  const inCalc   = mode === 'calculator';
+  const inQuiz   = mode === 'quiz';
+  const inLore   = mode === 'lore';     // ← add this
   if (ctx && !ctx.botContext) ctx.botContext = {}; // ✅ ensure memory
   const raw = String(utterance || '').trim();
   const u = norm(utterance);
   if (!u) return null;
 
-  // If we're already in the Recipe booth, don't smalltalk-intercept recipe words.
-  const inRecipe = String(ctx?.currentMode || '').toLowerCase() === 'recipe';
-  if (inRecipe) {
-    if (/(?:^|\b)(nachos?|quesadillas?|snow\s*cones?|cocoa|hot\s*choc)/i.test(u)) {
-      return null; // let Recipe booth handle
-    }
-  }
-
   // ——— hard early exits to let commons/router speak ———
   if (GREETING_ONLY.test(raw)) return null; // pure “hi/hey/hello…"
 
   // allow confirms to advance jokes if we're in a jokes thread
+  // BARE_CONFIRM: only advance jokes if we're NOT in lore
   if (BARE_CONFIRM.test(u)) {
-    if (getLastSTopic(ctx) === 'jokes') {
+    if (!inLore && getLastSTopic(ctx) === 'jokes') {
       return reply(REPLIES.jokeCard(nextJoke(ctx)));
     }
-    return null; // otherwise, let router/booth confirms handle it
+    return null; // let the booth handle yes/ok in its own flow
   }
 
   // quick nav
@@ -609,6 +681,10 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
       }
     }
   }
+  if (like(u, ['i am bored','im bored','bored'])) return reply(REPLIES.bored());
+  if (like(u, ['i am stressed','im stressed','stressed','anxious','overwhelmed'])) return reply(REPLIES.stressed());
+  if (like(u, ['im bad at math','i am bad at math','i suck at math','math is hard'])) return reply(REPLIES.badAtMath());
+
 
   // —— quick mood hooks
   if (/\bi\s*(?:am|['’]m)\s*(?:so\s+)?(tired|sleepy|exhausted|worn)\b/i.test(u)) {
@@ -617,7 +693,7 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   }
 
   // —— gratitude / friends / happy
-  if (likeWord(u, ['thank you', 'thanks', 'thanks so much', 'cool thanks'])) {
+  if (like(u, ['thank you','thanks','thanks so much','cool thanks','ty'])) {
     return reply(REPLIES.thanks());
   }
 
@@ -690,6 +766,9 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   if (like(u, ['favorite planet',"what is your favorite planet","what's your favorite planet",'planet'])) {
     return reply(bubble({ title: "planet pick", lines: ["saturn — fashion icon. those rings? infinite drip."] }));
   }
+  if (like(u, ['favorite number','favourite number','fav number'])) return reply(REPLIES.favNumber());
+  if (like(u, ['favorite color','favourite colour','fav color','fav colour'])) return reply(REPLIES.favColor());
+
 
   // 6) love / family hook
   if (like(u, ['i love you','love you'])) {
@@ -706,8 +785,9 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   // non-dad stories
   if (like(u, ['tell me a story','story time','a story','give me a story'])) {
     setLastSTopic(ctx, 'story');
-    return reply(REPLIES.storyCamp());
+    return reply(REPLIES.storyAny());
   }
+
   if (getLastSTopic(ctx) === 'story' && /\b(more|another|again|one more)\b/i.test(u)) {
     return reply(REPLIES.storyCamp());
   }
@@ -760,9 +840,17 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     setLastSTopic(ctx, 'jokes');
     return reply(REPLIES.jokeCard(nextJoke(ctx)));
   }
-  if (getLastSTopic(ctx) === 'jokes' && /\b(more|another|again|one more|more jokes|another one)\b/i.test(u)) {
+  // jokes follow-up: block inside lore so "more" continues lore
+  if (getLastSTopic(ctx) === 'jokes'
+      && !inLore
+      && /\b(more|another|again|one more|more jokes|another one|next)\b/i.test(u)) {
     return reply(REPLIES.jokeCard(nextJoke(ctx)));
   }
+
+  if (like(u, ['explain that joke','explain the joke','i dont get it','i don’t get it','why is that funny','what does that mean'])) {
+    return reply(REPLIES.jokeExplain());
+  }
+
 
 
 
@@ -815,6 +903,19 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   ])) {
     return reply(bubble({ title: "chill mode", lines: ["all good — we can just chat right here."], hint: `ask me anything, or say <code>help</code> when you want the map.` }));
   }
+
+  if (like(u, ['repeat','say that again','slower','slow down','too fast','shorter','tldr','tl;dr'])) {
+    return reply(REPLIES.clarifyShort());
+  }
+  if (/\b(hola|buenas|un\s+chiste|cuenta\s+un\s+chiste|ens[eé]ñame\s+fracciones|ensename\s+fracciones)\b/i.test(u)) {
+    return reply(REPLIES.holaES());
+  }
+  if (like(u, ['tell me a secret','share a secret']) || /\b(weed|marijuana|cannabis|vape|nicotine)\b/i.test(u)) {
+    return reply(REPLIES.boundaryGentle());
+  }
+
+
+
 
   // farewells
   if (isFarewell(u)) {
