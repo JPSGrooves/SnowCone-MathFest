@@ -44,7 +44,7 @@ export function readAffirmative(s = '') {
   const t = String(s).trim().toLowerCase();
 
   // broader yes slang
-  const YES = /\b(yes|yeah|yea|yep|yup|sure|ok|okay|alright|bet|yessir|mhmm|mhm|absolutely|for sure|do it|go|next|whatever|whateva|more)\b/;
+  const YES = /\b(yes|yeah|yea|yep|yup|sure|ok|okay|alright|bet|yessir|mhmm|mhm|absolutely|for sure|do it|go|next|whatever|why not|whateva|right on|more)\b/;
 
   // polite/soft no
   const NO = /\b(no|nope|nah|not now|maybe later|not really|no thanks|pass)\b/;

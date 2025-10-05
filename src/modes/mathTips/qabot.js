@@ -112,7 +112,27 @@ const RESPONSES = {
   jokes: [
     "Why’d the obtuse angle skip the party? Never right.",
     "Parallel lines? So much in common, but they’ll never meet.",
-    "Six is scared of seven ‘cause seven ate nine. Math humor!"
+    "Six is scared of seven ‘cause seven ate nine. Math humor!",
+    "The derivative dumped me — said I was too constant.",
+    "I tried mindfulness in calculus and finally found my limit.",
+    "My study group is a matrix — great table manners, still no determinant.",
+    "Opened a math bakery: sizes are ‘π-ish.’ Customers leave approximately happy.",
+    "I packed with vectors — brought direction and magnitude, forgot socks.",
+    "Running on complex coffee — enough imaginary shots and I feel real.",
+    "Gave my heart to a statistician — sample size of one was ‘inconclusive.’",
+    "The probability I share fries approaches zero as you approach me.",
+    "Our group project claims it’s commutative — order doesn’t matter, they’re still late.",
+    "My dog learned exponents — every walk multiplies his energy.",
+    "I named my plant Delta — it thrives on small changes.",
+    "Geometry party RSVP: I’ll arrive obtusely late.",
+    "Numbers at the gym: just working on our figures.",
+    "I keep promises like absolute value — no negatives.",
+    "Tutor said ‘show your work,’ so I emailed the git history.",
+    "My playlist is arithmetic — steady progression, no drops.",
+    "The conference swag was a compass — finally, well-rounded merch.",
+    "Trying to be more discrete, but my math keeps getting continuous.",
+    "I trust triangles — two friends and a solid base.",
+    "Server asked ‘how many slices?’ I said ‘k.’ We both pretended that helped."
   ],
   math_general: [
     "Math’s the rhythm of the cosmos, bruh.",
@@ -152,6 +172,63 @@ function pick(arr) {
   if (!arr?.length) return '💀 Yo... my brain froze.';
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
+// ---- session-unique picker -----------------------------------------------
+
+function ensureBankSeen(sessionId) {
+  const bc = ensureBC(); // uses your act() under the hood
+  act(() => {
+    if (!bc.seen) bc.seen = {};
+    if (!bc.seen[sessionId]) bc.seen[sessionId] = {};
+  });
+  return bc.seen[sessionId];
+}
+
+/**
+ * Pick a non-repeating item from an array for this session.
+ * Resets automatically after exhausting the bank.
+ */
+function pickUnique(bankKey, arr, sessionId = getSessionId(appState)) {
+  const items = Array.isArray(arr) ? arr : [];
+  const total = items.length;
+  if (!total) return '💀 Yo... my brain froze.';
+
+  const seenBySession = ensureBankSeen(sessionId);
+  const used = Array.isArray(seenBySession[bankKey]) ? seenBySession[bankKey] : [];
+  const usedSet = new Set(used);
+
+  // reset once exhausted
+  if (usedSet.size >= total) {
+    act(() => { seenBySession[bankKey] = []; });
+    usedSet.clear();
+  }
+
+  // choose from remaining indices
+  const remaining = [];
+  for (let i = 0; i < total; i++) if (!usedSet.has(i)) remaining.push(i);
+  const idx = remaining[Math.floor(Math.random() * remaining.length)];
+
+  // persist
+  act(() => {
+    const next = Array.isArray(seenBySession[bankKey]) ? seenBySession[bankKey].slice(0) : [];
+    next.push(idx);
+    // keep bounded (not strictly necessary, but tidy)
+    if (next.length > total) next.splice(0, next.length - total);
+    seenBySession[bankKey] = next;
+  });
+
+  return items[idx];
+}
+
+/** Optional: clear seen history for a bank (or all) this session */
+function clearSeen(bankKey = null, sessionId = getSessionId(appState)) {
+  const seen = ensureBankSeen(sessionId);
+  act(() => {
+    if (bankKey) seen[bankKey] = [];
+    else seen[sessionId] = {}; // nuke all banks for this session
+  });
+}
+
 function n(x, d = 0) { const v = +x; return Number.isFinite(v) ? v : d; }
 
 // Bot-context stash
@@ -210,7 +287,7 @@ function consumePendingSwitch() {
 function isAffirmative(s) {
   const t = String(s).toLowerCase();
   return (
-    /\b(y(?:es+|ea|ep|up)|yeah|yea|yessir|sure|ok(?:ay)?|alright|bet|roger|10 4|indeed|affirmative)\b/.test(t) ||
+    /\b(y(?:es+|ea|ep|up)|yeah|yea|yessir|sure|ok(?:ay)?|alright|bet|roger|10 4|indeed|right on|affirmative)\b/.test(t) ||
     /\b(let'?s\s+go|sounds\s+good|do\s+it|go|switch|please)\b/.test(t) ||
     /^\s*y\s*$/.test(t)
   );
@@ -1089,7 +1166,7 @@ export function getResponse(userText, appStateLike = appState) {
       }
 
       case 'joke': {
-        const line = `<p>${pick(RESPONSES.jokes)} More laughs, ${userName}? Try lore booth for festival tales.</p>`;
+        const line = `<p>${pickUnique('jokes', RESPONSES.jokes, getSessionId(appStateLike))} More laughs, ${userName}? Try lore booth for festival tales.</p>`;
         return {
           html: composeReply({
             userText: text,
@@ -1100,6 +1177,7 @@ export function getResponse(userText, appStateLike = appState) {
           meta: { intent: guess }
         };
       }
+
 
       case 'badges': {
         const line = `<p>Badges mark your math and snowcone swagger, ${userName}. Check status booth for yours!</p>`;
