@@ -447,3 +447,69 @@ html, body {
   border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.35);
   font-weight:600; z-index:9999; backdrop-filter:saturate(140%) blur(4px);
 }
+/* Layout */
+.modal-hero { text-align: center; margin-bottom: 1rem; }
+.tagline { color: #9ff; margin: .25rem 0 .5rem; text-shadow: 0 0 8px #00ffee66; }
+.byline { color: #eaffff; opacity: .95; }
+
+/* CTA buttons */
+.cta-row {
+  display: grid; gap: .6rem;
+  grid-template-columns: 1fr; margin: .8rem auto 0; width: min(560px, 92%);
+}
+@media (min-width: 560px) { .cta-row { grid-template-columns: 1fr 1fr; } }
+
+.cta {
+  display: inline-block; text-align: center; font-weight: 800;
+  padding: .65rem 1rem; border-radius: 12px; text-decoration: none;
+  border: 2px solid #00ffee66; color: #00ffee; background: #001416;
+  box-shadow: 0 0 12px #00ffee33; transition: transform .08s ease, filter .2s ease, box-shadow .2s ease;
+}
+.cta:hover { filter: brightness(1.06); box-shadow: 0 0 16px #00ffee66; }
+.cta:active { transform: translateY(1px) scale(.99); }
+.cta-primary {
+  background: linear-gradient(135deg, #00ffee 0%, #2ef7ff 50%, #00ffee 100%);
+  color: #001b1b; border-color: transparent; box-shadow: 0 0 14px #00ffee88;
+}
+
+/* Lists */
+.dot-list { list-style: none; padding: 0; margin: .4rem 0 1rem; }
+.dot-list li { margin: .35rem 0; }
+.dot-list li::marker { content: none; }
+
+/* Scroll bounds */
+.scrollable-modal { max-height: min(86dvh, 720px); overflow: auto; }
+
+/* Small tidy */
+.support-note { margin-top: .8rem; color: #cfe; opacity: .95; }
+/* ——— Header legibility ——— */
+#infoModal .modal-hero h2 {
+  color: #eaffff !important;
+  text-shadow: 0 0 14px #00ffee66, 0 0 28px #00ffee33;
+  margin: 0 0 .25rem 0;
+}
+#infoModal .modal-hero .tagline { color: #9ff; }
+#infoModal .modal-hero .byline { color: #eaffff; opacity: .95; }
+
+/* Optional: a subtle backdrop behind the hero text for contrast */
+#infoModal .modal-hero {
+  background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.18));
+  border: 1px solid #00ffee33;
+  border-radius: 14px;
+  padding: .9rem 1rem;
+}
+
+/* ——— CTA buttons: single stacked column ——— */
+#infoModal .cta-row {
+  display: grid;
+  grid-template-columns: 1fr;   /* ← always one column */
+  gap: .65rem;
+  width: min(520px, 92%);
+  margin: .9rem auto 0;
+}
+#infoModal .cta {
+  width: 100%;
+  justify-self: stretch;         /* make anchors fill the column */
+}
+
+/* (keep your existing .cta / .cta-primary styles) */
