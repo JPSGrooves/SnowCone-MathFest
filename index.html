@@ -69,52 +69,58 @@
     <div id="game-container" class="hidden"></div>
 
     <!-- 🧊 Info Modal -->
-    <div id="infoModal" class="cosmic-modal hidden">
+    <div id="infoModal" class="cosmic-modal hidden" role="dialog" aria-labelledby="infoTitle" aria-modal="true">
       <div class="cosmic-modal-inner scrollable-modal">
-        <button class="close-modal" onclick="closeInfoModal()">✖</button>
-        <div class="tab-content">
-          <h2>🌈 What is SnowCone MathFest?</h2>
+        <button class="close-modal" type="button" aria-label="Close" onclick="closeInfoModal()">✖</button>
+
+        <header class="modal-hero">
+          <h2 id="infoTitle">🍧 SnowCone MathFest</h2>
+          <p class="tagline">Neon math. Real music. Zero fluff.</p>
+          <p class="byline">
+            Built end-to-end by <strong>JPS Grooves</strong> — developer · musician · educator · illustrator.
+          </p>
+          <nav class="cta-row">
+            <a class="cta cta-primary" href="https://JPSGrooves.com" target="_blank" rel="noopener">🌐 Visit JPSGrooves.com</a>
+            <a class="cta" href="https://open.spotify.com/artist/436k9RrQa35PJ357R5Kq6c?si=32xgVLQJRgmQxEMhzul9GA" target="_blank" rel="noopener">🎧 Spotify</a>
+            <a class="cta" href="https://music.apple.com/us/album/jps-grooves/1755334789" target="_blank" rel="noopener">🍎 Apple Music</a>
+            <a class="cta" href="https://soundcloud.com/jpsgrooves" target="_blank" rel="noopener">🔊 SoundCloud</a>
+          </nav>
+        </header>
+
+        <section class="tab-content">
+          <h3>What is SnowCone MathFest?</h3>
           <p>
-            <h3>(Use full screen mode for the full cosmic effect!)</h3>
-            SnowCone MathFest is an interactive math experience wrapped in rhythm, neon, and good vibes. 
-            It's a game, it's a festival, it's a playground for brains. 🎪🧠<br><br>
-            Created for kids, nerds, chillers, and math rebels — the whole thing runs offline, remembers your progress, 
-            and lets you groove your way through problems, badges, and themes.
+            An interactive math adventure wrapped in rhythm, story, and arcade-style feedback.  
+            It runs as an app, remembers your progress in your browser, and rewards practice with XP, badges, and unlockable themes.
           </p>
 
-          <h2>🗺️ Modes & Zones</h2>
-          <p>
-            💠 <strong>QuickServe:</strong> Solve fast, earn XP, stack cones.<br>
-            🌲 <strong>StoryMode:</strong> Work the truck, meet math ghosts, unravel the lore.<br>
-            ♾️ <strong>Infinity:</strong> Free play + endless combos.<br>
-            🧠 <strong>Math Tips:</strong> Ghost-taught micro lessons.<br>
-            ⛺ <strong>Kids Mode:</strong> Tactile, fidget-friendly fun.<br>
-          </p>
-
-          <h2>🎨 A Solo Dev Passion Project</h2>
-          <p>
-            Designed, coded, drawn, and scored entirely by <strong>JPS Grooves</strong> — a musician, educator, 
-            and pixel conjurer with a glowing cone obsession. This isn’t just a game — it's the latest 
-            addition to my creative portfolio.<br><br>
-            This is the only place you'll hear about my other work in this app — but if you’re curious:
-          </p>
-
-          <ul>
-            <li><a href="https://JPSGrooves.com" target="_blank" rel="noopener">🌐 JPSGrooves.com</a></li>
-            <li><a href="https://soundcloud.com/jpsgrooves" target="_blank" rel="noopener">🔊 SoundCloud</a></li>
-            <li><a href="https://open.spotify.com/artist/436k9RrQa35PJ357R5Kq6c?si=32xgVLQJRgmQxEMhzul9GA" target="_blank" rel="noopener">🎧 Spotify</a></li>
-            <li><a href="https://music.apple.com/us/album/jps-grooves/1755334789" target="_blank" rel="noopener">🍎 Apple Music</a></li>
+          <h3>Modes & Zones</h3>
+          <ul class="dot-list">
+            <li>💠 <strong>QuickServe:</strong> Solve fast, earn XP, jam with Cosmic Phil.</li>
+            <li>🌲 <strong>StoryMode:</strong> Work the truck, meet math ghosts, unravel the lore.</li>
+            <li>♾️ <strong>Infinity:</strong> Free play + endless combos by the Lake.</li>
+            <li>😺 <strong>MathTips:</strong> Grampy P taught micro lessons.</li>
+            <li>⛺ <strong>Camping:</strong> Tactile, fidget-friendly fun.</li>
           </ul>
 
-          <h2>📜 How to Use the App</h2>
-          <p>
-            Tap a zone on the festival map to explore different game modes.<br>
-            Your XP and cones (badges) are saved automatically in your browser.<br>
-            Go for mastery, unlock new themes, and enjoy the mathy ride.
+          <h3>How to Use</h3>
+          <ul class="dot-list">
+            <li>Tap a zone on the map to jump into a mode.</li>
+            <li>Your XP and badges save automatically in your browser.</li>
+            <li>Practice daily, unlock themes, and keep the groove going.</li>
+          </ul>
+
+          <p class="support-note">
+            Like it? Share it & come say hi at <a href="https://JPSGrooves.com" target="_blank" rel="noopener">JPSGrooves.com</a>.  
+            This project is part of my larger music/art portfolio and is not affiliated with any educational institution.
+            <br><br>
+            Made with 💖 and 🎵 by JPS Grooves, 2026.
+
           </p>
-        </div>
+        </section>
       </div>
     </div>
+
 
     <!-- 🌌 Cosmic Background Dimmer -->
     <div id="cosmicOverlay" class="modal-overlay hidden"></div>

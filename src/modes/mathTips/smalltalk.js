@@ -46,14 +46,15 @@ const clean = x => String(x || '').replace(/\s*[.!?,'"]+\s*$/, '');
 
 // Common guards
 const GREETING_ONLY = /^(hi|hey|hello|yo|hiya|sup)[!.?]*$/i;
-const BARE_CONFIRM = /^(yes|yep|yeah|yea|yup|right on|sure|next|ok|okay)$/i;
+const BARE_CONFIRM = /^(yes|yep|yeah|yea|yup|right on|sure|next|ok|okay|k|kk|okie|okie doke)$/i;
+
 
 
 const startsWithQuestionVerb = /^(tell|what|who|why|how|do|does|is|are|can|should|could|would|where|give|show|play|about)\b/i;
 
 // Farewell detector (centralized)
 function isFarewell(u) {
-  return /\b(?:goodbye|bye(?:-?bye)?|adios|cya|later|peace\s*out|see\s+ya|see\s+you)\b/i.test(u)
+  return /\b(?:goodbye|bye(?:-?bye)?|bye\s*now|adios|ciao|cya|see\s+ya|see\s+you|later(?:s|z)?|l8r|ttyl?|peace(?:\s*out)?)\b/i.test(u)
       || /\bi\s*(?:gotta|have to|hafta|need to)\s+go\b/i.test(u)
       || /\bi['’]?m\s+(?:gonna|going to)\s+go\b/i.test(u)
       || /\bi['’]?m\s+leaving\b/i.test(u);
@@ -518,6 +519,57 @@ const REPLIES = {
     lines: [`${escapeHTML(band)} is canon now.`, "i’ll spin it while we crunch numbers."],
     hint: `say <code>percent quiz</code> or <code>equations quiz</code>.`
   }),
+  hydrate: () => bubble({
+    title: "water break",
+    lines: ["sip water, roll shoulders, blink at the far wall.", "one tiny win after."],
+    hint: `say <code>percent quiz</code> or <code>calculator booth</code>.`
+  }),
+
+  posture: () => bubble({
+    title: "posture check",
+    lines: ["un-slouch the spine, square the shoulders, jaw unclench.", "ok, now a tiny puzzle?"],
+    hint: `try <code>fractions quiz</code>.`
+  }),
+
+  stretch: () => bubble({
+    title: "stretch",
+    lines: ["reach up 5 sec · fold 5 · twist 5 each side.", "brain wakes up when the body moves."],
+  }),
+
+  studyTip: () => bubble({
+    title: "study snap",
+    lines: ["two tabs only, timer 10 minutes, one goal.", "stop when the timer sings. snack if needed."],
+    hint: `want a 2-min drill? say <code>quiz fractions</code>.`
+  }),
+
+  focusSnap: () => bubble({
+    title: "focus snap",
+    lines: ["mute pings · full screen · breathe 4-4-4 · one problem only."],
+    hint: `say <code>calculator booth</code> and throw me a number.`
+  }),
+
+  tinyCongrats: () => bubble({
+    title: "tiny win logged",
+    lines: ["every rep stacks the cone. nice move."],
+    hint: `want another tiny rep? try <code>3/8 as decimal</code>.`
+  }),
+
+  cheerShort: () => bubble({
+    title: "pep talk",
+    lines: ["you don’t need perfect — you need next."],
+    hint: `say <code>help</code> when you want the map.`
+  }),
+
+  mathFact: () => bubble({
+    title: "math fact",
+    lines: [
+      "zero is even.",
+      "a triangle’s angles sum to 180° — always.",
+      "any number to the power 0 is 1 (except 0⁰ we keep mysterious)."
+    ],
+    hint: `want more? say <code>tell me a joke</code> or <code>quiz</code>.`
+  }),
+
 };
 
 // ————————————————————————————————————————————————————————————
@@ -693,9 +745,11 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   }
 
   // —— gratitude / friends / happy
-  if (like(u, ['thank you','thanks','thanks so much','cool thanks','ty'])) {
+  // —— gratitude / friends / happy
+  if (likeWord(u, ['thanks','thank','thx','ty'])) {
     return reply(REPLIES.thanks());
   }
+
 
   if (like(u, ['can we be friends','be my friend','will you be my friend'])) {
     return reply(REPLIES.friendsYes());
@@ -703,6 +757,8 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   if (like(u, ['are you happy','are you ok','are you okay','are you sad'])) {
     return reply(REPLIES.happy());
   }
+
+  
 
   // 1) kindness/insults/boundaries (includes common bait phrase)
   if (
@@ -768,6 +824,26 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   }
   if (like(u, ['favorite number','favourite number','fav number'])) return reply(REPLIES.favNumber());
   if (like(u, ['favorite color','favourite colour','fav color','fav colour'])) return reply(REPLIES.favColor());
+  // canned weather response — no API, no state writes
+  if (/\b(weather|forecast|rain(?:ing)?|umbrella|temp(?:erature)?|hot|cold|wind(?:y)?|humidity)\b/i.test(u)) {
+    return reply(bubble({
+      title: "weather",
+      lines: [
+        "i’m more cocoa than cloud radar.",
+        "peek your favorite weather app, then we’ll crunch a quick problem."
+      ],
+      hint: `try <code>percent quiz</code> or <code>calculator booth</code>.`
+    }));
+  }
+  // only answer when it looks like a question about Jesus
+  if (
+    /\b(jesus(?:\s+christ)?|christ)\b/i.test(u) &&
+    (/\?/.test(u) || /^(what|who|why|how|is|are|do|does|can|should|could|would)\b/i.test(u))
+  ) {
+    return reply(bubble({ lines: ["christ is Lord."] }));
+  }
+
+
 
 
   // 6) love / family hook
@@ -826,6 +902,18 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     setLastSTopic(ctx, 'music');
     return reply(REPLIES.musicAskBack());
   }
+    // micro self-care / study snaps
+  if (likeWord(u, ['hydrate','water','water break','drink water'])) return reply(REPLIES.hydrate());
+  if (likeWord(u, ['posture','sit up','un-slouch','unslouch']))     return reply(REPLIES.posture());
+  if (likeWord(u, ['stretch','stretch break']))                     return reply(REPLIES.stretch());
+  if (like(u, ['study tip','how to study','focus tip']))            return reply(REPLIES.studyTip());
+  if (like(u, ['i cant focus','i cannot focus','hard to focus','focus please'])) {
+    return reply(REPLIES.focusSnap());
+  }
+  if (like(u, ['motivate me','pep talk','hype me up','encourage me'])) return reply(REPLIES.cheerShort());
+  if (like(u, ['fun fact','math fact','tell me a fact']))             return reply(REPLIES.mathFact());
+  if (like(u, ['i did it','done!','finished it','nailed it','woo']))  return reply(REPLIES.tinyCongrats());
+
 
   // 12) festival cast takes
   if (like(u, ['what do you think of cosmic phil','cosmic phil','cosmis phil','do you know cosmic phil','do you know cosmis phil'])) {
@@ -850,6 +938,69 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   if (like(u, ['explain that joke','explain the joke','i dont get it','i don’t get it','why is that funny','what does that mean'])) {
     return reply(REPLIES.jokeExplain());
   }
+
+    // ——— more booth typos & aliases
+  // status booth
+  if (like(u, ['staus booth','stats booth','statuss booth'])) {
+    return withAction(REPLIES.exitToCommons(), { type:'SWITCH_MODE', to:'status' });
+  }
+
+  // recipe booth name typos
+  if (like(u, ['recipies','reciepe','recepie','reccipe','resipe'])) {
+    return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe' });
+  }
+
+  // calculator typos (more variants)
+  if (like(u, [
+    'caluclator','calcultor','calcualtor','caulculator','calculater','calculater',
+    'calclator','caculator'
+  ])) {
+    return withAction(
+      bubble({ title: "calculator", lines: ["rolling into the calculator booth?"], hint: `type a math like <code>27% of 150</code>.` }),
+      { type:'SWITCH_MODE', to:'calculator' }
+    );
+  }
+
+  // recipe topic misspellings
+  if (like(u, [
+    'quesedila','quesedilla','quesadila','quesodilla','kesadilla','caseadia','case-a-dilla','quesa dilla'
+  ])) {
+    return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'quesadilla' }});
+  }
+  if (like(u, [
+    'snow kone','snokone','snoecone','sno-cone','sno cone','snocne'
+  ])) {
+    return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'snowcone' }});
+  }
+  if (like(u, ['nachoes',"nacho's"])) {
+    return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'nachos' }});
+  }
+
+  // quiz topic misspellings → jump straight to quiz booth with a sensible topic
+  if (like(u, ['precent quiz','percant quiz','percint quiz','percentage quiz'])) {
+    return withAction(
+      bubble({ title: "quiz: percent", lines: ["percent drills coming right up."] }),
+      { type:'SWITCH_MODE', to:'quiz', payload:{ topic:'percent', count:3 } }
+    );
+  }
+  if (like(u, ['fration quiz','frations quiz','fracton quiz'])) {
+    return withAction(
+      bubble({ title: "quiz: fractions", lines: ["fractions it is."] }),
+      { type:'SWITCH_MODE', to:'quiz', payload:{ topic:'fractions', count:3 } }
+    );
+  }
+  if (like(u, ['equasion quiz','equasions quiz'])) {
+    return withAction(
+      bubble({ title: "quiz: equations", lines: ["equations on deck."] }),
+      { type:'SWITCH_MODE', to:'quiz', payload:{ topic:'equations', count:3 } }
+    );
+  }
+
+  if (likeWord(u, ['ttyl','afk','laters'])) {
+    return reply(bubble({ title: "farewell", lines: ["catch you under the string lights, traveler."], hint: `say <code>help</code> next time to see the map.` }));
+  }
+
+
 
 
 

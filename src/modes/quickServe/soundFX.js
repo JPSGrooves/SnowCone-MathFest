@@ -15,7 +15,7 @@ const sfxMap = {
 //////////////////////////////
 // 🚀 Load SFX Objects
 //////////////////////////////
-const SFX_VOLUME = 0.4; // 🔥 Turned way down but still audible
+const SFX_VOLUME = 0.2; // 🔥 Turned way down but still audible
 
 const sfx = {};
 for (const [key, path] of Object.entries(sfxMap)) {

@@ -16,6 +16,7 @@ import { pickRecipeTopic } from './modes/recipes.js';
 
 
 
+
 const getSessionId = (app) =>
   app?.progress?.mathtips?.sessionId   // ✅ use the same id quiz.js uses
   || app?.profile?.id
@@ -354,6 +355,9 @@ function shouldBypassLayer(intentTag) {
 // Intent scoring
 function scoreIntent(input) {
   const lower = input.toLowerCase();
+  if (input.trim().length <= 3 && !/^\d+$/.test(input.trim())) {
+    return { guess: 'unknown', score: 0.0 };
+  }
   if (/^\/?(help|commands|stats|tip|clear|reset)\b/.test(lower)) return { guess: 'command', score: 0.99, arg: lower.match(/^\/?(\w+)/)?.[1] };
   if (tryPercentOf(lower)) return { guess: 'percent', score: 0.95 };
   if (SAFE_EXPR.test(lower)) return { guess: 'calc', score: 0.9 };

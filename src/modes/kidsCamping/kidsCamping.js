@@ -224,34 +224,38 @@ function renderIntroScreen() {
         <div class="kc-intro">
           <div class="kc-intro-stack">
             <div class="kc-speech">
-              Heyo! We're the Dino Dividers! Let's chill out and play some camping games!
+              Heyo! We're the Dino Dividers! Let's chill out and play some camping games! Be sure to watch out for ants and mosquitoes!
             </div>
             <div class="director-wrapper">
               <img id="directorSpriteIntro" class="director-img"
                    src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/directors_intro.png" />
             </div>
             <button id="startCamping" class="kc-intro-btn kc-btn-large start-camp-btn">⛺ Get to Camping! ⛺</button>
-            <button id="backToMenuIntro" class="kc-intro-btn kc-btn-large back-to-menu-btn">🔙 Back to Menu</button>
           </div>
+        </div>
+
+        <!-- 🍧 KC bottom bar (Story-style) -->
+        <div class="kc-bottom-bar">
+          <button id="kcBackIntro" class="kc-square-btn kc-left">🔙</button>
         </div>
       </div>
     </div>
   `;
 }
 
+
 function wireIntroHandlers() {
-  const back = document.querySelector('#backToMenuIntro');
   const start = document.querySelector('#startCamping');
+  const back  = document.querySelector('#kcBackIntro');
+  const mute  = document.querySelector('#kcMuteIntro');
 
   HANDLERS.onBackToMenuIntro = () => {
     stopTrack();
     returnToMenu();
   };
-
   HANDLERS.onStartCamping = async () => {
-    if (globalThis.__KC_BOOT_LOCK__) return;  // prevent double-boot
+    if (globalThis.__KC_BOOT_LOCK__) return;
     globalThis.__KC_BOOT_LOCK__ = true;
-
     const introEl = document.querySelector('.kc-intro');
     if (!introEl) return;
     introEl.classList.add('fade-out');
@@ -263,17 +267,30 @@ function wireIntroHandlers() {
     }, 450);
   };
 
+  HANDLERS.onMuteClickIntro = () => {
+    const H = window.Howler ?? globalThis.Howler;
+    H?.mute?.(!H._muted);
+    applyMuteVisual(mute);
+  };
+
   back?.addEventListener('click', HANDLERS.onBackToMenuIntro);
   start?.addEventListener('click', HANDLERS.onStartCamping);
+  mute?.addEventListener('click', HANDLERS.onMuteClickIntro);
+  applyMuteVisual(mute);
 }
 
 function unwireIntroHandlers() {
-  const back = document.querySelector('#backToMenuIntro');
+  const back = document.querySelector('#kcBackIntro');
   const start = document.querySelector('#startCamping');
+  const mute = document.querySelector('#kcMuteIntro');
+
   if (back && HANDLERS.onBackToMenuIntro) back.removeEventListener('click', HANDLERS.onBackToMenuIntro);
-  if (start && HANDLERS.onStartCamping) start.removeEventListener('click', HANDLERS.onStartCamping);
+  if (start && HANDLERS.onStartCamping)   start.removeEventListener('click', HANDLERS.onStartCamping);
+  if (mute && HANDLERS.onMuteClickIntro)  mute.removeEventListener('click', HANDLERS.onMuteClickIntro);
+
   HANDLERS.onBackToMenuIntro = null;
   HANDLERS.onStartCamping = null;
+  HANDLERS.onMuteClickIntro = null;
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -333,27 +350,34 @@ function renderMainUI() {
 
           <div class="kc-popper-cell">
             <div class="kc-popper-lineup">
-              <div class="kc-popper-slot">
-                <button id="backToMenu">🔙<br/>Menu</button>
-              </div>
+              <!-- left slot now empty (buttons moved to fixed bottom bar) -->
+              <div class="kc-popper-slot"></div>
+
+              <!-- center: score stays exactly as before -->
               <div class="kc-score-wrap">
                 <div class="kc-score-box">
                   <div class="kc-score-label">Camping Score</div>
                   <span id="popCount">0</span>
                 </div>
               </div>
-              <div class="kc-popper-slot">
-                <button id="muteToggle" class="mute-btn">🔊<br/>Mute?</button>
-              </div>
+
+              <!-- right slot now empty (buttons moved to fixed bottom bar) -->
+              <div class="kc-popper-slot"></div>
             </div>
           </div>
+        </div>
 
+        <!-- 🍧 KC bottom bar (Story-style) -->
+        <div class="kc-bottom-bar">
+          <button id="kcBack" class="kc-square-btn kc-left">🔙</button>
+          <button id="kcMute" class="kc-square-btn kc-right">🔊</button>
         </div>
       </div>
     </div>
   `;
 
-  hookReturnButton('backToMenu');
+  // return hook now targets the square back button
+  hookReturnButton('kcBack');
   document.querySelectorAll('.kc-aspect-wrap, .kc-game-frame, .kc-grid').forEach(preventDoubleTapZoom);
 }
 
@@ -370,8 +394,8 @@ function onTentsAll() {
 
 
 function wireMainHandlers() {
-  // Mute toggle
-  const muteBtn = document.getElementById('muteToggle');
+  // Mute toggle (square)
+  const muteBtn = document.getElementById('kcMute');
   if (muteBtn) {
     HANDLERS.onMuteClick = () => {
       const H = window.Howler ?? globalThis.Howler;
@@ -382,7 +406,7 @@ function wireMainHandlers() {
     applyMuteVisual(muteBtn);
   }
 
-  // Title dino twirl
+  // Title dino twirl (unchanged)
   HANDLERS.onIconTwist = (ev) => {
     const icon = ev.currentTarget;
     icon.classList.remove('twisting');
@@ -392,13 +416,14 @@ function wireMainHandlers() {
   document.querySelectorAll('.kc-icon, .kc-title img.kc-icon').forEach(el => {
     el.addEventListener('click', HANDLERS.onIconTwist);
   });
-  wireKidsBadgeListeners(); // <— add this
+
+  wireKidsBadgeListeners();
   const container = document.querySelector(SELECTORS.container);
   container?.addEventListener('kc:tents-all', onTentsAll, { once: true, passive: true });
 }
 
 function unwireMainHandlers() {
-  const muteBtn = document.getElementById('muteToggle');
+  const muteBtn = document.getElementById('kcMute');
   if (muteBtn && HANDLERS.onMuteClick) muteBtn.removeEventListener('click', HANDLERS.onMuteClick);
   HANDLERS.onMuteClick = null;
 
@@ -408,10 +433,11 @@ function unwireMainHandlers() {
     });
   }
   HANDLERS.onIconTwist = null;
-  unwireKidsBadgeListeners(); // <— add this
+  unwireKidsBadgeListeners();
   const container = document.querySelector(SELECTORS.container);
   container?.removeEventListener('kc:tents-all', onTentsAll);
 }
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Boot games (mosquito confined to #game-container)
@@ -522,11 +548,16 @@ function animatePopCount() {
 }
 
 function applyMuteVisual(btn) {
-  const H = window.Howler ?? globalThis.Howler;
-  const isMuted = !!H?._muted;
-  btn.innerHTML = isMuted ? '🔇<br/>Muted' : '🔊<br/>Mute?';
-  btn.classList.toggle('muted', isMuted);
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+    const muted = !!H?._muted;
+    if (btn) {
+      btn.textContent = muted ? '🔇' : '🔊';
+      btn.classList.toggle('muted', muted);
+    }
+  } catch {}
 }
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Navigation

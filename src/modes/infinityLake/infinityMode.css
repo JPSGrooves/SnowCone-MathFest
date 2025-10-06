@@ -263,7 +263,7 @@
   line-height: 1.15;
 
   /* fluid, slightly smaller baseline */
-  font-size: clamp(0.95rem, 1.3vh + 0.4rem, 1.6rem);
+  font-size: clamp(1.1rem, 1.7vh + 0.5rem, 1.85rem); /* ≈+12–20% */
 
   /* existing styles… */
   width: 100%;
@@ -708,3 +708,70 @@
 .il-math #mathProblem {
   -webkit-line-clamp: 2; /* Shorter for equations */
 }
+/* ───────────────── Infinity bottom bar (intro only) ───────────────── */
+.il-bottom-bar {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: max(1.2vh, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  pointer-events: none;     /* buttons re-enable */
+  padding: 0 1.2vh;
+  z-index: 9;
+}
+
+/* Story-like square buttons, scoped to IL */
+.il-square-btn {
+  pointer-events: auto;
+  width: clamp(44px, 6.5vh, 84px);
+  height: clamp(44px, 6.5vh, 84px);
+  border-radius: 14%;
+  border: 2px solid #ffffff55;
+  background: #0b1530cc;
+  color: #fff;
+  font-size: clamp(18px, 3vh, 26px);
+  line-height: 1;
+  box-shadow: 0 6px 16px #00000060, inset 0 0 10px #00e6ff22;
+  display: grid;
+  place-items: center;
+  transition: transform .06s ease, background .2s ease, box-shadow .2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.il-square-btn:active { transform: translateY(1px) scale(0.98); }
+.il-square-btn.il-left  { justify-self: start; }
+.il-square-btn.il-right { justify-self: end; }
+
+/* (optional) muted state if you ever add a mute square later */
+.il-square-btn.muted {
+  background: #2a2a2acc;
+  box-shadow: 0 6px 16px #00000060, inset 0 0 8px #ff337722;
+}
+/* 🪄 IL result popup — compact buttons */
+#ilResultPopup .start-show-btn,
+#ilResultPopup .back-to-menu-btn {
+  font-size: clamp(0.9rem, 1.4vh, 1.05rem); /* smaller text */
+  line-height: 1.05;
+  padding: clamp(0.35rem, 1vh, 0.55rem) clamp(0.75rem, 1.6vh, 1.1rem); /* less padding */
+  min-width: clamp(110px, 24vw, 180px); /* narrower */
+  border-radius: 12px;                  /* less “pill” */
+  box-shadow: 0 0 8px currentColor;     /* softer glow */
+}
+
+/* tighten spacing between them a bit */
+.il-result-buttons { gap: 0.6rem; }
+/* 🧭 IL result popup — put Back to Menu on the left */
+#ilResultPopup #ilBackBtn { order: -1; }     /* first in row */
+#ilResultPopup #ilPlayAgainBtn { order: 0; } /* second */
+/* 🌊 Infinity Lake — neon banner */
+
+/* 📱 Mobile fit: scale by WIDTH, cap lines, trim padding */
+.il-speech{
+  /* width-driven fluid size (stays readable but won’t explode) */
+  font-size: clamp(0.92rem, 0.62rem + 2.2svw, 1.28rem);
+  line-height: 1.12;
+  overflow-wrap: anywhere; /* belt & suspenders for long words */
+}
+

@@ -10,16 +10,52 @@
 * ✅ **v0.8.8 – The Grampy P Badge**
 * ✅ **v0.9.0 – Legendary Badges/Badge/Theme Implemented****
 * ✅ **v0.9.0.5 – MathTips Village Kitty Paws**
-* 🔜 **v0.9.1 – MathTips Village Complete/Polished**
-* 🔜 **v0.9.2 – QuickServe Pavillion Complete/Polished**
-* 🔜 **v0.9.3 – Infinity Lake Complete/Polished**
-* 🔜 **v0.9.4 – Camping Games Complete/Polished**
-* 🔜 **v0.9.5 – Story Mode Forest Complete/Polished**
+* ✅ **v0.9.1 – QuickServe Pavillion Complete/Polished**
+* ✅ **v0.9.2 – Infinity Lake Complete/Polished**
+* ✅ **v0.9.3 – Camping Games Complete/Polished**
+* ✅ **v0.9.4 – Story Mode Forest Complete/Polished**
+* 🔜 **v0.9.5 – MathTips Village Complete/Polished**
 * 🔜 **v0.9.6 – Badges (add 5?) Complete/Polished**
 * 🔜 **v0.9.7 – Music/SFX Complete/Polished**
 * 🔜 **v0.9.8 – Celebrations Complete/Polished**
 * 🔜 **v0.9.9 – Code Complete/Polished**
 * 🎯 **v1.0.0 – Final Polish + Launch Ready✨**
+
+
+---
+## v0.9.4 — More Kitty Fixes, Louder About, Quick Polishes (October 6, 2025)
+
+### 📖 Story Mode Forest — playable & polished
+
+* KC-style **11:16 stage**; background center/contain (no crops) + larger portrait band.
+* **Prologue flow**: typewriter intro → **Skip / I’m Ready** → slide deck with **Prev/Next** and keyboard (**Enter/←/→/Esc**).
+* **Practice slides**: one-shot “Reveal” blocks + **Pythagoras fretboard** mini-sim (fraction readout, interval tag, soft WebAudio beep).
+* **Rewards**: +25 XP per reveal, **+500 XP on Finish**, and a new **`story_prologue` badge** with a subtle toast near the tapped button.
+* **Bottom bar** pinned (Back/Mute), safe-area aware; answers/images no longer push the buttons around.
+* **Audio**: one-tap Howler unlock; Prologue track loops; mute state stays in sync across screens.
+* **Stability**: single click/keydown handler per screen; full unwire on exit; background repaint helper to bust stale paints.
+
+### 🧠 Math Tips Village — iOS “Add-to-Home” hotfix
+
+* **True full-height** after the intro (uses `100svh`/safe-area); chat no longer “scrunches.”
+* **One scroller** owns overflow (the chat window); intro overlay releases input on fade-out.
+* Pinned bottom bar (Back/Mute + Copy/Export); **touch-action: pan-y** restores smooth scrolling.
+* Music start/mute stays tidy when re-entering Tips.
+
+### 🧊 Info Modal — creator-forward & cleaner
+
+* New hero blurb: **“Neon math. Real music. Zero fluff.”**
+* Clear credit line: **Built end-to-end by JPS Grooves — developer • musician • educator • illustrator.**
+* **Primary CTA first**: **Visit JPSGrooves.com**, then SoundCloud / Spotify / Apple Music.
+* Buttons **stack in a column** on narrow screens; removed the fullscreen warning; header text fixed (no invisible black).
+
+### 🧪 Quick QA
+
+* Story: BG never crops, buttons don’t jump, XP/badge award once, keys work.
+* Tips: On iOS PWA, chat fills the screen and scrolls smoothly; bottom bar never overlaps input.
+* Modal: Links feel primary, layout stacks cleanly on phones.
+
+> *“Forest tells the tale, Tips fills the screen, and the About finally points people straight to the music, the site, and the work.”*
 
 ---
 

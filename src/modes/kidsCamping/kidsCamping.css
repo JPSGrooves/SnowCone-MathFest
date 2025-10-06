@@ -1730,3 +1730,44 @@ html.kc-no-zoom, body.kc-no-zoom { overscroll-behavior: contain; }
 
 /* (optional) hide scrollbar but keep it working */
 .mt-root .chat-window::-webkit-scrollbar { display: none; }
+/* ───────────────── Bottom bar (KC) ───────────────── */
+.kc-bottom-bar {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: max(1.2vh, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  pointer-events: none;            /* buttons re-enable */
+  padding: 0 1.2vh;
+  z-index: 9;                      /* above grid chrome */
+}
+
+/* ───────────────── Square button (KC) ───────────────── */
+.kc-square-btn {
+  pointer-events: auto;
+  width: clamp(44px, 6.5vh, 84px);
+  height: clamp(44px, 6.5vh, 84px);
+  border-radius: 14%;
+  border: 2px solid #ffffff55;
+  background: #0b1530cc;
+  color: #fff;
+  font-size: clamp(18px, 3vh, 26px);
+  line-height: 1;
+  box-shadow: 0 6px 16px #00000060, inset 0 0 10px #00e6ff22;
+  display: grid;
+  place-items: center;
+  transition: transform .06s ease, background .2s ease, box-shadow .2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.kc-square-btn:active { transform: translateY(1px) scale(0.98); }
+.kc-square-btn.kc-left  { justify-self: start; }
+.kc-square-btn.kc-right { justify-self: end; }
+
+/* visual cue when muted (same idea as Story's .muted) */
+.kc-square-btn.muted {
+  background: #2a2a2acc;
+  box-shadow: 0 6px 16px #00000060, inset 0 0 8px #ff337722;
+}

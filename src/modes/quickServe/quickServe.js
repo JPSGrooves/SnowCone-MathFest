@@ -72,8 +72,14 @@ function renderIntroScreen() {
               src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_intro.png"
             />
           </div>
+
+          <!-- keep Start button exactly as-is -->
           <button id="startShowBtn" class="start-show-btn">✨ Start the Show ✨</button>
-          <button id="backToMenuBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
+        </div>
+
+        <!-- ✅ Story-style bottom bar just for QS intro -->
+        <div class="qs-bottom-bar">
+          <button id="qsBackIntro" class="qs-square-btn qs-left">🔙</button>
         </div>
       </div>
     </div>
@@ -81,17 +87,23 @@ function renderIntroScreen() {
 
   phil.initPhil();
   repaintBackground();
-  setupMuteButton();
 
+  // Start the show
   document.getElementById('startShowBtn')?.addEventListener('click', () => {
     playTransition(() => {
-      playQSRandomTrack();  // 🎧 DJ Booth spins up
-      renderGameUI();
+      playQSRandomTrack();   // 🎧 DJ Booth spins up
+      renderGameUI();        // (main UI unchanged)
     });
   });
 
-  document.getElementById('backToMenuBtn')?.addEventListener('click', returnToMenu);
+  // New square Back/Mute for intro
+  document.getElementById('qsBackIntro')?.addEventListener('click', returnToMenu);
+
+
+
+  // (leave setupMuteButton() out here; it targets in-game #muteBtn if present)
 }
+
 
 //////////////////////////////
 // 🎮 Main Game Screen
@@ -341,24 +353,3 @@ function clearFeedback() {
 //////////////////////////////
 export { stopGameLogic as stopQuickServeGame } from './quickServeGame.js';
 export { startGameLogic as startQuickServeGame } from './quickServeGame.js';
-function checkQSBadges() {
-  if (score >= 25)  awardBadge('quick_25');
-  if (score >= 50)  awardBadge('quick_50');
-  if (score >= 75)  awardBadge('quick_75');
-  if (score >= 100) awardBadge('quick_100');
-}
-// call checkQSBadges() right after you bump score
-export function finalizeQuickServeRun(runScore) {
-  // pacing: ~1 XP per 2 points (tune as you like)
-  const QS_XP_PER_POINT = 0.5;
-  const xp = Math.max(0, Math.floor(runScore * QS_XP_PER_POINT));
-
-  appState.addQuickServeXP(xp);      // ✅ fills QuickServe bucket (cap 500)
-  appState.updateQuickServeHighScore(runScore);
-
-  // sample badge thresholds you already planned
-  if (runScore >= 25)  awardBadge('quick_25');
-  if (runScore >= 50)  awardBadge('quick_50');
-  if (runScore >= 75)  awardBadge('quick_75');
-  if (runScore >= 100) awardBadge('quick_100');
-}

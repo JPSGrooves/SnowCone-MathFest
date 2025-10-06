@@ -228,6 +228,7 @@ function wireIntroHandlers() {
   if (intro) {
     intro.classList.add('fade-out');
     intro.style.pointerEvents = 'none';
+    intro.addEventListener('transitionend', () => intro.remove(), { once: true }); // ← add this line
   }
   setTimeout(() => {
     renderMainUI();
@@ -267,7 +268,7 @@ function renderMainUI() {
           />
 
           <div class="mt-grid">
-            <div class="mt-header"><h1>🧠 Math Tips Village</h1></div>
+            <div class="mt-header"><h1>🐱 Math Tips Village</h1></div>
             <div class="mt-content">
               <div class="chat-window" id="chatOutput"></div>
               <div class="chat-input-zone">

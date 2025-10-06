@@ -66,6 +66,7 @@ export function loadInfinityMode() {
   gameContainer.style.display = 'flex';
 
   renderIntroScreen();
+  document.getElementById('ilBackIntro')?.addEventListener('click', returnToMenu);
   setTimeout(() => {
     startTripletLoop('intro', 'tripletSpriteIntro', 500);
   }, 100);
@@ -154,9 +155,10 @@ function renderIntroScreen() {
           <div class="il-intro-stack">
             <div class="il-speech">
               Hi! We're the <strong>Infinity Triplets</strong>!<br>
-              We keep the beats pumping while you solve math problems!<br>
+              We keep the math beats pumping all night long!<br>
               Infinity Awaits!
             </div>
+
             <div class="triplet-wrapper">
               <img 
                 id="tripletSpriteIntro" 
@@ -165,19 +167,22 @@ function renderIntroScreen() {
               />
             </div>
 
-            <!-- 🎛️ Scoped buttons — properly classed and styled -->
+            <!-- ✅ Keep Start button in the stack -->
             <button id="startInfinitySet" class="il-intro-btn start-show-btn">
               🎶 Start the Set 🎶
             </button>
-            <button id="backToMenu" class="il-intro-btn back-to-menu-btn">
-              🔙 Back to Menu
-            </button>
+          </div>
+
+          <!-- ✅ QS/Story-style bottom bar (intro only) -->
+          <div class="il-bottom-bar">
+            <button id="ilBackIntro" class="il-square-btn il-left">🔙</button> <!-- ✅ no global class -->
           </div>
         </div>
       </div>
     </div>
   `;
 }
+
 
 function switchMode(mode) {
   currentMode = mode;

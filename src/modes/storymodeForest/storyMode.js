@@ -565,7 +565,7 @@ function renderIntroScreen() {
   resetContainerStyles();
 
   container.classList.remove('hidden');
-  container.removeAttribute('style'); 
+  container.removeAttribute('style');
 
   container.innerHTML = `
     <div class="sm-aspect-wrap">
@@ -588,8 +588,13 @@ function renderIntroScreen() {
 
             <div class="sm-intro-buttons">
               <button id="smHearStory" class="sm-btn sm-btn-primary">🍧 Hear the Story</button>
-              <button id="smBackToMenu" class="sm-btn sm-btn-secondary">🔙 Back to Menu</button>
+              <!-- ⛔ removed the secondary Back button here -->
             </div>
+          </div>
+
+          <!-- ✅ QS-style bottom bar: only Back on intro -->
+          <div class="sm-bottom-bar">
+            <button id="smBackToMenu" class="sm-square-btn sm-left">🔙</button>
           </div>
         </section>
       </div>
@@ -598,9 +603,13 @@ function renderIntroScreen() {
 
   elRoot = container.querySelector('.sm-aspect-wrap');
 
-  // repaint helper you already had
   repaintBackground();
+
+  // existing helpers
+  wireHandlersForCurrentRoot();
+  document.querySelectorAll('.sm-aspect-wrap, .sm-game-frame, .sm-intro').forEach(preventDoubleTapZoom);
 }
+
 
 
 function renderChapterMenu() {

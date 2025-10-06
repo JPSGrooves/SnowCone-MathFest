@@ -6,27 +6,26 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v0.9.0.5</h3>
+      <h3>🧠 SnowCone MathFest v0.9.4</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.9.0.5 — musical kitty paws</h3>
+      <h3>🍦 v0.9.4 — More Kitty Fixes, Louder About, Quick Polishes</h3>
       <p>
-        – 🧠 <strong>Math Tips Village UI refresh</strong>: full-bleed background restored, 11:16 aspect wrapper, single scroll area that hugs the bottom, smoother pop-in animations, safe-area padding, and mobile scrollbars hidden<br>
-        – 🏷️ <strong>Header cleanup</strong>: title is text-only (“Math Tips Village”) — no panel/border — neon glow retained<br>
-        – 💬 <strong>Response styling</strong>: new <code>.mt-response-card</code>, <code>.mt-response-list</code>, and mini-lecture blocks (<code>.mt-lecture-card</code>) for consistent lesson/lore rendering + tidy inline <code>code</code> tokens<br>
-        – 🧭 <strong>Bottom utility bar</strong>: fixed Back / Copy / Export / Mute pinned to corners; pointer-events fixes so center actions stay clickable on intro & main screens<br>
-        – 🧱 <strong>CSS dedupe & layout hardening</strong>: one scroller owns overflow (<code>min-height:0</code> grid fixes), fewer duplicate rules, and HMR-safe animations<br>
-        – 📖 <strong>Lore mode expansion</strong>: added “Festival lore” (Hypotenuse Gate beat), “Who is Grampy P?” identity blurb, and a lightweight “lore joke” path; all use the new card/footer pattern (“Would you like to know more?”) with polished copy<br>
-        – 🎵 <strong>MathTips music flow</strong>: reliable one-tap Howler unlock, <code>kittyPaws</code> auto-resume on re-entry, loop toggled on enter/exit, and stop only if the current track belongs to this mode; mute UI stays in sync<br>
-        – 🏆 <strong>Legend badge</strong>: auto-awards once all non-legend badges are unlocked (95%), adds the final 5% for 100% completion<br>
-        – 📊 <strong>Completion system simplified</strong>: badge-driven only (95% non-legend + 5% legend); XP still fuels levels but no longer affects completion<br>
-        – 🗨️ <strong>“Grampy P” badge</strong>: first chat in Math Tips Village (working + persisted)<br>
+        – 📖 <strong>Story Mode Forest polish</strong>: KC-style 11:16 stage (center/contain BG), typewriter intro with <em>Skip / I’m Ready</em>, clean slide deck (Prev/Next + Enter/←/→/Esc), one-shot “Reveal” blocks, +25 XP per reveal and <strong>+500 XP</strong> on Finish, subtle toast near the pressed button, and a tiny fretboard mini-sim (fraction readout + interval beep)<br>
+        – 🧊 <strong>Bottom bar stability</strong>: Back/Mute pinned inside safe-area; portraits/images and popups no longer push buttons down on small phones<br>
+        – 🔊 <strong>Audio discipline</strong>: one-tap Howler unlock, Prologue track loops, mute UI stays in sync across screens, loop state reset on exit<br>
+        – 🧠 <strong>Math Tips Village — iOS PWA fix</strong>: true full-height after intro (<code>100svh</code> + safe-area), single chat scroller owns overflow (<code>min-height:0</code> grid fix), intro overlay drops <code>pointer-events</code> on fade, <code>touch-action: pan-y</code> restores smooth scroll, bottom bar never overlaps input<br>
+        – 🏷️ <strong>Header cleanup (Tips)</strong>: title is text-only — neon glow, no panel/border<br>
+        – 💬 <strong>Response styling (Tips)</strong>: added <code>.mt-response-card</code>, <code>.mt-response-list</code>, <code>.mt-lecture-card</code>; tidy inline <code>code</code> tokens, softer pop-in animations<br>
+        – 🪪 <strong>About/Info modal — louder & clearer</strong>: removed fullscreen warning; bold credit line (<em>Built end-to-end by JPS Grooves</em>); <strong>JPSGrooves.com</strong> listed first; links stack vertically on mobile; header contrast fixed (no “invisible black” look)<br>
+        – 🧼 <strong>Event wiring & repaint</strong>: single screen-level handlers (click/keydown) with full unwire on exit; background repaint helper to bust stale paints<br>
+        – 🐛 <strong>Misc fixes</strong>: tiny-screen text clamping, safe-area padding, button hitboxes, and minor CSS dedupe across Story/Tips
       </p>
-
     </div>
+
 
     <div class="settings-block">
       <h3>📲 App Info</h3>

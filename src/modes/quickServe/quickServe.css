@@ -20,7 +20,6 @@
   position: relative;
   z-index: 2;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
   box-sizing: border-box;
 }
 
@@ -94,7 +93,6 @@
   border: 2px dashed #00ffee88;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(6px);
   overflow: hidden;
   min-height: 20vh;
   max-height: clamp(120px, 30vh, 200px);
@@ -486,7 +484,7 @@
   line-height: 1.35;
   
 
-  font-size: clamp(-3rem, 2.1vh, 1.6rem);
+  font-size: clamp(-3rem, 2.4vh, 1.8rem);
   max-height: clamp(10rem, 30vh, 20rem); /* 🍧 bigger upper limit */
 }
 
@@ -839,3 +837,54 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+/* ───────────────── QuickServe bottom bar (intro only) ───────────────── */
+.qs-bottom-bar {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: max(1.2vh, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  pointer-events: none;     /* buttons re-enable */
+  padding: 0 1.2vh;
+  z-index: 9;               /* sits above intro stack */
+}
+
+/* Story-like square buttons, scoped to QS */
+.qs-square-btn {
+  pointer-events: auto;
+  width: clamp(44px, 6.5vh, 84px);
+  height: clamp(44px, 6.5vh, 84px);
+  border-radius: 14%;
+  border: 2px solid #ffffff55;
+  background: #0b1530cc;
+  color: #fff;
+  font-size: clamp(18px, 3vh, 26px);
+  line-height: 1;
+  box-shadow: 0 6px 16px #00000060, inset 0 0 10px #00e6ff22;
+  display: grid;
+  place-items: center;
+  transition: transform .06s ease, background .2s ease, box-shadow .2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.qs-square-btn:active { transform: translateY(1px) scale(0.98); }
+.qs-square-btn.qs-left  { justify-self: start; }
+.qs-square-btn.qs-right { justify-self: end; }
+
+/* muted state (matches Story vibe) */
+.qs-square-btn.muted {
+  background: #2a2a2acc;
+  box-shadow: 0 6px 16px #00000060, inset 0 0 8px #ff337722;
+}
+/* 🌊 QS sine waves canvas */
+.qs-stage .glow-lines .qs-waves {
+  position: absolute;
+  inset: 0;
+  z-index: 0;         /* behind Phil */
+  pointer-events: none;
+}
+
+/* hide legacy straight lines if any slipped through */
+.qs-stage .glow-lines .glow-line { display: none; }
