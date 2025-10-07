@@ -888,3 +888,32 @@
 
 /* hide legacy straight lines if any slipped through */
 .qs-stage .glow-lines .glow-line { display: none; }
+/* ───────────────── QuickServe result popup: compact buttons (IL-style) ───────────────── */
+
+#qsResultPopup .qs-result-buttons {
+  display: flex;
+  gap: 0.6rem;            /* tighter gap */
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+/* smaller, denser buttons inside QS result popup only */
+#qsResultPopup .play-again-btn,
+#qsResultPopup .back-to-menu-btn {
+  font-size: clamp(0.9rem, 1.4vh, 1.05rem);
+  line-height: 1.05;
+  padding: clamp(0.35rem, 1vh, 0.55rem) clamp(0.75rem, 1.6vh, 1.1rem);
+  min-width: clamp(110px, 24vw, 180px);
+  border-radius: 12px;           /* less pill */
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* keep QS colorway (already defined earlier); this just scopes sizing/shape */
+
+/* put Back on the left, Play Again on the right */
+#qsResultPopup #qsBackBtn { order: -1; }
+#qsResultPopup #qsPlayAgainBtn { order: 0; }
+#qsResultPopup h2 {
+  font-size: clamp(1.2rem, 3vh, 2rem);
+}

@@ -1,203 +1,148 @@
 // /src/modes/mathTips/modes/lore.js
-// Lore booth — topics with short drops. Stays in-booth and returns to Lore Menu
-// when a section ends or on ok/stop/menu. Single-card replies, no end:true.
-
 import { composeReply } from '../conversationPolicy.js';
+import { makeSession, readAffirmative, helpCard } from './_kit.js';
 
-// ───────────────── CONTENT ─────────────────
-// Keep your existing flavor; these are your current cards.
+const S = makeSession({ capMin: 3, capMax: 4 });
+let Gate = { topicKey: null, index: 0, started: false, waiting: true };
+
+/* content */
 const LORE = {
-  festival: [
-    `<p>when night falls, cones hum at the hypotenuse gate. each solved puzzle makes the glow brighter.</p>`,
-    `<p>legend says grampy p once squared a circle — turned out to be a quesadilla. still counts.</p>`,
-    `<p>the sages map constellations to flavor curves: mango is sine, blueberry is cosine, cherry is chaotic good.</p>`,
-    `<p>beneath the village, a tunnel of triangles keeps time. step on the right beat, doors open. step wrong — extra homework.</p>`
-  ],
-  origins: [
-    `<p>first gate was drawn in chalk, then struck by lightning — the outline never washed away.</p>`,
-    `<p>old timers say the festival grew from a single proof whispered to a snow cloud.</p>`,
-    `<p>a cartographer measured joy in radians and found full circle at the shaved-ice tent.</p>`,
-    `<p>some claim the parking dino learned to honk before it learned to roar.</p>`
-  ],
-  pcat: [
-    `<p>pythagoras cat answers only yes/no, but blinks in prime numbers when it’s excited.</p>`,
-    `<p>pcat naps on the diagonal of every rectangle rug — efficiency matters.</p>`,
-    `<p>if you ask for hints thrice, it leaves a pawprint that points the shortest way.</p>`,
-    `<p>legend: pcat once factored a polynomial by batting the terms into place.</p>`
-  ],
-  xFiles: [
-    `<p>type “park the cars” in any booth and the traffic dino waves at you (only once per day).</p>`,
-    `<p>there’s a hidden comet snowcone topping — unlock it by hitting a 7-streak at infinity lake.</p>`,
-    `<p>the ant commanders argue about vectors. neither one will pivot.</p>`,
-    `<p>grampy p’s guitar has a secret capo slot labeled φ — strum it for golden vibes.</p>`
-  ]
+  origins: {
+    title: 'Origins',
+    slides: [
+      `<p>Before MathFest, the valley was just orchards and fog. During a storm, a traveling teacher rigged a tarp
+      between two trucks and started drawing triangles to find where to dig a drainage ditch. Kids came with lanterns.
+      Farmers brought thermoses. The ditch worked; the drawings stayed. People came back the next night with questions and pie.</p>`,
+      `<p>They learned the first village law: <em>Problems are invitations.</em> Not insults, not verdicts — invitations.
+      If a diagram looked wrong, someone would bake it into a pie-tin graph and spin it under a string. If a proof felt mean,
+      they’d translate it into cookie steps and see where the tone softened.</p>`,
+      `<p>When winter came, they built a shed and hung up every broken tool with a note about what it taught them.
+      “This rule snapped when I pulled too hard on a weird edge case,” one card reads. The shed is still there,
+      a museum of productive mistakes. Field trips end there, pockets full of questions.</p>`,
+      `<p>Years later, visitors swear the valley smells faintly of warm sugar and pencil shavings. “That’s not magic,”
+      say the elders. “That’s what curiosity smells like when you keep it fed.”</p>`
+    ]
+  },
+  festival: {
+    title: 'Festival Nights',
+    slides: [
+      `<p>At dusk the spiral pavilion lights one lantern per solved riddle. The path glows like a number line,
+      brighter where folks linger. Kids swap conjectures; aunties trade factoring tricks like recipes.</p>`,
+      `<p>There’s a quiet bell for “aha” moments. You only hear it if you’re thinking softly. The pavilion claims
+      the bell rings itself; nobody argues with a pavilion that tells nice stories.</p>`,
+      `<p>Closing glow is simple: everyone writes one thing they still wonder on a paper leaf and clips it to the wind wall.
+      The leaves rustle questions at the stars.</p>`
+    ]
+  },
+  sages: {
+    title: 'Snowcone Sages',
+    slides: [
+      `<p><strong>Neon</strong> speaks in gradients: start where it’s bright, move where it’s dim. Says a proof should taste
+      like a snowcone — sweet enough to keep you going, sharp enough to wake you up.</p>`,
+      `<p><strong>Granita</strong> is patient. She’ll let silence do math for a full minute before she nods. “Listen to the
+      diagram. It breathes,” she says, handing you a spoon.</p>`,
+      `<p><strong>Crush</strong> looks chaotic, but the scribbles are choreographed. He can erase a whole board with one sleeve
+      and still leave the idea standing, waving like a friend at a station.</p>`
+    ]
+  },
+  badges: {
+    title: 'Badges',
+    slides: [
+      `<p><strong>Bridge Builder</strong> is for stitching two ideas into one walkway. People pin it on with string they dyed
+      in tea. It looks better after storms.</p>`,
+      `<p><strong>Fraction Smith</strong> shines faintly in the dark, like coals. You earn it by showing someone how a messy
+      ratio becomes a clean one — then letting them hold the tongs.</p>`,
+      `<p><strong>Quiet Torch</strong> isn’t worn. It’s placed on the table near you when the room realizes you’ve been
+      lighting it the whole time.</p>`
+    ]
+  }
 };
 
-// ───────────────── STATE (per-session) ─────────────────
-/** sessionId -> { topic: 'festival'|'origins'|'pcat'|'xFiles'|null, idx: number } */
-const SESS = new Map();
-
-function isAffirmative(s) {
-  const t = String(s || '').toLowerCase().trim();
-  return (
-    /\b(y(?:es+|ea|ep|up)?|yeah|yea|yessir|yass+|sure|ok(?:ay)?|alright|all right|bet|roger|10[\s-]?4|indeed|affirmative|please|do it|do this|go|let'?s go|sounds (?:good|great))\b/.test(t)
-    || /^\s*[yk]\s*$/i.test(t) // y, k, kk
-  );
+function pickTopic(t = '') {
+  const k = String(t).toLowerCase();
+  if (/origin|tarp|ditch|shed/.test(k)) return 'origins';
+  if (/festival|night|pavilion|closing/.test(k)) return 'festival';
+  if (/sage|neon|granita|crush/.test(k)) return 'sages';
+  if (/badge|bridge|smith|torch/.test(k)) return 'badges';
+  return Gate.topicKey || 'origins';
 }
 
-
-// ───────────────── UTIL ─────────────────
-const norm = (s) => String(s || '').trim().toLowerCase();
-
-function pickTopic(input) {
-  const k = norm(input);
-  if (!k) return null;
-  if (/origin|begin|history|start|found/.test(k)) return 'origins';
-  if (/(p[-\s]*cat|pcat|pythagoras\s*cat|cat)/.test(k)) return 'pcat';
-  if (/egg|secret|xfiles?|hidden|unlock/.test(k)) return 'xFiles';
-  if (/fest|village|gate|cone|tunnel|legend|lore/.test(k)) return 'festival';
-  if (/^(festival|origins?|pcat|xfiles?)$/.test(k)) {
-    return k.startsWith('origin') ? 'origins' : k.startsWith('xfile') ? 'xFiles' : k;
-  }
-  return null;
-}
-
-function ensure(sessionId) {
-  if (!sessionId) sessionId = 'default';
-  if (!SESS.has(sessionId)) SESS.set(sessionId, { topic: null, idx: 0 });
-  return SESS.get(sessionId);
-}
-
-function setTopic(sessionId, topic) {
-  const st = ensure(sessionId);
-  st.topic = topic;
-  st.idx = 0;
-  return st;
-}
-
-function menuHTML() {
+function menuCard() {
   return `
     <p><strong>Lore Menu</strong></p>
     <ul class="mt-menu">
-      <li><strong>festival</strong> — gates · cones · tunnels</li>
-      <li><strong>origins</strong> — how it all began</li>
-      <li><strong>pcat</strong> — yes/no myths</li>
-      <li><strong>xFiles</strong> — secrets & unlocks</li>
+      <li><strong>festival</strong> — nights, spiral pavilion, closing glow</li>
+      <li><strong>sages</strong> — Neon · Granita · Crush</li>
+      <li><strong>badges</strong> — bridge builder · fraction smith · quiet torch</li>
+      <li><strong>origins</strong> — the tarp · the ditch · the shed</li>
     </ul>
-    <p class="mt-dim">say a topic (“festival”, “origins”, “pcat”, “xFiles”) or <em>more</em> / <em>stop</em> / <em>menu</em>.</p>
+    <p class="mt-dim">say a topic (“festival”, “sages”, “badges”, “origins”) or say <em>next</em>/<em>more</em> to begin.</p>
   `;
 }
+const slideHtml = (k,i)=>{const r=LORE[k]||LORE.origins;const j=Math.max(0,Math.min(i,r.slides.length-1));return `<p><strong>${r.title}</strong> — ${j+1} of ${r.slides.length}</p>${r.slides[j]}`;};
+const endToMenuHtml = () => `<p>stories topped off — wanna pick another lore thread?</p>${menuCard()}`;
 
-function card(html, { askAllowed = true } = {}) {
-  return composeReply({
-    part: { kind: 'answer', html },
-    askAllowed,
-    mode: 'lore',
-    noAck: true
-  });
+export function start({ topic } = {}) {
+  S.reset();
+  Gate = { topicKey: pickTopic(topic), index: 0, started: false, waiting: true };
+  return composeReply({ part: { kind:'answer', html: menuCard() }, askAllowed:false, noAck:true, mode:'lore' });
 }
 
-function showMenu() {
-  return card(menuHTML(), { askAllowed: false });
-}
+export function handle(text = '') {
+  const msg = String(text || '').trim();
+  if (/^start\b/i.test(msg)) return start({ topic: Gate.topicKey });
 
-function showStep(topic, idx) {
-  const deck = LORE[topic] || [];
-  const i = Math.max(0, Math.min(idx, deck.length - 1));
-  const html = `${deck[i]}<p class="mt-dim">say <code>more</code> for another, or <code>menu</code> to pick a topic.</p>`;
-  return card(html);
-}
-
-function finishToMenu() {
-  return showMenu(); // ← important: stay in lore, no end:true
-}
-
-// Optional: tiny analytics
-function markLoreTouch(sessionId) {
-  try {
-    const { appState } = require('../../../data/appState.js'); // tolerant require
-    appState.progress ??= {};
-    appState.progress.mathtips ??= {};
-    const p = appState.progress.mathtips;
-    p.loreSeen ??= {};
-    const st = ensure(sessionId);
-    const key = st.topic || 'menu';
-    p.loreSeen[key] = (p.loreSeen[key] || 0) + 1;
-  } catch {}
-}
-
-// ───────────────── PUBLIC API ─────────────────
-export function start({ sessionId, topic } = {}) {
-  const picked = pickTopic(topic);
-  const st = ensure(sessionId);
-  if (picked) setTopic(sessionId, picked);
-  else { st.topic = null; st.idx = 0; }
-  return showMenu();
-}
-
-export function handle(text = '', { sessionId } = {}) {
-  const t = norm(text);
-  const st = ensure(sessionId);
-
-  // router may send 'start'
-  if (t.startsWith('start')) return start({ sessionId, topic: st.topic });
-
-  // help/menu → show menu (stay in booth)
-  if (t === 'help' || t === 'menu' || t === 'lore') return showMenu();
-
-  // stop/ok/done/exit section → return to menu (no end:true)
-  if (/\b(stop|quit|pause|later|enough|exit|done)\b/i.test(t)) {
-    st.topic = null; st.idx = 0;
-    return showMenu();
+  if (/^help\b/i.test(msg)) {
+    const card = helpCard(
+      'Lore Help',
+      ['say: festival · sages · badges · origins','controls: next · more · again · menu','tip: short paragraphs — not flashcards'],
+      'say "exit" to leave lore.'
+    );
+    return { html: composeReply({ part:{ html: card }, askAllowed:false, noAck:true, mode:'lore' }) };
   }
 
-  // topic switch/select (emit first drop)
-  const maybe = pickTopic(t);
-  if (maybe) {
-    setTopic(sessionId, maybe);
-    markLoreTouch(sessionId);
-    return showStep(maybe, 0);
+  if (/^menu\b/i.test(msg)) {
+    Gate.waiting = true;
+    return { html: composeReply({ part:{ html: menuCard() }, askAllowed:false, noAck:true, mode:'lore' }) };
   }
 
-  // flow: yes/more/next/again continue; 'no' = menu
-  if (/\b(no|nah|nope|negative|pass)\b/i.test(t)) {
-    st.topic = null; st.idx = 0;
-    return showMenu();
-  }
-  // treat empty, "more" words, or ANY affirmative as continue
-  const wantsMore =
-    !t
-    || /\b(more|another|continue|next|again)\b/i.test(t)
-    || isAffirmative(t);
-
-  if (wantsMore) {
-    if (!st.topic) return showMenu();
-    const deck = LORE[st.topic] || [];
-    if (st.idx + 1 < deck.length) {
-      st.idx += 1;
-      markLoreTouch(sessionId);
-      return showStep(st.topic, st.idx);
+  // topic
+  {
+    const maybe = pickTopic(msg);
+    if (maybe && maybe !== Gate.topicKey) {
+      Gate = { ...Gate, topicKey: maybe, index: 0, started: false, waiting: true };
+      S.reset?.();
+      return { html: composeReply({ part:{ html: slideHtml(Gate.topicKey, Gate.index) }, askAllowed:true, askText:'want another?', noAck:true, mode:'lore' }) };
     }
-    st.topic = null; st.idx = 0;
-    return finishToMenu();
   }
 
-  if (!t || /\b(more|another|continue|next|again|yes|y)\b/.test(t)) {
-    if (!st.topic) return showMenu();
-    const deck = LORE[st.topic] || [];
-    // advance if possible, else finish to menu
-    if (st.idx + 1 < deck.length) {
-      st.idx += 1;
-      markLoreTouch(sessionId);
-      return showStep(st.topic, st.idx);
+  if (/^again\b/i.test(msg)) {
+    if (!Gate.topicKey) return { html: composeReply({ part:{ html: menuCard() }, askAllowed:false, noAck:true, mode:'lore' }) };
+    return { html: composeReply({ part:{ html: slideHtml(Gate.topicKey, Gate.index) }, askAllowed:true, askText:'one more?', noAck:true, mode:'lore' }) };
+  }
+
+  if (/\b(exit|quit|leave|stop|pause|enough)\b/i.test(msg)) {
+    S.reset?.();
+    Gate = { topicKey: null, index: 0, started: false, waiting: true };
+    return { html: composeReply({ part:{ html: endToMenuHtml() }, askAllowed:false, noAck:true, mode:'lore' }), end: true };
+  }
+
+  const isNextish = /^(next|more|another|one\s*more|ok(?:ay)?)\b/i.test(msg) || readAffirmative(msg) === 'yes';
+  if (isNextish) {
+    if (!Gate.started) { Gate.started = true; S.bump(); return { html: composeReply({ part:{ html: slideHtml(Gate.topicKey, Gate.index) }, askAllowed:true, askText:'want another?', noAck:true, mode:'lore' }) }; }
+    const slides = LORE[Gate.topicKey].slides, last = slides.length - 1;
+
+    if (S.isCapReached() || Gate.index >= last) {
+      return { html: composeReply({ part:{ kind:'answer', html: endToMenuHtml() }, askAllowed:true, mode:'lore' }) };
     }
-    // finished that topic → back to menu
-    st.topic = null; st.idx = 0;
-    return finishToMenu();
+
+    Gate.index = Math.min(Gate.index + 1, last); S.bump();
+    return { html: composeReply({ part:{ html: slideHtml(Gate.topicKey, Gate.index) }, askAllowed:true, askText:'want another?', noAck:true, mode:'lore' }) };
   }
 
-  // unknown inside lore → gentle nudge with menu
-  return card(`<p>ready to jam some lore? say <strong>more</strong>, <strong>stop</strong>, or pick a topic: festival · origins · pcat · xFiles.</p>`, { askAllowed: false });
-}
+  if (Gate.waiting) {
+    return { html: composeReply({ part:{ html:`<p>lore time — say <strong>next</strong>/<strong>more</strong>, <strong>again</strong>, or pick: <em>festival · sages · badges · origins</em>.</p>` }, askAllowed:false, noAck:true, mode:'lore' }) };
+  }
 
-export default { start, handle };
+  return { html: composeReply({ part:{ html:`<p>pick a thread: <strong>festival</strong>, <strong>sages</strong>, <strong>badges</strong>, or <strong>origins</strong> — or <em>menu</em>.</p>` }, askAllowed:true, mode:'lore' }) };
+}

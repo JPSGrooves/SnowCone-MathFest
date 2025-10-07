@@ -828,6 +828,20 @@ export function getResponse(userText, appStateLike = appState) {
       }
     }
   }
+  // 🔎 Quick Lessons intent: "lesson", "lessons", "i want a lesson", "teach me a lesson"
+  {
+    const t = String(userText || '').trim().toLowerCase();
+    if (/\b(lesson|lessons)\b/.test(t) || /\b(i\s+want\s+a\s+lesson|teach\s+me\s+a?\s*lesson)\b/.test(t)) {
+      setMode(MODES.lessons);
+      clearSmalltalkThread?.();
+      return adaptModeOutput(
+        MODEx.lessons.start({}),
+        userText,
+        'booth:lessons'
+      );
+    }
+  }
+
 
 
   // 0a) Handle pending booth switch
@@ -1076,20 +1090,14 @@ export function getResponse(userText, appStateLike = appState) {
     if (out) {
       const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
       if (adapted) {
+        // NEW — trust the booth's end card (it can show its own menu)
         if (adapted?.meta?.end) {
           setMode(MODES.none);
           clearBoothContext();
-          // Return the Commons menu so the user *sees* we’ve left
-          return {
-            html: composeReply({
-              userText: text,
-              part: { kind: 'answer', html: boothMenuHTML('👋 Back to the village center.') },
-              askAllowed: false,
-              noAck: true
-            }),
-            meta: { intent: 'exit' }
-          };
+          // Pass through exactly what the booth emitted (often includes its menu)
+          return adapted;
         }
+
         return adapted;
       }
     }
@@ -1108,6 +1116,19 @@ export function getResponse(userText, appStateLike = appState) {
       };
     }
   }
+  // bare "lesson" / "lessons" opens Lessons booth
+  if (/^\s*lessons?\s*$/.test(t)) {
+    setMode(MODES.lessons);
+    const out = MODEx.lessons.start({});
+    return adaptModeOutput(out, text, 'booth:lessons') || { html: '' };
+  }
+  // If we're in Lessons and the user says "menu", defer to Lessons.handle so it shows the Lessons menu card
+  if (currentMode === MODES.lessons && /^\s*menu\s*$/i.test(t)) {
+    const out = MODEx.lessons.handle('menu', { sessionId: SESSION_ID });
+    const adapted = adaptModeOutput(out, userText, 'booth:lessons');
+    if (adapted) return adapted;
+  }
+
 
 
   // 1b) Idle mode: handle specific intents

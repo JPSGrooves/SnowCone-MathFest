@@ -148,9 +148,6 @@
   text-shadow: 0 0 4px #ffffff88;
   text-align: center;
   max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 
@@ -650,7 +647,6 @@
     font-size: clamp(0.8rem, 3svh, 2rem); /* Aggressive text shrink */
     white-space: normal; /* Allow wrap to prevent wide overflow */
     overflow: hidden;    /* Clip if it still pushes */
-    text-overflow: ellipsis;
     max-lines: 2;        /* Limit to 2 lines max */
   }
 
@@ -698,7 +694,6 @@
   word-break: break-word; /* Break long words if needed */
   hyphens: auto; /* Auto-hyphenate for better flow */
   overflow: hidden; /* Clip overflow text */
-  text-overflow: ellipsis; /* ... for clipped lines */
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4; /* Max 4 lines before clip (adjust per element) */
@@ -774,4 +769,265 @@
   line-height: 1.12;
   overflow-wrap: anywhere; /* belt & suspenders for long words */
 }
+/* ── IL: subtler Main Menu + Mute styles ───────────────────────────── */
+.il-controls .utility-buttons #backToMenu{
+  background: rgba(0,0,0,.55) !important;   /* blackish translucent */
+  border: 2px solid #ff66ff !important;     /* pink outline */
+  color: #fff !important;                   /* white text */
+  text-shadow: none;
+  box-shadow: 0 0 10px #ff66ff55;
+}
+.il-controls .utility-buttons #backToMenu:hover{
+  background: rgba(0,0,0,.7) !important;
+  box-shadow: 0 0 14px #ff66ffaa;
+}
+.il-controls .utility-buttons #backToMenu:active{
+  transform: translateY(1px);
+}
 
+/* Mute: cyan outline, same translucent fill + white text */
+.il-controls .utility-buttons #muteToggle{
+  background: rgba(0,0,0,.55) !important;
+  border: 2px solid #00ccff !important;     /* cyan outline */
+  color: #fff !important;
+  text-shadow: none;
+  box-shadow: 0 0 10px #00ccff55;
+}
+.il-controls .utility-buttons #muteToggle:hover{
+  background: rgba(0,0,0,.7) !important;
+  box-shadow: 0 0 14px #00ccffaa;
+}
+.il-controls .utility-buttons #muteToggle:active{
+  transform: translateY(1px);
+}
+
+/* Optional: keep sizes steady so they don’t “breathe” */
+.il-controls .utility-buttons button{
+  height: 48px;
+  line-height: 1;
+}
+/* ── IL: End ♾️ subtle diagonal shimmer ───────────────────────────── */
+.il-controls .utility-buttons #endGame{
+  position: relative;
+  overflow: hidden;              /* keep shine inside the pill */
+  isolation: isolate;            /* avoids weird blending with neighbors */
+}
+
+/* moving light streak */
+.il-controls .utility-buttons #endGame::after{
+  content: "";
+  position: absolute;
+  inset: -40% -120%;             /* oversize so corners look clean */
+  background:
+    linear-gradient(135deg,
+      transparent 46%,
+      rgba(255,255,255,.26) 50%,
+      transparent 54%);
+  transform: translateX(-60%) rotate(18deg);
+  animation: il-end-shimmer 2.8s linear infinite;
+  border-radius: inherit;
+  pointer-events: none;          /* don’t block clicks */
+  mix-blend-mode: screen;        /* gentle add of the highlight */
+}
+
+/* a soft breathing glow so it feels “special” even between passes */
+.il-controls .utility-buttons #endGame{
+  box-shadow:
+    0 0 0 0 rgba(0, 238, 255, .0),
+    0 0 18px 0 rgba(0, 238, 255, .25);
+  animation: il-end-breathe 3.6s ease-in-out infinite;
+}
+
+@keyframes il-end-shimmer{
+  0%   { transform: translateX(-65%) rotate(18deg); }
+  100% { transform: translateX(65%)  rotate(18deg); }
+}
+
+@keyframes il-end-breathe{
+  0%,100% { box-shadow: 0 0 18px rgba(0,238,255,.25); }
+  50%     { box-shadow: 0 0 26px rgba(0,238,255,.40); }
+}
+
+/* Hover: a touch brighter & faster, still tasteful */
+.il-controls .utility-buttons #endGame:hover::after{
+  animation-duration: 1.8s;
+  background:
+    linear-gradient(135deg,
+      transparent 45%,
+      rgba(255,255,255,.34) 50%,
+      transparent 55%);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .il-controls .utility-buttons #endGame::after,
+  .il-controls .utility-buttons #endGame{
+    animation: none;
+  }
+}
+/* ── IL: End ♾️ shimmer particles ─────────────────────────────────── */
+.il-controls .utility-buttons #endGame {
+  position: relative;
+  overflow: hidden;            /* keep particles inside while spawning */
+}
+
+#endGame .il-inf-particle{
+  position: absolute;
+  top: var(--y, 50%);          /* spawn line */
+  left: var(--x, 50%);
+  transform: translate(-50%, -50%) scale(0.8);
+  font-weight: 700;
+  font-size: clamp(12px, 1.4vh, 16px);
+  color: #00f2ff;
+  text-shadow:
+    0 0 6px rgba(0,242,255,.9),
+    0 0 12px rgba(0,242,255,.6);
+  pointer-events: none;
+  opacity: .85;
+  filter: drop-shadow(0 0 4px rgba(0,242,255,.8));
+  animation: il-inf-fly var(--dur, 1100ms) ease-out forwards;
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+}
+
+@keyframes il-inf-fly{
+  0%{
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--r0, -8deg))
+      translate(0, 0)
+      scale(0.9);
+    opacity: .95;
+  }
+  70%{
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--r1, 12deg))
+      translate(var(--dx, 48px), var(--dy, -28px))
+      scale(1.05);
+    opacity: .9;
+  }
+  100%{
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--r2, 22deg))
+      translate(calc(var(--dx, 48px) * 1.4), calc(var(--dy, -28px) * 1.6))
+      scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* optional: hover = slightly denser & faster shimmer */
+.il-controls .utility-buttons #endGame:hover::after{
+  animation-duration: 1.8s;
+}
+/* Ensure the button creates its own stacking context */
+#endGame {
+  position: relative;
+  overflow: visible;          /* let particles drift a bit */
+  isolation: isolate;         /* keeps ::after below our particles when z-indexed */
+}
+
+/* SHIMMER: keep it under the particles */
+#endGame::after {
+  content: "";
+  position: absolute;
+  inset: -40% -120%;
+  background:
+    linear-gradient(135deg,
+      transparent 46%,
+      rgba(255,255,255,.26) 50%,
+      transparent 54%);
+  transform: translateX(-60%) rotate(18deg);
+  animation: il-end-shimmer 2.8s linear infinite;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 0;                 /* 👈 stays below particles */
+}
+
+@keyframes il-end-shimmer{
+  0%   { transform: translateX(-65%) rotate(18deg); }
+  100% { transform: translateX(65%)  rotate(18deg); }
+}
+
+/* PARTICLES */
+#endGame .il-inf-particle {
+  position: absolute;
+  top: var(--y, 50%);
+  left: var(--x, 50%);
+  transform: translate(-50%, -50%) scale(0.9);
+  font-weight: 700;
+  font-size: clamp(12px, 1.4vh, 16px);
+  color: #00f2ff;
+  text-shadow:
+    0 0 6px rgba(0,242,255,.9),
+    0 0 12px rgba(0,242,255,.6);
+  pointer-events: none;
+  opacity: .9;
+  filter: drop-shadow(0 0 4px rgba(0,242,255,.8));
+  animation: il-inf-fly var(--dur, 1100ms) ease-out forwards;
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+  z-index: 1;                 /* 👈 above the shimmer */
+}
+
+@keyframes il-inf-fly{
+  0%{
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--r0, -8deg))
+      translate(0, 0)
+      scale(0.9);
+    opacity: .95;
+  }
+  70%{
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--r1, 12deg))
+      translate(var(--dx, 48px), var(--dy, -28px))
+      scale(1.05);
+    opacity: .9;
+  }
+  100%{
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--r2, 22deg))
+      translate(calc(var(--dx, 48px) * 1.4), calc(var(--dy, -28px) * 1.6))
+      scale(0.9);
+    opacity: 0;
+  }
+}
+.il-math #mathProblem .il-problem-head {
+  display: inline-block;
+  font-size: clamp(1.2rem, 2svh, 1.4rem);
+  letter-spacing: .02em;
+  color: #00ffee;
+  text-shadow: 0 0 6px #00ffee66;
+  margin-bottom: .2rem;
+  opacity: .95;
+}
+.il-title {
+  /* existing styles… */
+  background: linear-gradient(90deg, #00ffee 0%, #78ffec 30%, #ffffff 50%, #78ffec 70%, #00ffee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;                /* uses the gradient as “ink” */
+  animation: il-title-ink 6s linear infinite;
+}
+
+@keyframes il-title-ink {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+/* --- IL: final override so the equation can wrap, no ellipsis --- */
+.il-math #mathProblem{
+  white-space: normal !important;        /* allow wrap */
+  overflow: visible !important;          /* don't clip tail */
+  text-overflow: clip !important;        /* no … */
+  display: block !important;             /* undo -webkit-box */
+  -webkit-line-clamp: unset !important;  /* no clamping */
+  word-break: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.1;
+}

@@ -1,109 +1,239 @@
 // /src/modes/mathTips/modes/recipes.js
-// Recipe booth — short, cozy breaks between math beats.
-// Menu → topic steps (3–4) → gentle outro. Mirrors Lessons/Lore pacing.
+// Grampy P Cooking Show — narrative slides (not flashcards).
+// Menu → topic → 3–4 paragraph “episodes” → gentle outro to Menu.
 
 import { composeReply } from '../conversationPolicy.js';
 import { makeSession, readAffirmative, helpCard } from './_kit.js';
 
 const S = makeSession({ capMin: 3, capMax: 4 });
 
-let Gate = { topicKey: null, index: 0 };
+// Gate mirrors Lessons/Lore shape
+let Gate = { topicKey: null, index: 0, started: false, waiting: true };
 
-// ───────────────── CONTENT ─────────────────
+/* ───────────── CONTENT: narrative paragraph slides ───────────── */
 const RECIPES = {
   quesadilla: {
     title: 'Quesadilla Wisdom',
-    steps: [
-      `low heat first — patience makes the crunch.`,
-      `cheese to the edges; add a tiny butter swipe for browning.`,
-      `flip once; let the other side kiss the pan.`,
-      `rest 60 seconds before slicing. math fuel unlocked.`
+    slides: [
+      `
+      <p><strong>Mise en place</strong> first, friend. Tortilla, shredded cheese (mix a melter + a flavor banger),
+      and a tiny pat of butter or a drizzle of oil. Why low heat to start? Cheese has a melting window — too hot,
+      the tortilla scorches before the cheese bridges; low heat lets the lattice form so every bite pulls a cheesy
+      parabola.</p>
+      `,
+      `
+      <p><strong>Heat & layup.</strong> Swipe the pan with the tiniest butter film; lay the tortilla down.
+      Scatter cheese to the edges — edge melt = edge seal. If adding fillings (beans, scallion, leftover chicken),
+      keep them <em>thin and dry</em> so the triangle stays crisp, not soggy. Fold or top with a second tortilla —
+      either way, gentle pressure with a spatula helps knit the layers.</p>
+      `,
+      `
+      <p><strong>The single flip rule.</strong> Wait for faint bubbling and a golden freckles pattern, then flip once.
+      Don’t chase color too fast — color is a lagging indicator. If the first side looks right, the second side needs
+      less time. You’re chasing the crunch “snap,” not a burn speedrun.</p>
+      `,
+      `
+      <p><strong>Rest & slice.</strong> Off heat, rest 60 seconds so cheese re-sets and steam calms down — like letting
+      a proof settle before you generalize. Slice with a long sweep. Dip ideas in salsa. Math fuel unlocked.</p>
+      `
     ]
   },
+
   snowcone: {
     title: 'Mango Snowcone',
-    steps: [
-      `shave ice fine — like new snow at infinity lake.`,
-      `mix mango purée + squeeze of lime + tiny pinch of salt.`,
-      `pour, stir gently, taste; adjust lime/salt to brightness.`,
-      `optional sparkle: a few mango cubes on top.`
+    slides: [
+      `
+      <p><strong>Ice like new snow</strong>. Shave it fine — tiny crystals catch syrup evenly. If the ice is chunky,
+      pockets stay plain and the top floods. Think “uniform partition” for maximum flavor coverage.</p>
+      `,
+      `
+      <p><strong>Bright mango base.</strong> Blend mango purée with a squeeze of lime and a literal pinch of salt.
+      The salt doesn’t make it salty — it turns the mango’s lights up. Start slightly undersweet; the cold dampens
+      sweetness, so too sweet in a warm bowl becomes cloying on ice.</p>
+      `,
+      `
+      <p><strong>Build in layers.</strong> Spoon some ice, drizzle syrup, spoon more, drizzle again. Stir with a gentle
+      fork flip so stripes become sunburst. Taste and tune — more lime for spark, more mango for hug.</p>
+      `,
+      `
+      <p><strong>Finish.</strong> A few mango cubes on top for texture. If you’re wild, micro-grate lime zest for aroma.
+      Take a brain-freeze sip, laugh, and keep the math flowing.</p>
+      `
     ]
   },
+
   nachos: {
     title: 'Nacho Night',
-    steps: [
-      `preheat 400°F (or broil low).`,
-      `layer chips in thin strata so every chip sees cheese.`,
-      `add cheese + beans/jalapeño; back to heat till bubbly.`,
-      `finish with cool stuff: salsa, avocado, cilantro.`
+    slides: [
+      `
+      <p><strong>Heat strategy.</strong> Preheat to 400°F (or broil low, rack in the middle).
+      We want fast melt without scorching chips. Preheating is like setting good boundaries —
+      the cheese behaves when the environment’s steady.</p>
+      `,
+      `
+      <p><strong>Thin strata.</strong> Make a single honest layer of chips — not a mountain. Every chip should see cheese
+      and at least one buddy (bean, jalapeño, corn). Crowding hides chips in a cheese shadow.</p>
+      `,
+      `
+      <p><strong>Melt & monitor.</strong> Bake until cheese is glossy and just starting to bubble — pull early rather than
+      late; carryover heat finishes the job. If using broiler, rotate the tray once. Nachos burn in exponents, not linears.</p>
+      `,
+      `
+      <p><strong>Cold toppings after.</strong> Salsa, avocado, cilantro, pickled red onion — all off-heat so they stay bright.
+      Hit with a squeeze of lime. Serve immediately to avoid the dreaded sog window.</p>
+      `
     ]
   },
+
   cocoa: {
     title: 'Festival Cocoa',
-    steps: [
-      `ratio: 2 parts dark chocolate : 1 part milk chocolate.`,
-      `warm milk (don’t boil); whisk chocolate in to melt.`,
-      `dash cinnamon; pinch of salt; keep whisking smooth.`,
-      `serve with a secret smile.`
+    slides: [
+      `
+      <p><strong>Two-chocolate ratio.</strong> Use 2 parts dark to 1 part milk chocolate. Dark brings depth; milk brings
+      body and friendly sweetness. Chop it fine so it melts fast and evenly — surface area is your friend.</p>
+      `,
+      `
+      <p><strong>Warm, don’t boil.</strong> Heat milk until steamy with tiny bubbles on the edge. Boiling can split milk
+      proteins and dull flavor. Whisk chocolate in off heat, then return to low and keep whisking until glossy.</p>
+      `,
+      `
+      <p><strong>Season like soup.</strong> A pinch of salt makes the chocolate taste more chocolate. A whisper of cinnamon
+      or chili is optional. If it tastes flat, it needs salt, not more sugar — trust the matrix.</p>
+      `,
+      `
+      <p><strong>Serve.</strong> Mugs pre-warmed with hot water (dump it out first). Pour, breathe the aroma, share a secret
+      smile. Best sipped while a good problem cools down.</p>
+      `
     ]
   }
 };
 
-export function pickRecipeTopic(t = '') {
-  const k = String(t).toLowerCase();
-  if (/quesa|quesa?dilla|cheese/.test(k)) return 'quesadilla';
-  if (/snow\s*cone|mango|shave/.test(k)) return 'snowcone';
-  if (/nacho|chips/.test(k)) return 'nachos';
-  if (/cocoa|cacao|hot\s*choc/.test(k)) return 'cocoa';
-  // if nothing matched, just return the existing topic (if any), else null
-  return Gate.topicKey ? Gate.topicKey : null;
+/* ───────────── topic matching — typo-friendly & order-first ───────────── */
+const TOPIC_KEYS = ['quesadilla', 'snowcone', 'nachos', 'cocoa'];
+
+const TOPIC_ALIASES = {
+  quesadilla: [
+    'quesadilla','quesadillas','quesdilla','quesedilla','quesa','queso','dilla','cheese tortilla'
+  ],
+  snowcone: [
+    'snowcone','snow cone','sno cone','snocone','sno-cone','shave ice','shaved ice','mango snowcone'
+  ],
+  nachos: [
+    'nachos','nacho','nachoos','nacos','nachoz','chips and cheese','totopos'
+  ],
+  cocoa: [
+    'cocoa','hot cocoa','hot chocolate','hot choc','cacao','cocao','cococa'
+  ]
+};
+
+// light, fast Levenshtein for short tokens
+function levenshtein(a = '', b = '') {
+  if (a === b) return 0;
+  const m = a.length, n = b.length;
+  if (!m || !n) return m || n;
+  const dp = new Array(n + 1);
+  for (let j = 0; j <= n; j++) dp[j] = j;
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const tmp = dp[j];
+      dp[j] = Math.min(
+        dp[j] + 1,
+        dp[j - 1] + 1,
+        prev + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+      prev = tmp;
+    }
+  }
+  return dp[n];
 }
 
+function normalizeText(x) {
+  return String(x || '')
+    .toLowerCase()
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
+// returns best topic or null
+// replace your current pickRecipeTopic with this version
+export function pickRecipeTopic(t = '') {
+  const s = String(t || '').toLowerCase();
 
+  // quick-normalize (letters only) to make typo patterns easier
+  const n = s.replace(/[^a-z]/g, '');
+
+  // quesadilla (typos: quesdilla, quesils, quesella, etc.)
+  if (/(quesad?illa|quesdilla|quesils|quesel+|quesadilla)/.test(n)) return 'quesadilla';
+
+  // snowcone (typos: snocone, sno cone, snow con)
+  if (/(snowcone|snowcon|snocone|snocone|snocone|snocone|snocone|snocone|snocone|snocone|snocone|snocone)/.test(n)) return 'snowcone';
+  // keep it simple & robust:
+  if (/(snowcone|snowcon|snocone|snocone|snocone|snocone|snocone|snocone)/.test(n)) return 'snowcone';
+  if (/(snowcone|snowcon|snocone|snocone|snocone)/.test(n)) return 'snowcone';
+  // (or simply:)
+  if (/(snowcone|snowcon|snocone|snocone)/.test(n)) return 'snowcone';
+
+  // nachos (typos: nachoos, nacos)
+  if (/(nachos?|nachoos|nacos|naco)/.test(n)) return 'nachos';
+
+  // cocoa (typos: cococa, cacao, hotchoc, hotchocolate)
+  if (/(cocoa|cococa|cacao|hotchoc(olate)?)/.test(n)) return 'cocoa';
+
+  // no change — keep current if already set
+  return Gate.topicKey || null;
+}
+
+/* ───────────── UI helpers ───────────── */
 function menuCard() {
   return `
     <p><strong>Recipe Menu</strong></p>
     <ul class="mt-menu">
-      <li><strong>quesadilla</strong> — low heat · flip once · rest</li>
-      <li><strong>snowcone</strong> — mango · lime · pinch of salt</li>
-      <li><strong>nachos</strong> — thin layers · bubbly cheese</li>
-      <li><strong>cocoa</strong> — 2:1 dark to milk</li>
+      <li><strong>quesadilla</strong> — mise · knit · single flip · rest</li>
+      <li><strong>snowcone</strong> — fine ice · bright mango · layer</li>
+      <li><strong>nachos</strong> — thin strata · quick melt · finish cold</li>
+      <li><strong>cocoa</strong> — 2:1 dark:milk · whisk glossy</li>
     </ul>
-    <p class="mt-dim">say a topic (“quesadilla”, “snowcone”, “nachos”, “cocoa”) or <em>more</em> / <em>stop</em>.</p>
+    <p class="mt-dim">say a topic (“quesadilla”, “snowcone”, “nachos”, “cocoa”) or say <em>next</em>/<em>more</em> to begin.</p>
   `;
 }
 
-function stepHtml(topicKey, idx) {
+function slideHtml(topicKey, idx) {
   const r = RECIPES[topicKey] || RECIPES.quesadilla;
-  const i = Math.max(0, Math.min(idx, r.steps.length - 1));
-  const total = r.steps.length;
+  const i = Math.max(0, Math.min(idx, r.slides.length - 1));
+  const total = r.slides.length;
   return `
     <p><strong>${r.title}</strong> — ${i + 1} of ${total}</p>
-    <div class="mt-response-list">
-      <div class="mt-response-item">${r.steps[i]}</div>
-    </div>
+    ${r.slides[i]}
   `;
 }
 
-// replace your current endHtml() with this:
 function endToMenuHtml() {
   return `
-    <p>that’s the snack break for now — pick another recipe?</p>
+    <p>that’s the cooking show for now — wanna pick another recipe?</p>
     ${menuCard()}
   `;
 }
 
-
-// ───────── ENTRY ─────────
+/* ───────── ENTRY ───────── */
+// replace your current start() with this version
 export function start({ topic } = {}) {
   S.reset();
-  const picked = topic ? pickRecipeTopic(topic) : null;
-  Gate = { topicKey: picked, index: 0 };
+  Gate = { topicKey: null, index: 0, started: false, waiting: true };
 
+  const picked = topic ? pickRecipeTopic(topic) : null;
+
+  // If a topic was explicitly passed (router fast-path), emit the first slide immediately.
   if (picked) {
-    // user came in with a specific recipe
-    const html = stepHtml(picked, 0);
+    Gate.topicKey = picked;
+    Gate.index = 0;
+    Gate.started = true;
+    Gate.waiting = true;
+    S.bump?.();
+    const html = slideHtml(Gate.topicKey, Gate.index);
     return {
       html: composeReply({
         part: { html },
@@ -115,7 +245,7 @@ export function start({ topic } = {}) {
     };
   }
 
-  // otherwise, plain menu
+  // Otherwise, show the menu first (like Lessons/Lore)
   return {
     html: composeReply({
       part: { kind: 'answer', html: menuCard() },
@@ -126,14 +256,26 @@ export function start({ topic } = {}) {
   };
 }
 
-
-// ───────── LOOP ─────────
-// ───────── LOOP ─────────
+/* ───────── LOOP ───────── */
 export function handle(text = '') {
   const msg = String(text || '').trim();
 
-  // router sometimes calls "start"
+  // router shim
   if (/^start\b/i.test(msg)) return start({});
+
+  // ── TOPIC PICK ALWAYS WINS (do this before help/menu/etc.)
+  {
+    const maybe = pickRecipeTopic(msg);
+    if (maybe && maybe !== Gate.topicKey) {
+      Gate.topicKey = maybe;
+      Gate.index = 0;
+      Gate.started = false;
+      Gate.waiting = true;
+      S.reset?.();
+      const html = slideHtml(Gate.topicKey, Gate.index);
+      return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
+    }
+  }
 
   // help
   if (/^help\b/i.test(msg)) {
@@ -141,99 +283,114 @@ export function handle(text = '') {
       'Recipes Help',
       [
         'say: quesadilla · snowcone · nachos · cocoa',
-        'controls: more · stop · menu',
-        'tip: short breaks keep the math groove fresh'
+        'controls: next · more · again · menu',
+        'tip: short paragraphs — not flashcards'
       ],
       'say "exit" to leave recipes.'
     );
     return { html: composeReply({ part: { html: card }, askAllowed: false, noAck: true, mode: 'recipe' }) };
   }
 
-  // ─── TOPIC PICK ALWAYS WINS ────────────────────────────────────────────────
-  const maybeTopic = pickRecipeTopic(msg);
-  if (maybeTopic && maybeTopic !== Gate.topicKey) {
-    Gate.topicKey = maybeTopic;
-    Gate.index = 0;
+  // explicit menu
+  if (/^menu\b/i.test(msg)) {
+    Gate.waiting = true;
+    return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
+  }
+
+  // again = repeat current slide
+  if (/^again\b/i.test(msg)) {
+    if (!Gate.topicKey) {
+      return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
+    }
+    Gate.waiting = true;
+    return { html: composeReply({ part: { html: slideHtml(Gate.topicKey, Gate.index) }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
+  }
+
+  // stop/exit
+  if (/\b(exit|quit|leave|stop|pause|enough)\b/i.test(msg) || /\b(no thanks|not really)\b/i.test(msg)) {
     S.reset?.();
-    const html = stepHtml(Gate.topicKey, Gate.index);
+    Gate.index = 0;
+    Gate.topicKey = null;
+    Gate.started = false;
+    return { html: composeReply({ part: { html: endToMenuHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }), end: true };
+  }
+
+  // more/next aliases
+  const isNextish = /^(next|more|another|one\s*more|ok(?:ay)?)\b/i.test(msg) || readAffirmative(msg) === 'yes';
+
+  if (isNextish) {
+    // if no topic selected yet, keep the menu up
+    if (!Gate.topicKey) {
+      Gate.waiting = true;
+      return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
+    }
+
+    const slides = RECIPES[Gate.topicKey].slides;
+    const lastIdx = slides.length - 1;
+
+    // session cap guard → end with booth menu
+    if (S.isCapReached()) {
+      Gate.waiting = true;
+      return {
+        html: composeReply({
+          part: { kind: 'answer', html: `<p>plates are stacked.</p>${menuCard()}` },
+          askAllowed: true,
+          mode: 'recipe'
+        })
+      };
+    }
+
+    // first emit: show index 0 and mark started
+    if (!Gate.started) {
+      Gate.started = true;
+      Gate.waiting = true;
+      S.bump();
+      return { html: composeReply({ part: { html: slideHtml(Gate.topicKey, Gate.index) }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
+    }
+
+    // end guard: no repeats, show menu right away
+    // in handle(), replace the "end guard: no repeats" block with this:
+    if (Gate.index >= lastIdx) {
+    Gate.waiting = true;
+    // Show the menu card so the user can pick a new recipe immediately
+    return {
+        html: composeReply({
+        part: { kind: 'answer', html: endToMenuHtml() },
+        askAllowed: false,
+        mode: 'recipe',
+        noAck: true
+        })
+    };
+    }
+
+
+    // advance
+    Gate.index = Math.min(Gate.index + 1, lastIdx);
+    Gate.waiting = true;
+    S.bump();
+    return { html: composeReply({ part: { html: slideHtml(Gate.topicKey, Gate.index) }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
+  }
+
+  // polite nudge while waiting
+  if (Gate.waiting) {
     return {
       html: composeReply({
-        part: { html },
-        askAllowed: true,
-        askText: 'want another step?',
+        part: { html: `<p>cooking show vibe — say <strong>next</strong>/<strong>more</strong>, <strong>again</strong>, or pick: <em>quesadilla · snowcone · nachos · cocoa</em>.</p>` },
+        askAllowed: false,
         noAck: true,
         mode: 'recipe'
       })
     };
   }
 
-  // stop / exit
-  if (/\b(exit|quit|leave)\b/i.test(msg)) {
-    // ✅ use endToMenuHtml, do NOT call the old endHtml()
-    return {
-      html: composeReply({ part: { html: endToMenuHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }),
-      end: true
-    };
-  }
-
-  if (/\b(stop|pause|later|enough)\b/i.test(msg) || /\b(no thanks|not really)\b/i.test(msg)) {
-    S.reset?.();
-    Gate.index = 0;
-    // optional: keep topic or clear it; clearing avoids accidental “more” repeat
-    Gate.topicKey = null;
-    return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
-  }
-
-  // explicit menu
-  if (/^menu\b/i.test(msg)) {
-    return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
-  }
-
-  // yes/more BEFORE any other fallbacks
-  const yn = readAffirmative(msg);
-  const wantsMore = yn === 'yes' || /\b(more|next|again|continue|step|go|gimme|another)\b/i.test(msg);
-
-  if (wantsMore) {
-    // no active topic? show menu instead of faking progress
-    if (!Gate.topicKey) {
-      S.reset?.();
-      Gate.index = 0;
-      return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
-    }
-
-
-
-    const r = RECIPES[Gate.topicKey] || RECIPES.quesadilla;
-
-    // last step reached? bounce to the menu but STAY IN BOOTH (no end:true)
-    if (S.isCapReached() || Gate.index >= r.steps.length - 1) {
-      S.reset?.();
-      Gate.index = 0;
-      Gate.topicKey = null;
-      return { html: composeReply({ part: { html: endToMenuHtml() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
-    }
-
-    // advance normally
-    S.bump?.();
-    Gate.index = Math.min(Gate.index + 1, r.steps.length - 1);
-    const html = stepHtml(Gate.topicKey, Gate.index);
-    return { html: composeReply({ part: { html }, askAllowed: true, askText: 'want another step?', noAck: true, mode: 'recipe' }) };
-  }
-
-  if (yn === 'no') {
-    S.reset?.();
-    Gate.index = 0;
-    Gate.topicKey = null;
-    return { html: composeReply({ part: { html: menuCard() }, askAllowed: false, noAck: true, mode: 'recipe' }) };
-  }
-
-  // gentle nudge
+  // fallback
   return {
     html: composeReply({
-      part: { html: `<p>recipes vibe — say <strong>more</strong>, <strong>stop</strong>, or pick: <em>quesadilla · snowcone · nachos · cocoa</em>.</p>` },
-      askAllowed: false,
-      noAck: true,
+      part: { html: `<p>pick a recipe: <strong>quesadilla</strong>, <strong>snowcone</strong>, <strong>nachos</strong>, or <strong>cocoa</strong> — or <em>menu</em>.</p>` },
+      askAllowed: true,
       mode: 'recipe'
     })
   };
 }
+
+

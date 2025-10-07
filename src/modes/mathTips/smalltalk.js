@@ -582,6 +582,8 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   const inCalc   = mode === 'calculator';
   const inQuiz   = mode === 'quiz';
   const inLore   = mode === 'lore';     // ← add this
+  const hasPendingBooth = !!(ctx?.appState?.router?.pendingBooth);
+  const jokesActive = getLastSTopic(ctx) === 'jokes';
   if (ctx && !ctx.botContext) ctx.botContext = {}; // ✅ ensure memory
   const raw = String(utterance || '').trim();
   const u = norm(utterance);
@@ -592,12 +594,15 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
 
   // allow confirms to advance jokes if we're in a jokes thread
   // BARE_CONFIRM: only advance jokes if we're NOT in lore
+  // allow confirms to advance jokes only when smalltalk is active,
+  // there is no booth handoff pending, and we're not in lore
   if (BARE_CONFIRM.test(u)) {
-    if (!inLore && getLastSTopic(ctx) === 'jokes') {
+    if (!hasPendingBooth && mode === 'smalltalk' && !inLore && jokesActive) {
       return reply(REPLIES.jokeCard(nextJoke(ctx)));
     }
-    return null; // let the booth handle yes/ok in its own flow
+    return null; // let the router/booth handle the confirm
   }
+
 
   // quick nav
   if (likeWord(u, ['help','menu','map'])) {
@@ -610,12 +615,15 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   }
 
   if (like(u, ['quesedilla','quesedila','kesadilla'])) {
+    clearLastSTopic(ctx);
     return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'quesadilla' }});
   }
   if (like(u, ['snow cone','snow-cone','snocone','sno cone'])) {
+    clearLastSTopic(ctx);
     return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'snowcone' }});
   }
   if (like(u, ['calulator','calculater','claculator','calcuator','calc'])) {
+    clearLastSTopic(ctx);
     return withAction(
       bubble({ title: "calculator", lines: ["rolling into the calculator booth?"], hint: `type a math like <code>15% of 80</code>.` }),
       { type:'SWITCH_MODE', to:'calculator' }
@@ -929,9 +937,12 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     return reply(REPLIES.jokeCard(nextJoke(ctx)));
   }
   // jokes follow-up: block inside lore so "more" continues lore
-  if (getLastSTopic(ctx) === 'jokes'
+  if (!hasPendingBooth
+      && mode === 'smalltalk'
       && !inLore
+      && jokesActive
       && /\b(more|another|again|one more|more jokes|another one|next)\b/i.test(u)) {
+
     return reply(REPLIES.jokeCard(nextJoke(ctx)));
   }
 
@@ -942,11 +953,13 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     // ——— more booth typos & aliases
   // status booth
   if (like(u, ['staus booth','stats booth','statuss booth'])) {
+    clearLastSTopic(ctx);
     return withAction(REPLIES.exitToCommons(), { type:'SWITCH_MODE', to:'status' });
   }
 
   // recipe booth name typos
   if (like(u, ['recipies','reciepe','recepie','reccipe','resipe'])) {
+    clearLastSTopic(ctx);
     return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe' });
   }
 
@@ -965,31 +978,37 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   if (like(u, [
     'quesedila','quesedilla','quesadila','quesodilla','kesadilla','caseadia','case-a-dilla','quesa dilla'
   ])) {
+    clearLastSTopic(ctx);
     return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'quesadilla' }});
   }
   if (like(u, [
     'snow kone','snokone','snoecone','sno-cone','sno cone','snocne'
   ])) {
+    clearLastSTopic(ctx);
     return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'snowcone' }});
   }
   if (like(u, ['nachoes',"nacho's"])) {
+    clearLastSTopic(ctx);
     return withAction(REPLIES.recipesMenu(), { type:'SWITCH_MODE', to:'recipe', payload:{ topic:'nachos' }});
   }
 
   // quiz topic misspellings → jump straight to quiz booth with a sensible topic
   if (like(u, ['precent quiz','percant quiz','percint quiz','percentage quiz'])) {
+    clearLastSTopic(ctx);
     return withAction(
       bubble({ title: "quiz: percent", lines: ["percent drills coming right up."] }),
       { type:'SWITCH_MODE', to:'quiz', payload:{ topic:'percent', count:3 } }
     );
   }
   if (like(u, ['fration quiz','frations quiz','fracton quiz'])) {
+    clearLastSTopic(ctx);
     return withAction(
       bubble({ title: "quiz: fractions", lines: ["fractions it is."] }),
       { type:'SWITCH_MODE', to:'quiz', payload:{ topic:'fractions', count:3 } }
     );
   }
   if (like(u, ['equasion quiz','equasions quiz'])) {
+    clearLastSTopic(ctx);
     return withAction(
       bubble({ title: "quiz: equations", lines: ["equations on deck."] }),
       { type:'SWITCH_MODE', to:'quiz', payload:{ topic:'equations', count:3 } }

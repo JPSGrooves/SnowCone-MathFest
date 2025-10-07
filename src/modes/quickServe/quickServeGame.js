@@ -312,6 +312,7 @@ function checkBadgeUnlock() {
 //////////////////////////////
 // 🏆 Result Screen
 //////////////////////////////
+// ——— replace showResultScreen() ———
 function showResultScreen() {
   const container = document.getElementById('game-container');
   if (!container) {
@@ -321,28 +322,26 @@ function showResultScreen() {
 
   // pull final state after finalizeQuickServeRun
   const isNewHighScore = score > (appState.profile.qsHighScore ?? 0);
-
-  // if you want confetti only when it’s truly a new HS (after finalizer set):
-  if (isNewHighScore) {
-    launchConfetti();
-  }
+  if (isNewHighScore) launchConfetti();
 
   const popup = document.createElement('div');
   popup.classList.add('result-popup');
+  popup.id = 'qsResultPopup'; // 👈 lets CSS target QS popup specifically
   popup.innerHTML = buildResultHTML(isNewHighScore);
 
   container.appendChild(popup);
 
-  const playAgainBtn = popup.querySelector('#playAgainBtn');
-  const menuBtn = popup.querySelector('#menuBtn');
+  // 🔘 compact button ids (IL-style)
+  const playAgainBtn = popup.querySelector('#qsPlayAgainBtn');
+  const backBtn      = popup.querySelector('#qsBackBtn');
 
   playAgainBtn?.addEventListener('click', handlePlayAgain);
-  menuBtn?.addEventListener('click', handleReturnToMenu);
+  backBtn?.addEventListener('click', handleReturnToMenu);
 
   playAgainBtn?.focus();
 }
 
-
+// ——— replace buildResultHTML() ———
 function buildResultHTML(isNewHighScore) {
   const highScore = appState.profile.qsHighScore ?? 0;
   const highScoreMsg = isNewHighScore
@@ -355,10 +354,15 @@ function buildResultHTML(isNewHighScore) {
     ${highScoreMsg}
     <p>High Score: ${highScore}</p>
     <p>XP Earned: ${totalSessionXP}</p>
-    <button id="playAgainBtn" class="play-again-btn">🎧 Play Again</button>
-    <button id="menuBtn" class="back-to-menu-btn">🔙 Menu</button>
+
+    <!-- 🔘 wrap in a row like IL -->
+    <div class="qs-result-buttons">
+      <button id="qsBackBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
+      <button id="qsPlayAgainBtn" class="play-again-btn">🔁 Play Again</button>
+    </div>
   `;
 }
+
 
 async function handlePlayAgain() {
   document.querySelector('.result-popup')?.remove();

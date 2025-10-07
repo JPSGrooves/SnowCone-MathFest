@@ -6,6 +6,22 @@ import { appState } from '../../../data/appState.js';
 const QUIZ_SESS = new Map();                     // per-session state
 const S = makeSession({ capMin: 3, capMax: 4 }); // caps # of short sets
 
+/* ───────── controls ───────── */
+const RX = {
+  HELP: /^help\b/i,
+  MENU: /^menu\b/i,
+  ENDQUIZ: /^end\s+quiz\b/i,
+  AGAIN: /^again\b/i,
+  HINT: /^hint\b/i,
+  SKIP: /^skip\b/i,
+  // Treat these as skip so “next” won’t be graded as an answer
+  NEXTISH: /^(next|more|continue|go|gimme|another)\b/i,
+  // topic starters
+  TOPIC_ONLY: /^(fractions?|percent|equations?)\b(?:\s+(\d+))?$/i,
+  START_CMD: /^quiz\b(?:\s+(fractions?|percent|equations?))?(?:\s+(\d+))?$/i,
+  ALT_START: /^start\b(?:\s+(fractions?|percent|equations?))?(?:\s+(\d+))?$/i,
+};
+
 /* ───────── math helpers ───────── */
 function gcd(a, b) { a = Math.abs(a|0); b = Math.abs(b|0); while (b) [a, b] = [b, a % b]; return a || 1; }
 function reduce(num, den) { if (den === 0) return { num, den: 0 }; const g = gcd(num, den); const s = den < 0 ? -1 : 1; return { num: s*(num/g), den: Math.abs(den/g) }; }
@@ -23,7 +39,6 @@ const close = (a,b,eps=1e-6)=>Math.abs(a-b)<=eps;
 const canonFrac = (fr)=>{ const r = reduce(fr.num, fr.den); return `${r.num}/${r.den}`; };
 
 /* ───────── deck factory ───────── */
-// ——— replace your makeQs with this enhanced version ———
 function makeQs(topic = 'fractions', count = 3) {
   const qs = [];
   for (let i = 0; i < count; i++) {
@@ -44,8 +59,7 @@ function makeQs(topic = 'fractions', count = 3) {
       const kind = i % 3; // 0 twoPoints, 1 standard, 2 slopeIntercept
 
       if (kind === 0) {
-        // two points slope
-        // ensure x2 != x1 to avoid vertical line
+        // two points slope — ensure x2 != x1 to avoid vertical line
         const x1 = -5 + Math.floor(Math.random() * 11); // [-5..5]
         let x2 = x1;
         while (x2 === x1) x2 = -5 + Math.floor(Math.random() * 11);
@@ -88,7 +102,7 @@ function makeQs(topic = 'fractions', count = 3) {
       continue;
     }
 
-    // default = fractions deck (your original pattern)
+    // default = fractions deck
     const a = i + 1, b = i + 2, c = i + 3, d = i + 4;
     const num = a * d + c * b, den = b * d;
     qs.push({
@@ -109,7 +123,6 @@ const normTopic = (s = '') => {
 const clampCount = (n) => Math.max(1, Math.min(5, n|0 || 3));
 
 /* ───────── correctness ───────── */
-// ——— extend isCorrectAnswer with equations ———
 function isCorrectAnswer(userText, q) {
   const raw = String(userText || '').trim();
 
@@ -143,7 +156,6 @@ function isCorrectAnswer(userText, q) {
   return false;
 }
 
-// ——— extend canonicalAnswerString for equations ———
 function canonicalAnswerString(q) {
   if (q.topic === 'fractions') return canonFrac(q.answerFrac);
   let s = String(q.answerNum);
@@ -153,8 +165,7 @@ function canonicalAnswerString(q) {
   return s;
 }
 
-
-/* ───────── UI helpers (plain bubbles) ───────── */
+/* ───────── UI helpers ───────── */
 const controlsLine = () =>
   `<p class="mt-dim">controls: <code>hint</code> · <code>skip</code> · <code>again</code> · <code>end quiz</code> · <code>menu</code></p>`;
 
@@ -167,20 +178,33 @@ const menuCard = () => `
   </ul>
   <p class="mt-dim">start: <code>fractions quiz</code> · <code>percent quiz</code> · <code>equations quiz</code></p>
 `;
+
 const qCard = (_head, body) => `${body}${controlsLine()}`;
-const endCard = (score,total,tail='') => `<p><strong>Quiz complete</strong> — ${score}/${total}.</p>${tail}`;
+
+const endCard = (score,total,tail='') =>
+  `<p><strong>Quiz complete</strong> — ${score}/${total}.</p>${tail}`;
+
+// Soft landing with actions
+function withOutro(html) {
+  return `
+    ${html}
+    <div class="mt-gap"></div>
+    ${menuCard()}
+    <p class="mt-dim">or hop: <em>lessons</em> · <em>lore</em> · <em>recipe</em> · <em>calculator</em></p>
+  `;
+}
 
 /* ───────── public API ───────── */
 export function start({ topic, count=3, sessionId='default' } = {}) {
-  // prefer explicit topic; else take last lesson topic; else fractions
-  let t = topic;
-  if (!t) {
-    try { t = appState?.progress?.mathtips?.botContext?.lastLessonTopic || 'fractions'; }
-    catch { t = 'fractions'; }
-  }
-  t = normTopic(t);
-
   S.reset();
+  // MENU-FIRST when no explicit topic is provided (e.g., user said "quiz booth" or "quiz")
+  if (!topic) {
+    QUIZ_SESS.delete(sessionId);
+    return composeReply({ part:{ kind:'answer', html: menuCard() }, askAllowed:false, mode:'quiz', noAck:true });
+  }
+
+  // Explicit topic path (e.g., lessons → “rolling to Quiz for fractions”)
+  const t = normTopic(topic);
   const deck = makeQs(t, clampCount(count));
   QUIZ_SESS.set(sessionId, { topic: t, idx: 0, deck, score: 0 });
 
@@ -192,8 +216,6 @@ export function start({ topic, count=3, sessionId='default' } = {}) {
   return composeReply({ part:{ kind:'answer', html }, askAllowed:false, mode:'quiz', noAck:true });
 }
 
-
-// add an explicit end hook near isActive()
 export function end(sessionId='default') {
   QUIZ_SESS.delete(sessionId);
 }
@@ -203,7 +225,7 @@ export function handle(text = '', ctx = {}) {
   const sessionId = ctx.sessionId || 'default';
 
   // help + menu
-  if (/^help\b/i.test(msg)) {
+  if (RX.HELP.test(msg)) {
     const card = helpCard(
       'Quiz Help',
       [
@@ -215,35 +237,42 @@ export function handle(text = '', ctx = {}) {
     );
     return { html: composeReply({ part:{ kind:'answer', html: card }, askAllowed:false, mode:'quiz', noAck:true }) };
   }
-  if (/^menu\b/i.test(msg)) {
+  if (RX.MENU.test(msg)) {
     return { html: composeReply({ part:{ kind:'answer', html: menuCard() }, askAllowed:false, mode:'quiz', noAck:true }) };
   }
 
-  // allow bare topic to start (e.g., "fractions" or "percent [N]")
-  const mTopicOnly = msg.match(/^(fractions?|percent|equations?)\b(?:\s+(\d+))?$/i);
+  // bare topic (e.g., "fractions" or "percent [N]") → start that deck
+  const mTopicOnly = msg.match(RX.TOPIC_ONLY);
   if (mTopicOnly) {
     const t = normTopic(mTopicOnly[1]);
     const c = clampCount(parseInt(mTopicOnly[2] || '3', 10));
     return start({ topic: t, count: c, sessionId });
   }
 
-  // still support "quiz fractions [N]" and "start ..."
-  const mStart = msg.match(/^quiz\b(?:\s+(fractions?|percent|equations?))?(?:\s+(\d+))?$/i)
-               || msg.match(/^start\b(?:\s+(fractions?|percent|equations?))?(?:\s+(\d+))?$/i);
+  // "quiz" or "start" commands:
+  //   - plain "quiz" / "start" → show MENU (no autosart)
+  //   - "quiz fractions 4" → start immediately
+  const mStart = msg.match(RX.START_CMD) || msg.match(RX.ALT_START);
   if (mStart) {
-    const t = normTopic(mStart[1] || 'fractions');
-    const c = clampCount(parseInt(mStart[2] || '3', 10));
+    const rawTopic = mStart[1];
+    const rawCount = mStart[2];
+    if (!rawTopic && !rawCount) {
+      return start({ sessionId }); // menu-first
+    }
+    const t = normTopic(rawTopic || 'fractions');
+    const c = clampCount(parseInt(rawCount || '3', 10));
     return start({ topic: t, count: c, sessionId });
   }
 
-  if (/^end\s+quiz\b/i.test(msg)) {
+  if (RX.ENDQUIZ.test(msg)) {
     QUIZ_SESS.delete(sessionId);
-    return { html: composeReply({ part:{ kind:'answer', html: `<p>quiz ended. want another booth?</p>` }, askAllowed:false, mode:'quiz', noAck:true }) };
+    const html = withOutro(`<p>quiz ended. want another set?</p>`);
+    return { html: composeReply({ part:{ kind:'answer', html }, askAllowed:false, mode:'quiz', noAck:true }) };
   }
 
   const s = QUIZ_SESS.get(sessionId);
   if (!s) {
-    // No active deck → show menu until they pick a topic
+    // No active deck → keep showing the menu until they pick a topic
     return { html: composeReply({ part:{ kind:'answer', html: menuCard() }, askAllowed:false, mode:'quiz', noAck:true }) };
   }
 
@@ -253,19 +282,18 @@ export function handle(text = '', ctx = {}) {
 
   const q = s.deck[s.idx];
   if (!q) {
-    const html = endCard(s.score, s.deck.length);
+    const html = withOutro(endCard(s.score, s.deck.length));
     QUIZ_SESS.delete(sessionId);
     return { html: composeReply({ part:{ html }, askAllowed:true, askText:'want another short set?', mode:'quiz', noAck:true }) };
   }
 
-  if (/^again\b/i.test(msg)) {
+  if (RX.AGAIN.test(msg)) {
     const body = `<p>Q${s.idx+1} of ${s.deck.length}: <strong>${q.prompt}</strong></p>`;
     return { html: composeReply({ part:{ html: qCard('Quiz', body) }, askAllowed:false, noAck:true }) };
   }
 
-  // ✅ FIXED: clean, separate paragraphs (no nested <p>)
-  // ——— in the `hint` handler ———
-  if (/^hint\b/i.test(msg)) {
+  // ✅ HINTS: unchanged (keep your equation-rich hints exactly as-is)
+  if (RX.HINT.test(msg)) {
     const tipText = (q.topic === 'fractions')
       ? `common denom: <code>${q.a}/${q.b} + ${q.c}/${q.d} = (${q.a}×${q.d} + ${q.c}×${q.b})/(${q.b}×${q.d})</code>. then simplify.`
       : (q.topic === 'percent')
@@ -283,14 +311,14 @@ export function handle(text = '', ctx = {}) {
     return { html: composeReply({ part:{ html: qCard('Quiz', body) }, askAllowed:false, noAck:true }) };
   }
 
-
-  if (/^skip\b/i.test(msg)) {
+  // “next/more/continue/go/gimme/another” OR “skip” → advance without grading
+  if (RX.NEXTISH.test(msg) || RX.SKIP.test(msg)) {
     s.idx++;
     const next = s.deck[s.idx];
     if (!next) {
-      const html = endCard(s.score, s.deck.length, '<p class="mt-dim">that was the last one.</p>');
+      const html = withOutro(endCard(s.score, s.deck.length, '<p class="mt-dim">that was the last one.</p>'));
       QUIZ_SESS.delete(sessionId);
-      return { html: composeReply({ part:{ html }, askAllowed:true, askText:'another short set?', noAck:true }) };
+      return { html: composeReply({ part:{ html }, askAllowed:true, askText:'another short set?', noAck:true, mode:'quiz' }) };
     }
     const body = `<p><span class="mt-dim">skipped.</span></p><p>Q${s.idx+1} of ${s.deck.length}: <strong>${next.prompt}</strong></p>`;
     return { html: composeReply({ part:{ html: qCard('Quiz', body) }, askAllowed:false, noAck:true }) };
@@ -305,7 +333,7 @@ export function handle(text = '', ctx = {}) {
 
   const next = s.deck[s.idx];
   if (!next) {
-    const html = endCard(s.score, s.deck.length, `<p>${feedback}</p>`);
+    const html = withOutro(endCard(s.score, s.deck.length, `<p>${feedback}</p>`));
     if (S?.isCapReached?.()) {
       QUIZ_SESS.delete(sessionId);
       return { html: composeReply({ part:{ kind:'answer', html: `${html}<p>that’s my stretch today. try another booth?</p>` }, askAllowed:false, mode:'quiz', noAck:true }) };

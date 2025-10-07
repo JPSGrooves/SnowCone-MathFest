@@ -258,7 +258,7 @@ function renderUI() {
 
           <div class="il-result-buttons">
             <button id="ilPlayAgainBtn" class="start-show-btn">🔁 Play Again</button>
-            <button id="ilBackBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
+            <button id="ilBackBtn" class="back-to-menu-btn">🔙 to Menu</button>
           </div>
         </div>
       </div>
@@ -394,66 +394,67 @@ function newProblem() {
   let question;
 
   switch (mode) {
-    case 'addsub':
+    case 'addsub': {
+      const head = `<span class="il-problem-head">Add. and Sub.</span>`;
       if (addsubToggle) {
         correctAnswer = a + b;
-        question = `${a} + ${b} = ?`;
+        question = `${head}<br>${a} + ${b} = ?`;
       } else {
         correctAnswer = a - b;
-        question = `${a} − ${b} = ?`;
+        question = `${head}<br>${a} − ${b} = ?`;
       }
       addsubToggle = !addsubToggle;
       break;
+    }
 
-    case 'multdiv':
+    case 'multdiv': {
+      const head = `<span class="il-problem-head">Mult. and Div.</span>`;
       if (multdivToggle) {
         correctAnswer = a * b;
-        question = `${a} × ${b} = ?`;
+        question = `${head}<br>${a} × ${b} = ?`;
       } else {
-        // Generate clean division
-        b = Math.floor(Math.random() * 9) + 1; // 1–9
+        // clean division
+        b = Math.floor(Math.random() * 9) + 1;           // 1–9
         correctAnswer = Math.floor(Math.random() * 10) + 1; // 1–10
         a = b * correctAnswer;
-        question = `${a} ÷ ${b} = ?`;
+        question = `${head}<br>${a} ÷ ${b} = ?`;
       }
       multdivToggle = !multdivToggle;
       break;
+    }
 
     case 'alg': {
+      const head = `<span class="il-problem-head">Solve for 𝒙</span>`;
       const ops = ['+', '-', '×', '÷'];
       let op = ops[Math.floor(Math.random() * ops.length)];
       let result;
 
-      // default safe values
-      correctAnswer = a;
+      correctAnswer = a; // default
 
       if (op === '+') {
         result = a + b;
-        question = `solve for 𝒙<br>𝒙 + ${b} = ${result}`;
+        question = `${head}<br>𝒙 + ${b} = ${result}`;
       }
-
       else if (op === '-') {
         result = a - b;
-        question = `solve for 𝒙<br>𝒙 − ${b} = ${result}`;
+        question = `${head}<br>𝒙 − ${b} = ${result}`;
       }
-
       else if (op === '×') {
         result = a * b;
         correctAnswer = a;
-        question = `solve for 𝒙<br>𝒙 × ${b} = ${result}`;
+        question = `${head}<br>𝒙 × ${b} = ${result}`;
       }
-
       else if (op === '÷') {
-        // only allow clean division: a = b * x
+        // clean division: a = b * x
         correctAnswer = Math.floor(Math.random() * 10) + 1;
         b = Math.floor(Math.random() * 9) + 1;
-        result = correctAnswer;
         a = b * correctAnswer;
-        question = `solve for 𝒙<br>${a} ÷ 𝒙 = ${b}`;
+        question = `${head}<br>${a} ÷ 𝒙 = ${b}`;
       }
 
       break;
     }
+
   }
 
 
