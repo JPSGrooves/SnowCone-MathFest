@@ -446,6 +446,7 @@ html, body {
   background:rgba(0,0,0,.85); color:#fff; padding:10px 14px;
   border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.35);
   font-weight:600; z-index:9999; backdrop-filter:saturate(140%) blur(4px);
+  pointer-events: none; /* 👈 taps/clicks pass through to the game */
 }
 /* Layout */
 .modal-hero { text-align: center; margin-bottom: 1rem; }
