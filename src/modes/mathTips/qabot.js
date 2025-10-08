@@ -743,6 +743,20 @@ export function getResponse(userText, appStateLike = appState) {
   });
   const SESSION_ID = appStateLike.progress.mathtips.sessionId;
 
+  // ✅ Affirmative continuation from Lessons → kick off a default quiz
+  // Covers cases like: Lessons said “rolling to Quiz…”, user says “ok/yes/sure”
+  if (isAffirmative(t) && getMode() === MODES.lessons && !quiz.isActive?.(SESSION_ID)) {
+    setMode(MODES.quiz);
+    clearSmalltalkThread?.();
+    const topic = lastLessonTopicOrDefault();
+    return adaptModeOutput(
+      MODEx.quiz.start({ topic, count: 3, userText: text, sessionId: SESSION_ID }),
+      text,
+      'quiz_start'
+    );
+  }
+
+
   // 🔌 global exit/leave synonyms — run before smalltalk & fast paths
   if (/\b(leave|leave\s+mode|exit|quit|out|back(?:\s+to)?\s+(?:commons?|center|village)|go\s*home|return|main\s*menu)\b/i.test(t)) {
     try { quiz.end?.(SESSION_ID); } catch {}     // ← NEW: kill any active quiz deck

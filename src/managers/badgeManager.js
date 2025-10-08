@@ -173,6 +173,9 @@ export function initBadgeManager(appStateRef) {
     const banner = document.createElement('div');
     banner.className = 'badge-banner';
     banner.textContent = `🎉 New badge unlocked: ${name}! Check Options ✨`;
+    banner.style.pointerEvents = 'none';       // defense-in-depth
+    banner.setAttribute('role', 'status');     // screen readers can announce
+    banner.setAttribute('aria-live', 'polite');
     document.body.appendChild(banner);
 
     setTimeout(() => banner.remove(), 5000);

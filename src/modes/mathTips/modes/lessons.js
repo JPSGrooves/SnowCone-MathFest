@@ -32,7 +32,7 @@ const LESSONS = {
     `
     <p><strong>Adding fractions</strong> is easy with a shared denominator. 
     Same denom? Add or subtract the numerators and keep the denom: <code>3/8 + 2/8 = 5/8</code>. 
-    Different denoms? Build a common one first (often the LCM). 
+    Different denoms? Build a common one first (often the Least Common Multiple). 
     Example: <code>1/2 + 1/3</code> → common denom <code>6</code>, so <code>1/2 = 3/6</code> and <code>1/3 = 2/6</code>; total <code>5/6</code>. 
     Quick check: is <code>3/4 − 1/8</code> equal to <code>5/8</code>?</p>
     `,

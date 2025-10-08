@@ -499,4 +499,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: "v0.9.4 — More Kitty Fixes, Louder About, Quick Polishes" };
+window.devFlags = { build: "v0.9.6 — Onward to the Tunes" };

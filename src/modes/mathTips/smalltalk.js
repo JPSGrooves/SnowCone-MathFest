@@ -694,16 +694,16 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     const topic = getLastSTopic(ctx);
     // Mood branch
     if (topic === 'mood') {
-      if (/\b(i\s*am|i['’]m)\s*(good|great|fine|ok|okay|chill)\b/i.test(u)) {
+      if (/\b(i\s*am|i['’]m|im)\s*(good|great|fine|ok|okay|chill)\b/i.test(u)) {
         clearLastSTopic(ctx); return reply(REPLIES.moodGood());
       }
-      if (/\b(i\s*am|i['’]m)\s*(tired|sleepy|exhausted|worn)\b/i.test(u)) {
+      if (/\b(i\s*am|i['’]m|im)\s*(tired|sleepy|exhausted|worn)\b/i.test(u)) {
         clearLastSTopic(ctx); return reply(REPLIES.moodTired());
       }
-      if (/\b(i\s*am|i['’]m)\s*(horrible|awful|bad|sad|down|terrible)\b/i.test(u)) {
+      if (/\b(i\s*am|i['’]m|im)\s*(horrible|awful|bad|sad|down|terrible)\b/i.test(u)) {
         clearLastSTopic(ctx); return reply(REPLIES.moodRough());
       }
-      if (/^\s*i(?:\s*am|['’]m)\s+[^]+$/.test(u)) {
+      if (/^\s*i(?:\s*am|['’]m|m|m\s+just|m\s+kind\s+of|m\s+kinda|m\s+sorta|m|im)\s+[^]+$/.test(u)) {
         clearLastSTopic(ctx); return reply(REPLIES.reassure());
       }
     }

@@ -12,7 +12,7 @@ export function renderVersionTab() {
     </div>
 
     <div class="settings-block">
-      <h3>🍦 v0.9.4 — More Kitty Fixes, Louder About, Quick Polishes</h3>
+      <h3>v0.9.6 — Complete: Onward to the Tunes</h3>
       <p>
         – 📖 <strong>Story Mode Forest polish</strong>: KC-style 11:16 stage (center/contain BG), typewriter intro with <em>Skip / I’m Ready</em>, clean slide deck (Prev/Next + Enter/←/→/Esc), one-shot “Reveal” blocks, +25 XP per reveal and <strong>+500 XP</strong> on Finish, subtle toast near the pressed button, and a tiny fretboard mini-sim (fraction readout + interval beep)<br>
         – 🧊 <strong>Bottom bar stability</strong>: Back/Mute pinned inside safe-area; portraits/images and popups no longer push buttons down on small phones<br>
@@ -24,7 +24,9 @@ export function renderVersionTab() {
         – 🧼 <strong>Event wiring & repaint</strong>: single screen-level handlers (click/keydown) with full unwire on exit; background repaint helper to bust stale paints<br>
         – 🐛 <strong>Misc fixes</strong>: tiny-screen text clamping, safe-area padding, button hitboxes, and minor CSS dedupe across Story/Tips
       </p>
+      <p><em>Next up:</em> v0.9.7 — Music/SFX Complete/Polished.</p>
     </div>
+
 
 
     <div class="settings-block">

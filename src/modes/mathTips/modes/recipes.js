@@ -18,23 +18,23 @@ const RECIPES = {
       `
       <p><strong>Mise en place</strong> first, friend. Tortilla, shredded cheese (mix a melter + a flavor banger),
       and a tiny pat of butter or a drizzle of oil. Why low heat to start? Cheese has a melting window — too hot,
-      the tortilla scorches before the cheese bridges; low heat lets the lattice form so every bite pulls a cheesy
+      the tortilla scorches before the cheese binds; low heat lets the lattice form so every bite pulls a cheesy
       parabola.</p>
       `,
       `
       <p><strong>Heat & layup.</strong> Swipe the pan with the tiniest butter film; lay the tortilla down.
       Scatter cheese to the edges — edge melt = edge seal. If adding fillings (beans, scallion, leftover chicken),
-      keep them <em>thin and dry</em> so the triangle stays crisp, not soggy. Fold or top with a second tortilla —
-      either way, gentle pressure with a spatula helps knit the layers.</p>
+      keep them <em>on one half only</em> so the tortilla stays crisp, not burnt. Fold once cheese is melty —
+      then...apply a gentle pressure with a spatula.</p>
       `,
       `
-      <p><strong>The single flip rule.</strong> Wait for faint bubbling and a golden freckles pattern, then flip once.
+      <p><strong>The single flip rule.</strong> After folding and seeing the half circle, flip it foreal!
       Don’t chase color too fast — color is a lagging indicator. If the first side looks right, the second side needs
       less time. You’re chasing the crunch “snap,” not a burn speedrun.</p>
       `,
       `
-      <p><strong>Rest & slice.</strong> Off heat, rest 60 seconds so cheese re-sets and steam calms down — like letting
-      a proof settle before you generalize. Slice with a long sweep. Dip ideas in salsa. Math fuel unlocked.</p>
+      <p><strong>Rest & slice.</strong> Remove from pan, rest 60 seconds so cheese re-sets and steam calms down
+      Slice 3 time to make four pieces. Dip ideas in salsa and sour cream. Math fuel unlocked!</p>
       `
     ]
   },
@@ -43,21 +43,21 @@ const RECIPES = {
     title: 'Mango Snowcone',
     slides: [
       `
-      <p><strong>Ice like new snow</strong>. Shave it fine — tiny crystals catch syrup evenly. If the ice is chunky,
-      pockets stay plain and the top floods. Think “uniform partition” for maximum flavor coverage.</p>
+      <p><strong>Ice like new snow</strong>. Shave it fine — tiny crystals catch the syrup evenly. If the ice is chunky,
+      pockets stay plain and the top floods. Think “uniform partition” of crystals for maximum flavor coverage.</p>
       `,
       `
       <p><strong>Bright mango base.</strong> Blend mango purée with a squeeze of lime and a literal pinch of salt.
-      The salt doesn’t make it salty — it turns the mango’s lights up. Start slightly undersweet; the cold dampens
-      sweetness, so too sweet in a warm bowl becomes cloying on ice.</p>
+      The salt doesn’t make it salty — it turns the mango’s lights up. Start slightly undersweet; the cold dampens the
+      sweetness, so too sweet in a warm bowl becomes cloying on ice. Freeze the bowl!</p>
       `,
       `
       <p><strong>Build in layers.</strong> Spoon some ice, drizzle syrup, spoon more, drizzle again. Stir with a gentle
-      fork flip so stripes become sunburst. Taste and tune — more lime for spark, more mango for hug.</p>
+      fork flip so stripes become sunburst. Taste and tune — more lime for sparks, more mango for hugs.</p>
       `,
       `
       <p><strong>Finish.</strong> A few mango cubes on top for texture. If you’re wild, micro-grate lime zest for aroma.
-      Take a brain-freeze sip, laugh, and keep the math flowing.</p>
+      Take a brain-freeze size sip, laugh, and keep the math flowing.</p>
       `
     ]
   },

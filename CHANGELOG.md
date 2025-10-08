@@ -14,12 +14,62 @@
 * ✅ **v0.9.2 – Infinity Lake Complete/Polished**
 * ✅ **v0.9.3 – Camping Games Complete/Polished**
 * ✅ **v0.9.4 – Story Mode Forest Complete/Polished**
-* 🔜 **v0.9.5 – MathTips Village Complete/Polished**
-* 🔜 **v0.9.6 – Badges (add 5?) Complete/Polished**
+* ✅ **v0.9.5 – MathTips Village Complete/Polished**
+* ✅ **v0.9.6 – Badges Complete/Polished**
 * 🔜 **v0.9.7 – Music/SFX Complete/Polished**
 * 🔜 **v0.9.8 – Celebrations Complete/Polished**
 * 🔜 **v0.9.9 – Code Complete/Polished**
 * 🎯 **v1.0.0 – Final Polish + Launch Ready✨**
+
+----
+
+## v0.9.6 — Badges Pass, Touch-Through Toasts, Router That Doesn’t Get Lost (October 8, 2025)
+
+### 🏅 Badge System — Phase 3 polish
+
+* **Play Music** routes through a single `sc:jukebox-play` event — awards once on the first successful ▶️, never on auto-play.
+* **Alias guard** (`play_music → listened_music`) and **unknown-id bailouts** prevent phantom awards.
+* **Grid renderer** groups badges (Core, Camping, QuickServe, Infinity, Story, Completion) with locked/earned art and alt text.
+* **Theme unlocks** gated by badge metadata; themes push into `profile.unlockedThemes` idempotently.
+* **Autoruns** redraw the grid on badge count change and show a one-shot banner when a new badge lands.
+
+### 🧃 Touch-through badge banner
+
+* The celebration banner now **never blocks gameplay** — it’s visible but **click-/tap-through** (`pointer-events: none`), auto-dismisses after 5s, and uses a subtle frosted backdrop.
+* Result: you keep playing QuickServe/Kids/Infinity **without waiting** for a toast to fade.
+
+### 🧠 Math Tips Village — router, quiz, and small-talk tune-up
+
+* **“Quiz me” actually starts a quiz** from anywhere; quiz mode holds input focus until ended.
+* **Calculator no longer hijacks** while quizzing; inline math is allowed elsewhere (percent-of, simple expressions).
+* **Pending booth switch** flow: natural **yes/no** confirms, with a quick “what is that booth?” explainer on ask.
+* **Typos & shorthands** normalized: `claculator`, `staus`, `calc`, `recipes` topics, and “go/open/send me to …” all route cleanly.
+* **Lore/Recipes** get clean, single-card outputs; layered cards don’t double-wrap.
+* **Small-talk fixes**: “I’m good” normalization, festival chat now answers **that Grampy P loves festivals and SCMF is home**, weather stays cozy (“peek your app, then we’ll do a quick problem”), and boundaries stay school-friendly.
+
+### 🧊 UI & stability
+
+* **Auto-scroller** respects user scroll; sticks to bottom only when pinned; handles resize/mutation reflows.
+* **Layered output guards** (`alreadyHasCard`) stop double cards; menus share a single booth-style template.
+* **Help/Exit** are global and predictable; returning to the village center is one tap.
+
+### 🐛 Notables
+
+* Fixed a path where **“quiz me” in Lessons** looped the menu instead of starting a deck.
+* Fixed the “You ever been to a music festival?” prompt to deliver the intended Grampy-P vibe.
+* Tightened algebra intercepts (slope-intercept & Pythagorean) to avoid false positives.
+
+### 🧪 Quick QA
+
+* Start a quiz from Lessons → **Q1 appears**; calculator input doesn’t steal focus.
+* Unlock a badge during any game → **banner shows**, but taps pass through; gameplay uninterrupted.
+* Say “recipe snowcone” / “calc booth” with typos → correct booth opens, single clean card.
+* “Exit” / “leave booth” returns to the **village center** with the map prompt.
+
+> *“Badges feel earned, not noisy; toasts celebrate without getting in the way; and Grampy P finally routes like a festival pro.”*
+
+**Next:** v0.9.7 — Music/SFX polish (mix pass, celebration cues, and loop discipline across modes).
+
 
 
 ---
