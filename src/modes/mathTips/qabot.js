@@ -15,6 +15,12 @@ import { maybeHandleSmallTalk } from './smalltalk.js';
 import { pickRecipeTopic } from './modes/recipes.js';
 
 
+// after: import { getMode, setMode, MODES } from './modeManager.js';
+const MODE_NAME = Object.fromEntries(
+  Object.entries(MODES).map(([k, v]) => [v, k])
+);
+
+
 
 
 const getSessionId = (app) =>
@@ -365,9 +371,12 @@ function scoreIntent(input) {
   if (matcher(lower, 'greetings') || /\b(yo|hey|hi|what['’]?s\s*up|nm\s*man)\b/i.test(lower)) return { guess: 'greet', score: 0.75 };
   if (/\bhow\s*are\s*you\b/i.test(lower)) return { guess: 'how_are_you', score: 0.75 };
   if (/\bmath\b/.test(lower)) return { guess: 'math_general', score: 0.75 };
-  if (/\bfraction(s)?\s+quiz\b/i.test(lower) || /\bpercent(s)?\s+quiz\b/i.test(lower)) return { guess: 'quiz_fractions', score: 0.7 };
-  if (/\bfractions?\b/.test(lower)) return { guess: 'quiz_fractions', score: 0.7 };
-  if (/\bpercent\b/.test(lower)) return { guess: 'quiz_percent', score: 0.7 };
+  // explicit quiz requests only
+  if (/\b(fractions?|percent|equations?)\s+quiz\b/i.test(lower)) return { guess: 'quiz_explicit', score: 0.9 };
+
+  // topic words mean lessons, not quiz
+  if (/\bfractions?\b/.test(lower)) return { guess: 'lessons_fractions', score: 0.7 };
+  if (/\bpercent\b/.test(lower))   return { guess: 'lessons_percent',   score: 0.7 };
   if (matcher(lower, 'jokes')) return { guess: 'joke', score: 0.7 };
   if (matcher(lower, 'lore_badges')) return { guess: 'badges', score: 0.65 };
   if (matcher(lower, 'lore_cones') || matcher(lower, 'lore_snowcone') || matcher(lower, 'lore_festival')) return { guess: 'lore', score: 0.6 };
@@ -418,6 +427,44 @@ function maybeOffTopicRedirect(userText, currentMode) {
   return null;
 }
 
+// ——— pretty-print plain lesson text into bullets + callouts ———
+function formatLessonCard(raw) {
+  const text = String(raw || '').trim();
+  // skip if it already looks like HTML/card
+  if (!text || isBlockyHtml(text) || alreadyHasCard(text)) return null;
+
+  // split into logical lines (you already write them that way)
+  const lines = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+
+  // label → callout (we'll detect these and render as keylined blocks)
+  const labelRe = /^(Why it works|Example|Your turn|Try one|Practice|Quick check|Tip|Note)\s*:\s*(.*)$/i;
+
+  const bullets = [];
+  const callouts = [];
+
+  for (const line of lines) {
+    const m = line.match(labelRe);
+    if (m) {
+      const label = m[1];
+      const body  = m[2];
+      callouts.push(
+        `<div class="mt-keyline"><strong>${html(label)}:</strong> ${html(body)}</div>`
+      );
+    } else {
+      bullets.push(`<li>${html(line)}</li>`);
+    }
+  }
+
+  // if there's nothing to improve, bail
+  if (bullets.length + callouts.length < 2) return null;
+
+  // treat first bullet as the intro sentence, rest as a list
+  const intro = bullets.length ? bullets.shift().replace(/^<li>|<\/li>$/g, '') : '';
+  const ul    = bullets.length ? `<ul>${bullets.join('')}</ul>` : '';
+
+  const inner = `${intro ? `<p>${intro}</p>` : ''}${ul}${callouts.join('')}`;
+  return wrapLayerCard(inner, { tone: 'cyan' });
+}
 
 
 function adaptModeOutput(out, userText, intentTag) {
@@ -427,6 +474,10 @@ function adaptModeOutput(out, userText, intentTag) {
 
   // case: booth returned a raw string
   if (typeof out === 'string') {
+    if (intentTag && /booth:lessons/.test(intentTag)) {
+      const pretty = formatLessonCard(out);
+      if (pretty) return { html: pretty, meta: { intent: intentTag, layered: true, end: ended } };
+    }
     if (alreadyHasCard(out)) {
       return { html: out, meta: { intent: intentTag, layered: true, end: ended } };
     }
@@ -442,6 +493,10 @@ function adaptModeOutput(out, userText, intentTag) {
 
   // case: booth returned an object { html, [end] }
   if (out && typeof out.html === 'string') {
+    if (intentTag && /booth:lessons/.test(intentTag)) {
+      const pretty = formatLessonCard(out.html);
+      if (pretty) return { html: pretty, meta: { intent: intentTag, layered: true, end: ended } };
+    }
     if (alreadyHasCard(out.html)) {
       return { html: out.html, meta: { intent: intentTag, layered: true, end: ended } };
     }
@@ -743,9 +798,8 @@ export function getResponse(userText, appStateLike = appState) {
   });
   const SESSION_ID = appStateLike.progress.mathtips.sessionId;
 
-  // ✅ Affirmative continuation from Lessons → kick off a default quiz
-  // Covers cases like: Lessons said “rolling to Quiz…”, user says “ok/yes/sure”
-  if (isAffirmative(t) && getMode() === MODES.lessons && !quiz.isActive?.(SESSION_ID)) {
+  // explicit "quiz me" while in Lessons → jump to Quiz (no confirm)
+  if (getMode() === MODES.lessons && /\b(quiz\s*me|start\s+quiz|give\s+me\s+a\s+quiz)\b/i.test(t)) {
     setMode(MODES.quiz);
     clearSmalltalkThread?.();
     const topic = lastLessonTopicOrDefault();
@@ -755,6 +809,11 @@ export function getResponse(userText, appStateLike = appState) {
       'quiz_start'
     );
   }
+
+
+
+
+
 
 
   // 🔌 global exit/leave synonyms — run before smalltalk & fast paths
@@ -1063,10 +1122,8 @@ export function getResponse(userText, appStateLike = appState) {
   if (alg) return { html: alg, meta: { intent: 'algebra', topic: 'algebra' } };
 
   // 1) Active booth with off-topic guard
-  // 1) Active booth with off-topic guard
-  // 1) Active booth with off-topic guard
   const currentMode = getMode();
-  const regKey = (/recipe/i.test(String(currentMode)) ? 'recipe' : currentMode);
+  const regKey = MODE_NAME[currentMode] || 'none';
 
   if (currentMode !== MODES.none) {
     // 🔮 calculator is global: quick calcs (discount/tip/tax/split/change/…) win early
@@ -1102,7 +1159,7 @@ export function getResponse(userText, appStateLike = appState) {
       : callMode(regKey, text, { sessionId: SESSION_ID });
 
     if (out) {
-      const adapted = adaptModeOutput(out, text, `booth:${currentMode}`);
+      const adapted = adaptModeOutput(out, text, `booth:${regKey}`);
       if (adapted) {
         // NEW — trust the booth's end card (it can show its own menu)
         if (adapted?.meta?.end) {
@@ -1234,6 +1291,30 @@ export function getResponse(userText, appStateLike = appState) {
           meta: { intent: guess }
         };
       }
+
+      case 'quiz_explicit': {
+        setMode(MODES.quiz);
+        clearSmalltalkThread();
+        // sniff which topic the user named
+        const topic = /\bpercent/i.test(text) ? 'percent'
+                    : /\bequation/i.test(text) ? 'equations'
+                    : 'fractions';
+        return adaptModeOutput(MODEx.quiz.start({ topic, count: 3, userText: text, sessionId: SESSION_ID }), text, 'quiz_start');
+      }
+
+      case 'lessons_fractions': {
+        setMode(MODES.lessons);
+        clearSmalltalkThread();
+        // if your lessons module accepts topic payloads, pass it; else just start()
+        return adaptModeOutput(MODEx.lessons.start({ topic: 'fractions' }), text, 'booth:lessons');
+      }
+
+      case 'lessons_percent': {
+        setMode(MODES.lessons);
+        clearSmalltalkThread();
+        return adaptModeOutput(MODEx.lessons.start({ topic: 'percent' }), text, 'booth:lessons');
+      }
+
 
 
 

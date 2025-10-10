@@ -1284,3 +1284,4 @@ body { margin: 0; }
 .mt-grid, .mt-content, .chat-window { min-height: 0; }
 .mt-content { grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }
 .chat-window { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+

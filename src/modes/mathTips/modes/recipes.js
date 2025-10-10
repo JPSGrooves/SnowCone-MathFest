@@ -17,24 +17,24 @@ const RECIPES = {
     slides: [
       `
       <p><strong>Mise en place</strong> first, friend. Tortilla, shredded cheese (mix a melter + a flavor banger),
-      and a tiny pat of butter or a drizzle of oil. Why low heat to start? Cheese has a melting window — too hot,
+      and a tiny pat of butter or a drizzle of oil. </p> Why low heat to start? Cheese has a melting window — too hot,
       the tortilla scorches before the cheese binds; low heat lets the lattice form so every bite pulls a cheesy
       parabola.</p>
       `,
       `
-      <p><strong>Heat & layup.</strong> Swipe the pan with the tiniest butter film; lay the tortilla down.
-      Scatter cheese to the edges — edge melt = edge seal. If adding fillings (beans, scallion, leftover chicken),
+      <p><strong>Heat & layup.</strong> Swipe the pan with the tiniest butter film; lay the tortilla down.</p>
+      Scatter cheese to the edges — edge melt = edge seal. </p> If adding fillings (beans, scallion, leftover chicken),
       keep them <em>on one half only</em> so the tortilla stays crisp, not burnt. Fold once cheese is melty —
       then...apply a gentle pressure with a spatula.</p>
       `,
       `
-      <p><strong>The single flip rule.</strong> After folding and seeing the half circle, flip it foreal!
-      Don’t chase color too fast — color is a lagging indicator. If the first side looks right, the second side needs
+      <p><strong>The single flip rule.</strong> After folding and seeing the half circle, flip it foreal! 
+      Don’t chase color too fast — color is a lagging indicator. </p>If the first side looks right, the second side needs
       less time. You’re chasing the crunch “snap,” not a burn speedrun.</p>
       `,
       `
       <p><strong>Rest & slice.</strong> Remove from pan, rest 60 seconds so cheese re-sets and steam calms down
-      Slice 3 time to make four pieces. Dip ideas in salsa and sour cream. Math fuel unlocked!</p>
+      Slice 3 time to make four pieces. </p> Dip ideas in salsa and sour cream. Math fuel unlocked!</p>
       `
     ]
   },
@@ -43,20 +43,20 @@ const RECIPES = {
     title: 'Mango Snowcone',
     slides: [
       `
-      <p><strong>Ice like new snow</strong>. Shave it fine — tiny crystals catch the syrup evenly. If the ice is chunky,
-      pockets stay plain and the top floods. Think “uniform partition” of crystals for maximum flavor coverage.</p>
+      <p><strong>Ice like new snow</strong>. Shave it fine — tiny crystals catch the syrup evenly. </p> If the ice is chunky,
+      pockets stay plain and the top floods. </p> Think “uniform partition” of crystals for maximum flavor coverage.</p>
       `,
       `
-      <p><strong>Bright mango base.</strong> Blend mango purée with a squeeze of lime and a literal pinch of salt.
-      The salt doesn’t make it salty — it turns the mango’s lights up. Start slightly undersweet; the cold dampens the
-      sweetness, so too sweet in a warm bowl becomes cloying on ice. Freeze the bowl!</p>
+      <p><strong>Bright mango base.</strong> Blend mango purée with a squeeze of lime and a literal pinch of salt. </p>
+      The salt doesn’t make it salty — it turns the mango’s lights up. </p> Start slightly undersweet; the cold dampens the
+      sweetness, so too sweet in a warm bowl becomes cloying on ice. </p> Freeze the bowl!</p>
       `,
       `
-      <p><strong>Build in layers.</strong> Spoon some ice, drizzle syrup, spoon more, drizzle again. Stir with a gentle
-      fork flip so stripes become sunburst. Taste and tune — more lime for sparks, more mango for hugs.</p>
+      <p><strong>Build in layers.</strong> Spoon some ice, drizzle syrup, spoon more, drizzle again. </p> Stir with a gentle
+      fork flip so stripes become sunburst. </p> Taste and tune — more lime for sparks, more mango for hugs.</p>
       `,
       `
-      <p><strong>Finish.</strong> A few mango cubes on top for texture. If you’re wild, micro-grate lime zest for aroma.
+      <p><strong>Finish.</strong> A few mango cubes on top for texture. </p> If you’re wild, micro-grate lime zest for aroma. </p>
       Take a brain-freeze size sip, laugh, and keep the math flowing.</p>
       `
     ]
@@ -66,21 +66,21 @@ const RECIPES = {
     title: 'Nacho Night',
     slides: [
       `
-      <p><strong>Heat strategy.</strong> Preheat to 400°F (or broil low, rack in the middle).
-      We want fast melt without scorching chips. Preheating is like setting good boundaries —
+      <p><strong>Heat strategy.</strong> Preheat to 400°F (or broil low, rack in the middle). </p>
+      We want fast melt without scorching chips.  </p> Preheating is like setting good boundaries —
       the cheese behaves when the environment’s steady.</p>
       `,
       `
-      <p><strong>Thin strata.</strong> Make a single honest layer of chips — not a mountain. Every chip should see cheese
-      and at least one buddy (bean, jalapeño, corn). Crowding hides chips in a cheese shadow.</p>
+      <p><strong>Thin strata.</strong> Make a single honest layer of chips — not a mountain. </p> Every chip should see cheese
+      and at least one buddy (bean, jalapeño, corn). </p> Crowding hides chips in a cheese shadow.</p>
       `,
       `
       <p><strong>Melt & monitor.</strong> Bake until cheese is glossy and just starting to bubble — pull early rather than
-      late; carryover heat finishes the job. If using broiler, rotate the tray once. Nachos burn in exponents, not linears.</p>
+      late; carryover heat finishes the job. </p> If using broiler, rotate the tray once. Nachos burn in exponents, not linears.</p>
       `,
       `
-      <p><strong>Cold toppings after.</strong> Salsa, avocado, cilantro, pickled red onion — all off-heat so they stay bright.
-      Hit with a squeeze of lime. Serve immediately to avoid the dreaded sog window.</p>
+      <p><strong>Cold toppings after.</strong> Salsa, avocado, cilantro, pickled red onion — all off-heat so they stay bright. </p>
+      Hit with a squeeze of lime. </p> Serve immediately to avoid the dreaded sog window.</p>
       `
     ]
   },
@@ -89,20 +89,20 @@ const RECIPES = {
     title: 'Festival Cocoa',
     slides: [
       `
-      <p><strong>Two-chocolate ratio.</strong> Use 2 parts dark to 1 part milk chocolate. Dark brings depth; milk brings
-      body and friendly sweetness. Chop it fine so it melts fast and evenly — surface area is your friend.</p>
+      <p><strong>Two-chocolate ratio.</strong> Use 2 parts dark to 1 part milk chocolate. </p> Dark brings depth; milk brings
+      body and friendly sweetness. </p> Chop it fine so it melts fast and evenly — surface area is your friend.</p>
       `,
       `
-      <p><strong>Warm, don’t boil.</strong> Heat milk until steamy with tiny bubbles on the edge. Boiling can split milk
-      proteins and dull flavor. Whisk chocolate in off heat, then return to low and keep whisking until glossy.</p>
+      <p><strong>Warm, don’t boil.</strong> Heat milk until steamy with tiny bubbles on the edge. </p> Boiling can split milk
+      proteins and dull flavor. </p> Whisk chocolate in off heat, then return to low and keep whisking until glossy.</p>
       `,
       `
-      <p><strong>Season like soup.</strong> A pinch of salt makes the chocolate taste more chocolate. A whisper of cinnamon
-      or chili is optional. If it tastes flat, it needs salt, not more sugar — trust the matrix.</p>
+      <p><strong>Season like soup.</strong> A pinch of salt makes the chocolate taste more chocolate. </p> A whisper of cinnamon
+      or chili is optional. </p> If it tastes flat, it needs salt, not more sugar — trust the matrix.</p>
       `,
       `
-      <p><strong>Serve.</strong> Mugs pre-warmed with hot water (dump it out first). Pour, breathe the aroma, share a secret
-      smile. Best sipped while a good problem cools down.</p>
+      <p><strong>Serve.</strong> Mugs pre-warmed with hot water (dump it out first). </p> Pour, breathe the aroma, share a secret
+      smile. </p> Best sipped while a good problem cools down.</p>
       `
     ]
   }
