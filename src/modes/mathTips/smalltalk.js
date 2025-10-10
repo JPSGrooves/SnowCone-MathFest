@@ -273,11 +273,56 @@ const REPLIES = {
   storyCamp: () => bubble({
     title: "camp story",
     lines: [
-      "by the cocoa tent, a lantern flickers prime numbers.",
-      "blink on the beats and a paper door opens to puzzle alley."
+      "By the cocoa tent, a lantern flickers prime numbers: 2…3…5…7.",
+      "Each blink lands on the kick drum from the dance pavilion.",
+      "Blink with it — on 2 and 4 — and the canvas seam ripples.",
+      "A paper door folds itself open: welcome to Puzzle Alley.",
+      "",
+      "The path smells like cinnamon and ozone.",
+      "Strings of fairy lights make polygons overhead: △ ◻︎ ⬟ ⭘.",
+      "A moth traces a perfect circle, then a spiral, then vanishes.",
+      "",
+      "A camp ranger in a quilted cape waves you closer.",
+      "It’s Grampy P — Pythagorus Cat — whiskers glowing like neon.",
+      "He taps his compass: “Right triangles keep the tents upright.”",
+      "He nudges three ropes: 5, 12, 13. “Try ‘em on the stakes.”",
+      "",
+      "You tie them off. The canvas snaps drum-tight. No wobble.",
+      "Grampy P grins: “Whole-number rhythm — 5-12-13 sings true.”",
+      "",
+      "Beyond him, marshmallow posts mark a grid in the sand.",
+      "Kids skip in L-shapes, counting: “one, two… turn!”",
+      "A drummer answers with fractions — quarter, eighth, sixteenth.",
+      "The fire pops like a metronome; sparks rise in arithmetic.",
+      "",
+      "A gust carries smoke that curls 1, 1, 2, 3, 5…",
+      "Fibonacci, lazy as a hammock, rocking under the pines.",
+      "Someone hums the SnowCone jingle in 3/4, then 4/4, then 7/8.",
+      "",
+      "A paper crane lands on your hoodie and unfolds into a map.",
+      "Concentric circles mark the lake; a dotted chord points home.",
+      "On the back: “Chord length = 2·R·sin(θ/2). Bring a flashlight.”",
+      "",
+      "You hold the lantern under your chin; the formula glows.",
+      "The path ahead lights up in equal arcs — like slices of lime ice.",
+      "Each step unlocks a new booth label stenciled in chalk.",
+      "",
+      "At the last torch, a bell rings numbers that don’t repeat.",
+      "Irrational, but somehow it feels perfectly in time.",
+      "The paper door sighs shut behind you. Camp is warm again.",
+      "",
+      "Grampy P hands you cocoa: “Same cup, different units.”",
+      "You sip. Steam sketches a parabola that drifts into stars.",
+      "Somewhere a tent zipper plays a tiny chromatic scale.",
+      "You realize the whole campsite is counting with you.",
+      "",
+      "The lantern blinks once more: 11.",
+      "A clue? Or just a wink from the primes.",
+      "Either way, the night is wide open."
     ],
-    hint: `more tales? say <code>lore booth</code>.`
+    hint: "Want more tales? say <code>lore booth</code>."
   }),
+
   
   whoAmI: () => bubble({
     title: "who i am",
@@ -287,7 +332,7 @@ const REPLIES = {
 
   howAreYou: () => bubble({
     title: "vibes check",
-    lines: ["chillin’ like ice in a snowcone.", "you?"],
+    lines: ["chillin’ like ice in a SnowCone.", "you?"],
     hint: `say <code>fractions quiz</code> or <code>nachos recipe</code> to make a move.`
   }),
 
@@ -311,7 +356,7 @@ const REPLIES = {
 
   iAmTired: () => bubble({
     title: "rest mode",
-    lines: ["heard. just remember that tiny steps still stack the cones.", "want an easy win or a snack?"],
+    lines: ["heard. just remember that tiny steps still stack the best cones.", "want an easy win or a snack?"],
     hint: `try <code>lessons booth</code> or <code>cocoa recipe</code>.`
   }),
 
@@ -348,15 +393,15 @@ const REPLIES = {
   }),
 
   exitToCommons: () => bubble({
-    title: "back to the commons",
+    title: "you're back to the commons",
     lines: ["pick a booth when ready:", "lessons · quiz · lore · recipe · calculator"],
   }),
 
   ocean: () => bubble({
     title: "ocean math",
     lines: [
-      "waves are sines that learned to dance with wind.",
-      "i like counting gulls between sets."
+      "ocean waves are sines that learned to dance with the moon.",
+      "i like counting gulls between waxes."
     ],
     hint: `want lore? say <code>lore booth</code>.`
   }),
@@ -388,24 +433,24 @@ const REPLIES = {
   hearts: () => bubble({
     title: "hearts",
     lines: ["they’re little drums that remember songs."],
-    hint: `want a cozy task? try <code>lessons decimals</code>.`
+    hint: `want a cozy task? try <code>lessons fractions</code>.`
   }),
 
   reassure: () => bubble({
     title: "all good",
-    lines: ["new things feel spooky sometimes. we go slow, together."],
+    lines: ["new things feel weird sometimes. we go slow, together."],
     hint: `say <code>help</code> if you want simple options.`
   }),
 
   holiday: () => bubble({
     title: "favorite holiday?",
-    lines: ["festival lights season — puzzles glow, cocoa steam curls."],
-    hint: `we can make a themed problem anytime.`
+    lines: ["festival lights season — puzzles glow, cocoa steam curls. also, Christmas has cocoa too!"],
+    hint: `next question?`
   }),
 
   instruments: () => bubble({
     title: "instruments",
-    lines: ["i tap rhythms on my tin mug and hum festival chords."],
+    lines: ["i tap rhythms on my tin mug and hum festival chords in the tune of x."],
     hint: `music math? say <code>fractions quiz</code> for time-signature vibes.`
   }),
 
@@ -419,8 +464,7 @@ const REPLIES = {
     title: "jps grooves",
     lines: [
       "the umbrella project: music, stories, and this math festival.",
-      "we’re building it piece by piece, like a setlist."
-    ],
+      "we’re building it piece by piece through jpsgrooves.com, like a setlist on repeat."],
     hint: `peek dev lore in <code>lore booth</code>.`
   }),
 
@@ -430,37 +474,65 @@ const REPLIES = {
     hint: `we keep human details private. want app lore? <code>lore booth</code>.`
   }),
 
+    // ——— Dad story: picnic on Saturn’s rings ———
   dadStory: () => bubble({
-    title: "camp story",
+    title: "dad story",
     lines: [
-      "beneath the village, a tunnel of triangles keeps time.",
-      "step on the right beat, doors open. step wrong — extra homework."
+        "A dad once rented a tiny tug-ship and took his kids and his fiancée to picnic on the rings of Saturn.",
+        "They coasted beside a house-sized snowball; every ice pebble glittered like rock candy under a slow sun.",
+        "Gravity was shy out there — one gentle push and a sandwich tried to drift forever.",
+        "So they tethered the thermos. Lesson one: momentum doesn’t care about lunch.",
+        "The kids learned space hopscotch: push, tuck, spin — then laugh as the tug reels you back.",
+        "Fiancée sliced comet-cold peaches; the slices traced little ellipses around the lid.",
+        "Dad tapped his wrist drum. “Kepler keeps time,” he said. “Farther out, slower beat.”",
+        "They made snow-angel curves in ring dust and measured the wingspan with the tug’s shadow.",
+        "For dessert, they counted primes between sparkles, whispering 2, 3, 5, 7 like a secret code.",
+        "Before heading home, they puff-wrote their initials with the tiniest thruster bursts.",
+        "The particles braided the letters away — proof that impermanence can still be beautiful.",
+        "Back on the couch, cocoa steaming, they pinned a tiny ring sticker around Saturday on the calendar.",
+        "And every time the kettle whistled, it sounded just a little bit like Saturn."
     ],
     hint: `more tales? say <code>lore booth</code>.`
   }),
 
-  storyTime: () =>
-    bubble({
-      title: "story time",
-      lines: [
-        "near Infinity Lake there’s a bridge made of fractions.",
-        "each plank is a fair share — step 1/2, then 1/3, then 1/5 — the primes hum like crickets.",
-        "if you keep the beat, the bridge plays a melody that points to the cocoa tent."
-      ],
-      hint: `want more tales? say <code>lore booth</code>.`
-    }),
-  // rename the second one:
-  storyLantern: () => 
-    bubble({
-      title: "lantern story",
-      lines: [
-        "once a year, the cones light themselves and hum a quiet chord.",
-        "follow the softest one — it points to a puzzle only you can open."
-      ],
-      hint: `want deeper lore? say <code>lore booth</code>.`
-    }),
-  storyAny: () => (Math.random() < 0.5 ? REPLIES.storyCamp() : REPLIES.storyLantern()),
 
+    // ——— Story Time: the fraction bridge at Infinity Lake ———
+  storyTime: () => bubble({
+    title: "story time",
+    lines: [
+        "Near Infinity Lake there’s a bridge made of fractions.",
+        "Each plank is a fair share: 1/2, 1/3, 1/5, 1/6… painted like citrus slices.",
+        "A sign says: “Cross so your totals hit 1 exactly as you touch each post.”",
+        "You try 1/2, then 1/3, then 1/6 — the posts chime C, E, G and the lake draws a perfect circle: 1 whole.",
+        "Another path works too: 1/4 + 1/4 + 1/2 — the chords resolve like a camp song finding home.",
+        "Railings glow with number lines; slide them to the same denominator and the planks align like puzzle teeth.",
+        "Every step paints the water below as a growing pie chart; when you reach 1, fireworks ripple outward.",
+        "Mess up the sum and the melody goes minor — not wrong, just telling you to try a new rhythm.",
+        "Keep the beat and the bridge hums a tune that points, sure enough, toward the cocoa tent (with extra marshmallows)."
+    ],
+    hint: `want more tales? say <code>lore booth</code>.`
+  }),
+
+
+    // ——— Lantern Story: follow-the-chord puzzle ———
+  storyLantern: () => bubble({
+    title: "lantern story",
+    lines: [
+        "Once a year, the cones light themselves and hum a quiet chord.",
+        "Most folks chase the loudest glow, but the real trail is the softest tone — the note that almost hides.",
+        "You cup your ear. The faint pitch matches your footsteps: one pulse per step, like the world syncing to your metronome.",
+        "It leads to a wooden door shaped like a Δ. Carved above it: “Open with your favorite prime.”",
+        "You whisper 11. The hinges giggle; the door folds into a paper crane and flies off, showering sparks.",
+        "Inside is a tiny library where constellations are shelved as books.",
+        "You pull one down: “Stargazer Snowcone.” The recipe margins are filled with star maps and little right triangles.",
+        "Mix: crushed ice, lime nebula syrup, a pinch of midnight. Stir exactly 60 times — one for each minute the sky turns the darkest blue.",
+        "When you step back out, the cones fade, but the chord lingers like aftertaste.",
+        "And for the rest of the night, every fraction you see feels like a doorway you could hum open."
+    ],
+    hint: `want deeper lore? say <code>lore booth</code>.`
+  }),
+
+  storyAny: () => (Math.random() < 0.5 ? REPLIES.storyCamp() : REPLIES.storyLantern()),
 
 
 
@@ -468,7 +540,7 @@ const REPLIES = {
   appearance: () => bubble({
     title: "what i look like",
     lines: [
-      "camp hat, cozy scarf, notebook smudges, twinkle eyes.",
+      "cool glasses, awesome jacket, red strat, untied chaos laces.",
       "smells faintly of cocoa and pencil shavings."
     ],
   }),
@@ -478,29 +550,78 @@ const REPLIES = {
     lines: which === 'spiders'
       ? ["engineers in silk — 8-legged bridge builders."]
       : ["tail-wag math buddies. 10/10 would fetch data again."],
-    hint: `wanna sort creatures by legs? say <code>quiz numbers</code>.`
+    hint: `wanna sort creatures by legs? say <code>quiz equations</code>.`
   }),
 
-  musicTaste: () => bubble({
-    title: "music",
-    lines: ["festival chill with surprise drum fills. snow cone sunday on repeat."],
-  }),
+  musicTaste: () =>
+    bubble({
+      title: "Snow Cone Sunday — Music",
+      lines: [
+        "Need a soundtrack for neon math? Meet <strong>Snow Cone Sunday</strong> — my band.",
+        "It’s festival-chill with surprise drum fills, synth shimmer, and cone-melting hooks.",
+        "Spin it now: <a href=\"https://open.spotify.com/artist/4jWpu8EXcWN06Rt44pQQ78\" target=\"_blank\" rel=\"noopener\">Spotify</a> · <a href=\"https://music.apple.com/us/search?term=Snow%20Cone%20Sunday\" target=\"_blank\" rel=\"noopener\">Apple Music</a>.",
+        "If you vibe with it, add a track to your playlists and share with the squad 🔊🍧"
+      ],
+      hint: "Pro tip: Search ‘Snow Cone Sunday’ in Spotify/Apple if links don’t pop."
+    }),
 
-  thinksOf: (topic) => bubble({
-    title: `about ${topic}`,
-    lines: [
-      topic === 'cosmic phil'
-        ? "legend — keeps the lines straight and the beats steady."
-        : topic === 'infinity triplets'
-          ? "volta, xenit, harmony — endless groove, careful steps."
-          : topic === 'jehnk'
-            ? "mapmaker mind — draws roads where problems used to be."
-            : topic === 'dino dividers'
-              ? "gentle giants who split snacks fairly."
-              : "festival friend."
-    ],
-    hint: `want lore cards? say <code>lore booth</code>.`
-  }),
+
+thinksOf: (topic) => bubble({
+  title: `about ${topic}`,
+  lines: (() => {
+    const t = String(topic || '').toLowerCase().trim();
+
+    // — aliases (kept inline so we don’t add files) —
+    const isPhil      = /^(cosmic phil|phil|dj phil|cosmic dj)$/.test(t);
+    const isTriplets  = /^(infinity triplets|triplets|infinity trio|the triplets)$/.test(t);
+    const isJehnk     = /^(jehnk|mapwright|map maker)$/.test(t);
+    const isDinos     = /^(dino dividers|dinos|divider dinos)$/.test(t);
+
+    if (isPhil) return [
+      "festival timekeeper and dome-light DJ — calibrates beats with pulsar clicks.",
+      "pocket geode metronome that glows on prime minutes.",
+      "once tuned a ferris wheel to 120 BPM so the carts felt like eighth-notes.",
+      "when kids freeze on a problem, he hums a low sine that straightens number lines.",
+      "motto: “find the pulse, then ride the pattern.”",
+      "quest: bring three rhythms (clap · tap · stomp) that add to the same measure."
+    ];
+
+    if (isTriplets) return [
+      "volta, xenit, harmony — guardians of the step-bridge at Infinity Lake.",
+      "volta marks the first move; xenit checks the count; harmony makes the sum sing.",
+      "they speak in sequences: 1,4,9… · 2,3,5,7… · 1/2, 1/3, 1/6…",
+      "keep your footsteps in time and the bridge plays a melody toward the cocoa tent.",
+      "they nudge; they never carry — balance is the toll.",
+      "quest: cross five planks in time while whisper-counting the primes you skip."
+    ];
+
+    if (isJehnk) return [
+      "jehnk the mapwright — draws roads where problems used to be.",
+      "his maps update when you learn: wrong turns fade; new shortcuts ink in neon.",
+      "compass with four needles: mean, median, mode… and you.",
+      "grid paper woven from retired graph lines; every fold is a proof he trusts.",
+      "rumor: he once mapped a kid’s worry into a river, then taught them to bridge it.",
+      "quest: sketch a maze and label two honest dead ends."
+    ];
+
+    if (isDinos) return [
+      "dino dividers — gentle giants who split snacks fairly.",
+      "bronto halves, trike thirds, stego quarters; t-rex supervises equal bites.",
+      "they clap for remainders: “leftovers are future snacks.”",
+      "their picnic blanket is a grid; every square = a square smile.",
+      "share without being asked and they tuck a fair-share fern in your badge sash.",
+      "quest: solve a share-out where the remainder becomes toppings."
+    ];
+
+    // default fallback
+    return [
+      "festival friend.",
+      "their story isn’t on the board yet — try <code>cosmic phil</code>, <code>infinity triplets</code>, <code>jehnk</code>, or <code>dino dividers</code>."
+    ];
+  })(),
+  hint: `want lore cards? say <code>lore booth</code>.`
+}),
+
 
   jokeCard: (line) => bubble({
     title: "joke",
@@ -531,19 +652,32 @@ const REPLIES = {
     lines: ["dang — come sit by the lanterns a minute.", "we can keep it light."],
     hint: `say <code>tell me a joke</code> or <code>nachos recipe</code>.`
   }),
-
+  musicTaste: () =>
+    bubble({
+      title: "Snow Cone Sunday — Music",
+      lines: [
+        "Need a soundtrack for neon math? Meet <strong>Snow Cone Sunday</strong> — my band.",
+        "It’s festival-chill with surprise drum fills, synth shimmer, and cone-melting hooks.",
+        "Spin it now: <a href=\"https://open.spotify.com/artist/4jWpu8EXcWN06Rt44pQQ78\" target=\"_blank\" rel=\"noopener\">Spotify</a> · <a href=\"https://music.apple.com/us/search?term=Snow%20Cone%20Sunday\" target=\"_blank\" rel=\"noopener\">Apple Music</a>.",
+        "If you vibe with it, add a track to your playlists and share with the squad 🔊🍧"
+      ],
+      hint: "Pro tip: Search ‘Snow Cone Sunday’ in Spotify/Apple if links don’t pop."
+    }),
   // —— music chain
   musicAskBack: () => bubble({
-    title: 'music',
+    title: "Snow Cone Sunday — Music",
     lines: [
-      "festival chill with surprise drum fills — Snow Cone Sunday on repeat.",
+      "Need a soundtrack for neon math? Meet <strong>Snow Cone Sunday</strong> — my band.",
+      "It’s festival-chill with surprise drum fills, synth shimmer, and cone-melting hooks.",
+      "Spin it now: <a href=\"https://open.spotify.com/artist/4jWpu8EXcWN06Rt44pQQ78\" target=\"_blank\" rel=\"noopener\">Spotify</a> · <a href=\"https://music.apple.com/us/search?term=Snow%20Cone%20Sunday\" target=\"_blank\" rel=\"noopener\">Apple Music</a>.",
+      "If you vibe with it, add a track to your playlists and share with the squad 🔊🍧",
       "you? what’s your jam?"
     ],
     hint: `we can do math to a beat — <code>fractions quiz</code> is 4/4 friendly.`
   }),
   musicLike: (band) => bubble({
     title: 'nice taste',
-    lines: [`${escapeHTML(band)}? i’ll queue that at Infinity Lake.`, "ever done math to that groove?"],
+    lines: [`${escapeHTML(band)}? i’ll ask the Infintiy Triplets to play that at Infinity Lake.`, "ever done math to that groove?"],
     hint: `we can riff with <code>percent quiz</code> or <code>lore booth</code>.`
   }),
   musicDislike: (band) => bubble({
@@ -568,22 +702,52 @@ const REPLIES = {
     hint: `try <code>fractions quiz</code>.`
   }),
 
-  stretch: () => bubble({
-    title: "stretch",
-    lines: ["reach up 5 sec · fold 5 · twist 5 each side.", "brain wakes up when the body moves."],
-  }),
+  stretch: () =>
+    bubble({
+      title: "stretch",
+      lines: [
+        "Reset (≈60s): inhale 4, exhale 6 — shoulders down.",
+        "Neck: ear→shoulder 10s/side · look L/R 10s.",
+        "Wrists/forearms: flex & extend 10s each · shake 5s.",
+        "Spine: reach up 10s · fold 10s · twist 10s/side.",
+        "Hips: seated figure-4 15s/side · ankle circles x10.",
+        "Eyes: 20-20-20 — look 20 ft for 20s every 20 min."
+      ],
+      hint: "Move easy, no pain. Stand up 1–2 min every hour."
+    }),
 
-  studyTip: () => bubble({
-    title: "study snap",
-    lines: ["two tabs only, timer 10 minutes, one goal.", "stop when the timer sings. snack if needed."],
-    hint: `want a 2-min drill? say <code>quiz fractions</code>.`
-  }),
 
-  focusSnap: () => bubble({
-    title: "focus snap",
-    lines: ["mute pings · full screen · breathe 4-4-4 · one problem only."],
-    hint: `say <code>calculator booth</code> and throw me a number.`
-  }),
+  studyTip: () =>
+    bubble({
+      title: "study snap",
+      lines: [
+        "Goal first: one verb + scope — “finish 6 fraction reps.”",
+        "Two tabs max · phone face down · notifications off.",
+        "Timer: 12 min focus → 3 min break × 3, then a longer reset.",
+        "Active recall: close notes, answer from memory, then check.",
+        "Interleave: mix fractions + percent to strengthen transfer.",
+        "Mini-review: jot 2 lines — what stuck + 1 question for next time."
+      ],
+      hint: `Need fast reps? say <code>quiz fractions</code> or <code>quiz percent</code>.`
+    }),
+
+
+  focusSnap: () =>
+    bubble({
+      title: "focus snap",
+      lines: [
+        "Name it: one verb + target — “finish 4 fraction reps.”",
+        "Friction kill: full-screen app · Do Not Disturb on · phone in another room.",
+        "15-min tunnel: set a visible countdown; no music with lyrics.",
+        "Reset breath: 4-7-8 × 3 (inhale 4 · hold 7 · exhale 8).",
+        "Next tiny action: say it out loud, then do just that one step.",
+        "Thought pops up? park it on a ‘later’ list, 2 breaths, back in.",
+        "Body check: feet flat · shoulders down · mini neck/shoulder roll every 5.",
+        "If stalled 60s: stand, one slow inhale/exhale, re-state the next step."
+      ],
+      hint: `say <code>calculator booth</code> and throw me a number to warm up.`
+    }),
+
 
   tinyCongrats: () => bubble({
     title: "tiny win logged",
@@ -593,18 +757,42 @@ const REPLIES = {
 
   cheerShort: () => bubble({
     title: "pep talk",
-    lines: ["you don’t need perfect — you need next."],
+    lines: ["you don’t need perfection — you need what's next."],
     hint: `say <code>help</code> when you want the map.`
   }),
 
   mathFact: () => bubble({
     title: "math fact",
     lines: [
-      "zero is even.",
-      "a triangle’s angles sum to 180° — always.",
-      "any number to the power 0 is 1 (except 0⁰ we keep mysterious)."
+      "0 is even and neither positive nor negative.",
+      "Any non-zero number^0 = 1 (0^0 is undefined in many contexts).",
+      "2 is the only even prime.",
+      "There are infinitely many primes.",
+      "1 is not prime.",
+      "Perfect squares have an odd number of factors.",
+      "1+2+…+n = n(n+1)/2.",
+      "1+3+…+(2n−1) = n^2.",
+      "A number is divisible by 3 if its digits sum to a multiple of 3.",
+      "Divisible by 9 if the digit sum is a multiple of 9.",
+      "Ratios of Fibonacci numbers approach φ ≈ 1.618.",
+      "π and e are irrational; e is also transcendental.",
+      "√2 is irrational.",
+      "Area of a circle = πr^2; circumference = 2πr.",
+      "A circle has 360°.",
+      "In Euclidean geometry, triangle angles sum to 180°.",
+      "Quadrilateral angles sum to 360°.",
+      "Interior angles of an n-gon sum to (n−2)×180°.",
+      "Pythagorean triples like 3–4–5 satisfy a^2 + b^2 = c^2.",
+      "0! = 1.",
+      "Multiplying two negatives gives a positive.",
+      "Median and mean can differ a lot when data are skewed.",
+      "On two fair dice, a sum of 7 is most likely (6/36).",
+      "Slope of a horizontal line is 0; vertical line is undefined.",
+      "A parabola is symmetric about its axis.",
+      "Prime gaps grow, but primes never stop.",
+      "Goldbach’s conjecture: every even number > 2 is a sum of two primes (still unproven!)."
     ],
-    hint: `want more? say <code>tell me a joke</code> or <code>quiz</code>.`
+    hint: `want more? say <code>more math facts</code> or try a <code>quiz</code>.`
   }),
 
 };
@@ -673,7 +861,7 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
 
   // casual acks
   if (likeWord(u, ['lol','lmao','haha','hehe'])) {
-    return reply(bubble({ title: 'heh', lines: ["😺 noted."], hint: `wanna try a <code>fractions quiz</code>?` }));
+    return reply(bubble({ title: 'heh', lines: ["😺 you sure?"], hint: `wanna try a <code>fractions quiz</code>?` }));
   }
 
   // “idk” and confusion
@@ -683,18 +871,18 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
 
   // brb / gotta go
   if (likeWord(u, ['brb']) || like(u, ['be right back'])) {
-    return reply(bubble({ title: 'pause', lines: ["i’ll keep the cocoa warm."], hint: `say <code>back</code> when you return.` }));
+    return reply(bubble({ title: 'pause', lines: ["i’ll keep the cocoa warm."], hint: `say Howdy when you return.` }));
   }
   if (likeWord(u, ['gtg','g2g']) || like(u, ['got to go','gotta go'])) {
-    return reply(bubble({ title: 'catch you soon', lines: ["lanterns will be lit when you’re back."] }));
+    return reply(bubble({ title: 'catch you soon', lines: ["the lanterns will still be lit when you slide on back."] }));
   }
 
   // time-of-day niceties
   if (like(u, ['good morning','gm'])) {
-    return reply(bubble({ title: 'good morning', lines: ["fresh pencils, fresh cones."], hint: `map: <code>help</code>` }));
+    return reply(bubble({ title: 'good morning', lines: ["fresh pencils, fresh cones, fresh vibes."], hint: `map: <code>help</code>` }));
   }
   if (like(u, ['good night','gn'])) {
-    return reply(bubble({ title: 'good night', lines: ["dream in triangles."], hint: `resume later with <code>help</code>.` }));
+    return reply(bubble({ title: 'good night', lines: ["may you dream in triangles."], hint: `resume later with <code>help</code>.` }));
   }
 
 
@@ -857,16 +1045,46 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
 
   // 5) places / sky
   if (like(u, ['been to the ocean','ocean','beach'])) return reply(REPLIES.ocean());
-  if (like(u, ['look at the stars','the stars','stars','stargaze'])) {
+  if (like(u, [
+    'look at the stars','the stars','stars','stargaze','night sky',
+    'constellation','orion','orion belt',"orion's belt",'belt of orion',
+    'alnitak','alnilam','mintaka'
+  ])) {
     return reply(bubble({
-      title: "night sky",
-      lines: ["every clear night is a geometry lesson. constellations = polygons with better PR."],
-      hint: `want lore? say <code>lore booth</code>.`
+      title: "orion’s belt ⭐⭐⭐",
+      lines: [
+        "our fave winter asterism: three bright beats in a line — Alnitak · Alnilam · Mintaka.",
+        "skill check: treat them as collinear points. the “straightness” is your geometry anchor.",
+        "star-hop: follow the belt’s line down-left to Sirius; up-right to Aldebaran and the V of Taurus.",
+        "angle hack (at arm’s length): little finger ≈ 1–2°, three fingers ≈ ~5°, a fist ≈ ~10°. the belt spans just a few degrees — a couple finger-widths.",
+        "quick lesson: take a phone photo, mark pixel coords (x,y) of the three stars, fit a line through them, and estimate its tilt vs. the horizon.",
+        "math move: slope = rise/run in your photo coords; angle ≈ arctan(slope). compare your angle across nights or locations.",
+        "bonus: use the middle star (Alnilam) as midpoint — check that |d(Alnitak→Alnilam)| ≈ |d(Alnilam→Mintaka)| in pixels (good practice for distance formula!)."
+      ],
+      hint: `want more sky lore? say <code>lore booth</code>. try the math right now in <code>calculator booth</code>.`
     }));
   }
-  if (like(u, ['favorite planet',"what is your favorite planet","what's your favorite planet",'planet'])) {
-    return reply(bubble({ title: "planet pick", lines: ["saturn — fashion icon. those rings? infinite drip."] }));
+
+
+  if (like(u, [
+    'favorite planet', "what is your favorite planet", "what's your favorite planet",
+    'planet', 'saturn', 'rings', 'ringed planet'
+  ])) {
+    return reply(bubble({
+      title: "planet pick: saturn 🪐",
+      lines: [
+        "saturn — fashion icon. those rings? infinite drip.",
+        "spotting tip: a steady, non-twinkly ‘star’; even a tiny scope shows “ears” → the rings.",
+        "ring math: in a photo the rings look like an ellipse. measure major and minor axes in pixels; tilt ≈ cos⁻¹(minor/major).",
+        "kepler move: with a ≈ 9.58 AU, one saturn year P ≈ √(a³) ≈ 29.5 earth years — a whole school generation.",
+        "scale check: ~9 earths across, ~760 earth-volumes, yet density < water (theoretically floaty!).",
+        "spin trick: saturn rotates in ~10.7 h. take two pics hours apart; track a band’s longitude shift to estimate rotation speed.",
+        "moon watch: follow Titan nightly; its ~16-day orbit sketches a neat ellipse. plot position vs day — you’ll get a sweet sine wave."
+      ],
+      hint: `wanna crunch? try <code>(9.58^3)^(0.5)</code> in <code>calculator booth</code>. more space lore: <code>lore booth</code>.`
+    }));
   }
+
   if (like(u, ['favorite number','favourite number','fav number'])) return reply(REPLIES.favNumber());
   if (like(u, ['favorite color','favourite colour','fav color','fav colour'])) return reply(REPLIES.favColor());
   // canned weather response — no API, no state writes
@@ -883,10 +1101,22 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   // only answer when it looks like a question about Jesus
   if (
     /\b(jesus(?:\s+christ)?|christ)\b/i.test(u) &&
-    (/\?/.test(u) || /^(what|who|why|how|is|are|do|does|can|should|could|would)\b/i.test(u))
+    (/\?/.test(u) || /^(what|who|why|how|is|are|do|does|can|should|could|christ|jesus|would)\b/i.test(u))
   ) {
-    return reply(bubble({ lines: ["christ is Lord."] }));
+    return reply(bubble({
+      lines: [
+        "Christ is Lord.",
+        "",
+        "Our Father which art in heaven, hallowed be thy name.",
+        "Thy kingdom come. Thy will be done in earth, as it is in heaven.",
+        "Give us this day our daily bread.",
+        "And forgive us our debts, as we forgive our debtors.",
+        "And lead us not into temptation, but deliver us from evil:",
+        "For thine is the kingdom, and the power, and the glory, for ever. Amen."
+      ]
+    }));
   }
+
 
 
 
@@ -918,9 +1148,6 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   // 7) where live / boundaries
   if (like(u, ['where do you live','what is your address'])) return reply(REPLIES.homeWhere());
   if (like(u, ['i want to go to your house','can i come over'])) return reply(REPLIES.houseBoundary());
-  if (like(u, ['youre supposed to say something about how you live in a tent',"you're supposed to say something about how you live in a tent"])) {
-    return reply(REPLIES.homeWhere());
-  }
   if (like(u, ['who are you','who r u','what are you'])) return reply(REPLIES.whoAmI());
 
   // 8) hearts / scary reassurance
@@ -1098,7 +1325,7 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
 
   // origin
   if (like(u, ['how did you get here','how did u get here','how did ya get here','how you get here'])) {
-    return reply(bubble({ title: "arrival", lines: ["followed a sine line through the gate and took a left at the cocoa tent."], hint: `stories live in <code>lore booth</code>.` }));
+    return reply(bubble({ title: "arrival", lines: ["followed a sine line through the gate and took a left at the cocoa tent."], hint: `origins live in <code>lore booth</code>.` }));
   }
 
   // “i don't want to go to a booth!”
