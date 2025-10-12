@@ -1,5 +1,3 @@
-## 🔮 Version Roadmap (2025)
-
 * ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**
 * ✅ **v0.5.6 – QuickServe Keyboard Ascension**
 * ✅ **v0.6.0 – Infinity Mode Complete**
@@ -10,16 +8,79 @@
 * ✅ **v0.8.8 – The Grampy P Badge**
 * ✅ **v0.9.0 – Legendary Badges/Badge/Theme Implemented****
 * ✅ **v0.9.0.5 – MathTips Village Kitty Paws**
-* ✅ **v0.9.1 – QuickServe Pavillion Complete/Polished**
+* ✅ **v0.9.1 – QuickServe Pavilion Complete/Polished**
 * ✅ **v0.9.2 – Infinity Lake Complete/Polished**
 * ✅ **v0.9.3 – Camping Games Complete/Polished**
 * ✅ **v0.9.4 – Story Mode Forest Complete/Polished**
 * ✅ **v0.9.5 – MathTips Village Complete/Polished**
 * ✅ **v0.9.6 – Badges Complete/Polished**
-* 🔜 **v0.9.7 – Music/SFX Complete/Polished**
-* 🔜 **v0.9.8 – Celebrations Complete/Polished**
-* 🔜 **v0.9.9 – Code Complete/Polished**
+* ✅ **v0.9.7 – Music/SFX Complete/Polished**
+* ✅ **v0.9.8 – Celebrations Complete/Polished**
+* ✅ **v0.9.9 – Just Small Details Now**
 * 🎯 **v1.0.0 – Final Polish + Launch Ready✨**
+
+
+## v0.9.9 — Just Small Details Now (October 11, 2025)
+
+### 🧊 UI Consistency & Safe-Area Polish
+
+* 11:16 stage locked across modes; backgrounds center/contain (no crops).
+* Safe-area padding unified; bottom bars (Back/Mute/etc.) never overlap content.
+* Text clamping + responsive type scales prevent tiny-screen spill.
+
+### 🧼 Event Wiring & Stability
+
+* Single screen-level handlers per mode with full unwire on exit.
+* Background “repaint nudge” prevents stale paints when swapping modes.
+* Pointer-events audit: overlays/celebrations never block gameplay.
+
+### 🧠 Navigation & Flow
+
+* Help/Exit consistent everywhere; one-tap returns to each mode’s center.
+* Dialog/menus share one template—no double-wrapped cards.
+* Router edge-cases trimmed (typos, shorthands, booth switches) for clean handoffs.
+
+### 🏕️ Kids Camping — Final Touches
+
+* Honk/park flow stable; Park button always visible; celebration overlay fades cleanly.
+* Mobile zoom prevention tightened; hitboxes padded; stacked honk label format locked.
+
+### ♾️ Infinity Lake & ⚡ QuickServe
+
+* Bottom bar pinned and protected on small phones.
+* Combo/readability tweaks: glow timing + lightweight textures for smoother reads.
+
+### 📖 Story Mode Forest & 🐱 Math Tips Village
+
+* Typewriter intro (Skip / I’m Ready) & slide deck keys finalized.
+* iOS PWA true-full-height fix (`100svh` + safe-area); single chat scroller owns overflow.
+* Response cards refined (`.mt-response-card`, `.mt-response-list`, `.mt-lecture-card`); softer pop-in animations.
+
+### 🎵 Soundtrack — Remaster Pass Complete
+
+* All tracks **remastered** for loudness/clarity; loop points tightened.
+* Mute/loop UI stays in sync; one-tap Howler unlock preserved.
+
+### ♿️ Accessibility & Copy
+
+* ALT text/labels for key UI and badges; contrast nudges on dark headers.
+* About/Info: louder credit line (*Built end-to-end by JPS Grooves*), **jpsgrooves.com** first.
+
+### 🐛 Misc Cleanups
+
+* Button hitboxes normalized; safe CSS dedupe; micro-jank on resize eliminated.
+
+### 🧪 Quick QA
+
+* Mode swap spam → no lingering handlers or blocked taps.
+* Any celebration → gameplay remains interactive; overlay fades on schedule.
+* Tiny-screen mobile → bottom bar visible, text wraps safely, no overlap.
+* OST loops → no clicks/pops; mute/loop reflect true state across screens.
+
+> *“Nothing flashy left — just that glassy feel. Every mode behaves, every track sings.”*
+
+**Next:** **v1.0.0 — Final Polish + Launch Ready ✨**
+
 
 ----
 

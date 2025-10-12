@@ -9,7 +9,7 @@ const fadeDuration = 1000;
 // managers/musicManager.js
 // ...existing imports & code...
 
-// 🔥 Track List
+// managers/musicManager.js — 🔥 Track List
 const tracks = [
   { id: 'quikserve',  name: 'QuikServe OG',         file: 'quikserveST_OG.mp3' },
   { id: 'kktribute',  name: 'KK Tribute',           file: 'KKtribute.mp3' },
@@ -18,11 +18,12 @@ const tracks = [
   { id: 'sc90',       name: 'SnowCone 90',          file: 'sc_90.mp3' },
   { id: 'nothingorg', name: 'Nothing Organic',      file: 'nothing_organic.mp3' },
   { id: 'secrets',    name: 'Secrets of Math',      file: 'secretsOfMath.mp3' },
+  { id: 'stoopidelectro',name: 'Stoopid Electro',   file: 'stoopidElectro.mp3' },
   { id: 'prologue',   name: 'Story Prologue',       file: 'prologueTrack.mp3' },
-
-  // ➕ NEW: MathTips Village loop
   { id: 'kittyPaws',  name: 'Kitty Paws',           file: 'kittyPaws.mp3' },
+  { id: 'patchrelaxes', name: 'Patch Relaxes',      file: 'patchRelaxes.mp3' },
 ];
+
 // ...rest of file unchanged...
 
 
@@ -296,7 +297,8 @@ export function getCurrentSeekPercent() {
   return (currentTrack.seek() || 0) / duration;
 }
 
-const infinityTrackIds = ['infadd', 'nothingorg', 'secrets'];
+const infinityTrackIds = ['infadd', 'nothingorg', 'secrets', 'patchrelaxes', 'stoopidelectro'];
+
 
 function shuffleInfinityTrackList() {
   return infinityTrackIds

@@ -12,22 +12,18 @@ export function renderVersionTab() {
     </div>
 
     <div class="settings-block">
-      <h3>v0.9.6 — Complete: Onward to the Tunes</h3>
+      <h3>v0.9.9 — Just Small Details Now</h3>
       <p>
-        – 📖 <strong>Story Mode Forest polish</strong>: KC-style 11:16 stage (center/contain BG), typewriter intro with <em>Skip / I’m Ready</em>, clean slide deck (Prev/Next + Enter/←/→/Esc), one-shot “Reveal” blocks, +25 XP per reveal and <strong>+500 XP</strong> on Finish, subtle toast near the pressed button, and a tiny fretboard mini-sim (fraction readout + interval beep)<br>
-        – 🧊 <strong>Bottom bar stability</strong>: Back/Mute pinned inside safe-area; portraits/images and popups no longer push buttons down on small phones<br>
-        – 🔊 <strong>Audio discipline</strong>: one-tap Howler unlock, Prologue track loops, mute UI stays in sync across screens, loop state reset on exit<br>
-        – 🧠 <strong>Math Tips Village — iOS PWA fix</strong>: true full-height after intro (<code>100svh</code> + safe-area), single chat scroller owns overflow (<code>min-height:0</code> grid fix), intro overlay drops <code>pointer-events</code> on fade, <code>touch-action: pan-y</code> restores smooth scroll, bottom bar never overlaps input<br>
-        – 🏷️ <strong>Header cleanup (Tips)</strong>: title is text-only — neon glow, no panel/border<br>
-        – 💬 <strong>Response styling (Tips)</strong>: added <code>.mt-response-card</code>, <code>.mt-response-list</code>, <code>.mt-lecture-card</code>; tidy inline <code>code</code> tokens, softer pop-in animations<br>
-        – 🪪 <strong>About/Info modal — louder & clearer</strong>: removed fullscreen warning; bold credit line (<em>Built end-to-end by JPS Grooves</em>); <strong>JPSGrooves.com</strong> listed first; links stack vertically on mobile; header contrast fixed (no “invisible black” look)<br>
-        – 🧼 <strong>Event wiring & repaint</strong>: single screen-level handlers (click/keydown) with full unwire on exit; background repaint helper to bust stale paints<br>
-        – 🐛 <strong>Misc fixes</strong>: tiny-screen text clamping, safe-area padding, button hitboxes, and minor CSS dedupe across Story/Tips
+        – 📖 <strong>Story Mode Forest</strong>: KC-style 11:16 stage, typewriter intro with <em>Skip / I’m Ready</em>, clean slide deck (Prev/Next + Enter/←/→/Esc), one-shot “Reveal” blocks, +25 XP per reveal and <strong>+500 XP</strong> on Finish, tiny fretboard mini-sim (fraction readout + interval beep)<br>
+        – 🧊 <strong>Bottom bar stability (all modes)</strong>: Back/Mute pinned inside safe-area; portraits, images, and popups no longer push controls on small phones<br>
+        – 🧠 <strong>Math Tips Village</strong>: true full-height iOS PWA fix (<code>100svh</code> + safe-area), single chat scroller owns overflow, smooth scroll restored, bottom bar never overlaps input; refreshed response styling cards<br>
+        – 🪪 <strong>About/Info clarity</strong>: louder credits (<em>Built end-to-end by JPS Grooves</em>), JPSGrooves.com first, stacked links on mobile, fixed header contrast<br>
+        – 🧼 <strong>Event wiring & repaint</strong>: single screen-level handlers with clean unwire on exit; background repaint helper to prevent stale paints<br>
+        – 🏕️ <strong>Kids Camping suite</strong>: layout locks, honk/park flow stable, zoom protections tightened; smoother celebration overlays and score handling<br>
+        – ✅ <strong>Final polishes applied across all modes</strong>: UI consistency, safe-area padding, text clamping, hitboxes, and minor CSS dedupe<br>
+        – 🎵 <strong>Soundtrack update</strong>: all tracks <strong>remastered</strong> for levels, clarity, and loop smoothness (JPS Grooves)
       </p>
-      <p><em>Next up:</em> v0.9.7 — Music/SFX Complete/Polished.</p>
     </div>
-
-
 
     <div class="settings-block">
       <h3>📲 App Info</h3>
@@ -58,13 +54,13 @@ export function renderVersionTab() {
 
       <p>
         <strong>🗑️ Reset Progress:</strong><br>
-        Clears all saved progress and starts fresh.
+        CLEARS ALL SAVED PROGRESS and starts fresh.
       </p>
 
       <input type="file" id="importSave" accept="application/json" style="display:none;" />
       <button class="track-button" id="downloadSave">⬇️ Download Save</button>
       <button class="track-button" id="importSaveBtn">📤 Import Save</button>
-      <button class="track-button" id="resetProgress">🗑️ Reset Progress</button>
+      <button class="track-button" id="resetProgress">☠️ Reset Progress</button>
     </div>
   `;
 }
