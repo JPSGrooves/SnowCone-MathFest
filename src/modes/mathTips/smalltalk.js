@@ -46,7 +46,12 @@ const clean = x => String(x || '').replace(/\s*[.!?,'"]+\s*$/, '');
 
 // Common guards
 const GREETING_ONLY = /^(hi|hey|hello|yo|hiya|sup)[!.?]*$/i;
-const BARE_CONFIRM = /^(yes|yep|yeah|yea|yup|right on|sure|next|ok|okay|k|kk|okie|okie doke)$/i;
+const BARE_CONFIRM = /^(yes|yep|yeah|yea|yup|right on|sure|ok|okay|k|kk|okie|okie doke)$/i;
+// Mood lexicons
+const MOOD_GOODISH = /\b(?:good|great|fine|ok|okay|alright|all\s*right|cool|decent|solid|pretty\s*good|not\s*bad|chill(?:in[g’']?)?|vib(?:ing|ey)|gucci|straight|aight)\b/i;
+const MOOD_TIREDISH = /\b(?:tired|sleepy|exhausted|worn|beat|wiped|drained|burn(?:t|ed)\s*out|fried|spent)\b/i;
+const MOOD_ROUGHISH = /\b(?:horrible|awful|bad|sad|down|terrible|meh|not\s*(?:good|ok(?:ay)?|alright|all\s*right))\b/i;
+
 
 
 
@@ -196,6 +201,119 @@ const JOKE_BANK = [
   "I asked the clock for advice; it said, “Mod 12, and move on.”"
 ];
 
+// ——— session-unique haiku picker (no repeat until exhausted) ———
+const HAIKU_BANK = [
+  ["cocoa steam lifts",
+   "camp lantern hums a circle —",
+   "we count, then just breathe"],
+
+  ["fresh pencil shavings",
+   "spiral like tiny galaxies —",
+   "homework meets starlight"],
+
+  ["string lights over sand",
+   "footsteps find an easy beat —",
+   "numbers walk with us"],
+
+  ["quiet tent zipper",
+   "makes a small chromatic scale —",
+   "night tunes its own math"],
+
+  ["rain taps on canvas",
+   "four beats, then a gentle rest —",
+   "fractions of cozy"],
+
+  ["page corners flutter",
+   "triangles nap in the margin —",
+   "campfire warms the proof"],
+
+  ["mango on shaved ice",
+   "lime whispers, salt says hello —",
+   "summer adds itself"],
+
+  ["stars beyond the pines",
+   "three in a row point us home —",
+   "Orion nods, “yes”"],
+
+  ["badge sash by the fire",
+   "tiny wins stitched side by side —",
+   "bravery in rows"],
+
+  ["morning kettle sings",
+   "steam draws a soft parabola —",
+   "daybreak finds its arc"],
+
+  ["footbridge at the lake",
+   "planks add up to something whole —",
+   "we cross, smiling, one"],
+
+  ["quiet counting breath",
+   "four in, four hold, four out slow —",
+   "lanterns blink in time"],
+
+  ["graph paper moonlight",
+   "pines tally crickets in fours —",
+   "night plots a soft curve"],
+
+  ["cinder pops once",
+   "fractions settle in our cups —",
+   "marshmallows find halves"],
+
+  ["raincoat hood up",
+   "prime drops count the windowpane —",
+   "seven lingers, plink"],
+
+  ["pencil taps the desk",
+   "rhythm matches kettle hiss —",
+   "proof warms like cocoa"],
+
+  ["lake mirrors the sky",
+   "stone skips a geometric beat —",
+   "circles ripple out"],
+
+  ["camp badge thread loose",
+   "tiny knot learns symmetry —",
+   "square turns to bow"],
+
+  ["wind tests each guyline",
+   "triangles hold their secret —",
+   "tents breathe in and stay"],
+
+  ["firefly on watch",
+   "blinks two, three, five, then thirteen —",
+   "we whisper along"],
+
+  ["morning page of sums",
+   "eraser snow drifts to shoe —",
+   "sun lifts the answer"],
+
+  ["comet tail of chalk",
+   "trails across the blackboard night —",
+   "classroom stars appear"],
+
+  ["library hush hums",
+   "digits nap between the stacks —",
+   "dreams count quietly"],
+
+  ["mango melts the ice",
+   "lime brightens the denominator —",
+   "summer tastes like whole"],
+
+];
+
+function nextHaiku(ctx) {
+  if (ctx && !ctx.botContext) ctx.botContext = {};
+  const seen = Array.isArray(ctx.botContext.haikuSeen) ? ctx.botContext.haikuSeen.slice() : [];
+  let pool = [];
+  for (let i = 0; i < HAIKU_BANK.length; i++) if (!seen.includes(i)) pool.push(i);
+  if (!pool.length) { pool = HAIKU_BANK.map((_, i) => i); seen.length = 0; } // reset when exhausted
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  seen.push(pick);
+  ctx.botContext.haikuSeen = seen;
+  return HAIKU_BANK[pick]; // ← returns [line1, line2, line3]
+}
+
+
 function nextJoke(ctx) {
   if (ctx && !ctx.botContext) ctx.botContext = {};
   const seen = Array.isArray(ctx.botContext.jokesSeen) ? ctx.botContext.jokesSeen.slice() : [];
@@ -227,6 +345,13 @@ const REPLIES = {
     lines: ["let’s snag a 10-sec win or a snack idea."],
     hint: `try <code>percent quiz</code> or <code>snowcone recipe</code>.`
   }),
+
+  haikuCard: (lines) => bubble({
+    title: "haiku",
+    lines, // already an array of 3 lines
+    hint: `one more? say <code>more</code>, <code>another haiku</code>, or just <code>next</code>.`
+  }),
+
 
   stressed: () => bubble({
     title: "breather",
@@ -408,7 +533,7 @@ const REPLIES = {
 
   loveNoteKid: () => bubble({
     title: "Message from Dad",
-    lines: ["if your reading this, that means that this app is still here. Pretty cool place right? Also, if you're reading this, that means you can read! Even cooler!", "I want you to know that my life changed for the better when I met you. Everything that I've done since your birth involved you in my mind first. This app was built for you because I want you to be the best you can possibly be and maybe knowing some math early on might've helped. Anyway, I love you, I'll always love you, and if I can't tell you that any more...I FUCKING LOVE YOU SO MUCH OMG YOURE THE BEST AND ARE SO AMAZING AND CAN DO ANYTHING YOU SET YOUR MIND TO AND FUCK EVERYBODY ELSE AND WHAT THEY THINK. DO YOUR THING!!"],
+    lines: ["if your reading this, that means that this app is still here. Pretty cool place right? Also, if you're reading this, that means you can read! Even cooler!", "I want you to know that my life changed for the better when I met you. Everything that I've done since your birth involved you in my mind first. This app was built for you because I want you to be the best you can possibly be and maybe knowing some math early on might've helped. Anyway, I love you, I'll always love you, and if I can't tell you that any more...I F***ING LOVE YOU SO MUCH OMG YOURE THE BEST AND ARE SO AMAZING AND CAN DO ANYTHING YOU SET YOUR MIND TO AND F*** EVERYBODY ELSE AND WHAT THEY THINK. DO YOUR THING!!"],
     hint: `want a story? say <code>lore booth</code>.`
   }),
 
@@ -474,29 +599,32 @@ const REPLIES = {
     hint: `we keep human details private. want app lore? <code>lore booth</code>.`
   }),
 
-    // ——— Dad story: picnic on Saturn’s rings ———
+  // ——— Dad story: picnic on Saturn’s rings (warm & heart-forward) ———
   dadStory: () => bubble({
     title: "dad story",
     lines: [
-        "A dad once rented a tiny tug-ship and took his kids and his fiancée to picnic on the rings of Saturn.",
-        "They coasted beside a house-sized snowball; every ice pebble glittered like rock candy under a slow sun.",
-        "Gravity was shy out there — one gentle push and a sandwich tried to drift forever.",
-        "So they tethered the thermos. Lesson one: momentum doesn’t care about lunch.",
-        "The kids learned space hopscotch: push, tuck, spin — then laugh as the tug reels you back.",
-        "Fiancée sliced comet-cold peaches; the slices traced little ellipses around the lid.",
-        "Dad tapped his wrist drum. “Kepler keeps time,” he said. “Farther out, slower beat.”",
-        "They made snow-angel curves in ring dust and measured the wingspan with the tug’s shadow.",
-        "For dessert, they counted primes between sparkles, whispering 2, 3, 5, 7 like a secret code.",
-        "Before heading home, they puff-wrote their initials with the tiniest thruster bursts.",
-        "The particles braided the letters away — proof that impermanence can still be beautiful.",
-        "Back on the couch, cocoa steaming, they pinned a tiny ring sticker around Saturday on the calendar.",
-        "And every time the kettle whistled, it sounded just a little bit like Saturn."
+        "A dad rented a tiny tug-ship and took his kids and his fiancée to picnic on the rings of Saturn.",
+        "They floated where the sunlight felt slow and soft; the ice dust looked like spilled sugar.",
+        "A snowball drifted by and left glitter in the air. Everyone laughed and waved at it like a shy neighbor.",
+        "They clipped into the same strap, the way they hold hands at the crosswalk back home.",
+        "A blanket with little magnets hugged the deck. Snacks had their own tiny clips, too.",
+        "“Nothing important floats away if we’re holding on to each other,” Dad said.",
+        "Peach slices tried to wander; fiancée caught them with a giggle and a cup.",
+        "They took turns giving the gentlest kicks and felt the world answer with a hush and a glide.",
+        "One by one, they shared a good thing from the week and a hope for next week.",
+        "The kids drew smiley faces in the frost and tapped the ice like a hello on a window.",
+        "Dad listened to everyone’s whispers and said, “This is what happy sounds like.”",
+        "Before heading home, they flashed a picture toward the tiny blue dot where Grandma P lives.",
+        "Back on the couch, cocoa steaming, they pressed a little ring sticker onto Saturday.",
+        "After that, the kettle’s whistle always sounded like a tiny spaceship saying, “I’m here.”",
+        "On wobbly nights, they gripped a corner of the magnet blanket and remembered: together, we don’t drift."
     ],
     hint: `more tales? say <code>lore booth</code>.`
   }),
 
 
-    // ——— Story Time: the fraction bridge at Infinity Lake ———
+
+  // ——— Story Time: the fraction bridge at Infinity Lake ———
   storyTime: () => bubble({
     title: "story time",
     lines: [
@@ -553,17 +681,6 @@ const REPLIES = {
     hint: `wanna sort creatures by legs? say <code>quiz equations</code>.`
   }),
 
-  musicTaste: () =>
-    bubble({
-      title: "Snow Cone Sunday — Music",
-      lines: [
-        "Need a soundtrack for neon math? Meet <strong>Snow Cone Sunday</strong> — my band.",
-        "It’s festival-chill with surprise drum fills, synth shimmer, and cone-melting hooks.",
-        "Spin it now: <a href=\"https://open.spotify.com/artist/4jWpu8EXcWN06Rt44pQQ78\" target=\"_blank\" rel=\"noopener\">Spotify</a> · <a href=\"https://music.apple.com/us/search?term=Snow%20Cone%20Sunday\" target=\"_blank\" rel=\"noopener\">Apple Music</a>.",
-        "If you vibe with it, add a track to your playlists and share with the squad 🔊🍧"
-      ],
-      hint: "Pro tip: Search ‘Snow Cone Sunday’ in Spotify/Apple if links don’t pop."
-    }),
 
 
 thinksOf: (topic) => bubble({
@@ -677,7 +794,7 @@ thinksOf: (topic) => bubble({
   }),
   musicLike: (band) => bubble({
     title: 'nice taste',
-    lines: [`${escapeHTML(band)}? i’ll ask the Infintiy Triplets to play that at Infinity Lake.`, "ever done math to that groove?"],
+    lines: [`${escapeHTML(band)}? i’ll ask the Infinity Triplets to play that at Infinity Lake.`, "ever done math to that groove?"],
     hint: `we can riff with <code>percent quiz</code> or <code>lore booth</code>.`
   }),
   musicDislike: (band) => bubble({
@@ -809,6 +926,7 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   const inLore   = mode === 'lore';     // ← add this
   const hasPendingBooth = !!(ctx?.appState?.router?.pendingBooth);
   const jokesActive = getLastSTopic(ctx) === 'jokes';
+  const haikuActive = getLastSTopic(ctx) === 'haiku';
   if (ctx && !ctx.botContext) ctx.botContext = {}; // ✅ ensure memory
   const raw = String(utterance || '').trim();
   const u = norm(utterance);
@@ -822,11 +940,32 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   // allow confirms to advance jokes only when smalltalk is active,
   // there is no booth handoff pending, and we're not in lore
   if (BARE_CONFIRM.test(u)) {
-    if (!hasPendingBooth && mode === 'smalltalk' && !inLore && jokesActive) {
-      return reply(REPLIES.jokeCard(nextJoke(ctx)));
+    if (!hasPendingBooth && mode === 'smalltalk' && !inLore) {
+      if (haikuActive)  return reply(REPLIES.haikuCard(nextHaiku(ctx)));
+      if (jokesActive)  return reply(REPLIES.jokeCard(nextJoke(ctx)));
     }
-    return null; // let the router/booth handle the confirm
+    return null; // let router/booth handle confirms otherwise
   }
+
+  // Always advance the active smalltalk thread on “more/again/next”
+  {
+    const CONT = /\b(more|another|again|one more|next)\b/i;
+    if (CONT.test(u)) {
+      const t = getLastSTopic(ctx);
+      if (t === 'haiku')  return reply(REPLIES.haikuCard(nextHaiku(ctx)));
+      if (t === 'jokes')  return reply(REPLIES.jokeCard(nextJoke(ctx)));
+    }
+  }
+
+
+  if (like(u, [
+    'haiku','know any haiku','write a haiku','do a haiku','give me a haiku','haiku please','a haiku'
+  ])) {
+    setLastSTopic(ctx, 'haiku');
+    return reply(REPLIES.haikuCard(nextHaiku(ctx)));
+  }
+
+
 
 
   // quick nav
@@ -917,21 +1056,37 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   // ——— follow-ups for last smalltalk topic ———
   {
     const topic = getLastSTopic(ctx);
-    // Mood branch
+
     if (topic === 'mood') {
-      if (/\b(i\s*am|i['’]m|im)\s*(good|great|fine|ok|okay|chill)\b/i.test(u)) {
-        clearLastSTopic(ctx); return reply(REPLIES.moodGood());
+      // Normalize quick one-word vibes like "chillin", "alright", "cool"
+      const bareGoodish = /^\s*(?:not\s*bad|pretty\s*good|all\s* ?right|alright|good|great|fine|ok(?:ay)?|cool|decent|solid|chill(?:in[g’']?)?|vib(?:ing|ey)|gucci|straight|aight)[.!]*\s*$/i.test(u);
+
+      // Prioritize rough → tired → good to avoid "not good" being misread as good
+      if (MOOD_ROUGHISH.test(u)) {
+        clearLastSTopic(ctx);
+        return reply(REPLIES.moodRough());
       }
-      if (/\b(i\s*am|i['’]m|im)\s*(tired|sleepy|exhausted|worn)\b/i.test(u)) {
-        clearLastSTopic(ctx); return reply(REPLIES.moodTired());
+
+      if (MOOD_TIREDISH.test(u) || /\b(i\s*(?:am|['’]m)|im|feeling)\b.*\b(?:tired|sleepy)\b/i.test(u)) {
+        clearLastSTopic(ctx);
+        return reply(REPLIES.moodTired());
       }
-      if (/\b(i\s*am|i['’]m|im)\s*(horrible|awful|bad|sad|down|terrible)\b/i.test(u)) {
-        clearLastSTopic(ctx); return reply(REPLIES.moodRough());
+
+      if (
+        bareGoodish ||
+        (/\b(i\s*(?:am|['’]m)|im|doing|feeling)\b/i.test(u) && MOOD_GOODISH.test(u))
+      ) {
+        clearLastSTopic(ctx);
+        return reply(REPLIES.moodGood());
       }
-      if (/^\s*i(?:\s*am|['’]m|m|m\s+just|m\s+kind\s+of|m\s+kinda|m\s+sorta|m|im)\s+[^]+$/.test(u)) {
-        clearLastSTopic(ctx); return reply(REPLIES.reassure());
+
+      // Generic “i’m …” fallback stays last
+      if (/^\s*i(?:\s*am|['’]m|m|m\s+just|m\s+kind\s+of|m\s+kinda|m\s+sorta|im)\s+[^]+$/.test(u)) {
+        clearLastSTopic(ctx);
+        return reply(REPLIES.reassure());
       }
     }
+
 
     // Music branch
     if (topic === 'music') {
@@ -1201,9 +1356,7 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
     return reply(REPLIES.jokeCard(nextJoke(ctx)));
   }
   // jokes follow-up: block inside lore so "more" continues lore
-  if (!hasPendingBooth
-      && mode === 'smalltalk'
-      && !inLore
+  if (!inLore
       && jokesActive
       && /\b(more|another|again|one more|more jokes|another one|next)\b/i.test(u)) {
 
@@ -1213,6 +1366,13 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
   if (like(u, ['explain that joke','explain the joke','i dont get it','i don’t get it','why is that funny','what does that mean'])) {
     return reply(REPLIES.jokeExplain());
   }
+
+  if (!inLore
+      && haikuActive
+      && /\b(more|another|again|one more|next|more haiku|another haiku)\b/i.test(u)) {
+    return reply(REPLIES.haikuCard(nextHaiku(ctx)));
+  }
+
 
     // ——— more booth typos & aliases
   // status booth
@@ -1229,7 +1389,7 @@ export function maybeHandleSmallTalk(utterance, ctx = {}) {
 
   // calculator typos (more variants)
   if (like(u, [
-    'caluclator','calcultor','calcualtor','caulculator','calculater','calculater',
+    'caluclator','calcultor','calcualtor','caulculator','calculater',
     'calclator','caculator'
   ])) {
     return withAction(

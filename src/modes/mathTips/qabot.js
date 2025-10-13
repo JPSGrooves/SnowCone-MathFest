@@ -360,21 +360,33 @@ function shouldBypassLayer(intentTag) {
 
 // Intent scoring
 function scoreIntent(input) {
-  const lower = input.toLowerCase();
-  if (input.trim().length <= 3 && !/^\d+$/.test(input.trim())) {
+  const lower = String(input || '').toLowerCase();
+  const trimmed = String(input || '').trim();
+
+  // ✅ Handle short greetings *before* the short-input guard
+  if (
+    /^(hi|hey|yo|sup)\b/i.test(trimmed) ||         // “hi”, “hey”, “yo”, “sup”
+    /\bwhat['’]?s\s*up\b/i.test(lower)             // “what's up”, “whats up”
+  ) {
+    return { guess: 'greet', score: 0.95 };
+  }
+
+  // (keep the short-input guard, but only after greeting check)
+  if (trimmed.length <= 3 && !/^\d+$/.test(trimmed)) {
     return { guess: 'unknown', score: 0.0 };
   }
-  if (/^\/?(help|commands|stats|tip|clear|reset)\b/.test(lower)) return { guess: 'command', score: 0.99, arg: lower.match(/^\/?(\w+)/)?.[1] };
+
+  // — existing logic below unchanged —
+  if (/^\/?(help|commands|stats|tip|clear|reset)\b/.test(lower)) {
+    return { guess: 'command', score: 0.99, arg: lower.match(/^\/?(\w+)/)?.[1] };
+  }
   if (tryPercentOf(lower)) return { guess: 'percent', score: 0.95 };
   if (SAFE_EXPR.test(lower)) return { guess: 'calc', score: 0.9 };
   if (matcher(lower, 'who_are_you') || /\bwhat['’]?s\s*your\s*name\b/i.test(lower)) return { guess: 'who', score: 0.8 };
   if (matcher(lower, 'greetings') || /\b(yo|hey|hi|what['’]?s\s*up|nm\s*man)\b/i.test(lower)) return { guess: 'greet', score: 0.75 };
   if (/\bhow\s*are\s*you\b/i.test(lower)) return { guess: 'how_are_you', score: 0.75 };
   if (/\bmath\b/.test(lower)) return { guess: 'math_general', score: 0.75 };
-  // explicit quiz requests only
   if (/\b(fractions?|percent|equations?)\s+quiz\b/i.test(lower)) return { guess: 'quiz_explicit', score: 0.9 };
-
-  // topic words mean lessons, not quiz
   if (/\bfractions?\b/.test(lower)) return { guess: 'lessons_fractions', score: 0.7 };
   if (/\bpercent\b/.test(lower))   return { guess: 'lessons_percent',   score: 0.7 };
   if (matcher(lower, 'jokes')) return { guess: 'joke', score: 0.7 };
@@ -382,6 +394,7 @@ function scoreIntent(input) {
   if (matcher(lower, 'lore_cones') || matcher(lower, 'lore_snowcone') || matcher(lower, 'lore_festival')) return { guess: 'lore', score: 0.6 };
   return { guess: 'unknown', score: 0.2 };
 }
+
 
 // Soft off-topic hinting
 const SOFT_MODE_HINTS = {

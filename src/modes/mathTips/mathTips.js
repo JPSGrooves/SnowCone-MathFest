@@ -1,5 +1,4 @@
 // /src/modes/mathTips/mathTips.js
-
 import './mathTips.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
@@ -9,14 +8,12 @@ import { getResponse } from './qabot.js';
 import { awardBadge } from '../../managers/badgeManager.js';
 import { runInAction } from 'mobx';
 
-// 🎵 bring in the same music hooks as Story Mode
+// 🎵 music hooks — no loop forcing here
 import {
   playTrack,
   stopTrack,
   toggleMute,
   isMuted,
-  toggleLoop,
-  getLooping,
   currentTrackId,
   isPlaying,
 } from '../../managers/musicManager.js';
@@ -30,6 +27,7 @@ let copyBtn, exportBtn;
 let detachAutoScroll; // cleanup handle returned by attachAutoScroller()
 
 let __mtMusicStarted = false; // prevents double-starts across re-renders
+let _mtOwnsMusic = false; // ← NEW: track if MathTips started playback
 
 
 const MT = {
@@ -150,12 +148,17 @@ export function stopMathTips() {
   unwireGlobalClick();
   try { detachAutoScroll?.(); detachAutoScroll = null; } catch {}
 
-
   // 🎵 stop only if we’re actually in this mode’s track
   try {
     if (currentTrackId() === 'kittyPaws') stopTrack();
-    if (getLooping()) toggleLoop(); // reset loop to normal app behavior
   } catch {}
+
+  // 🎵 stop only if MathTips started this session’s music
+  try {
+    if (_mtOwnsMusic) stopTrack();
+  } catch {}
+  _mtOwnsMusic = false;
+
 
   __mtMusicStarted = false;
 
@@ -167,6 +170,7 @@ export function stopMathTips() {
   }
   console.log('🧠 Math Tips Mode cleaned up!');
 }
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Intro Screen
@@ -297,7 +301,6 @@ function renderMainUI() {
   // ensure center-stack isn't inheriting pointer-events:none from the bar
   document.querySelector('.mt-center-stack')?.style.setProperty('pointer-events', 'auto');
 
-
   // cache
   inputEl   = document.getElementById('userInput');
   outputEl  = document.getElementById('chatOutput');
@@ -305,22 +308,29 @@ function renderMainUI() {
   copyBtn   = document.getElementById('copyTranscript');
   exportBtn = document.getElementById('exportChatJson');
 
-  // 🔽 enable respectful auto-scroll (pinned to bottom until user scrolls up)
+  // 🔽 respectful auto-scroll
   try { detachAutoScroll = attachAutoScroller('chatOutput'); } catch {}
 
-
-  // 🎵 ensure MathTips soundtrack is running for this session
+  // 🎵 Start MathTips with kittyPaws, then let global Jukebox rules run (no loop forcing)
   try {
-    const needStart = (typeof currentTrackId === 'function' && currentTrackId() !== 'kittyPaws')
-                  || (typeof isPlaying === 'function' && !isPlaying());
-    if (needStart) playTrackUnlocked('kittyPaws');
-    if (!getLooping()) toggleLoop();
-    __mtMusicStarted = true; // optional, harmless now
+    const needStart =
+      (typeof currentTrackId === 'function' && currentTrackId() !== 'kittyPaws') ||
+      (typeof isPlaying === 'function' && !isPlaying());
+
+    if (needStart) {
+      playTrackUnlocked('kittyPaws');
+      _mtOwnsMusic = true;   // ← MathTips owns this playback session
+    } else {
+      _mtOwnsMusic = false;  // already playing and not started by us
+    }
+
+    __mtMusicStarted = true;
   } catch {}
 
 
   startChat();
 }
+
 
 function wireMainHandlers() {
   MT.handlers.sendClick = () => handleSend();
