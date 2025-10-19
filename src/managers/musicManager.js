@@ -22,6 +22,7 @@ const tracks = [
   { id: 'prologue',   name: 'Story Prologue',       file: 'prologueTrack.mp3' },
   { id: 'kittyPaws',  name: 'Kitty Paws',           file: 'kittyPaws.mp3' },
   { id: 'patchrelaxes', name: 'Patch Relaxes',      file: 'patchRelaxes.mp3' },
+  { id: 'bonusTime',  name: 'Bonus Time',           file: 'bonusTime.mp3' },
 ];
 
 // ...rest of file unchanged...

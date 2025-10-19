@@ -1,10 +1,13 @@
+// storyMode.js — CLEAN RESET (Prologue-only)
+
+// Styles & managers
 import './storyMode.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
-// top of storyMode.js imports:
-// storyMode.js (top)
+
+// Music
 import {
   playTrack,
   stopTrack,
@@ -15,20 +18,37 @@ import {
   currentTrackId,
   isPlaying,
 } from '../../managers/musicManager.js';
-// managers/sfxManager.js
+
+// SFX / badges
 import { Howl } from 'howler';
 import { awardBadge } from '../../managers/badgeManager.js';
 
+import { Chapter1 } from './chapters/ch1.js';
+import { Chapter2 } from './chapters/ch2.js';
+import { ItemIds } from '../../data/storySchema.js';
+import { ChapterEngine } from './chapterEngine.js';
+const Chapters = {
+  [Chapter1.id]: Chapter1,
+  [Chapter2.id]: Chapter2,
+};
 
+let chapterEngine;
+function getEngine() {
+  if (!chapterEngine) chapterEngine = new ChapterEngine(Chapters);
+  return chapterEngine;
+}
 
-
-
+// ────────────────────────────────────────────────────────────────────────────────
+// Locals
+// ────────────────────────────────────────────────────────────────────────────────
 const SELECTORS = {
   container: '#game-container',
   menuWrapper: '.menu-wrapper',
 };
 
-let elRoot = null;  // .sm-aspect-wrap in current screen
+const STORY_TRACKS = ['prologue', 'bonusTime'];
+
+let elRoot = null;
 let keyHandler = null;
 let clickHandler = null;
 let smAudioUnlockOnce = null;
@@ -37,23 +57,15 @@ let __smAudioCtx = null;
 let __lastInterval = '';
 let __lastPlayTs = 0;
 
-
 // Assets
 const BASE = import.meta.env.BASE_URL;
 const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
 const DIRECTOR_SRC = `${BASE}assets/img/characters/storyMode/jehnk.png`;
+const PRO_IMG = (name) => `${BASE}assets/img/characters/storyMode/${name}`;
 
-
-// ---- Prologue assets (adjust if your paths differ) ----
-const SFX_PATHS = {
-  p25: `${BASE}assets/audio/QuikServe points25.mp3`,
-  p100: `${BASE}assets/audio/QuikServe points100.mp3`,
-};
-// Put this where PRO_IMG is defined
-const PRO_IMG = (name) => `${import.meta.env.BASE_URL}assets/img/characters/storyMode/${name}`;
-
-
-// ---- Prologue pages: text / image(+caption) / practice(reveal items) ----
+// ────────────────────────────────────────────────────────────────────────────────
+// Prologue pages (text/image/practice)
+// ────────────────────────────────────────────────────────────────────────────────
 const PROLOGUE_PAGES = [
   // Page 1 — Why Math? Why Now?
 {
@@ -443,9 +455,23 @@ const PROLOGUE_PAGES = [
   // Page 21 — Final image
   { type: 'image', src: PRO_IMG('finalsnowconepicture.png'), caption: "Galileo and Newton are ready for a SnowCone!" },
 ];
+// Typewriter text
+const PROLOGUE_SCRIPT = `
+Why math? Why now?
 
+Because every great festival runs on patterns—lights, lines, loops—and SnowCone MathFest is no different.
+The syrups swirl like spirals, the queues tick like clocks, and the ghosts of good ideas only show up
+when you invite them with structure.
 
-// Typing helper
+So we start small. We notice. We name. We nudge.
+We learn to look twice, then a third time, until the pattern looks back.
+
+Ready to try it the SnowCone way?
+`;
+
+// ────────────────────────────────────────────────────────────────────────────────
+// Utilities
+// ────────────────────────────────────────────────────────────────────────────────
 function typeInto(node, text, { cps = 35, onDone } = {}) {
   node.textContent = '';
   let i = 0;
@@ -467,7 +493,6 @@ function typeInto(node, text, { cps = 35, onDone } = {}) {
   };
   tick();
 
-  // Return a cancel/finish fast function
   return () => {
     cancelled = true;
     node.textContent = text;
@@ -475,31 +500,6 @@ function typeInto(node, text, { cps = 35, onDone } = {}) {
     onDone?.();
   };
 }
-
-// Prologue text (typewriter “Why math? Why now?” — fill with full script)
-const PROLOGUE_SCRIPT = `
-Why math? Why now?
-
-Because every great festival runs on patterns—lights, lines, loops—and SnowCone MathFest is no different.
-The syrups swirl like spirals, the queues tick like clocks, and the ghosts of good ideas only show up
-when you invite them with structure.
-
-So we start small. We notice. We name. We nudge.
-We learn to look twice, then a third time, until the pattern looks back.
-
-Ready to try it the SnowCone way?
-`;
-
-// Prologue slides (word → picture → reveal-practice)
-const PROLOGUE_SLIDES = [
-  { kind: 'text', text: 'A story is just a pattern that knows where it’s going. So is a solution.' },
-  { kind: 'image', src: `${BASE}assets/img/modes/storymodeForest/storyBG.png`, alt: 'Forest motif' },
-  {
-    kind: 'reveal',
-    prompt: 'Spot the pattern in this mini line-up. Tap “Reveal” when you think you see it.',
-    answer: 'Every third cone is mint. Patterns = predictions.'
-  },
-];
 
 function resetContainerStyles() {
   const c = document.querySelector(SELECTORS.container);
@@ -531,8 +531,9 @@ function loadStoryMode() {
   wireHandlersForCurrentRoot();
   document.querySelectorAll('.sm-aspect-wrap, .sm-game-frame, .sm-intro').forEach(preventDoubleTapZoom);
 
-  // 🔓 Make sure Howler is unlockable on first tap
-  wireSMAudioUnlockOnce();
+  wireSMAudioUnlockOnce(); // ensure Howler can resume on first tap
+  // when story mode loads
+  window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
 }
 
 export function stopStoryMode() {
@@ -541,7 +542,6 @@ export function stopStoryMode() {
 
   try { stopTrack(); } catch {}
 
-  // reset loop so other modes behave normally
   try { if (getLooping()) toggleLoop(); } catch {}
 
   const container = document.querySelector(SELECTORS.container);
@@ -550,15 +550,13 @@ export function stopStoryMode() {
     container.style.display = 'none';
   }
   applyBackgroundTheme();
+  window.removeEventListener('sm:backToChapterMenu', backToChapterMenu);
 }
-
 
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Screens
 // ────────────────────────────────────────────────────────────────────────────────
-// storyMode.js — RENDER INTRO (clean, KC-like)
-// storyMode.js — renderIntroScreen (drop-in)
 function renderIntroScreen() {
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
@@ -588,11 +586,9 @@ function renderIntroScreen() {
 
             <div class="sm-intro-buttons">
               <button id="smHearStory" class="sm-btn sm-btn-primary">🍧 Hear the Story</button>
-              <!-- ⛔ removed the secondary Back button here -->
             </div>
           </div>
 
-          <!-- ✅ QS-style bottom bar: only Back on intro -->
           <div class="sm-bottom-bar">
             <button id="smBackToMenu" class="sm-square-btn sm-left">🔙</button>
           </div>
@@ -602,13 +598,12 @@ function renderIntroScreen() {
   `;
 
   elRoot = container.querySelector('.sm-aspect-wrap');
-
   repaintBackground();
 
-  // existing helpers
   wireHandlersForCurrentRoot();
   document.querySelectorAll('.sm-aspect-wrap, .sm-game-frame, .sm-intro').forEach(preventDoubleTapZoom);
 }
+
 
 
 
@@ -616,7 +611,9 @@ function renderChapterMenu() {
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
 
-  container.querySelector('.sm-game-frame')?.classList.add('sm-is-intro');
+  const unlockedCh2 =
+    !!(window.devFlags?.unlockAllChapters || appState.hasItem?.(ItemIds.MASTER_SIGIL));
+
 
   container.innerHTML = `
     <div class="sm-aspect-wrap">
@@ -628,25 +625,25 @@ function renderChapterMenu() {
 
           <div class="sm-chapter-list">
             <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue</button>
-
-            <button class="sm-btn sm-btn-secondary is-disabled" id="smCh1" disabled>
-              Chapter 1 — FREE on Day One!
+            <button class="sm-btn sm-btn-primary" id="smCh1">
+              Chapter 1 — The Gate
             </button>
-
-            <button class="sm-btn sm-btn-secondary is-disabled" id="smCh2" disabled>
-              🔒 Chapter 2 — Paid Content
+            <button
+               class="sm-btn ${unlockedCh2 ? 'sm-btn-primary' : 'sm-btn-secondary'}"
+               id="smCh2"
+               ${unlockedCh2 ? '' : 'disabled title="Find the Master Sigil in Chapter 1 to unlock"'}
+             >
+               Chapter 2 — Shift: Four Customers
             </button>
-
-            <button class="sm-btn sm-btn-secondary is-disabled" id="smCh3" disabled>
-              🔒 Chapter 3 — Paid Content
-            </button>
+            <button class="sm-btn sm-btn-secondary" id="smCh3" disabled title="Coming soon">Chapter 3 — The Acts (soon)</button>
+            <button class="sm-btn sm-btn-secondary" id="smCh4" disabled title="Coming soon">Chapter 4 — Into the Forest (soon)</button>
+            <button class="sm-btn sm-btn-secondary" id="smCh5" disabled title="Coming soon">Chapter 5 — Endings (soon)</button>
           </div>
 
           <div class="sm-chapter-note">
-            Pick Prologue to begin! <br> Chapter 1 will release 1/1/26, and the rest will come if people keep returning to SnowCone MathFest!
+            Pick Prologue to begin! <br> Future chapters will unlock later.
           </div>
 
-          <!-- Bottom utility bar: left=Back, right=Mute (last chance) -->
           <div class="sm-bottom-bar">
             <button id="smBackToMenu" class="sm-square-btn sm-left">🔙</button>
             <button id="smMute" class="sm-square-btn sm-right ${isMuted() ? 'muted' : ''}">
@@ -661,22 +658,20 @@ function renderChapterMenu() {
   elRoot = container.querySelector('.sm-aspect-wrap');
   repaintBackground();
 
-  // ✅ Start prologue music only if not already playing
-  if (!(isPlaying() && currentTrackId() === 'prologue')) {
-    playTrackUnlocked('prologue');
-    if (!getLooping()) toggleLoop(); // loop Prologue
+  // Start Story music: random, no immediate repeat, on first real tap path
+ // Start Story music only if nothing is playing yet (first real tap path)
+  if (!isPlaying?.()) {
+    kickStoryMusic({ forceNew: true });
   }
 
-  // ✅ Let the global handler own all clicks/keys
+
+
   wireHandlersForCurrentRoot();
 }
-
 
 function renderPrologueReader() {
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
-
-  container.querySelector('.sm-game-frame')?.classList.add('sm-is-intro');
 
   container.innerHTML = `
     <div class="sm-aspect-wrap">
@@ -691,6 +686,12 @@ function renderPrologueReader() {
             <button id="smSkipType" class="sm-btn sm-btn-secondary">⏩ Skip</button>
             <button id="smReady" class="sm-btn sm-btn-primary" style="display:none">I’m Ready 🎵</button>
           </div>
+          <div class="sm-bottom-bar">
+            <button id="smBackToMenu" class="sm-square-btn sm-left">🔙</button>
+            <button id="smMute" class="sm-square-btn sm-right ${isMuted() ? 'muted' : ''}">
+              ${isMuted() ? '🔇' : '🔊'}
+            </button>
+          </div>
         </section>
       </div>
     </div>
@@ -699,56 +700,24 @@ function renderPrologueReader() {
   elRoot = container.querySelector('.sm-aspect-wrap');
   repaintBackground();
 
-
-  // ⌨️ Typewriter effect
   const node = elRoot.querySelector('#smTypeNode');
   const doneFast = typeInto(node, PROLOGUE_SCRIPT.trim(), {
     cps: 30,
     onDone: () => {
-      const ready = elRoot.querySelector('#smReady');
-      const skip  = elRoot.querySelector('#smSkipType');
-      if (skip)  skip.style.display  = 'none';
-      if (ready) ready.style.display = '';
+      elRoot.querySelector('#smSkipType')?.classList.add('hidden');
+      elRoot.querySelector('#smReady')?.style.removeProperty('display');
     }
   });
 
-  // Make Skip button callable from global handler
   elRoot.__smDoneFast = doneFast;
-
-  // 🌍 Single handler wiring
   wireHandlersForCurrentRoot();
 }
 
-
-
 let slideIndex = 0;
+
 function renderPrologueSlides() {
   slideIndex = 0;
   drawSlide();
-}
-
-function wireSMAudioUnlockOnce() {
-  if (smAudioUnlockOnce) return;
-  smAudioUnlockOnce = () => {
-    try {
-      const H = window.Howler ?? globalThis.Howler;
-      if (H?.ctx && H.ctx.state === 'suspended') {
-        H.ctx.resume().then(() => console.log('🔓 [SM] Howler AudioContext unlocked'));
-      }
-    } catch {}
-    document.body.removeEventListener('touchstart', smAudioUnlockOnce);
-    document.body.removeEventListener('click', smAudioUnlockOnce);
-    smAudioUnlockOnce = null;
-  };
-  document.body.addEventListener('touchstart', smAudioUnlockOnce, { once: true });
-  document.body.addEventListener('click', smAudioUnlockOnce, { once: true });
-}
-
-function unwireSMAudioUnlock() {
-  if (!smAudioUnlockOnce) return;
-  document.body.removeEventListener('touchstart', smAudioUnlockOnce);
-  document.body.removeEventListener('click', smAudioUnlockOnce);
-  smAudioUnlockOnce = null;
 }
 
 function drawSlide() {
@@ -758,7 +727,6 @@ function drawSlide() {
   const page = PROLOGUE_PAGES[slideIndex];
   if (!page) { backToChapterMenu(); return; }
 
-  // --- build slide inner ------------------------------------------------------
   let inner = '';
   if (page.type === 'html') {
     inner = `<div class="sm-slide sm-fade-in">${page.html}</div>`;
@@ -804,7 +772,6 @@ function drawSlide() {
     inner = `<div class="sm-slide sm-fade-in"></div>`;
   }
 
-  // --- frame markup -----------------------------------------------------------
   container.innerHTML = `
     <div class="sm-aspect-wrap">
       <div class="sm-game-frame sm-is-intro">
@@ -833,9 +800,7 @@ function drawSlide() {
 
   elRoot = container.querySelector('.sm-aspect-wrap');
 
-  // --- practice wiring (reveal SFX + XP + popup + fretboard) ------------------
   if (page.type === 'practice') {
-    // per-item reveal
     elRoot.querySelectorAll('.js-reveal').forEach(btn => {
       btn.addEventListener('click', () => {
         const i = +btn.dataset.i;
@@ -843,19 +808,15 @@ function drawSlide() {
         if (ans && !ans.classList.contains('is-open')) {
           ans.classList.add('is-open');
 
-          // SFX
           const item = PROLOGUE_PAGES[slideIndex].items[i];
           if (item?.sfx) playSFX(item.sfx);
 
-          // XP + popup
           awardXP(25, { anchor: btn, reason: 'practice reveal' });
-
         }
         btn.setAttribute('disabled', 'true');
       }, { once: true });
     });
 
-    // optional interactive fretboard
     if (page.interactive) {
       const L = page.interactive.length || 60;
       const fret = elRoot.querySelector('#smFret');
@@ -900,21 +861,18 @@ function drawSlide() {
     }
   }
 
-  // --- final slide: +500 XP on Finish before navigation -----------------------
+  // Final slide: +500 XP + badge
   const nextBtn = elRoot.querySelector('#smNext');
   if (nextBtn && slideIndex === PROLOGUE_PAGES.length - 1) {
-    // capture so it fires before global Next handler re-renders
     nextBtn.addEventListener('click', () => {
       awardXP(500, { anchor: nextBtn, reason: 'prologue complete' });
       awardBadge('story_prologue');
+      onPrologueCompleteOnce();
     }, { once: true, capture: true });
   }
 
-  // --- global handlers (as before) --------------------------------------------
   wireHandlersForCurrentRoot();
 }
-
-
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Wiring
@@ -923,10 +881,8 @@ function wireHandlersForCurrentRoot() {
   unwireHandlers();
 
   clickHandler = (e) => {
-    if (e.target.closest('#smBackToMenu')) {
-      backToMainMenu();
-      return;
-    }
+    // Global UI
+    if (e.target.closest('#smBackToMenu')) { backToMainMenu(); return; }
     if (e.target.closest('#smMute')) {
       const muted = toggleMute();
       const btn = elRoot.querySelector('#smMute');
@@ -936,90 +892,46 @@ function wireHandlersForCurrentRoot() {
       }
       return;
     }
-    if (e.target.closest('#smHearStory')) {
-      renderChapterMenu();
-      wireHandlersForCurrentRoot();
+
+    // Intro + Chapter menu
+    if (e.target.closest('#smHearStory')) { renderChapterMenu(); return; }
+    if (e.target.closest('#smPrologue')) { renderPrologueReader(); return; }
+    if (e.target.closest('#smCh1')) {
+      getEngine().start('ch1');
       return;
     }
-    if (e.target.closest('#smPrologue')) {
-      renderPrologueReader();
-      return;
-    }
-    // 🆕 Prologue typing screen
-    if (e.target.closest('#smSkipType')) {
-      elRoot?.__smDoneFast?.();
-      return;
-    }
-    if (e.target.closest('#smReady')) {
-      renderPrologueSlides();
-      return;
-    }
-    // Slides
-    if (e.target.closest('#smNext')) {
-      slideIndex++;
-      drawSlide();
-      return;
-    }
-    if (e.target.closest('#smPrev')) {
-      slideIndex = Math.max(0, slideIndex - 1);
-      drawSlide();
-      return;
-    }
+
+
+    // Prologue: typing/slides
+    if (e.target.closest('#smSkipType')) { elRoot?.__smDoneFast?.(); return; }
+    if (e.target.closest('#smReady')) { renderPrologueSlides(); return; }
+    if (e.target.closest('#smNext')) { slideIndex++; drawSlide(); return; }
+    if (e.target.closest('#smPrev')) { slideIndex = Math.max(0, slideIndex - 1); drawSlide(); return; }
   };
 
   keyHandler = (e) => {
-    if (e.key === 'Escape') {
-      backToMainMenu();
-      e.preventDefault();
-      return;
-    }
+    if (e.key === 'Escape') { backToChapterMenu(); e.preventDefault(); return; }
 
-    // 🆕 Handle Enter across contexts
     if (e.key === 'Enter') {
-      // 1) Typing screen: prefer Ready if visible, else Skip
       const ready = elRoot?.querySelector('#smReady');
-      const skip  = elRoot?.querySelector('#smSkipType');
-      if (ready && ready.style.display !== 'none') {
-        ready.click();
-        e.preventDefault();
-        return;
-      }
-      if (skip) {
-        skip.click();
-        e.preventDefault();
-        return;
-      }
-      // 2) Slides: Next
-      const next = elRoot?.querySelector('#smNext');
-      if (next) {
-        next.click();
-        e.preventDefault();
-        return;
-      }
-      // 3) Intro / Chapter menu fallback
-      const pro = elRoot?.querySelector('#smPrologue') || elRoot?.querySelector('#smHearStory');
-      if (pro) {
-        pro.click();
-        e.preventDefault();
-        return;
-      }
+      const skip = elRoot?.querySelector('#smSkipType');
+      if (ready && ready.style.display !== 'none') { ready.click(); e.preventDefault(); return; }
+      if (skip && !skip.classList.contains('hidden')) { skip.click(); e.preventDefault(); return; }
+
+      const pro = elRoot?.querySelector('#smNext') || elRoot?.querySelector('#smPrologue') || elRoot?.querySelector('#smHearStory');
+      if (pro) { pro.click(); e.preventDefault(); return; }
     }
 
     if (e.key === 'ArrowRight') {
       const next = elRoot?.querySelector('#smNext') || elRoot?.querySelector('#smPrologue');
-      next?.click();
-      e.preventDefault();
-    } else if (e.key === 'ArrowLeft') {
-      const prev = elRoot?.querySelector('#smPrev');
-      prev?.click();
-      e.preventDefault();
+      next?.click(); e.preventDefault(); return;
     }
+    if (e.key === 'ArrowLeft') { elRoot?.querySelector('#smPrev')?.click(); e.preventDefault(); return; }
   };
 
   elRoot?.addEventListener('click', clickHandler);
   window.addEventListener('keydown', keyHandler);
 }
-
 
 function unwireHandlers() {
   if (elRoot && clickHandler) elRoot.removeEventListener('click', clickHandler);
@@ -1041,7 +953,6 @@ function backToChapterMenu() {
   wireHandlersForCurrentRoot();
 }
 
-// Force BG repaint if needed
 function repaintBackground() {
   requestAnimationFrame(() => {
     setTimeout(() => {
@@ -1051,42 +962,78 @@ function repaintBackground() {
   });
 }
 
-// ensure named exports exist
 export { loadStoryMode };
 
-function playTrackUnlocked(id) {
+// ────────────────────────────────────────────────────────────────────────────────
+// Audio helpers
+// ────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
+// Story music rotation — flexible + no immediate repeats
+// ────────────────────────────────────────────────────────────────────────────────
+function unlockHowlerCtx() {
   try {
     const H = window.Howler ?? globalThis.Howler;
-
-    // Make sure master is unmuted before constructing/playing the Howl
     if (H && H._muted) H.mute(false);
-
-    // Best-effort WebAudio unlock (does nothing if html5:true, but harmless)
-    if (H?.ctx && H.ctx.state === 'suspended') {
-      // Don't await; keep synchronous gesture timing
-      H.ctx.resume().catch(() => {});
-    }
+    if (H?.ctx && H.ctx.state === 'suspended') { H.ctx.resume().catch(() => {}); }
   } catch {}
-
-  // Play immediately in the same click stack
-  try { playTrack(id); } catch {}
 }
-// 🔔 Local SFX Howls
-const smDing = new Howl({
-  src: [`${import.meta.env.BASE_URL}assets/audio/SFX/smDing.mp3`],
-  volume: .25
-});
 
-const smDing2 = new Howl({
-  src: [`${import.meta.env.BASE_URL}assets/audio/SFX/smDing2.mp3`],
-  volume: .25
-});
+function pickNextStoryTrack() {
+  try {
+    const pool = STORY_TRACKS.filter(Boolean);
+    if (!pool.length) return null;
+    const cur = (() => { try { return currentTrackId?.(); } catch { return null; } })();
 
-// Helper to pick the right one
+    // avoid immediate repeat when we have 2+ tracks
+    const eligible = pool.length > 1 ? pool.filter(id => id !== cur) : pool;
+    const idx = Math.floor(Math.random() * eligible.length);
+    return eligible[idx] ?? pool[0];
+  } catch {
+    return STORY_TRACKS[0] ?? null;
+  }
+}
+
+function ensureStoryLoop() {
+  try { if (!getLooping?.()) toggleLoop(); } catch {}
+}
+
+/**
+ * Kick story music:
+ * - random pick from STORY_TRACKS
+ * - never same as current (if 2+ tracks)
+ * - optional forceNew to definitely change if something’s already playing
+ */
+function kickStoryMusic({ forceNew = false } = {}) {
+  const wantId = pickNextStoryTrack();
+  if (!wantId) return;
+
+  unlockHowlerCtx();
+
+  const curId = (() => { try { return currentTrackId?.(); } catch { return null; } })();
+  const needChange = forceNew
+    ? (STORY_TRACKS.length > 1 ? true : !isPlaying?.())
+    : (!isPlaying?.() || curId !== wantId);
+
+  if (needChange) {
+    try { playTrack(wantId); } catch {}
+  }
+  ensureStoryLoop();
+}
+
+
+const smDing = new Howl({ src: [`${BASE}assets/audio/SFX/smDing.mp3`], volume: .25 });
+const smDing2 = new Howl({ src: [`${BASE}assets/audio/SFX/smDing2.mp3`], volume: .25 });
+
 function playSFX(name) {
   if (name === 'smDing') smDing.play();
   else if (name === 'smDing2') smDing2.play();
 }
+
+
+
+
+
+
 
 function playIntervalBeep(label) {
   try {
@@ -1094,7 +1041,6 @@ function playIntervalBeep(label) {
     __smAudioCtx = (__smAudioCtx || H?.ctx || new (window.AudioContext || window.webkitAudioContext)());
     if (__smAudioCtx.state === 'suspended') __smAudioCtx.resume().catch(() => {});
   } catch {}
-
   const ac = __smAudioCtx;
   if (!ac) return;
 
@@ -1102,19 +1048,16 @@ function playIntervalBeep(label) {
   const osc = ac.createOscillator();
   const gain = ac.createGain();
 
-  // Map label → frequency multiple of a base note
-  const baseHz = 220; // A3 feels nice
+  const baseHz = 220;
   const mult =
     label.includes('Octave')        ? 2.0 :
     label.includes('Perfect Fifth') ? 3/2 :
     label.includes('Perfect Fourth')? 4/3 :
-    label.includes('Major Third')   ? 5/4 :
-    1.0;
+    label.includes('Major Third')   ? 5/4 : 1.0;
 
   osc.type = 'sine';
   osc.frequency.value = baseHz * mult;
 
-  // Short clickless envelope
   gain.gain.setValueAtTime(0, now);
   gain.gain.linearRampToValueAtTime(0.12, now + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
@@ -1126,20 +1069,20 @@ function playIntervalBeep(label) {
   osc.stop(now + 0.4);
 }
 
+// XP popup helpers
 function awardXP(amount, opts = {}) {
-  // opts: { anchor?: HTMLElement, noPopup?: boolean, reason?: string }
   const { anchor = null, noPopup = false, reason = '' } = opts;
   try {
     appState.addXP(amount);
-    console.log(`✨ [StoryMode] +${amount} XP ${reason}`);
     if (!noPopup) showXPPopup(`+${amount} XP`, anchor);
+    console.log(`✨ [StoryMode] +${amount} XP ${reason}`);
   } catch (err) {
     console.warn('XP award failed:', err);
   }
 }
 
 function showXPPopup(text, anchorEl) {
-  const container = document.body; // render fixed to body
+  const container = document.body;
   const popup = document.createElement('div');
   popup.className = 'sm-xp-popup';
   popup.textContent = text;
@@ -1179,12 +1122,41 @@ function showXPPopup(text, anchorEl) {
     setTimeout(() => popup.remove(), 1600);
   });
 }
+
 export function onPrologueCompleteOnce() {
-  // guard: only award once
-  if (!appState.profile.completedModes.includes('story')) {
-    appState.addStoryXP(800);       // ✅ counts toward Story bucket (cap 800)
-    appState.markModeComplete('story');
+  // award Story-bucket XP the first time only
+  if (!appState.profile.completedModes?.includes?.('story')) {
+    try {
+      appState.addStoryXP?.(800);         // Story bucket cap example
+      appState.markModeComplete?.('story');
+    } catch {}
   }
-  // If you still want replay XP that DOESN'T affect completion:
-  // appState.addXP(25); // pure global XP (goes to "extra" only if not from the 4 mode buckets)
 }
+
+// ────────────────────────────────────────────────────────────────────────────────
+// Mobile audio unlock
+// ────────────────────────────────────────────────────────────────────────────────
+function wireSMAudioUnlockOnce() {
+  if (smAudioUnlockOnce) return;
+  smAudioUnlockOnce = () => {
+    try {
+      const H = window.Howler ?? globalThis.Howler;
+      if (H?.ctx && H.ctx.state === 'suspended') {
+        H.ctx.resume().then(() => console.log('🔓 [SM] Howler AudioContext unlocked'));
+      }
+    } catch {}
+    document.body.removeEventListener('touchstart', smAudioUnlockOnce);
+    document.body.removeEventListener('click', smAudioUnlockOnce);
+    smAudioUnlockOnce = null;
+  };
+  document.body.addEventListener('touchstart', smAudioUnlockOnce, { once: true });
+  document.body.addEventListener('click', smAudioUnlockOnce, { once: true });
+}
+function unwireSMAudioUnlock() {
+  if (!smAudioUnlockOnce) return;
+  document.body.removeEventListener('touchstart', smAudioUnlockOnce);
+  document.body.removeEventListener('click', smAudioUnlockOnce);
+  smAudioUnlockOnce = null;
+}
+
+

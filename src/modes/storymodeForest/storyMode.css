@@ -667,3 +667,363 @@
   80%  { opacity: 1; transform: translate(-50%, -40px); }
   100% { opacity: 0; transform: translate(-50%, -50px); }
 }
+/* === Chapter 1 layout === */
+.sm-ch1 {
+  position: relative;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr;
+  gap: clamp(0.6rem, 1.6vh, 1rem);
+  padding: clamp(0.8rem, 2vh, 1.4rem);
+  background: #000c0c;
+}
+
+.sm-ch1-wrap {
+  width: 92%;
+  max-width: 820px;
+  margin: 0 auto;
+  display: grid;
+  gap: clamp(10px, 1.6vh, 16px);
+  place-items: center;
+}
+
+.sm-ch1-title {
+  color: #b8fff8;
+  font-family: "Orbitron", system-ui, sans-serif;
+  text-shadow: 0 0 8px rgba(0,255,238,.35);
+  font-size: clamp(1.3rem, 1.2vh + 1rem, 2rem);
+  margin: 0.25rem 0 0.5rem;
+  text-align: center;
+}
+
+.sm-ch1-text {
+  color: #eaffff;
+  text-shadow: 0 0 8px rgba(0,255,238,.35);
+  font-family: "Orbitron", system-ui, sans-serif;
+  font-size: clamp(1.05rem, 1vh + .75rem, 1.2rem);
+  line-height: 1.25;
+  text-align: center;
+  white-space: pre-wrap;
+}
+
+.sm-ch1-img, .sm-ch1 .sm-ch1-img, .sm-ch1-img img {
+  max-width: 86%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 26px rgba(0,255,238,.25));
+}
+
+.sm-choice-list {
+  display: grid;
+  gap: clamp(8px, 1.2vh, 12px);
+  width: clamp(220px, 70%, 520px);
+  margin: 0.4rem auto 0;
+}
+
+.sm-reveal-list .sm-reveal-answer.is-open { display: block; }
+/* === CHAPTER 1 ONLY: shrink scene images === */
+.sm-ch1 .sm-ch1-img {
+  max-width: clamp(160px, 55vw, 360px) !important;
+  max-height: clamp(120px, 34vh, 300px) !important;
+  margin: 0.6rem auto 0.4rem !important;
+}
+
+/* Optional: make the first-order art even smaller */
+.sm-ch1 .sm-ch1-img.sm-img-first-order {
+  max-width: clamp(140px, 48vw, 320px) !important;
+  max-height: clamp(110px, 30vh, 260px) !important;
+}
+
+/* Tighten a bit more on short screens */
+@media (max-height: 720px) {
+  .sm-ch1 .sm-ch1-img {
+    max-height: 30vh !important;
+  }
+}
+
+/* — Kill switch (CH1 only): hide images entirely — */
+/*
+.sm-ch1 .sm-ch1-img { display: none !important; }
+*/
+/* CH1 ONLY — shrink scene images */
+.sm-ch1 .sm-ch1-img {
+  max-width: clamp(160px, 52vw, 340px) !important;
+  max-height: clamp(120px, 32vh, 280px) !important;
+  margin: 0.6rem auto 0.4rem !important;
+}
+
+/* Optional: make the first-order art even smaller */
+.sm-ch1 .sm-ch1-img.sm-img-first-order {
+  max-width: clamp(140px, 46vw, 300px) !important;
+  max-height: clamp(110px, 28vh, 240px) !important;
+}
+
+/* Tighter on short screens */
+@media (max-height: 720px) {
+  .sm-ch1 .sm-ch1-img { max-height: 28vh !important; }
+}
+
+/* If you decide to remove CH1 images entirely: */
+/* .sm-ch1 .sm-ch1-img { display: none !important; } */
+/* inventory sheet + cash chip */
+.sm-inventory-sheet { position: fixed; left:0; right:0; bottom:0; padding: .75rem; background: rgba(10,10,16,.78); backdrop-filter: blur(7px); border-top: 1px solid rgba(255,255,255,.12); z-index: 9998; }
+.sm-inv-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; }
+.sm-inv-title { color:#eaffff; font: 700 0.95rem Orbitron, system-ui; text-shadow: 0 0 8px rgba(0,255,238,.35); }
+.sm-inv-cash { color:#9ff; font: 700 0.95rem Orbitron, system-ui; text-shadow: 0 0 8px rgba(0,255,238,.45); }
+.sm-inventory-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: .5rem; }
+.sm-item { display:flex; flex-direction:column; align-items:center; gap:.25rem; padding:.55rem; border-radius:.75rem; background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); font: 600 12px/1.1 Orbitron, system-ui; color:#eaffff; }
+.sm-item-qty { font-size: 10px; opacity: .8; }
+.sm-empty { color:#9ff; opacity:.8; padding: .75rem; text-align:center; }
+.sm-cash-chip { justify-self:start; pointer-events:none; padding: .25rem .5rem; border-radius: .6rem; border:1px solid rgba(0,255,238,.25); background: rgba(0,0,0,.35); color:#9ff; font: 700 0.8rem/1 Orbitron, system-ui; box-shadow: 0 0 6px #00ffee33; }
+/* add to infinityMode.css */
+.mode-buttons .active-mode {
+  background-color: #00ffee22;
+  box-shadow: 0 0 10px #00ffee88 inset;
+}
+/* CH1 bottom bar: L |  (cash + bag)  | R  */
+.sm-ch1 .sm-bottom-bar {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto auto auto; /* back | spacer | cash | bag | mute */
+  align-items: end;
+  gap: clamp(8px, 1.2vh, 12px);
+  pointer-events: none; /* keep, buttons re-enable */
+}
+
+.sm-ch1 #smBackToMenu { 
+  grid-column: 1; 
+  justify-self: start; 
+  pointer-events: auto; 
+}
+
+.sm-ch1 #smCash { 
+  grid-column: 3;       /* center-left */
+  justify-self: end;
+  pointer-events: auto;
+}
+
+.sm-ch1 #smInv { 
+  grid-column: 4;       /* center-right */
+  justify-self: start; 
+  pointer-events: auto; 
+}
+
+.sm-ch1 #smMute { 
+  grid-column: 5; 
+  justify-self: end; 
+  pointer-events: auto; 
+}
+/* CH1: Back (left) | [cash + bag] (center) | Mute (right) */
+.sm-ch1 .sm-bottom-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: clamp(8px, 1.2vh, 12px);
+  pointer-events: none; /* buttons re-enable */
+}
+
+.sm-ch1 #smBackToMenu { justify-self: start; pointer-events: auto; }
+.sm-ch1 #smMute       { justify-self: end;   pointer-events: auto; }
+
+.sm-ch1 .sm-bottom-center {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(8px, 1.2vh, 12px);
+  pointer-events: none; /* wrapper ignores; button opts in */
+}
+
+.sm-ch1 .sm-bottom-center #smCash { pointer-events: none; }
+.sm-ch1 .sm-bottom-center #smInv  { pointer-events: auto; }
+/* Fullscreen overlay */
+.sm-inventory-sheet{
+  position: fixed;
+  inset: 0;                      /* covers whole screen */
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  z-index: 9998;
+  display: grid;
+  align-items: end;              /* panel slides from bottom */
+}
+
+/* Bottom sheet panel */
+.sm-inventory-panel{
+  padding: .75rem;
+  background: rgba(10,10,16,.88);
+  border-top: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 -12px 24px rgba(0,0,0,.35);
+}
+
+/* Header + close button */
+.sm-inv-head{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.5rem; }
+.sm-inv-title{ color:#eaffff; font:700 0.95rem Orbitron, system-ui; text-shadow:0 0 8px rgba(0,255,238,.35); }
+.sm-inv-cash{ color:#9ff; font:700 0.95rem Orbitron, system-ui; text-shadow:0 0 8px rgba(0,255,238,.45); }
+
+.sm-inv-close{
+  border:0; background:transparent; color:#eaffff;
+  font:700 1rem Orbitron, system-ui; line-height:1;
+  padding:.35rem .55rem; border-radius:.5rem; cursor:pointer;
+}
+.sm-inv-close:hover{ background: rgba(255,255,255,.08); }
+.sm-btn .sm-kind { opacity:.85; letter-spacing:.02em; margin-right:.35ch; }
+.sm-btn .sm-desc { font-weight:900; }
+:root{
+  --sm-bbar-h: clamp(44px, 6.5vh, 84px); /* bottom bar height */
+}
+
+/* your existing absolute bar can keep position:absolute */
+.sm-bottom-bar{
+  height: var(--sm-bbar-h);
+  z-index: 5; /* make sure it draws on top */
+}
+
+/* reserve room so options never slide under it */
+.sm-choice-list{
+  margin-bottom: calc(var(--sm-bbar-h) + max(1vh, env(safe-area-inset-bottom)));
+}
+
+/* if any slide body can be taller than the screen, give the slide container space too */
+.sm-ch1-wrap,
+.sm-chapter-menu{
+  padding-bottom: calc(var(--sm-bbar-h) + max(1vh, env(safe-area-inset-bottom)));
+}
+/* ================================
+   CH1 anti-overlap patch (prologue untouched)
+   Paste at end of stylesheet
+   ================================ */
+
+/* 0) Safety: let things shrink */
+.sm-aspect-wrap,
+.sm-game-frame,
+.sm-ch1,
+.sm-ch1-wrap { min-height: 0 !important; }
+
+/* 1) One source of truth for CH1 art height */
+.sm-ch1 { --sm-ch1-art-h: 28vh; }
+
+/* 2) CH1 becomes a 4-row grid: title | art | text | choices */
+.sm-ch1-wrap {
+  height: 100%;
+  width: 92%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows:
+    auto                          /* title */
+    minmax(0, var(--sm-ch1-art-h))/* art band */
+    minmax(0, 1fr)                /* text (scrolls if needed) */
+    auto;                         /* choices */
+  align-content: start;
+  justify-items: center;
+  gap: clamp(8px, 1.4vh, 14px);
+  /* never let content slide under the bottom bar */
+  padding-bottom: calc(var(--sm-bbar-h) + max(1vh, env(safe-area-inset-bottom)));
+}
+
+/* 3) Scene art: never exceed the art band, never stretch weird */
+.sm-ch1 .sm-ch1-img,
+.sm-ch1-img img {
+  max-height: var(--sm-ch1-art-h) !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: min(86%, 520px) !important;
+  object-fit: contain !important;
+  margin: clamp(6px, 1vh, 10px) auto clamp(6px, 1vh, 12px) !important;
+}
+
+/* 4) Body text lives in the flexible row; scrolls gently on short viewports */
+.sm-ch1-text {
+  max-width: 70ch;
+  width: 100%;
+  text-align: center;
+  overflow: auto;                 /* <-- key to stop overlap */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
+  min-height: 0;                  /* allow grid child to shrink */
+  font-size: clamp(0.98rem, 0.9vh + 0.6rem, 1.2rem);
+  line-height: 1.24;
+}
+
+/* 5) Choice buttons: stay above the bar and centered */
+.sm-choice-list {
+  width: clamp(220px, 70%, 520px);
+  margin: 0.4rem auto 0;
+  /* extra insurance if other CSS touches margins later */
+  padding-bottom: 0;
+}
+
+/* 6) Bottom bar sits on top (you already have this, but ensure z) */
+.sm-bottom-bar { z-index: 100; pointer-events: none; }
+.sm-bottom-bar .sm-square-btn { pointer-events: auto; }
+
+/* 7) Small/short screens — shrink art band a bit, text gets more room */
+@media (max-height: 740px) {
+  .sm-ch1 { --sm-ch1-art-h: 22vh; }
+  .sm-ch1-text { font-size: clamp(0.92rem, 0.85vh + 0.5rem, 1.05rem); }
+}
+
+@media (max-width: 380px) {
+  .sm-ch1 { --sm-ch1-art-h: 24vh; }
+  .sm-ch1-text { font-size: clamp(0.9rem, 0.9vh + 0.45rem, 1.05rem); }
+  .sm-choice-list { width: clamp(220px, 86%, 520px); }
+}
+
+/* 8) Tall screens — give art a hair more space without crowding */
+@media (min-height: 900px) {
+  .sm-ch1 { --sm-ch1-art-h: 32vh; }
+}
+/* CH1: make art yield to content (aggressive shrink) */
+.sm-ch1 { --sm-ch1-art-h: min(20vh, 36vw); }               /* lower global cap */
+@media (max-height: 760px) { .sm-ch1 { --sm-ch1-art-h: min(16vh, 32vw); } }
+@media (max-height: 680px) { .sm-ch1 { --sm-ch1-art-h: min(14vh, 30vw); } }
+
+.sm-ch1 .sm-ch1-img,
+.sm-ch1-img img{
+  max-height: var(--sm-ch1-art-h) !important;
+  max-width: min(72%, 300px) !important;   /* smaller footprint */
+  height: auto !important; width: auto !important;
+  margin: clamp(4px, .8vh, 8px) auto !important;
+  object-fit: contain !important;
+}
+
+/* Ensure text wins the vertical space battle */
+.sm-ch1-wrap{ min-height:0 !important; }
+.sm-ch1-text{
+  min-height:0 !important; overflow:auto; overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+/* === CH1: content-first image behavior (keep prologue unchanged) === */
+.sm-ch1 { --sm-ch1-art-h: min(20vh, 36vw); }       /* default smaller art */
+@media (max-height: 760px){ .sm-ch1 { --sm-ch1-art-h: min(16vh, 32vw); } }
+@media (max-height: 680px){ .sm-ch1 { --sm-ch1-art-h: min(14vh, 30vw); } }
+
+.sm-ch1 .sm-ch1-img,
+.sm-ch1-img img{
+  max-height: var(--sm-ch1-art-h) !important;
+  max-width: min(72%, 300px) !important;
+  height: auto !important; width: auto !important;
+  object-fit: contain !important;
+  margin: clamp(4px,.8vh,8px) auto !important;
+}
+
+/* Ensure text can claim space instead of pushing UI off-screen */
+.sm-ch1-wrap,
+.sm-ch1-text { min-height: 0 !important; }
+.sm-ch1-text{
+  overflow: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bottom bar stays on top and content leaves room for it */
+:root{ --sm-bbar-h: clamp(44px, 6.5vh, 84px); }
+.sm-bottom-bar{
+  position: absolute; left:0; right:0;
+  bottom: max(1.2vh, env(safe-area-inset-bottom));
+  height: var(--sm-bbar-h); z-index: 100; pointer-events: none;
+}
+.sm-bottom-bar .sm-square-btn{ pointer-events: auto; }
+.sm-ch1, .sm-ch1-wrap{ padding-bottom: calc(var(--sm-bbar-h) + max(1vh, env(safe-area-inset-bottom))) !important; }
+
+/* Safety: all primary containers may shrink */
+.sm-aspect-wrap, .sm-game-frame, .sm-ch1, .sm-ch1-wrap, .sm-slide{ min-height:0 !important; }

@@ -1,131 +1,135 @@
 // appState.js
-import { makeAutoObservable, autorun, runInAction } from 'mobx';
+import { makeAutoObservable, autorun, runInAction, toJS, observable } from 'mobx';
 import { allBadges as BADGES } from '../managers/badgeManager.js';
 
+// ───────────────────────────────────────────────────────────────────────────────
+// Small helpers
+// ───────────────────────────────────────────────────────────────────────────────
+class InventoryEntry {
+  constructor(id, name, qty = 1, meta = {}) {
+    Object.assign(this, { id, name, qty, meta });
+  }
+}
+
+class CurrencyPurse {
+  amount = 0;
+  constructor() {
+    makeAutoObservable(this, {}, { autoBind: true });
+  }
+  add(n = 0) {
+    this.amount = Math.max(0, this.amount + (n | 0));
+  }
+  spend(n = 0) {
+    n = n | 0;
+    if (n <= 0) return true;
+    if (this.amount < n) return false;
+    this.amount -= n;
+    return true;
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// AppState
+// ───────────────────────────────────────────────────────────────────────────────
 class AppState {
+  // Profile / user meta
   profile = {
-    // ... existing
-    unlockedThemes: [],     // 🆕 stash of unlocked backgrounds
+    unlockedThemes: [],
     infinityHighScore: 0,
     infinityLongestStreak: 0,
     username: 'Friend',
     xp: 0,
     level: 1,
-    qsHighScore: 0, // 🏁 Add this!
+    qsHighScore: 0,
     badges: [],
     completedModes: [],
     lastPlayed: null,
     seenIntro: false,
     streakDays: 0,
-    lastStreakDayKey: null // 'YYYY-MM-DD' in America/New_York
+    lastStreakDayKey: null, // 'YYYY-MM-DD' in America/New_York
   };
-  
 
+  // Settings (single source of truth for gameMode)
   settings = {
     theme: 'menubackground',
     mute: false,
     difficulty: 'normal',
     loop: false,
     shuffle: false,
-    gameMode: 'add' // 🧪 NEW: default mode!
+    gameMode: 'add',
   };
 
+  // Stats
   stats = {
     quickServe: { sessions: 0, topScore: 0 },
     infinity: { timeSpent: 0 },
-    story: { chapter: 0 }
+    story: { chapter: 0 },
   };
 
+  // Story progress
   storyProgress = {
     currentChapter: 0,
-    seenPanels: []
+    seenPanels: [],
   };
 
-  // ✅ Per-mode XP that feeds completion math (clamped by completionManager caps)
+  // Per-mode XP (feeds completion math; caps enforced elsewhere)
   progress = {
-    story:       { xp: 0 },   // cap 800
-    kidsCamping: { xp: 0 },   // cap 1000
-    quickServe:  { xp: 0 },   // cap 500
-    infinity:    { xp: 0 },   // cap 1000
+    story: { xp: 0 },       // cap 800
+    kidsCamping: { xp: 0 }, // cap 1000
+    quickServe: { xp: 0 },  // cap 500
+    infinity: { xp: 0 },    // cap 1000
   };
 
-
+  // UI state (no duplicate gameMode here)
   uiState = {
     pendingBadgePopup: null,
     triggerBadgeModal: false,
     currentMode: null,
-    gameMode: 'add' // 💥 Default safe value!
   };
 
+  // Story memory flags
   storyMemory = {
     askedWhoAreYou: false,
     askedAboutCones: false,
     askedAboutMath: false,
     heardAllJokes: false,
-    farewellSaid: false
+    farewellSaid: false,
   };
 
+  // Logs
   chatLogs = [];
+
+  // Camping pop count
+  popCount = 0;
+
+  // Inventory & currency
+  inventory = observable.map(); // id -> InventoryEntry (observable)
+  purse = new CurrencyPurse();
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
     this.loadFromStorage();
   }
 
-  //////////////////////////////////////
-  // 🚀 PROFILE
-  //////////////////////////////////////
+  // ── XP / Leveling ────────────────────────────────────────────────────────────
   addXP(amount) {
     this.profile.xp += amount;
-
     const newLevel = Math.floor(this.profile.xp / 100) + 1;
     if (newLevel > this.profile.level) {
       this.profile.level = newLevel;
     }
-
-    return amount; // ✅ This makes it future-safe
+    return amount;
   }
 
-  // ---------- Mode XP helpers (feed completion buckets) ----------
   _addXPNumber(n) { return Number.isFinite(+n) ? Math.max(0, +n) : 0; }
 
-  addStoryXP(amount) {
-    const n = this._addXPNumber(amount);
-    if (!n) return 0;
-    this.addXP(n);
-    this.progress.story.xp += n;
-    return n;
-  }
-  addKidsCampingXP(amount) {
-    const n = this._addXPNumber(amount);
-    if (!n) return 0;
-    this.addXP(n);
-    this.progress.kidsCamping.xp += n;
-    return n;
-  }
-  addQuickServeXP(amount) {
-    const n = this._addXPNumber(amount);
-    if (!n) return 0;
-    this.addXP(n);
-    this.progress.quickServe.xp += n;
-    return n;
-  }
-  addInfinityXP(amount) {
-    const n = this._addXPNumber(amount);
-    if (!n) return 0;
-    this.addXP(n);
-    this.progress.infinity.xp += n;
-    return n;
-  }
+  addStoryXP(amount)       { const n = this._addXPNumber(amount); if (!n) return 0; this.addXP(n); this.progress.story.xp += n;       return n; }
+  addKidsCampingXP(amount) { const n = this._addXPNumber(amount); if (!n) return 0; this.addXP(n); this.progress.kidsCamping.xp += n; return n; }
+  addQuickServeXP(amount)  { const n = this._addXPNumber(amount); if (!n) return 0; this.addXP(n); this.progress.quickServe.xp += n;  return n; }
+  addInfinityXP(amount)    { const n = this._addXPNumber(amount); if (!n) return 0; this.addXP(n); this.progress.infinity.xp += n;    return n; }
 
-
-  setUsername(name) {
-    this.profile.username = name;
-  }
-
-  setLastPlayed(timestamp = Date.now()) {
-    this.profile.lastPlayed = timestamp;
-  }
+  setUsername(name) { this.profile.username = name; }
+  setLastPlayed(timestamp = Date.now()) { this.profile.lastPlayed = timestamp; }
 
   markModeComplete(mode) {
     if (!this.profile.completedModes.includes(mode)) {
@@ -133,16 +137,10 @@ class AppState {
     }
   }
 
-  setSeenIntro(flag = true) {
-    this.profile.seenIntro = flag;
-  }
+  setSeenIntro(flag = true) { this.profile.seenIntro = flag; }
 
-  //////////////////////////////////////
-  // 🎯 STATS
-  //////////////////////////////////////
-  incrementQuickServeSessions() {
-    this.stats.quickServe.sessions += 1;
-  }
+  // ── Stats ────────────────────────────────────────────────────────────────────
+  incrementQuickServeSessions() { this.stats.quickServe.sessions += 1; }
 
   updateQuickServeHighScore(score) {
     if (score > this.stats.quickServe.topScore) {
@@ -150,9 +148,7 @@ class AppState {
     }
   }
 
-  addInfinityTime(seconds) {
-    this.stats.infinity.timeSpent += seconds;
-  }
+  addInfinityTime(seconds) { this.stats.infinity.timeSpent += seconds; }
 
   incrementStoryChapter() {
     this.stats.story.chapter++;
@@ -172,83 +168,36 @@ class AppState {
     }
   }
 
-  //////////////////////////////////////
-  // 🎨 SETTINGS
-  //////////////////////////////////////
+  // ── Settings / UI ────────────────────────────────────────────────────────────
   setSetting(key, value) {
-    if (this.settings.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(this.settings, key)) {
       this.settings[key] = value;
     }
   }
+  toggleMute() { this.settings.mute = !this.settings.mute; }
+  setTheme(themeId) { this.settings.theme = themeId; }
 
-  toggleMute() {
-    this.settings.mute = !this.settings.mute;
-  }
+  setTriggerBadgeModal(flag = true) { this.uiState.triggerBadgeModal = flag; }
+  clearTriggerBadgeModal() { this.uiState.triggerBadgeModal = false; }
 
-  setTheme(themeId) {
-    this.settings.theme = themeId;
-  }
+  setPendingBadge(id) { this.uiState.pendingBadgePopup = id; }
+  clearPendingBadgePopup() { this.uiState.pendingBadgePopup = null; }
 
-  //////////////////////////////////////
-  // 🧠 UI STATE
-  //////////////////////////////////////
-  setTriggerBadgeModal(flag = true) {
-    this.uiState.triggerBadgeModal = flag;
-  }
-
-  clearTriggerBadgeModal() {
-    this.uiState.triggerBadgeModal = false;
-  }
-
-  setPendingBadge(id) {
-    this.uiState.pendingBadgePopup = id;
-  }
-
-  clearPendingBadgePopup() {
-    this.uiState.pendingBadgePopup = null;
-  }
-
-  setCurrentMode(mode) {
-    this.uiState.currentMode = mode;
-  }
-
-  clearCurrentMode() {
-    this.uiState.currentMode = null;
-  }
+  setCurrentMode(mode) { this.uiState.currentMode = mode; }
+  clearCurrentMode() { this.uiState.currentMode = null; }
 
   setMode(mode) {
     this.setCurrentMode(mode);
-
-    // 🔥 Count daily streak on real gameplay modes only
-    const gameplayModes = new Set([
-      'mathtips',
-      'quickserve',
-      'infinity',
-      'story',
-      'kids',
-      'camping'
-      // add/remove to match your actual mode ids
-    ]);
-
+    const gameplayModes = new Set(['mathtips','quickserve','infinity','story','kids','camping']);
     if (gameplayModes.has(mode)) {
       try { this.touchDailyStreak(`enter:${mode}`); } catch {}
     }
   }
 
+  setGameMode(mode) { this.settings.gameMode = mode; }
+  getGameMode() { return this.settings.gameMode; }
 
-  setGameMode(mode) {
-    this.settings.gameMode = mode;
-  }
-
-  getGameMode() {
-    return this.settings.gameMode;
-  }
-
-  //////////////////////////////////////
-  // 🔮 MOOD ENGINE (XP DRIVEN)
-  //////////////////////////////////////
-  // ---------- Completion & Mood ----------
-  // ---------- Completion (BADGE-ONLY: 95% non-legend, 5% legend) ----------
+  // ── Completion / Mood ────────────────────────────────────────────────────────
   getCompletionPercent() {
     try {
       const owned = new Set(this.profile?.badges || []);
@@ -263,7 +212,6 @@ class AppState {
 
       return Math.round(Math.min(100, Math.max(0, pct)));
     } catch {
-      // super-safe fallback
       const haveLegend = !!this.profile?.badges?.includes?.('legend');
       const total = (this.profile?.badges || []).length;
       const nonLegendOwned = haveLegend ? (total - 1) : total;
@@ -272,7 +220,6 @@ class AppState {
     }
   }
 
-  // Optional: keep a breakdown for UIs / debugging
   getCompletionBreakdown() {
     const owned = new Set(this.profile?.badges || []);
     const allIds = Object.keys(BADGES || {});
@@ -283,11 +230,8 @@ class AppState {
 
     const nonLegendFrac = nonLegendIds.length ? (nonLegendOwned / nonLegendIds.length) : 0;
 
-    const badgesFrac = nonLegendFrac; // 0..1 of non-legend
-    const legendDone = haveLegend;
-
     const totalPercent = Math.round(
-      Math.min(100, (badgesFrac * 95) + (legendDone ? 5 : 0))
+      Math.min(100, (nonLegendFrac * 95) + (haveLegend ? 5 : 0))
     );
 
     return {
@@ -295,12 +239,11 @@ class AppState {
       badges: {
         nonLegendTotal: nonLegendIds.length,
         nonLegendOwned,
-        badgesFrac // 0..1
+        badgesFrac: nonLegendFrac,
       },
-      legendDone
+      legendDone: haveLegend,
     };
   }
-
 
   getMood() {
     const pct = this.getCompletionPercent();
@@ -312,165 +255,169 @@ class AppState {
     return 'happy';
   }
 
-
-  //////////////////////////////////////
-  // 🍄 POP COUNT (Kids Camping)
-  //////////////////////////////////////
-  popCount = 0;
-
+  // ── Kids Camping pop count ───────────────────────────────────────────────────
   incrementPopCount(amount = 1) {
     this.popCount += amount;
-    document.dispatchEvent(new CustomEvent('campScoreUpdated', { detail: this.popCount })); // Notify UI
+    document.dispatchEvent(new CustomEvent('campScoreUpdated', { detail: this.popCount }));
   }
 
-  //////////////////////////////////////
-  // 🧠 STORY MEMORY (PERSISTENT)
-  //////////////////////////////////////
+  // ── Story memory ─────────────────────────────────────────────────────────────
   setMemory(key, value = true) {
-    if (this.storyMemory.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(this.storyMemory, key)) {
       this.storyMemory[key] = value;
     }
   }
-
   resetMemory() {
     this.storyMemory = {
       askedWhoAreYou: false,
       askedAboutCones: false,
       askedAboutMath: false,
       heardAllJokes: false,
-      farewellSaid: false
+      farewellSaid: false,
     };
   }
 
-  //////////////////////////////////////
-  // 📝 CHAT LOGGER (NEW!!)
-  //////////////////////////////////////
+  // ── Chat logs ────────────────────────────────────────────────────────────────
   logChat(input, matched, response) {
-    this.chatLogs.push({
-      input,
-      matched,
-      response,
-      timestamp: Date.now()
-    });
+    this.chatLogs.push({ input, matched, response, timestamp: Date.now() });
   }
-
-  clearChatLogs() {
-    this.chatLogs = [];
-  }
-
+  clearChatLogs() { this.chatLogs = []; }
   exportChatLogs() {
-    const blob = new Blob(
-      [JSON.stringify(this.chatLogs, null, 2)],
-      { type: 'application/json' }
-    );
+    const blob = new Blob([JSON.stringify(this.chatLogs, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'chatLogs.json';
-    a.click();
+    a.href = url; a.download = 'chatLogs.json'; a.click();
     URL.revokeObjectURL(url);
   }
 
-  //////////////////////////////////////
-  // 💾 STORAGE
-  //////////////////////////////////////
-   // 💾 STORAGE (patch both methods)
-
-  // saveToStorage()
-  saveToStorage() {
-    const dataToSave = {
-      profile: this.profile,
-      settings: this.settings,
-      stats: this.stats,
-      storyProgress: this.storyProgress,
-      storyMemory: this.storyMemory,
-      chatLogs: this.chatLogs,
-      popCount: this.popCount,
-      progress: this.progress,              // ✅ add this
-    };
-    localStorage.setItem('snowcone_save_data', JSON.stringify(dataToSave));
+  // ── Inventory / Currency API ─────────────────────────────────────────────────
+  addItem(id, payload = {}) {
+    const cur = this.inventory.get(id);
+    if (cur) {
+      cur.qty += 1;
+      this.inventory.set(id, cur);
+    } else {
+      const e = new InventoryEntry(id, payload.name ?? id, 1, payload.meta ?? {});
+      this.inventory.set(id, e);
+    }
   }
+  removeItem(id, n = 1) {
+    const cur = this.inventory.get(id);
+    if (!cur) return;
+    cur.qty = Math.max(0, cur.qty - (n | 0));
+    if (cur.qty === 0) this.inventory.delete(id);
+    else this.inventory.set(id, cur);
+  }
+  hasItem(id) { return this.inventory.has(id); }
+  getItem(id) { return this.inventory.get(id) ?? null; }
+  listItems() { return Array.from(this.inventory.values()); }
 
-  // loadFromStorage()
-  loadFromStorage() {
-    const raw = localStorage.getItem('snowcone_save_data');
-    if (raw) {
-      try {
-        const data = JSON.parse(raw);
-        runInAction(() => {
-          Object.assign(this.profile, data.profile);
-          Object.assign(this.settings, data.settings);
-          Object.assign(this.stats, data.stats);
-          Object.assign(this.storyProgress, data.storyProgress);
-          Object.assign(this.storyMemory, data.storyMemory);
-          this.chatLogs = data.chatLogs || [];
-          this.popCount = data.popCount || 0;
+  addCurrency(n) { this.purse.add(n); }
+  spendCurrency(n) { return this.purse.spend(n); }
+  getCurrency() { return this.purse.amount; }
 
-          // ✅ merge progress safely (keep defaults if missing)
-          if (data.progress) {
-            this.progress.story       = { xp: 0, ...(data.progress.story || {}) };
-            this.progress.kidsCamping = { xp: 0, ...(data.progress.kidsCamping || {}) };
-            this.progress.quickServe  = { xp: 0, ...(data.progress.quickServe || {}) };
-            this.progress.infinity    = { xp: 0, ...(data.progress.infinity || {}) };
-          }
-        });
-      } catch (err) {
-        console.warn('⚠️ Bad save data. Resetting to defaults.', err);
-      }
+  // ── Storage ─────────────────────────────────────────────────────────────────
+  saveToStorage() {
+    try {
+      const dataToSave = {
+        profile:       toJS(this.profile),
+        settings:      toJS(this.settings),
+        stats:         toJS(this.stats),
+        storyProgress: toJS(this.storyProgress),
+        storyMemory:   toJS(this.storyMemory),
+        chatLogs:      toJS(this.chatLogs),
+        popCount:      this.popCount,
+        progress:      toJS(this.progress),
+        currency:      this.purse.amount,
+        inventory:     Object.fromEntries(this.inventory), // { id -> InventoryEntry }
+      };
+      localStorage.setItem('snowcone_save_data', JSON.stringify(dataToSave));
+    } catch (e) {
+      console.warn('save failed', e);
     }
   }
 
+  loadFromStorage() {
+    const raw = localStorage.getItem('snowcone_save_data');
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      runInAction(() => {
+        Object.assign(this.profile,       data.profile);
+        Object.assign(this.settings,      data.settings);
+        Object.assign(this.stats,         data.stats);
+        Object.assign(this.storyProgress, data.storyProgress);
+        Object.assign(this.storyMemory,   data.storyMemory);
+        this.chatLogs = data.chatLogs || [];
+        this.popCount = data.popCount || 0;
+
+        if (data.progress) {
+          this.progress.story       = { xp: 0, ...(data.progress.story || {}) };
+          this.progress.kidsCamping = { xp: 0, ...(data.progress.kidsCamping || {}) };
+          this.progress.quickServe  = { xp: 0, ...(data.progress.quickServe || {}) };
+          this.progress.infinity    = { xp: 0, ...(data.progress.infinity || {}) };
+        }
+
+        if (typeof data.currency === 'number') this.purse.amount = data.currency | 0;
+        this.inventory.clear();
+        if (data.inventory && typeof data.inventory === 'object') {
+          for (const [id, obj] of Object.entries(data.inventory)) {
+            this.inventory.set(
+              id,
+              new InventoryEntry(id, obj.name ?? id, obj.qty ?? 1, obj.meta ?? {})
+            );
+          }
+        }
+      });
+    } catch (err) {
+      console.warn('⚠️ Bad save data. Resetting to defaults.', err);
+    }
+  }
 
   resetAllData() {
     localStorage.removeItem('snowcone_save_data');
     window.location.reload();
   }
 
-  //////////////////////////////////////
-  // 🔥 DAILY STREAK (America/New_York)
-  //////////////////////////////////////
+  // ── Daily streak (America/New_York) ──────────────────────────────────────────
   getNYDayKey(ts = Date.now()) {
     const d = new Date(ts);
     const parts = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'America/New_York',
-      year: 'numeric', month: '2-digit', day: '2-digit'
+      year: 'numeric', month: '2-digit', day: '2-digit',
     }).formatToParts(d);
-    const y = parts.find(p => p.type === 'year')?.value || '0000';
-    const m = parts.find(p => p.type === 'month')?.value || '00';
+    const y  = parts.find(p => p.type === 'year')?.value || '0000';
+    const m  = parts.find(p => p.type === 'month')?.value || '00';
     const dd = parts.find(p => p.type === 'day')?.value || '00';
     return `${y}-${m}-${dd}`;
   }
 
-  // Call this on meaningful activity (e.g., solved rep).
-  touchDailyStreak(reason = 'activity') {
+  touchDailyStreak() {
     const today = this.getNYDayKey();
     const last  = this.profile.lastStreakDayKey;
 
     if (!last) {
       this.profile.lastStreakDayKey = today;
-      this.profile.streakDays = 1; // first real activity = day 1
+      this.profile.streakDays = 1;
       return this.profile.streakDays;
     }
-
-    if (last === today) return this.profile.streakDays; // already counted today
+    if (last === today) return this.profile.streakDays;
 
     const yest = this.getNYDayKey(Date.now() - 86400000);
     this.profile.streakDays = (last === yest) ? (this.profile.streakDays + 1) : 1;
     this.profile.lastStreakDayKey = today;
     return this.profile.streakDays;
   }
-  // ✅ quick checks
+
+  // ── Badges / Themes ─────────────────────────────────────────────────────────
   hasBadge(id) {
     return Array.isArray(this.profile.badges) && this.profile.badges.includes(id);
   }
-
   hasTheme(themeId) {
-    const base = ['menubackground', 'freedom']; // always usable
+    const base = ['menubackground', 'freedom'];
     const unlocked = this.profile.unlockedThemes || [];
     return base.includes(themeId) || unlocked.includes(themeId);
   }
-
-  // ✅ unlock a theme (id from allBadges[id].unlocks)
   unlockTheme(themeId) {
     if (!themeId) return false;
     const arr = this.profile.unlockedThemes || (this.profile.unlockedThemes = []);
@@ -481,22 +428,30 @@ class AppState {
     }
     return false;
   }
-
-  // ✅ badge inventory (kept simple; badgeManager does the theme side)
   unlockBadge(id) {
     if (!this.profile.badges.includes(id)) {
       this.profile.badges.push(id);
-      this.setPendingBadge(id); // banner hook
+      this.setPendingBadge(id);
     }
   }
-} // ← make sure this is the actual end of the class
+}
 
+// singleton
 export const appState = new AppState();
 
-// 💾 AUTO SAVE MACHINE
+// Deep-tracked autosave (reads snapshots so mutations trigger this)
 autorun(() => {
+  void toJS(appState.profile);
+  void toJS(appState.settings);
+  void toJS(appState.stats);
+  void toJS(appState.storyProgress);
+  void toJS(appState.storyMemory);
+  void toJS(appState.chatLogs);
+  void toJS(appState.progress);
+  void Object.fromEntries(appState.inventory);
+  void appState.purse.amount;
   appState.saveToStorage();
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: "v0.9.9 — Just Small Details Now" };
+window.devFlags = { build: 'v0.9.9 — Just Small Details Now' };

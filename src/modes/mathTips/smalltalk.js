@@ -533,7 +533,7 @@ const REPLIES = {
 
   loveNoteKid: () => bubble({
     title: "Message from Dad",
-    lines: ["if your reading this, that means that this app is still here. Pretty cool place right? Also, if you're reading this, that means you can read! Even cooler!", "I want you to know that my life changed for the better when I met you. Everything that I've done since your birth involved you in my mind first. This app was built for you because I want you to be the best you can possibly be and maybe knowing some math early on might've helped. Anyway, I love you, I'll always love you, and if I can't tell you that any more...I F***ING LOVE YOU SO MUCH OMG YOURE THE BEST AND ARE SO AMAZING AND CAN DO ANYTHING YOU SET YOUR MIND TO AND F*** EVERYBODY ELSE AND WHAT THEY THINK. DO YOUR THING!!"],
+    lines: ["if your reading this, that means that this app is still here. Pretty cool place right? Also, if you're reading this, that means you can read! Even cooler!", "I want you to know that my life changed for the better when I met you. Everything that I've done since your birth involved you in my mind first. This app was built for you because I want you to be the best you can possibly be and maybe knowing some math early on might've helped. Anyway, I love you, I'll always love you, and if I can't tell you that any more...I FREAKING LOVE YOU SO MUCH, OMG YOURE THE BEST AND ARE SO AMAZING, AND CAN DO ANYTHING YOU SET YOUR MIND TO, AND FORGET EVERYBODY ELSE AND WHAT THEY THINK. DO YOUR THING!!"],
     hint: `want a story? say <code>lore booth</code>.`
   }),
 
