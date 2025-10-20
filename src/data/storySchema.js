@@ -11,9 +11,10 @@ export const ItemIds = {
   SQUARE_SHARD: 'sq_shard',
   CIRCLE_SHARD: 'cir_shard',
   MASTER_SIGIL: 'master_sigil', // forged on Slide 5 if all 3 shards held
+  WORK_BADGE: 'work_badge',
 };
 
-export const CURRENCY_NAME = 'Festival Scrip'; // TODO: rename to your canon anytime
+export const CURRENCY_NAME = 'Cone Coins'; // TODO: rename to your canon anytime
 
 export const Currency = {
   key: 'scrip',

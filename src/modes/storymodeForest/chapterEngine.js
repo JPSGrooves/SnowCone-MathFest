@@ -45,6 +45,35 @@ export class ChapterEngine {
     this.state.idx = Math.max(0, Math.min(last, i|0));
     this._renderSlide();
   }
+  // chapterEngine.js (inside export class ChapterEngine)
+  _grantSlideRewards(slide){
+    if (!slide || !slide.grants) return;
+    try {
+      const give = (id, qty = 1, payload = undefined) => {
+        // prefer your appState helpers; avoid dupes if you track possession
+        if (appState.hasItem?.(id)) return;
+        // support either (id, payload) or (id, {qty,…})
+        if (payload) {
+          appState.addItem?.(id, payload);
+        } else {
+          appState.addItem?.(id, { qty });
+        }
+      };
+
+      // grants can be ['work_badge'] OR [{ item:'work_badge', qty:1, payload:{...}}]
+      slide.grants.forEach(g => {
+        if (typeof g === 'string') give(g, 1);
+        else if (g && typeof g === 'object') {
+          if (g.item) give(g.item, g.qty ?? 1, g.payload);
+          if (g.currency) appState.addCurrency?.(g.currency|0);
+        }
+      });
+      appState.saveToStorage?.();
+    } catch (e) {
+      console.warn('[Story] grant failed:', e);
+    }
+  }
+
 
 
   _renderFrame(inner){
@@ -231,12 +260,14 @@ export class ChapterEngine {
   _onAdvance(chapter, slide, topOpt){
     const last = chapter.slides.length - 1;
 
+    // 🔔 new: process any slide-level item/currency grants
+    this._grantSlideRewards(slide);
+
     if (typeof slide.onAdvance === 'function') {
       slide.onAdvance({ appState, engine: this });
     }
 
     if (this.state.idx === last) {
-      // If slide wants to chain into another chapter, do it.
       if (slide.nextChapterId && this.registry[slide.nextChapterId]) {
         this.start(slide.nextChapterId);
         return;
@@ -250,6 +281,7 @@ export class ChapterEngine {
       this._renderSlide();
     }
   }
+
 
 
   _onLoop(slide){

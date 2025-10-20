@@ -56,6 +56,9 @@ let smAudioUnlockOnce = null;
 let __smAudioCtx = null;
 let __lastInterval = '';
 let __lastPlayTs = 0;
+let __smLastStoryTrack = null;
+let __smRotateTimer = null;
+
 
 // Assets
 const BASE = import.meta.env.BASE_URL;
@@ -539,6 +542,7 @@ function loadStoryMode() {
 export function stopStoryMode() {
   unwireHandlers();
   unwireSMAudioUnlock();
+  stopStoryRotation();
 
   try { stopTrack(); } catch {}
 
@@ -661,8 +665,11 @@ function renderChapterMenu() {
   // Start Story music: random, no immediate repeat, on first real tap path
  // Start Story music only if nothing is playing yet (first real tap path)
   if (!isPlaying?.()) {
-    kickStoryMusic({ forceNew: true });
+    // pick a random track but DON'T loop; we’ll rotate on end
+    kickStoryMusic({ forceNew: true, rotate: true });
+    startStoryRotation();
   }
+
 
 
 
@@ -882,7 +889,17 @@ function wireHandlersForCurrentRoot() {
 
   clickHandler = (e) => {
     // Global UI
-    if (e.target.closest('#smBackToMenu')) { backToMainMenu(); return; }
+    if (e.target.closest('#smBackToMenu')) {
+      // If we’re on a Prologue screen, go to the chapter selector inside Story Mode.
+      // Otherwise (Intro screen, Chapter Menu itself), fall back to the main menu.
+      const inPrologue = !!document.querySelector('.sm-prologue');
+      if (inPrologue) {
+        backToChapterMenu();
+      } else {
+        backToMainMenu();
+      }
+      return;
+    }
     if (e.target.closest('#smMute')) {
       const muted = toggleMute();
       const btn = elRoot.querySelector('#smMute');
@@ -942,6 +959,7 @@ function unwireHandlers() {
 
 function backToMainMenu() {
   playTransition(() => {
+    stopStoryRotation();
     stopStoryMode();
     document.querySelector(SELECTORS.menuWrapper)?.classList.remove('hidden');
     applyBackgroundTheme();
@@ -978,20 +996,22 @@ function unlockHowlerCtx() {
   } catch {}
 }
 
-function pickNextStoryTrack() {
+function pickNextStoryTrack(excludeId = null) {
   try {
     const pool = STORY_TRACKS.filter(Boolean);
     if (!pool.length) return null;
-    const cur = (() => { try { return currentTrackId?.(); } catch { return null; } })();
 
-    // avoid immediate repeat when we have 2+ tracks
-    const eligible = pool.length > 1 ? pool.filter(id => id !== cur) : pool;
+    // prefer the last-played id if we have it, else ask manager
+    const curOrLast = excludeId ?? __smLastStoryTrack ?? (() => { try { return currentTrackId?.(); } catch { return null; } })();
+
+    const eligible = pool.length > 1 ? pool.filter(id => id !== curOrLast) : pool;
     const idx = Math.floor(Math.random() * eligible.length);
     return eligible[idx] ?? pool[0];
   } catch {
     return STORY_TRACKS[0] ?? null;
   }
 }
+
 
 function ensureStoryLoop() {
   try { if (!getLooping?.()) toggleLoop(); } catch {}
@@ -1000,25 +1020,56 @@ function ensureStoryLoop() {
 /**
  * Kick story music:
  * - random pick from STORY_TRACKS
- * - never same as current (if 2+ tracks)
- * - optional forceNew to definitely change if something’s already playing
+ * - never same as last
+ * - rotate: don't loop; when song ends we'll start another
  */
-function kickStoryMusic({ forceNew = false } = {}) {
-  const wantId = pickNextStoryTrack();
+function kickStoryMusic({ forceNew = false, rotate = false } = {}) {
+  const wantId = pickNextStoryTrack(__smLastStoryTrack);
   if (!wantId) return;
 
   unlockHowlerCtx();
 
   const curId = (() => { try { return currentTrackId?.(); } catch { return null; } })();
-  const needChange = forceNew
-    ? (STORY_TRACKS.length > 1 ? true : !isPlaying?.())
-    : (!isPlaying?.() || curId !== wantId);
+  const needChange = forceNew ? (STORY_TRACKS.length > 1 ? true : !isPlaying?.())
+                              : (!isPlaying?.() || curId !== wantId);
 
   if (needChange) {
-    try { playTrack(wantId); } catch {}
+    try {
+      console.log('[StoryMusic] play →', wantId, '(prev was', __smLastStoryTrack, ')');
+      playTrack(wantId);
+      __smLastStoryTrack = wantId;
+    } catch {}
   }
-  ensureStoryLoop();
+
+  if (rotate) {
+    try { if (getLooping?.()) toggleLoop(); } catch {}
+  } else {
+    ensureStoryLoop();
+  }
 }
+
+function startStoryRotation() {
+  // rotation mode: make sure global looping is OFF
+  try { if (getLooping?.()) toggleLoop(); } catch {}
+
+  // only set one timer
+  if (__smRotateTimer) return;
+
+  __smRotateTimer = setInterval(() => {
+    try {
+      // when current track ends, musicManager should report not playing
+      if (!isPlaying?.()) {
+        kickStoryMusic({ forceNew: true, rotate: true });
+      }
+    } catch {}
+  }, 1000);
+}
+
+
+function stopStoryRotation() {
+  if (__smRotateTimer) { clearInterval(__smRotateTimer); __smRotateTimer = null; }
+}
+
 
 
 const smDing = new Howl({ src: [`${BASE}assets/audio/SFX/smDing.mp3`], volume: .25 });
