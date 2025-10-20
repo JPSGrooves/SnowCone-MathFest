@@ -1027,3 +1027,32 @@
 
 /* Safety: all primary containers may shrink */
 .sm-aspect-wrap, .sm-game-frame, .sm-ch1, .sm-ch1-wrap, .sm-slide{ min-height:0 !important; }
+/* === Visited choice affordance (non-destructive) === */
+.sm-btn.is-visited {
+  /* slightly darker, still clickable, still fun */
+  opacity: 0.92;
+  filter: brightness(0.95) saturate(0.95);
+  box-shadow: 0 0 8px rgba(255,255,255,0.06) inset;
+}
+
+/* the little check */
+.sm-check {
+  display: inline-block;
+  margin-right: 0.45ch;
+  font-weight: 900;
+  text-shadow: 0 0 6px rgba(0,255,238,0.45);
+}
+/* visited choice — darker but still clickable */
+.sm-btn.is-visited {
+  opacity: 0.92;
+  filter: brightness(0.95) saturate(0.95);
+  box-shadow: 0 0 8px rgba(255,255,255,0.06) inset;
+}
+
+/* the little checkmark before the label */
+.sm-check {
+  display: inline-block;
+  margin-right: 0.45ch;
+  font-weight: 900;
+  text-shadow: 0 0 6px rgba(0,255,238,0.45);
+}

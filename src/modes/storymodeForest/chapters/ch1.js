@@ -142,6 +142,7 @@ export const Chapter1 = {
             Breathe. Count. Let me know when you’re ready to roll.”`,
         mode: 'solo',
         role: SlideRole.ADVANCE,
+        soloLabel: 'Take the Job!', 
 
         // 🆕 would the reward system work here?
         grants: [ItemIds.WORK_BADGE],

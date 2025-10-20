@@ -21,7 +21,10 @@ export class ChapterEngine {
 
   start(chapterId){
     const chapter = this.registry[chapterId];
-    if (!chapter) return;
+    if (!chapter) {
+      console.warn('[Story] Unknown chapterId:', chapterId, 'Known:', Object.keys(this.registry));
+      return;
+    }
     this.state = {
       chapterId,
       idx: 0,          // 0..4 (five main slides)
@@ -29,6 +32,7 @@ export class ChapterEngine {
       quest: null,     // active quest step if any
       flags: {},
       revealed: new Set(), 
+      visited: new Set(), 
     };
     this._renderSlide();
   }
@@ -39,6 +43,18 @@ export class ChapterEngine {
     this.state.idx++;
     this._renderSlide();
   }
+
+  // 👇 visited-key helpers
+  _vKey(kind){ 
+    return `${this.state.chapterId}:${this.state.idx}:${kind}`; 
+  }
+  _isVisited(kind){ 
+    return this.state.visited.has(this._vKey(kind)); 
+  }
+  _markVisited(kind){ 
+    this.state.visited.add(this._vKey(kind)); 
+  }
+
 
   _goto(i){
     const last = this.registry[this.state.chapterId].slides.length - 1;
@@ -194,13 +210,10 @@ export class ChapterEngine {
       ? 'Go to Chapter 2 ➡️'
       : (isLast ? 'Finish Chapter' : 'Continue ➡️');
 
-  // keep supporting slide.dynamicTop, but default to our smart default
-  const topOpt = slide.dynamicTop?.(appState) ?? {
-    label: slide.topLabel ?? defaultTop,
-    disabled: false
-  };
+  // keep supporting slide.dynamicTop...
+  const topOpt = slide.dynamicTop?.(appState) ?? { label: slide.topLabel ?? defaultTop, disabled: false };
 
-  // allow labels to be strings OR functions (appState, engine) => string
+  // helper (must exist before we use it)
   const resolve = (v) => (typeof v === 'function' ? v(appState, this) : v);
 
   // category prefixes (can be overridden per slide)
@@ -222,39 +235,74 @@ export class ChapterEngine {
   const lbl = (kind, text) =>
     `<span class="sm-kind">${kind}:</span> <span class="sm-desc">${text}</span>`;
 
+      const buildBtn = (slot) => {
+      const visited = this._isVisited(slot);
+      const visitedClass = visited ? ' is-visited' : '';
+      const check = visited ? `<span class="sm-check" aria-hidden="true">✓</span>` : '';
+      const primary =
+        (slot === 'quest') || (slot === 'top'); // keep your visual priority
+      const cls = primary ? 'sm-btn sm-btn-primary' : 'sm-btn sm-btn-secondary';
+      const disabled = (slot === 'top' && topOpt.disabled) ? 'disabled' : '';
+
+      // map slot → handler class used by listeners
+      const handlerClass = (slot === 'top') ? 'js-advance' : `js-${slot}`;
+
+      // slot maps to kinds/desc keys ('top','loop','quest','weird')
+      const kindLabel = kinds[slot === 'weird' ? 'weird' : slot];
+      const textLabel = desc[slot === 'weird' ? 'weird' : slot];
+
+      return `
+        <button class="${cls} ${handlerClass}${visitedClass}" ${disabled}>
+          ${check}${lbl(kindLabel, textLabel)}
+        </button>`;
+    };
 
 
+
+    // 🔄 Lore → Quest → Puzzle → Story (uses buildBtn so visited styles appear)
     const choices = `
-      <button class="sm-btn sm-btn-primary js-advance" ${topOpt.disabled?'disabled':''}>
-        ${lbl(kinds.top,   desc.top)}
-      </button>
-      <button class="sm-btn sm-btn-secondary js-loop">
-        ${lbl(kinds.loop,  desc.loop)}
-      </button>
-      <button class="sm-btn sm-btn-primary js-quest">
-        ${lbl(kinds.quest, desc.quest)}
-      </button>
-      <button class="sm-btn sm-btn-secondary js-weird">
-        ${lbl(kinds.weird, desc.weird)}
-      </button>
+      ${buildBtn('weird')}
+      ${buildBtn('quest')}
+      ${buildBtn('loop')}
+      ${buildBtn('top')}
     `;
 
+  // compute CTA after resolve/choices exist
+  const ctaLabel = resolve(slide.soloLabel ?? slide.topLabel ?? 'Continue ➡️');
+  const body = (slide.mode === 'solo')
+    ? `${title}${img}${text}
+        <div class="sm-choice-list">
+          <button class="sm-btn sm-btn-primary js-advance">${ctaLabel}</button>
+        </div>`
+    : `${title}${img}${text}<div class="sm-choice-list">${choices}</div>`;
 
-    // special: equation-only slide (no choices) — use slide.mode === 'solo'
-    const body = (slide.mode === 'solo')
-      ? `${title}${img}${text}
-         <div class="sm-choice-list">
-           <button class="sm-btn sm-btn-primary js-advance">Continue ➡️</button>
-         </div>`
-      : `${title}${img}${text}<div class="sm-choice-list">${choices}</div>`;
+
 
     this._renderFrame(body);
 
-    const root = document;
-    root.querySelector('.js-advance')?.addEventListener('click', ()=> this._onAdvance(chapter, slide, topOpt));
-    root.querySelector('.js-loop')?.addEventListener('click', ()=> this._onLoop(slide));
-    root.querySelector('.js-quest')?.addEventListener('click', ()=> this._onQuest(slide));
-    root.querySelector('.js-weird')?.addEventListener('click', ()=> this._onWeird(slide));
+const root = document;
+
+// Story / advance
+root.querySelector('.js-advance')?.addEventListener('click', ()=> this._onAdvance(chapter, slide, topOpt));
+
+// Puzzle (loop)
+root.querySelector('.js-loop')?.addEventListener('click', ()=>{
+  this._markVisited('loop');   // ✅ mark as seen
+  this._onLoop(slide);
+});
+
+// Quest
+root.querySelector('.js-quest')?.addEventListener('click', ()=>{
+  this._markVisited('quest');  // ✅ mark as seen
+  this._onQuest(slide);
+});
+
+// Lore (weird)
+root.querySelector('.js-weird')?.addEventListener('click', ()=>{
+  this._markVisited('weird');  // ✅ mark as seen
+  this._onWeird(slide);
+});
+
   }
 
   _onAdvance(chapter, slide, topOpt){

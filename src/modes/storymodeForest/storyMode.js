@@ -28,8 +28,8 @@ import { Chapter2 } from './chapters/ch2.js';
 import { ItemIds } from '../../data/storySchema.js';
 import { ChapterEngine } from './chapterEngine.js';
 const Chapters = {
-  [Chapter1.id]: Chapter1,
-  [Chapter2.id]: Chapter2,
+   ch1: Chapter1,
+   ch2: Chapter2,
 };
 
 let chapterEngine;
