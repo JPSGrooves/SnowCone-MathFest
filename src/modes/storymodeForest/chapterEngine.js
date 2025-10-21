@@ -405,16 +405,48 @@ _onQuest(slide){
   doStep();
 }
 
+  // in chapterEngine.js, replace _onWeird with:
   _onWeird(slide){
-    if (!slide.weird) return this._renderSlide();
-    const inner = `
-      <h2 class="sm-ch1-title">${slide.weird.title}</h2>
-      ${slide.weird.img ? `<img class="sm-ch1-img" src="${slide.weird.img}" alt="">` : ''}
-      <div class="sm-ch1-text">${slide.weird.text}</div>
-      <div class="sm-choice-list">
-        <button class="sm-btn sm-btn-secondary js-back">Okay then…</button>
-      </div>`;
-    this._renderFrame(inner);
-    document.querySelector('.js-back')?.addEventListener('click', ()=> this._renderSlide());
+    const w = slide.weird;
+    if (!w) return this._renderSlide();
+
+    const hasExtra =
+        typeof w.extraWhen === 'function' ? !!w.extraWhen(appState, this) : false;
+    const extra = hasExtra
+        ? (typeof w.getExtra === 'function' ? w.getExtra(appState, this) : (w.extra || null))
+        : null;
+
+    const renderMain = () => {
+        const inner = `
+        <h2 class="sm-ch1-title">${w.title}</h2>
+        ${w.img ? `<img class="sm-ch1-img" src="${w.img}" alt="">` : ''}
+        <div class="sm-ch1-text">${w.text}</div>
+        <div class="sm-choice-list">
+            ${extra ? `<button class="sm-btn sm-btn-primary js-extra">See Note</button>` : ''}
+            <button class="sm-btn sm-btn-secondary js-back">Okay then…</button>
+        </div>`;
+        this._renderFrame(inner);
+        document.querySelector('.js-back')?.addEventListener('click', ()=> this._renderSlide());
+        if (extra) {
+        document.querySelector('.js-extra')?.addEventListener('click', ()=> renderExtra());
+        }
+    };
+
+    const renderExtra = () => {
+        const ex = extra || {};
+        const inner = `
+        <h2 class="sm-ch1-title">${ex.title ?? 'Field Notes'}</h2>
+        ${ex.img ? `<img class="sm-ch1-img" src="${ex.img}" alt="">` : ''}
+        <div class="sm-ch1-text">${ex.text ?? ''}</div>
+        <div class="sm-choice-list">
+            <button class="sm-btn sm-btn-secondary js-back">Back</button>
+        </div>`;
+        this._renderFrame(inner);
+        document.querySelector('.js-back')?.addEventListener('click', ()=> renderMain());
+    };
+
+    // ✅ Always show the main screen first
+    renderMain();
   }
+
 }
