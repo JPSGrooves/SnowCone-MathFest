@@ -406,6 +406,7 @@ _onQuest(slide){
 }
 
   // in chapterEngine.js, replace _onWeird with:
+ // in chapterEngine.js
   _onWeird(slide){
     const w = slide.weird;
     if (!w) return this._renderSlide();
@@ -416,19 +417,34 @@ _onQuest(slide){
         ? (typeof w.getExtra === 'function' ? w.getExtra(appState, this) : (w.extra || null))
         : null;
 
+    // 🔸 small helpers for visited state of the gated note
+    const VISIT_SLOT = 'weird.extra';
+    const isExtraVisited = () => this._isVisited(VISIT_SLOT);
+    const noteButtonHTML = (label = 'See Note') => {
+        const visitedCls = isExtraVisited() ? ' is-visited' : '';
+        const check = isExtraVisited() ? '<span class="sm-check" aria-hidden="true">✓</span> ' : '';
+        return `<button class="sm-btn sm-btn-primary js-extra${visitedCls}">${check}${label}</button>`;
+    };
+
     const renderMain = () => {
         const inner = `
         <h2 class="sm-ch1-title">${w.title}</h2>
         ${w.img ? `<img class="sm-ch1-img" src="${w.img}" alt="">` : ''}
         <div class="sm-ch1-text">${w.text}</div>
         <div class="sm-choice-list">
-            ${extra ? `<button class="sm-btn sm-btn-primary js-extra">See Note</button>` : ''}
+            ${extra ? noteButtonHTML('See Note') : ''}
             <button class="sm-btn sm-btn-secondary js-back">Okay then…</button>
         </div>`;
         this._renderFrame(inner);
+
         document.querySelector('.js-back')?.addEventListener('click', ()=> this._renderSlide());
+
         if (extra) {
-        document.querySelector('.js-extra')?.addEventListener('click', ()=> renderExtra());
+        document.querySelector('.js-extra')?.addEventListener('click', ()=> {
+            // ✅ mark once the player opens it
+            this._markVisited(VISIT_SLOT);
+            renderExtra();
+        });
         }
     };
 
@@ -442,10 +458,11 @@ _onQuest(slide){
             <button class="sm-btn sm-btn-secondary js-back">Back</button>
         </div>`;
         this._renderFrame(inner);
+        // Back returns to main which will now paint the ✓ + dim
         document.querySelector('.js-back')?.addEventListener('click', ()=> renderMain());
     };
 
-    // ✅ Always show the main screen first
+    // Always show the main screen first
     renderMain();
   }
 

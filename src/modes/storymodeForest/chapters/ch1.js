@@ -148,19 +148,18 @@ export const Chapter1 = {
     {
       title: 'You\'re in! Explore?',
       img: PRO_IMG('jehnkExplore.png'),
-      text: `"Hey man, I can hold down the fort here. Go check out the scene—just follow the cones and footprints!" Jehnk waves you off as he starts setting up his truck booth for the night.<br><br>The festival hums around you, a playground of light and sound stretching into the dark. Where to first?`,
+      text: `"Hey man, I can hold down the fisrt shift. Go check out the SnowCone MathFest!" Jehnk waves you off as he starts setting up his truck booth for the night.`,
       role: SlideRole.ADVANCE,
       topLabel: 'Start your shift ➡️',
-      loopLabel: 'Walk through ShakeSquare',
+      loopLabel: 'Stroll through ShakeSquare',
       questLabel: 'Turn off the CampLights',
       weirdLabel: 'More Syrup Bubbles?',
       loop: {
         title: 'ShakeSquare Stroll',
         img: PRO_IMG('shakeSquare.png'),
         text: `
-            The row opens like a neon canyon—tie-dye canopies, string lights, and chalk menus that hum with numbers.<br><br>
-            “Sine & Dine” flips <em>π</em>-day hand pies; “Prime Time Falafel” lists spices 2, 3, 5, 7. A kid twirls a beaded abacus like a wind chime. A vendor in mirrored shades holds up a prism: “Three for a dollar—refractions included.” Another hawks fractal tapestries that bloom when you step closer. You could get lost here for hours.<br><br>
-            You pocket the urge to browse and turn back toward the truck. Time to pay your way with Jehnk first.
+            The row opens like a neon, tie-dye canyon. "<em>π-Pretzels</em>"-tying delicious, unsolvable knots; “Gold Ratio Cones” selling garbitrary twists. A kid twirls a beaded abacus like a wind chime. A vendor in mirrored shades holds up a prime crystal: “Three for a dollar—refractions included.” Another offers fractal tapestries that bloom when you step closer. You could get lost here for hours.<br><br>
+            You pocket the urge to browse and turn back toward the truck. Somewhere past the tents, Jehnk’s offer calls like a promise.
         `,
       },
       quest: {
@@ -168,41 +167,39 @@ export const Chapter1 = {
         steps: [
             {
             img: PRO_IMG("campLight.png"),
-            text: `Someone stands under a blinding floodlight, staring it down.
-                    “If you can answer this, that’ll be my sign to flip it,” they say, tapping the dimmer box.
-                    <br><br><em>The dimmer halves brightness each click. Starting at 100%, after how many clicks is it
-                    effectively zero for sleepy eyes (below 1%)?</em>`,
+            text: `A small dino stands under a blinding floodlight, staring it down.
+                    “If you can answer this, that’ll be my sign to flip it,” it says, tapping the brightness switch.
+                    <br><br><em>If I half the brightness each click. Starting at 100%, after how many clicks is it
+                    effectively zero (below 1%)?</em>`,
             reveal: `7 clicks. Halves: 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.5625 → 0.78125%.
                     It drops below 1% after the <b>7th</b> click.`
             },
             {
             img: PRO_IMG("breakerBox.png"),
-            text: `You give the number. They grin and throw the switch. The generator coughs; the floodlight fades.`,
-            reveal: `“Honestly, I was gonna kill it either way—no one can sleep with that racket.”`
+            text: `You give an educated guess. The dino grins, palms the lever, and snaps it clean to <b>OFF</b>. The generator coughs twice; moths scatter; the floodlight exhales into dark.`,
+            reveal: `“Honestly, I was gonna kill it either way—I can’t depend on halves to tame these lights!”`
             },
             {
-            img: PRO_IMG("infinity.png"), // your circle sigil art
-            text: `They press a tiny circle charm into your palm—moon-white, now on a keyring.`,
-            reveal: `You receive the <b>Circle Shard</b> (moon keychain).`
+            img: PRO_IMG("moonChain.png"), // your circle sigil art
+            text: `With the field light gone, the night settles. He fishes something from his pocket and sets it in your palm: a tiny full moon on a stubby chain. La luna glows cool and steady, craters crisp, casting pale light across your fingers while the tents dim back to whispers.`,
+            reveal: `You receive the <b>MoonChain</b>.`
             }
         ],
         reward: {
             item: {
             id: ItemIds.CIRCLE_SHARD,                  // ✅ same item id as your “circle thing”
-            payload: { name: "Circle Shard", meta: { emoji: "⚪", note: "moon keychain" } }
+            payload: { name: "MoonChain", meta: { emoji: "⚪", note: "moon keychain" } }
             },
             currency: 50
         }
       },
       weird: {
         title: 'More Syrup Bubbles',
-        img: PRO_IMG('scienceGuy.png'),
+        img: PRO_IMG('scienceGuy2.png'),
         text: `
-            Under a humming camp light, Dr. Kenny Fields has turned a folding table into a lab.
-            Beakers crowd a griddle; pancakes flip in time with a metronome app.<br><br>
-            “I’m chasing a <em>float-then-kiss</em> bubble,” he says. “Light enough to hover, dense enough to coat.”<br>
-            He taps a grease card: <code>3:1</code> = heavy; <code>2:1</code> = poppy. “Somewhere in the pocket.”<br><br>
-            “If you spot a ratio board with triangles and spirals, send ’em my way.”`,
+          Under a humming camp light, Dr. Kenny Fields runs a tidy pop-up lab. Beakers hiss; pancakes flip to a metronome.<br><br>
+          “I’ve got it now,” he says. “The bubble floats, kisses, and coats—perfect, every time.” He grimaces. “Blast! The moment it pops, the flavor fades.”<br><br>
+          “I need a note that survives the pop. If you spot any ratio tricks, send them my way.”`,
 
         // ✅ bonus screen only if player holds the *square* (mint) item
         // NOTE: change ItemIds.MINT_SQUARE to your actual square item id (e.g. SQUARE_SIGIL, SQUARE_CHIP, etc.)
@@ -212,10 +209,11 @@ export const Chapter1 = {
             title: 'Square Mint, Eh?',
             img: PRO_IMG('mintSquare.png'),   // any square/mint art you’ve got
             text: `
-            You flash a small <b>square</b> that glows cool-green. Fields grins, then nods like he’s seen a ghost he knows.<br>
-            “Mint Square… classic. Nice find.” He scribbles a refinement:<br>
-            <code>sugar : water : syrup ≈ 5 : 3 : 1</code>, rest 30s, one tiny CO₂ burp.<br><br>
-            “That’s closer to a true float-then-kiss. When the camp lights finally cut, you’ll hear the bubbles <em>kiss</em> the ice.”`
+                You flash a small <b>square</b> that glows cool-green. Fields’ smile widens—recognition, not surprise.<br>
+                “Mint Square—classic,” he says. “That’s one of the first ratios folks try at SnowCone MathFest.”<br><br>
+                He jots: <code>sugar : water : syrup ≈ 5 : 3 : 1</code>, then taps the note and chuckles. 
+                “Good instincts. Believe me, I’ve run that one all night—float, kiss, perfect coat. But the moment it pops, the flavor ghosts.”<br><br>
+                “I’m hunting a note that <em>sticks</em> after the pop.”`
         }
       },
     },
