@@ -4,6 +4,7 @@ import { appState } from '../../data/appState.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 import { isMuted, toggleMute } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
+import { ITEM_DISPLAY} from '../../data/storySchema.js';
 
 const SELECTORS = { container: '#game-container' };
 const BASE = import.meta.env.BASE_URL;
@@ -153,15 +154,20 @@ export class ChapterEngine {
             <div class="sm-inv-cash">${appState.getCurrency()} ${CURRENCY_NAME}</div>
             <button class="sm-inv-close" aria-label="Close">✕</button>
         </div>
-        <div class="sm-inventory-grid">
-            ${appState.listItems().map(it=>`
-            <button class="sm-item" data-id="${it.id}">
-                <span class="sm-item-emoji">${it.meta?.emoji ?? '📦'}</span>
-                <span class="sm-item-name">${it.name}</span>
-                ${it.qty>1 ? `<span class="sm-item-qty">×${it.qty}</span>`:``}
-            </button>
-            `).join('') || `<div class="sm-empty">You’ve got pockets, but no treasures yet.</div>`}
-        </div>
+            <div class="sm-inventory-grid">
+                ${appState.listItems().map(it=>{
+                    const disp  = ITEM_DISPLAY[it.id] || {};
+                    const emoji = disp.emoji ?? it.meta?.emoji ?? '📦';
+                    const name  = disp.name  ?? it.name ?? it.id;
+                    return `
+                    <button class="sm-item" data-id="${it.id}">
+                        <span class="sm-item-emoji">${emoji}</span>
+                        <span class="sm-item-name">${name}</span>
+                        ${it.qty>1 ? `<span class="sm-item-qty">×${it.qty}</span>`:''}
+                    </button>
+                    `;
+                }).join('') || `<div class="sm-empty">You’ve got pockets, but no treasures yet.</div>`}
+            </div>
         </div>`;
 
     document.body.appendChild(sheet);
@@ -420,7 +426,7 @@ _onQuest(slide){
     // 🔸 small helpers for visited state of the gated note
     const VISIT_SLOT = 'weird.extra';
     const isExtraVisited = () => this._isVisited(VISIT_SLOT);
-    const noteButtonHTML = (label = 'See Note') => {
+    const noteButtonHTML = (label = 'Show MintSquare') => {
         const visitedCls = isExtraVisited() ? ' is-visited' : '';
         const check = isExtraVisited() ? '<span class="sm-check" aria-hidden="true">✓</span> ' : '';
         return `<button class="sm-btn sm-btn-primary js-extra${visitedCls}">${check}${label}</button>`;
@@ -432,7 +438,7 @@ _onQuest(slide){
         ${w.img ? `<img class="sm-ch1-img" src="${w.img}" alt="">` : ''}
         <div class="sm-ch1-text">${w.text}</div>
         <div class="sm-choice-list">
-            ${extra ? noteButtonHTML('See Note') : ''}
+            ${extra ? noteButtonHTML('Show MintSqaure') : ''}
             <button class="sm-btn sm-btn-secondary js-back">Okay then…</button>
         </div>`;
         this._renderFrame(inner);

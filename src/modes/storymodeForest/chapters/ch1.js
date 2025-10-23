@@ -87,7 +87,7 @@ export const Chapter1 = {
       topLabel: 'Toss ticket & turn back 😔',
       loopLabel: 'Stop by the wristband tent',
       questLabel: 'Sneak through a gap',
-      weirdLabel: 'Listen to the Rambler',
+      weirdLabel: 'A Rambler Walks By',
       // Slide 1 — replace ONLY the `loop` block on "Sold Out"
       loop: {
         title: 'Wristband Tent',
@@ -115,8 +115,8 @@ export const Chapter1 = {
             item: {
             id: ItemIds.SQUARE_SHARD,
             payload: {
-                name: 'Syrup Recipe',
-                meta: { emoji: '◼️', note: 'mint recipe on edible square paper' }
+                name: 'MintSquare',
+                meta: { emoji: '🟩', note: 'mint recipe on edible square paper' }
             }
             },
             currency: 50
@@ -181,7 +181,7 @@ export const Chapter1 = {
             },
             {
             img: PRO_IMG("moonChain.png"), // your circle sigil art
-            text: `With the field light gone, the night settles. He fishes something from his pocket and sets it in your palm: a tiny full moon on a stubby chain. La luna glows cool and steady, craters crisp, casting pale light across your fingers while the tents dim back to whispers.`,
+            text: `With the field light gone, the night settles. He fishes something from his pocket and sets it in your palm: a tiny full moon on a stubby chain.<br><br>La luna glows cool and steady, craters crisp, casting pale light across your fingers while the tents dim back to whispers.`,
             reveal: `You receive the <b>MoonChain</b>.`
             }
         ],
@@ -196,24 +196,16 @@ export const Chapter1 = {
       weird: {
         title: 'More Syrup Bubbles',
         img: PRO_IMG('scienceGuy2.png'),
-        text: `
-          Under a humming camp light, Dr. Kenny Fields runs a tidy pop-up lab. Beakers hiss; pancakes flip to a metronome.<br><br>
-          “I’ve got it now,” he says. “The bubble floats, kisses, and coats—perfect, every time.” He grimaces. “Blast! The moment it pops, the flavor fades.”<br><br>
-          “I need a note that survives the pop. If you spot any ratio tricks, send them my way.”`,
+        text: `Under a humming camp light, Dr. Kenny Fields runs a tidy pop-up lab.<br><br>“I’ve got it now,” he says. “The bubble floats, kisses, and coats—perfect, every time.” He grimaces, “Blast! The moment it pops, the flavor fades.”<br><br>“I need flavor that survives the pop. If you spot any ratio tricks, send them my way.”`,
 
         // ✅ bonus screen only if player holds the *square* (mint) item
         // NOTE: change ItemIds.MINT_SQUARE to your actual square item id (e.g. SQUARE_SIGIL, SQUARE_CHIP, etc.)
         extraWhen: (appState) => appState.hasItem?.(ItemIds.SQUARE_SHARD),
 
         extra: {
-            title: 'Square Mint, Eh?',
+            title: 'Mint Recipe, Eh?',
             img: PRO_IMG('mintSquare.png'),   // any square/mint art you’ve got
-            text: `
-                You flash a small <b>square</b> that glows cool-green. Fields’ smile widens—recognition, not surprise.<br>
-                “Mint Square—classic,” he says. “That’s one of the first ratios folks try at SnowCone MathFest.”<br><br>
-                He jots: <code>sugar : water : syrup ≈ 5 : 3 : 1</code>, then taps the note and chuckles. 
-                “Good instincts. Believe me, I’ve run that one all night—float, kiss, perfect coat. But the moment it pops, the flavor ghosts.”<br><br>
-                “I’m hunting a note that <em>sticks</em> after the pop.”`
+            text: `You flash a small <b>square</b> that glows cool-green. Fields’ smile widens—recognition, not surprise.<br>“Mint Square—classic,” he says. “That’s one of the first ratios folks try at SnowCone MathFest.”<br><br>“Good instincts. Believe me, I’ve run that one all night—float, kiss, perfect coat. But the moment it pops, the flavor ghosts.”<br><br>“Plus, this recipe can't use <em>mint</em>.”`
         }
       },
     },

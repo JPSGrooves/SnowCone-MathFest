@@ -1056,3 +1056,12 @@
   font-weight: 900;
   text-shadow: 0 0 6px rgba(0,255,238,0.45);
 }
+/* stronger visited dim for primary variant */
+.sm-btn-primary.is-visited {
+  opacity: 0.75;
+  filter: grayscale(0.12) brightness(0.88) saturate(0.88);
+  box-shadow: 0 0 6px rgba(255,255,255,0.05) inset;
+}
+.sm-btn-primary.is-visited:hover {
+  filter: grayscale(0.12) brightness(0.9) saturate(0.9);
+}

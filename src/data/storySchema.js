@@ -14,6 +14,16 @@ export const ItemIds = {
   WORK_BADGE: 'work_badge',
 };
 
+// storySchema.js
+export const ITEM_DISPLAY = Object.freeze({
+  [ItemIds.WORK_BADGE]:    { name: 'Work Badge',       emoji: '🪪' },
+  [ItemIds.CIRCLE_SHARD]:  { name: 'MoonChain',        emoji: '⚪' },
+  [ItemIds.TRIANGLE_SHARD]:{ name: 'Triangle Shard',   emoji: '🔺' },
+  [ItemIds.SQUARE_SHARD]:  { name: 'MintSquare',       emoji: '🟩' }, // closest “mint” square
+  [ItemIds.MASTER_SIGIL]:  { name: 'Perfect SnowCone', emoji: '🍧' },
+});
+
+
 export const CURRENCY_NAME = 'Cone Coins'; // TODO: rename to your canon anytime
 
 export const Currency = {
