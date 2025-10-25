@@ -46,7 +46,7 @@ const SELECTORS = {
   menuWrapper: '.menu-wrapper',
 };
 
-const STORY_TRACKS = ['prologue', 'bonusTime'];
+const STORY_TRACKS = ['prologue', 'bonusTime', 'patchrelaxes' ];
 
 let elRoot = null;
 let keyHandler = null;

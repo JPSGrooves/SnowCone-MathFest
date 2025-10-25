@@ -20,7 +20,7 @@ export const Chapter1 = {
     {
       title: 'The Gate',
       img: PRO_IMG('gate.png'),
-      text: `When you arrive, it's 2am, dark, dewy, and the festival gate looms. You bought your ticket months ago and can't wait to see what the festival has to offer. A Dino Divider ushers you into a parking spot, and emerging from you car, you decide to make a move.`,
+      text: `When you arrive, it's 2am, dark, dewy, and the festival gate looms. You bought your ticket months ago and can't wait to see what the festival has to offer. A Dino Divider ushers you into a parking spot, and emerging from your car, you decide to make a move.`,
       role: SlideRole.ADVANCE,
       topLabel: 'Step up to the gate! ➡️',
       loopLabel: 'Stare at the dinosaurs',
@@ -32,7 +32,7 @@ export const Chapter1 = {
         text: `You linger at the ropes and the Dinos catch your look. One walks over and grins.<br>
         “We’re the Dino Dividers, line keepers, vibe shepherds, buddy-system champs.”
         She points to the footprints and glowing cones.<br><br>“We pair folks up, keep the beat moving,
-        answer questions, and make sure nobody misses their first chill.” A claw waves good bye. “Hope you have fun!”`,
+        answer questions, and make sure nobody misses their first chill.” A claw waves good-bye. “Hope you have fun!”`,
         },
 
       quest: {
@@ -40,7 +40,7 @@ export const Chapter1 = {
       steps: [
         {
         img: PRO_IMG('hippyTriangle.png'),
-        text: `She breezes between bumpers, shoulder-strap tray jangling.<br><br> “Triangles, triangles!” she grins—then clocks your empty pockets. “No coin? No problem. Pay with math.” <br><br>She chalks: 3–4–? and taps a right angle. “Shortest path corner-to-corner?”`,
+        text: `She breezes between bumpers, shoulder-strap tray jangling.<br><br> “Triangles, triangles!” she grins...then clocks your empty pockets. “No coin? No problem. Pay with math.” <br><br>She chalks: 3–4–? and taps a right angle. “Shortest path corner-to-corner?”`,
         reveal: `5 — the hypotenuse. “Math accepted,” she laughs.`
         },
         {
@@ -61,7 +61,7 @@ export const Chapter1 = {
       weird: {
         title: 'Syrupy Scientist',
         img: PRO_IMG('scienceGuy.png'),
-        text: `By the hatchback, Dr. Kenny Fields flips pancakes under string lights. <br><br>He’s chasing a “float-then-kiss” bubble—light enough to hover, dense enough to coat.<br><br> “Ratios are wrong,” he mutters. “Too heavy at 3:1, too poppy at 2:1. I drove here for help—someone here knows the mix.”<br><br>If you see a ratio board marked with triangles and spirals, send him there`,
+        text: `By the hatchback, Dr. Kenny Fields flips pancakes under string lights. <br><br>He’s chasing a “float-then-kiss” bubble; light enough to hover, dense enough to coat.<br><br> “Ratios are wrong,” he mutters. “Too heavy at 3:1, too poppy at 2:1. I drove here for help...someone here knows the mix.”<br><br>If you see a ratio board marked with triangles and spirals, send him there`,
       },
 
       meta: {
@@ -82,9 +82,9 @@ export const Chapter1 = {
     {
       title: 'All Sold Out',
       img: PRO_IMG('noEntry.png'),
-      text: `Guard: “Dude, who gave you a ticket? It's wristbands only...”<br><br>The biker dino isn’t mad—just bummed for you. He tilts the scanner toward a sign that reads <i>WRISTBAND TENT ➜</i>.`,
+      text: `Guard: “Dude, who gave you a ticket? It's wristbands only...”<br><br>The biker dino isn’t mad — just bummed for you. He tilts the scanner toward a sign that reads <i>WRISTBAND TENT ➜</i>.`,
       role: SlideRole.ADVANCE,
-      topLabel: 'Toss ticket & turn back 😔',
+      topLabel: 'Toss ticket & give up 😔',
       loopLabel: 'Stop by the wristband tent',
       questLabel: 'Sneak through a gap',
       weirdLabel: 'A Rambler Walks By',
@@ -93,8 +93,8 @@ export const Chapter1 = {
         title: 'Wristband Tent',
         img: PRO_IMG('wristbandTent.png'),
         text:
-            `The pop-up tent flaps in the breeze. A clipboard on the table reads:<b>SOLD OUT</b>.<br>Beside it, a hand-lettered sign:<br>“<i>Can’t get in? Talk to Jehnk!</i>”<br><br>
-            As you stand there with dew soaking into your shoes, the night feels suddenly bigger; yet, your pocket feels light.<br><br>Who is Jehnk? You try the name out under your breath—“Jehnk”—and feel the festival listening back.`
+            `The pop-up tent flaps in the breeze. A clipboard on the table reads:<br><b>SOLD OUT</b>.<br>Beside it, a hand-lettered sign:<br>“<i>Can’t get in? Talk to Jehnk!</i>”<br><br>
+            As you stand there with dew soaking into your shoes, the night feels suddenly bigger; yet, your pockets feel light.<br><br>Who is Jehnk? You try the name out under your breath—“Jehnk”—and feel the festival listening back.`
       },
 
       // Slide 1 — QUEST (replace the whole quest block)
@@ -103,12 +103,12 @@ export const Chapter1 = {
         steps: [
             {
             img: PRO_IMG('bikerDino.png'), // add this asset
-            text: `You edge along the rope line and slip toward a gap. A biker dino steps in; he's calm, firm, sympathetic.<br><br>“Sorry, I can't let you in. This is literally my only job.” He lowers his voice: “Answer me this and I’ll give you something that’ll blow him away:<br><br> The <i>festival grounds</i> have a perimeter of 2 miles. What’s the area?”`,
-            reveal: `The sides of the fest = .5 miles,<br>The area = .5 × .5 = <b>.25 square miles</b>.`
+            text: `You edge along the rope line and slip toward a gap. A biker dino steps in; he's calm, firm, sympathetic.<br><br>“Sorry, I can't let you in. This is literally my only job.” He lowers his voice: “Answer me this and I’ll give you a coveted festival secret:<br><br> The <i>festival grounds</i> has a perimeter of 2 miles. What’s the area?”`,
+            reveal: `4 sides = .5 miles each,<br>The area = .5 × .5 = <b>.25 square miles</b>.`
             },
             {
             img: PRO_IMG('mintSquareRecipe.png'), // add this asset
-            text: `He presses a perfectly square mint recipe into your hand; it's an edible paper, mint-green ink.<br><br>“Use the sheet in the mix; it’s part of the recipe,” he says. “If you find Jehnk, show him this. He’s got a thing for mint and neat squares.<br><br>You put the card in your <b>inventory</b>, wondering if someone else might need those ratios.”`
+            text: `He presses a perfectly square mint recipe into your hand; it's on edible paper with mint-green ink.<br><br>“Use the sheet in the mix; it’s part of the recipe!” he says. “If you find Jehnk, show it to him. He’s got a thing for mint and neat squares."<br><br>You put the card in your <b>inventory</b>, wondering if someone else might need those ratios.`
             }
         ],
         reward: {
@@ -126,7 +126,7 @@ export const Chapter1 = {
       weird: {
         title: 'A Rambler Walks By',
         img: PRO_IMG('rambler.png'),
-        text: `From the neon mist, a beanie’d rambler drifts past, patting every pocket. “Wristband… I <i>worked for Jehnk last year</i>—does that still count?”<br><br>He shoves his hand into his hoodie and—<i>poof</i>—it vanishes to the elbow. He yelps, pulls it back dusted with dew. “Okay. My pocket folded into the space-time continuum <i>again</i>. It was right here, I swear.”<br><br>He gives you a conspiratorial nod and wanders on, still fishing for a wristband that might be orbiting a small moon.`
+        text: `From the neon mist, a beanie’d rambler drifts past, patting every pocket. “My wristband… I <i>worked for Jehnk last year</i>—does that still count?”<br><br>He shoves his hand into his hoodie and—<i>poof</i>—it vanishes to the elbow. He yelps, pulls it back dusted with dew. “Okay. My pocket folded into the space-time continuum <i>again</i>. It was right here, I swear.”<br><br>He gives you a conspiratorial nod and wanders on, still fishing for a wristband that might be orbiting a small moon.`
       }
     },
 
@@ -134,7 +134,7 @@ export const Chapter1 = {
     {
       title: "Jehnk Swirves In",
         img: PRO_IMG('jehnkTruck.png'), // ← use the iconic truck art
-        text:`The ground rumbles and tires squeal, as Jehnk swerves in and does a few infinity burnouts.<br><br>He stops the truck and leans out with an easy grin; sunglasses reflecting the 2AM neon. “Evening, camper. You look like someone who found the music but lost the map.”<br><br>He slides a <b>WorkBadge</b> your way. “Everyone starts right here at the gates! <b>You wanna work your way in?</b>”`,
+        text:`The ground rumbles and tires squeal, as Jehnk swerves in and does a few infinity burnouts.<br><br>He stops the truck and leans out with an easy grin, sunglasses reflecting the 2AM neon. “Evening, camper. You look like someone who found the music but lost the map.”<br><br>He slides a <b>WorkBadge</b> your way. “Everyone starts right here at the gates! <b>You wanna work your way in?</b>”`,
         mode: 'solo',
         role: SlideRole.ADVANCE,
         soloLabel: 'Take the Job!', 
@@ -148,7 +148,7 @@ export const Chapter1 = {
     {
       title: 'You\'re in! Explore?',
       img: PRO_IMG('jehnkExplore.png'),
-      text: `"Hey man, I can hold down the fisrt shift. Go check out the SnowCone MathFest!" Jehnk waves you off as he starts setting up his truck booth for the night.`,
+      text: `"Hey man, I can hold down the first shift. Go check out the SnowCone MathFest!" Jehnk waves you off as he starts setting up his truck booth for the night.`,
       role: SlideRole.ADVANCE,
       topLabel: 'Start your shift ➡️',
       loopLabel: 'Stroll through ShakeSquare',
@@ -158,7 +158,7 @@ export const Chapter1 = {
         title: 'ShakeSquare Stroll',
         img: PRO_IMG('shakeSquare.png'),
         text: `
-            The row opens like a neon, tie-dye canyon. "<em>π-Pretzels</em>"-tying delicious, unsolvable knots; “Gold Ratio Cones” selling garbitrary twists. A kid twirls a beaded abacus like a wind chime. A vendor in mirrored shades holds up a prime crystal: “Three for a dollar—refractions included.” Another offers fractal tapestries that bloom when you step closer. You could get lost here for hours.<br><br>
+            The row opens like a neon, tie-dye canyon. "<em>π-Pretzels</em>"-tying delicious, unsolvable knots; “Gold Ratio Cones” selling arbitrary twists. A kid dino walks by with a mysterious backpack. A vendor in mirrored shades holds up a prime crystal: “Three for a dollar—refractions included.” Another offers fractal tapestries that bloom when you step closer. You could get lost here for hours.<br><br>
             You pocket the urge to browse and turn back toward the truck. Somewhere past the tents, Jehnk’s offer calls like a promise.
         `,
       },
@@ -168,7 +168,7 @@ export const Chapter1 = {
             {
             img: PRO_IMG("campLight.png"),
             text: `A small dino stands under a blinding floodlight, staring it down.
-                    “If you can answer this, that’ll be my sign to flip it,” it says, tapping the brightness switch.
+                    “If you can answer this, that’ll be my sign to flip it,” he says, tapping the brightness switch.
                     <br><br><em>If I half the brightness each click. Starting at 100%, after how many clicks is it
                     effectively zero (below 1%)?</em>`,
             reveal: `7 clicks. Halves: 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.5625 → 0.78125%.
@@ -177,11 +177,11 @@ export const Chapter1 = {
             {
             img: PRO_IMG("breakerBox.png"),
             text: `You give an educated guess. The dino grins, palms the lever, and snaps it clean to <b>OFF</b>. The generator coughs twice; moths scatter; the floodlight exhales into dark.`,
-            reveal: `“Honestly, I was gonna kill it either way—I can’t depend on halves to tame these lights!”`
+            reveal: `“Honestly, I was gonna kill it either way—we're gonna need zeroes to tame these lights!”`
             },
             {
             img: PRO_IMG("moonChain.png"), // your circle sigil art
-            text: `With the field light gone, the night settles. He fishes something from his pocket and sets it in your palm: a tiny full moon on a stubby chain.<br><br>La luna glows cool and steady, craters crisp, casting pale light across your fingers while the tents dim back to whispers.`,
+            text: `With the field light gone, the night settles. He fishes something from his pocket and sets it in your palm: a tiny full moon on a stubby chain.<br><br>La Luna glows cool and steady, craters crisp, casting pale light across your fingers while the tents dim back to whispers.`,
             reveal: `You receive the <b>MoonChain</b>.`
             }
         ],
