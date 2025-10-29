@@ -213,8 +213,9 @@ export const Chapter1 = {
     // 4) Last slide — go to Chapter 2, with dynamic side paths
     {
       title: 'Back to the Truck',
-      img: PRO_IMG('jehnk2Cones.png'),
-      text: `Jehnk eyes your pockets. “Whatcha find out there?”`,
+      img: PRO_IMG('jehnkNews.png'),
+      text: `“Alright, map-finder… what’d the festival trade you for your time?” He breathes through his nose, “Mmm. That’s mint. And… lime? You been reading recipe cards in the mist?”<br><br>He taps the truck door twice—clink, clink. “Out here, math is a language and items are verbs.`,
+
       role: SlideRole.ADVANCE,
 
       // Top choice: go straight into Chapter 2
@@ -222,12 +223,12 @@ export const Chapter1 = {
       nextChapterId: 'ch2',
 
       // Side choices: dynamic descriptors
-      loopLabel: 'Square puzzle',
+      loopLabel: 'Question the Recipes',
       questLabel: (appState) => {
         const total = (appState.listItems?.() ?? []).reduce((n, it) => n + (it.qty ?? 1), 0);
-        return total >= 3 ? 'Forge the Master Sigil' : 'Scavenge more parts';
+        return total >= 3 ? 'Forge the Perfect SnowCone' : 'Scavenge more parts';
       },
-      weirdLabel: 'Strange syrup lore',
+      weirdLabel: 'A Syrup Story',
 
       meta: {
         top:   { kind: 'Story' },
@@ -236,30 +237,95 @@ export const Chapter1 = {
         weird: { kind: 'Lore' },
       },
 
-      loop: {
-        title: 'Square Quest',
-        img: `${BASE}assets/img/modes/storymodeForest/art/puzzle_card.png`,
-        text: `A recipe card: 300 ml mix, mint:lime = 2:3. What are the parts?`,
-      },
+loop: {
+  title: 'Question the Recipes',
+  img: PRO_IMG('jehnkRecipe.png'),
+  text: `
+    Jehnk flips a stained card onto the counter. <i>“Ratios are stories. Taste the math.”</i><br><br>
+    <b>Red</b> is momentum — bright and quick; a triangle of taste that spikes if you rush the sugar.<br>
+    <b>Green</b> is patience — mint arrives when the heat leaves; time does the steeping, not the flame.<br>
+    <b>Purple</b> is depth — grape needs a quiet flashlight of acid so the bass notes don’t go muddy.`
+},
+
 
       quest: {
         title: 'Pocket Check',
         getSteps(appState) {
-          const total = (appState.listItems?.() ?? []).reduce((n, it) => n + (it.qty ?? 1), 0);
-          if (total >= 3) {
+            const has = (id) => appState?.hasItem?.(id);
+            const hasTriangle = has(ItemIds.TRIANGLE_SHARD);
+            const hasSquare   = has(ItemIds.SQUARE_SHARD);   // Mint Square recipe
+            const hasCircle   = has(ItemIds.CIRCLE_SHARD);   // MoonChain
+            const haveAll = hasTriangle && hasSquare && hasCircle;
+
+           if (haveAll) {
             return [
-              { text: 'You lay out the parts: a sigil shard, a token, a tag.', reveal: 'They lock together like magnets.' },
-              { text: 'A faint hum rises from the pieces.', reveal: 'The Master Sigil clicks into place. The gate listens.' },
+                {
+                img: PRO_IMG('essentialsTrio.png'),
+                imgAlt: 'Triangle Shard (Perpetual Chill), Mint Square recipe (The Ratio & Flavor), and MoonChain (The Shape Model) glowing on a dark field.',
+                // ⬇️ SHORT pre-reveal; long detail stays in `reveal`
+                text: `On the tailgate: a frost-bright shard, a mint-square ratio, and a moonlit chain. Three pieces; one method waiting to click.`,
+                reveal: `These are the festival’s three essentials, kid: <b>Chill</b> (the shard’s cryo snap), <b>Flavor</b> (that 2:3 mint-lime choir), and <b>Shapes</b> (the moon’s perfect loop guiding the spiral).<br><br>
+                        Line them up and you get the method: <i>Chill → Mix → Shape</i>. The bench lights breathe brighter, like they know what comes next.`
+                },
+                {
+                img: PRO_IMG('essentialsTrio2.png'),
+                imgAlt: 'Triangle Shard, Mint Square 2:3 recipe, and MoonChain spiraling together into a single flow.',
+                text: `You lift them: cold breath, a glowing 2:3, and a steady lunar spin. The motions begin to braid.`,
+                reveal: `The pieces <i>lock</i> with a little cosmic thunk—first a chill tone, then a bright 2:3 chord, then a soft lunar hum. A halo of neon bubbles lifts from your workbench as the mixture stabilizes.<br><br>
+                        <b>Chill anchors.</b> <b>Flavor harmonizes.</b> <b>Shape guides.</b><br>
+                        Your hands know the rest: spiral, crest, and crown. The Perfect SnowCone is ready to be born.`
+                },
+                {
+                img: PRO_IMG('essentialsTrio3.png'),
+                imgAlt: 'Jehnk cues the final steps at the truck: pack ice, swirl a 2:3 mint–lime ribbon, crown it with a precise triangle crest as neon bubbles glow at 2AM.',
+                text: `Jehnk cues the finale: pack ice, pour a steady <b>2:3</b> ribbon, finish with a triangle crest.`,
+                reveal: `<b>Perfect SnowCone crafted!</b> Neon bubbles rise and drift like little planets as the cone gleams in the 2AM glow.<br><br>
+                        The stack sings in three parts—<b>Chill</b> holds the shape, <b>Flavor</b> rings out 2:3 bright, <b>Geometry</b> keeps the swirl honest. Jehnk grins: “Serve that comet cone, traveler.” 🫧🍧`
+                }
             ];
-          }
-          return [{ text: 'Not quite enough to craft the Sigil.', reveal: 'Try the puzzle or lore paths for another piece.' }];
+            }
+
+
+            // Partial set: name what’s missing
+            const missing = [
+            !hasTriangle ? 'a Triangle Shard' : null,
+            !hasSquare   ? 'the Mint Square recipe' : null,
+            !hasCircle   ? 'the MoonChain' : null,
+            ].filter(Boolean).join(', ');
+
+            return [{
+            img: PRO_IMG('essentialsTrio0.png'),
+            imgAlt: 'Three neon question marks where the Triangle Shard, Mint Square 2:3, and MoonChain should be.',
+            text: `You pat every pocket, then the jacket you forgot you were wearing—lint, a token stub, and vibes… but no treasures. Close—so close—but you’re missing ${missing || 'something vital'}.<br><br>
+            A frosty outline where the shard should sit, a minty whisper where the ratio card belongs, and a pale lunar ring waiting for its chain. The bench lights flicker and float up three polite question marks, like the night itself is asking, “uh… where’s the gear, traveler?”`,
+            reveal: `No worries—every perfect cone starts with a scavenger list. Hit the <b>puzzle</b> lanes and the <b>lore</b> detours to assemble all three: the <b>Triangle Shard</b> for <i>Chill</i>, the <b>Mint Square (2:3)</b> for <i>Flavor</i>, and the <b>MoonChain</b> for <i>Shape</i>.<br><br>
+            When they click together, your rig will hum, the neon will rise, and your hands will know the spiral. That’s when you spin the <b>Perfect SnowCone</b>.`
+            }];
+
         },
         reward: { currency: 50 },
       },
 
+
+      // replace your current entry
       weird: {
-        title: 'Bubble Follows You',
-        text: `A syrup bubble drifts by, reflecting triangles that weren’t there a second ago.`,
+        title: 'A Bubble Follows You',
+        img: PRO_IMG('syrupBubble.png'), // close-up bubble near ear w/ triangle reflections
+        imgAlt: 'A shimmering syrup bubble floating by your ear, reflecting glowing triangles.',
+        text: `A syrup bubble drifts by, reflecting triangles that weren’t there a second ago.<br><br>“This must be the work of none other than Dr. Kenny Fields,” Jehnk muses. “He’s been experimenting with festival syrup bubbles for pancakes, but never tells anyone that they follow people around."<br><br>He points, "You’ve got one floating right by your ear.”`,
+
+        // 👇 new: force the CTA copy on this slide
+        extraLabel: 'Reveal More',
+
+        // 🔓 follow-up is contingent on Work Badge
+        extraWhen: (appState) => appState?.hasItem?.(ItemIds.WORK_BADGE),
+
+        extra: {
+            title: 'Three Days of Bubbles',
+            img: PRO_IMG('fieldsBubbleStory.png'),
+            imgAlt: 'Jehnk and Dr. Kenny Fields surrounded by neon syrup bubbles over the festival tents at 2AM.',
+            text: `Jehnk leans back, grinning. “Me and Dr. Kenny Fields? Yeah, we tuned syrups together—ratios perfect, viscosity money.<br><br>Then Kenny gets obsessed with bubbles. Not just a few—like, a *weather system* of bubbles. They swarmed the Midway and wouldn’t pop unless you danced.<br><br>Whole festival formed a conga line and we—no joke—danced that cloud out for three days straight. Best cardio of my life. Worst cleanup.”`,
+        },
       },
 
       // award on press (also handles forging if the player has everything)

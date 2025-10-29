@@ -17,8 +17,56 @@
 * ✅ **v0.9.7 – Music/SFX Complete/Polished**
 * ✅ **v0.9.8 – Celebrations Complete/Polished**
 * ✅ **v0.9.9 – Just Small Details Now**
-* 🎯 **v1.0.0 – Final Polish + Launch Ready✨**
+* ✅ **v1.0.0 – Final Polish + Launch Ready✨**
+* ✅ **v1.1.0 – Chapter 1: It Has Begun✨**
+* 🎯 **v1.2.0 – Chapter 2 in Story Mode✨**
 
+## [1.1.0] – 2025-10-26 — **It Has Begun — Chapter 1 Complete**
+
+### Added
+
+* **Story Mode Forest:** **Prologue + Chapter 1 (*The Gates of Dawn*) complete.**
+* **Lore loop — “Question the Recipes”:** single-screen exposition teeing up Red/Green/Purple flavor stories.
+* **Quest — “Pocket Check”:** have-all branch forges the perfect cone and advances progression.
+* **Chapter finish drip** and **clean hand-off to Chapter 2** from “Back to the Truck.”
+* **Forge flow & rewards (Chapter 1):**
+
+  * When player holds **Triangle Shard**, **Mint Square**, and **MoonChain**, grant **Master Sigil** and currency; badge hook wired for the forge moment.
+
+### Changed
+
+* **Pocket Check copy discipline:** short pre-reveal blurbs; the **Reveal** carries the big prose (no “double wall of text”).
+* **Version tab copy:** updated to call out **Chapter 1 complete** alongside the Save Tools note.
+
+### Fixed
+
+* **Loop “undefined” blip:** loop renderer expects `loop.text`; ensured it’s present even when experimenting with steps.
+* **Loop bounce after first page:** collapsed the loop to **one slide (exposition)** to match the engine’s loop model; no accidental return to options.
+
+
+## [1.0.0] – 2025-10-26 — **Final Polish + Launch Ready ✨**
+
+### Added
+
+* **Save Tools (rock-solid):**
+
+  * Robust **Download Save** with delayed URL revoke + in-DOM anchor for Safari compliance.
+  * **iOS PWA Share** fallback (`navigator.share({ files })`) and **data-URL** backup.
+  * Clipboard failover (copies JSON) when downloads aren’t permitted.
+* **Export snapshot guardrails:** prefers `appState.toJSON()`, then `structuredClone` → JSON round-trip → minimal curated snapshot to avoid MobX cycles.
+* **Import hardening:** reads as ArrayBuffer + TextDecoder → JSON; calls `appState.importFromJSON()` when present; sets `forceWelcomeReload` and nudges reload; optionally persists via `appState.saveToStorage?.()`.
+
+### Changed
+
+* Final copy pass across About/Info and headings; **JPSGrooves.com** featured first; credit line louder: *Built end-to-end by JPS Grooves*.
+* Subtle presentation nips/tucks for consistency with the polished v0.9.9 UI.
+
+### Fixed
+
+* Rare Safari/PWA cases where downloads silently failed due to early URL revocation or detached anchors.
+* Reset now clears both `localStorage` and `sessionStorage`, ensuring a truly fresh start.
+
+> ✅ **Smoke test:** Reset → Import → full state restore (themes/badges/XP) confirmed.
 
 ## v0.9.9 — Just Small Details Now (October 11, 2025)
 

@@ -454,4 +454,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: 'v0.9.9 — Just Small Details Now' };
+window.devFlags = { build: 'v1.1.0 — Chapter 1: It Has Begun' };

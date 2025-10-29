@@ -365,7 +365,7 @@ _onQuest(slide){
 
     const inner = `
       <h2 class="sm-ch1-title">${slide.quest.title}</h2>
-      ${s.img ? `<img class="sm-ch1-img" src="${s.img}" alt="">` : ''}
+      ${s.img ? `<img class="sm-ch1-img" src="${s.img}" alt="${s.imgAlt ?? ''}">` : ''}
       <div class="sm-ch1-text">${s.text}</div>
 
       <div class="sm-ch1-reveal-hold">
@@ -414,62 +414,68 @@ _onQuest(slide){
   // in chapterEngine.js, replace _onWeird with:
  // in chapterEngine.js
   _onWeird(slide){
-    const w = slide.weird;
-    if (!w) return this._renderSlide();
+  const w = slide.weird;
+  if (!w) return this._renderSlide();
 
-    const hasExtra =
-        typeof w.extraWhen === 'function' ? !!w.extraWhen(appState, this) : false;
-    const extra = hasExtra
-        ? (typeof w.getExtra === 'function' ? w.getExtra(appState, this) : (w.extra || null))
-        : null;
+  const hasExtra =
+    (typeof w.extraWhen === 'function') ? !!w.extraWhen(appState, this) : false;
+  const extra = hasExtra
+    ? (typeof w.getExtra === 'function' ? w.getExtra(appState, this) : (w.extra || null))
+    : null;
 
-    // 🔸 small helpers for visited state of the gated note
-    const VISIT_SLOT = 'weird.extra';
-    const isExtraVisited = () => this._isVisited(VISIT_SLOT);
-    const noteButtonHTML = (label = 'Show MintSquare') => {
-        const visitedCls = isExtraVisited() ? ' is-visited' : '';
-        const check = isExtraVisited() ? '<span class="sm-check" aria-hidden="true">✓</span> ' : '';
-        return `<button class="sm-btn sm-btn-primary js-extra${visitedCls}">${check}${label}</button>`;
-    };
+  // visited state for the gated note
+  const VISIT_SLOT = 'weird.extra';
+  const isExtraVisited = () => this._isVisited(VISIT_SLOT);
 
-    const renderMain = () => {
-        const inner = `
-        <h2 class="sm-ch1-title">${w.title}</h2>
-        ${w.img ? `<img class="sm-ch1-img" src="${w.img}" alt="">` : ''}
-        <div class="sm-ch1-text">${w.text}</div>
-        <div class="sm-choice-list">
-            ${extra ? noteButtonHTML('Show MintSqaure') : ''}
-            <button class="sm-btn sm-btn-secondary js-back">Okay then…</button>
-        </div>`;
-        this._renderFrame(inner);
+  // 🔹 resolve the CTA label once; allow per-slide override via w.extraLabel
+  const extraLabel =
+    (w && typeof w.extraLabel === 'string' && w.extraLabel.trim())
+      ? w.extraLabel.trim()
+      : 'Show MintSquare'; // <- global default for other slides
 
-        document.querySelector('.js-back')?.addEventListener('click', ()=> this._renderSlide());
+  // button factory (defaults to the resolved label above)
+  const noteButtonHTML = (label = extraLabel) => {
+    const visitedCls = isExtraVisited() ? ' is-visited' : '';
+    const check = isExtraVisited() ? '<span class="sm-check" aria-hidden="true">✓</span> ' : '';
+    return `<button class="sm-btn sm-btn-primary js-extra${visitedCls}">${check}${label}</button>`;
+  };
 
-        if (extra) {
-        document.querySelector('.js-extra')?.addEventListener('click', ()=> {
-            // ✅ mark once the player opens it
-            this._markVisited(VISIT_SLOT);
-            renderExtra();
-        });
-        }
-    };
+  const renderMain = () => {
+    const inner = `
+      <h2 class="sm-ch1-title">${w.title}</h2>
+      ${w.img ? `<img class="sm-ch1-img" src="${w.img}" alt="">` : ''}
+      <div class="sm-ch1-text">${w.text}</div>
+      <div class="sm-choice-list">
+        ${extra ? noteButtonHTML() : ''}  <!-- uses extraLabel (e.g., "Reveal More") -->
+        <button class="sm-btn sm-btn-secondary js-back">Okay then…</button>
+      </div>`;
+    this._renderFrame(inner);
 
-    const renderExtra = () => {
-        const ex = extra || {};
-        const inner = `
-        <h2 class="sm-ch1-title">${ex.title ?? 'Field Notes'}</h2>
-        ${ex.img ? `<img class="sm-ch1-img" src="${ex.img}" alt="">` : ''}
-        <div class="sm-ch1-text">${ex.text ?? ''}</div>
-        <div class="sm-choice-list">
-            <button class="sm-btn sm-btn-secondary js-back">Back</button>
-        </div>`;
-        this._renderFrame(inner);
-        // Back returns to main which will now paint the ✓ + dim
-        document.querySelector('.js-back')?.addEventListener('click', ()=> renderMain());
-    };
+    document.querySelector('.js-back')?.addEventListener('click', ()=> this._renderSlide());
 
-    // Always show the main screen first
-    renderMain();
-  }
+    if (extra) {
+      document.querySelector('.js-extra')?.addEventListener('click', ()=> {
+        this._markVisited(VISIT_SLOT); // mark when opened
+        renderExtra();
+      }, { once: true });
+    }
+  };
+
+  const renderExtra = () => {
+    const ex = extra || {};
+    const inner = `
+      <h2 class="sm-ch1-title">${ex.title ?? 'Field Notes'}</h2>
+      ${ex.img ? `<img class="sm-ch1-img" src="${ex.img}" alt="">` : ''}
+      <div class="sm-ch1-text">${ex.text ?? ''}</div>
+      <div class="sm-choice-list">
+        <button class="sm-btn sm-btn-secondary js-back">Back</button>
+      </div>`;
+    this._renderFrame(inner);
+    document.querySelector('.js-back')?.addEventListener('click', ()=> renderMain());
+  };
+
+  // show the main screen first
+  renderMain();
+}
 
 }
