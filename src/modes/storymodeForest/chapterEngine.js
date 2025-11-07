@@ -10,6 +10,32 @@ const SELECTORS = { container: '#game-container' };
 const BASE = import.meta.env.BASE_URL;
 const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
 
+// ─────────────────────────────
+// inline unlock store (no new files)
+// ─────────────────────────────
+const SM_UNLOCK_KEY = 'sm_unlocked_chapters_v1';
+
+function smLoadUnlocks() {
+  try {
+    const raw = localStorage.getItem(SM_UNLOCK_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch (e) {}
+  return new Set(['ch1']); // default: ch1 is open
+}
+function smSaveUnlocks(set) {
+  try { localStorage.setItem(SM_UNLOCK_KEY, JSON.stringify([...set])); } catch (e) {}
+}
+function smUnlock(id) {
+  const set = smLoadUnlocks();
+  if (!set.has(id)) {
+    set.add(id);
+    smSaveUnlocks(set);
+    // tell any chapter menu to refresh if it's listening
+    window.dispatchEvent(new CustomEvent('sm:chaptersChanged', { detail: [...set] }));
+  }
+}
+
+
 
 
 function el(sel, root=document){ return root.querySelector(sel); }
@@ -26,17 +52,22 @@ export class ChapterEngine {
       console.warn('[Story] Unknown chapterId:', chapterId, 'Known:', Object.keys(this.registry));
       return;
     }
+
+    // ← NEW: ensure the chapter you’re starting is unlocked for the options screen
+    this._unlockChapter(chapterId);
+
     this.state = {
       chapterId,
-      idx: 0,          // 0..4 (five main slides)
-      loopStack: [],   // return points
-      quest: null,     // active quest step if any
+      idx: 0,          // 0..N
+      loopStack: [],
+      quest: null,
       flags: {},
-      revealed: new Set(), 
-      visited: new Set(), 
+      revealed: new Set(),
+      visited: new Set(),
     };
     this._renderSlide();
   }
+
 
   _nextMain(){
     const last = this.registry[this.state.chapterId].slides.length - 1;
@@ -89,6 +120,24 @@ export class ChapterEngine {
     } catch (e) {
       console.warn('[Story] grant failed:', e);
     }
+    
+  }
+  // mark a chapter unlocked (engine-level, idempotent)
+  _unlockChapter(id) {
+    try {
+      // if your appState also tracks unlocks, let it run (no-op if missing)
+      if (typeof appState?.unlockChapter === 'function') appState.unlockChapter(id);
+    } catch(e) {}
+    smUnlock(id); // inline store above (localStorage)
+  }
+
+  _isChapterUnlocked(id) {
+    try {
+      if (typeof appState?.isChapterUnlocked === 'function') {
+        return !!appState.isChapterUnlocked(id);
+      }
+    } catch(e) {}
+    return smLoadUnlocks().has(id);
   }
 
 
@@ -200,29 +249,40 @@ export class ChapterEngine {
   }
 
 
-  _renderSlide(){
-    const chapter = this.registry[this.state.chapterId];
-    const slide = chapter.slides[this.state.idx];
-    const title = `<h2 class="sm-ch1-title">${slide.title}</h2>`;
-    const img = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
-    const text = slide.text ? `<div class="sm-ch1-text">${slide.text}</div>` : '';
+_renderSlide(){
+  const chapter = this.registry[this.state.chapterId];
+  const slide = chapter.slides[this.state.idx];
 
-    // dynamic top choice label / availability (for Slide 5 in Ch1)
-    // dynamic top choice label / availability (+ “Finish Chapter” on last slide)
-  // dynamic top choice label / availability (+ “Go to Chapter 2” on last slide if configured)
+  // Route CUSTOMER slides to the mini-runner
+  if (slide?.role === SlideRole.CUSTOMER || slide?.role === 'customer') {
+    this._onCustomer(slide);
+    return;
+  }
+
+  // ───────────────────────────────────────────
+  // Gating: require side-path visits before "Advance"
+  // You can set either:
+  //   slide.requireAllSidePaths = true
+  // or:
+  //   slide.requireVisited = ['weird','quest','loop']  // any subset, order agnostic
+  // ───────────────────────────────────────────
+  const requiredSlots = slide.requireVisited || (slide.requireAllSidePaths ? ['weird','quest','loop'] : []);
+  const unmetSlots = requiredSlots.filter(s => !this._isVisited(s));
+  const blockAdvance = unmetSlots.length > 0;
+
+  const title = `<h2 class="sm-ch1-title">${slide.title}</h2>`;
+  const img = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
+  const text = slide.text ? `<div class="sm-ch1-text">${slide.text}</div>` : '';
+
   const isLast = this.state.idx === (chapter.slides.length - 1);
   const defaultTop =
     (isLast && slide.nextChapterId && this.registry[slide.nextChapterId])
       ? 'Go to Chapter 2 ➡️'
       : (isLast ? 'Finish Chapter' : 'Continue ➡️');
 
-  // keep supporting slide.dynamicTop...
   const topOpt = slide.dynamicTop?.(appState) ?? { label: slide.topLabel ?? defaultTop, disabled: false };
-
-  // helper (must exist before we use it)
   const resolve = (v) => (typeof v === 'function' ? v(appState, this) : v);
 
-  // category prefixes (can be overridden per slide)
   const kinds = {
     top:   slide.meta?.top?.kind   || 'Story',
     loop:  slide.meta?.loop?.kind  || 'Puzzle',
@@ -230,7 +290,6 @@ export class ChapterEngine {
     weird: slide.meta?.weird?.kind || 'Lore',
   };
 
-  // short descriptors (strings or functions)
   const desc = {
     top:   resolve(topOpt.label ?? slide.topLabel ?? defaultTop),
     loop:  resolve(slide.loopLabel  ?? 'Look around'),
@@ -241,39 +300,37 @@ export class ChapterEngine {
   const lbl = (kind, text) =>
     `<span class="sm-kind">${kind}:</span> <span class="sm-desc">${text}</span>`;
 
-      const buildBtn = (slot) => {
-      const visited = this._isVisited(slot);
-      const visitedClass = visited ? ' is-visited' : '';
-      const check = visited ? `<span class="sm-check" aria-hidden="true">✓</span>` : '';
-      const primary =
-        (slot === 'quest') || (slot === 'top'); // keep your visual priority
-      const cls = primary ? 'sm-btn sm-btn-primary' : 'sm-btn sm-btn-secondary';
-      const disabled = (slot === 'top' && topOpt.disabled) ? 'disabled' : '';
+  const buildBtn = (slot) => {
+    const visited = this._isVisited(slot);
+    const visitedClass = visited ? ' is-visited' : '';
+    const check = visited ? `<span class="sm-check" aria-hidden="true">✓</span>` : '';
+    const primary = (slot === 'quest') || (slot === 'top');
+    const cls = primary ? 'sm-btn sm-btn-primary' : 'sm-btn sm-btn-secondary';
 
-      // map slot → handler class used by listeners
-      const handlerClass = (slot === 'top') ? 'js-advance' : `js-${slot}`;
+    // 🔒 Top button locked if blockAdvance or topOpt.disabled
+    const disabled = (slot === 'top' && (topOpt.disabled || blockAdvance)) ? 'disabled' : '';
+    const handlerClass = (slot === 'top') ? 'js-advance' : `js-${slot}`;
+    const kindLabel = kinds[slot === 'weird' ? 'weird' : slot];
+    const textLabel = desc[slot === 'weird' ? 'weird' : slot];
 
-      // slot maps to kinds/desc keys ('top','loop','quest','weird')
-      const kindLabel = kinds[slot === 'weird' ? 'weird' : slot];
-      const textLabel = desc[slot === 'weird' ? 'weird' : slot];
+    // Optional: hint text when locked (kept minimal)
+    const lockHint = (slot === 'top' && (topOpt.disabled || blockAdvance))
+      ? ' data-hint="Try the other options first!"'
+      : '';
 
-      return `
-        <button class="${cls} ${handlerClass}${visitedClass}" ${disabled}>
-          ${check}${lbl(kindLabel, textLabel)}
-        </button>`;
-    };
+    return `
+      <button class="${cls} ${handlerClass}${visitedClass}" ${disabled}${lockHint}>
+        ${check}${lbl(kindLabel, textLabel)}
+      </button>`;
+  };
 
+  const choices = `
+    ${buildBtn('weird')}
+    ${buildBtn('quest')}
+    ${buildBtn('loop')}
+    ${buildBtn('top')}
+  `;
 
-
-    // 🔄 Lore → Quest → Puzzle → Story (uses buildBtn so visited styles appear)
-    const choices = `
-      ${buildBtn('weird')}
-      ${buildBtn('quest')}
-      ${buildBtn('loop')}
-      ${buildBtn('top')}
-    `;
-
-  // compute CTA after resolve/choices exist
   const ctaLabel = resolve(slide.soloLabel ?? slide.topLabel ?? 'Continue ➡️');
   const body = (slide.mode === 'solo')
     ? `${title}${img}${text}
@@ -282,59 +339,139 @@ export class ChapterEngine {
         </div>`
     : `${title}${img}${text}<div class="sm-choice-list">${choices}</div>`;
 
+  this._renderFrame(body);
 
+  const root = document;
+  root.querySelector('.js-advance')?.addEventListener('click', ()=> this._onAdvance(chapter, slide, topOpt));
+  root.querySelector('.js-loop')?.addEventListener('click', ()=>{
+    this._markVisited('loop'); this._onLoop(slide);
+  });
+  root.querySelector('.js-quest')?.addEventListener('click', ()=>{
+    this._markVisited('quest'); this._onQuest(slide);
+  });
+  root.querySelector('.js-weird')?.addEventListener('click', ()=>{
+    this._markVisited('weird'); this._onWeird(slide);
+  });
+}
 
-    this._renderFrame(body);
+// inside export class ChapterEngine { ... } — place below your other handlers
+_onCustomer(slide){
+  // slide.customer = { name, bio:{img?,text}, lore:{img?,text}, puzzle:{img?,prompt,reveal} }
+  const C = slide.customer || {};
+  let step = 0;          // 0 = Bio, 1 = Lore, 2 = Puzzle
+  let didReveal = false; // 🔒 gate Serve until Reveal
 
-const root = document;
+  const card = (s) => `
+    ${s?.img ? `<img class="sm-ch1-img" src="${s.img}" alt="">` : ''}
+    <div class="sm-ch1-text">${s?.text || ''}</div>`;
 
-// Story / advance
-root.querySelector('.js-advance')?.addEventListener('click', ()=> this._onAdvance(chapter, slide, topOpt));
+  const render = () => {
+    const title = `<h2 class="sm-ch1-title">${slide.title || 'Customer'}</h2>`;
+    const meta  = `
+      <div class="sm-customer-meta">
+        <span class="sm-customer-name">${C.name || 'Guest'}</span>
+        <span class="sm-customer-step">Step ${step+1}/3</span>
+      </div>`;
 
-// Puzzle (loop)
-root.querySelector('.js-loop')?.addEventListener('click', ()=>{
-  this._markVisited('loop');   // ✅ mark as seen
-  this._onLoop(slide);
-});
-
-// Quest
-root.querySelector('.js-quest')?.addEventListener('click', ()=>{
-  this._markVisited('quest');  // ✅ mark as seen
-  this._onQuest(slide);
-});
-
-// Lore (weird)
-root.querySelector('.js-weird')?.addEventListener('click', ()=>{
-  this._markVisited('weird');  // ✅ mark as seen
-  this._onWeird(slide);
-});
-
-  }
-
-  _onAdvance(chapter, slide, topOpt){
-    const last = chapter.slides.length - 1;
-
-    // 🔔 new: process any slide-level item/currency grants
-    this._grantSlideRewards(slide);
-
-    if (typeof slide.onAdvance === 'function') {
-      slide.onAdvance({ appState, engine: this });
+    let inner = '';
+    if (step === 0) inner = card(C.bio);
+    else if (step === 1) inner = card(C.lore);
+    else {
+      inner = `
+        ${C.puzzle?.img ? `<img class="sm-ch1-img" src="${C.puzzle.img}" alt="">` : ''}
+        <div class="sm-ch1-text">${C.puzzle?.prompt || ''}</div>
+        <div class="sm-ch1-reveal-hold"></div>`;
     }
 
-    if (this.state.idx === last) {
-      if (slide.nextChapterId && this.registry[slide.nextChapterId]) {
-        this.start(slide.nextChapterId);
-        return;
+    const controls = (() => {
+      if (step < 2) {
+        return `
+          <div class="sm-choice-list">
+            ${step>0 ? `<button class="sm-btn sm-btn-secondary js-prev">Back</button>` : ''}
+            <button class="sm-btn sm-btn-primary js-next">Next ➡️</button>
+          </div>`;
       }
-      if (typeof chapter.onFinish === 'function') {
-        chapter.onFinish({ appState, engine: this });
-      }
-      this._finishChapter();
-    } else {
-      this.state.idx++;
-      this._renderSlide();
+      // puzzle step: Reveal + Serve (Serve disabled until Reveal)
+      return `
+        <div class="sm-choice-list">
+          <button class="sm-btn sm-btn-secondary js-prev">Back</button>
+          <button class="sm-btn sm-btn-primary js-reveal"${didReveal ? '' : ''}>Reveal</button>
+          <button class="sm-btn sm-btn-primary js-serve ${didReveal ? '' : 'is-disabled'}" ${didReveal ? '' : 'disabled'}>Serve the SnowCone ➡️</button>
+        </div>`;
+    })();
+
+    this._renderFrame(`${title}${meta}${inner}${controls}`);
+
+    const root = document;
+
+    if (step < 2) {
+      root.querySelector('.js-prev')?.addEventListener('click', () => { step = Math.max(0, step-1); render(); });
+      root.querySelector('.js-next')?.addEventListener('click', () => { step = Math.min(2, step+1); render(); });
+      return;
     }
+
+    // step === 2 (Puzzle)
+    const revealBtn = root.querySelector('.js-reveal');
+    const serveBtn  = root.querySelector('.js-serve');
+
+    // Keep Serve disabled until didReveal flips
+    if (serveBtn) {
+      serveBtn.disabled = !didReveal;
+      serveBtn.classList.toggle('is-disabled', !didReveal);
+    }
+
+    revealBtn?.addEventListener('click', () => {
+      const hold = root.querySelector('.sm-ch1-reveal-hold');
+      if (hold && !hold.querySelector('.sm-reveal-answer')) {
+        const ans = document.createElement('div');
+        ans.className = 'sm-reveal-answer is-open';
+        ans.innerHTML = C.puzzle?.reveal || '';
+        hold.appendChild(ans);
+      }
+      // 🔓 unlock Serve
+      didReveal = true;
+      if (serveBtn) {
+        serveBtn.disabled = false;
+        serveBtn.classList.remove('is-disabled');
+      }
+    }, { once: true });
+
+    root.querySelector('.js-prev')?.addEventListener('click', () => { step = Math.max(0, step-1); render(); });
+
+    root.querySelector('.js-serve')?.addEventListener('click', () => {
+      if (!didReveal) return; // hard gate
+      const chapter = this.registry[this.state.chapterId];
+      this._onAdvance(chapter, slide, { disabled:false });
+    });
+  };
+
+  render();
+}
+
+_onAdvance(chapter, slide, topOpt){
+  const last = chapter.slides.length - 1;
+
+  this._grantSlideRewards(slide);
+
+  if (typeof slide.onAdvance === 'function') {
+    slide.onAdvance({ appState, engine: this });
   }
+
+  if (this.state.idx === last) {
+    if (slide.nextChapterId && this.registry[slide.nextChapterId]) {
+      this._unlockChapter(slide.nextChapterId);  // make it visible in the menu
+      this.start(slide.nextChapterId);
+      return;
+    }
+    if (typeof chapter.onFinish === 'function') {
+      chapter.onFinish({ appState, engine: this });
+    }
+    this._finishChapter();
+  } else {
+    this.state.idx++;
+    this._renderSlide();
+  }
+}
 
 
 
@@ -351,64 +488,103 @@ root.querySelector('.js-weird')?.addEventListener('click', ()=>{
     document.querySelector('.js-back')?.addEventListener('click', ()=> this._renderSlide());
   }
 
+// chapterEngine.js — inside export class ChapterEngine { ... }
+// chapterEngine.js — inside export class ChapterEngine { ... } in _onQuest(slide){ ... }
+
 _onQuest(slide){
   if (!slide.quest) return this._renderSlide();
 
-  // Allow slide.quest.getSteps(appState, engine) to override static steps
   const stepsBase = slide.quest.getSteps?.(appState, this) ?? slide.quest.steps;
   let i = 0;
 
-  const doStep = () => {
-    const s = stepsBase[i];
-    const key = `${this.state.chapterId}:${this.state.idx}:${i}`;
+  const keyFor = (idx) => `${this.state.chapterId}:${this.state.idx}:${idx}`;
+
+  const grantReward = (reward) => {
+    if (!reward) return;
+    try {
+      // item: string OR { id, payload }
+      if (reward.item) {
+        const itemId = (typeof reward.item === 'string')
+          ? reward.item
+          : reward.item.id;
+        const payload = (typeof reward.item === 'object')
+          ? (reward.item.payload ?? reward.payload)
+          : reward.payload;
+        if (itemId && !appState.hasItem?.(itemId)) {
+          appState.addItem?.(itemId, payload);
+        }
+      }
+      if (reward.currency) appState.addCurrency?.(reward.currency|0);
+      appState.saveToStorage?.();
+    } catch (e) {
+      console.warn('[Story] quest reward grant failed:', e);
+    }
+  };
+
+  // ⬇️ NEW: treat legacy quest.reward as a completion fallback
+  const completionPayout = slide.quest.completionReward || slide.quest.reward || null;
+
+  const renderStep = () => {
+    const s = stepsBase[i] || {};
+    const key = keyFor(i);
     const already = this.state.revealed.has(key);
+
+    const revealBtnHTML = s.reveal ? (already
+      ? `<button class="sm-btn sm-btn-primary js-reveal is-visited is-disabled" disabled>
+           <span class="sm-check" aria-hidden="true">✓</span> Revealed
+         </button>`
+      : `<button class="sm-btn sm-btn-primary js-reveal">Reveal</button>`)
+      : '';
 
     const inner = `
       <h2 class="sm-ch1-title">${slide.quest.title}</h2>
       ${s.img ? `<img class="sm-ch1-img" src="${s.img}" alt="${s.imgAlt ?? ''}">` : ''}
-      <div class="sm-ch1-text">${s.text}</div>
-
+      <div class="sm-ch1-text">${s.text ?? ''}</div>
       <div class="sm-ch1-reveal-hold">
         ${already ? `<div class="sm-reveal-answer is-open">${s.reveal ?? ''}</div>` : ``}
       </div>
-
       <div class="sm-choice-list">
-        ${s.reveal && !already ? `<button class="sm-btn sm-btn-primary js-reveal">Reveal</button>` : ''}
-        <button class="sm-btn sm-btn-secondary js-next">${i<stepsBase.length-1 ? 'Next' : 'Finish'}</button>
+        ${revealBtnHTML}
+        <button class="sm-btn sm-btn-secondary js-next">${i < stepsBase.length - 1 ? 'Next' : 'Finish'}</button>
       </div>`;
+
     this._renderFrame(inner);
 
-    const revealBtn = document.querySelector('.js-reveal');
-    if (revealBtn) {
-      revealBtn.addEventListener('click', () => {
-        const hold = document.querySelector('.sm-ch1-reveal-hold');
+    const root = document;
+
+    // Step reveal → show, award s.reward once
+    const rb = root.querySelector('.js-reveal');
+    if (rb && !already) {
+      rb.addEventListener('click', () => {
+        const hold = root.querySelector('.sm-ch1-reveal-hold');
         if (hold && !hold.querySelector('.sm-reveal-answer')) {
           const ans = document.createElement('div');
           ans.className = 'sm-reveal-answer is-open';
           ans.innerHTML = s.reveal ?? '';
           hold.appendChild(ans);
-          this.state.revealed.add(key);
         }
-        revealBtn.disabled = true;
-        revealBtn.classList.add('is-disabled');
-        revealBtn.textContent = 'Revealed';
+        grantReward(s.reward);                 // ← step-level reward still supported
+        this.state.revealed.add(key);
+        rb.classList.add('is-visited','is-disabled');
+        rb.setAttribute('disabled','true');
+        rb.innerHTML = `<span class="sm-check" aria-hidden="true">✓</span> Revealed`;
       }, { once: true });
     }
 
-    document.querySelector('.js-next')?.addEventListener('click', () => {
-      if (i < stepsBase.length - 1) { i++; doStep(); }
-      else {
-        try {
-          if (slide.quest.reward?.item) appState.addItem(slide.quest.reward.item.id, slide.quest.reward.item.payload);
-          if (slide.quest.reward?.currency) appState.addCurrency(slide.quest.reward.currency|0);
-          appState.saveToStorage?.();
-        } catch {}
+    // Next/Finish
+    root.querySelector('.js-next')?.addEventListener('click', () => {
+      if (i < stepsBase.length - 1) {
+        i++;
+        renderStep();
+      } else {
+        // ⬇️ NEW: pay completion reward OR legacy quest.reward here
+        if (completionPayout) grantReward(completionPayout);
         this._renderSlide();
       }
     });
   };
 
-  doStep();
+  renderStep();
 }
 
   // in chapterEngine.js, replace _onWeird with:

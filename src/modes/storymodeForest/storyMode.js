@@ -512,6 +512,14 @@ function resetContainerStyles() {
   c.style.justifyContent = '';
   c.removeAttribute('style');
 }
+// Hoisted, module-scope handler (function declaration = hoisted)
+function onChaptersChanged(e) {
+  // Only re-render if the menu is visible
+  if (document.querySelector('.sm-chapter-menu')) {
+    // if your render takes unlocks, this preserves e.detail from the event
+    renderChapterMenu(e?.detail);
+  }
+}
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Public API
@@ -537,6 +545,15 @@ function loadStoryMode() {
   wireSMAudioUnlockOnce(); // ensure Howler can resume on first tap
   // when story mode loads
   window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
+  // inside loadStoryMode()
+window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
+window.addEventListener('sm:chaptersChanged', onChaptersChanged);  // ← add
+
+function onChaptersChanged(){
+  // if the chapter menu is on screen, redraw it to reflect new unlocks
+  if (document.querySelector('.sm-chapter-menu')) renderChapterMenu();
+}
+
 }
 
 export function stopStoryMode() {
@@ -555,6 +572,10 @@ export function stopStoryMode() {
   }
   applyBackgroundTheme();
   window.removeEventListener('sm:backToChapterMenu', backToChapterMenu);
+  // inside stopStoryMode()
+  window.removeEventListener('sm:backToChapterMenu', backToChapterMenu);
+  window.removeEventListener('sm:chaptersChanged', onChaptersChanged); // ← add
+
 }
 
 
@@ -615,8 +636,12 @@ function renderChapterMenu() {
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
 
-  const unlockedCh2 =
-    !!(window.devFlags?.unlockAllChapters || appState.hasItem?.(ItemIds.MASTER_SIGIL));
+const unlockedSet = smGetUnlocked();
+const unlockedCh2 =
+  !!(window.devFlags?.unlockAllChapters
+     || unlockedSet.has('ch2')
+     || appState.hasItem?.(ItemIds.MASTER_SIGIL));
+
 
 
   container.innerHTML = `
@@ -890,8 +915,6 @@ function wireHandlersForCurrentRoot() {
   clickHandler = (e) => {
     // Global UI
     if (e.target.closest('#smBackToMenu')) {
-      // If we’re on a Prologue screen, go to the chapter selector inside Story Mode.
-      // Otherwise (Intro screen, Chapter Menu itself), fall back to the main menu.
       const inPrologue = !!document.querySelector('.sm-prologue');
       if (inPrologue) {
         backToChapterMenu();
@@ -912,18 +935,15 @@ function wireHandlersForCurrentRoot() {
 
     // Intro + Chapter menu
     if (e.target.closest('#smHearStory')) { renderChapterMenu(); return; }
-    if (e.target.closest('#smPrologue')) { renderPrologueReader(); return; }
-    if (e.target.closest('#smCh1')) {
-      getEngine().start('ch1');
-      return;
-    }
-
+    if (e.target.closest('#smPrologue'))  { renderPrologueReader(); return; }
+    if (e.target.closest('#smCh1'))       { getEngine().start('ch1'); return; }
+    if (e.target.closest('#smCh2'))       { getEngine().start('ch2'); return; } // 👈 NEW
 
     // Prologue: typing/slides
     if (e.target.closest('#smSkipType')) { elRoot?.__smDoneFast?.(); return; }
-    if (e.target.closest('#smReady')) { renderPrologueSlides(); return; }
-    if (e.target.closest('#smNext')) { slideIndex++; drawSlide(); return; }
-    if (e.target.closest('#smPrev')) { slideIndex = Math.max(0, slideIndex - 1); drawSlide(); return; }
+    if (e.target.closest('#smReady'))    { renderPrologueSlides();  return; }
+    if (e.target.closest('#smNext'))     { slideIndex++; drawSlide(); return; }
+    if (e.target.closest('#smPrev'))     { slideIndex = Math.max(0, slideIndex - 1); drawSlide(); return; }
   };
 
   keyHandler = (e) => {
@@ -931,10 +951,9 @@ function wireHandlersForCurrentRoot() {
 
     if (e.key === 'Enter') {
       const ready = elRoot?.querySelector('#smReady');
-      const skip = elRoot?.querySelector('#smSkipType');
+      const skip  = elRoot?.querySelector('#smSkipType');
       if (ready && ready.style.display !== 'none') { ready.click(); e.preventDefault(); return; }
       if (skip && !skip.classList.contains('hidden')) { skip.click(); e.preventDefault(); return; }
-
       const pro = elRoot?.querySelector('#smNext') || elRoot?.querySelector('#smPrologue') || elRoot?.querySelector('#smHearStory');
       if (pro) { pro.click(); e.preventDefault(); return; }
     }
@@ -943,7 +962,9 @@ function wireHandlersForCurrentRoot() {
       const next = elRoot?.querySelector('#smNext') || elRoot?.querySelector('#smPrologue');
       next?.click(); e.preventDefault(); return;
     }
-    if (e.key === 'ArrowLeft') { elRoot?.querySelector('#smPrev')?.click(); e.preventDefault(); return; }
+    if (e.key === 'ArrowLeft') {
+      elRoot?.querySelector('#smPrev')?.click(); e.preventDefault(); return;
+    }
   };
 
   elRoot?.addEventListener('click', clickHandler);
@@ -1211,3 +1232,9 @@ function unwireSMAudioUnlock() {
 }
 
 
+// ── inline chapter-unlock reader (matches chapterEngine.js key)
+const SM_UNLOCK_KEY = 'sm_unlocked_chapters_v1';
+function smGetUnlocked(){
+  try { return new Set(JSON.parse(localStorage.getItem(SM_UNLOCK_KEY) || '["ch1"]')); }
+  catch { return new Set(['ch1']); }
+}

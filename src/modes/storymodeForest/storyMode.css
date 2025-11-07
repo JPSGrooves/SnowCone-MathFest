@@ -1065,3 +1065,20 @@
 .sm-btn-primary.is-visited:hover {
   filter: grayscale(0.12) brightness(0.9) saturate(0.9);
 }
+/* /src/modes/storyMode/storyMode.css — customer pill */
+.sm-customer-meta{
+  display:inline-flex; gap:.6ch; align-items:center;
+  margin:.25rem auto .5rem; padding:.35rem .7rem;
+  border:1px solid rgba(0,255,238,.25);
+  background:rgba(0,0,0,.35);
+  box-shadow:0 0 6px #00ffee33;
+  border-radius:.6rem; color:#9ff;
+  font:700 .9rem/1 Orbitron, system-ui, sans-serif;
+}
+.sm-customer-name{ letter-spacing:.02em; }
+.sm-customer-step{ opacity:.9; font-weight:600; }
+.sm-btn.is-disabled[disabled] {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(0.1);
+}

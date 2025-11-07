@@ -22,6 +22,7 @@ export const Chapter1 = {
       img: PRO_IMG('gate.png'),
       text: `When you arrive, it's 2am, dark, dewy, and the festival gate looms. You bought your ticket months ago and can't wait to see what the festival has to offer. A Dino Divider ushers you into a parking spot, and emerging from your car, you decide to make a move.`,
       role: SlideRole.ADVANCE,
+      requireAllSidePaths: true,
       topLabel: 'Step up to the gate! ➡️',
       loopLabel: 'Stare at the dinosaurs',
       questLabel: 'Kool Kat selling triangles',
@@ -84,6 +85,7 @@ export const Chapter1 = {
       img: PRO_IMG('noEntry.png'),
       text: `Guard: “Dude, who gave you a ticket? It's wristbands only...”<br><br>The biker dino isn’t mad — just bummed for you. He tilts the scanner toward a sign that reads <i>WRISTBAND TENT ➜</i>.`,
       role: SlideRole.ADVANCE,
+      requireAllSidePaths: true,
       topLabel: 'Toss ticket & give up 😔',
       loopLabel: 'Stop by the wristband tent',
       questLabel: 'Sneak through a gap',
@@ -150,6 +152,7 @@ export const Chapter1 = {
       img: PRO_IMG('jehnkExplore.png'),
       text: `"Hey man, I can hold down the first shift. Go check out the SnowCone MathFest!" Jehnk waves you off as he starts setting up his truck booth for the night.`,
       role: SlideRole.ADVANCE,
+      requireAllSidePaths: true,
       topLabel: 'Start your shift ➡️',
       loopLabel: 'Stroll through ShakeSquare',
       questLabel: 'Turn off the CampLights',
@@ -221,6 +224,7 @@ export const Chapter1 = {
       // Top choice: go straight into Chapter 2
       topLabel: () => 'Go to Chapter 2 ➡️',
       nextChapterId: 'ch2',
+      requireVisited: ['weird','loop'],
 
       // Side choices: dynamic descriptors
       loopLabel: 'Question the Recipes',
@@ -294,13 +298,12 @@ loop: {
             ].filter(Boolean).join(', ');
 
             return [{
-            img: PRO_IMG('essentialsTrio0.png'),
-            imgAlt: 'Three neon question marks where the Triangle Shard, Mint Square 2:3, and MoonChain should be.',
-            text: `You pat every pocket, then the jacket you forgot you were wearing—lint, a token stub, and vibes… but no treasures. Close—so close—but you’re missing ${missing || 'something vital'}.<br><br>
-            A frosty outline where the shard should sit, a minty whisper where the ratio card belongs, and a pale lunar ring waiting for its chain. The bench lights flicker and float up three polite question marks, like the night itself is asking, “uh… where’s the gear, traveler?”`,
-            reveal: `No worries—every perfect cone starts with a scavenger list. Hit the <b>puzzle</b> lanes and the <b>lore</b> detours to assemble all three: the <b>Triangle Shard</b> for <i>Chill</i>, the <b>Mint Square (2:3)</b> for <i>Flavor</i>, and the <b>MoonChain</b> for <i>Shape</i>.<br><br>
-            When they click together, your rig will hum, the neon will rise, and your hands will know the spiral. That’s when you spin the <b>Perfect SnowCone</b>.`
+                img: PRO_IMG('essentialsTrio0.png'),
+                imgAlt: 'Three neon question marks where the Triangle Shard, Mint Square 2:3, and MoonChain should be.',
+                text: `You check every pocket—lint and a ticket stub. You’re missing ${missing || 'something vital'}. Three faint placeholders glow on the bench: shard, square, moon.`,
+                reveal: `Scavenger checklist → 🔺 Triangle Shard = <i>Chill</i>, 🟩 Mint Square (2:3) = <i>Flavor</i>, ⚪ MoonChain = <i>Shape</i>. Collect all three, click them together, then spin the Perfect SnowCone.`
             }];
+
 
         },
         reward: { currency: 50 },
