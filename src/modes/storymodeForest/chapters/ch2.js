@@ -1,8 +1,11 @@
 // /src/modes/storyMode/chapters/ch2.js
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 const BASE = import.meta.env.BASE_URL;
-const PRO_IMG = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
-const SCN_IMG = (n) => `${BASE}assets/img/modes/storymodeForest/${n}`;
+const PRO_IMG     = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
+const PRO_BIG_IMG = (n) => `${BASE}assets/img/characters/storyMode/${n}?lg=1`;   // 👈 new
+const SCN_IMG     = (n) => `${BASE}assets/img/modes/storymodeForest/${n}`;
+const SCN_BIG_IMG = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?lg=1`; // 👈 new
+
 
 export const Chapter2 = {
   id: 'ch2',
@@ -16,7 +19,7 @@ export const Chapter2 = {
     img: PRO_IMG('insideTruck.png'),
     text: `Now that you've got the basics, Jehnk is letting you run the truck for a shift.<br><br>
     Dew beads on the window as neon leaks through the mist, the Pavilion bass keeping slow time.<br><br>
-    Four shapes hover at the rope—one polishing a wooden timepiece, one tracing quiet symmetries in the air, one rolling a circle charm across their knuckles, one thumbing a tiny ledger that glows; each carrying a different kind of math.`,
+    Four shapes hover near the truck—one polishing a wooden timepiece, one tracing quiet symmetries in the air, one rolling a circle charm across their knuckles, one thumbing a tiny ledger that glows; each carrying a different kind of math.`,
     soloLabel: 'Open the Window ➡️',
     },
 
@@ -29,16 +32,16 @@ export const Chapter2 = {
       customer: {
         name: 'Benjamin Banneker',
         bio: {
-          img: PRO_IMG('banneker.png'),
-          text: `He sets a wooden timepiece on the counter. Self-taught astronomer, almanac author, and surveyor—he read the sky like a ledger.`,
+          img: PRO_BIG_IMG('banneker.png'),
+          text: `First in line, Banneker sets a wooden timepiece on the counter. Self-taught astronomer, almanac author, and surveyor—he reads the cones like a ledger.`,
         },
         lore: {
           img: PRO_IMG('treeline.png'),
-          text: `Out past the lights, the Math Ghost hums at the treeline. “Rhythm is ratio,” he says. “Cones per minute; minutes per song.”`,
+          text: 'Out past the lights, Banneker hums at the treeline. “Rhythm is ratio,” he says. “Cones are minutes; minutes are song.”<br><br> He taps the wooden timepiece and the second hand ticks like a far-off hi-hat. “Keep count,” he whispers, “and the night will keep you.” The crickets answer in syncopation, a ledger of stars marking every measure.',
         },
         puzzle: {
           img: PRO_IMG('scheduleCard.png'),
-          prompt: `A set lasts 42 minutes. Your pace is 5 cones every 3 minutes. How many cones per set?`,
+          prompt: `The band plays one set that lasts 42 minutes. You make cones at a steady speed: 5 cones every 3 minutes.<br><br>How many groups of 3 fit into 42, and how many cones is that for the whole set?`,
           reveal: `<b>70 cones.</b> 42 ÷ 3 = 14 chunks; 14 × 5 = 70.`,
         },
       },
@@ -47,8 +50,8 @@ export const Chapter2 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Happy • Benjamin Banneker',
-      img: PRO_IMG('bannekerHappy.png'),
-      text: `He tastes the cone, eyes glinting like midnight brass. “Keep your time; the night will keep you.”`,
+      img: PRO_BIG_IMG('bannekerHappy.png'),
+      text: `He tastes the cone, eyes glinting like midnight brass. "Keep your time; the night will keep you." He taps the wooden timepiece once, steady as a heartbeat. "Set your ledger by the stars, not the noise. When the count feels crooked, look up, breathe, and start the next measure true."`,
       soloLabel: 'Next Customer ➡️',
       grants: [{ item: ItemIds.BANNEKER_TOKEN }],
     },

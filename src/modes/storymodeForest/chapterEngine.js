@@ -148,7 +148,7 @@ export class ChapterEngine {
         <div class="sm-aspect-wrap">
         <div class="sm-game-frame sm-is-intro">
             <img id="modeBackground" class="sm-bg-img" src="${BG_SRC}" alt="Story Mode Background"/>
-            <section class="sm-ch1">
+            <section class="sm-ch1" data-chapter="${this.state?.chapterId || ''}">
             <div class="sm-ch1-wrap">${inner}</div>
 
             <!-- bottom bar lives inside .sm-ch1 so grid can place it -->
@@ -356,51 +356,56 @@ _renderSlide(){
 
 // inside export class ChapterEngine { ... } — place below your other handlers
 _onCustomer(slide){
-  // slide.customer = { name, bio:{img?,text}, lore:{img?,text}, puzzle:{img?,prompt,reveal} }
-  const C = slide.customer || {};
-  let step = 0;          // 0 = Bio, 1 = Lore, 2 = Puzzle
-  let didReveal = false; // 🔒 gate Serve until Reveal
+  // inside function _onCustomer(slide) { ... }
+    const C = slide.customer || {};
+    let step = 0;
+    let didReveal = false;
 
-  const card = (s) => `
+    const headerHTML = () => `
+    <div class="sm-customer-header">
+        <h2 class="sm-ch1-title sm-customer-title">
+        ${slide.title || `Customer • ${C.name || 'Guest'}`}
+        </h2>
+        <div class="sm-customer-meta sm-customer-step-pill">
+        <span class="sm-customer-step">Step ${step + 1}/3</span>
+        </div>
+    </div>
+    `;
+
+    const card = (s) => `
     ${s?.img ? `<img class="sm-ch1-img" src="${s.img}" alt="">` : ''}
     <div class="sm-ch1-text">${s?.text || ''}</div>`;
 
-  const render = () => {
-    const title = `<h2 class="sm-ch1-title">${slide.title || 'Customer'}</h2>`;
-    const meta  = `
-      <div class="sm-customer-meta">
-        <span class="sm-customer-name">${C.name || 'Guest'}</span>
-        <span class="sm-customer-step">Step ${step+1}/3</span>
-      </div>`;
-
+    // render()
+    const render = () => {
     let inner = '';
     if (step === 0) inner = card(C.bio);
     else if (step === 1) inner = card(C.lore);
     else {
-      inner = `
+        inner = `
         ${C.puzzle?.img ? `<img class="sm-ch1-img" src="${C.puzzle.img}" alt="">` : ''}
         <div class="sm-ch1-text">${C.puzzle?.prompt || ''}</div>
         <div class="sm-ch1-reveal-hold"></div>`;
     }
 
     const controls = (() => {
-      if (step < 2) {
+        if (step < 2) {
         return `
-          <div class="sm-choice-list">
+            <div class="sm-choice-list">
             ${step>0 ? `<button class="sm-btn sm-btn-secondary js-prev">Back</button>` : ''}
             <button class="sm-btn sm-btn-primary js-next">Next ➡️</button>
-          </div>`;
-      }
-      // puzzle step: Reveal + Serve (Serve disabled until Reveal)
-      return `
+            </div>`;
+        }
+        return `
         <div class="sm-choice-list">
-          <button class="sm-btn sm-btn-secondary js-prev">Back</button>
-          <button class="sm-btn sm-btn-primary js-reveal"${didReveal ? '' : ''}>Reveal</button>
-          <button class="sm-btn sm-btn-primary js-serve ${didReveal ? '' : 'is-disabled'}" ${didReveal ? '' : 'disabled'}>Serve the SnowCone ➡️</button>
+            <button class="sm-btn sm-btn-secondary js-prev">Back</button>
+            <button class="sm-btn sm-btn-primary js-reveal">Reveal</button>
+            <button class="sm-btn sm-btn-primary js-serve ${didReveal ? '' : 'is-disabled'}" ${didReveal ? '' : 'disabled'}>Serve the SnowCone ➡️</button>
         </div>`;
     })();
 
-    this._renderFrame(`${title}${meta}${inner}${controls}`);
+    this._renderFrame(`${headerHTML()}${inner}${controls}`);
+
 
     const root = document;
 

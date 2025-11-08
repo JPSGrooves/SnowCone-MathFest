@@ -1082,3 +1082,124 @@
   pointer-events: none;
   filter: grayscale(0.1);
 }
+/* =========================
+   CH2-only image boost (+25%)
+   ========================= */
+
+/* Flag wrapper selector: only active when the ChapterEngine marks ch2 on the root. */
+.sm-ch2 .sm-slide-image,
+.sm-ch2 .sm-slide-img {
+  /* base in your CSS was ~80% width / ~60vh height—25% wider hits 100%.
+     We cap width to the stage and raise the height ceiling a touch without crowding buttons. */
+  max-width: 100% !important;
+  max-height: clamp(320px, 66vh, 800px) !important;
+}
+
+/* Also support an explicit helper class you can add per-image on ch2 slides. */
+.sm-slide-image.sm-ch2-img,
+.sm-slide-img.sm-ch2-img {
+  max-width: 100% !important;
+  max-height: clamp(320px, 66vh, 800px) !important;
+}
+
+/* Short screens get a gentle cap so text/buttons don’t get pushed under the bottom bar. */
+@media (max-height: 720px) {
+  .sm-ch2 .sm-slide-image,
+  .sm-ch2 .sm-slide-img,
+  .sm-slide-image.sm-ch2-img,
+  .sm-slide-img.sm-ch2-img {
+    max-height: 60vh !important;
+  }
+}
+/* ───────── “Big image” toggles — survive earlier !important clamps ───────── */
+
+/* 1) If a big image is present, expand the CH1 art row itself (parent height cap) */
+#game-container .sm-ch1:has(.sm-ch1-img[src*="lg=1"]) {
+  /* way taller than the default: enough to look obviously bigger */
+  --sm-ch1-art-h: min(52vh, 84vw);
+}
+
+/* 2) Make the image itself larger; out-specific previous rules + use !important */
+#game-container .sm-ch1 .sm-ch1-img[src*="lg=1"],
+#game-container .sm-ch1 .sm-ch1-img.sm-ch1-img[src*="lg=1"],   /* extra specificity */
+#game-container .sm-ch1-img[src*="lg=1"] {
+  max-width:  min(96%, 640px) !important;   /* huge cap so you SEE the bump */
+  max-height: min(52vh, 84vw) !important;
+  height: auto !important;
+  width: auto !important;
+  object-fit: contain !important;
+  margin: clamp(6px, 1vh, 12px) auto !important;
+}
+
+/* ── CH2 only: title stacked with centered step pill ── */
+#game-container .sm-ch1[data-chapter="ch2"] .sm-customer-header{
+  display: grid;
+  grid-auto-flow: row;
+  justify-items: center;      /* centers the pill */
+  align-items: center;
+  gap: clamp(4px, .8vh, 10px);
+  margin-bottom: clamp(4px, .6vh, 8px);
+}
+
+/* keep the title snug */
+#game-container .sm-ch1[data-chapter="ch2"] .sm-customer-title{
+  margin: 0;
+  text-align: center;
+}
+
+/* tidy pill spacing */
+#game-container .sm-ch1[data-chapter="ch2"] .sm-customer-step-pill{
+  margin: 0;
+}
+/* ── CH2 hero portraits (PRO_BIG_IMG) — shrink ~10% ── */
+#game-container .sm-ch1[data-chapter="ch2"]:has(.sm-ch1-img[src*="xl=1"]),
+#game-container .sm-ch1[data-chapter="ch2"]:has(.sm-ch1-img[src*="xL=1"]),
+#game-container .sm-ch1[data-chapter="ch2"]:has(.sm-ch1-img[src*="big=1"]) {
+  /* reduce the art band itself so layout actually gets smaller */
+  --sm-ch1-art-h: calc(min(66vh, 96vw) * 0.9); /* 10% smaller than the hero cap */
+}
+
+/* cap the image to the same reduced size */
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="xl=1"],
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="xL=1"],
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="big=1"] {
+  max-height: calc(min(66vh, 96vw) * 0.9) !important;
+  max-width: min(88%, 648px) !important; /* 90% of the 720px cap */
+  height: auto !important;
+  width: auto !important;
+  object-fit: contain !important;
+  margin: clamp(6px, 1vh, 12px) auto !important;
+}
+
+/* ── CH2: shrink PRO_BIG_IMG ~10% (works for ?xL=1 or ?lg=1) ── */
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="xL=1"],
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="xl=1"],
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="lg=1"] {
+  /* knock down the hero caps by ~10% */
+  max-height: calc(min(66vh, 96vw) * 0.9) !important;
+  max-width:  calc(min(98%, 720px) * 0.9) !important;
+  height: auto !important;
+  width: auto !important;
+  object-fit: contain !important;
+}
+
+/* also shrink the art band so layout gives back space */
+#game-container .sm-ch1[data-chapter="ch2"] {
+  --sm-ch1-art-h: calc(min(66vh, 96vw) * 0.9);
+}
+/* ── CH2: PRO_BIG_IMG shrink ~10% (relative to the 52vh/84vw big cap) ── */
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="lg=1"],
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="xL=1"],
+#game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="xl=1"] {
+  max-height: calc(min(52vh, 84vw) * 0.9) !important;
+  max-width:  calc(min(96%, 640px) * 0.9) !important;
+  height: auto !important;
+  width: auto !important;
+  object-fit: contain !important;
+  margin: clamp(6px, 1vh, 12px) auto !important;
+}
+
+/* shrink the band so layout actually yields space */
+#game-container .sm-ch1[data-chapter="ch2"] {
+  --sm-ch1-art-h: calc(min(52vh, 84vw) * 0.6);
+}
