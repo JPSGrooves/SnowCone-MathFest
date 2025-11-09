@@ -132,7 +132,7 @@ export const Chapter2 = {
         name: 'Luca Pacioli',
         bio: {
           img: PRO_BIG_IMG('pacioli.png'),
-          text: `Renaissance popularizer of double-entry bookkeeping—two columns in honest balance.`,
+          text: `Fourth customer is portentous at first. Renaissance popularizer of double-entry bookkeeping—two columns in honest balance.`,
         },
         lore: {
             img: PRO_IMG('ledgerGlow.png'),
@@ -140,11 +140,11 @@ export const Chapter2 = {
         },
 
         puzzle: {
-            img: PRO_IMG('ledgerGlow.png'),
-            prompt: `Sponsor loads +1000 Cone Coins into your wallet (prepaid for future cones).
-                    Double-entry (coins): Debit Cone Coin Wallet; Credit Unearned Cones. Amounts?`,
-            reveal: `<b>Debit:</b> Cone Coin Wallet <b>1000 CC</b> · <b>Credit:</b> Unearned Cones <b>1000 CC</b>.`,
+            img: PRO_IMG('mixCard.png'),
+            prompt: `Tap-to-pay: 1 cone costs $5, paid entirely with Cone Coins (from a prior top-up). Customer also leaves a $1 cash tip. Vendor double-entry: list the Debits and Credits.`,
+            reveal: `<b>Debits:</b> Unearned Cone Coins $5; Cash $1 · <b>Credits:</b> Sales Revenue $5; Tips Payable $1.`,
         },
+
 
 
 

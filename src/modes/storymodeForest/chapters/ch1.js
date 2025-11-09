@@ -42,7 +42,8 @@ export const Chapter1 = {
         {
         img: PRO_IMG('hippyTriangle.png'),
         text: `She breezes between bumpers, shoulder-strap tray jangling.<br><br> “Triangles, triangles!” she grins...then clocks your empty pockets. “No coin? No problem. Pay with math.” <br><br>She chalks: 3–4–? and taps a right angle. “Shortest path corner-to-corner?”`,
-        reveal: `5 — the hypotenuse. “Math accepted,” she laughs.`
+        reveal: `5 — the hypotenuse. “Math accepted,” she laughs.`,
+        requireRevealToAdvance: true
         },
         {
         img: PRO_IMG('triangleHand.png'),
@@ -106,7 +107,8 @@ export const Chapter1 = {
             {
             img: PRO_IMG('bikerDino.png'), // add this asset
             text: `You edge along the rope line and slip toward a gap. A biker dino steps in; he's calm, firm, sympathetic.<br><br>“Sorry, I can't let you in. This is literally my only job.” He lowers his voice: “Answer me this and I’ll give you a coveted festival secret:<br><br> The <i>festival grounds</i> has a perimeter of 2 miles. What’s the area?”`,
-            reveal: `4 sides = .5 miles each,<br>The area = .5 × .5 = <b>.25 square miles</b>.`
+            reveal: `4 sides = .5 miles each,<br>The area = .5 × .5 = <b>.25 square miles</b>.`,
+            requireRevealToAdvance: true
             },
             {
             img: PRO_IMG('mintSquareRecipe.png'), // add this asset
@@ -175,17 +177,20 @@ export const Chapter1 = {
                     <br><br><em>If I half the brightness each click. Starting at 100%, after how many clicks is it
                     effectively zero (below 1%)?</em>`,
             reveal: `7 clicks. Halves: 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.5625 → 0.78125%.
-                    It drops below 1% after the <b>7th</b> click.`
+                    It drops below 1% after the <b>7th</b> click.`,
+            requireRevealToAdvance: true
             },
             {
             img: PRO_IMG("breakerBox.png"),
             text: `You give an educated guess. The dino grins, palms the lever, and snaps it clean to <b>OFF</b>. The generator coughs twice; moths scatter; the floodlight exhales into dark.`,
-            reveal: `“Honestly, I was gonna kill it either way—we're gonna need zeroes to tame these lights!”`
+            reveal: `“Honestly, I was gonna kill it either way—we're gonna need zeroes to tame these lights!”`,
+            requireRevealToAdvance: true
             },
             {
             img: PRO_IMG("moonChain.png"), // your circle sigil art
             text: `With the field light gone, the night settles. He fishes something from his pocket and sets it in your palm: a tiny full moon on a stubby chain.<br><br>La Luna glows cool and steady, craters crisp, casting pale light across your fingers while the tents dim back to whispers.`,
-            reveal: `You receive the <b>MoonChain</b>.`
+            reveal: `You receive the <b>MoonChain</b>.`,
+            requireRevealToAdvance: true
             }
         ],
         reward: {
@@ -269,7 +274,8 @@ loop: {
                 // ⬇️ SHORT pre-reveal; long detail stays in `reveal`
                 text: `On the tailgate: a frost-bright shard, a mint-square ratio, and a moonlit chain. Three pieces; one method waiting to click.`,
                 reveal: `These are the festival’s three essentials, kid: <b>Chill</b> (the shard’s cryo snap), <b>Flavor</b> (that 2:3 mint-lime choir), and <b>Shapes</b> (the moon’s perfect loop guiding the spiral).<br><br>
-                        Line them up and you get the method: <i>Chill → Mix → Shape</i>. The bench lights breathe brighter, like they know what comes next.`
+                        Line them up and you get the method: <i>Chill → Mix → Shape</i>. The bench lights breathe brighter, like they know what comes next.`,
+                        requireRevealToAdvance: true
                 },
                 {
                 img: PRO_IMG('essentialsTrio2.png'),
@@ -277,14 +283,16 @@ loop: {
                 text: `You lift them: cold breath, a glowing 2:3, and a steady lunar spin. The motions begin to braid.`,
                 reveal: `The pieces <i>lock</i> with a little cosmic thunk—first a chill tone, then a bright 2:3 chord, then a soft lunar hum. A halo of neon bubbles lifts from your workbench as the mixture stabilizes.<br><br>
                         <b>Chill anchors.</b> <b>Flavor harmonizes.</b> <b>Shape guides.</b><br>
-                        Your hands know the rest: spiral, crest, and crown. The Perfect SnowCone is ready to be born.`
+                        Your hands know the rest: spiral, crest, and crown. The Perfect SnowCone is ready to be born.`,
+                        requireRevealToAdvance: true
                 },
                 {
                 img: PRO_IMG('essentialsTrio3.png'),
                 imgAlt: 'Jehnk cues the final steps at the truck: pack ice, swirl a 2:3 mint–lime ribbon, crown it with a precise triangle crest as neon bubbles glow at 2AM.',
                 text: `Jehnk cues the finale: pack ice, pour a steady <b>2:3</b> ribbon, finish with a triangle crest.`,
                 reveal: `<b>Perfect SnowCone crafted!</b> Neon bubbles rise and drift like little planets as the cone gleams in the 2AM glow.<br><br>
-                        The stack sings in three parts—<b>Chill</b> holds the shape, <b>Flavor</b> rings out 2:3 bright, <b>Geometry</b> keeps the swirl honest. Jehnk grins: “Serve that comet cone, traveler.” 🫧🍧`
+                        The stack sings in three parts—<b>Chill</b> holds the shape, <b>Flavor</b> rings out 2:3 bright, <b>Geometry</b> keeps the swirl honest. Jehnk grins: “Serve that comet cone, traveler.” 🫧🍧`,
+                        requireRevealToAdvance: true
                 }
             ];
             }

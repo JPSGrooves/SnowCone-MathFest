@@ -499,9 +499,18 @@ _onAdvance(chapter, slide, topOpt){
 _onQuest(slide){
   if (!slide.quest) return this._renderSlide();
 
+  // 🔄 Optional: clear any remembered reveals for THIS slide
+  const revealPrefix = `${this.state.chapterId}:${this.state.idx}:`;
+  if (slide.quest?.resetRevealsOnOpen === true) {
+    for (const key of Array.from(this.state.revealed)) {
+      if (key.startsWith(revealPrefix)) this.state.revealed.delete(key);
+    }
+  }
+
   const stepsBase = slide.quest.getSteps?.(appState, this) ?? slide.quest.steps;
   let i = 0;
 
+  // unique key for "this step on this slide"
   const keyFor = (idx) => `${this.state.chapterId}:${this.state.idx}:${idx}`;
 
   const grantReward = (reward) => {
@@ -526,63 +535,106 @@ _onQuest(slide){
     }
   };
 
-  // ⬇️ NEW: treat legacy quest.reward as a completion fallback
+  // legacy “completion” payout still honored
   const completionPayout = slide.quest.completionReward || slide.quest.reward || null;
+
+  // tiny helper to toggle a button disabled state
+  const setBtnEnabled = (btn, on) => {
+    if (!btn) return;
+    btn.disabled = !on;
+    btn.classList.toggle('is-disabled', !on);
+  };
 
   const renderStep = () => {
     const s = stepsBase[i] || {};
     const key = keyFor(i);
-    const already = this.state.revealed.has(key);
 
-    const revealBtnHTML = s.reveal ? (already
-      ? `<button class="sm-btn sm-btn-primary js-reveal is-visited is-disabled" disabled>
-           <span class="sm-check" aria-hidden="true">✓</span> Revealed
-         </button>`
-      : `<button class="sm-btn sm-btn-primary js-reveal">Reveal</button>`)
+    // did this step’s reveal already happen?
+    const alreadyRevealed = this.state.revealed.has(key);
+
+    // per-step gate; also allow a quest-wide default via slide.quest.requireRevealToAdvance
+    const mustReveal = !!(s.requireRevealToAdvance || slide.quest?.requireRevealToAdvance);
+    const hasRevealContent = !!s.reveal;
+
+    // if dev mistakenly requires reveal but no reveal content exists, don't soft-lock
+    const gateActive = mustReveal && hasRevealContent;
+
+    const revealBtnHTML = s.reveal
+      ? (alreadyRevealed
+          ? `<button class="sm-btn sm-btn-primary js-reveal is-visited is-disabled" disabled>
+               <span class="sm-check" aria-hidden="true">✓</span> Revealed
+             </button>`
+          : `<button class="sm-btn sm-btn-primary js-reveal">Reveal</button>`)
       : '';
+
+    const nextLabel = (i < stepsBase.length - 1) ? 'Next' : 'Finish';
+    const nextDisabledAtLoad = gateActive && !alreadyRevealed;
 
     const inner = `
       <h2 class="sm-ch1-title">${slide.quest.title}</h2>
       ${s.img ? `<img class="sm-ch1-img" src="${s.img}" alt="${s.imgAlt ?? ''}">` : ''}
       <div class="sm-ch1-text">${s.text ?? ''}</div>
+
       <div class="sm-ch1-reveal-hold">
-        ${already ? `<div class="sm-reveal-answer is-open">${s.reveal ?? ''}</div>` : ``}
+        ${alreadyRevealed && s.reveal ? `<div class="sm-reveal-answer is-open">${s.reveal}</div>` : ``}
       </div>
+
       <div class="sm-choice-list">
         ${revealBtnHTML}
-        <button class="sm-btn sm-btn-secondary js-next">${i < stepsBase.length - 1 ? 'Next' : 'Finish'}</button>
-      </div>`;
+        <button class="sm-btn sm-btn-secondary js-next ${nextDisabledAtLoad ? 'is-disabled' : ''}" ${nextDisabledAtLoad ? 'disabled' : ''}>${nextLabel}</button>
+      </div>
+    `;
 
     this._renderFrame(inner);
 
     const root = document;
+    const nextBtn   = root.querySelector('.js-next');
+    const revealBtn = root.querySelector('.js-reveal');
+    const hold      = root.querySelector('.sm-ch1-reveal-hold');
 
-    // Step reveal → show, award s.reward once
-    const rb = root.querySelector('.js-reveal');
-    if (rb && !already) {
-      rb.addEventListener('click', () => {
-        const hold = root.querySelector('.sm-ch1-reveal-hold');
-        if (hold && !hold.querySelector('.sm-reveal-answer')) {
+    // Reveal → show answer, pay step reward once, unlock Next
+    if (revealBtn && !alreadyRevealed) {
+      revealBtn.addEventListener('click', () => {
+        if (hold && !hold.querySelector('.sm-reveal-answer') && s.reveal) {
           const ans = document.createElement('div');
           ans.className = 'sm-reveal-answer is-open';
-          ans.innerHTML = s.reveal ?? '';
+          ans.innerHTML = s.reveal;
           hold.appendChild(ans);
         }
-        grantReward(s.reward);                 // ← step-level reward still supported
+        // step-level reward remains supported
+        grantReward(s.reward);
+
+        // mark this step revealed
         this.state.revealed.add(key);
-        rb.classList.add('is-visited','is-disabled');
-        rb.setAttribute('disabled','true');
-        rb.innerHTML = `<span class="sm-check" aria-hidden="true">✓</span> Revealed`;
+
+        // update the reveal button look
+        revealBtn.classList.add('is-visited', 'is-disabled');
+        revealBtn.setAttribute('disabled', 'true');
+        revealBtn.innerHTML = `<span class="sm-check" aria-hidden="true">✓</span> Revealed`;
+
+        // 🔓 unlock Next for gated steps
+        if (gateActive) setBtnEnabled(nextBtn, true);
       }, { once: true });
     }
 
-    // Next/Finish
-    root.querySelector('.js-next')?.addEventListener('click', () => {
+    // Next/Finish click
+    nextBtn?.addEventListener('click', () => {
+      // hard gate: if required and not revealed yet, do nothing (soft jiggle vibe)
+      if (gateActive && !this.state.revealed.has(key)) {
+        nextBtn.style.transform = 'translateY(0) scale(1.02)';
+        nextBtn.style.filter = 'brightness(1.05)';
+        setTimeout(() => {
+          nextBtn.style.transform = '';
+          nextBtn.style.filter = '';
+        }, 120);
+        return;
+      }
+
+      // proceed
       if (i < stepsBase.length - 1) {
         i++;
         renderStep();
       } else {
-        // ⬇️ NEW: pay completion reward OR legacy quest.reward here
         if (completionPayout) grantReward(completionPayout);
         this._renderSlide();
       }
