@@ -17,9 +17,8 @@ export const Chapter2 = {
     mode: 'solo',
     title: 'The First Shift',
     img: PRO_IMG('insideTruck.png'),
-    text: `Now that you've got the basics, Jehnk is letting you run the truck for a shift.<br><br>
-    Dew beads on the window as neon leaks through the mist, the Pavilion bass keeping slow time.<br><br>
-    Four shapes hover near the truck—one polishing a wooden timepiece, one tracing quiet symmetries in the air, one rolling a circle charm across their knuckles, one thumbing a tiny ledger that glows; each carrying a different kind of math.`,
+    text: `Now that you've got the basics, Jehnk dissapears and lets you run the truck for a shift.<br><br>
+    Four figures hover near the truck: one polishing a wooden timepiece, one tracing quiet symmetries in the air, one rolling a circle charm across his knuckles, and one thumbing a tiny, glowing ledger; each carrying a different kind of math.`,
     soloLabel: 'Open the Window ➡️',
     },
 
@@ -28,7 +27,7 @@ export const Chapter2 = {
     // ───────────────────────────────────
     {
       role: SlideRole.CUSTOMER,
-      title: 'Customer • Benjamin Banneker',
+      title: 'Benjamin Banneker',
       customer: {
         name: 'Benjamin Banneker',
         bio: {
@@ -41,17 +40,17 @@ export const Chapter2 = {
         },
         puzzle: {
           img: PRO_IMG('scheduleCard.png'),
-          prompt: `The band plays one set that lasts 42 minutes. You make cones at a steady speed: 5 cones every 3 minutes.<br><br>How many groups of 3 fit into 42, and how many cones is that for the whole set?`,
-          reveal: `<b>70 cones.</b> 42 ÷ 3 = 14 chunks; 14 × 5 = 70.`,
+          prompt: `The band plays one set that lasts 42 minutes. You make SnowCones at a steady speed: 5 cones every 3 minutes.<br><br>How many cones is that for the whole set?`,
+          reveal: `<b>70 cones!</b> 42 ÷ 3 = 14 chunks; 14 × 5 = 70.`,
         },
       },
     },
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Happy • Benjamin Banneker',
+      title: 'Benjamin Banneker',
       img: PRO_BIG_IMG('bannekerHappy.png'),
-      text: `He tastes the cone, eyes glinting like midnight brass. "Keep your time; the night will keep you." He taps the wooden timepiece once, steady as a heartbeat. "Set your ledger by the stars, not the noise. When the count feels crooked, look up, breathe, and start the next measure true."`,
+      text: `He tastes the cone, eyes glinting like midnight brass. "Keep your time and the night will reward you." He goes on, "When the count feels crooked, look up, breathe, and start the next minute true."`,
       soloLabel: 'Next Customer ➡️',
       grants: [{ item: ItemIds.BANNEKER_TOKEN }],
     },
@@ -61,30 +60,30 @@ export const Chapter2 = {
     // ───────────────────────────────────
     {
       role: SlideRole.CUSTOMER,
-      title: 'Customer • Emmy Noether',
+      title: 'Emmy Noether',
       customer: {
         name: 'Emmy Noether',
         bio: {
-          img: PRO_IMG('noether.png'),
-          text: `A pioneer of abstract algebra and physics—she linked symmetries to conserved quantities: when the world transforms, something stays true.`,
+          img: PRO_BIG_IMG('noether.png'),
+          text: `Next up, a pioneer of abstract algebra and physics—she linked symmetries to conserved quantities: when the world transforms, something stays true.`,
         },
         lore: {
-          img: SCN_IMG('coilCables.png'),
-          text: `Stage lights loop. “Find your invariant,” she says. “The ratio that survives any total.”`,
+          img: PRO_IMG('coilCables.png'),
+          text: `Stage lights loop. "Find your invariant," she says. "The ratio that survives any total." The colors wheel—blue, gold, violet—but the pulse repeats. Four counts pass; the bright hit comes back on five. Add bulbs, swap their order, fade one low, push one high—the share of light to dark stays fixed. That's your anchor. When everything shifts, symmetry keeps time.`,
         },
         puzzle: {
-          img: SCN_IMG('ratioCard.png'),
-          prompt: `Invariant recipe: 2:3 mint:lime. For 180 mL total, how many mL of each?`,
-          reveal: `<b>72 mL mint, 108 mL lime.</b> (2/5, 3/5 of 180)`,
+            img: PRO_IMG('stageLightsCard.png'), // placeholder filename — swap to whatever you export
+            prompt: `On stage, the lights loop in a 2:3 pattern: 2 blue beams, then 3 gold beams, repeating. If the crew runs 180 beams this chorus, how many are blue and how many are gold?`,
+            reveal: `<b>72 blue, 108 gold.</b> (That's 2/5 and 3/5 of 180)`,
         },
       },
     },
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Happy • Emmy Noether',
-      img: PRO_IMG('noetherHappy.png'),
-      text: `She smiles. “Invariant preserved.” The Ghost goes quiet for a beat.`,
+      title: 'Emmy Noether',
+      img: PRO_BIG_IMG('noetherHappy.png'),
+      text: `She smiles. “Invariant preserved.” The Ghost goes quiet for a beat. The stage lights sweep and swap, but the pattern holds. “When something stays fixed, you can dance around it.”`,
       soloLabel: 'Next Customer ➡️',
       grants: [{ item: ItemIds.NOETHER_TOKEN }],
     },
@@ -94,32 +93,33 @@ export const Chapter2 = {
     // ───────────────────────────────────
     {
       role: SlideRole.CUSTOMER,
-      title: 'Customer • Archimedes',
+      title: 'Archimedes',
       customer: {
         name: 'Archimedes',
         bio: {
-          img: PRO_IMG('archimedes.png'),
-          text: `Geometry’s old lion—levers, circles, and one famous bath. He taps the dunk-tank like it’s a theorem.`,
+          img: PRO_BIG_IMG('archimedes.png'),
+          text: `Third to roll in is Geometry’s old lion—levers, circles, and one famous bath. He taps the dunk-tank like it’s a theorem.`,
         },
         lore: {
-          img: SCN_IMG('lanternCircle.png'),
-          text: `The barrel gurgles. “Displacement tells the truth,” he grins. “What goes in, pushes out equal volume.”`,
+            img: PRO_IMG('lanternCircle.png'),
+            text: `The barrel gurgles. He pictures two huge tubs—one pure water, one piled with snowcones. He steps in; both surfaces climb. “Displacement tells the truth,” he grins. “The rise matches my volume, and the lift equals the weight I push aside—cone or water, same law.”`,
         },
         puzzle: {
-          img: SCN_IMG('waterBarrel.png'),
-          prompt: `A trinket dropped in the measuring barrel raises the water by 150 mL. What’s the trinket’s volume?`,
-          reveal: `<b>150 cm³.</b> (1 mL ≈ 1 cm³)`,
+            img: PRO_IMG('waterBarrel.png'),
+            prompt: `At Infinity Lake, Archimedes lowers a giant snowcone into the calibrated test cove. The level mark jumps by 3.0 L. What’s the snowcone’s submerged volume?`,
+            reveal: `<b>3000 cm³.</b> (1 L = 1000 cm³; and 1 mL ≈ 1 cm³, so 3.0 L = 3000 cm³)`,
         },
+
       },
     },
     {
-      role: SlideRole.ADVANCE,
-      mode: 'solo',
-      title: 'Happy • Archimedes',
-      img: PRO_IMG('archimedesHappy.png'),
-      text: `He laughs. “Balanced perfectly!” He pockets the cone like a solved problem.`,
-      soloLabel: 'Next Customer ➡️',
-      grants: [{ item: ItemIds.ARCHIMEDES_TOKEN }],
+        role: SlideRole.ADVANCE,
+        mode: 'solo',
+        title: 'Archimedes',
+        img: PRO_BIG_IMG('archimedesHappy.png'),
+        text: `He laughs. “Balanced perfectly!” The ripples settle into neat circles. “Equal weight, equal lift—always.” He taps the cone like a theorem, pockets it like a solved problem, and tips you a wink. “Bill me in buoyant units,” he says, leaving a faint ring of dew on the counter as his token warms your jar.`,
+        soloLabel: 'Next Customer ➡️',
+        grants: [{ item: ItemIds.ARCHIMEDES_TOKEN }],
     },
 
     // ───────────────────────────────────
@@ -127,33 +127,37 @@ export const Chapter2 = {
     // ───────────────────────────────────
     {
       role: SlideRole.CUSTOMER,
-      title: 'Customer • Luca Pacioli',
+      title: 'Luca Pacioli',
       customer: {
         name: 'Luca Pacioli',
         bio: {
-          img: PRO_IMG('pacioli.png'),
+          img: PRO_BIG_IMG('pacioli.png'),
           text: `Renaissance popularizer of double-entry bookkeeping—two columns in honest balance.`,
         },
         lore: {
-          img: SCN_IMG('ledgerGlow.png'),
-          text: `He flips a tiny ledger: left syrup, right cones. “Debits greet credits,” he winks.`,
+            img: PRO_IMG('ledgerGlow.png'),
+            text: `He flips a tiny ledger: left syrup, right cones. “Debits greet credits,” he winks. He sketches a crisp T and notes ‘Somma = Somma’ in the margin. “What leaves inventory enters the mix—every pour has its pair.”`,
         },
+
         puzzle: {
-          img: SCN_IMG('mixCard.png'),
-          prompt: `Order: 10 cones, each 150 mL, at a 3:2 mint:lime ratio.
-                   Total mint and lime needed?`,
-          reveal: `<b>Mint 900 mL; Lime 600 mL.</b> Total 1500 mL → 3/5 = 900; 2/5 = 600.`,
+            img: PRO_IMG('ledgerGlow.png'),
+            prompt: `Sponsor loads +1000 Cone Coins into your wallet (prepaid for future cones).
+                    Double-entry (coins): Debit Cone Coin Wallet; Credit Unearned Cones. Amounts?`,
+            reveal: `<b>Debit:</b> Cone Coin Wallet <b>1000 CC</b> · <b>Credit:</b> Unearned Cones <b>1000 CC</b>.`,
         },
+
+
+
       },
     },
     {
-      role: SlideRole.ADVANCE,
-      mode: 'solo',
-      title: 'Happy • Luca Pacioli',
-      img: PRO_IMG('pacioliHappy.png'),
-      text: `He nods at your books and your blend. “Balanced.” The page glows, then closes itself.`,
-      soloLabel: 'Jehnk Jumps In ➡️',
-      grants: [{ item: ItemIds.PACIOLI_TOKEN }],
+        role: SlideRole.ADVANCE,
+        mode: 'solo',
+        title: 'Luca Pacioli',
+        img: PRO_IMG('pacioliHappy.png'),
+        text: `He nods at your books and your blend. “Balanced.” He sets a tiny glowing ledger in your palm—left Syrup, right Cones, Somma = Somma—then lifts two snowcones, one in each hand, level as a scale. The page hums, signs itself, and closes warm against your pocket. “Every pour has its pair,” he winks, strolling into the lights with twin cones held high.`,
+        soloLabel: 'Jehnk Jumps In ➡️',
+        grants: [{ item: ItemIds.PACIOLI_TOKEN }],
     },
 
     // Wrap — Jehnk pep talk → Chapter 3
@@ -162,7 +166,7 @@ export const Chapter2 = {
       mode: 'solo',
       title: 'Shift Complete',
       img: PRO_IMG('jehnk2Cones.png'),
-      text: `Jehnk whistles. “Four legends, four cones—clean pours, clean math. Keep this up and I might let you run the truck one night.”`,
+      text: `Jehnk whistles. “Four legends, four cones—clean pours, clean math. Keep this up and I might let you run the truck forever.”`,
       soloLabel: 'Chapter 3 ➡️',
       nextChapterId: 'ch3',
     },
