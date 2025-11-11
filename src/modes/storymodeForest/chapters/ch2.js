@@ -121,8 +121,8 @@ export const Chapter2 = {
         role: SlideRole.ADVANCE,
         mode: 'solo',
         title: 'Archimedes',
-        img: PRO_BIG_IMG('archimedesHappy.png'),
-        text: `He laughs. “Balanced perfectly!” The ripples settle into neat circles. “Equal weight, equal lift—always.” He taps the cone and pockets it like a solved problem. “Bill me in buoyant units, and don't take things too seriously until you've taken a bath.`,
+        img: PRO_IMG('archimedesHappy.png'),
+        text: `He laughs. “Balanced perfectly!” The ripples settle into neat circles. “Equal weight, equal lift—always.” He taps the cone and pockets it like a solved problem. “Bill me in buoyant units, and don't take things too seriously until you've tested your wieght in a bath."`,
         soloLabel: 'Next Customer ➡️',
         // NOETHER happy slide
         // ARCHIMEDES happy slide

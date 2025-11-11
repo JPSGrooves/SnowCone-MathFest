@@ -2,6 +2,7 @@
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
 import { awardBadge } from '../../../managers/badgeManager.js';
+import { pickupPing } from '../ui/pickupPing.js'; 
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG = (name) => `${BASE}assets/img/characters/storyMode/${name}`;
@@ -144,7 +145,7 @@ export const Chapter1 = {
         soloLabel: 'Take the Job!', 
 
         // 🆕 would the reward system work here?
-        grants: [ItemIds.WORK_BADGE],
+        grants: [{ item: ItemIds.WORK_BADGE, announce: true }],
     },
 
 
@@ -341,25 +342,89 @@ loop: {
 
       // award on press (also handles forging if the player has everything)
         // /src/modes/storyMode/chapters/ch1.js — last slide object
-        onAdvance: ({ appState }) => {
-        const need = [ItemIds.TRIANGLE_SHARD, ItemIds.SQUARE_SHARD, ItemIds.CIRCLE_SHARD];
-        const hasAll = appState.hasItems(...need);
-        const alreadyForged = appState.hasItem(ItemIds.MASTER_SIGIL);
+        // ch1.js — replace the entire onAdvance handler on the last slide with this:
 
-        if (hasAll && !alreadyForged) {
-            // 🧱 1) consume the parts used in crafting
-            appState.consumeItems(need);
+onAdvance: ({ appState }) => {
+  // IDs we expect to consume to craft
+  const need = [ItemIds.TRIANGLE_SHARD, ItemIds.SQUARE_SHARD, ItemIds.CIRCLE_SHARD];
 
-            // 🜚 2) award the crafted result + a little “that was sick” cash
-            appState.addItem(ItemIds.MASTER_SIGIL, { name: 'Perfect SnowCone', meta: { emoji: '🍧' } });
-            appState.addCurrency(300);
-            try { awardBadge('ch1_forge'); } catch {}
-        }
+  // tolerate missing master id in schema
+  const MASTER_SIGIL_ID = (ItemIds && ItemIds.MASTER_SIGIL) ? ItemIds.MASTER_SIGIL : 'master_sigil';
 
-        // chapter finish drip
-        appState.addCurrency(200);
-        appState.saveToStorage?.();
-        }
+  // helpers
+  const hasItem = (id) => !!appState?.hasItem?.(id);
+  const hasAllParts = need.every(hasItem);
+  const alreadyForged = hasItem(MASTER_SIGIL_ID);
+
+  // DEV: one-shot state debug so we can *see* why it didn’t fire
+  console.log('[ch1 forge] parts:', {
+    triangle: hasItem(ItemIds.TRIANGLE_SHARD),
+    square:   hasItem(ItemIds.SQUARE_SHARD),
+    circle:   hasItem(ItemIds.CIRCLE_SHARD),
+    hasAllParts,
+    alreadyForged,
+    MASTER_SIGIL_ID,
+  });
+
+  // If the player currently has all three parts, we ALWAYS do the epic ping (celebration),
+  // even if they already forged before.
+  if (hasAllParts) {
+    try {
+      pickupPing({
+        kind: 'item',
+        emoji: '🍧',
+        name: 'Perfect SnowCone',
+        qty: 1,
+        variant: 'epic',
+        durationMs: 2600
+      });
+    } catch (e) {
+      console.warn('[ch1 forge] epic ping failed:', e);
+    }
+  }
+
+  // Only *add* the Perfect SnowCone + consume parts if not already forged
+  if (hasAllParts && !alreadyForged) {
+    // consume parts safely
+    try {
+      if (typeof appState.consumeItems === 'function') {
+        appState.consumeItems(need);
+      } else {
+        need.forEach(id => { try { appState.removeItem?.(id); } catch {} });
+      }
+    } catch (e) {
+      console.warn('[ch1 forge] consume parts failed:', e);
+    }
+
+    // award the crafted result
+    try {
+      appState.addItem(MASTER_SIGIL_ID, { name: 'Perfect SnowCone', meta: { emoji: '🍧' } });
+      console.log('[ch1 forge] added Master Sigil item:', MASTER_SIGIL_ID);
+    } catch (e) {
+      console.warn('[ch1 forge] add master item failed:', e);
+    }
+
+    // quiet currency bump (no cash ping), then refresh chip
+    try { appState.addCurrency?.(300); } catch {}
+    refreshCashChip();
+
+    try { awardBadge('ch1_forge'); } catch (e) {
+      console.warn('[ch1 forge] badge award failed:', e);
+    }
+  } else {
+    // Not all parts? Just explain in log so you know why no add happened.
+    if (!hasAllParts) console.log('[ch1 forge] skipped (missing parts)');
+    if (alreadyForged) console.log('[ch1 forge] skipped (already forged)');
+  }
+
+  // chapter finish drip (quiet)
+  try { appState.addCurrency?.(200); } catch {}
+  refreshCashChip();
+
+  try { appState.saveToStorage?.(); } catch {}
+}
+
+
 
     },
   ],
@@ -371,3 +436,14 @@ loop: {
     } catch {}
   }
 };
+// handy: keep the cash chip accurate without cash flash
+// replace your refreshCashChip() with this:
+function refreshCashChip() {
+  const chip = document.getElementById('smCash');
+  if (!chip) return;
+  const parts = (chip.textContent || '').trim().split(/\s+/);
+  const currentLabel = parts.length > 1 ? parts.slice(1).join(' ') : 'Coins';
+  chip.textContent = `${globalAppState.getCurrency()} ${currentLabel}`;
+}
+
+

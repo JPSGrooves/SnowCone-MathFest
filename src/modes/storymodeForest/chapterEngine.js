@@ -4,6 +4,7 @@ import { appState } from '../../data/appState.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 import { isMuted, toggleMute } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
+import { pickupPing } from './ui/pickupPing.js';
 import { ITEM_DISPLAY} from '../../data/storySchema.js';
 
 const SELECTORS = { container: '#game-container' };
@@ -14,6 +15,15 @@ const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
 // inline unlock store (no new files)
 // ─────────────────────────────
 const SM_UNLOCK_KEY = 'sm_unlocked_chapters_v1';
+
+function _displayFor(itemId){
+  const d = ITEM_DISPLAY?.[itemId] || {};
+  return {
+    name:  d.name  || String(itemId),
+    emoji: d.emoji || '✨'
+  };
+}
+
 
 function smLoadUnlocks() {
   try {
@@ -94,35 +104,49 @@ export class ChapterEngine {
     this._renderSlide();
   }
   // chapterEngine.js (inside export class ChapterEngine)
+  // inside export class ChapterEngine { ... }
+  
   _grantSlideRewards(slide){
     if (!slide || !slide.grants) return;
     try {
-      const give = (id, qty = 1, payload = undefined) => {
-        // prefer your appState helpers; avoid dupes if you track possession
-        if (appState.hasItem?.(id)) return;
-        // support either (id, payload) or (id, {qty,…})
-        if (payload) {
-          appState.addItem?.(id, payload);
-        } else {
-          appState.addItem?.(id, { qty });
-        }
-      };
+        const give = (id, qty = 1, payload = undefined) => {
+        if (appState.hasItem?.(id)) return false;
+        if (payload !== undefined) appState.addItem?.(id, payload);
+        else appState.addItem?.(id, { qty });
+        return true;
+        };
 
-      // grants can be ['work_badge'] OR [{ item:'work_badge', qty:1, payload:{...}}]
-      slide.grants.forEach(g => {
-        if (typeof g === 'string') give(g, 1);
-        else if (g && typeof g === 'object') {
-          if (g.item) give(g.item, g.qty ?? 1, g.payload);
-          if (g.currency) appState.addCurrency?.(g.currency|0);
+        slide.grants.forEach(g => {
+        if (typeof g === 'string') {
+            const added = give(g, 1);
+            if (added) pickupPing({ emoji: (ITEM_DISPLAY?.[g]?.emoji || '✨'), name: (ITEM_DISPLAY?.[g]?.name || g), qty: 1 });
+        } else if (g && typeof g === 'object') {
+            if (g.item) {
+            const qty = (typeof g.qty === 'number') ? g.qty
+                    : (typeof g.payload?.qty === 'number') ? g.payload.qty
+                    : 1;
+            const added = give(g.item, qty, g.payload);
+            if (added) pickupPing({ emoji: (ITEM_DISPLAY?.[g.item]?.emoji || '✨'), name: (ITEM_DISPLAY?.[g.item]?.name || g.item), qty });
+            }
+            if (g.currency) {
+            const amt = g.currency | 0;
+            appState.addCurrency?.(amt);
+            // 🔕 no pickupPing for cash
+            // keep the chip fresh so players still see their money tick up
+            const chip = document.getElementById('smCash');
+            if (chip) chip.textContent = `${appState.getCurrency()} ${CURRENCY_NAME}`;
+            }
+
         }
       });
-      appState.saveToStorage?.();
+
+        appState.saveToStorage?.();
     } catch (e) {
-      console.warn('[Story] grant failed:', e);
+        console.warn('[Story] grant failed:', e);
     }
-    
-  }
-  // mark a chapter unlocked (engine-level, idempotent)
+    }
+
+// mark a chapter unlocked (engine-level, idempotent)
   _unlockChapter(id) {
     try {
       // if your appState also tracks unlocks, let it run (no-op if missing)
@@ -514,26 +538,34 @@ _onQuest(slide){
   const keyFor = (idx) => `${this.state.chapterId}:${this.state.idx}:${idx}`;
 
   const grantReward = (reward) => {
-    if (!reward) return;
-    try {
-      // item: string OR { id, payload }
-      if (reward.item) {
-        const itemId = (typeof reward.item === 'string')
-          ? reward.item
-          : reward.item.id;
-        const payload = (typeof reward.item === 'object')
-          ? (reward.item.payload ?? reward.payload)
-          : reward.payload;
-        if (itemId && !appState.hasItem?.(itemId)) {
-          appState.addItem?.(itemId, payload);
-        }
+  if (!reward) return;
+  try {
+    if (reward.item) {
+      const itemId = (typeof reward.item === 'string') ? reward.item : reward.item.id;
+      const payload = (typeof reward.item === 'object') ? (reward.item.payload ?? reward.payload) : reward.payload;
+      let qty = 1;
+      if (typeof reward.qty === 'number') qty = reward.qty;
+      else if (typeof payload?.qty === 'number') qty = payload.qty;
+
+      if (itemId && !appState.hasItem?.(itemId)) {
+        appState.addItem?.(itemId, payload ?? { qty });
+        pickupPing({ emoji:(ITEM_DISPLAY?.[itemId]?.emoji || '✨'), name:(ITEM_DISPLAY?.[itemId]?.name || itemId), qty });
       }
-      if (reward.currency) appState.addCurrency?.(reward.currency|0);
-      appState.saveToStorage?.();
-    } catch (e) {
-      console.warn('[Story] quest reward grant failed:', e);
     }
-  };
+    if (reward.currency) {
+    const amount = reward.currency | 0;
+    appState.addCurrency?.(amount);
+    // 🔕 no pickupPing for cash
+    const chip = document.getElementById('smCash');
+    if (chip) chip.textContent = `${appState.getCurrency()} ${CURRENCY_NAME}`;
+    }
+
+    appState.saveToStorage?.();
+  } catch (e) {
+    console.warn('[Story] quest reward grant failed:', e);
+  }
+};
+
 
   // legacy “completion” payout still honored
   const completionPayout = slide.quest.completionReward || slide.quest.reward || null;

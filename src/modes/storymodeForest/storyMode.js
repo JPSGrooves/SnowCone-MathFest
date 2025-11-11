@@ -7,7 +7,6 @@ import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 // add these with your other imports
-import { pingItem } from './ui/itemPing.js';
 // OPTIONAL: if you added display names/emojis near ItemIds
 import { ITEM_DISPLAY } from '../../data/storySchema.js';
 
