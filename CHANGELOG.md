@@ -19,7 +19,58 @@
 * ✅ **v0.9.9 – Just Small Details Now**
 * ✅ **v1.0.0 – Final Polish + Launch Ready✨**
 * ✅ **v1.1.0 – Chapter 1: It Has Begun✨**
-* 🎯 **v1.2.0 – Chapter 2 in Story Mode✨**
+* ✅ **v1.2.0 – Chapter 2 in Story Mode✨**
+
+# [1.2.0] – 2025-11-10 — **Shift: Four Customers — Chapter 2 Live** 🌌
+
+## Added
+
+- **Story Mode • Chapter 2: _Shift: Four Customers_**
+  - **Four-legend run:** **Benjamin Banneker**, **Emmy Noether**, **Archimedes**, **Luca Pacioli** — each arrives with **bio → lore → puzzle → happy slide** flow, then drops a **token**.
+  - **Token grants:** `BANNEKER_TOKEN`, `NOETHER_TOKEN`, `ARCHIMEDES_TOKEN`, `PACIOLI_TOKEN` (one-shot, idempotent; inventory-driven for future gates).
+  - **Portrait pipeline (retina-friendly):** new **`PRO_BIG_IMG()` / `SCN_BIG_IMG()`** helpers for high-res portraits/backgrounds (clean art swaps without layout thrash).
+  - **XP flow (Story-parity):** +25 XP per reveal; +500 XP at chapter finish (before nav), with soft toasts anchored to the pressed control.
+  - **Hand-off:** “Shift Complete” slide routes cleanly toward **Chapter 3** (`nextChapterId: 'ch3'`).
+
+- **Puzzles (tight, 2025-practical phrasing)**
+  - **Banneker (time & reckoning):** minute/ledger vibe to set the shift’s rhythm.
+  - **Noether (stage-light invariant):** 2:3 light loop framed as “**pattern runs _N_ times**”; reveals **2/5 vs 3/5** split against any total.
+  - **Archimedes (Infinity Lake):** dunk test; **3.0 L displaced → 3000 cm³** submerged volume (1 L = 1000 cm³).
+  - **Pacioli (Cone Coins double-entry):** one cone paid entirely with **Cone Coins** + **$1 cash tip** →  
+    **Debits:** Unearned Cone Coins $5; Cash $1 · **Credits:** Sales Revenue $5; Tips Payable $1.  
+    *(Focus stays on the Cone Coin liability, not syrup inventories.)*
+
+## Changed
+
+- **Copy discipline:** short pre-reveals; the **Reveal** carries the heavy answer prose (consistent with Ch.1).
+- **Portrait band & scaling:** enlarged legend band, safe **11:16** framing, no underlap with text or bottom bar.
+- **Music & mute parity:** Howler state mirrors UI across the chapter slides; one-tap unlock held from Prologue/Ch.1.
+
+## Fixed
+
+- **One-shot grants & toasts:** no double-award on re-enter; toasts are **pointer-through** and auto-dismiss.
+- **Slide unwire:** all RAF/timers/listeners tear down on exit; no ghost handlers between customers.
+- **Image repaint hiccups:** big-img helpers + background repaint nudge prevent stale frames on mobile.
+
+## QA (fast pass)
+
+- Run full chapter → **four tokens land exactly once**; XP ticks (+25 per reveal, +500 on finish).
+- Toggle mute anywhere → state reflects **every** slide; no surprise audio starts.
+- Tiny phones → bottom bar never overlaps text; portraits never crop; lights puzzle scales clean.
+- Re-enter Ch.2 mid-run → no duplicate listeners; no repeat grants.
+
+## Dev Notes (why we coded it this way)
+
+- **Event-driven tokens:** hooking grants to the **happy slide** keeps narrative beats atomic and idempotent—no imports firing side-effects, no double awards on HMR.
+- **Big-image helpers:** `PRO_BIG_IMG/SCN_BIG_IMG` give us a **single switching seam** for art quality (and future `?lg=1` variants) without touching slide logic.
+- **Ledger puzzle focus:** centering on **Cone Coins** modernizes the Pacioli beat and teaches liabilities/revenue in the player’s actual economy—less theme drag, more literacy.
+- **Toast pointer-through:** celebrations shouldn’t block play; we keep the hype visible while the UI stays interactive. 😎
+
+## Next
+
+- Chapter 2 completion badge & award hook (after all four customers).
+- Optional tiny SFX set: timepiece tick (Banneker), light scanner chirp (Noether), water plunk (Archimedes), ledger page flip (Pacioli) — respecting global mute.
+
 
 ## [1.1.0] – 2025-10-26 — **It Has Begun — Chapter 1 Complete**
 

@@ -309,8 +309,25 @@ class AppState {
     else this.inventory.set(id, cur);
   }
   hasItem(id) { return this.inventory.has(id); }
+  hasItems(...ids) {
+    return ids.every(id => this.hasItem(id));
+  }
   getItem(id) { return this.inventory.get(id) ?? null; }
   listItems() { return Array.from(this.inventory.values()); }
+  // drop-in replacement (same name); defaults to "all-or-nothing"
+  consumeItems(entries = [], opts = { requireAll: true }) {
+    const list = Array.isArray(entries)
+      ? entries.map(e => (typeof e === 'string' ? { id: e, qty: 1 } : { id: e.id, qty: e.qty ?? 1 }))
+      : [];
+
+    if (opts.requireAll) {
+      const ok = list.every(e => this.getItem(e.id)?.qty >= e.qty);
+      if (!ok) return false;
+    }
+    for (const e of list) this.removeItem(e.id, e.qty);
+    return true;
+  }
+
 
   addCurrency(n) { this.purse.add(n); }
   spendCurrency(n) { return this.purse.spend(n); }
@@ -454,4 +471,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: 'v1.1.0 — Chapter 1: It Has Begun' };
+window.devFlags = { build: 'v1.2.0 — Chapter 2: Fab Four' };

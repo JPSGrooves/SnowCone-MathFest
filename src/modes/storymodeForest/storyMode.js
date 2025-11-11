@@ -6,6 +6,10 @@ import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgro
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
+// add these with your other imports
+import { pingItem } from './ui/itemPing.js';
+// OPTIONAL: if you added display names/emojis near ItemIds
+import { ITEM_DISPLAY } from '../../data/storySchema.js';
 
 // Music
 import {
@@ -36,6 +40,84 @@ let chapterEngine;
 function getEngine() {
   if (!chapterEngine) chapterEngine = new ChapterEngine(Chapters);
   return chapterEngine;
+}
+let __smWired = false;
+
+// storyMode-scoped addItem patch
+// ───── Story-mode inventory watcher (MobX reaction) ─────
+// ───── Story-mode inventory watcher (polling diff, no MobX needed) ─────
+let __smInvPoll = null;
+let __smInvPrevJson = '';
+
+function smReadItemsSnapshot() {
+  // Robust: try accessor first, else fall back to profile.items
+  const ids =
+    appState.getItemIds?.() ||
+    Object.keys(appState.profile?.items || {}) ||
+    [];
+
+  const pairs = ids.map((id) => {
+    const rec = appState.getItem?.(id) || appState.profile?.items?.[id] || 0;
+    // normalize qty: numbers okay; objects with qty okay; booleans/strings coerce
+    let qty;
+    if (typeof rec === 'number') qty = rec;
+    else if (rec && typeof rec === 'object' && 'qty' in rec) qty = Number(rec.qty) || 0;
+    else qty = rec ? 1 : 0;
+    return [id, qty];
+  });
+
+  // Sort for stable stringify
+  pairs.sort((a,b) => (a[0] > b[0] ? 1 : -1));
+  return pairs;
+}
+
+function smStartInventoryWatcher() {
+  if (__smInvPoll) return;
+
+  const readNow = () => JSON.stringify(smReadItemsSnapshot());
+  __smInvPrevJson = readNow();
+
+  __smInvPoll = setInterval(() => {
+    try {
+      // Only operate if Story UI lives
+      if (!document.querySelector('.sm-aspect-wrap')) return;
+
+      const nowJson = readNow();
+      if (nowJson === __smInvPrevJson) return;
+
+      const prev = Object.fromEntries(JSON.parse(__smInvPrevJson));
+      const now  = Object.fromEntries(JSON.parse(nowJson));
+
+      // Detect increases and new IDs
+      Object.keys(now).forEach((id) => {
+        const oldQ = prev[id] ?? 0;
+        const newQ = now[id] ?? 0;
+        if (newQ > oldQ) {
+          const delta = newQ - oldQ;
+          const name  = (ITEM_DISPLAY?.[id]?.name)  || id || 'Item';
+          const emoji = (ITEM_DISPLAY?.[id]?.emoji) || '✨';
+          pingItem({ emoji, name, qty: delta });
+        }
+      });
+
+      __smInvPrevJson = nowJson;
+    } catch (err) {
+      // fail silent; don’t break story loop
+      // console.warn('[SM] inv poll err', err);
+    }
+  }, 250); // light + responsive
+}
+
+function smStopInventoryWatcher() {
+  if (__smInvPoll) clearInterval(__smInvPoll);
+  __smInvPoll = null;
+  __smInvPrevJson = '';
+}
+function smSetChapterFlag(id) {
+  const root = document.querySelector('.sm-aspect-wrap');
+  if (!root) return;
+  if (id) root.setAttribute('data-chapter', id);
+  else root.removeAttribute('data-chapter');
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -513,10 +595,10 @@ function resetContainerStyles() {
   c.removeAttribute('style');
 }
 // Hoisted, module-scope handler (function declaration = hoisted)
+// Hoisted, module-scope handler — single source of truth
 function onChaptersChanged(e) {
-  // Only re-render if the menu is visible
+  // Only re-render if the chapter menu is visible
   if (document.querySelector('.sm-chapter-menu')) {
-    // if your render takes unlocks, this preserves e.detail from the event
     renderChapterMenu(e?.detail);
   }
 }
@@ -526,6 +608,7 @@ function onChaptersChanged(e) {
 // ────────────────────────────────────────────────────────────────────────────────
 function loadStoryMode() {
   appState.setMode('story');
+  smStartInventoryWatcher();
   swapModeBackground('storymodeForest');
 
   const container = document.querySelector(SELECTORS.container);
@@ -542,27 +625,23 @@ function loadStoryMode() {
   wireHandlersForCurrentRoot();
   document.querySelectorAll('.sm-aspect-wrap, .sm-game-frame, .sm-intro').forEach(preventDoubleTapZoom);
 
-  wireSMAudioUnlockOnce(); // ensure Howler can resume on first tap
-  // when story mode loads
-  window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
-  // inside loadStoryMode()
-window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
-window.addEventListener('sm:chaptersChanged', onChaptersChanged);  // ← add
+  wireSMAudioUnlockOnce();
 
-function onChaptersChanged(){
-  // if the chapter menu is on screen, redraw it to reflect new unlocks
-  if (document.querySelector('.sm-chapter-menu')) renderChapterMenu();
-}
-
+  // Global listeners — add once
+  if (!__smWired) {
+    window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
+    window.addEventListener('sm:chaptersChanged', onChaptersChanged);
+    __smWired = true;
+  }
 }
 
 export function stopStoryMode() {
   unwireHandlers();
   unwireSMAudioUnlock();
+  smStopInventoryWatcher();
   stopStoryRotation();
 
   try { stopTrack(); } catch {}
-
   try { if (getLooping()) toggleLoop(); } catch {}
 
   const container = document.querySelector(SELECTORS.container);
@@ -570,12 +649,14 @@ export function stopStoryMode() {
     container.classList.add('hidden');
     container.style.display = 'none';
   }
-  applyBackgroundTheme();
-  window.removeEventListener('sm:backToChapterMenu', backToChapterMenu);
-  // inside stopStoryMode()
-  window.removeEventListener('sm:backToChapterMenu', backToChapterMenu);
-  window.removeEventListener('sm:chaptersChanged', onChaptersChanged); // ← add
 
+  applyBackgroundTheme();
+
+  if (__smWired) {
+    window.removeEventListener('sm:backToChapterMenu', backToChapterMenu);
+    window.removeEventListener('sm:chaptersChanged', onChaptersChanged);
+    __smWired = false;
+  }
 }
 
 
@@ -916,16 +997,14 @@ function wireHandlersForCurrentRoot() {
     // Global UI
     if (e.target.closest('#smBackToMenu')) {
       const inPrologue = !!document.querySelector('.sm-prologue');
-      if (inPrologue) {
-        backToChapterMenu();
-      } else {
-        backToMainMenu();
-      }
+      if (inPrologue) backToChapterMenu();
+      else backToMainMenu();
       return;
     }
+
     if (e.target.closest('#smMute')) {
       const muted = toggleMute();
-      const btn = elRoot.querySelector('#smMute');
+      const btn = elRoot?.querySelector('#smMute');
       if (btn) {
         btn.textContent = muted ? '🔇' : '🔊';
         btn.classList.toggle('muted', muted);
@@ -933,13 +1012,13 @@ function wireHandlersForCurrentRoot() {
       return;
     }
 
-    // Intro + Chapter menu
+    // Intro + Chapter menu navigation
     if (e.target.closest('#smHearStory')) { renderChapterMenu(); return; }
     if (e.target.closest('#smPrologue'))  { renderPrologueReader(); return; }
-    if (e.target.closest('#smCh1'))       { getEngine().start('ch1'); return; }
-    if (e.target.closest('#smCh2'))       { getEngine().start('ch2'); return; } // 👈 NEW
+    if (e.target.closest('#smCh1'))       { smSetChapterFlag('ch1'); getEngine().start('ch1'); return; }
+    if (e.target.closest('#smCh2'))       { smSetChapterFlag('ch2'); getEngine().start('ch2'); return; }
 
-    // Prologue: typing/slides
+    // Prologue flow
     if (e.target.closest('#smSkipType')) { elRoot?.__smDoneFast?.(); return; }
     if (e.target.closest('#smReady'))    { renderPrologueSlides();  return; }
     if (e.target.closest('#smNext'))     { slideIndex++; drawSlide(); return; }
@@ -971,6 +1050,7 @@ function wireHandlersForCurrentRoot() {
   window.addEventListener('keydown', keyHandler);
 }
 
+
 function unwireHandlers() {
   if (elRoot && clickHandler) elRoot.removeEventListener('click', clickHandler);
   if (keyHandler) window.removeEventListener('keydown', keyHandler);
@@ -987,10 +1067,6 @@ function backToMainMenu() {
   });
 }
 
-function backToChapterMenu() {
-  renderChapterMenu();
-  wireHandlersForCurrentRoot();
-}
 
 function repaintBackground() {
   requestAnimationFrame(() => {
@@ -1033,6 +1109,11 @@ function pickNextStoryTrack(excludeId = null) {
   }
 }
 
+function backToChapterMenu() {
+  smSetChapterFlag(null);
+  renderChapterMenu();
+  wireHandlersForCurrentRoot();
+}
 
 function ensureStoryLoop() {
   try { if (!getLooping?.()) toggleLoop(); } catch {}
@@ -1070,21 +1151,17 @@ function kickStoryMusic({ forceNew = false, rotate = false } = {}) {
 }
 
 function startStoryRotation() {
-  // rotation mode: make sure global looping is OFF
-  try { if (getLooping?.()) toggleLoop(); } catch {}
-
-  // only set one timer
+  try { if (getLooping?.()) toggleLoop(); } catch {} // rotation mode = not looping
   if (__smRotateTimer) return;
-
   __smRotateTimer = setInterval(() => {
     try {
-      // when current track ends, musicManager should report not playing
       if (!isPlaying?.()) {
         kickStoryMusic({ forceNew: true, rotate: true });
       }
     } catch {}
   }, 1000);
 }
+
 
 
 function stopStoryRotation() {

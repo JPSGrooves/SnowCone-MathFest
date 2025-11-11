@@ -340,21 +340,27 @@ loop: {
       },
 
       // award on press (also handles forging if the player has everything)
-      onAdvance: ({ appState }) => {
-        const hasAll =
-          appState.hasItem(ItemIds.TRIANGLE_SHARD) &&
-          appState.hasItem(ItemIds.SQUARE_SHARD) &&
-          appState.hasItem(ItemIds.CIRCLE_SHARD);
+        // /src/modes/storyMode/chapters/ch1.js — last slide object
+        onAdvance: ({ appState }) => {
+        const need = [ItemIds.TRIANGLE_SHARD, ItemIds.SQUARE_SHARD, ItemIds.CIRCLE_SHARD];
+        const hasAll = appState.hasItems(...need);
+        const alreadyForged = appState.hasItem(ItemIds.MASTER_SIGIL);
 
-        if (hasAll && !appState.hasItem(ItemIds.MASTER_SIGIL)) {
-          appState.addItem(ItemIds.MASTER_SIGIL, { name: 'Master Sigil', meta: { emoji: '🜚' } });
-          appState.addCurrency(300);
-          try { awardBadge('ch1_forge'); } catch {}
+        if (hasAll && !alreadyForged) {
+            // 🧱 1) consume the parts used in crafting
+            appState.consumeItems(need);
+
+            // 🜚 2) award the crafted result + a little “that was sick” cash
+            appState.addItem(ItemIds.MASTER_SIGIL, { name: 'Perfect SnowCone', meta: { emoji: '🍧' } });
+            appState.addCurrency(300);
+            try { awardBadge('ch1_forge'); } catch {}
         }
 
-        appState.addCurrency(200); // chapter finish drip
+        // chapter finish drip
+        appState.addCurrency(200);
         appState.saveToStorage?.();
-      }
+        }
+
     },
   ],
 

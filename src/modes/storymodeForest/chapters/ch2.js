@@ -1,11 +1,15 @@
 // /src/modes/storyMode/chapters/ch2.js
-import { SlideRole, ItemIds } from '../../../data/storySchema.js';
+import { SlideRole, ItemIds, ITEM_DISPLAY } from '../../../data/storySchema.js'; // 👈 add ITEM_DISPLAY
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG     = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
 const PRO_BIG_IMG = (n) => `${BASE}assets/img/characters/storyMode/${n}?lg=1`;   // 👈 new
 const SCN_IMG     = (n) => `${BASE}assets/img/modes/storymodeForest/${n}`;
 const SCN_BIG_IMG = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?lg=1`; // 👈 new
 
+const payloadFor = (id) => {
+  const d = ITEM_DISPLAY[id] || {};
+  return { name: typeof d.name === 'string' ? d.name : String(id), meta: { emoji: d.emoji || '' } };
+};
 
 export const Chapter2 = {
   id: 'ch2',
@@ -17,7 +21,7 @@ export const Chapter2 = {
     mode: 'solo',
     title: 'The First Shift',
     img: PRO_IMG('insideTruck.png'),
-    text: `Now that you've got the basics, Jehnk dissapears and lets you run the truck for a shift.<br><br>
+    text: `Now that you've got the basics, Jehnk disapears and lets you run the truck for a shift.<br><br>
     Four figures hover near the truck: one polishing a wooden timepiece, one tracing quiet symmetries in the air, one rolling a circle charm across his knuckles, and one thumbing a tiny, glowing ledger; each carrying a different kind of math.`,
     soloLabel: 'Open the Window ➡️',
     },
@@ -52,7 +56,7 @@ export const Chapter2 = {
       img: PRO_BIG_IMG('bannekerHappy.png'),
       text: `He tastes the SnowCone, eyes glinting like midnight brass. "Set your watch by the heavens; set your word by your watch." He goes on, "If the count feels crooked, look up, breathe, and start the next minute fresh."`,
       soloLabel: 'Next Customer ➡️',
-      grants: [{ item: ItemIds.BANNEKER_TOKEN }],
+      grants: [{ item: ItemIds.BANNEKER_TOKEN, payload: payloadFor(ItemIds.BANNEKER_TOKEN) }],
     },
 
     // ───────────────────────────────────
@@ -83,9 +87,10 @@ export const Chapter2 = {
       mode: 'solo',
       title: 'Emmy Noether',
       img: PRO_BIG_IMG('noetherHappy.png'),
-      text: `She smiles. “Invariant preserved.” She goes quiet for a few beats. The stage lights sweep and swap, but you notice the pattern now. “Sometimes, when you want the lights to be fixed, a dance is the best way to bring them in line!”`,
+      text: `She smiles. “Invariant preserved.” She goes quiet for a few beats. The stage lights sweep and swap, but you notice the pattern now. “Sometimes, stability isn't stillness, and it's okay to get lost in the dance!”`,
       soloLabel: 'Next Customer ➡️',
-      grants: [{ item: ItemIds.NOETHER_TOKEN }],
+      // NOETHER happy slide
+      grants: [{ item: ItemIds.NOETHER_TOKEN, payload: payloadFor(ItemIds.NOETHER_TOKEN) }],
     },
 
     // ───────────────────────────────────
@@ -98,16 +103,16 @@ export const Chapter2 = {
         name: 'Archimedes',
         bio: {
           img: PRO_BIG_IMG('archimedes.png'),
-          text: `Third to roll in is Geometry’s old lion—levers, circles, and one famous bath. He taps the dunk-tank like it’s a theorem.`,
+          text: `Third to roll in, is Geometry’s old lion: levers, circles, and one famous bath. He taps at the truck window like it’s a theorem.`,
         },
         lore: {
             img: PRO_IMG('lanternCircle.png'),
-            text: `The barrel gurgles. He pictures two huge tubs—one pure water, one piled with snowcones. He steps in; both surfaces climb. “Displacement tells the truth,” he grins. “The rise matches my volume, and the lift equals the weight I push aside—cone or water, same law.”`,
+            text: `He pictures a huge gurgling barrel: one filled with pure water and piled with snowcones. He steps in; the SnowCones climb. “Displacement tells the truth,” he grins. “The rise matches my volume, and the lift equals the weight I push aside: man or cone, it's the same law.”`,
         },
         puzzle: {
             img: PRO_IMG('waterBarrel.png'),
-            prompt: `At Infinity Lake, Archimedes lowers a giant snowcone into the calibrated test cove. The level mark jumps by 3.0 L. What’s the snowcone’s submerged volume?`,
-            reveal: `<b>3000 cm³.</b> (1 L = 1000 cm³; and 1 mL ≈ 1 cm³, so 3.0 L = 3000 cm³)`,
+            prompt: `At Infinity Lake, Archimedes lowers a giant snowcone into a calibrated test cove. He gives a riddle while he waits: Two cones of the same size, but one is heavier. Which sinks deeper?`,
+            reveal: `<b>The heavier one.</b> (Needs more buoyant force → displaces more water)`
         },
 
       },
@@ -117,9 +122,12 @@ export const Chapter2 = {
         mode: 'solo',
         title: 'Archimedes',
         img: PRO_BIG_IMG('archimedesHappy.png'),
-        text: `He laughs. “Balanced perfectly!” The ripples settle into neat circles. “Equal weight, equal lift—always.” He taps the cone like a theorem, pockets it like a solved problem, and tips you a wink. “Bill me in buoyant units,” he says, leaving a faint ring of dew on the counter as his token warms your jar.`,
+        text: `He laughs. “Balanced perfectly!” The ripples settle into neat circles. “Equal weight, equal lift—always.” He taps the cone and pockets it like a solved problem. “Bill me in buoyant units, and don't take things too seriously until you've taken a bath.`,
         soloLabel: 'Next Customer ➡️',
-        grants: [{ item: ItemIds.ARCHIMEDES_TOKEN }],
+        // NOETHER happy slide
+        // ARCHIMEDES happy slide
+        grants: [{ item: ItemIds.ARCHIMEDES_TOKEN, payload: payloadFor(ItemIds.ARCHIMEDES_TOKEN) }],
+
     },
 
     // ───────────────────────────────────
@@ -132,22 +140,20 @@ export const Chapter2 = {
         name: 'Luca Pacioli',
         bio: {
           img: PRO_BIG_IMG('pacioli.png'),
-          text: `Fourth customer is portentous at first. Renaissance popularizer of double-entry bookkeeping—two columns in honest balance.`,
+          text: `Fourth customer seems portentous at first...Renaissance popularizer of double-entry bookkeeping—two columns in honest balance.`,
         },
         lore: {
             img: PRO_IMG('ledgerGlow.png'),
-            text: `He flips a tiny ledger: left syrup, right cones. “Debits greet credits,” he winks. He sketches a crisp T and notes ‘Somma = Somma’ in the margin. “What leaves inventory enters the mix—every pour has its pair.”`,
+            text: `Then he flips a tiny ledger: left = to give, right = to desire. “Debits greet credits,” he winks. He sketches a crisp T and notes ‘Somma = Somma’ in the margin. “What leaves inventory enters the heart—every gift has a reciever.”`,
         },
 
+// swap just this inside Pacioli.customer
         puzzle: {
-            img: PRO_IMG('mixCard.png'),
-            prompt: `Tap-to-pay: 1 cone costs $5, paid entirely with Cone Coins (from a prior top-up). Customer also leaves a $1 cash tip. Vendor double-entry: list the Debits and Credits.`,
-            reveal: `<b>Debits:</b> Unearned Cone Coins $5; Cash $1 · <b>Credits:</b> Sales Revenue $5; Tips Payable $1.`,
+          img: PRO_IMG('mixCard.png'),
+          prompt: `If I pay you <b>$5 cash</b> for 1 cone. In double-entry, what goes on each side so the totals match? (Use plain words.)`,
+          reveal: `<b>Debit:</b> Cash $5 · <b>Credit:</b> Sales $5.<br>(Cash went up by $5; you recorded $5 of sales. Debits = Credits.)`,
+          requireRevealToAdvance: true,
         },
-
-
-
-
       },
     },
     {
@@ -155,9 +161,10 @@ export const Chapter2 = {
         mode: 'solo',
         title: 'Luca Pacioli',
         img: PRO_IMG('pacioliHappy.png'),
-        text: `He nods at your books and your blend. “Balanced.” He sets a tiny glowing ledger in your palm—left Syrup, right Cones, Somma = Somma—then lifts two snowcones, one in each hand, level as a scale. The page hums, signs itself, and closes warm against your pocket. “Every pour has its pair,” he winks, strolling into the lights with twin cones held high.`,
+        text: `He nods at your books and your blends. “Balanced.” He sets a tiny glowing ledger in your palm, then lifts two snowcones, one in each hand, level as a scale. The page hums, signs itself, and closes warm against your pocket. “Every gift has a reciever,” he winks, strolling into the lights with twin cones held high.`,
         soloLabel: 'Jehnk Jumps In ➡️',
-        grants: [{ item: ItemIds.PACIOLI_TOKEN }],
+        // PACIOLI happy slide
+        grants: [{ item: ItemIds.PACIOLI_TOKEN, payload: payloadFor(ItemIds.PACIOLI_TOKEN) }],
     },
 
     // Wrap — Jehnk pep talk → Chapter 3
@@ -165,8 +172,8 @@ export const Chapter2 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Shift Complete',
-      img: PRO_IMG('jehnk2Cones.png'),
-      text: `Jehnk whistles. “Four legends, four cones—clean pours, clean math. Keep this up and I might let you run the truck forever.”`,
+      img: PRO_BIG_IMG('jehnkNod.png'),
+      text: `Jehnk whistles. “Four legends, four cones—clean serves, clean math. Keep this up and I might let you run the truck forever!”`,
       soloLabel: 'Chapter 3 ➡️',
       nextChapterId: 'ch3',
     },

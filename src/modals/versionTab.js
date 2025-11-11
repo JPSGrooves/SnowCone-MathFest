@@ -125,24 +125,23 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v1.1.0</h3>
+      <h3>🧠 SnowCone MathFest v1.2.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>v1.1.0 — Chapter 1: It Has Begun</h3>
+      <h3>v1.2.0 — Chapter 2: Fab Four</h3>
       <p>
-        – 📖 <strong>Story Mode Forest</strong>: <strong>Prologue + Chapter 1 (The Gates of Dawn) complete</strong> — KC-style 11:16 stage, typewriter intro (<em>Skip / I’m Ready</em>), clean slide deck (Prev/Next + Enter/←/→/Esc), one-shot “Reveal” blocks; new lore loop <em>Question the Recipes</em>; quest <em>Pocket Check</em> (tight pre-reveal → big reveal) with item-forge flow; chapter finish drip + <strong>Chapter 2 handoff</strong><br>
-        – ⬇️ <strong>Save Tools (rock-solid)</strong>: hardened <em>Download Save</em> (delayed URL revoke + in-DOM anchor), iOS PWA <code>navigator.share({ files })</code> fallback, data-URL + clipboard backups; safer <code>toJSON()</code> snapshot with defensive fallbacks<br>
-        – 🧊 <strong>Bottom bar stability (all modes)</strong>: Back/Mute pinned inside safe-area; portraits, images, and popups no longer push controls on small phones<br>
-        – 🧠 <strong>Math Tips Village</strong>: true full-height iOS PWA fix (<code>100svh</code> + safe-area), single chat scroller owns overflow, smooth scroll restored, bottom bar never overlaps input; refreshed response styling cards<br>
-        – 🪪 <strong>About/Info clarity</strong>: louder credits (<em>Built end-to-end by JPS Grooves</em>), JPSGrooves.com first, stacked links on mobile, fixed header contrast<br>
-        – 🧼 <strong>Event wiring & repaint</strong>: single screen-level handlers with clean unwire on exit; background repaint helper to prevent stale paints<br>
-        – 🏕️ <strong>Kids Camping suite</strong>: layout locks, honk/park flow stable, zoom protections tightened; smoother celebration overlays and score handling<br>
-        – ♿ <strong>Accessibility & copy</strong>: ALT labels on key UI/badges; contrast nudges on dark headers; consistent help/exit patterns<br>
-        – ✅ <strong>Final polishes across all modes</strong>: UI consistency, safe-area padding, text clamping, hitboxes, and minor CSS dedupe<br>
-        – 🎵 <strong>Soundtrack update</strong>: all tracks <strong>remastered</strong> for levels, clarity, and loop smoothness (JPS Grooves)
+        – 📖 <strong>Story Mode Forest</strong>: <strong>Chapter 2 — Shift: Four Customers</strong> is live — Benjamin Banneker, Emmy Noether, Archimedes, and Luca Pacioli each arrive in a <em>bio → lore → puzzle → happy</em> flow and drop a token; clean finish drip and <strong>Ch.3 handoff</strong><br>
+        – 🪙 <strong>Token grants</strong>: <code>BANNEKER_TOKEN</code>, <code>NOETHER_TOKEN</code>, <code>ARCHIMEDES_TOKEN</code>, <code>PACIOLI_TOKEN</code> — one-shot, idempotent, inventory-driven gates<br>
+        – 🧩 <strong>Puzzles (practical phrasing)</strong>: Banneker timekeeping; Noether 2:3 stage-light pattern (“run the pattern N times”); Archimedes dunk test (3.0 L → 3000 cm³); Pacioli Cone Coin double-entry (Debits Unearned Cone Coins $5 & Cash $1; Credits Sales $5 & Tips Payable $1)<br>
+        – 🖼️ <strong>Portrait pipeline</strong>: high-res <code>PRO_BIG_IMG()</code>/<code>SCN_BIG_IMG()</code> helpers + larger legend band; 11:16 stage locked; zero underlap with bottom bar<br>
+        – 🔊 <strong>Music/mute parity</strong>: Howler one-tap unlock preserved; mute state mirrors UI on every slide<br>
+        – 🎉 <strong>Toasts & grants</strong>: XP +25 per reveal, +500 on chapter finish; celebration toasts are pointer-through and auto-dismiss; grants fire on happy slide only<br>
+        – 🧼 <strong>Stability & repaint</strong>: full unwire on exit (timers/RAF/listeners); background repaint nudge fixes rare stale frames on mobile<br>
+        – 🧪 <strong>QA pass</strong>: four tokens award exactly once; tiny phones keep bottom bar clear; lights puzzle scales; re-entry causes no duplicates<br>
+        – ⭐ <strong>Next</strong>: Chapter 2 completion badge + optional light SFX set (tick, scan, plunk, ledger flip)
       </p>
     </div>
 
