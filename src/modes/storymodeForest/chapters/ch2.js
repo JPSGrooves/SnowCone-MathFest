@@ -32,15 +32,15 @@ export const Chapter2 = {
         name: 'Benjamin Banneker',
         bio: {
           img: PRO_BIG_IMG('banneker.png'),
-          text: `First in line, Banneker sets a wooden timepiece on the counter. Self-taught astronomer, almanac author, and surveyor—he reads the cones like a ledger.`,
+          text: `First up, Banneker sets a wooden timepiece on the counter. Self-taught astronomer, almanac author, and surveyor. “Evening,” he says. “Clock has you right on time.”`,
         },
         lore: {
           img: PRO_IMG('treeline.png'),
-          text: 'Out past the lights, Banneker hums at the treeline. “Rhythm is ratio,” he says. “Cones are minutes; minutes are song.”<br><br> He taps the wooden timepiece and the second hand ticks like a far-off hi-hat. “Keep count,” he whispers, “and the night will keep you.” The crickets answer in syncopation, a ledger of stars marking every measure.',
+          text: 'Out past the lights, Banneker hums at the treeline. “Rhythm is ratio,” he says. “Beats are proportions of time.”<br><br> He taps the wooden timepiece and the second hand ticks like a far-off hi-hat. “Keep track of the stars,” he whispers, “and their beat will keep you informed."',
         },
         puzzle: {
           img: PRO_IMG('scheduleCard.png'),
-          prompt: `The band plays one set that lasts 42 minutes. You make SnowCones at a steady speed: 5 cones every 3 minutes.<br><br>How many cones is that for the whole set?`,
+          prompt: `While vending during a 42 minute Cosmic Phil set, you make 5 cones every 3 minutes...<br><br>How many cones will you serve during the set?`,
           reveal: `<b>70 cones!</b> 42 ÷ 3 = 14 chunks; 14 × 5 = 70.`,
         },
       },
@@ -50,7 +50,7 @@ export const Chapter2 = {
       mode: 'solo',
       title: 'Benjamin Banneker',
       img: PRO_BIG_IMG('bannekerHappy.png'),
-      text: `He tastes the cone, eyes glinting like midnight brass. "Keep your time and the night will reward you." He goes on, "When the count feels crooked, look up, breathe, and start the next minute true."`,
+      text: `He tastes the SnowCone, eyes glinting like midnight brass. "Set your watch by the heavens; set your word by your watch." He goes on, "If the count feels crooked, look up, breathe, and start the next minute fresh."`,
       soloLabel: 'Next Customer ➡️',
       grants: [{ item: ItemIds.BANNEKER_TOKEN }],
     },
@@ -69,12 +69,12 @@ export const Chapter2 = {
         },
         lore: {
           img: PRO_IMG('coilCables.png'),
-          text: `Stage lights loop. "Find your invariant," she says. "The ratio that survives any total." The colors wheel—blue, gold, violet—but the pulse repeats. Four counts pass; the bright hit comes back on five. Add bulbs, swap their order, fade one low, push one high—the share of light to dark stays fixed. That's your anchor. When everything shifts, symmetry keeps time.`,
+          text: `Stage lights sweep the field. “Find what doesn’t change,” she says.<br><br>"Count 1–2–3–4, and the 1 comes back again. Swap colors, add bulbs—the beat still loops. That never-changing part is your invariant. It’s your anchor."`,
         },
         puzzle: {
             img: PRO_IMG('stageLightsCard.png'), // placeholder filename — swap to whatever you export
-            prompt: `On stage, the lights loop in a 2:3 pattern: 2 blue beams, then 3 gold beams, repeating. If the crew runs 180 beams this chorus, how many are blue and how many are gold?`,
-            reveal: `<b>72 blue, 108 gold.</b> (That's 2/5 and 3/5 of 180)`,
+            prompt: `On stage, the lights flash in a 2:3 pattern—2 blue, then 3 gold—repeating. If the crew runs that pattern 36 times during a song, how many flashes are blue and how many are gold?`,
+            reveal: `       <b>72 blue, 108 gold.</b><br>(That's 2/5 and 3/5 of 180)`,
         },
       },
     },
@@ -83,7 +83,7 @@ export const Chapter2 = {
       mode: 'solo',
       title: 'Emmy Noether',
       img: PRO_BIG_IMG('noetherHappy.png'),
-      text: `She smiles. “Invariant preserved.” The Ghost goes quiet for a beat. The stage lights sweep and swap, but the pattern holds. “When something stays fixed, you can dance around it.”`,
+      text: `She smiles. “Invariant preserved.” She goes quiet for a few beats. The stage lights sweep and swap, but you notice the pattern now. “Sometimes, when you want the lights to be fixed, a dance is the best way to bring them in line!”`,
       soloLabel: 'Next Customer ➡️',
       grants: [{ item: ItemIds.NOETHER_TOKEN }],
     },
