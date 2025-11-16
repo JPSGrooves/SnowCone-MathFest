@@ -31,7 +31,7 @@ export const Chapter1 = {
       loop: {
         title: 'Dino Divider',
         img: PRO_IMG('dinoDivider.png'),
-        text: `You linger at the ropes and the Dinos catch your look. One walks over and grins.<br>
+        text: `You linger near the gates and one of the Dinos catch your look. She walks over and smiles.<br>
         “We’re the Dino Dividers, line keepers, vibe shepherds, buddy-system champs.”
         She points to the footprints and glowing cones.<br><br>“We pair folks up, keep the beat moving,
         answer questions, and make sure nobody misses their first chill.” A claw waves good-bye. “Hope you have fun!”`,
@@ -42,7 +42,7 @@ export const Chapter1 = {
       steps: [
         {
         img: PRO_IMG('hippyTriangle.png'),
-        text: `She breezes between bumpers, shoulder-strap tray jangling.<br><br> “Triangles, triangles!” she grins...then clocks your empty pockets. “No coin? No problem. Pay with math.” <br><br>She chalks: 3–4–? and taps a right angle. “Shortest path corner-to-corner?”`,
+        text: `Kat breezes between bumpers, shoulder-strap tray jangling.<br><br> “Triangles, triangles!” she grins...then notices your empty pockets. “No cone coin? No problem. Pay me with math.” <br><br>She chalks: 3–4–? and taps a right angle. “Shortest path corner-to-corner?”`,
         reveal: `5 — the hypotenuse. “Math accepted,” she laughs.`,
         requireRevealToAdvance: true
         },

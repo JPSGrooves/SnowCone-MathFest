@@ -140,7 +140,7 @@ export const Chapter2 = {
         name: 'Luca Pacioli',
         bio: {
           img: PRO_BIG_IMG('pacioli.png'),
-          text: `Fourth customer seems portentous at first...Renaissance popularizer of double-entry bookkeeping—two columns in honest balance.`,
+          text: `The fourth customer seems portentous at first...Renaissance popularizer of double-entry bookkeeping—two columns in honest balance.`,
         },
         lore: {
             img: PRO_IMG('ledgerGlow.png'),
@@ -150,8 +150,8 @@ export const Chapter2 = {
 // swap just this inside Pacioli.customer
         puzzle: {
           img: PRO_IMG('mixCard.png'),
-          prompt: `If I pay you <b>$5 cash</b> for 1 cone. In double-entry, what goes on each side so the totals match? (Use plain words.)`,
-          reveal: `<b>Debit:</b> Cash $5 · <b>Credit:</b> Sales $5.<br>(Cash went up by $5; you recorded $5 of sales. Debits = Credits.)`,
+          prompt: `If I pay you <b>$5 cone cash</b> for 1 cone. In double-entry, what goes on each side so the totals match? (Use plain words.)`,
+          reveal: `<b>Debit:</b> Cone Cash $5 · <b>Credit:</b> Sales $5.<br>(Cone Cash went up by $5; you recorded $5 of sales. Debits = Credits.)`,
           requireRevealToAdvance: true,
         },
       },
