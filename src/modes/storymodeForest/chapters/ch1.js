@@ -270,7 +270,7 @@ loop: {
                 img: PRO_IMG('essentialsTrio.png'),
                 imgAlt: 'Triangle Shard (Perpetual Chill), Mint Square recipe (The Ratio & Flavor), and MoonChain (The Shape Model) glowing on a dark field.',
                 // ⬇️ SHORT pre-reveal; long detail stays in `reveal`
-                text: `On the tailgate: a <span style='color: rgb(143, 190, 255);'>\“frost-bright shard</span>, a <span style='color: rgb(164, 255, 164);'>\"mint-square ratio</span>, and a <span style='color:rgb(217, 164, 255);'>\"moonlit chain</span>. Three pieces; one method waiting to click.`,
+                text: `On the tailgate: a <span style='color: rgb(143, 190, 255);">frost-bright shard</span>, a <span style='color: rgb(164, 255, 164);">mint-square ratio</span>, and a <span style='color:rgb(217, 164, 255);">moonlit chain</span>. Three pieces; one method waiting to click.`,
                 reveal: `These are the festival’s three essentials: <span style="color: rgb(143, 190, 255);"><b>Chill</b> (the shard’s cryo snap)</span>, <span style="color: rgb(164, 255, 164);"><b>Flavor</b> (that 2:3 mint-lime choir)</span>, and <span style="color: rgb(217, 164, 255);"><b>Shapes</b> (the moon’s perfect loop guiding the spiral)</span>.<br><br>
                         Line them up and you get the method: <span style="color: rgb(143, 190, 255);"><i>Chill</span> → <span style="color: rgb(164, 255, 164);">Mix</span> → <span style="color: rgb(217, 164, 255);">Shape</span></i>. The bench lights breathe brighter, like they know what comes next.`,
                         requireRevealToAdvance: true
@@ -279,9 +279,9 @@ loop: {
                 img: PRO_IMG('essentialsTrio2.png'),
                 imgAlt: 'Triangle Shard, Mint Square 2:3 recipe, and MoonChain spiraling together into a single flow.',
                 text: `You lift them: <span style="color: rgb(143, 190, 255);">cold breath</span>, a <span style='color: rgb(164, 255, 164);'>\"glowing 2:3</span>, and a steady <span style='color:rgb(217, 164, 255);'>\"lunar spin</span>. The motions begin to braid.`,
-                reveal: `The pieces <i>lock</i> with a little cosmic thunk—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style='color:rgb(217, 164, 255);'>\"lunar hum</span>. A halo of neon bubbles lifts from your workbench as the mixture stabilizes.<br><br>
+                reveal: `The pieces <i>lock</i> with a little cosmic thunk—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style='color:rgb(217, 164, 255);">lunar hum</span>. A halo of neon bubbles lifts from your workbench as the mixture stabilizes.<br><br>
                         <span style="color: rgb(143, 190, 255);"><b>Chill anchors</span>.</b> <span style="color: rgb(164, 255, 164);"><b>Flavor harmonizes</span>.</b> <span style="color: rgb(217, 164, 255);"><b>Shape guides</span>.</b><br>
-                        Your hands know the rest: spiral, crest, and crown. The Perfect SnowCone is ready to be born.`,
+                        The Perfect SnowCone is ready to be born.`,
                         requireRevealToAdvance: true
                 },
                 {
