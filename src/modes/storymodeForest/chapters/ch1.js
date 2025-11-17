@@ -42,7 +42,7 @@ export const Chapter1 = {
       steps: [
         {
         img: PRO_IMG('hippyTriangle.png'),
-        text: `Kat breezes by between bumpers, her shoulder-strap tray jangling with her call:<br><br> <span style='color: rgb(143, 190, 255);'>\“Triangles, triangles!\"</span> she offers you some...then notices your empty pockets. <span style='color: rgb(143, 190, 255);'>\"No cone coins? No problem. Just pay me with math.\"</span> <br><br>She draws a shape: <span style='color: rgb(143, 190, 255);'>\"3–4–?\"</span> and taps a right triangle. <span style='color: rgb(143, 190, 255);'>\"What is the length of the longest side of this trigon?\"</span>`,
+        text: `<span style='color: rgb(143, 190, 255);'>\“Triangles, triangles!\"</span> Kat offers you some of her best triangles...then notices your empty pockets. <span style='color: rgb(143, 190, 255);'>\"No cone coins? No problem. Just pay me with math.\"</span> <br><br>She draws a shape: <span style='color: rgb(143, 190, 255);'>\"3–4–?\"</span> and taps a right triangle. <span style='color: rgb(143, 190, 255);'>\"What is the length of the longest side of this trigon?\"</span>`,
         reveal: `<span style='color: rgb(143, 190, 255);'>\“5 — the hypotenuse! Your Math is accepted!\"</span>`,
         requireRevealToAdvance: true
         },
@@ -173,10 +173,7 @@ export const Chapter1 = {
         steps: [
             {
             img: PRO_IMG("campLight.png"),
-            text: `A small dino stands under a blinding floodlight, staring it down.
-                    <span style='color: rgb(143, 190, 255);'>\“If you can answer this, that’ll be my sign to flip it,\"</span> he says, tapping the brightness switch.
-                    <br><br><em><span style='color: rgb(143, 190, 255);'>\“If I half the brightness each click. Starting at 100%, after how many clicks is it
-                    effectively zero (below 1%)?\"</span></em>`,
+            text: `A small dino stands under a blinding floodlight, staring it down.<br><span style='color: rgb(143, 190, 255);'>\“If you can answer this, that’ll be my sign to flip it,\"</span> he says, tapping the brightness switch.<br><br><em><span style='color: rgb(143, 190, 255);'>\“If I half the brightness each click. Starting at 100%, after how many clicks is it effectively zero (below 1%)?\"</span></em>`,
             reveal: `7 clicks. Halves: 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.5625 → 0.78125%.
                     It drops below 1% after the <b>7th</b> click.`,
             requireRevealToAdvance: true
@@ -289,7 +286,6 @@ loop: {
                 },
                 {
                 img: PRO_IMG('essentialsTrio3.png'),
-                imgAlt: 'Jehnk cues the final steps at the truck: <span style="color: rgb(217, 164, 255);">pack ice</span>, <span style="color: rgb(164, 255, 164);">swirl a 2:3 mint–lime ribbon</span>, crown it with a <span style="color: rgb(143, 190, 255);">precise triangle crest</span> as neon bubbles glow at 2AM.',
                 text: `Jehnk cues the finale: pack <span style="color: rgb(217, 164, 255);">ice</span>, pour a steady <span style="color: rgb(164, 255, 164);"><b>2:3</b> ribbon</span>, finish with a <span style="color: rgb(143, 190, 255);">triangle crest</span>.`,
                 reveal: `<span style="color: rgb(247, 255, 105);"><b>Perfect SnowCone crafted!</b></span> Neon bubbles rise and drift like little planets as the cone gleams in the 2AM glow.<br><br>
                         The stack sings in three parts—<span style="color: rgb(143, 190, 255);"><b>Chill</b></span> holds the shape, <span style="color: rgb(164, 255, 164);"><b>Flavor</b></span> rings out 2:3 bright, <span style="color: rgb(217, 164, 255);"><b>Geometry</b></span> keeps the swirl honest. Jehnk grins: <span style='color: rgb(247, 255, 105);'>\"Serve that comet cone, traveler.\"</span> 🫧🍧`,
