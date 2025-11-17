@@ -31,8 +31,8 @@ export const Chapter1 = {
       loop: {
         title: '<span style="color: rgb(217, 164, 255);">Dino Divider</span>',
         img: PRO_IMG('dinoDivider.png'),
-        text: `You linger near the gates and one of the Dinos catches your eye. She walks over and smiles.<br>
-        <span style='color:rgb(217, 164, 255);'>\"“We’re the Dino Dividers, line keepers, vibe shepherds and buddy-system champs.\"</span>
+        text: `You linger near the gates and make eye contact with a Dino Divider. She walks over and smiles.<br>
+        <span style='color:rgb(217, 164, 255);'>\"We’re the Dino Dividers, line keepers, vibe shepherds and buddy-system champs.\"</span>
         She points to the footprints and glowing cones.<br><br><span style='color: rgb(217, 164, 255);'>\"We pair folks up and keep the beat moving,
         answering questions and making sure nobody misses their first SnowCone!\"</span> She waves you in, <span style='color: rgb(217, 164, 255);'>\"This way to the gates!\"</span>`,
         },
@@ -42,13 +42,13 @@ export const Chapter1 = {
       steps: [
         {
         img: PRO_IMG('hippyTriangle.png'),
-        text: `<span style='color: rgb(143, 190, 255);'>\“Triangles, triangles!\"</span> Kat offers you some of her best triangles...then notices your empty pockets. <span style='color: rgb(143, 190, 255);'>\"No cone coins? No problem. Just pay me with math.\"</span> <br><br>She draws a shape: <span style='color: rgb(143, 190, 255);'>\"3–4–?\"</span> and taps a right triangle. <span style='color: rgb(143, 190, 255);'>\"What is the length of the longest side of this trigon?\"</span>`,
+        text: `<span style='color: rgb(143, 190, 255);'>\“Triangles, triangles!\"</span> Kat offers you some of her best 3-siders...then she notices your empty pockets. <span style='color: rgb(143, 190, 255);'>\"No cone coins? No problem. Just pay me with math!\"</span> <br><br>She draws a shape: <span style='color: rgb(143, 190, 255);'>\"3–4–?\"</span> and taps an imaginary right triangle:<br><span style='color: rgb(143, 190, 255);'>\"What is the length of the longest side of this triangle?\"</span>`,
         reveal: `<span style='color: rgb(143, 190, 255);'>\“5 — the hypotenuse! Your Math is accepted!\"</span>`,
         requireRevealToAdvance: true
         },
         {
         img: PRO_IMG('triangleHand.png'),
-        text: `She presses a shimmering shard into your palm.<br><br><span style='color: rgb(143, 190, 255);'>\“Around this fest, folks <b>trade</b> little finds for favors, shortcuts, songs...secrets. Start collecting and you can use them later.\"</span><br><br>She winks, <span style='color: rgb(143, 190, 255);'>\“Here’s your first trinket!\"</span>`
+        text: `She presses a shimmering shard into your palm.<br><br><span style='color: rgb(143, 190, 255);'>\“Around this fest, folks <b>trade</b> little finds for favors, shortcuts, songs...maybe even secrets. Start collecting with this and you can use them later!\"</span><br><br>She winks, <span style='color: rgb(143, 190, 255);'>\“Here’s your first trinket!\"</span>`
         }
       ],
       reward: {
@@ -64,7 +64,7 @@ export const Chapter1 = {
       weird: {
         title: '<span style="color: rgb(164, 255, 164);">Syrupy Scientist</span>',
         img: PRO_IMG('scienceGuy.png'),
-        text: `By a dusty hatchback, Dr. Kenny Fields flips pancakes under the string lights. <br><br>He’s chasing a <span style='color: rgb(164, 255, 164);'>\"float-then-kiss\"</span> bubble; light enough to hover, dense enough to coat a whole pancake.<br><br> <span style='color: rgb(164, 255, 164);'>\"My ratios are all wrong,\"</span> he mutters. <span style='color: rgb(164, 255, 164);'>\"The bubbles are too heavy at 3:1 and too poppy at 2:1. I drove here for help...someone here knows the mix.\"</span><br><br>If you see a ratio board marked with waffles and flapjacks, send him there`,
+        text: `By a dusty hatchback, Dr. Kenny Fields flips pancakes under the string lights. <br><br>He’s chasing a <span style='color: rgb(164, 255, 164);'>\"float-then-kiss\"</span> bubble; light enough to hover but dense enough to coat a whole pancake.<br><br> <span style='color: rgb(164, 255, 164);'>\"My ratios are all wrong,\"</span> he mutters. <span style='color: rgb(164, 255, 164);'>\"The bubbles are too heavy at 3:1 and too poppy at 2:1. I drove here for help...someone here knows the mix.\"</span><br><br>If you see a ratio board marked with waffles and flapjacks, send him there!`,
       },
 
       meta: {
@@ -83,9 +83,9 @@ export const Chapter1 = {
 
     // 1) Rising action — can’t get in
     {
-      title: 'All Sold Out',
+      title: 'All Sold Out!!',
       img: PRO_IMG('noEntry.png'),
-      text: `Guard: “Dude, who gave you a ticket? It's wristbands only...\"</span><br><br>The biker dino isn’t mad — just bummed for you. He tilts the scanner toward a sign that reads <i>WRISTBAND TENT ➜</i>.`,
+      text: `The guard sees your ticket and immediately begins to frown. <span style='color: rgb(164, 255, 164);'>\"Dude, who gave you a ticket? It's wristbands only...\"</span><br><br>The biker dino isn’t mad — just bummed for you. He tilts the scanner toward a sign that reads <span style="color: rgb(247, 255, 105);"><i>WRISTBAND TENT ➜</i></span>.`,
       role: SlideRole.ADVANCE,
       requireAllSidePaths: true,
       topLabel: 'Toss ticket & give up 😔',
@@ -97,23 +97,23 @@ export const Chapter1 = {
         title: '<span style="color: rgb(164, 255, 164);">Wristband Tent</span>',
         img: PRO_IMG('wristbandTent.png'),
         text:
-            `The pop-up tent flaps in the breeze. A clipboard on the table reads:<br><b><span style='color: rgb(164, 255, 164);'>\"SOLD OUT\"</span></b>.<br>Beside it, a hand-lettered sign:<br><span style='color: rgb(164, 255, 164);'>\"<i>Can’t get in? Talk to Jehnk!</i>\"</span><br><br>
-            As you stand there with dew soaking into your shoes, the night feels suddenly bigger; yet, your pockets feel light.<br><br>Who is Jehnk? You try the name out under your breath—<span style='color: rgb(164, 255, 164);'>\"Jehnk\"</span>—and feel the festival listening back.`
+            `The pop-up tent flaps in the breeze. A clipboard on the table reads:<br><b><span style='color: rgb(164, 255, 164);'>\"SOLD OUT\"</span></b>.<br>Beside it, a hand-lettered sign:<br><span style='color: rgb(164, 255, 164);'>\"<i>Can’t get in? Talk to Jehnk!</i>\"</span><br>
+            As you stand wondering, with dew soaking into your shoes, the night feels suddenly bigger; yet, your wrist feels light.<br><br>Who is this Jehnk? You try the name out under your breath—<span style='color: rgb(164, 255, 164);'>\"Jehnk\"</span>—and immediately feel the festival listening back.`
       },
 
       // Slide 1 — QUEST (replace the whole quest block)
       quest: {
-        title: '<span style="color: rgb(217, 164, 255);">Stopped at the gap</span>',
+        title: '<span style="color: rgb(217, 164, 255);">Stopped at the Gap</span>',
         steps: [
             {
             img: PRO_IMG('bikerDino.png'), // add this asset
-            text: `You edge along the rope line and slip toward a gap. A biker dino steps in; he's calm, firm, sympathetic.<br><br><span style='color:rgb(217, 164, 255);'>\"Sorry, I can't let you in. This is literally my only job.\"</span> He lowers his voice: <span style='color:rgb(217, 164, 255);'>\"Answer me this and I’ll give you a coveted festival secret:<br><br> The <i>festival grounds</i> has a perimeter of 2 miles. What’s the area?\"</span>`,
-            reveal: `4 sides = .5 miles each,<br>The area = .5 × .5 = <b>.25 square miles</b>.`,
+            text: `You edge along the festival perimeter and slip toward an open gap. A biker dino swiftly steps in; he's firm, yet calm and sympathetic.<br><br><span style='color:rgb(217, 164, 255);'>\"Sorry, I can't let you in. This is literally my only job.\"</span> He lowers his voice: <span style='color:rgb(217, 164, 255);'>\"But...answer a question and I’ll give you a coveted festival secret:<br><br> The <i>festival grounds</i> have a perimeter of 2 miles. What’s the area?\"</span>`,
+            reveal: `<span style="color: rgb(217, 164, 255);">4 sides = .5 miles each,<br>The area = .5 × .5 = <b>.25 square miles</b>.</span>`,
             requireRevealToAdvance: true
             },
             {
             img: PRO_IMG('mintSquareRecipe.png'), // add this asset
-            text: `He presses a perfectly square mint recipe into your hand; it's on edible paper with mint-green ink.<br><br><span style='color:rgb(217, 164, 255);'>\"Use the sheet in the mix; it’s part of the recipe!\"</span> he says. <span style='color:rgb(217, 164, 255);'>\"If you find Jehnk, show it to him. He’s got a thing for mint and neat squares.\"</span><br><br>You put the card in your <b>inventory</b>, wondering if someone else might need those ratios.`
+            text: `He presses a perfectly square, mint recipe into your hand; it's printed on edible green paper with mint-green ink.<br><br><span style='color:rgb(217, 164, 255);'>\"You can use this sheet in the mix; it’s part of the recipe!\"</span> He goes on, <span style='color:rgb(217, 164, 255);'>\"If you find Jehnk, show it to him. He’s got a thing for mint and perfect squares.\"</span><br><br>You put the card in your <b>inventory</b>, wondering if anyone else might need those ratios.`
             }
         ],
         reward: {
@@ -131,15 +131,15 @@ export const Chapter1 = {
       weird: {
         title: '<span style="color: rgb(143, 190, 255);">A Rambler Walks By</span>',
         img: PRO_IMG('rambler.png'),
-        text: `From the neon mist, a beanie’d rambler drifts past, patting every pocket. <span style='color: rgb(143, 190, 255);'>\“My wristband… I <i>worked for Jehnk last year</i>—does that still count?\"</span><br><br>He shoves his hand into his hoodie and—<i>poof</i>—it vanishes to the elbow. He yelps, pulls it back dusted with dew. <span style='color: rgb(143, 190, 255);'>\“Okay. My pocket folded into the space-time continuum <i>again</i>. It was right here, I swear.\"</span><br><br>He gives you a conspiratorial nod and wanders on, still fishing for a wristband that might be orbiting a small moon.`
+        text: `Wandering in the neon mist, a weathered, beanie’d rambler drifts past, patting every pocket. <span style='color: rgb(143, 190, 255);'>\“Lost my wristband… I <i>worked for Jehnk last year</i>—does that still count?\"</span><br><br>He shoves his hand into his hoodie and—<i>poof</i>—it vanishes to the elbow. He yelps and pulls it back, dusted with frost. <span style='color: rgb(143, 190, 255);'>\“Okay. My pocket folded into the space-time continuum <i>again</i>. It was right there, I swear.\"</span><br><br>He barely notices you and wanders on, still fishing for a wristband that might be orbiting a small moon.`
       }
     },
 
     // 2) Arrival — Jehnk rolls in (exposition beat)
     {
-      title: "Jehnk Swirves In",
+      title: '<span style="color: rgb(247, 255, 105);">Jehnk Swirves In</span>',
         img: PRO_IMG('jehnkTruck.png'), // ← use the iconic truck art
-        text:`The ground rumbles and tires squeal, as Jehnk swerves in and does a few infinity burnouts.<br><br>He stops the truck and leans out with an easy grin, sunglasses reflecting the 2AM neon. <span style='color: rgb(247, 255, 105);'>\"Evening, camper. You look like someone who found the music but lost the map.\"</span><br><br>He slides a <b>WorkBadge</b> your way. <span style='color: rgb(247, 255, 105);'>\"Everyone starts right here at the gates! <b>You wanna work your way in?</b>\"</span>`,
+        text:`The ground rumbles and tires squeal, as Jehnk swerves in and does a few infinity burnouts.<br><br>He stops the truck and leans out with an easy grin, sunglasses reflecting the 2AM neon. <span style='color: rgb(247, 255, 105);'>\"Evening, camper! You look like someone who found the music but lost the map.\"</span><br><br>He slides a <b>WorkBadge</b> your way. <span style='color: rgb(247, 255, 105);'>\"Everyone starts right here at the gates! You seem cool enough...<b>You wanna work your way in?</b>\"</span>`,
         mode: 'solo',
         role: SlideRole.ADVANCE,
         soloLabel: 'Take the Job!', 
@@ -151,9 +151,9 @@ export const Chapter1 = {
 
     // 3) Walkabout
     {
-      title: 'You\'re in! Explore?',
+      title: '<span style="color: rgb(247, 255, 105);">You\'re in! Explore?</span>',
       img: PRO_IMG('jehnkExplore.png'),
-      text: `"Hey man, I can hold down the first shift. Go check out the SnowCone MathFest!\"</span> Jehnk waves you off as he starts setting up his truck booth for the night.`,
+      text: `<span style='color: rgb(247, 255, 105);'>\"Hey man, I can hold down the first shift. Go check out the SnowCone MathFest!\"</span> Jehnk waves you off as he starts setting up his truck booth for the night.`,
       role: SlideRole.ADVANCE,
       requireAllSidePaths: true,
       topLabel: 'Start your shift ➡️',
@@ -161,11 +161,11 @@ export const Chapter1 = {
       questLabel: 'Turn off the CampLights',
       weirdLabel: 'More Syrup Bubbles?',
       loop: {
-        title: '<span style="color: rgb(217, 164, 255);">ShakeSquare Stroll</span>',
+        title: '<span style="color: rgb(217, 164, 255);">ShakeDownSquare</span>',
         img: PRO_IMG('shakeSquare.png'),
         text: `
-            The row opens like a neon, tie-dye canyon. <span style='color:rgb(217, 164, 255);'>\"<em>π-Pretzels</em>\"</span>-tying delicious, unsolvable knots; <span style='color:rgb(217, 164, 255);'>\"Gold Ratio Cones\"</span> selling arbitrary twists. A kid dino walks by with a mysterious backpack. A vendor in mirrored shades holds up a prime crystal: <span style='color:rgb(217, 164, 255);'>\"Three for a dollar—refractions included.\"</span> Another offers fractal tapestries that bloom when you step closer. You could get lost here for hours.<br><br>
-            You pocket the urge to browse and turn back toward the truck. Somewhere past the tents, Jehnk’s offer calls like a promise.
+            The shakedown opens up like a neon, tie-dye canyon. You see <span style='color:rgb(217, 164, 255);'>\"<em>Pi-Pretzels</em>\"</span> tying delicious, unsolvable knots; <span style='color:rgb(217, 164, 255);'>\"Gold Ratio Cones\"</span> selling randomly twisted scones. A hooded dino walks by with a mysterious backpack full of prime crystals: <span style='color:rgb(217, 164, 255);'>\"Three for a Cone Coin? No refunds!\"</span> Another vendor offers fractal tapestries that bloom when you step closer.<br><br>
+            You pocket the urge to explore and turn back toward the truck. Somewhere past the vendors, Jehnk’s customers are lining up fast.
         `,
       },
       quest: {
@@ -173,20 +173,20 @@ export const Chapter1 = {
         steps: [
             {
             img: PRO_IMG("campLight.png"),
-            text: `A small dino stands under a blinding floodlight, staring it down.<br><span style='color: rgb(143, 190, 255);'>\“If you can answer this, that’ll be my sign to flip it,\"</span> he says, tapping the brightness switch.<br><br><em><span style='color: rgb(143, 190, 255);'>\“If I half the brightness each click. Starting at 100%, after how many clicks is it effectively zero (below 1%)?\"</span></em>`,
-            reveal: `7 clicks. Halves: 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.5625 → 0.78125%.
+            text: `A small dino stands under a blinding floodlight, staring it down. He wants the light OFF!<br><span style='color: rgb(143, 190, 255);'>\“If you can answer me correctly, that’ll be my sign to turn it off!\"</span> He taps the brightness switch,<br><br><em><span style='color: rgb(143, 190, 255);'>\“If I half the brightness each click. Starting at 100%, after how many clicks is it effectively zero (below 1%)?\"</span></em>`,
+            reveal: `7 clicks. By halves = 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.563 → 0.781%.
                     It drops below 1% after the <b>7th</b> click.`,
             requireRevealToAdvance: true
             },
             {
             img: PRO_IMG("breakerBox.png"),
-            text: `You give an educated guess. The dino grins, palms the lever, and snaps it clean to <span style="color: rgb(143, 190, 255);"><b>OFF</b></span>. The generator coughs twice; moths scatter; the floodlight exhales into dark.`,
-            reveal: `<span style='color: rgb(143, 190, 255);'>\“Honestly, I was gonna kill it either way—we're gonna need zeroes to tame these lights!\"</span>`,
+            text: `You gave it your best guess. The dino grins, grabs the ON/OFF switch, and snaps it clean to <span style="color: rgb(143, 190, 255);"><b>OFF</b></span>. The generator coughs twice, some moths scatter, and the floodlight exhales into the darkness.`,
+            reveal: `He laughs, <span style='color: rgb(143, 190, 255);'>\“Honestly, I was gonna kill it either way! We were gonna need zeroes to tame these lights!\"</span>`,
             requireRevealToAdvance: true
             },
             {
             img: PRO_IMG("moonChain.png"), // your circle sigil art
-            text: `With the field light gone, the night settles. He fishes something from his pocket and sets it in your palm: <span style="color: rgb(143, 190, 255);">A tiny full moon on a stubby chain</span>.<br><br><span style="color: rgb(143, 190, 255);">La Luna</span> glows cool and steady, craters crisp, casting pale light across your fingers while the tents dim back to whispers.`,
+            text: `With the field light gone, the night settles in. He fishes something from his pocket and sets it in your palm: <span style="color: rgb(143, 190, 255);">A tiny full moon on a stubby chain</span>.<br><br>The<span style="color: rgb(143, 190, 255);">Moon</span> glows cool and steady. Craters crisping, the keychain casts a pale light across your fingers, while the tents around you dim back to whispers.`,
             reveal: `You receive the <span style="color: rgb(143, 190, 255);"><b>MoonChain</b></span>.`,
             requireRevealToAdvance: true
             }
@@ -202,7 +202,7 @@ export const Chapter1 = {
       weird: {
         title: '<span style="color: rgb(164, 255, 164);">More Syrup Bubbles</span>',
         img: PRO_IMG('scienceGuy2.png'),
-        text: `Under a humming camp light, Dr. Kenny Fields runs a tidy pop-up lab.<br><br><span style='color: rgb(164, 255, 164);'>\"I’ve got it now,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"The bubble floats, kisses, and coats—perfect, every time.\"</span> He grimaces, <span style='color: rgb(164, 255, 164);'>\"Blast! The moment it pops, the flavor fades.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"I need flavor that survives the pop. If you spot any ratio tricks, send them my way.\"</span>`,
+        text: `Under a humming camp light, Dr. Kenny Fields runs a tidy pop-up lab outside MathTips Village.<br><br><span style='color: rgb(164, 255, 164);'>\"I’ve almost got it now,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"The bubbles float, kiss the pancake, and coat it perfectly.\"</span> Then he admits, <span style='color: rgb(164, 255, 164);'>\"Blast! The moment it pops, the flavor dissapears.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"I need flavor that survives the pop. If you spot any ratio tricks, send them my way...\"</span>`,
 
         // ✅ bonus screen only if player holds the *square* (mint) item
         // NOTE: change ItemIds.MINT_SQUARE to your actual square item id (e.g. SQUARE_SIGIL, SQUARE_CHIP, etc.)
@@ -211,7 +211,7 @@ export const Chapter1 = {
         extra: {
             title: '<span style="color: rgb(164, 255, 164);">Mint Recipe, Eh?</span>',
             img: PRO_IMG('mintSquare.png'),   // any square/mint art you’ve got
-            text: `You flash a small <b>square</b> that glows cool-green. Fields’ smile widens—recognition, not surprise.<br><span style='color: rgb(164, 255, 164);'>\"Mint Square—classic,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"That’s one of the first ratios folks try at SnowCone MathFest.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Good instincts. Believe me, I’ve run that one all night—float, kiss, perfect coat. But the moment it pops, the flavor ghosts.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Plus, this recipe can't use <em>mint</em>.\"</span>`
+            text: `You flash a small <b>square</b> that glows cool-green. Fields’ smile widens, one of recognition, not surprise.<br><span style='color: rgb(164, 255, 164);'>\"Mint Square? Classic,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"That’s one of the first ratios folks try at SnowCone MathFest.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Good instincts. But believe me, I’ve run that one all night before. It floats, kisses, perfectly coats. But the moment it pops, the flavor ghosts.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Plus...My recipe can't use <em>mint</em>.\"</span>`
         }
       },
     },
