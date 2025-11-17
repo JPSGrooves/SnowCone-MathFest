@@ -1255,3 +1255,6 @@
   0%   { opacity: 1; transform: translateY(0) }
   100% { opacity: 0; transform: translateY(-14px) } /* up a touch is still right */
 }
+.sm-xp-popup {
+  animation: none !important; /* 🚫 no rogue keyframes */
+}
