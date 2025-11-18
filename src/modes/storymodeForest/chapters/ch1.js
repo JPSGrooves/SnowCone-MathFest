@@ -276,8 +276,8 @@ loop: {
                 img: PRO_IMG('essentialsTrio2.png'),
                 imgAlt: 'Triangle Shard, Mint Square 2:3 recipe, and MoonChain spiraling together into a single flow.',
                 text: `You lift them up: <span style="color: rgb(143, 190, 255);">cold breath</span>, a <span style='color: rgb(164, 255, 164);'>\"glowing 2:3</span>, and a steady <span style='color:rgb(217, 164, 255);'>\"lunar spin</span>. The ingredients begin to meld.`,
-                reveal: `The pieces <i>lock together</i> with a little cosmic jingle—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style='color:rgb(217, 164, 255);">lunar hum</span>. A halo of neon notes lift from your workbench as the mixture stabilizes.<br><br>
-                        <span style="color: rgb(143, 190, 255);"><b>Chill anchors</span>.</b> <span style="color: rgb(164, 255, 164);"><b>Flavor harmonizes</span>.</b> <span style="color: rgb(217, 164, 255);"><b>Shape guides</span>.</b><br>
+                reveal: `The pieces <i>lock together</i> with a little cosmic jingle—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style="color:rgb(217, 164, 255);">lunar hum</span>. A halo of neon notes lift from your workbench as the mixture stabilizes.<br><br>
+                        <span style="color: rgb(143, 190, 255);"><b>Chill anchors</b></span>. <span style="color: rgb(164, 255, 164);"><b>Flavor harmonizes</b></span>. <span style="color: rgb(217, 164, 255);"><b>Shape guides</b></span>.<br>
                         The Perfect SnowCone is ready to be born.`,
                         requireRevealToAdvance: true
                 },
