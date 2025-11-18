@@ -163,30 +163,27 @@ export const Chapter1 = {
       loop: {
         title: '<span style="color: rgb(217, 164, 255);">ShakeDownSquare</span>',
         img: PRO_IMG('shakeSquare.png'),
-        text: `
-            The shakedown opens up like a neon, tie-dye canyon. You see <span style='color:rgb(217, 164, 255);'>\"<em>Pi-Pretzels</em>\"</span> tying delicious, unsolvable knots; <span style='color:rgb(217, 164, 255);'>\"Gold Ratio Cones\"</span> selling randomly twisted scones. A hooded dino walks by with a mysterious backpack full of prime crystals: <span style='color:rgb(217, 164, 255);'>\"Three for a Cone Coin? No refunds!\"</span> Another vendor offers fractal tapestries that bloom when you step closer.<br><br>
-            You pocket the urge to explore and turn back toward the truck. Somewhere past the vendors, Jehnk’s customers are lining up fast.
-        `,
+        text: `Shakedown Square opens up like a neon, tie-dye canyon. You see <span style='color:rgb(217, 164, 255);'>\"<em>Pi-Pretzels</em>\"</span> tying delicious, unsolvable knots; <span style='color:rgb(217, 164, 255);'>\"Gold Ratio Cones\"</span> selling randomly twisted scones. The tiny hooded dino walks by with a mysterious backpack full of prime crystals: <span style='color:rgb(217, 164, 255);'>\"Three for a Cone Coin? No refunds!\"</span> Another vendor offers fractal tapestries that bloom when you step closer.<br><br>You pocket the urge to explore and turn back toward the truck. Somewhere past the vendors, you can hear Jehnk’s customers lining up fast.`,
       },
       quest: {
         title: '<span style="color: rgb(143, 190, 255);">Turn off the CampLights</span>',
         steps: [
             {
             img: PRO_IMG("campLight.png"),
-            text: `A small dino stands under a blinding floodlight, staring it down. He wants the light OFF!<br><span style='color: rgb(143, 190, 255);'>\“If you can answer me correctly, that’ll be my sign to turn it off!\"</span> He taps the brightness switch,<br><br><em><span style='color: rgb(143, 190, 255);'>\“If I half the brightness each click. Starting at 100%, after how many clicks is it effectively zero (below 1%)?\"</span></em>`,
-            reveal: `7 clicks. By halves = 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.563 → 0.781%.
-                    It drops below 1% after the <b>7th</b> click.`,
+            text: `A tiny dino stands under a blinding floodlight, staring it down.<br>He wants the light OFF!<br><span style='color: rgb(143, 190, 255);'>\“If you can answer my question correctly, that’ll be my sign to turn it off!\"</span> He taps the brightness knob...<br><br><em><span style='color: rgb(143, 190, 255);'>\“Assume I half the brightness with each click; starting at 100%, how many clicks before the lights dim below 1%?\"</span></em>`,
+            reveal: `<span style="color: rgb(143, 190, 255);">7 clicks! By halves = 100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.563 → 0.781%.
+                    It drops below 1% after the <b>7th</b> click.</span>`,
             requireRevealToAdvance: true
             },
             {
             img: PRO_IMG("breakerBox.png"),
-            text: `You gave it your best guess. The dino grins, grabs the ON/OFF switch, and snaps it clean to <span style="color: rgb(143, 190, 255);"><b>OFF</b></span>. The generator coughs twice, some moths scatter, and the floodlight exhales into the darkness.`,
-            reveal: `He laughs, <span style='color: rgb(143, 190, 255);'>\“Honestly, I was gonna kill it either way! We were gonna need zeroes to tame these lights!\"</span>`,
+            text: `You give it your best guess. The dino grins, grabs the ON/OFF switch, and snaps it clean to <span style="color: rgb(143, 190, 255);"><b>OFF</b></span>.<br><br>The generator coughs twice, causing the moths to scatter, and the bugless floodlight exhales its final beam into darkness.`,
+            reveal: `He laughs, <span style='color: rgb(143, 190, 255);'>\“Honestly, I was gonna kill the lights either way! Zero was the only number good enough for these lights!\"</span>`,
             requireRevealToAdvance: true
             },
             {
             img: PRO_IMG("moonChain.png"), // your circle sigil art
-            text: `With the field light gone, the night settles in. He fishes something from his pocket and sets it in your palm: <span style="color: rgb(143, 190, 255);">A tiny full moon on a stubby chain</span>.<br><br>The<span style="color: rgb(143, 190, 255);">Moon</span> glows cool and steady. Craters crisping, the keychain casts a pale light across your fingers, while the tents around you dim back to whispers.`,
+            text: `With the field light gone, the night finally settles in. The tiny dino fishes something from his pocket and sets it in your palm: <span style="color: rgb(143, 190, 255);">A full moon on a stubby little chain</span>.<br><br>The <span style="color: rgb(143, 190, 255);">Moon</span> glows cool and steady. Craters crisping, the keychain casts a pale light across your fingers, while the tents around you settle into a din of whispers.`,
             reveal: `You receive the <span style="color: rgb(143, 190, 255);"><b>MoonChain</b></span>.`,
             requireRevealToAdvance: true
             }
@@ -202,7 +199,7 @@ export const Chapter1 = {
       weird: {
         title: '<span style="color: rgb(164, 255, 164);">More Syrup Bubbles</span>',
         img: PRO_IMG('scienceGuy2.png'),
-        text: `Under a humming camp light, Dr. Kenny Fields runs a tidy pop-up lab outside MathTips Village.<br><br><span style='color: rgb(164, 255, 164);'>\"I’ve almost got it now,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"The bubbles float, kiss the pancake, and coat it perfectly.\"</span> Then he admits, <span style='color: rgb(164, 255, 164);'>\"Blast! The moment it pops, the flavor dissapears.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"I need flavor that survives the pop. If you spot any ratio tricks, send them my way...\"</span>`,
+        text: `Under a humming camp light, Dr. Kenny Fields runs a tidy pop-up lab outside MathTips Village.<br><br><span style='color: rgb(164, 255, 164);'>\"I’ve almost got it now,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"The bubbles float, kiss the pancake, and coat it perfectly.\"</span> Then he laments, <span style='color: rgb(164, 255, 164);'>\"And yet! The moment it pops, the flavor dissapears!\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"I need flavor that survives the pop. If you spot any ratio tricks, send them my way...\"</span>`,
 
         // ✅ bonus screen only if player holds the *square* (mint) item
         // NOTE: change ItemIds.MINT_SQUARE to your actual square item id (e.g. SQUARE_SIGIL, SQUARE_CHIP, etc.)
@@ -211,7 +208,7 @@ export const Chapter1 = {
         extra: {
             title: '<span style="color: rgb(164, 255, 164);">Mint Recipe, Eh?</span>',
             img: PRO_IMG('mintSquare.png'),   // any square/mint art you’ve got
-            text: `You flash a small <b>square</b> that glows cool-green. Fields’ smile widens, one of recognition, not surprise.<br><span style='color: rgb(164, 255, 164);'>\"Mint Square? Classic,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"That’s one of the first ratios folks try at SnowCone MathFest.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Good instincts. But believe me, I’ve run that one all night before. It floats, kisses, perfectly coats. But the moment it pops, the flavor ghosts.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Plus...My recipe can't use <em>mint</em>.\"</span>`
+            text: `You flash a small <b>square</b> that glows cool-green. Fields’ smile widens, one of recognition, not surprise.<br><span style='color: rgb(164, 255, 164);'>\"Mint Square? Classic,\"</span> he says. <span style='color: rgb(164, 255, 164);'>\"That’s one of the first ratios folks try at SnowCone MathFest.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Good instincts. But believe me, I’ve run that one all night before. It floats, kisses, and even perfectly coats. But the moment it pops, the flavor ghosts.\"</span><br><br><span style='color: rgb(164, 255, 164);'>\"Plus,\"</span> he smiles, <span style='color: rgb(164, 255, 164);'>\"My recipe can't use <em>mint</em>.\"</span>`
         }
       },
     },
@@ -248,10 +245,10 @@ loop: {
   title: '<span style="color: rgb(247, 255, 105);">Question the Recipes</span>',
   img: PRO_IMG('jehnkRecipe.png'),
   text: `
-    Jehnk flips a stained card onto the counter. <i><span style='color: rgb(247, 255, 105);'>\"Ratios are stories. Taste the math.\"</span></i><br><br>
-    <b><span style='color: rgb(143, 190, 255);'>\“Blue\"</span></b> is momentum — bright and quick; a triangle of taste that spikes if you rush the sugar.<br>
-    <b><span style='color: rgb(164, 255, 164);'>\"Green\"</span></b> is patience — mint arrives when the heat leaves; time does the steeping, not the flame.<br>
-    <b><span style='color:rgb(217, 164, 255);'>\"Purple\"</span></b> is depth — grape needs a quiet flashlight of acid so the bass notes don’t go muddy.`
+    Jehnk flips a stained card onto the counter. <i><span style='color: rgb(247, 255, 105);'>\"Ratios are stories and Math has the flavors.\"</span></i><br><br>
+    <b><span style='color: rgb(143, 190, 255);'>\“Blue\"</span></b> is momentum — smooth and quick; a trifecta of flavor that spikes if you rush the sugar.<br>
+    <b><span style='color: rgb(164, 255, 164);'>\"Green\"</span></b> is patience — mint arrives to help the tempers cool down; once the cool is reached, the answer arrives.<br>
+    <b><span style='color:rgb(217, 164, 255);'>\"Purple\"</span></b> is depth — circles need a quiet flashlight of citrus so the bass notes don’t go muddy.`
 },
 
 
@@ -270,25 +267,25 @@ loop: {
                 img: PRO_IMG('essentialsTrio.png'),
                 imgAlt: 'Triangle Shard (Perpetual Chill), Mint Square recipe (The Ratio & Flavor), and MoonChain (The Shape Model) glowing on a dark field.',
                 // ⬇️ SHORT pre-reveal; long detail stays in `reveal`
-                text: `On the tailgate: a <span style='color: rgb(143, 190, 255);">frost-bright shard</span>, a <span style='color: rgb(164, 255, 164);">mint-square ratio</span>, and a <span style='color:rgb(217, 164, 255);">moonlit chain</span>. Three pieces; one method waiting to click.`,
+                text: `On the tailgate, sits a <span style="color: rgb(143, 190, 255);">frost-bit shard</span>, a <span style="color: rgb(164, 255, 164);">mint-square ratio</span>, and a <span style="color:rgb(217, 164, 255);">moonlit chain</span>. Three pieces; one method waiting to click.`,
                 reveal: `These are the festival’s three essentials: <span style="color: rgb(143, 190, 255);"><b>Chill</b> (the shard’s cryo snap)</span>, <span style="color: rgb(164, 255, 164);"><b>Flavor</b> (that 2:3 mint-lime choir)</span>, and <span style="color: rgb(217, 164, 255);"><b>Shapes</b> (the moon’s perfect loop guiding the spiral)</span>.<br><br>
-                        Line them up and you get the method: <span style="color: rgb(143, 190, 255);"><i>Chill</span> → <span style="color: rgb(164, 255, 164);">Mix</span> → <span style="color: rgb(217, 164, 255);">Shape</span></i>. The bench lights breathe brighter, like they know what comes next.`,
+                        Line them up and you get the method: <span style="color: rgb(143, 190, 255);"><i>Chill</span> → <span style="color: rgb(164, 255, 164);">Mix</span> → <span style="color: rgb(217, 164, 255);">Shape</span></i>. The truck lights breathe brighter, like it knows what comes next.`,
                         requireRevealToAdvance: true
                 },
                 {
                 img: PRO_IMG('essentialsTrio2.png'),
                 imgAlt: 'Triangle Shard, Mint Square 2:3 recipe, and MoonChain spiraling together into a single flow.',
-                text: `You lift them: <span style="color: rgb(143, 190, 255);">cold breath</span>, a <span style='color: rgb(164, 255, 164);'>\"glowing 2:3</span>, and a steady <span style='color:rgb(217, 164, 255);'>\"lunar spin</span>. The motions begin to braid.`,
-                reveal: `The pieces <i>lock</i> with a little cosmic thunk—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style='color:rgb(217, 164, 255);">lunar hum</span>. A halo of neon bubbles lifts from your workbench as the mixture stabilizes.<br><br>
+                text: `You lift them up: <span style="color: rgb(143, 190, 255);">cold breath</span>, a <span style='color: rgb(164, 255, 164);'>\"glowing 2:3</span>, and a steady <span style='color:rgb(217, 164, 255);'>\"lunar spin</span>. The ingredients begin to meld.`,
+                reveal: `The pieces <i>lock together</i> with a little cosmic jingle—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style='color:rgb(217, 164, 255);">lunar hum</span>. A halo of neon notes lift from your workbench as the mixture stabilizes.<br><br>
                         <span style="color: rgb(143, 190, 255);"><b>Chill anchors</span>.</b> <span style="color: rgb(164, 255, 164);"><b>Flavor harmonizes</span>.</b> <span style="color: rgb(217, 164, 255);"><b>Shape guides</span>.</b><br>
                         The Perfect SnowCone is ready to be born.`,
                         requireRevealToAdvance: true
                 },
                 {
                 img: PRO_IMG('essentialsTrio3.png'),
-                text: `Jehnk cues the finale: pack <span style="color: rgb(217, 164, 255);">ice</span>, pour a steady <span style="color: rgb(164, 255, 164);"><b>2:3</b> ribbon</span>, finish with a <span style="color: rgb(143, 190, 255);">triangle crest</span>.`,
-                reveal: `<span style="color: rgb(247, 255, 105);"><b>Perfect SnowCone crafted!</b></span> Neon bubbles rise and drift like little planets as the cone gleams in the 2AM glow.<br><br>
-                        The stack sings in three parts—<span style="color: rgb(143, 190, 255);"><b>Chill</b></span> holds the shape, <span style="color: rgb(164, 255, 164);"><b>Flavor</b></span> rings out 2:3 bright, <span style="color: rgb(217, 164, 255);"><b>Geometry</b></span> keeps the swirl honest. Jehnk grins: <span style='color: rgb(247, 255, 105);'>\"Serve that comet cone, traveler.\"</span> 🫧🍧`,
+                text: `Jehnk cues the finale: pack some <span style="color: rgb(217, 164, 255);">ice</span>, pour a steady <span style="color: rgb(164, 255, 164);">syrupy ribbon</span>, finish with a signature <span style="color: rgb(143, 190, 255);">triangle crest</span>.`,
+                reveal: `<span style="color: rgb(247, 255, 105);"><b>The Perfect SnowCone has been crafted!</b></span> Neon bubbles rise and drift like little planets, as the cone gleams in the 2AM glow.<br><br>
+                        The stack sings in three parts—<span style="color: rgb(143, 190, 255);"><b>Chill</b></span> holds the shape, <span style="color: rgb(164, 255, 164);"><b>Flavor</b></span> rings out minty brightness, <span style="color: rgb(217, 164, 255);"><b>Geometry</b></span> keeps the swirl honest. Jehnk grins: <span style='color: rgb(247, 255, 105);'>\"Now you're trained to work the truck!\"</span> 🫧🍧`,
                         requireRevealToAdvance: true
                 }
             ];
@@ -320,7 +317,7 @@ loop: {
         title: '<span style="color: rgb(247, 255, 105);">A Bubble Follows You</span>',
         img: PRO_IMG('syrupBubble.png'), // close-up bubble near ear w/ triangle reflections
         imgAlt: 'A shimmering syrup bubble floating by your ear, reflecting glowing triangles.',
-        text: `A syrup bubble drifts by, reflecting triangles that weren’t there a second ago.<br><br><span style='color: rgb(247, 255, 105);'>\"This must be the work of none other than Dr. Kenny Fields,\"</span> Jehnk muses. <span style='color: rgb(247, 255, 105);'>\"He’s been experimenting with festival syrup bubbles for pancakes, but never tells anyone that they follow people around.\"</span><br><br>He points, <span style='color: rgb(247, 255, 105);'>\"You’ve got one floating right by your ear.\"</span>`,
+        text: `A syrup bubble drifts by, reflecting triangles that weren’t there a second ago.<br><br><span style='color: rgb(247, 255, 105);'>\"This must be the work of none other than Dr. Kenny Fields,\"</span> Jehnk muses. <span style='color: rgb(247, 255, 105);'>\"He’s been experimenting with festival syrup bubbles for pancakes, but never tells anyone that they will follow you around!\"</span><br><br>He points, <span style='color: rgb(247, 255, 105);'>\"You’ve got one floating right by your ear, as we speak!\"</span>`,
 
         // 👇 new: force the CTA copy on this slide
         extraLabel: 'Reveal More',
@@ -332,7 +329,7 @@ loop: {
             title: '<span style="color: rgb(247, 255, 105);">Three Days of Bubbles</span>',
             img: PRO_IMG('fieldsBubbleStory.png'),
             imgAlt: 'Jehnk and Dr. Kenny Fields surrounded by neon syrup bubbles over the festival tents at 2AM.',
-            text: `Jehnk leans back, grinning. <span style='color: rgb(247, 255, 105);'>\"Me and Dr. Kenny Fields? Yeah, we tuned syrups together—ratios perfect, viscosity money.<br><br>Then Kenny gets obsessed with bubbles. Not just a few—like, a *weather system* of bubbles. They swarmed the Midway and wouldn’t pop unless you danced.<br><br>Whole festival formed a conga line and we—no joke—danced that cloud out for three days straight. Best cardio of my life. Worst cleanup.\"</span>`,
+            text: `Jehnk thinks back, grinning his way into the story, <span style='color: rgb(247, 255, 105);'>\"Me and Dr. Kenny Fields? Yeah, we tuned syrups together for a long time, made a lot of money at pancake festivals...<br><br>Then Kenny got obsessed with bubbles. Not just a few...like, an entire weather system of bubbles. They swarmed the 1997 Flapjack Forum and wouldn’t pop unless you danced on 'em.<br><br>Whole festival had to form a conga line and we, no joke, danced those bubbles out for three days straight. Best cardio of my life, but the worst cleanup ever!\"</span>`,
         },
       },
 
