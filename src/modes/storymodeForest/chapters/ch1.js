@@ -245,10 +245,10 @@ loop: {
   title: '<span style="color: rgb(247, 255, 105);">Question the Recipes</span>',
   img: PRO_IMG('jehnkRecipe.png'),
   text: `
-    Jehnk flips a stained card onto the counter. <i><span style='color: rgb(247, 255, 105);'>\"Ratios are stories and Math has the flavors.\"</span></i><br><br>
-    <b><span style='color: rgb(143, 190, 255);'>\“Blue\"</span></b> is momentum — smooth and quick; a trifecta of flavor that spikes if you rush the sugar.<br>
-    <b><span style='color: rgb(164, 255, 164);'>\"Green\"</span></b> is patience — mint arrives to help the tempers cool down; once the cool is reached, the answer arrives.<br>
-    <b><span style='color:rgb(217, 164, 255);'>\"Purple\"</span></b> is depth — circles need a quiet flashlight of citrus so the bass notes don’t go muddy.`
+    Jehnk sees you questioning things. <i><span style='color: rgb(247, 255, 105);'>\"The colors and flavors are all working together, keep looking!\"</span></i><br><br>
+    <b><span style='color: rgb(143, 190, 255);'>\“Blue\"</span></b> is our momentum. — we get in, we move around, we learn. Fast or slow, it's the steady pour that wins.<br>
+    <b><span style='color: rgb(164, 255, 164);'>\"Green\"</span></b> is our patience — the ability to chew the mint and work your cool into a singular focus.<br>
+    <b><span style='color:rgb(217, 164, 255);'>\"Purple\"</span></b> is our depth — how far we go could only ever be determined by time and motion...`
 },
 
 

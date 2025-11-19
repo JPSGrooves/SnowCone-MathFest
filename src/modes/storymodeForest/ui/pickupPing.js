@@ -104,7 +104,7 @@ export function pickupPing({
   qty=1,
   enableCash=true,
   variant='normal',
-  durationMs=1700
+  durationMs=6600
 } = {}) {
   try {
     injectPickupStyle();

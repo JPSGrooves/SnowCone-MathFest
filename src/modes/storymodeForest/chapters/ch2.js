@@ -21,8 +21,8 @@ export const Chapter2 = {
     mode: 'solo',
     title: 'The First Shift',
     img: PRO_IMG('insideTruck.png'),
-    text: `Now that you've got the basics, Jehnk disapears and lets you run the truck for a shift.<br><br>
-    Four figures hover near the truck: one polishing a wooden timepiece, one tracing quiet symmetries in the air, one rolling a circle charm across his knuckles, and one thumbing a tiny, glowing ledger; each carrying a different kind of math.`,
+    text: `Now that you've made <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span>, Jehnk disappears and lets you run the truck for a shift.<br><br>
+    Four figures line up near the truck: one polishing a wooden timepiece, one tracing quiet symmetries in the air, another rolling a circle charm across his knuckles, and the last one reading a tiny, glowing ledger; each looking for a different flavor 🍧.`,
     soloLabel: 'Open the Window ➡️',
     },
 
@@ -36,11 +36,11 @@ export const Chapter2 = {
         name: 'Benjamin Banneker',
         bio: {
           img: PRO_BIG_IMG('banneker.png'),
-          text: `First up, Banneker sets a wooden timepiece on the counter. Self-taught astronomer, almanac author, and surveyor. “Evening,” he says. “Clock has you right on time.”`,
+          text: `First up, Banneker sets a wooden timepiece on the counter. Self-taught astronomer, almanac author, and surveyor. <span style='color: rgb(20, 161, 255);'>\“Evening,\"</span> he says. <span style='color: rgb(20, 161, 255);'>\“Clock has you right on time.\"</span>`,
         },
         lore: {
-          img: PRO_IMG('treeline.png'),
-          text: 'Out past the lights, Banneker hums at the treeline. “Rhythm is ratio,” he says. “Beats are proportions of time.”<br><br> He taps the wooden timepiece and the second hand ticks like a far-off hi-hat. “Keep track of the stars,” he whispers, “and their beat will keep you informed."',
+            img: PRO_IMG('treeline.png'),
+            text: `Out past the lights, Banneker hums at the treeline. <span style="color: rgb(20, 161, 255);">"The music pulses,"</span> he says. <span style="color: rgb(20, 161, 255);">"always on time."</span><br><br>He taps his wooden clock and the second hand ticks like a far-off hi-hat. <span style="color: rgb(20, 161, 255);">"It must be the Infinity Triplets,"</span> he whispers. <span style="color: rgb(20, 161, 255);">"That means we'll be dancing past sunrise."</span>`,
         },
         puzzle: {
           img: PRO_IMG('scheduleCard.png'),
@@ -54,7 +54,7 @@ export const Chapter2 = {
       mode: 'solo',
       title: 'Benjamin Banneker',
       img: PRO_BIG_IMG('bannekerHappy.png'),
-      text: `He tastes the SnowCone, eyes glinting like midnight brass. "Set your watch by the heavens; set your word by your watch." He goes on, "If the count feels crooked, look up, breathe, and start the next minute fresh."`,
+      text: `He tastes the SnowCone, eyes glinting like midnight brass. <span style="color: rgb(20, 161, 255);">"Set your watch by the heavens; set your word by your watch."</span> He goes on, <span style="color: rgb(20, 161, 255);">"If the count feels crooked, look up, breathe, and start the next minute fresh."</span>`,
       soloLabel: 'Next Customer ➡️',
       grants: [{ item: ItemIds.BANNEKER_TOKEN, payload: payloadFor(ItemIds.BANNEKER_TOKEN) }],
     },
@@ -73,7 +73,7 @@ export const Chapter2 = {
         },
         lore: {
           img: PRO_IMG('coilCables.png'),
-          text: `Stage lights sweep the field. “Find what doesn’t change,” she says.<br><br>"Count 1–2–3–4, and the 1 comes back again. Swap colors, add bulbs—the beat still loops. That never-changing part is your invariant. It’s your anchor."`,
+          text: `Stage lights sweep the field. <span style="color: rgb(20, 161, 255);">"Find what doesn’t change,”</span> she says.<br><br><span style="color: rgb(20, 161, 255);">"Count 1–2–3–4, and the 1 comes back again. Swap colors, add bulbs—the beat still loops. That never-changing part is your invariant. It’s your anchor."</span>`,
         },
         puzzle: {
             img: PRO_IMG('stageLightsCard.png'), // placeholder filename — swap to whatever you export
@@ -87,7 +87,7 @@ export const Chapter2 = {
       mode: 'solo',
       title: 'Emmy Noether',
       img: PRO_BIG_IMG('noetherHappy.png'),
-      text: `She smiles. “Invariant preserved.” She goes quiet for a few beats. The stage lights sweep and swap, but you notice the pattern now. “Sometimes, stability isn't stillness, and it's okay to get lost in the dance!”`,
+      text: `She smiles. <span style="color: rgb(20, 161, 255);">"Invariant preserved.”</span> She goes quiet for a few beats. The stage lights sweep and swap, but you notice the pattern now. <span style="color: rgb(20, 161, 255);">"Sometimes, stability isn't stillness, and it's okay to get lost in the dance!”</span>`,
       soloLabel: 'Next Customer ➡️',
       // NOETHER happy slide
       grants: [{ item: ItemIds.NOETHER_TOKEN, payload: payloadFor(ItemIds.NOETHER_TOKEN) }],
@@ -107,7 +107,7 @@ export const Chapter2 = {
         },
         lore: {
             img: PRO_IMG('lanternCircle.png'),
-            text: `He pictures a huge gurgling barrel: one filled with pure water and piled with snowcones. He steps in; the SnowCones climb. “Displacement tells the truth,” he grins. “The rise matches my volume, and the lift equals the weight I push aside: man or cone, it's the same law.”`,
+            text: `He pictures a huge gurgling barrel: one filled with pure water and piled with snowcones. He steps in; the SnowCones climb. <span style="color: rgb(20, 161, 255);">“Displacement tells the truth,”</span> he grins. <span style="color: rgb(20, 161, 255);">“The rise matches my volume, and the lift equals the weight I push aside: man or cone, it's the same law.”</span>`,
         },
         puzzle: {
             img: PRO_IMG('waterBarrel.png'),
@@ -122,7 +122,7 @@ export const Chapter2 = {
         mode: 'solo',
         title: 'Archimedes',
         img: PRO_IMG('archimedesHappy.png'),
-        text: `He laughs. “Balanced perfectly!” The ripples settle into neat circles. “Equal weight, equal lift—always.” He taps the cone and pockets it like a solved problem. “Bill me in buoyant units, and don't take things too seriously until you've tested your wieght in a bath."`,
+        text: `He laughs. <span style="color: rgb(20, 161, 255);">“Balanced perfectly!”</span> The ripples settle into neat circles. <span style="color: rgb(20, 161, 255);">“Equal weight, equal lift—always.”</span> He taps the cone and pockets it like a solved problem. <span style="color: rgb(20, 161, 255);">“Bill me in buoyant units, and don't take things too seriously until you've tested your wieght in a bath."</span>`,
         soloLabel: 'Next Customer ➡️',
         // NOETHER happy slide
         // ARCHIMEDES happy slide
@@ -144,7 +144,7 @@ export const Chapter2 = {
         },
         lore: {
             img: PRO_IMG('ledgerGlow.png'),
-            text: `Then he flips a tiny ledger: left = to give, right = to desire. “Debits greet credits,” he winks. He sketches a crisp T and notes ‘Somma = Somma’ in the margin. “What leaves inventory enters the heart—every gift has a reciever.”`,
+            text: `Then he flips a tiny ledger: left = to give, right = to desire. <span style="color: rgb(20, 161, 255);">“Debits greet credits,”</span> he winks. He sketches a crisp T and notes ‘Somma = Somma’ in the margin. <span style="color: rgb(20, 161, 255);">“What leaves inventory enters the heart—every gift has a reciever.”</span>`,
         },
 
 // swap just this inside Pacioli.customer
@@ -161,7 +161,7 @@ export const Chapter2 = {
         mode: 'solo',
         title: 'Luca Pacioli',
         img: PRO_IMG('pacioliHappy.png'),
-        text: `He nods at your books and your blends. “Balanced.” He sets a tiny glowing ledger in your palm, then lifts two snowcones, one in each hand, level as a scale. The page hums, signs itself, and closes warm against your pocket. “Every gift has a reciever,” he winks, strolling into the lights with twin cones held high.`,
+        text: `He nods at your books and your blends. <span style="color: rgb(20, 161, 255);">“Balanced.”</span> He sets a tiny glowing ledger in your palm, then lifts two snowcones, one in each hand, level as a scale. The page hums, signs itself, and closes warm against your pocket. <span style="color: rgb(20, 161, 255);">“Every gift has a reciever,”</span> he winks, strolling into the lights with twin cones held high.`,
         soloLabel: 'Jehnk Jumps In ➡️',
         // PACIOLI happy slide
         grants: [{ item: ItemIds.PACIOLI_TOKEN, payload: payloadFor(ItemIds.PACIOLI_TOKEN) }],
@@ -173,7 +173,7 @@ export const Chapter2 = {
       mode: 'solo',
       title: 'Shift Complete',
       img: PRO_BIG_IMG('jehnkNod.png'),
-      text: `Jehnk whistles. “Four legends, four cones—clean serves, clean math. Keep this up and I might let you run the truck forever!”`,
+      text: `Jehnk whistles. <span style="color: rgb(247, 255, 105);">“Four legends, four cones—clean serves, clean math. Keep this up and I might let you run the truck forever!”</span>`,
       soloLabel: 'Chapter 3 ➡️',
       nextChapterId: 'ch3',
     },
