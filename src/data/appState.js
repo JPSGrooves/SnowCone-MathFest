@@ -99,6 +99,38 @@ class AppState {
   // Logs
   chatLogs = [];
 
+    // 👇 NEW: generic flag store for endings, one-shot events, etc.
+  flags = {};
+
+  constructor() {
+    makeAutoObservable(this, {}, { autoBind: true });
+    this.loadFromStorage();
+  }
+
+    // ── Flags / story markers ─────────────────────────────────────────────
+  setFlag(key, value = true) {
+    if (!key) return;
+    if (!this.flags || typeof this.flags !== 'object') {
+      this.flags = {};
+    }
+    this.flags[key] = value;
+  }
+
+  getFlag(key, fallback = false) {
+    if (!this.flags || typeof this.flags !== 'object') return fallback;
+    return Object.prototype.hasOwnProperty.call(this.flags, key)
+      ? this.flags[key]
+      : fallback;
+  }
+
+  clearFlag(key) {
+    if (!this.flags || typeof this.flags !== 'object') return;
+    if (key in this.flags) {
+      delete this.flags[key];
+    }
+  }
+
+
   // Camping pop count
   popCount = 0;
 
@@ -106,10 +138,6 @@ class AppState {
   inventory = observable.map(); // id -> InventoryEntry (observable)
   purse = new CurrencyPurse();
 
-  constructor() {
-    makeAutoObservable(this, {}, { autoBind: true });
-    this.loadFromStorage();
-  }
 
   // ── XP / Leveling ────────────────────────────────────────────────────────────
   addXP(amount) {
@@ -343,6 +371,7 @@ class AppState {
         storyProgress: toJS(this.storyProgress),
         storyMemory:   toJS(this.storyMemory),
         chatLogs:      toJS(this.chatLogs),
+        flags:         this.flags,
         popCount:      this.popCount,
         progress:      toJS(this.progress),
         currency:      this.purse.amount,
@@ -360,30 +389,36 @@ class AppState {
     try {
       const data = JSON.parse(raw);
       runInAction(() => {
-        Object.assign(this.profile,       data.profile);
-        Object.assign(this.settings,      data.settings);
-        Object.assign(this.stats,         data.stats);
+        Object.assign(this.profile, data.profile);
+        Object.assign(this.settings, data.settings);
+        Object.assign(this.stats, data.stats);
         Object.assign(this.storyProgress, data.storyProgress);
-        Object.assign(this.storyMemory,   data.storyMemory);
+        Object.assign(this.storyMemory, data.storyMemory);
         this.chatLogs = data.chatLogs || [];
-        this.popCount = data.popCount || 0;
 
-        if (data.progress) {
-          this.progress.story       = { xp: 0, ...(data.progress.story || {}) };
-          this.progress.kidsCamping = { xp: 0, ...(data.progress.kidsCamping || {}) };
-          this.progress.quickServe  = { xp: 0, ...(data.progress.quickServe || {}) };
-          this.progress.infinity    = { xp: 0, ...(data.progress.infinity || {}) };
+        // 👇 NEW: gentle merge for flags
+        if (data.flags && typeof data.flags === 'object') {
+          Object.assign(this.flags, data.flags);
         }
 
-        if (typeof data.currency === 'number') this.purse.amount = data.currency | 0;
-        this.inventory.clear();
+        // if you already restore progress/inventory/currency, keep those lines too
+        if (data.progress) {
+          this.progress.story = { xp: 0, ...(data.progress.story || {}) };
+          this.progress.kidsCamping = { xp: 0, ...(data.progress.kidsCamping || {}) };
+          this.progress.quickServe = { xp: 0, ...(data.progress.quickServe || {}) };
+          this.progress.infinity = { xp: 0, ...(data.progress.infinity || {}) };
+        }
         if (data.inventory && typeof data.inventory === 'object') {
+          this.inventory.clear();
           for (const [id, obj] of Object.entries(data.inventory)) {
             this.inventory.set(
               id,
               new InventoryEntry(id, obj.name ?? id, obj.qty ?? 1, obj.meta ?? {})
             );
           }
+        }
+        if (typeof data.currency === 'number') {
+          this.purse.amount = data.currency | 0;
         }
       });
     } catch (err) {

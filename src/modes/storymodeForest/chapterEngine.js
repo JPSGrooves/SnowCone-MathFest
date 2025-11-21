@@ -1,11 +1,18 @@
-// chapterEngine.js
-import { SlideRole, ItemIds, Currency, CURRENCY_NAME } from '../../data/storySchema.js';
+// src/modes/storyMode/chapterEngine.js
+import {
+  SlideRole,
+  ItemIds,
+  Currency,
+  CURRENCY_NAME,
+  ITEM_DISPLAY,        // ← grab display map here too
+} from '../../data/storySchema.js';
+
 import { appState } from '../../data/appState.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 import { isMuted, toggleMute } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
 import { pickupPing } from './ui/pickupPing.js';
-import { ITEM_DISPLAY} from '../../data/storySchema.js';
+
 
 const SELECTORS = { container: '#game-container' };
 const BASE = import.meta.env.BASE_URL;
@@ -155,6 +162,98 @@ export class ChapterEngine {
     smUnlock(id); // inline store above (localStorage)
   }
 
+    _gotoById(targetId) {
+    const chapter = this.registry[this.state.chapterId];
+    if (!chapter) return;
+    const idx = chapter.slides.findIndex((s) => s.id === targetId);
+    if (idx >= 0) {
+      this.state.idx = idx;
+      this._renderSlide();
+    }
+  }
+      _renderEndingSlide(chapter, slide) {
+    const title = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
+    const img   = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
+    const text  = slide.text || '';
+
+    const options = slide.options || [];
+
+    const optionsHtml = options.map((opt, idx) => `
+      <button
+        class="sm-btn sm-btn-primary sm-ending-choice"
+        data-i="${idx}"
+      >
+        ${opt.label}
+      </button>
+    `).join('');
+
+    const inner = `
+      ${title}
+      ${img}
+      <div class="sm-ch1-text">${text}</div>
+
+      <div class="sm-choice-list sm-ending-choices">
+        ${optionsHtml}
+      </div>
+    `;
+
+    // 🔳 Draw the standard frame
+    this._renderFrame(inner);
+
+    // 🔔 NEW: fire slide.onEnter hooks for ending slides (credits, music, etc.)
+    if (typeof slide.onEnter === 'function') {
+      try {
+        slide.onEnter({ appState, engine: this });
+      } catch (err) {
+        console.warn('[Story] ending onEnter failed:', err);
+      }
+    }
+
+    const root = document;
+
+    root.querySelectorAll('.sm-ending-choice').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = Number(btn.dataset.i || 0);
+        const opt = options[i];
+        if (!opt) return;
+
+        // Honor normal reward + onAdvance hooks, like other slide types
+        this._grantSlideRewards(slide);
+        if (typeof slide.onAdvance === 'function') {
+          try {
+            slide.onAdvance({ appState, engine: this, choice: opt });
+          } catch (err) {
+            console.warn('[Story] ending onAdvance failed:', err);
+          }
+        }
+
+        const target = opt.nextId;
+
+        // Special 'root_menu' keyword → bounce back to chapter menu
+        if (target === 'root_menu') {
+          if (typeof chapter.onFinish === 'function') {
+            try {
+              chapter.onFinish({ appState, engine: this });
+            } catch (err) {
+              console.warn('[Story] ending onFinish failed:', err);
+            }
+          }
+          this._finishChapter();
+          return;
+        }
+
+        if (target) {
+          this._gotoById(target);
+        } else {
+          // Fallback: just advance linearly
+          this._nextMain();
+        }
+      });
+    });
+  }
+
+
+
   _isChapterUnlocked(id) {
     try {
       if (typeof appState?.isChapterUnlocked === 'function') {
@@ -273,110 +372,132 @@ export class ChapterEngine {
   }
 
 
-_renderSlide(){
-  const chapter = this.registry[this.state.chapterId];
-  const slide = chapter.slides[this.state.idx];
+  _renderSlide(){
+    const chapter = this.registry[this.state.chapterId];
+    const slide = chapter.slides[this.state.idx];
 
-  // Route CUSTOMER slides to the mini-runner
-  if (slide?.role === SlideRole.CUSTOMER || slide?.role === 'customer') {
-    this._onCustomer(slide);
-    return;
+    // 👉 NEW: fire onEnter hook when a slide is rendered
+    if (slide && typeof slide.onEnter === 'function') {
+      try {
+        slide.onEnter({ appState, engine: this });
+      } catch (err) {
+        console.warn('[Story] slide.onEnter error:', err);
+      }
+    }
+
+    // Route CUSTOMER slides to the mini-runner
+    if (slide?.role === SlideRole.CUSTOMER || slide?.role === 'customer') {
+      this._onCustomer(slide);
+      return;
+    }
+
+    // Custom slide modes (Chapter 3, but reusable)
+    if (slide?.mode === 'quiz3' && slide?.quiz) {
+      this._renderQuizSlide(chapter, slide);
+      return;
+    }
+
+    if (slide?.mode === 'choice3' && slide?.choices) {
+      this._renderChoiceSlide(chapter, slide);
+      return;
+    }
+
+    // NEW: simple ending-mode screens with buttons → next slide id
+    if (slide?.mode === 'ending' && slide?.options) {
+      this._renderEndingSlide(chapter, slide);
+      return;
+    }
+
+    // ───────────────────────────────────────────
+    // Gating: require side-path visits before "Advance"
+    // ───────────────────────────────────────────
+    const requiredSlots = slide.requireVisited || (slide.requireAllSidePaths ? ['weird','quest','loop'] : []);
+    const unmetSlots = requiredSlots.filter(s => !this._isVisited(s));
+    const blockAdvance = unmetSlots.length > 0;
+
+    const title = `<h2 class="sm-ch1-title">${slide.title}</h2>`;
+    const img = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
+    const text = slide.text ? `<div class="sm-ch1-text">${slide.text}</div>` : '';
+
+    const isLast = this.state.idx === (chapter.slides.length - 1);
+    const defaultTop =
+      (isLast && slide.nextChapterId && this.registry[slide.nextChapterId])
+        ? 'Go to Chapter 2 ➡️'
+        : (isLast ? 'Finish Chapter' : 'Continue ➡️');
+
+    const topOpt = slide.dynamicTop?.(appState) ?? { label: slide.topLabel ?? defaultTop, disabled: false };
+    const resolve = (v) => (typeof v === 'function' ? v(appState, this) : v);
+
+    const kinds = {
+      top:   slide.meta?.top?.kind   || 'Story',
+      loop:  slide.meta?.loop?.kind  || 'Puzzle',
+      quest: slide.meta?.quest?.kind || 'Quest',
+      weird: slide.meta?.weird?.kind || 'Lore',
+    };
+
+    const desc = {
+      top:   resolve(topOpt.label ?? slide.topLabel ?? defaultTop),
+      loop:  resolve(slide.loopLabel  ?? 'Look around'),
+      quest: resolve(slide.questLabel ?? 'Side quest'),
+      weird: resolve(slide.weirdLabel ?? 'Something odd'),
+    };
+
+    const lbl = (kind, text) =>
+      `<span class="sm-kind">${kind}:</span> <span class="sm-desc">${text}</span>`;
+
+    const buildBtn = (slot) => {
+      const visited = this._isVisited(slot);
+      const visitedClass = visited ? ' is-visited' : '';
+      const check = visited ? `<span class="sm-check" aria-hidden="true">✓</span>` : '';
+      const primary = (slot === 'quest') || (slot === 'top');
+      const cls = primary ? 'sm-btn sm-btn-primary' : 'sm-btn sm-btn-secondary';
+
+      // 🔒 Top button locked if blockAdvance or topOpt.disabled
+      const disabled = (slot === 'top' && (topOpt.disabled || blockAdvance)) ? 'disabled' : '';
+      const handlerClass = (slot === 'top') ? 'js-advance' : `js-${slot}`;
+      const kindLabel = kinds[slot === 'weird' ? 'weird' : slot];
+      const textLabel = desc[slot === 'weird' ? 'weird' : slot];
+
+      // Optional: hint text when locked (kept minimal)
+      const lockHint = (slot === 'top' && (topOpt.disabled || blockAdvance))
+        ? ' data-hint="Try the other options first!"'
+        : '';
+
+      return `
+        <button class="${cls} ${handlerClass}${visitedClass}" ${disabled}${lockHint}>
+          ${check}${lbl(kindLabel, textLabel)}
+        </button>`;
+    };
+
+    const choices = `
+      ${buildBtn('weird')}
+      ${buildBtn('quest')}
+      ${buildBtn('loop')}
+      ${buildBtn('top')}
+    `;
+
+    const ctaLabel = resolve(slide.soloLabel ?? slide.topLabel ?? 'Continue ➡️');
+    const body = (slide.mode === 'solo')
+      ? `${title}${img}${text}
+          <div class="sm-choice-list">
+            <button class="sm-btn sm-btn-primary js-advance">${ctaLabel}</button>
+          </div>`
+      : `${title}${img}${text}<div class="sm-choice-list">${choices}</div>`;
+
+    this._renderFrame(body);
+
+    const root = document;
+    root.querySelector('.js-advance')?.addEventListener('click', ()=> this._onAdvance(chapter, slide, topOpt));
+    root.querySelector('.js-loop')?.addEventListener('click', ()=>{
+      this._markVisited('loop'); this._onLoop(slide);
+    });
+    root.querySelector('.js-quest')?.addEventListener('click', ()=>{
+      this._markVisited('quest'); this._onQuest(slide);
+    });
+    root.querySelector('.js-weird')?.addEventListener('click', ()=>{
+      this._markVisited('weird'); this._onWeird(slide);
+    });
   }
-
-  // ───────────────────────────────────────────
-  // Gating: require side-path visits before "Advance"
-  // You can set either:
-  //   slide.requireAllSidePaths = true
-  // or:
-  //   slide.requireVisited = ['weird','quest','loop']  // any subset, order agnostic
-  // ───────────────────────────────────────────
-  const requiredSlots = slide.requireVisited || (slide.requireAllSidePaths ? ['weird','quest','loop'] : []);
-  const unmetSlots = requiredSlots.filter(s => !this._isVisited(s));
-  const blockAdvance = unmetSlots.length > 0;
-
-  const title = `<h2 class="sm-ch1-title">${slide.title}</h2>`;
-  const img = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
-  const text = slide.text ? `<div class="sm-ch1-text">${slide.text}</div>` : '';
-
-  const isLast = this.state.idx === (chapter.slides.length - 1);
-  const defaultTop =
-    (isLast && slide.nextChapterId && this.registry[slide.nextChapterId])
-      ? 'Go to Chapter 2 ➡️'
-      : (isLast ? 'Finish Chapter' : 'Continue ➡️');
-
-  const topOpt = slide.dynamicTop?.(appState) ?? { label: slide.topLabel ?? defaultTop, disabled: false };
-  const resolve = (v) => (typeof v === 'function' ? v(appState, this) : v);
-
-  const kinds = {
-    top:   slide.meta?.top?.kind   || 'Story',
-    loop:  slide.meta?.loop?.kind  || 'Puzzle',
-    quest: slide.meta?.quest?.kind || 'Quest',
-    weird: slide.meta?.weird?.kind || 'Lore',
-  };
-
-  const desc = {
-    top:   resolve(topOpt.label ?? slide.topLabel ?? defaultTop),
-    loop:  resolve(slide.loopLabel  ?? 'Look around'),
-    quest: resolve(slide.questLabel ?? 'Side quest'),
-    weird: resolve(slide.weirdLabel ?? 'Something odd'),
-  };
-
-  const lbl = (kind, text) =>
-    `<span class="sm-kind">${kind}:</span> <span class="sm-desc">${text}</span>`;
-
-  const buildBtn = (slot) => {
-    const visited = this._isVisited(slot);
-    const visitedClass = visited ? ' is-visited' : '';
-    const check = visited ? `<span class="sm-check" aria-hidden="true">✓</span>` : '';
-    const primary = (slot === 'quest') || (slot === 'top');
-    const cls = primary ? 'sm-btn sm-btn-primary' : 'sm-btn sm-btn-secondary';
-
-    // 🔒 Top button locked if blockAdvance or topOpt.disabled
-    const disabled = (slot === 'top' && (topOpt.disabled || blockAdvance)) ? 'disabled' : '';
-    const handlerClass = (slot === 'top') ? 'js-advance' : `js-${slot}`;
-    const kindLabel = kinds[slot === 'weird' ? 'weird' : slot];
-    const textLabel = desc[slot === 'weird' ? 'weird' : slot];
-
-    // Optional: hint text when locked (kept minimal)
-    const lockHint = (slot === 'top' && (topOpt.disabled || blockAdvance))
-      ? ' data-hint="Try the other options first!"'
-      : '';
-
-    return `
-      <button class="${cls} ${handlerClass}${visitedClass}" ${disabled}${lockHint}>
-        ${check}${lbl(kindLabel, textLabel)}
-      </button>`;
-  };
-
-  const choices = `
-    ${buildBtn('weird')}
-    ${buildBtn('quest')}
-    ${buildBtn('loop')}
-    ${buildBtn('top')}
-  `;
-
-  const ctaLabel = resolve(slide.soloLabel ?? slide.topLabel ?? 'Continue ➡️');
-  const body = (slide.mode === 'solo')
-    ? `${title}${img}${text}
-        <div class="sm-choice-list">
-          <button class="sm-btn sm-btn-primary js-advance">${ctaLabel}</button>
-        </div>`
-    : `${title}${img}${text}<div class="sm-choice-list">${choices}</div>`;
-
-  this._renderFrame(body);
-
-  const root = document;
-  root.querySelector('.js-advance')?.addEventListener('click', ()=> this._onAdvance(chapter, slide, topOpt));
-  root.querySelector('.js-loop')?.addEventListener('click', ()=>{
-    this._markVisited('loop'); this._onLoop(slide);
-  });
-  root.querySelector('.js-quest')?.addEventListener('click', ()=>{
-    this._markVisited('quest'); this._onQuest(slide);
-  });
-  root.querySelector('.js-weird')?.addEventListener('click', ()=>{
-    this._markVisited('weird'); this._onWeird(slide);
-  });
-}
 
 // inside export class ChapterEngine { ... } — place below your other handlers
 _onCustomer(slide){
@@ -477,15 +598,272 @@ _onCustomer(slide){
   render();
 }
 
+  /**
+   * 3-option quiz:
+   * - slide.mode === 'quiz3'
+   * - slide.quiz = {
+   *     options: [{ id, label, correct, praise? }, ...],
+   *     advanceLabel?: string
+   *   }
+   * - slide.text = question/prompt
+   */
+  _renderQuizSlide(chapter, slide) {
+    const title = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
+    const img   = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
+    const prompt = slide.text || '';
+
+    const optionsHtml = (slide.quiz.options || []).map((opt, idx) => `
+      <button
+        class="sm-btn sm-btn-secondary sm-quiz-choice"
+        data-i="${idx}"
+        data-correct="${opt.correct ? '1' : '0'}"
+      >
+        ${opt.label}
+      </button>
+    `).join('');
+
+    const advanceLabel =
+      slide.quiz.advanceLabel ||
+      slide.topLabel ||
+      slide.soloLabel ||
+      'Continue ➡️';
+
+    const inner = `
+      ${title}
+      ${img}
+      <div class="sm-ch1-text">${prompt}</div>
+
+      <div class="sm-choice-list sm-quiz-choices">
+        ${optionsHtml}
+      </div>
+
+      <div class="sm-ch1-text sm-quiz-note" id="smQuizNote"></div>
+
+      <div class="sm-choice-list">
+        <button class="sm-btn sm-btn-primary js-advance is-disabled" disabled>
+          ${advanceLabel}
+        </button>
+      </div>
+    `;
+
+    this._renderFrame(inner);
+
+    const root = document;
+    const advanceBtn = root.querySelector('.js-advance');
+    const note = root.getElementById('smQuizNote');
+
+    if (advanceBtn) {
+      advanceBtn.disabled = true;
+      advanceBtn.classList.add('is-disabled');
+    }
+
+    const opts = slide.quiz.options || [];
+
+    root.querySelectorAll('.sm-quiz-choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.i || 0);
+        const opt = opts[idx] || {};
+        const isCorrect = btn.dataset.correct === '1';
+
+        if (isCorrect) {
+          // lock all choices
+          root.querySelectorAll('.sm-quiz-choice').forEach(b => {
+            b.disabled = true;
+            if (b !== btn) b.classList.add('is-disabled');
+          });
+
+          // decorate chosen button with check
+          if (!btn.classList.contains('is-visited')) {
+            btn.classList.add('is-visited');
+            btn.innerHTML = `<span class="sm-check" aria-hidden="true">✓</span> ${btn.innerHTML}`;
+          }
+
+          if (note) {
+            note.innerHTML = opt.praise || 'Nice call.';
+          }
+
+          if (advanceBtn) {
+            advanceBtn.disabled = false;
+            advanceBtn.classList.remove('is-disabled');
+          }
+        } else {
+          // gentle "try again", but keep other buttons live
+          if (note) {
+            note.innerHTML = opt.praise || 'Not quite—try another one.';
+          }
+          btn.disabled = true;
+          btn.classList.add('is-disabled');
+        }
+      });
+    });
+
+    advanceBtn?.addEventListener('click', () => {
+      if (advanceBtn.disabled) return;
+      this._onAdvance(chapter, slide, { disabled: false });
+    });
+  }
+
+    /**
+   * Choice/trade slide:
+   * - slide.mode === 'choice3'
+   * - slide.choices = [
+   *     { id, label, praise?, onSelect?({ appState, engine }) }
+   *   ]
+   * - slide.choiceAdvanceLabel?: string
+   */
+    _renderChoiceSlide(chapter, slide) {
+    const title  = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
+    const img    = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
+    const prompt = slide.text || '';
+
+    const optionsHtml = (slide.choices || []).map((opt) => `
+      <button
+        class="sm-btn sm-btn-secondary sm-choice-option"
+        data-id="${opt.id}"
+      >
+        ${opt.label}
+      </button>
+    `).join('');
+
+    const advanceLabel =
+      slide.choiceAdvanceLabel ||
+      slide.topLabel ||
+      slide.soloLabel ||
+      'Continue ➡️';
+
+    const inner = `
+      ${title}
+      ${img}
+      <div class="sm-ch1-text">${prompt}</div>
+
+      <div class="sm-choice-list sm-choice-options">
+        ${optionsHtml}
+      </div>
+
+      <div class="sm-ch1-text sm-quiz-note" id="smChoiceNote"></div>
+
+      <div class="sm-choice-list">
+        <button class="sm-btn sm-btn-primary js-advance is-disabled" disabled>
+          ${advanceLabel}
+        </button>
+      </div>
+    `;
+
+    this._renderFrame(inner);
+
+    const root        = document;
+    const note        = root.getElementById('smChoiceNote');
+    const advanceBtn  = root.querySelector('.js-advance');
+    const choices     = slide.choices || [];
+
+    if (advanceBtn) {
+      advanceBtn.disabled = true;
+      advanceBtn.classList.add('is-disabled');
+    }
+
+    let pickedId = null;
+
+    // 🔹 choose exactly one option
+    root.querySelectorAll('.sm-choice-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (pickedId) return; // single-commit
+
+        pickedId = btn.dataset.id;
+        const choice = choices.find(c => c.id === pickedId) || {};
+
+        // decorate chosen button
+        if (!btn.classList.contains('is-visited')) {
+          btn.classList.add('is-visited');
+          btn.innerHTML = `<span class="sm-check" aria-hidden="true">✓</span> ${btn.innerHTML}`;
+        }
+
+        // lock the other options
+        root.querySelectorAll('.sm-choice-option').forEach(b => {
+          if (b !== btn) {
+            b.disabled = true;
+            b.classList.add('is-disabled');
+          }
+        });
+
+        // side-effect hook
+        if (typeof choice.onSelect === 'function') {
+          try {
+            choice.onSelect({ appState, engine: this });
+          } catch (err) {
+            console.warn('[Story] choice onSelect failed:', err);
+          }
+        }
+
+        if (note) {
+          note.innerHTML = choice.praise || '';
+        }
+
+        if (advanceBtn) {
+          advanceBtn.disabled = false;
+          advanceBtn.classList.remove('is-disabled');
+        }
+      });
+    });
+
+    // 🔻 THIS is the key part: portal-style routing
+    advanceBtn?.addEventListener('click', () => {
+      if (advanceBtn.disabled) return;
+
+      const choice = choices.find(c => c.id === pickedId) || null;
+
+      // If this choice points to another chapter, handle it here
+      if (choice && choice.nextChapterId && this.registry[choice.nextChapterId]) {
+        // 1) Same reward plumbing as _onAdvance
+        this._grantSlideRewards(slide);
+
+        let handled = false;
+        if (typeof slide.onAdvance === 'function') {
+          try {
+            const res = slide.onAdvance({ appState, engine: this, choice });
+            handled = (res === true || res === 'handled');
+          } catch (err) {
+            console.warn('[Story] choice slide.onAdvance error:', err);
+          }
+        }
+        if (handled) return;
+
+        // 2) Unlock and portal into the new chapter
+        this._unlockChapter(choice.nextChapterId);
+        this.start(choice.nextChapterId);
+
+        // Optional: jump to a specific slide id inside that chapter
+        if (choice.nextId) {
+          this._gotoById(choice.nextId);
+        }
+        return;
+      }
+
+      // Fallback: normal per-slide behavior (same-chapter advance / finish)
+      this._onAdvance(chapter, slide, { disabled: false });
+    });
+  }
+
+
 _onAdvance(chapter, slide, topOpt){
   const last = chapter.slides.length - 1;
 
+  // 1) Normal reward plumbing
   this._grantSlideRewards(slide);
 
+  // 2) Optional slide-level override:
+  //    If onAdvance returns true or 'handled', we *do not* auto-advance.
+  let handled = false;
   if (typeof slide.onAdvance === 'function') {
-    slide.onAdvance({ appState, engine: this });
+    try {
+      const res = slide.onAdvance({ appState, engine: this });
+      handled = (res === true || res === 'handled');
+    } catch (err) {
+      console.warn('[Story] slide.onAdvance error:', err);
+    }
   }
+  if (handled) return;
 
+  // 3) Default flow: step forward or jump to the next chapter / finish
   if (this.state.idx === last) {
     if (slide.nextChapterId && this.registry[slide.nextChapterId]) {
       this._unlockChapter(slide.nextChapterId);  // make it visible in the menu

@@ -1,16 +1,16 @@
 // storyMode.js — CLEAN RESET (Prologue-only)
 
 // Styles & managers
+// src/modes/storyMode/storyMode.js
 import './storyMode.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
-import { appState } from '../../data/appState.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
-// add these with your other imports
-// OPTIONAL: if you added display names/emojis near ItemIds
-import { ITEM_DISPLAY } from '../../data/storySchema.js';
 
-// Music
+// StoryMode data
+import { ITEM_DISPLAY, ItemIds } from '../../data/storySchema.js';
+
+// SFX / badges / music
 import {
   playTrack,
   stopTrack,
@@ -21,23 +21,24 @@ import {
   currentTrackId,
   isPlaying,
 } from '../../managers/musicManager.js';
-
-// SFX / badges
 import { Howl } from 'howler';
 import { awardBadge } from '../../managers/badgeManager.js';
 
-import { Chapter1 } from './chapters/ch1.js';
-import { Chapter2 } from './chapters/ch2.js';
-import { ItemIds } from '../../data/storySchema.js';
+import { Chapters as StoryChapters } from './chapters/index.js';
 import { ChapterEngine } from './chapterEngine.js';
-const Chapters = {
-   ch1: Chapter1,
-   ch2: Chapter2,
-};
+
+// 👇 NEW: use the same toast UI that chapterEngine uses
+import { pickupPing } from './ui/pickupPing.js';
+
+// src/modes/storyMode/storyMode.js
+import { appState } from '../../data/appState.js';
+import { scheduleStoryCredits } from './ui/storyCredits.js';
+
+
 
 let chapterEngine;
 function getEngine() {
-  if (!chapterEngine) chapterEngine = new ChapterEngine(Chapters);
+  if (!chapterEngine) chapterEngine = new ChapterEngine(StoryChapters);
   return chapterEngine;
 }
 let __smWired = false;
@@ -95,9 +96,16 @@ function smStartInventoryWatcher() {
           const delta = newQ - oldQ;
           const name  = (ITEM_DISPLAY?.[id]?.name)  || id || 'Item';
           const emoji = (ITEM_DISPLAY?.[id]?.emoji) || '✨';
-          pingItem({ emoji, name, qty: delta });
+
+          // 🔔 Use the shared StoryMode pickup toast
+          pickupPing({
+            emoji,
+            name,
+            qty: delta,
+          });
         }
       });
+
 
       __smInvPrevJson = nowJson;
     } catch (err) {
@@ -715,13 +723,25 @@ function renderChapterMenu() {
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
 
-const unlockedSet = smGetUnlocked();
+  const unlockedSet = smGetUnlocked();
+const devUnlock = !!window.devFlags?.unlockAllChapters;
+
 const unlockedCh2 =
-  !!(window.devFlags?.unlockAllChapters
-     || unlockedSet.has('ch2')
-     || appState.hasItem?.(ItemIds.MASTER_SIGIL));
+  devUnlock ||
+  unlockedSet.has('ch2') ||
+  appState.hasItem?.(ItemIds.MASTER_SIGIL);
 
+const unlockedCh3 =
+  devUnlock ||
+  unlockedSet.has('ch3');
 
+const unlockedCh4 =
+  devUnlock ||
+  unlockedSet.has('ch4');
+
+const unlockedCh5 =
+  devUnlock ||
+  unlockedSet.has('ch5');
 
   container.innerHTML = `
     <div class="sm-aspect-wrap">
@@ -733,23 +753,47 @@ const unlockedCh2 =
 
           <div class="sm-chapter-list">
             <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue</button>
+
             <button class="sm-btn sm-btn-primary" id="smCh1">
               Chapter 1 — The Gate
             </button>
+
             <button
                class="sm-btn ${unlockedCh2 ? 'sm-btn-primary' : 'sm-btn-secondary'}"
                id="smCh2"
-               ${unlockedCh2 ? '' : 'disabled title="Find the Master Sigil in Chapter 1 to unlock"'}
+               ${unlockedCh2 ? '' : 'disabled title="Find the Perfect SnowCone in Chapter 1 to unlock"'}
              >
                Chapter 2 — Shift: Four Customers
             </button>
-            <button class="sm-btn sm-btn-secondary" id="smCh3" disabled title="Coming soon">Chapter 3 — The Acts (soon)</button>
-            <button class="sm-btn sm-btn-secondary" id="smCh4" disabled title="Coming soon">Chapter 4 — Into the Forest (soon)</button>
-            <button class="sm-btn sm-btn-secondary" id="smCh5" disabled title="Coming soon">Chapter 5 — Endings (soon)</button>
+
+            <button
+               class="sm-btn ${unlockedCh3 ? 'sm-btn-primary' : 'sm-btn-secondary'}"
+               id="smCh3"
+               ${unlockedCh3 ? '' : 'disabled title="Finish Chapter 2 to unlock"'}
+            >
+               Chapter 3 — The Acts
+            </button>
+
+            <button
+               class="sm-btn ${unlockedCh4 ? 'sm-btn-primary' : 'sm-btn-secondary'}"
+               id="smCh4"
+               ${unlockedCh4 ? '' : 'disabled title="Follow the Dino into the forest to unlock"'}
+            >
+               Chapter 4 — Into the Forest
+            </button>
+
+            <button
+              class="sm-btn ${unlockedCh5 ? 'sm-btn-primary' : 'sm-btn-secondary'}"
+              id="smCh5"
+              ${unlockedCh5 ? '' : 'disabled title="Finish Chapter 4 to unlock"'}
+            >
+              Chapter 5 — Endings
+            </button>
+
           </div>
 
           <div class="sm-chapter-note">
-            Pick Prologue to begin! <br> Future chapters will unlock later.
+            Pick Prologue to begin! <br> Future chapters unlock as you play.
           </div>
 
           <div class="sm-bottom-bar">
@@ -763,19 +807,15 @@ const unlockedCh2 =
     </div>
   `;
 
+
   elRoot = container.querySelector('.sm-aspect-wrap');
   repaintBackground();
 
-  // Start Story music: random, no immediate repeat, on first real tap path
- // Start Story music only if nothing is playing yet (first real tap path)
+  // Story music: random track, no loop; rotation handles next picks
   if (!isPlaying?.()) {
-    // pick a random track but DON'T loop; we’ll rotate on end
     kickStoryMusic({ forceNew: true, rotate: true });
     startStoryRotation();
   }
-
-
-
 
   wireHandlersForCurrentRoot();
 }
@@ -1015,6 +1055,10 @@ function wireHandlersForCurrentRoot() {
     if (e.target.closest('#smPrologue'))  { renderPrologueReader(); return; }
     if (e.target.closest('#smCh1'))       { smSetChapterFlag('ch1'); getEngine().start('ch1'); return; }
     if (e.target.closest('#smCh2'))       { smSetChapterFlag('ch2'); getEngine().start('ch2'); return; }
+    if (e.target.closest('#smCh3'))       { smSetChapterFlag('ch3'); getEngine().start('ch3'); return; }
+    if (e.target.closest('#smCh4'))       { smSetChapterFlag('ch4'); getEngine().start('ch4'); return; }
+    if (e.target.closest('#smCh5'))       {smSetChapterFlag('ch5');  getEngine().start('ch5'); return; }
+
 
     // Prologue flow
     if (e.target.closest('#smSkipType')) { elRoot?.__smDoneFast?.(); return; }

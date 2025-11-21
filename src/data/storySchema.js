@@ -1,12 +1,15 @@
 // /src/modes/storyMode/data/storySchema.js
 
 export const SlideRole = {
-  ADVANCE: 'advance', // top choice advances to next main slide
-  LOOP: 'loop',       // flavor scene, then returns to the same slide hub
-  QUEST: 'quest',     // 2–3 micro-steps, awards an item, returns to hub
-  WEIRD: 'weird',     // funny tangent, dead end, returns to hub
-  CUSTOMER: 'customer', // 👈 NEW: multi-step “customer” runner (Bio → Lore → Puzzle → Serve)
+  ADVANCE:  'advance',
+  LOOP:     'loop',
+  QUEST:    'quest',
+  WEIRD:    'weird',
+  CUSTOMER: 'customer',
+  ENDINGS:  'endings',   // 👈 new
+  EPILOGUE: 'epilogue',  // 👈 new
 };
+
 
 // /src/modes/storyMode/data/storySchema.js
 
@@ -22,9 +25,12 @@ export const ItemIds = {
   NOETHER_TOKEN:    'tok_noether',
   ARCHIMEDES_TOKEN: 'tok_archimedes',
   PACIOLI_TOKEN:    'tok_pacioli',
+
+  // 👇 NEW: Dino trade item in Chapter 3
+  BEATUP_PHONE: 'beatup_phone',
 };
 
-// keep existing entries; replace just the Chapter 2 section in ITEM_DISPLAY:
+
 export const ITEM_DISPLAY = Object.freeze({
   [ItemIds.WORK_BADGE]:      { name: 'Work Badge',       emoji: '🪪' },
   [ItemIds.CIRCLE_SHARD]:    { name: 'MoonChain',        emoji: '⚪' },
@@ -32,12 +38,16 @@ export const ITEM_DISPLAY = Object.freeze({
   [ItemIds.SQUARE_SHARD]:    { name: 'MintSquare',       emoji: '🟩' },
   [ItemIds.MASTER_SIGIL]:    { name: 'Perfect SnowCone', emoji: '🍧' },
 
-  // 🔁 REDONE: Chapter 2 tokens → tangible objects
+  // 🔁 Chapter 2 tokens → tangible objects
   [ItemIds.BANNEKER_TOKEN]:   { name: 'Wooden Time Piece', emoji: '🕰️' },
   [ItemIds.NOETHER_TOKEN]:    { name: 'Flashlight',        emoji: '🔦' },
   [ItemIds.ARCHIMEDES_TOKEN]: { name: 'Bottle of Water',   emoji: '💧' },
   [ItemIds.PACIOLI_TOKEN]:    { name: "Jehnk's Ledger",    emoji: '📒' },
+
+  // 👇 NEW: Dino’s trade item
+  [ItemIds.BEATUP_PHONE]:    { name: 'Beat-Up Phone',     emoji: '📱' },
 });
+
 
 
 export const CURRENCY_NAME = 'Cone Coins'; // TODO: rename to your canon anytime

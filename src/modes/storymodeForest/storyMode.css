@@ -1258,3 +1258,165 @@
 .sm-xp-popup {
   animation: none !important; /* 🚫 no rogue keyframes */
 }
+
+/* ─────────────────────────────
+   Story Mode – Credits Overlay
+   ───────────────────────────── */
+
+.sm-credits-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* sit above story frame + XP popups */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(120, 200, 255, 0.18), transparent 55%),
+    rgba(0, 0, 0, 0.82);
+}
+
+/* The central popup panel */
+.sm-credits-panel {
+  position: relative;
+  width: min(480px, 92vw);
+  max-height: min(70vh, 520px);
+  padding: 1.5rem 1.75rem 1.25rem;
+  border-radius: 18px;
+  background: radial-gradient(circle at top, #10182a, #050810);
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(0, 255, 255, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sm-credits-title {
+  font-family: "Orbitron", system-ui, sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f7ffb5;
+  text-align: center;
+}
+
+.sm-credits-sub {
+  font-size: 0.9rem;
+  text-align: center;
+  color: #9ad1ff;
+}
+
+/* Viewport window for the scrolling credits */
+.sm-credits-list {
+  position: relative;
+  margin-top: 0.35rem;
+  padding-block: 0.5rem;
+  overflow: hidden; /* ⛓️ keep the roll INSIDE the panel */
+  border-radius: 10px;
+  background: linear-gradient(to bottom, rgba(5, 10, 24, 0.95), rgba(3, 6, 14, 0.95));
+
+  /* soft fade at top/bottom of the scroll, if supported */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+          mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+/* The actual rolling column of rows */
+.sm-credits-roll {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  animation: smCreditsRoll 22s linear infinite;
+}
+
+@keyframes smCreditsRoll {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+/* Individual lines */
+.sm-credits-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.15rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: "Orbitron", system-ui, sans-serif;
+  color: #dff6ff;
+  white-space: nowrap;
+}
+
+.sm-credits-role {
+  opacity: 0.7;
+}
+
+.sm-credits-name {
+  font-weight: 600;
+}
+
+/* Button stays readable & on-brand */
+.sm-credits-btn {
+  margin-top: 0.9rem;
+  align-self: center;
+  min-width: 60%;
+}
+
+/* If you want to be extra sure it’s visible, you can tune sm-btn-primary: */
+.sm-btn.sm-credits-btn {
+  background: linear-gradient(135deg, #18c9ff, #45ffb3);
+  color: #020409;
+  border: none;
+}
+/* ─────────────────────────────
+   Story Mode – Credits row polish
+   (presentation only, box sizing unchanged)
+   ───────────────────────────── */
+
+/* Stack each credit as ROLE (small) over NAME (bold), all centered */
+.sm-credits-row {
+  flex-direction: column;          /* was row */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  gap: 0.1rem;
+  padding: 0.25rem 0.4rem;        /* just vertical breathing room */
+}
+
+/* subtle separators, but super low-key */
+.sm-credits-row:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* role line – lighter, “header-ish” */
+.sm-credits-role {
+  order: 1;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+/* name line – main focus */
+.sm-credits-name {
+  order: 2;
+  font-size: 0.9rem;
+  font-weight: 700;
+  opacity: 0.98;
+}
