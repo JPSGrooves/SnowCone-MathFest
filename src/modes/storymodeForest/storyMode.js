@@ -807,6 +807,17 @@ const unlockedCh5 =
     </div>
   `;
 
+  const flags = appState.flags || {};
+  const storyDone = flags.ending_way_home || flags.ending_driver_loop;
+  const creditsSeen = flags.story_credits_seen;
+
+  if (storyDone && !creditsSeen) {
+    // 🌈 Schedule the credits to roll a second or two after we show the menu
+    scheduleStoryCredits(2000);
+    // Flag handled so we don’t keep spamming credits on every open
+    appState.setFlag?.('story_credits_seen', true);
+    appState.saveToStorage?.();
+  }
 
   elRoot = container.querySelector('.sm-aspect-wrap');
   repaintBackground();
