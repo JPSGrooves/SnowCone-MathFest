@@ -12,6 +12,7 @@ import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 import { isMuted, toggleMute } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
 import { pickupPing } from './ui/pickupPing.js';
+import { scheduleStoryCredits } from './ui/storyCredits.js';
 
 
 const SELECTORS = { container: '#game-container' };
@@ -358,18 +359,44 @@ export class ChapterEngine {
     // ESC to close
     window.addEventListener('keydown', onEsc);
   }
+    // Only roll credits if we're leaving from the Ch5 final slide
+  _maybeScheduleCredits() {
+    try {
+      const chapterId = this.state?.chapterId;
+      if (chapterId !== 'ch5') return;
+
+      const chapter = this.registry?.[chapterId];
+      if (!chapter) return;
+
+      const idx = this.state?.idx ?? 0;
+      const slide = chapter.slides?.[idx];
+      if (!slide || slide.id !== 'c5_final_the_end') return;
+
+      // ✅ We are on Ch5's final slide and about to leave → start credits in 1s
+      scheduleStoryCredits(1000);
+    } catch (err) {
+      console.warn('[Story] failed to schedule credits from Ch5 final:', err);
+    }
+  }
 
 
-  _backToMenu(){
-    // reuse your existing back logic
+
+    _backToMenu(){
+    // 🔍 If we're leaving from Ch5's final slide, arm the credits timer
+    this._maybeScheduleCredits();
+
     const evt = new CustomEvent('sm:backToChapterMenu');
     window.dispatchEvent(evt);
   }
 
   _finishChapter(){
+    // 🔍 Same check here for paths that use 'root_menu' from ending screens
+    this._maybeScheduleCredits();
+
     const evt = new CustomEvent('sm:backToChapterMenu');
     window.dispatchEvent(evt); // storyMode.js already listens and shows the chapter menu
   }
+
 
 
   _renderSlide(){

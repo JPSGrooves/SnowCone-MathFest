@@ -1,7 +1,6 @@
 // src/modes/storyMode/chapters/ch5.js
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
-import { scheduleStoryCredits } from '../ui/storyCredits.js';
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
@@ -159,13 +158,16 @@ clutching a ticket instead of a wristband…`,
     },
 
     // 3) Shared final slide: The End?
-       {
-  id: 'c5_final_the_end',
-  role: SlideRole.EPILOGUE,
-  mode: 'ending',
-  title: 'The End?',
-  img: SCN_IMG('festivalFade.png'), // 🔧 subtle, dreamy fest art
-  text: `SnowCone MathFest doesn’t erase cleanly.
+            // 3) Shared final slide: The End?
+       // 3) Shared final slide: The End?
+        // 3) Shared final slide: The End?
+    {
+      id: 'c5_final_the_end',
+      role: SlideRole.EPILOGUE,
+      mode: 'ending',
+      title: 'The End?',
+      img: SCN_IMG('festivalFade.png'), // 🔧 subtle, dreamy fest art
+      text: `SnowCone MathFest doesn’t erase cleanly.
 
 For some people, it’s a place on a map—a festival you drive to once,
 then forget after the merch fades and the playlists move on.
@@ -185,20 +187,13 @@ For now, the screen fades, the music softens,
 and four little words hang at the edge of the UI like a promise:
 
 <b>The End?</b>`,
-  onEnter: () => {
-    try {
-      // ⏱️ roll credits ~1s after we land here — EVERY TIME
-      scheduleStoryCredits(1000);
-    } catch (err) {
-      console.warn('[Chapter5] failed to schedule story credits:', err);
-    }
-  },
-  options: [
-    {
-      label: 'Back to Menu',
-      nextId: 'root_menu', // handled by engine: back to chapter menu
+      options: [
+        {
+          label: 'Back to Menu',
+          nextId: 'root_menu', // engine sends you to the chapter/menu screen
+        },
+      ],
     },
-  ],
-},
+
   ],
 };
