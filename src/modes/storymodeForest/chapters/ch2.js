@@ -161,7 +161,7 @@ export const Chapter2 = {
         mode: 'solo',
         title: 'Luca Pacioli',
         img: PRO_IMG('pacioliHappy.png'),
-        text: `He nods at your books and then your syrup blends. <span style="color: rgb(20, 161, 255);">“Balanced.”</span> He sets a tiny glowing ledger in your palm, then lifts two snowcones, one in each hand, level as a scale. <span style="color: rgb(20, 161, 255);">“That's Jehnks Ledger...you can learn a lot about a person by examining their books.”</span> He nods and strolls happily into the lights with twin cones held high.`,
+        text: `He nods at your books as the syrup blends. <span style="color: rgb(20, 161, 255);">“Balanced.”</span> He sets a tiny glowing ledger in your palm, then lifts two snowcones, one in each hand, level as a scale. <span style="color: rgb(20, 161, 255);">“That's Jehnk's Ledger...you can learn a lot about a person by examining their books.”</span> He nods and strolls happily into the lights with twin cones held high.`,
         soloLabel: 'Jehnk Jumps In ➡️',
         // PACIOLI happy slide
         grants: [{ item: ItemIds.PACIOLI_TOKEN, payload: payloadFor(ItemIds.PACIOLI_TOKEN) }],

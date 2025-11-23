@@ -27,7 +27,7 @@ export const Chapter4 = {
   id: 'ch4',
   title: 'Beyond the Veil',
   slides: [
-    // 0) Portal appears, dino jumps, phone drops.
+    // 0) Portal appears – shorter, vibe only
     {
       id: 'c4_portal_appears',
       role: SlideRole.ADVANCE,
@@ -35,9 +35,29 @@ export const Chapter4 = {
       title: 'The Glowing Doorway',
       img: SCN_IMG('portalGlow.png'),
       text: `You step past the last row of tents and the air thins, cool and electric.<br><br>
-A glowing doorway hangs in the dark like a rip in the festival, light spilling out in colors you don’t have names for.<br><br>
-Something tugs at your inventory. If you ever carried The Perfect SnowCone, you can almost feel the empty space where it used to rest—like a missing tooth in the line of your pockets.<br><br>
-Before you can call out, a blur of motion flips into view: the tiny hooded dino, landing in a clean front handspring at the edge of the portal.<br><br>
+A glowing doorway hangs in the dark like a rip in the festival, light spilling out in colors you don’t have names for.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    {
+      id: 'c4_portal_inventory_tug',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The Glowing Doorway',
+      img: SCN_IMG('portalGlow.png'),
+      text: `Something tugs at your inventory. If you ever carried The Perfect SnowCone, you can almost feel the empty space where it used to rest—like a missing tooth in the line of your pockets.`,
+      soloLabel: 'Step closer to the doorway ➡️',
+    },
+
+
+    // 0B) Dino flip + phone drop – this is where the old onAdvance logic lives now
+    {
+      id: 'c4_portal_phone',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The Drop',
+      img: SCN_IMG('portalGlow.png'),
+      text: `Before you can call out, a blur of motion flips into view: the tiny hooded dino, landing in a clean front handspring at the edge of the portal.<br><br>
 They grin, eyes reflecting the portal light, and in one easy motion they snatch whatever echo of perfection you were holding onto, then toss a beat-up cell phone at your feet and dive through the doorway like it was always meant for them.`,
       soloLabel: 'Pick up the phone…',
       onAdvance: ({ appState }) => {
@@ -71,19 +91,38 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
       },
     },
 
-    // 1) Phone call with tiny dino – choice3 style, but flavor only
+    // 1) Phone call with tiny dino – choice3 style, flavor only
+    {
+      id: 'c4_phone_call_intro1',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The Call',
+      img: PRO_IMG('tinyDinoHood.png'),
+      text: `You thumb the cracked screen. The call connects with a click and a little burst of static.<br><br>
+<span style="color: rgb(143, 190, 255);">“Whoa, it actually worked!”</span> The voice is tiny but unmistakable—the hooded dino.<br><br>
+<span style="color: rgb(143, 190, 255);">“I wasn’t sure the portal would sync up right, but I’m back. My original timeline, my original loop.”</span>`,
+      soloLabel: 'Next ➡️',
+    },
+
+    {
+      id: 'c4_phone_call_intro2',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The Call',
+      img: PRO_IMG('tinyDinoHood.png'),
+      text: `You hear festival noise on their side—same party, different angle.<br><br>
+<span style="color: rgb(143, 190, 255);">“SnowCone MathFest isn’t just a place,”</span> they say.
+<span style="color: rgb(143, 190, 255);">“It’s an in-between. Past, present, future—they all line up here when the symmetry’s just right.”</span>`,
+      soloLabel: 'Next ➡️',
+    },
+
     {
       id: 'c4_phone_call',
       role: SlideRole.ADVANCE,
       mode: 'choice3',
       title: 'The Call',
       img: PRO_IMG('tinyDinoHood.png'),
-      text: `You thumb the cracked screen. The call connects with a click and a little burst of static.<br><br>
-<span style="color: rgb(143, 190, 255);">“Whoa, it actually worked!”</span> The voice is tiny but unmistakable—the hooded dino.<br><br>
-<span style="color: rgb(143, 190, 255);">“I wasn’t sure the portal would sync up right, but I’m back. My original timeline, my original loop.”</span><br><br>
-You hear festival noise on their side—same party, different angle.<br><br>
-<span style="color: rgb(143, 190, 255);">“SnowCone MathFest isn’t just a place,”</span> they say. <span style="color: rgb(143, 190, 255);">“It’s an in-between. Past, present, future—they all line up here when the symmetry’s just right.”</span><br><br>
-There’s a quiet moment between ringtones and bass drops.<br>
+      text: `There’s a quiet moment between ringtones and bass drops.<br>
 <span style="color: rgb(143, 190, 255);">“So… ${playerName}, you ready to go home?”</span>`,
       choices: [
         {
@@ -101,42 +140,82 @@ There’s a quiet moment between ringtones and bass drops.<br>
     },
 
     // 2) Jehnk shows up at the portal
-    {
-      id: 'c4_post_call_jehnk_approaches',
+        {
+      id: 'c4_post_call_jehnk_approaches_1',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Truck Driver',
       img: PRO_IMG('jehnkPortal.png'),
       text: `The call drops. The portal hums.<br><br>
 Behind you, footsteps crunch on the grass.<br><br>
-<span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.<br><br>
-You turn. Jehnk stands there, hands in his pockets, neon from the doorway tracing the edge of his hoodie.<br><br>
+<span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    {
+      id: 'c4_post_call_jehnk_approaches_2',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The Truck Driver',
+      img: PRO_IMG('jehnkPortal.png'),
+      text: `You turn. Jehnk stands there, hands in his pockets, neon from the doorway tracing the edge of his hoodie.<br><br>
 <span style="color: rgb(247, 255, 105);">“Did the tiny dino in the hood lead you here?”</span><br>
-He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“They’ve been a menace ever since I got this place started.”</span><br><br>
-You catch yourself staring at him differently now, like you can finally see the edges of something he’s been hiding.<br><br>
+He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“They’ve been a menace ever since I got this place started.”</span>`,
+      soloLabel: 'Next ➡️',
+    },
+
+    {
+      id: 'c4_post_call_jehnk_approaches',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The Truck Driver',
+      img: PRO_IMG('jehnkPortal.png'),
+      text: `You catch yourself staring at him differently now, like you can finally see the edges of something he’s been hiding.<br><br>
 <span style="color: rgb(247, 255, 105);">“Look,”</span> he says. <span style="color: rgb(247, 255, 105);">“I’d walk you back to the truck myself. But now that you’re here… you can know the truth.”</span>`,
       soloLabel: '“Tell me the truth.”',
     },
 
-    // 3) Jehnk’s loop confession
+
+    // 3) Jehnk’s loop confession – part 1
+    {
+      id: 'c4_jehnk_trapped_story_1',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Looped Roads',
+      img: PRO_IMG('jehnkNightDrive.png'),
+      text: `“When I first started SnowCone MathFest,” Jehnk says, “it was all fun, music, and games.<br>
+I thought I’d just roll in, serve cones, catch sets, ride the good vibes forever.”`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // 3) Jehnk’s loop confession – part 2
+    {
+      id: 'c4_jehnk_trapped_story_2',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Looped Roads',
+      img: PRO_IMG('jehnkNightDrive.png'),
+      text: `He looks past you, out at the portal.<br><br>
+<span style="color: rgb(247, 255, 105);">“But after a while, I noticed something. No matter how far down the road I drove,
+no matter how many exits I took… the road always circled back here.”</span><br><br>
+He laughs once, but there’s no joy in it.<br>
+<span style="color: rgb(247, 255, 105);">“I’m trapped, ${playerName}. I’ve been trapped here as long as I can remember.”</span>`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // 3) Jehnk’s loop confession – part 3 (keeps original id + label)
     {
       id: 'c4_jehnk_trapped_story',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Looped Roads',
       img: PRO_IMG('jehnkNightDrive.png'),
-      text: `“When I first started SnowCone MathFest,” Jehnk says, “it was all fun, music, and games.<br>
-I thought I’d just roll in, serve cones, catch sets, ride the good vibes forever.”<br><br>
-He looks past you, out at the portal.<br><br>
-<span style="color: rgb(247, 255, 105);">“But after a while, I noticed something. No matter how far down the road I drove,
-no matter how many exits I took… the road always circled back here.”</span><br><br>
-He laughs once, but there’s no joy in it.<br>
-<span style="color: rgb(247, 255, 105);">“I’m trapped, ${playerName}. I’ve been trapped here as long as I can remember.”</span><br><br>
-He nods toward the doorway.<br>
+      text: `He nods toward the doorway.<br>
 <span style="color: rgb(247, 255, 105);">“The old driver? They didn’t warn me. They tricked me into taking over the truck.
 Handed me the keys with a smile… and a fractions question I couldn’t answer.”</span>`,
       soloLabel: '“What do fractions have to do with this?”',
     },
+
 
     // 4) Fractions quiz setup
     {
@@ -145,10 +224,7 @@ Handed me the keys with a smile… and a fractions question I couldn’t answer.
       mode: 'solo',
       title: 'How He Got Me',
       img: PRO_IMG('jehnkRecipe.png'),
-      text: `“You know how he got me?” Jehnk asks. “Fractions. Same old truck, same old recipes.<br>
-I just couldn’t see the splits.”<br><br>
-He sketches a ghost of an order in the air between you, invisible cups lining up in rows.<br><br>
-<span style="color: rgb(247, 255, 105);">“He hit me with a question kind of like this…”</span>`,
+      text: `“You know how he got me?” Jehnk asks. “Fractions. Same old truck, same old recipes.<br>I just couldn’t see the splits.”<br>He sketches a ghost of an order in the air between you, invisible cups lining up in rows.<br><span style="color: rgb(247, 255, 105);">“He hit me with a question kind of like this…”</span>`,
       soloLabel: 'Hear the question ➡️',
     },
 
@@ -159,32 +235,26 @@ He sketches a ghost of an order in the air between you, invisible cups lining up
       mode: 'quiz3',
       title: 'Fraction Trap',
       img: PRO_IMG('mixCard.png'),
-      text: `“Order comes in,” Jehnk says. “Six cones, all the same size.<br>
-Half the order is for a regular flavor band, half is for a special remix flavor.”<br><br>
-He leans on an imaginary counter.<br><br>
-<span style="color: rgb(247, 255, 105);">“If the remix flavor is \\(\\tfrac{2}{3}\\) of each cone,
-what fraction of the entire batch is remix flavor?”</span><br><br>
-You think of the total cones, the piece per cone, and how it all stacks together.`,
+      text: `“<span style="color: rgb(247, 255, 105);">“If the remix flavor is \\(\\tfrac{2}{3}\\) of each cone, what fraction of the entire batch is remix flavor?”</span><br><br>You think of the total cones, the piece per cone, and how it all stacks together.`,
       quiz: {
         options: [
           {
             id: 'c4_frac_opt_wrong_1',
             label: '2/3',
             correct: false,
-            praise: `That’s just the share *inside each cone*, not across all six. Think about the whole batch.`,
+            praise: `That’s just the share...Think about the whole batch.`,
           },
           {
             id: 'c4_frac_opt_correct',
             label: 'Half of 2/3 → 2/6 of the batch',
             correct: true,
-            praise: `Exactly. Half the cones are remix, and each remix cone is 2/3 remix.<br>
-So that’s (1/2) × (2/3) of the whole batch = 2/6 of the total volume.`,
+            praise: `Exactly. Half the cones are remix, and each remix cone is 2/3 remix.`,
           },
           {
             id: 'c4_frac_opt_wrong_2',
             label: '4/3',
             correct: false,
-            praise: `Too big—this would be *more* than the total batch. Remix can’t overflow reality (yet).`,
+            praise: `Too big—this would be *more* than the total batch.`,
           },
         ],
         advanceLabel: 'Okay… so what now? ➡️',
@@ -198,12 +268,21 @@ So that’s (1/2) × (2/3) of the whole batch = 2/6 of the total volume.`,
       mode: 'solo',
       title: 'Forge Another',
       img: PRO_IMG('jehnkThinking.png'),
-      text: `“Always know your fractions,” Jehnk says. “They’re how the truck keeps its balance.”<br><br>
-He looks back at you, thoughtful.<br><br>
-<span style="color: rgb(247, 255, 105);">“So tell me, ${playerName}… do you still have the stuff from when you worked the truck?”</span><br><br>
-Recipe scraps, ratio cards, ledger notes, all the little artifacts you’ve picked up over the night—they’re still rattling around in your pockets.<br><br>
-<span style="color: rgb(247, 255, 105);">“I think we can use them to forge another Perfect SnowCone.”</span>`,
+      text: `“Always know your fractions,” Jehnk says. “They’re how the truck keeps its balance.”<br>He looks back at you, thoughtful.<br><span style="color: rgb(247, 255, 105);">“So tell me, ${playerName}… do you still have the stuff from when you worked the truck?”</span><br>Recipe scraps, ratio cards, ledger notes, all the little artifacts you’ve picked up over the night—they’re still rattling around in your pockets.<br><span style="color: rgb(247, 255, 105);">“I think we can use them to forge another Perfect SnowCone.”</span>`,
       soloLabel: 'Forge the new cone ➡️',
+    },
+
+    // 7) Forge another – setup, no item yet
+    {
+      id: 'c4_no_cone_forge_action_intro',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Reforged',
+      img: PRO_IMG('perfectConeGlow.png'),
+      text: `You spread your truck tools out in the glow of the portal:<br>
+sticky recipe cards, ratio scribbles, a ledger corner stained with syrup.<br><br>
+Piece by piece, you rebuild the sequence—measure, pour, swirl, freeze.`,
+      soloLabel: 'Next ➡️',
     },
 
     // 7) Forge another – actual creation, grant MASTER_SIGIL back
@@ -213,10 +292,7 @@ Recipe scraps, ratio cards, ledger notes, all the little artifacts you’ve pick
       mode: 'solo',
       title: 'Reforged',
       img: PRO_IMG('perfectConeGlow.png'),
-      text: `You spread your truck tools out in the glow of the portal:<br>
-sticky recipe cards, ratio scribbles, a ledger corner stained with syrup.<br><br>
-Piece by piece, you rebuild the sequence—measure, pour, swirl, freeze.<br>
-The air thickens with mint and neon.<br><br>
+      text: `The air thickens with mint and neon.<br><br>
 <span style="color: rgb(247, 255, 105);">“There we go,”</span> Jehnk says as the cone locks into place,
 colors cycling in impossible gradients.<br>
 <span style="color: rgb(247, 255, 105);">“I never cease to amaze myself with my ability to make these things.”</span>`,
@@ -238,24 +314,40 @@ colors cycling in impossible gradients.<br>
       },
     },
 
+        // 8) Alignment choice – setup part 1
+    {
+      id: 'c4_alignment_choice_1',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Moment of Truth',
+      img: SCN_IMG('portalDecision.png'),
+      text: `The portal crackles brighter as you hold the Perfect SnowCone up to it.
+Every color in the cone answers back in shimmering waves.<br><br>
+
+<span style="color: rgb(247, 255, 105);">“Okay, ${playerName}, here comes the moment of truth.”</span>`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // 8) Alignment choice – setup part 2
+    {
+      id: 'c4_alignment_choice_2',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Moment of Truth',
+      img: SCN_IMG('portalDecision.png'),
+      text: `<span style="color: rgb(247, 255, 105);">“The Perfect SnowCone only works if you’re being served.
+I could make a million of these things and still never pass through that portal myself.”</span><br><br>`,
+      soloLabel: 'Next ➡️',
+    },
+
     // 8) Alignment choice – keep it or serve Jehnk, then jump to ch5
-        // 8) Alignment choice – keep it or serve Jehnk, then jump to ch5
-        // 8) Alignment choice – keep it or serve Jehnk, then jump to ch5
     {
       id: 'c4_alignment_choice',
       role: SlideRole.ADVANCE,
       mode: 'choice3',
       title: 'Moment of Truth',
       img: SCN_IMG('portalDecision.png'),
-      text: `The portal crackles brighter as you hold the Perfect SnowCone up to it.
-Every color in the cone answers back in shimmering waves.<br><br>
-
-<span style="color: rgb(247, 255, 105);">“Okay, ${playerName}, here comes the moment of truth.”</span><br><br>
-
-<span style="color: rgb(247, 255, 105);">“The Perfect SnowCone only works if you’re being served.
-I could make a million of these things and still never pass through that portal myself.”</span><br><br>
-
-He looks from the cone to the doorway, then back to you.<br><br>
+      text: `He looks from the cone to the doorway, then back to you.<br><br>
 
 <span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><br>
 
@@ -276,6 +368,7 @@ He looks from the cone to the doorway, then back to you.<br><br>
       ],
       choiceAdvanceLabel: 'Lock in your choice ➡️',
     },
+
 
   ],
 };
