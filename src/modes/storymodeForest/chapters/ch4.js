@@ -347,11 +347,7 @@ I could make a million of these things and still never pass through that portal 
       mode: 'choice3',
       title: 'Moment of Truth',
       img: SCN_IMG('portalDecision.png'),
-      text: `He looks from the cone to the doorway, then back to you.<br><br>
-
-<span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><br>
-
-<span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that snowcone.”</span>`,
+      text: `He looks from the cone to the doorway, then back to you.<br><br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that snowcone.”</span>`,
       choices: [
         {
           id: 'c4_choice_keep_cone',

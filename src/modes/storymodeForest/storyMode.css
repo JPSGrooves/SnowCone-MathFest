@@ -1420,3 +1420,20 @@
   font-weight: 700;
   opacity: 0.98;
 }
+/* ───────── MEDIUM portraits/scenes (?md=1) ───────── */
+/* Sits cleanly between default PRO_IMG and PRO_BIG_IMG. */
+
+#game-container .sm-ch1:has(.sm-ch1-img[src*="md=1"]) {
+  /* bump the art band, but not all the way to hero */
+  --sm-ch1-art-h: min(36vh, 64vw);
+}
+
+#game-container .sm-ch1 .sm-ch1-img[src*="md=1"],
+#game-container .sm-ch1-img[src*="md=1"] {
+  max-width:  min(88%, 520px) !important;
+  max-height: min(36vh, 64vw) !important;
+  height: auto !important;
+  width:  auto !important;
+  object-fit: contain !important;
+  margin: clamp(6px, 1vh, 12px) auto !important;
+}

@@ -57,8 +57,9 @@ You feel the after-image of the moment hanging in the air, waiting to collapse i
     },
 
     // 1) Ending if you KEPT the snowcone and walked through
+        // Keep Cone Ending – part 1
     {
-      id: 'c5_keep_cone_ending',
+      id: 'c5_keep_cone_ending_1',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
@@ -66,15 +67,45 @@ You feel the after-image of the moment hanging in the air, waiting to collapse i
       text: `You tighten your grip on the Perfect SnowCone.<br><br>
 <span style="color: rgb(247, 255, 105);">“I’m sorry,”</span> you tell Jehnk. <span style="color: rgb(247, 255, 105);">“I can’t leave myself stuck here.”</span><br><br>
 He studies your face for a long moment, then nods.<br>
-<span style="color: rgb(247, 255, 105);">“I get it,”</span> he says quietly. <span style="color: rgb(247, 255, 105);">“Really. Someone should make it out.”</span><br><br>
-You turn toward the portal. The closer you walk, the more the cone burns cold in your hand,
+<span style="color: rgb(247, 255, 105);">“I get it,”</span> he says quietly. <span style="color: rgb(247, 255, 105);">“Really. Someone should make it out.”</span>`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Keep Cone Ending – part 2 (@ You turn toward the portal)
+    {
+      id: 'c5_keep_cone_ending_2',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Carry the Festival',
+      img: SCN_IMG('homeReturn.png'),
+      text: `You turn toward the portal. The closer you walk, the more the cone burns cold in your hand,
 every color locking into a perfect ratio of light.<br><br>
-You step through.<br><br>
-When you open your eyes, you’re home.<br><br>
+You step through.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Keep Cone Ending – part 3 (@ When you open your eyes)
+    {
+      id: 'c5_keep_cone_ending_3',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Carry the Festival',
+      img: SCN_IMG('homeReturn.png'),
+      text: `When you open your eyes, you’re home.<br><br>
 No portal. No math ghosts. No hooded dinos. Just your regular life,
 waiting patiently like it never left.<br><br>
-But everything feels… different.<br><br>
-Now, when you solve an equation, you see the stage lights behind it.
+But everything feels… different.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Keep Cone Ending – part 4 (@ Now, when you solve…) – keeps original id + onAdvance
+    {
+      id: 'c5_keep_cone_ending',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Carry the Festival',
+      img: SCN_IMG('homeReturn.png'),
+      text: `Now, when you solve an equation, you see the stage lights behind it.
 Every time a pattern untangles in your head, you hear a distant beat.
 Even smashing a random mosquito reminds you of the campsite at Kids Camping,
 of the nights when numbers and fireflies were the same kind of magic.<br><br>
@@ -102,9 +133,11 @@ You’re still there, every time you balance something that felt impossible.`,
       },
     },
 
+
     // 2) Ending if you GAVE Jehnk the snowcone (you’re the new driver)
+       // Give Cone Ending – part 1 (@ You nod)
     {
-      id: 'c5_give_cone_ending',
+      id: 'c5_give_cone_ending_1',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The New Driver',
@@ -112,15 +145,45 @@ You’re still there, every time you balance something that felt impossible.`,
       text: `You press the Perfect SnowCone into Jehnk’s hands.<br><br>
 For a second, all three of you—the cone, the driver, and the portal—sync in the same pulse.
 The light flares. The festival hums.<br><br>
-<span style="color: rgb(247, 255, 105);">“You sure about this?”</span> he asks.<br><br>
-You nod. You know the truck, the math, the ghosts, the menu beats.
+<span style="color: rgb(247, 255, 105);">“You sure about this?”</span> he asks.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Give Cone Ending – part 2 (@ When the glow fades)
+    {
+      id: 'c5_give_cone_ending_2',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The New Driver',
+      img: SCN_IMG('truckLoop.png'),
+      text: `You nod. You know the truck, the math, the ghosts, the menu beats.
 You know the way the festival feels at 2am when the main stage dies down
 but the real weirdness is just getting started.<br><br>
-He takes one slow bite and vanishes in a halo of syrup light.<br><br>
-When the glow fades, the keys are in your hand.<br><br>
+He takes one slow bite and vanishes in a halo of syrup light.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Give Cone Ending – part 3 (@ But Jehnk was right)
+    {
+      id: 'c5_give_cone_ending_3',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The New Driver',
+      img: SCN_IMG('truckLoop.png'),
+      text: `When the glow fades, the keys are in your hand.<br><br>
 You climb into the driver’s seat. You drive.<br><br>
-You try exits. You try back roads. You even try turning the truck completely off.<br><br>
-But Jehnk was right. Every route circles back to the same entrance gate.<br><br>
+You try exits. You try back roads. You even try turning the truck completely off.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Give Cone Ending – part 4 (original id + onAdvance)
+    {
+      id: 'c5_give_cone_ending',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The New Driver',
+      img: SCN_IMG('truckLoop.png'),
+      text: `But Jehnk was right. Every route circles back to the same entrance gate.<br><br>
 You’ve lost signal to the tiny dino—the beat-up phone just flashes <b>NO SERVICE</b> in every timeline.<br><br>
 Still, as you pull into SnowCone MathFest for what feels like the 67th time, you see them:<br>
 a poor, stranded potential customer, standing at the start of the line,
@@ -161,31 +224,54 @@ clutching a ticket instead of a wristband…`,
             // 3) Shared final slide: The End?
        // 3) Shared final slide: The End?
         // 3) Shared final slide: The End?
+        // Final Epilogue – part 1 (@ For you, it’s a loop)
+    {
+      id: 'c5_final_the_end_1',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The End?',
+      img: SCN_IMG('festivalFade.png'), // 🔧 subtle, dreamy fest art
+      text: `SnowCone MathFest doesn’t erase cleanly.<br><br>
+For some people, it’s a place on a map—a festival you drive to once,<br>
+then forget after the merch fades and the playlists move on.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Final Epilogue – part 2 (@ Maybe you’re home)
+    {
+      id: 'c5_final_the_end_2',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The End?',
+      img: SCN_IMG('festivalFade.png'),
+      text: `For you, it’s a loop, or a memory, or a glitch in the road where music and math keep folding into each other.<br><br>
+Maybe you’re at the truck, keys in hand, waiting for the next unlucky soul to wander up with a ticket instead of a wristband.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Final Epilogue – part 3 (@ For now, the screen)
+    {
+      id: 'c5_final_the_end_3',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The End?',
+      img: SCN_IMG('festivalFade.png'),
+      text: `Maybe you’re home, staring at homework or spreadsheets or a fresh notebook page,<br>
+feeling the ghost-beat of the festival under every pattern you notice.<br><br>
+Either way, the story’s not exactly over.<br><br>
+It just knows how to pause.`,
+      soloLabel: 'Next ➡️',
+    },
+
+    // Final Epilogue – part 4 (keeps original id + options)
     {
       id: 'c5_final_the_end',
       role: SlideRole.EPILOGUE,
       mode: 'ending',
       title: 'The End?',
       img: SCN_IMG('festivalFade.png'), // 🔧 subtle, dreamy fest art
-      text: `SnowCone MathFest doesn’t erase cleanly.
-
-For some people, it’s a place on a map—a festival you drive to once,
-then forget after the merch fades and the playlists move on.
-
-For you, it’s a loop, or a memory, or a glitch in the road where music and math keep folding into each other.
-
-Maybe you’re at the truck, keys in hand, waiting for the next unlucky soul to wander up with a ticket instead of a wristband.
-
-Maybe you’re home, staring at homework or spreadsheets or a fresh notebook page,
-feeling the ghost-beat of the festival under every pattern you notice.
-
-Either way, the story’s not exactly over.
-
-It just knows how to pause.
-
-For now, the screen fades, the music softens,
-and four little words hang at the edge of the UI like a promise:
-
+      text: `For now, the screen fades, the music softens,<br>
+and four little words hang at the edge of the UI like a promise:<br><br>
 <b>The End?</b>`,
       options: [
         {
@@ -194,6 +280,7 @@ and four little words hang at the edge of the UI like a promise:
         },
       ],
     },
+
 
   ],
 };
