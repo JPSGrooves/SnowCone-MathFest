@@ -393,9 +393,21 @@ export class ChapterEngine {
     // 🔍 Same check here for paths that use 'root_menu' from ending screens
     this._maybeScheduleCredits();
 
+    // 🔔 NEW: chapter fully finished → tell StoryMode for XP/popup/SFX
+    try {
+      const detail = {
+        chapterId: this.state?.chapterId || null,
+        mode: 'to_menu',
+      };
+      window.dispatchEvent(new CustomEvent('sm:chapterComplete', { detail }));
+    } catch (err) {
+      console.warn('[Story] chapterComplete event (to_menu) failed:', err);
+    }
+
     const evt = new CustomEvent('sm:backToChapterMenu');
     window.dispatchEvent(evt); // storyMode.js already listens and shows the chapter menu
   }
+
 
 
 
@@ -833,6 +845,7 @@ _onCustomer(slide){
     });
 
     // 🔻 THIS is the key part: portal-style routing
+    // 🔻 THIS is the key part: portal-style routing
     advanceBtn?.addEventListener('click', () => {
       if (advanceBtn.disabled) return;
 
@@ -854,7 +867,16 @@ _onCustomer(slide){
         }
         if (handled) return;
 
-        // 2) Unlock and portal into the new chapter
+        // 2) Treat this as "chapter finished" before portaling out
+        if (typeof chapter.onFinish === 'function') {
+          try {
+            chapter.onFinish({ appState, engine: this });
+          } catch (err) {
+            console.warn('[Story] choice chapter.onFinish error:', err);
+          }
+        }
+
+        // 3) Unlock and portal into the new chapter
         this._unlockChapter(choice.nextChapterId);
         this.start(choice.nextChapterId);
 
@@ -868,6 +890,7 @@ _onCustomer(slide){
       // Fallback: normal per-slide behavior (same-chapter advance / finish)
       this._onAdvance(chapter, slide, { disabled: false });
     });
+
   }
 
 
@@ -892,14 +915,44 @@ _onAdvance(chapter, slide, topOpt){
 
   // 3) Default flow: step forward or jump to the next chapter / finish
   if (this.state.idx === last) {
+    // 🛠️ CHANGED: even if we have nextChapterId, we still treat this as 
+    // "chapter finished" and fire chapter.onFinish *before* hopping.
     if (slide.nextChapterId && this.registry[slide.nextChapterId]) {
+      // 🔔 NEW: chapter is *finishing* and we are portaling into another
+      // chapter → let StoryMode know so it can do XP + (maybe) SFX.
+      try {
+        const detail = {
+          chapterId: this.state?.chapterId || null,
+          nextChapterId: slide.nextChapterId,
+          mode: 'to_next',
+        };
+        window.dispatchEvent(new CustomEvent('sm:chapterComplete', { detail }));
+      } catch (err) {
+        console.warn('[Story] chapterComplete event (to_next) failed:', err);
+      }
+
+      if (typeof chapter.onFinish === 'function') {
+        try {
+          chapter.onFinish({ appState, engine: this });
+        } catch (err) {
+          console.warn('[Story] chapter.onFinish error:', err);
+        }
+      }
+
       this._unlockChapter(slide.nextChapterId);  // make it visible in the menu
       this.start(slide.nextChapterId);
       return;
     }
+
+    // No nextChapterId → normal finish to menu
     if (typeof chapter.onFinish === 'function') {
-      chapter.onFinish({ appState, engine: this });
+      try {
+        chapter.onFinish({ appState, engine: this });
+      } catch (err) {
+        console.warn('[Story] chapter.onFinish error:', err);
+      }
     }
+
     this._finishChapter();
   } else {
     this.state.idx++;
@@ -907,23 +960,10 @@ _onAdvance(chapter, slide, topOpt){
   }
 }
 
-
-
-  _onLoop(slide){
-    if (!slide.loop) return this._renderSlide();
-    const inner = `
-      <h2 class="sm-ch1-title">${slide.loop.title}</h2>
-      ${slide.loop.img ? `<img class="sm-ch1-img" src="${slide.loop.img}" alt="">` : ''}
-      <div class="sm-ch1-text">${slide.loop.text}</div>
-      <div class="sm-choice-list">
-        <button class="sm-btn sm-btn-secondary js-back">Back</button>
-      </div>`;
-    this._renderFrame(inner);
-    document.querySelector('.js-back')?.addEventListener('click', ()=> this._renderSlide());
-  }
-
 // chapterEngine.js — inside export class ChapterEngine { ... }
 // chapterEngine.js — inside export class ChapterEngine { ... } in _onQuest(slide){ ... }
+
+// chapterEngine.js — inside export class ChapterEngine { ... }
 
 _onQuest(slide){
   if (!slide.quest) return this._renderSlide();
@@ -943,34 +983,46 @@ _onQuest(slide){
   const keyFor = (idx) => `${this.state.chapterId}:${this.state.idx}:${idx}`;
 
   const grantReward = (reward) => {
-  if (!reward) return;
-  try {
-    if (reward.item) {
-      const itemId = (typeof reward.item === 'string') ? reward.item : reward.item.id;
-      const payload = (typeof reward.item === 'object') ? (reward.item.payload ?? reward.payload) : reward.payload;
-      let qty = 1;
-      if (typeof reward.qty === 'number') qty = reward.qty;
-      else if (typeof payload?.qty === 'number') qty = payload.qty;
+    if (!reward) return;
+    try {
+      if (reward.item) {
+        const itemId =
+          (typeof reward.item === 'string') ? reward.item :
+          (reward.item && typeof reward.item.id === 'string') ? reward.item.id :
+          null;
 
-      if (itemId && !appState.hasItem?.(itemId)) {
-        appState.addItem?.(itemId, payload ?? { qty });
-        pickupPing({ emoji:(ITEM_DISPLAY?.[itemId]?.emoji || '✨'), name:(ITEM_DISPLAY?.[itemId]?.name || itemId), qty });
+        const payload =
+          (typeof reward.item === 'object')
+            ? (reward.item.payload ?? reward.payload)
+            : reward.payload;
+
+        let qty = 1;
+        if (typeof reward.qty === 'number') qty = reward.qty;
+        else if (typeof payload?.qty === 'number') qty = payload.qty;
+
+        if (itemId && !appState.hasItem?.(itemId)) {
+          appState.addItem?.(itemId, payload ?? { qty });
+          pickupPing({
+            emoji: (ITEM_DISPLAY?.[itemId]?.emoji || '✨'),
+            name:  (ITEM_DISPLAY?.[itemId]?.name  || itemId),
+            qty
+          });
+        }
       }
-    }
-    if (reward.currency) {
-    const amount = reward.currency | 0;
-    appState.addCurrency?.(amount);
-    // 🔕 no pickupPing for cash
-    const chip = document.getElementById('smCash');
-    if (chip) chip.textContent = `${appState.getCurrency()} ${CURRENCY_NAME}`;
-    }
 
-    appState.saveToStorage?.();
-  } catch (e) {
-    console.warn('[Story] quest reward grant failed:', e);
-  }
-};
+      if (reward.currency) {
+        const amount = reward.currency | 0;
+        appState.addCurrency?.(amount);
+        // 🔕 no pickupPing for cash
+        const chip = document.getElementById('smCash');
+        if (chip) chip.textContent = `${appState.getCurrency()} ${CURRENCY_NAME}`;
+      }
 
+      appState.saveToStorage?.();
+    } catch (e) {
+      console.warn('[Story] quest reward grant failed:', e);
+    }
+  };
 
   // legacy “completion” payout still honored
   const completionPayout = slide.quest.completionReward || slide.quest.reward || null;
@@ -983,14 +1035,14 @@ _onQuest(slide){
   };
 
   const renderStep = () => {
-    const s = stepsBase[i] || {};
+    const s   = stepsBase[i] || {};
     const key = keyFor(i);
 
     // did this step’s reveal already happen?
     const alreadyRevealed = this.state.revealed.has(key);
 
     // per-step gate; also allow a quest-wide default via slide.quest.requireRevealToAdvance
-    const mustReveal = !!(s.requireRevealToAdvance || slide.quest?.requireRevealToAdvance);
+    const mustReveal       = !!(s.requireRevealToAdvance || slide.quest?.requireRevealToAdvance);
     const hasRevealContent = !!s.reveal;
 
     // if dev mistakenly requires reveal but no reveal content exists, don't soft-lock
@@ -1013,18 +1065,23 @@ _onQuest(slide){
       <div class="sm-ch1-text">${s.text ?? ''}</div>
 
       <div class="sm-ch1-reveal-hold">
-        ${alreadyRevealed && s.reveal ? `<div class="sm-reveal-answer is-open">${s.reveal}</div>` : ``}
+        ${alreadyRevealed && s.reveal
+          ? `<div class="sm-reveal-answer is-open">${s.reveal}</div>`
+          : ``}
       </div>
 
       <div class="sm-choice-list">
         ${revealBtnHTML}
-        <button class="sm-btn sm-btn-secondary js-next ${nextDisabledAtLoad ? 'is-disabled' : ''}" ${nextDisabledAtLoad ? 'disabled' : ''}>${nextLabel}</button>
+        <button class="sm-btn sm-btn-secondary js-next ${nextDisabledAtLoad ? 'is-disabled' : ''}"
+                ${nextDisabledAtLoad ? 'disabled' : ''}>
+          ${nextLabel}
+        </button>
       </div>
     `;
 
     this._renderFrame(inner);
 
-    const root = document;
+    const root      = document;
     const nextBtn   = root.querySelector('.js-next');
     const revealBtn = root.querySelector('.js-reveal');
     const hold      = root.querySelector('.sm-ch1-reveal-hold');
@@ -1072,7 +1129,18 @@ _onQuest(slide){
         i++;
         renderStep();
       } else {
+        // ✅ Quest is finishing now
         if (completionPayout) grantReward(completionPayout);
+
+        // ✅ NEW: quest-level complete hook (for stuff like forging Perfect SnowCone)
+        if (slide.quest && typeof slide.quest.onComplete === 'function') {
+          try {
+            slide.quest.onComplete({ appState, engine: this });
+          } catch (e) {
+            console.warn('[Story] quest onComplete failed:', e);
+          }
+        }
+
         this._renderSlide();
       }
     });

@@ -213,7 +213,7 @@ export const Chapter1 = {
       },
     },
 
-    // 4) Last slide — go to Chapter 2, with dynamic side paths
+        // 4) Last slide — go to Chapter 2, with dynamic side paths
     {
       title: 'Back to the Truck',
       img: PRO_IMG('jehnkNews.png'),
@@ -241,97 +241,183 @@ export const Chapter1 = {
         weird: { kind: 'Lore' },
       },
 
-loop: {
-  title: '<span style="color: rgb(247, 255, 105);">Question the Recipes</span>',
-  img: PRO_IMG('jehnkRecipe.png'),
-  text: `
-    Jehnk sees you questioning things. <i><span style='color: rgb(247, 255, 105);'>\"The colors and flavors are all working together, keep looking!\"</span></i><br><br>
-    <b><span style='color: rgb(143, 190, 255);'>\“Blue\"</span></b> is our momentum. — we get in, we move around, we learn. Fast or slow, it's the steady pour that wins.<br>
-    <b><span style='color: rgb(164, 255, 164);'>\"Green\"</span></b> is our patience — the ability to chew the mint and work your cool into a singular focus.<br>
-    <b><span style='color:rgb(217, 164, 255);'>\"Purple\"</span></b> is our depth — how far we go could only ever be determined by time and motion...`
-},
-
+      loop: {
+        title: '<span style="color: rgb(247, 255, 105);">Question the Recipes</span>',
+        img: PRO_IMG('jehnkRecipe.png'),
+        text: `
+          Jehnk sees you questioning things. <i><span style='color: rgb(247, 255, 105);'>\"The colors and flavors are all working together, keep looking!\"</span></i><br><br>
+          <b><span style='color: rgb(143, 190, 255);'>\"Blue\"</span></b> is our momentum. — we get in, we move around, we learn. Fast or slow, it's the steady pour that wins.<br>
+          <b><span style='color: rgb(164, 255, 164);'>\"Green\"</span></b> is our patience — the ability to chew the mint and work your cool into a singular focus.<br>
+          <b><span style='color:rgb(217, 164, 255);'>\"Purple\"</span></b> is our depth — how far we go could only ever be determined by time and motion...`
+      },
 
       quest: {
         title: '<span style="color: rgb(247, 255, 105);">Pocket Check</span>',
         getSteps(appState) {
-            const has = (id) => appState?.hasItem?.(id);
-            const hasTriangle = has(ItemIds.TRIANGLE_SHARD);
-            const hasSquare   = has(ItemIds.SQUARE_SHARD);   // Mint Square recipe
-            const hasCircle   = has(ItemIds.CIRCLE_SHARD);   // MoonChain
-            const haveAll = hasTriangle && hasSquare && hasCircle;
+          const has = (id) => appState?.hasItem?.(id);
+          const hasTriangle = has(ItemIds.TRIANGLE_SHARD);
+          const hasSquare   = has(ItemIds.SQUARE_SHARD);   // Mint Square recipe
+          const hasCircle   = has(ItemIds.CIRCLE_SHARD);   // MoonChain
+          const haveAll     = hasTriangle && hasSquare && hasCircle;
 
-           if (haveAll) {
+          if (haveAll) {
             return [
-                {
+              {
                 img: PRO_IMG('essentialsTrio.png'),
                 imgAlt: 'Triangle Shard (Perpetual Chill), Mint Square recipe (The Ratio & Flavor), and MoonChain (The Shape Model) glowing on a dark field.',
-                // ⬇️ SHORT pre-reveal; long detail stays in `reveal`
                 text: `On the tailgate, sits a <span style="color: rgb(143, 190, 255);">frost-bit shard</span>, a <span style="color: rgb(164, 255, 164);">mint-square ratio</span>, and a <span style="color:rgb(217, 164, 255);">moonlit chain</span>. Three pieces; one method waiting to click.`,
                 reveal: `These are the festival’s three essentials: <span style="color: rgb(143, 190, 255);"><b>Chill</b> (the shard’s cryo snap)</span>, <span style="color: rgb(164, 255, 164);"><b>Flavor</b> (that 2:3 mint-lime choir)</span>, and <span style="color: rgb(217, 164, 255);"><b>Shapes</b> (the moon’s perfect loop guiding the spiral)</span>.<br><br>
                         Line them up and you get the method: <span style="color: rgb(143, 190, 255);"><i>Chill</span> → <span style="color: rgb(164, 255, 164);">Mix</span> → <span style="color: rgb(217, 164, 255);">Shape</span></i>. The truck lights breathe brighter, like it knows what comes next.`,
-                        requireRevealToAdvance: true
-                },
-                {
+                requireRevealToAdvance: true
+              },
+              {
                 img: PRO_IMG('essentialsTrio2.png'),
                 imgAlt: 'Triangle Shard, Mint Square 2:3 recipe, and MoonChain spiraling together into a single flow.',
                 text: `You lift them up: <span style="color: rgb(143, 190, 255);">cold breath</span>, a <span style='color: rgb(164, 255, 164);'>\"glowing 2:3</span>, and a steady <span style='color:rgb(217, 164, 255);'>\"lunar spin</span>. The ingredients begin to meld.`,
                 reveal: `The pieces <i>lock together</i> with a little cosmic jingle—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style="color:rgb(217, 164, 255);">lunar hum</span>. A halo of neon notes lift from your workbench as the mixture stabilizes.<br><br>
                         <span style="color: rgb(143, 190, 255);"><b>Chill anchors</b></span>. <span style="color: rgb(164, 255, 164);"><b>Flavor harmonizes</b></span>. <span style="color: rgb(217, 164, 255);"><b>Shape guides</b></span>.<br>
                         The Perfect SnowCone is ready to be born.`,
-                        requireRevealToAdvance: true
-                },
-                {
+                requireRevealToAdvance: true
+              },
+              {
                 img: PRO_IMG('essentialsTrio3.png'),
                 text: `Jehnk cues the finale: pack some <span style="color: rgb(217, 164, 255);">ice</span>, pour a steady <span style="color: rgb(164, 255, 164);">syrupy ribbon</span>, finish with a signature <span style="color: rgb(143, 190, 255);">triangle crest</span>.`,
                 reveal: `<span style="color: rgb(247, 255, 105);"><b>The Perfect SnowCone has been crafted!</b></span> Neon bubbles rise and drift like little planets, as the cone gleams in the 2AM glow.<br><br>
-                        The stack sings in three parts—<span style="color: rgb(143, 190, 255);"><b>Chill</b></span> holds the shape, <span style="color: rgb(164, 255, 164);"><b>Flavor</b></span> rings out minty brightness, <span style="color: rgb(217, 164, 255);"><b>Geometry</b></span> keeps the swirl honest. Jehnk grins: <span style='color: rgb(247, 255, 105);'>\"Now you're trained to work the truck!\"</span> 🫧🍧`,
-                        requireRevealToAdvance: true
-                }
+                        The stack sings in three parts—<span style="color: rgb(143, 190, 255);"><b>Chill</b></span> holds the shape, <span style="color: rgb(164, 255, 164);"><b>Flavor</b></span> rings out minty brightness, <span style="color: rgb(217, 255, 255);"><b>Geometry</b></span> keeps the swirl honest. Jehnk grins: <span style='color: rgb(247, 255, 105);'>\"Now you're trained to work the truck!\"</span> 🫧🍧`,
+                requireRevealToAdvance: true
+              }
             ];
-            }
+          }
 
-
-            // Partial set: name what’s missing
-            const missing = [
+          // Partial set: name what’s missing
+          const missing = [
             !hasTriangle ? 'a Triangle Shard' : null,
             !hasSquare   ? 'the Mint Square recipe' : null,
             !hasCircle   ? 'the MoonChain' : null,
-            ].filter(Boolean).join(', ');
+          ].filter(Boolean).join(', ');
 
-            return [{
-                img: PRO_IMG('essentialsTrio0.png'),
-                imgAlt: 'Three neon question marks where the Triangle Shard, Mint Square 2:3, and MoonChain should be.',
-                text: `You check every pocket—lint and a ticket stub. You’re missing ${missing || 'something vital'}. Three faint placeholders glow on the bench: shard, square, moon.`,
-                reveal: `Scavenger checklist → 🔺 Triangle Shard = <i>Chill</i>, 🟩 Mint Square (2:3) = <i>Flavor</i>, ⚪ MoonChain = <i>Shape</i>. Collect all three, click them together, then spin the Perfect SnowCone.`
-            }];
-
-
+          return [{
+            img: PRO_IMG('essentialsTrio0.png'),
+            imgAlt: 'Three neon question marks where the Triangle Shard, Mint Square 2:3, and MoonChain should be.',
+            text: `You check every pocket—lint and a ticket stub. You’re missing ${missing || 'something vital'}. Three faint placeholders glow on the bench: shard, square, moon.`,
+            reveal: `Scavenger checklist → 🔺 Triangle Shard = <i>Chill</i>, 🟩 Mint Square (2:3) = <i>Flavor</i>, ⚪ MoonChain = <i>Shape</i>. Collect all three, click them together, then spin the Perfect SnowCone.`
+          }];
         },
+
+        // still keep the small cash reward for running the pocket check
         reward: { currency: 50 },
+
+        // 🌟 NEW: quest completion hook → forge Perfect SnowCone here
+        onComplete: ({ appState }) => {
+          const need = [ItemIds.TRIANGLE_SHARD, ItemIds.SQUARE_SHARD, ItemIds.CIRCLE_SHARD];
+
+          // tolerate missing master id in schema
+          const MASTER_SIGIL_ID =
+            (ItemIds && ItemIds.MASTER_SIGIL) ? ItemIds.MASTER_SIGIL : 'master_sigil';
+
+          const hasItem      = (id) => !!appState?.hasItem?.(id);
+          const hasAllParts  = need.every(hasItem);
+          const alreadyForge = hasItem(MASTER_SIGIL_ID);
+
+          console.log('[ch1 Pocket Check] quest complete', {
+            hasTriangle: hasItem(ItemIds.TRIANGLE_SHARD),
+            hasSquare:   hasItem(ItemIds.SQUARE_SHARD),
+            hasCircle:   hasItem(ItemIds.CIRCLE_SHARD),
+            hasAllParts,
+            alreadyForge,
+            MASTER_SIGIL_ID,
+          });
+
+          // Only forge if we *actually* have all three and haven’t crafted yet
+          if (!hasAllParts) {
+            console.log('[ch1 Pocket Check] Perfect SnowCone not forged: missing parts');
+            try { appState.saveToStorage?.(); } catch {}
+            return;
+          }
+
+          if (alreadyForge) {
+            console.log('[ch1 Pocket Check] Perfect SnowCone already forged, skipping.');
+            try { appState.saveToStorage?.(); } catch {}
+            return;
+          }
+
+          // consume the three parts
+          try {
+            if (typeof appState.consumeItems === 'function') {
+              appState.consumeItems(need);
+            } else {
+              need.forEach(id => { try { appState.removeItem?.(id); } catch {} });
+            }
+          } catch (e) {
+            console.warn('[ch1 Pocket Check] consume parts failed:', e);
+          }
+
+          // award the Perfect SnowCone itself
+          try {
+            appState.addItem(
+              MASTER_SIGIL_ID,
+              { name: 'Perfect SnowCone', meta: { emoji: '🍧' } }
+            );
+            console.log('[ch1 Pocket Check] added Master Sigil item:', MASTER_SIGIL_ID);
+          } catch (e) {
+            console.warn('[ch1 Pocket Check] add master item failed:', e);
+          }
+
+          // one epic pickup ping (but not stacked right on the chapter badge)
+          try {
+            pickupPing({
+              kind: 'item',
+              emoji: '🍧',
+              name: 'Perfect SnowCone',
+              qty: 1,
+              variant: 'epic',
+              durationMs: 2600,
+            });
+          } catch (e) {
+            console.warn('[ch1 Pocket Check] epic ping failed:', e);
+          }
+
+          // quiet currency bump → match your previous 300 + 200 pattern
+          try {
+            appState.addCurrency?.(300);
+            appState.addCurrency?.(200);
+          } catch (e) {
+            console.warn('[ch1 Pocket Check] currency bump failed:', e);
+          }
+
+          // keep the chip visually in sync
+          try {
+            refreshCashChip();
+            appState.saveToStorage?.();
+          } catch (e) {
+            console.warn('[ch1 Pocket Check] save/refresh failed:', e);
+          }
+        },
       },
 
-
-      // replace your current entry
+      // weird: syrup bubble lore (unchanged from your version)
       weird: {
         title: '<span style="color: rgb(247, 255, 105);">A Bubble Follows You</span>',
         img: PRO_IMG('syrupBubble.png'), // close-up bubble near ear w/ triangle reflections
         imgAlt: 'A shimmering syrup bubble floating by your ear, reflecting glowing triangles.',
         text: `A syrup bubble drifts by, reflecting triangles that weren’t there a second ago.<br><br><span style='color: rgb(247, 255, 105);'>\"This must be the work of none other than Dr. Kenny Fields,\"</span> Jehnk muses. <span style='color: rgb(247, 255, 105);'>\"He’s been experimenting with festival syrup bubbles for pancakes, but never tells anyone that they will follow you around!\"</span><br><br>He points, <span style='color: rgb(247, 255, 105);'>\"You’ve got one floating right by your ear, as we speak!\"</span>`,
 
-        // 👇 new: force the CTA copy on this slide
         extraLabel: 'Reveal More',
-
-        // 🔓 follow-up is contingent on Work Badge
         extraWhen: (appState) => appState?.hasItem?.(ItemIds.WORK_BADGE),
 
         extra: {
-            title: '<span style="color: rgb(247, 255, 105);">Three Days of Bubbles</span>',
-            img: PRO_IMG('fieldsBubbleStory.png'),
-            imgAlt: 'Jehnk and Dr. Kenny Fields surrounded by neon syrup bubbles over the festival tents at 2AM.',
-            text: `Jehnk thinks back, grinning his way into the story, <span style='color: rgb(247, 255, 105);'>\"Me and Dr. Kenny Fields? Yeah, we tuned syrups together for a long time, made a lot of money at pancake festivals...<br><br>Then Kenny got obsessed with bubbles. Not just a few...like, an entire weather system of bubbles. They swarmed the 1997 Flapjack Forum and wouldn’t pop unless you danced on 'em.<br><br>Whole festival had to form a conga line and we, no joke, danced those bubbles out for three days straight. Best cardio of my life, but the worst cleanup ever!\"</span>`,
+          title: '<span style="color: rgb(247, 255, 105);">Three Days of Bubbles</span>',
+          img: PRO_IMG('fieldsBubbleStory.png'),
+          imgAlt: 'Jehnk and Dr. Kenny Fields surrounded by neon syrup bubbles over the festival tents at 2AM.',
+          text: `Jehnk thinks back, grinning his way into the story, <span style='color: rgb(247, 255, 105);'>\"Me and Dr. Kenny Fields? Yeah, we tuned syrups together for a long time, made a lot of money at pancake festivals...<br><br>Then Kenny got obsessed with bubbles. Not just a few...like, an entire weather system of bubbles. They swarmed the 1997 Flapjack Forum and wouldn’t pop unless you danced on 'em.<br><br>Whole festival had to form a conga line and we, no joke, danced those bubbles out for three days straight. Best cardio of my life, but the worst cleanup ever!\"</span>`,
         },
       },
+
+      // ❗️ NOTE: we REMOVED the old massive onAdvance forge here.
+      // The engine's default _onAdvance now just:
+      // - honors grants (if any),
+      // - calls Chapter1.onFinish when we leave,
+      // - jumps to ch2 via nextChapterId.
 
       // award on press (also handles forging if the player has everything)
         // /src/modes/storyMode/chapters/ch1.js — last slide object
@@ -401,9 +487,6 @@ onAdvance: ({ appState }) => {
     try { appState.addCurrency?.(300); } catch {}
     refreshCashChip();
 
-    try { awardBadge('ch1_forge'); } catch (e) {
-      console.warn('[ch1 forge] badge award failed:', e);
-    }
   } else {
     // Not all parts? Just explain in log so you know why no add happened.
     if (!hasAllParts) console.log('[ch1 forge] skipped (missing parts)');

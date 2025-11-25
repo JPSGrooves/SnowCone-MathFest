@@ -115,6 +115,8 @@ function smStartInventoryWatcher() {
   }, 250); // light + responsive
 }
 
+
+
 function smStopInventoryWatcher() {
   if (__smInvPoll) clearInterval(__smInvPoll);
   __smInvPoll = null;
@@ -609,6 +611,41 @@ function onChaptersChanged(e) {
   }
 }
 
+// 🔔 Chapter-complete XP + SFX hook
+function onChapterComplete(e) {
+  const detail = e?.detail || {};
+  const chapterId = detail.chapterId;
+
+  if (!chapterId) return;
+
+  // We only care about numbered chapters ch1–ch5.
+  // Prologue already has its own 500 XP + badge flow.
+  if (!/^ch[1-5]$/.test(chapterId)) return;
+
+  // 🌟 100 XP per chapter completion, with the same popup system
+  try {
+    // No anchor → center-screen popup, like a little "chapter clear" toast
+    awardXP(100, {
+      anchor: null,
+      reason: `chapter ${chapterId} complete`,
+    });
+  } catch (err) {
+    console.warn('[StoryMode] chapter XP award failed:', err);
+  }
+
+  // 🎧 Sound effect only for ch1–ch4, not for the end of ch5
+  const n = Number(chapterId.replace('ch', '')) || 0;
+  if (n >= 1 && n <= 4) {
+    try {
+      // Same SFX family as Prologue practice reveals
+      playSFX('smDing');
+    } catch (err) {
+      console.warn('[StoryMode] chapter complete SFX failed:', err);
+    }
+  }
+}
+
+
 // ────────────────────────────────────────────────────────────────────────────────
 // Public API
 // ────────────────────────────────────────────────────────────────────────────────
@@ -634,9 +671,12 @@ function loadStoryMode() {
   wireSMAudioUnlockOnce();
 
   // Global listeners — add once
+  // Global listeners — add once
   if (!__smWired) {
     window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
     window.addEventListener('sm:chaptersChanged', onChaptersChanged);
+    // 🔔 NEW: chapter completion (ch1–ch5) → XP + maybe SFX
+    window.addEventListener('sm:chapterComplete', onChapterComplete);
     __smWired = true;
   }
 }
@@ -661,6 +701,7 @@ export function stopStoryMode() {
   if (__smWired) {
     window.removeEventListener('sm:backToChapterMenu', backToChapterMenu);
     window.removeEventListener('sm:chaptersChanged', onChaptersChanged);
+    window.removeEventListener('sm:chapterComplete', onChapterComplete);
     __smWired = false;
   }
 }
@@ -887,7 +928,10 @@ function drawSlide() {
   if (!container) return;
 
   const page = PROLOGUE_PAGES[slideIndex];
-  if (!page) { backToChapterMenu(); return; }
+  if (!page) {
+    backToChapterMenu();
+    return;
+  }
 
   let inner = '';
   if (page.type === 'html') {
@@ -962,29 +1006,59 @@ function drawSlide() {
 
   elRoot = container.querySelector('.sm-aspect-wrap');
 
+  const nextBtn = elRoot.querySelector('#smNext');
+
+  // 🔒 Practice slides: lock "Next" until all reveals are opened
   if (page.type === 'practice') {
-    elRoot.querySelectorAll('.js-reveal').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const i = +btn.dataset.i;
-        const ans = elRoot.querySelector(`#ans-${i}`);
-        if (ans && !ans.classList.contains('is-open')) {
-          ans.classList.add('is-open');
+    const revealButtons = elRoot.querySelectorAll('.js-reveal');
+    const answers       = elRoot.querySelectorAll('.sm-reveal-answer');
 
-          const item = PROLOGUE_PAGES[slideIndex].items[i];
-          if (item?.sfx) playSFX(item.sfx);
+    // Only guard if we actually have reveal content
+    if (revealButtons.length && answers.length) {
+      if (nextBtn) {
+        nextBtn.disabled = true;
+        nextBtn.classList.add('is-locked'); // purely cosmetic; your .sm-btn[disabled] already styles it
+      }
 
-          awardXP(25, { anchor: btn, reason: 'practice reveal' });
+      const checkAllRevealed = () => {
+        const remaining = elRoot.querySelectorAll('.sm-reveal-answer:not(.is-open)').length;
+        if (remaining === 0 && nextBtn) {
+          nextBtn.disabled = false;
+          nextBtn.classList.remove('is-locked');
         }
-        btn.setAttribute('disabled', 'true');
-      }, { once: true });
-    });
+      };
 
+      revealButtons.forEach(btn => {
+        btn.addEventListener(
+          'click',
+          () => {
+            const i = +btn.dataset.i;
+            const ans = elRoot.querySelector(`#ans-${i}`);
+            if (ans && !ans.classList.contains('is-open')) {
+              ans.classList.add('is-open');
+
+              const item = PROLOGUE_PAGES[slideIndex].items[i];
+              if (item?.sfx) playSFX(item.sfx);
+
+              awardXP(25, { anchor: btn, reason: 'practice reveal' });
+            }
+            btn.setAttribute('disabled', 'true');
+
+            // 🧮 After each reveal, re-check if all are open
+            checkAllRevealed();
+          },
+          { once: true }
+        );
+      });
+    }
+
+    // 🎸 Interactive fretboard stays the same
     if (page.interactive) {
       const L = page.interactive.length || 60;
-      const fret = elRoot.querySelector('#smFret');
-      const pressOut = elRoot.querySelector('#smPressVal');
-      const vibeLenOut = elRoot.querySelector('#smVibeLen');
-      const fracOut = elRoot.querySelector('#smFrac');
+      const fret        = elRoot.querySelector('#smFret');
+      const pressOut    = elRoot.querySelector('#smPressVal');
+      const vibeLenOut  = elRoot.querySelector('#smVibeLen');
+      const fracOut     = elRoot.querySelector('#smFrac');
       const intervalOut = elRoot.querySelector('#smInterval');
 
       const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b]} return a||1; };
@@ -1000,11 +1074,11 @@ function drawSlide() {
       };
 
       const update = () => {
-        const p = Number(fret.value);
+        const p   = Number(fret.value);
         const vib = Math.max(0, L - p);
-        pressOut.textContent = p.toString();
+        pressOut.textContent   = p.toString();
         vibeLenOut.textContent = vib.toString();
-        fracOut.textContent = simp(vib, L);
+        fracOut.textContent    = simp(vib, L);
 
         const label = intervalLabel(p, L);
         intervalOut.textContent = label ? `• ${label}` : '';
@@ -1021,16 +1095,25 @@ function drawSlide() {
       fret?.addEventListener('input', update);
       update();
     }
+  } else {
+    // Non-practice slides: make sure Next is unlocked
+    if (nextBtn) {
+      nextBtn.disabled = false;
+      nextBtn.classList.remove('is-locked');
+    }
   }
 
-  // Final slide: +500 XP + badge
-  const nextBtn = elRoot.querySelector('#smNext');
+  // 🌟 Final slide: +500 XP + badge (same behavior, just using the shared nextBtn)
   if (nextBtn && slideIndex === PROLOGUE_PAGES.length - 1) {
-    nextBtn.addEventListener('click', () => {
-      awardXP(500, { anchor: nextBtn, reason: 'prologue complete' });
-      awardBadge('story_prologue');
-      onPrologueCompleteOnce();
-    }, { once: true, capture: true });
+    nextBtn.addEventListener(
+      'click',
+      () => {
+        awardXP(500, { anchor: nextBtn, reason: 'prologue complete' });
+        awardBadge('story_prologue');
+        onPrologueCompleteOnce();
+      },
+      { once: true, capture: true }
+    );
   }
 
   wireHandlersForCurrentRoot();
@@ -1068,34 +1151,80 @@ function wireHandlersForCurrentRoot() {
     if (e.target.closest('#smCh2'))       { smSetChapterFlag('ch2'); getEngine().start('ch2'); return; }
     if (e.target.closest('#smCh3'))       { smSetChapterFlag('ch3'); getEngine().start('ch3'); return; }
     if (e.target.closest('#smCh4'))       { smSetChapterFlag('ch4'); getEngine().start('ch4'); return; }
-    if (e.target.closest('#smCh5'))       {smSetChapterFlag('ch5');  getEngine().start('ch5'); return; }
-
+    if (e.target.closest('#smCh5'))       { smSetChapterFlag('ch5'); getEngine().start('ch5'); return; }
 
     // Prologue flow
     if (e.target.closest('#smSkipType')) { elRoot?.__smDoneFast?.(); return; }
     if (e.target.closest('#smReady'))    { renderPrologueSlides();  return; }
-    if (e.target.closest('#smNext'))     { slideIndex++; drawSlide(); return; }
-    if (e.target.closest('#smPrev'))     { slideIndex = Math.max(0, slideIndex - 1); drawSlide(); return; }
+    if (e.target.closest('#smNext')) {
+      const btn = elRoot?.querySelector('#smNext');
+      if (!btn?.disabled) {
+        slideIndex++;
+        drawSlide();
+      }
+      return;
+    }
+    if (e.target.closest('#smPrev')) {
+      slideIndex = Math.max(0, slideIndex - 1);
+      drawSlide();
+      return;
+    }
   };
 
   keyHandler = (e) => {
-    if (e.key === 'Escape') { backToChapterMenu(); e.preventDefault(); return; }
+    if (e.key === 'Escape') {
+      backToChapterMenu();
+      e.preventDefault();
+      return;
+    }
 
     if (e.key === 'Enter') {
       const ready = elRoot?.querySelector('#smReady');
       const skip  = elRoot?.querySelector('#smSkipType');
-      if (ready && ready.style.display !== 'none') { ready.click(); e.preventDefault(); return; }
-      if (skip && !skip.classList.contains('hidden')) { skip.click(); e.preventDefault(); return; }
-      const pro = elRoot?.querySelector('#smNext') || elRoot?.querySelector('#smPrologue') || elRoot?.querySelector('#smHearStory');
-      if (pro) { pro.click(); e.preventDefault(); return; }
+
+      if (ready && ready.style.display !== 'none') {
+        ready.click();
+        e.preventDefault();
+        return;
+      }
+
+      if (skip && !skip.classList.contains('hidden')) {
+        skip.click();
+        e.preventDefault();
+        return;
+      }
+
+      const pro =
+        elRoot?.querySelector('#smNext') ||
+        elRoot?.querySelector('#smPrologue') ||
+        elRoot?.querySelector('#smHearStory');
+
+      if (pro && !pro.disabled) {
+        pro.click();
+        e.preventDefault();
+        return;
+      }
     }
 
     if (e.key === 'ArrowRight') {
-      const next = elRoot?.querySelector('#smNext') || elRoot?.querySelector('#smPrologue');
-      next?.click(); e.preventDefault(); return;
+      const next =
+        elRoot?.querySelector('#smNext') ||
+        elRoot?.querySelector('#smPrologue');
+
+      if (next && !next.disabled) {
+        next.click();
+        e.preventDefault();
+      }
+      return;
     }
+
     if (e.key === 'ArrowLeft') {
-      elRoot?.querySelector('#smPrev')?.click(); e.preventDefault(); return;
+      const prev = elRoot?.querySelector('#smPrev');
+      if (prev && !prev.disabled) {
+        prev.click();
+        e.preventDefault();
+      }
+      return;
     }
   };
 
