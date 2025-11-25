@@ -3,8 +3,13 @@ import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
 
 const BASE = import.meta.env.BASE_URL;
-const PRO_IMG = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
-const SCN_IMG = (n) => `${BASE}assets/img/modes/storymodeForest/${n}`;
+const PRO_IMG      = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
+const PRO_MED_IMG  = (n) => `${BASE}assets/img/characters/storyMode/${n}?md=1`;   // 👈 NEW: medium portraits
+const PRO_BIG_IMG  = (n) => `${BASE}assets/img/characters/storyMode/${n}?lg=1`;   // existing “hero” size
+
+const SCN_IMG      = (n) => `${BASE}assets/img/modes/storymodeForest/${n}`;
+const SCN_MED_IMG  = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?md=1`;  // 👈 NEW: medium scenes
+const SCN_BIG_IMG  = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?lg=1`;  // existing “hero” size
 
 // Canonical ids:
 //   MASTER_SIGIL  = Perfect SnowCone
@@ -33,7 +38,7 @@ export const Chapter4 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Glowing Doorway',
-      img: SCN_IMG('portalGlow.png'),
+      img: PRO_IMG('forestPath.png'),
       text: `You step past the last row of tents and the air thins, cool and electric.<br><br>
 A glowing doorway hangs in the dark like a rip in the festival, light spilling out in colors you don’t have names for.`,
       soloLabel: 'Next ➡️',
@@ -44,7 +49,7 @@ A glowing doorway hangs in the dark like a rip in the festival, light spilling o
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Glowing Doorway',
-      img: SCN_IMG('portalGlow.png'),
+      img: PRO_MED_IMG('portalGlow.png'),
       text: `Something tugs at your inventory. If you ever carried The Perfect SnowCone, you can almost feel the empty space where it used to rest—like a missing tooth in the line of your pockets.`,
       soloLabel: 'Step closer to the doorway ➡️',
     },
@@ -56,7 +61,7 @@ A glowing doorway hangs in the dark like a rip in the festival, light spilling o
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Drop',
-      img: SCN_IMG('portalGlow.png'),
+      img: PRO_IMG('portalGlow.png'),
       text: `Before you can call out, a blur of motion flips into view: the tiny hooded dino, landing in a clean front handspring at the edge of the portal.<br><br>
 They grin, eyes reflecting the portal light, and in one easy motion they snatch whatever echo of perfection you were holding onto, then toss a beat-up cell phone at your feet and dive through the doorway like it was always meant for them.`,
       soloLabel: 'Pick up the phone…',
@@ -97,7 +102,7 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Call',
-      img: PRO_IMG('tinyDinoHood.png'),
+      img: PRO_MED_IMG('tinyDinoHood.png'),
       text: `You thumb the cracked screen. The call connects with a click and a little burst of static.<br><br>
 <span style="color: rgb(143, 190, 255);">“Whoa, it actually worked!”</span> The voice is tiny but unmistakable—the hooded dino.<br><br>
 <span style="color: rgb(143, 190, 255);">“I wasn’t sure the portal would sync up right, but I’m back. My original timeline, my original loop.”</span>`,
@@ -109,7 +114,7 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Call',
-      img: PRO_IMG('tinyDinoHood.png'),
+      img: PRO_MED_IMG('tinyDinoHood.png'),
       text: `You hear festival noise on their side—same party, different angle.<br><br>
 <span style="color: rgb(143, 190, 255);">“SnowCone MathFest isn’t just a place,”</span> they say.
 <span style="color: rgb(143, 190, 255);">“It’s an in-between. Past, present, future—they all line up here when the symmetry’s just right.”</span>`,
@@ -145,7 +150,7 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Truck Driver',
-      img: PRO_IMG('jehnkPortal.png'),
+      img: PRO_MED_IMG('jehnkPortal.png'),
       text: `The call drops. The portal hums.<br><br>
 Behind you, footsteps crunch on the grass.<br><br>
 <span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.`,
@@ -157,7 +162,7 @@ Behind you, footsteps crunch on the grass.<br><br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Truck Driver',
-      img: PRO_IMG('jehnkPortal.png'),
+      img: PRO_MED_IMG('jehnkPortal2.png'),
       text: `You turn. Jehnk stands there, hands in his pockets, neon from the doorway tracing the edge of his hoodie.<br><br>
 <span style="color: rgb(247, 255, 105);">“Did the tiny dino in the hood lead you here?”</span><br>
 He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“They’ve been a menace ever since I got this place started.”</span>`,
@@ -182,7 +187,7 @@ He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“Th
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Looped Roads',
-      img: PRO_IMG('jehnkNightDrive.png'),
+      img: PRO_MED_IMG('itsAllGood.png'),
       text: `“When I first started SnowCone MathFest,” Jehnk says, “it was all fun, music, and games.<br>
 I thought I’d just roll in, serve cones, catch sets, ride the good vibes forever.”`,
       soloLabel: 'Next ➡️',
@@ -194,7 +199,7 @@ I thought I’d just roll in, serve cones, catch sets, ride the good vibes forev
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Looped Roads',
-      img: PRO_IMG('jehnkNightDrive.png'),
+      img: PRO_MED_IMG('jehnkNightDrive.png'),
       text: `He looks past you, out at the portal.<br><br>
 <span style="color: rgb(247, 255, 105);">“But after a while, I noticed something. No matter how far down the road I drove,
 no matter how many exits I took… the road always circled back here.”</span><br><br>
@@ -209,7 +214,7 @@ He laughs once, but there’s no joy in it.<br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Looped Roads',
-      img: PRO_IMG('jehnkNightDrive.png'),
+      img: PRO_MED_IMG('jehnkNightDrive2.png'),
       text: `He nods toward the doorway.<br>
 <span style="color: rgb(247, 255, 105);">“The old driver? They didn’t warn me. They tricked me into taking over the truck.
 Handed me the keys with a smile… and a fractions question I couldn’t answer.”</span>`,
@@ -223,7 +228,7 @@ Handed me the keys with a smile… and a fractions question I couldn’t answer.
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'How He Got Me',
-      img: PRO_IMG('jehnkRecipe.png'),
+      img: PRO_MED_IMG('fractions.png'),
       text: `“You know how he got me?” Jehnk asks. “Fractions. Same old truck, same old recipes.<br>I just couldn’t see the splits.”<br>He sketches a ghost of an order in the air between you, invisible cups lining up in rows.<br><span style="color: rgb(247, 255, 105);">“He hit me with a question kind of like this…”</span>`,
       soloLabel: 'Hear the question ➡️',
     },
@@ -234,7 +239,6 @@ Handed me the keys with a smile… and a fractions question I couldn’t answer.
       role: SlideRole.ADVANCE,
       mode: 'quiz3',
       title: 'Fraction Trap',
-      img: PRO_IMG('mixCard.png'),
       text: `“<span style="color: rgb(247, 255, 105);">“If the remix flavor is \\(\\tfrac{2}{3}\\) of each cone, what fraction of the entire batch is remix flavor?”</span><br><br>You think of the total cones, the piece per cone, and how it all stacks together.`,
       quiz: {
         options: [
@@ -267,7 +271,7 @@ Handed me the keys with a smile… and a fractions question I couldn’t answer.
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Forge Another',
-      img: PRO_IMG('jehnkThinking.png'),
+      img: PRO_MED_IMG('jehnkPortal.png'),
       text: `“Always know your fractions,” Jehnk says. “They’re how the truck keeps its balance.”<br>He looks back at you, thoughtful.<br><span style="color: rgb(247, 255, 105);">“So tell me, ${playerName}… do you still have the stuff from when you worked the truck?”</span><br>Recipe scraps, ratio cards, ledger notes, all the little artifacts you’ve picked up over the night—they’re still rattling around in your pockets.<br><span style="color: rgb(247, 255, 105);">“I think we can use them to forge another Perfect SnowCone.”</span>`,
       soloLabel: 'Forge the new cone ➡️',
     },
@@ -278,7 +282,7 @@ Handed me the keys with a smile… and a fractions question I couldn’t answer.
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Reforged',
-      img: PRO_IMG('perfectConeGlow.png'),
+      img: PRO_MED_IMG('essentialsTrio33.png'),
       text: `You spread your truck tools out in the glow of the portal:<br>
 sticky recipe cards, ratio scribbles, a ledger corner stained with syrup.<br><br>
 Piece by piece, you rebuild the sequence—measure, pour, swirl, freeze.`,
@@ -291,7 +295,7 @@ Piece by piece, you rebuild the sequence—measure, pour, swirl, freeze.`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Reforged',
-      img: PRO_IMG('perfectConeGlow.png'),
+      img: PRO_MED_IMG('essentialsTrio3.png'),
       text: `The air thickens with mint and neon.<br><br>
 <span style="color: rgb(247, 255, 105);">“There we go,”</span> Jehnk says as the cone locks into place,
 colors cycling in impossible gradients.<br>
@@ -320,7 +324,7 @@ colors cycling in impossible gradients.<br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Moment of Truth',
-      img: SCN_IMG('portalDecision.png'),
+      img: PRO_MED_IMG('portalDecision.png'),
       text: `The portal crackles brighter as you hold the Perfect SnowCone up to it.
 Every color in the cone answers back in shimmering waves.<br><br>
 
@@ -334,9 +338,9 @@ Every color in the cone answers back in shimmering waves.<br><br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Moment of Truth',
-      img: SCN_IMG('portalDecision.png'),
+      img: PRO_MED_IMG('portalDecision2.png'),
       text: `<span style="color: rgb(247, 255, 105);">“The Perfect SnowCone only works if you’re being served.
-I could make a million of these things and still never pass through that portal myself.”</span><br><br>`,
+            I could make a million of these things and still never pass through that portal myself.”</span> Then he serves you the SnowCone`,
       soloLabel: 'Next ➡️',
     },
 
@@ -346,22 +350,41 @@ I could make a million of these things and still never pass through that portal 
       role: SlideRole.ADVANCE,
       mode: 'choice3',
       title: 'Moment of Truth',
-      img: SCN_IMG('portalDecision.png'),
+      img: PRO_IMG('essentialsTrio3.png'),
       text: `He looks from the cone to the doorway, then back to you.<br><br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that snowcone.”</span>`,
-      choices: [
+            choices: [
         {
           id: 'c4_choice_keep_cone',
           label: 'Keep the SnowCone and step toward the portal.',
           nextChapterId: 'ch5',
-          nextId: 'c5_keep_cone_ending',
+          nextId: 'c5_keep_cone_ending_1', // 👈 optional, but harmless now
+          onSelect: ({ appState }) => {
+            try {
+              // Just make sure state is saved; cone stays in inventory
+              appState?.saveToStorage?.();
+            } catch (e) {
+              console.warn('[ch4 alignment] save after KEEP failed:', e);
+            }
+          },
         },
         {
           id: 'c4_choice_give_cone',
           label: 'Hand Jehnk the SnowCone.',
           nextChapterId: 'ch5',
-          nextId: 'c5_give_cone_ending',
+          nextId: 'c5_give_cone_ending_1', // 👈 optional, router will still decide
+          onSelect: ({ appState }) => {
+            try {
+              if (appState?.hasItem?.(PERFECT_CONE)) {
+                appState.removeItem?.(PERFECT_CONE);
+              }
+              appState?.saveToStorage?.();
+            } catch (e) {
+              console.warn('[ch4 alignment] remove cone on GIVE failed:', e);
+            }
+          },
         },
       ],
+
       choiceAdvanceLabel: 'Lock in your choice ➡️',
     },
 

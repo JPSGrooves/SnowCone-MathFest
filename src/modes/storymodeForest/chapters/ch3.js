@@ -216,7 +216,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'MathTips Village',
-      img: SCN_IMG('mathTipsTent.png'),
+      img: PRO_MED_IMG('mathTipsVillage.png'),
       text: `The noise of the stages fades into a low hum as you wander into MathTips Village.<br>Lanterns hang from tent poles. Whiteboards glow softly. In the middle of it all, <span style="color: rgb(217, 164, 255);">Grampy P</span> sits by his tent with a notebook and a SnowCone, just listening.<br>He’s not teaching, not preaching—just watching patterns walk by.`,
       soloLabel: 'Move into the crowd ➡️',
     },
@@ -225,7 +225,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Grampy’s Neighbor',
-      img: PRO_IMG('mathTipsFan.png'),
+      img: PRO_BIG_IMG('grampyP.png'),
       text: `A nearby camper taps their pencil against a clipboard.<br><br>
       <span style="color: rgb(217, 164, 255);">"Grampy P’s whole thing is *questions*,"</span> they say.
       <span style="color: rgb(217, 164, 255);">"He doesn’t grade you. He just wants to know how you’re thinking."</span>`,
@@ -237,7 +237,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Grampy’s Neighbor',
-      img: PRO_IMG('mathTipsFan.png'),
+      img: PRO_MED_IMG('grampyLesson.png'),
       text: `They nod at his notebook.
       <span style="color: rgb(217, 164, 255);">"He writes down good questions like he’s collecting rare trading cards. Math, feelings, stories—it all goes in the same journal."</span>`,
       soloLabel: 'Before you go… ➡️',
@@ -271,6 +271,15 @@ export const Chapter3 = {
         advanceLabel: 'Head back toward the truck ➡️',
       },
     },
+        {
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Grampy’s Neighbor',
+      img: PRO_MED_IMG('grampyPoint.png'),
+      text: `Grampy P knows you can't stay, but send a farewell as he points at a dinsoaur trying to get your attention.
+      <span style="color: rgb(217, 164, 255);">"I'll be here if you ever need a fractions lesson, haiku, joke, or how much you should tip your waiter. But it looks like that hooded dino over there wants your attention."</span>`,
+      soloLabel: 'Before you go… ➡️',
+    },
 
     // ─────────────────────────────────────────
     // Dino encounter + trade
@@ -279,7 +288,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'A Familiar Hood',
-      img: PRO_IMG('hoodedDinoPath.png'),
+      img: PRO_MED_IMG('hoodedDinoPath.png'),
       text: `On your way back to the truck, the path narrows into trees.<br>A small hooded dino pads out of the shadows—the same one who killed the floodlights and slipped you the MoonChain.<br>He tilts his head, eyes catching the glow from your pockets.`,
       soloLabel: 'Go talk to the dino ➡️',
     },
@@ -288,7 +297,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'choice3',
       title: 'The Trade',
-      img: PRO_IMG('dinoTrade.png'),
+      img: PRO_MED_IMG('dinoTrade.png'),
       text: `His gaze lands on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your hand.<br><span style="color: rgb(143, 190, 255);">\"That one doesn’t melt easy,\"</span> he whispers. <span style="color: rgb(143, 190, 255);">\"But neither does this.\"</span><br>From his hoodie, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, battery icon somehow full.<br><span style="color: rgb(143, 190, 255);">\"Trade?\"</span>`,
       choiceAdvanceLabel: 'Go into the forest ➡️',
       choices: [
@@ -348,7 +357,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Into the Trees',
-      img: PRO_IMG('forestPath.png'),
+      img: PRO_MED_IMG('phoneRun.png'),
       text: `No matter what you chose, the hooded dino nods once and melts back into the branches.<br><br>
       <span style="color: rgb(143, 190, 255);">"Only way out is through the forest,"</span> he calls softly from somewhere you can’t quite see.`,
       soloLabel: 'Next ➡️',
@@ -359,7 +368,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Into the Trees',
-      img: PRO_IMG('forestPath.png'),
+      img: PRO_MED_IMG('forestPath.png'),
       text: `You step off the festival path. The music thins. Crickets and distant subs share a strange, quiet rhythm.<br><br>
       Step by step, you slip deeper between the trunks, wondering what could possibly be next.`,
       soloLabel: 'Keep walking ➡️',
