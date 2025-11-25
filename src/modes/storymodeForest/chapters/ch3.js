@@ -293,63 +293,69 @@ export const Chapter3 = {
       soloLabel: 'Go talk to the dino ➡️',
     },
 
-    {
-      role: SlideRole.ADVANCE,
-      mode: 'choice3',
-      title: 'The Trade',
-      img: PRO_MED_IMG('dinoTrade.png'),
-      text: `His gaze lands on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your hand.<br><span style="color: rgb(143, 190, 255);">\"That one doesn’t melt easy,\"</span> he whispers. <span style="color: rgb(143, 190, 255);">\"But neither does this.\"</span><br>From his hoodie, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, battery icon somehow full.<br><span style="color: rgb(143, 190, 255);">\"Trade?\"</span>`,
-      choiceAdvanceLabel: 'Go into the forest ➡️',
-      choices: [
+            {
+    role: SlideRole.ADVANCE,
+    mode: 'choice3',
+    title: 'The Trade',
+    img: PRO_MED_IMG('dinoTrade.png'),
+    text: `His gaze lands on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your hand.<br><span style="color: rgb(143, 190, 255);">\"That one doesn’t melt easy,\"</span> he whispers. <span style="color: rgb(143, 190, 255);">\"But neither does this.\"</span><br>From his hoodie, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, battery icon somehow full.<br><span style="color: rgb(143, 190, 255);">\"Trade?\"</span>`,
+    choiceAdvanceLabel: 'Go into the forest ➡️',
+    choices: [
         {
-          id: 'trade',
-          label: 'Trade the Perfect SnowCone for the beat-up phone',
-          praise: `<span style="color: rgb(143, 190, 255);">The dino grins. \"Good call. Some signals don’t show up unless you’re tuned in.\"</span>`,
-          onSelect: ({ appState }) => {
+        id: 'trade',
+        label: 'Trade the Perfect SnowCone for the beat-up phone',
+        praise: `<span style="color: rgb(143, 190, 255);">The dino grins. \"Good call. Some signals don’t show up unless you’re tuned in.\"</span>`,
+        onSelect: ({ appState }) => {
             try {
-              const hasPerfect = appState?.hasItem?.(ItemIds.MASTER_SIGIL);
-              if (hasPerfect) {
+            // 🔹 record the latest choice
+            appState.flags = appState.flags || {};
+            appState.flags.ch3_tradeChoice = 'trade';
+
+            // 🔹 inventory effects
+            const hasPerfect = appState?.hasItem?.(ItemIds.MASTER_SIGIL);
+            if (hasPerfect) {
                 if (typeof appState.consumeItems === 'function') {
-                  appState.consumeItems([ItemIds.MASTER_SIGIL]);
+                appState.consumeItems([ItemIds.MASTER_SIGIL]);
                 } else {
-                  appState.removeItem?.(ItemIds.MASTER_SIGIL);
+                appState.removeItem?.(ItemIds.MASTER_SIGIL);
                 }
-              }
+            }
             } catch (e) {
-              console.warn('[ch3 trade] failed to consume Perfect SnowCone:', e);
+            console.warn('[ch3 trade] failed to consume Perfect SnowCone or set flag:', e);
             }
 
             try {
-              if (!appState.hasItem?.(ItemIds.BEATUP_PHONE)) {
+            if (!appState.hasItem?.(ItemIds.BEATUP_PHONE)) {
                 appState.addItem?.(ItemIds.BEATUP_PHONE, {
-                  name: 'Beat-Up Phone',
-                  meta: {
+                name: 'Beat-Up Phone',
+                meta: {
                     emoji: '📱',
                     note: 'Cracked screen, full bars somehow.',
-                  },
+                },
                 });
                 pickupPing({ emoji: '📱', name: 'Beat-Up Phone', qty: 1 });
-              }
-              appState.saveToStorage?.();
-            } catch (e) {
-              console.warn('[ch3 trade] failed to grant Beat-Up Phone:', e);
             }
-          },
+            appState.saveToStorage?.();
+            } catch (e) {
+            console.warn('[ch3 trade] failed to grant Beat-Up Phone:', e);
+            }
+        },
         },
         {
-          id: 'keep',
-          label: 'Keep the Perfect SnowCone',
-          praise: `<span style="color: rgb(143, 190, 255);">The dino shrugs. \"Some legends gotta be carried, not traded.\"</span>`,
-          onSelect: ({ appState }) => {
-            // no-op on inventory; just make sure it’s saved
+        id: 'keep',
+        label: 'Keep the Perfect SnowCone',
+        praise: `<span style="color: rgb(143, 190, 255);">The dino shrugs. \"Some legends gotta be carried, not traded.\"</span>`,
+        onSelect: ({ appState }) => {
             try {
-              appState.saveToStorage?.();
+            appState.flags = appState.flags || {};
+            appState.flags.ch3_tradeChoice = 'keep';
+            appState.saveToStorage?.();
             } catch (e) {
-              console.warn('[ch3 trade] save after keep failed:', e);
+            console.warn('[ch3 trade] save after keep failed:', e);
             }
-          },
         },
-      ],
+        },
+    ],
     },
 
     // Into the Trees – part 1
@@ -358,8 +364,8 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Into the Trees',
       img: PRO_MED_IMG('phoneRun.png'),
-      text: `No matter what you chose, the hooded dino nods once and melts back into the branches.<br><br>
-      <span style="color: rgb(143, 190, 255);">"Only way out is through the forest,"</span> he calls softly from somewhere you can’t quite see.`,
+      text: `The hooded dino nods once and darts back into the branches.<br><br>
+      <span style="color: rgb(143, 190, 255);">"Only way out is through the forest,"</span> he reveals softly from somewhere you can’t quite see.`,
       soloLabel: 'Next ➡️',
     },
 

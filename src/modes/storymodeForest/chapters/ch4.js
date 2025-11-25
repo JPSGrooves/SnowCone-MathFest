@@ -1,15 +1,16 @@
 // src/modes/storyMode/chapters/ch4.js
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
+import { pickupPing } from '../ui/pickupPing.js'; // 👈 add this
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG      = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
-const PRO_MED_IMG  = (n) => `${BASE}assets/img/characters/storyMode/${n}?md=1`;   // 👈 NEW: medium portraits
-const PRO_BIG_IMG  = (n) => `${BASE}assets/img/characters/storyMode/${n}?lg=1`;   // existing “hero” size
+const PRO_MED_IMG  = (n) => `${BASE}assets/img/characters/storyMode/${n}?md=1`;
+const PRO_BIG_IMG  = (n) => `${BASE}assets/img/characters/storyMode/${n}?lg=1`;
 
 const SCN_IMG      = (n) => `${BASE}assets/img/modes/storymodeForest/${n}`;
-const SCN_MED_IMG  = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?md=1`;  // 👈 NEW: medium scenes
-const SCN_BIG_IMG  = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?lg=1`;  // existing “hero” size
+const SCN_MED_IMG  = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?md=1`;
+const SCN_BIG_IMG  = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?lg=1`;
 
 // Canonical ids:
 //   MASTER_SIGIL  = Perfect SnowCone
@@ -44,54 +45,75 @@ A glowing doorway hangs in the dark like a rip in the festival, light spilling o
       soloLabel: 'Next ➡️',
     },
 
+    // 0A) Tug + router into the correct phone slide
     {
       id: 'c4_portal_inventory_tug',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Glowing Doorway',
       img: PRO_MED_IMG('portalGlow.png'),
-      text: `Something tugs at your inventory. If you ever carried The Perfect SnowCone, you can almost feel the empty space where it used to rest—like a missing tooth in the line of your pockets.`,
+      text: `Something tugs at your inventory.<br><br>
+If you ever carried <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span>, you feel that same pocket go strange again—like a tooth that’s either already missing or about to fall out.<br><br>
+Whatever you chose back on the path, the symmetry here definitely noticed.`,
       soloLabel: 'Step closer to the doorway ➡️',
+      onAdvance: ({ appState, engine }) => {
+        const a = appState || globalAppState;
+        if (!a || !engine) return;
+
+        try {
+          const flags  = a.flags || {};
+          const choice = flags.ch3_tradeChoice; // 'trade' | 'keep' | undefined
+
+          // Decide which Drop variant to show.
+          // Default to TRADE flavor if we somehow have no flag.
+          const targetId =
+            choice === 'keep'
+              ? 'c4_portal_phone_keep'
+              : 'c4_portal_phone_trade';
+
+          // 🧭 Route using the SAME pattern as c5_entry_router
+          const chapter = engine.registry[engine.state.chapterId];
+          if (!chapter) return;
+
+          const idx = chapter.slides.findIndex((s) => s.id === targetId);
+          if (idx >= 0) {
+            engine.state.idx = idx;
+            engine._renderSlide();
+            return 'handled';
+          }
+
+          // fallback: let engine advance linearly if something’s weird
+          return false;
+        } catch (e) {
+          console.warn('[ch4] portal phone routing failed:', e);
+        }
+      },
     },
 
-
-    // 0B) Dino flip + phone drop – this is where the old onAdvance logic lives now
-        {
-      id: 'c4_portal_phone',
+        // 0B-1) Variant: you KEPT the cone in ch3 → forced swap happens *here*.
+    {
+      id: 'c4_portal_phone_keep',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Drop',
       img: PRO_IMG('portalGlow.png'),
       text: `Before you can call out, a blur of motion flips into view: the tiny hooded dino, landing in a clean front handspring at the edge of the portal.<br><br>
-They grin, eyes reflecting the portal light, and in one easy motion they snatch whatever echo of perfection you were holding onto, then toss a beat-up cell phone at your feet and dive through the doorway like it was always meant for them.`,
+They grin, eyes reflecting the portal light, and in one easy swipe they steal <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> right out of your hands—out of your pockets, out of your story.<br><br>
+Something heavy and familiar drops by your feet instead: a <b>beat-up cell phone</b>, already buzzing like it’s been waiting for this moment the whole time—cracked screen, dented sides, bars somehow full.`,
       soloLabel: 'Pick up the phone…',
-      onAdvance: ({ appState }) => {
+      onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
         if (!a) return;
 
-        const hasCone  = !!a.hasItem?.(PERFECT_CONE);
-        const hasPhone = !!a.hasItem?.(BEATUP_PHONE);
-
         try {
-          // 🅰️ Case 1: You KEPT the cone in ch3 (cone yes, phone no)
-          // → Portal dino finally forces the trade here.
-          if (hasCone && !hasPhone) {
+          // 🧊 1) Steal the cone if it's still there
+          if (a.hasItem?.(PERFECT_CONE)) {
             a.removeItem?.(PERFECT_CONE);
-            a.addItem?.(BEATUP_PHONE, {
-              qty: 1,
-              meta: {
-                emoji: '📱',
-                note: 'Cracked screen. Somehow full bars.',
-              },
-            });
           }
-          // 🅱️ Case 2: You TRADED in ch3 (cone no, phone yes)
-          // → You already have the phone; portal scene is mostly flavor. No inventory change.
 
-          // 🅾️ Case 3: Weird state (neither cone nor phone somehow)
-          // → Failsafe: at least give the phone so the call scene can still run.
-          const hasPhoneAfter = !!a.hasItem?.(BEATUP_PHONE);
-          if (!hasPhoneAfter) {
+          // 📱 2) Grant the phone if you don't already have it
+          let grantedPhone = false;
+          if (!a.hasItem?.(BEATUP_PHONE)) {
             a.addItem?.(BEATUP_PHONE, {
               qty: 1,
               meta: {
@@ -99,14 +121,87 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
                 note: 'Cracked screen. Somehow full bars.',
               },
             });
+            grantedPhone = true;
+          }
+
+          // ✨ 3) Fire pickupPing only when we actually *grant* it here
+          if (grantedPhone) {
+            try {
+              pickupPing({ emoji: '📱', name: 'Beat-Up Phone', qty: 1 });
+            } catch (e) {
+              console.warn('[ch4 keep-drop] pickupPing failed:', e);
+            }
           }
 
           a.saveToStorage?.();
         } catch (e) {
-          console.warn('[ch4] portal phone inventory sync failed:', e);
+          console.warn('[ch4 keep-drop] inventory trade failed:', e);
         }
+
+        // 📞 4) Route into the shared phone call intro
+        if (!engine) return;
+        const chapter = engine.registry[engine.state.chapterId];
+        if (!chapter) return;
+
+        const idx = chapter.slides.findIndex((s) => s.id === 'c4_phone_call_intro1');
+        if (idx >= 0) {
+          engine.state.idx = idx;
+          engine._renderSlide();
+          return 'handled';
+        }
+        return false;
       },
     },
+
+
+    // 0B-2) Variant: you TRADED in ch3 → phone is old, not new.
+    {
+      id: 'c4_portal_phone_trade',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'The Drop',
+      img: PRO_IMG('portalGlow.png'),
+      text: `Before you can call out, the tiny hooded dino flips into view at the edge of the portal.<br><br>
+They spot the <b>beat-up cell phone</b> you already traded for and tap two claws against the cracked screen like they’re tuning a radio that’s finally on the right station.<br><br>
+The phone buzzes in your hand—battery icon full, signal bars pegged. Whatever you gave up back on the path stays gone; this is just the signal catching up.`,
+      soloLabel: 'Hold the phone closer…',
+      onAdvance: ({ appState, engine }) => {
+        const a = appState || globalAppState;
+
+        // Just sanity-check the phone in case of weird saves.
+        try {
+          if (!a?.hasItem?.(BEATUP_PHONE)) {
+            a?.addItem?.(BEATUP_PHONE, {
+              qty: 1,
+              meta: {
+                emoji: '📱',
+                note: 'Cracked screen. Somehow full bars.',
+              },
+            });
+          }
+          a?.saveToStorage?.();
+        } catch (e) {
+          console.warn('[ch4 trade-drop] ensure phone failed:', e);
+        }
+
+        if (!engine) return;
+        const chapter = engine.registry[engine.state.chapterId];
+        if (!chapter) return;
+
+        const idx = chapter.slides.findIndex((s) => s.id === 'c4_phone_call_intro1');
+        if (idx >= 0) {
+          engine.state.idx = idx;
+          engine._renderSlide();
+          return 'handled';
+        }
+        return false;
+      },
+    },
+
+    // 🔻 from here down, keep everything you already have:
+    // c4_phone_call_intro1, c4_phone_call_intro2, c4_phone_call,
+    // Jehnk portal speech, fractions trap, forge, alignment, etc.
+
 
     // 1) Phone call with tiny dino – choice3 style, flavor only
     {
@@ -134,40 +229,136 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
     },
 
     {
-      id: 'c4_phone_call',
-      role: SlideRole.ADVANCE,
-      mode: 'choice3',
-      title: 'The Call',
-      img: PRO_IMG('tinyDinoHood.png'),
-      text: `There’s a quiet moment between ringtones and bass drops.<br>
-<span style="color: rgb(143, 190, 255);">“So… ${playerName}, you ready to go home?”</span>`,
-      choices: [
+    id: 'c4_phone_call',
+    role: SlideRole.ADVANCE,
+    mode: 'choice3',
+    title: 'The Call',
+    img: PRO_IMG('tinyDinoHood.png'),
+    text: `There’s a quiet moment between ringtones and bass drops.<br>
+    <span style="color: rgb(143, 190, 255);">“So… ${playerName}, you ready to go home?”</span>`,
+    choices: [
         {
-          id: 'yes',
-          label: '“Yeah. I think I’m ready to go home.”',
-          praise: `<span style="color: rgb(143, 190, 255);">“Honestly? Best plan,”</span> the dino says. <span style="color: rgb(143, 190, 255);">“Make another Perfect SnowCone, ride the symmetry out. Clean exit.”</span>`,
+        id: 'yes',
+        label: '“Yeah. I think I’m ready to go home.”',
+        praise: `<span style="color: rgb(143, 190, 255);">“Honestly? Best plan,”</span> the dino says. <span style="color: rgb(143, 190, 255);">“Make another Perfect SnowCone, ride the symmetry out. Clean exit.”</span>`,
+        onSelect: ({ appState }) => {
+            const a = appState || globalAppState;
+            try {
+            a.flags = a.flags || {};
+            a.flags.ch4_phoneChoice = 'yes';
+            a.saveToStorage?.();
+            } catch (e) {
+            console.warn('[ch4 phone] failed to record YES choice:', e);
+            }
+        },
         },
         {
-          id: 'no',
-          label: '“No. I’m not done here yet.”',
-          praise: `<span style="color: rgb(143, 190, 255);">“I’m gonna have to advise against that,”</span> they sigh. <span style="color: rgb(143, 190, 255);">“You don’t know Jehnk like I do…”</span>`,
+        id: 'no',
+        label: '“No. I’m not done here yet.”',
+        praise: `<span style="color: rgb(143, 190, 255);">“I’m gonna have to advise against that,”</span> they sigh. <span style="color: rgb(143, 190, 255);">“You don’t know Jehnk like I do…”</span>`,
+        onSelect: ({ appState }) => {
+            const a = appState || globalAppState;
+            try {
+            a.flags = a.flags || {};
+            a.flags.ch4_phoneChoice = 'no';
+            a.saveToStorage?.();
+            } catch (e) {
+            console.warn('[ch4 phone] failed to record NO choice:', e);
+            }
         },
-      ],
-      choiceAdvanceLabel: 'Hang up the call ➡️',
+        },
+    ],
+    choiceAdvanceLabel: 'Hang up the call ➡️',
     },
 
     // 2) Jehnk shows up at the portal
         {
-      id: 'c4_post_call_jehnk_approaches_1',
-      role: SlideRole.ADVANCE,
-      mode: 'solo',
-      title: 'The Truck Driver',
-      img: PRO_MED_IMG('jehnkPortal.png'),
-      text: `The call drops. The portal hums.<br><br>
-Behind you, footsteps crunch on the grass.<br><br>
-<span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.`,
-      soloLabel: 'Next ➡️',
+    id: 'c4_post_call_router',
+    role: SlideRole.ADVANCE,
+    mode: 'solo',
+    title: 'The Truck Driver',
+    img: PRO_MED_IMG('jehnkPortal.png'),
+    text: `The call drops. The portal hums.<br><br>
+    Behind you, footsteps crunch on the grass.<br><br>`,
+    soloLabel: 'Next ➡️',
+    onAdvance: ({ appState, engine }) => {
+        const a = appState || globalAppState;
+        if (!a || !engine) return;
+
+        const chapter = engine.registry[engine.state.chapterId];
+        if (!chapter) return;
+
+        const flags = a.flags || {};
+        const choice = flags.ch4_phoneChoice; // 'yes' | 'no' | undefined
+
+        // Default to NO flavor if somehow unset
+        const targetId =
+        choice === 'yes'
+            ? 'c4_post_call_jehnk_approaches_yes'
+            : 'c4_post_call_jehnk_approaches_no';
+
+        const idx = chapter.slides.findIndex((s) => s.id === targetId);
+        if (idx >= 0) {
+        engine.state.idx = idx;
+        engine._renderSlide();
+        return 'handled';
+        }
+        return false;
     },
+    },
+        {
+    id: 'c4_post_call_jehnk_approaches_yes',
+    role: SlideRole.ADVANCE,
+    mode: 'solo',
+    title: 'The Truck Driver',
+    img: PRO_MED_IMG('jehnkPortal.png'),
+    text: `A shadow leans into the portal glow as the last bit of static fades from your ear.<br><br>
+    <span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.<br><br>
+    <span style="color: rgb(247, 255, 105);">“If you’re really ready to go home…”</span> he adds, stepping closer, <span style="color: rgb(247, 255, 105);">“maybe there’s still a way out for me too.”</span>`,
+    soloLabel: 'Next ➡️',
+    onAdvance: ({ engine }) => {
+        if (!engine) return;
+        const chapter = engine.registry[engine.state.chapterId];
+        if (!chapter) return;
+
+        const idx = chapter.slides.findIndex(
+        (s) => s.id === 'c4_post_call_jehnk_approaches_2'
+        );
+        if (idx >= 0) {
+        engine.state.idx = idx;
+        engine._renderSlide();
+        return 'handled';
+        }
+        return false;
+    },
+    },
+    {
+    id: 'c4_post_call_jehnk_approaches_no',
+    role: SlideRole.ADVANCE,
+    mode: 'solo',
+    title: 'The Truck Driver',
+    img: PRO_MED_IMG('jehnkPortal.png'),
+    text: `A shadow leans into the portal glow as the last bit of static fades from your ear.<br><br>
+    <span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.<br><br>
+    <span style="color: rgb(247, 255, 105);">“Glad to hear you’re starting to like this place,”</span> he adds with a half-smile. <span style="color: rgb(247, 255, 105);">“I sounded like that once.”</span>`,
+    soloLabel: 'Next ➡️',
+    onAdvance: ({ engine }) => {
+        if (!engine) return;
+        const chapter = engine.registry[engine.state.chapterId];
+        if (!chapter) return;
+
+        const idx = chapter.slides.findIndex(
+        (s) => s.id === 'c4_post_call_jehnk_approaches_2'
+        );
+        if (idx >= 0) {
+        engine.state.idx = idx;
+        engine._renderSlide();
+        return 'handled';
+        }
+        return false;
+    },
+    },
+
 
     {
       id: 'c4_post_call_jehnk_approaches_2',
@@ -191,7 +382,6 @@ He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“Th
 <span style="color: rgb(247, 255, 105);">“Look,”</span> he says. <span style="color: rgb(247, 255, 105);">“I’d walk you back to the truck myself. But now that you’re here… you can know the truth.”</span>`,
       soloLabel: '“Tell me the truth.”',
     },
-
 
     // 3) Jehnk’s loop confession – part 1
     {
@@ -220,7 +410,7 @@ He laughs once, but there’s no joy in it.<br>
       soloLabel: 'Next ➡️',
     },
 
-    // 3) Jehnk’s loop confession – part 3 (keeps original id + label)
+    // 3) Jehnk’s loop confession – part 3
     {
       id: 'c4_jehnk_trapped_story',
       role: SlideRole.ADVANCE,
@@ -232,7 +422,6 @@ He laughs once, but there’s no joy in it.<br>
 Handed me the keys with a smile… and a fractions question I couldn’t answer.”</span>`,
       soloLabel: '“What do fractions have to do with this?”',
     },
-
 
     // 4) Fractions quiz setup
     {
@@ -300,7 +489,6 @@ sticky recipe cards, ratio scribbles, a ledger corner stained with syrup.<br><br
 Piece by piece, you rebuild the sequence—measure, pour, swirl, freeze.`,
       soloLabel: 'Next ➡️',
     },
-
     // 7) Forge another – actual creation, grant MASTER_SIGIL back
     {
       id: 'c4_no_cone_forge_action',
@@ -312,17 +500,34 @@ Piece by piece, you rebuild the sequence—measure, pour, swirl, freeze.`,
 <span style="color: rgb(247, 255, 105);">“There we go,”</span> Jehnk says as the cone locks into place,
 colors cycling in impossible gradients.<br>
 <span style="color: rgb(247, 255, 105);">“I never cease to amaze myself with my ability to make these things.”</span>`,
-      soloLabel: '“Okay… what now?”',
+      soloLabel: 'Take the Perfect SnowCone ➡️',
       onAdvance: ({ appState }) => {
         const a = appState || globalAppState;
         if (!a) return;
 
         try {
+          let grantedCone = false;
+
           if (!a.hasItem?.(PERFECT_CONE)) {
             a.addItem?.(PERFECT_CONE, {
               qty: 1,
             });
+            grantedCone = true;
           }
+
+          // ✨ Fire pickup ping only if we actually forged a new cone here
+          if (grantedCone) {
+            try {
+              pickupPing({
+                emoji: '🍧',
+                name: 'The Perfect SnowCone',
+                qty: 1,
+              });
+            } catch (e) {
+              console.warn('[ch4] pickupPing failed during forge:', e);
+            }
+          }
+
           a.saveToStorage?.();
         } catch (e) {
           console.warn('[ch4] failed to grant Perfect SnowCone during forge:', e);
@@ -330,7 +535,8 @@ colors cycling in impossible gradients.<br>
       },
     },
 
-        // 8) Alignment choice – setup part 1
+
+    // 8) Alignment choice – setup part 1
     {
       id: 'c4_alignment_choice_1',
       role: SlideRole.ADVANCE,
@@ -364,15 +570,14 @@ Every color in the cone answers back in shimmering waves.<br><br>
       title: 'Moment of Truth',
       img: PRO_IMG('essentialsTrio3.png'),
       text: `He looks from the cone to the doorway, then back to you.<br><br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that snowcone.”</span>`,
-            choices: [
+      choices: [
         {
           id: 'c4_choice_keep_cone',
           label: 'Keep the SnowCone and step toward the portal.',
           nextChapterId: 'ch5',
-          nextId: 'c5_keep_cone_ending_1', // 👈 optional, but harmless now
+          nextId: 'c5_keep_cone_ending_1',
           onSelect: ({ appState }) => {
             try {
-              // Just make sure state is saved; cone stays in inventory
               appState?.saveToStorage?.();
             } catch (e) {
               console.warn('[ch4 alignment] save after KEEP failed:', e);
@@ -383,7 +588,7 @@ Every color in the cone answers back in shimmering waves.<br><br>
           id: 'c4_choice_give_cone',
           label: 'Hand Jehnk the SnowCone.',
           nextChapterId: 'ch5',
-          nextId: 'c5_give_cone_ending_1', // 👈 optional, router will still decide
+          nextId: 'c5_give_cone_ending_1',
           onSelect: ({ appState }) => {
             try {
               if (appState?.hasItem?.(PERFECT_CONE)) {
@@ -396,10 +601,7 @@ Every color in the cone answers back in shimmering waves.<br><br>
           },
         },
       ],
-
       choiceAdvanceLabel: 'Lock in your choice ➡️',
     },
-
-
   ],
 };
