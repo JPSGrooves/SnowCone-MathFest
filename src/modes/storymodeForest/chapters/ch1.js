@@ -422,13 +422,21 @@ onAdvance: ({ appState }) => {
     },
   ],
 
-  onFinish: ({ appState }) => {
+    onFinish: ({ appState }) => {
     try {
+      // existing quiet currency reward
       appState.addCurrency(250);
+
+      // 🎖 chapter completion badge
+      awardBadge('story_ch1');
+
       appState.saveToStorage?.();
-    } catch {}
+    } catch (e) {
+      console.warn('[ch1] onFinish failed', e);
+    }
   }
 };
+
 // handy: keep the cash chip accurate without cash flash
 // replace your refreshCashChip() with this:
 function refreshCashChip() {

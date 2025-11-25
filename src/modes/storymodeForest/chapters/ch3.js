@@ -2,6 +2,7 @@
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
 import { pickupPing } from '../ui/pickupPing.js';
+import { awardBadge } from '../../../managers/badgeManager.js';
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG      = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
@@ -374,7 +375,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Into the Trees',
-      img: PRO_MED_IMG('forestPath.png'),
+      img: PRO_IMG('forestPath.png'),
       text: `You step off the festival path. The music thins. Crickets and distant subs share a strange, quiet rhythm.<br><br>
       Step by step, you slip deeper between the trunks, wondering what could possibly be next.`,
       soloLabel: 'Keep walking ➡️',
@@ -382,4 +383,13 @@ export const Chapter3 = {
     },
 
   ],
+  onFinish: ({ appState }) => {
+    const a = appState || globalAppState;
+    try {
+      awardBadge('story_ch3');
+      a.saveToStorage?.();
+    } catch (e) {
+      console.warn('[ch3] onFinish failed', e);
+    }
+  },
 };

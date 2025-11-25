@@ -1,6 +1,7 @@
 // src/modes/storyMode/chapters/ch5.js
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
+import { awardBadge } from '../../../managers/badgeManager.js';
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG      = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
@@ -293,4 +294,13 @@ and four little words hang at the edge of the UI like a promise:<br><br>
 
 
   ],
+  onFinish: ({ appState }) => {
+    const a = appState || globalAppState;
+    try {
+      awardBadge('story_ch5');
+      a.saveToStorage?.();
+    } catch (e) {
+      console.warn('[ch5] onFinish failed', e);
+    }
+  },
 };

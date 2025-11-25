@@ -1,5 +1,7 @@
 // /src/modes/storyMode/chapters/ch2.js
 import { SlideRole, ItemIds, ITEM_DISPLAY } from '../../../data/storySchema.js'; // 👈 add ITEM_DISPLAY
+import { awardBadge } from '../../../managers/badgeManager.js';
+
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG     = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
 const PRO_BIG_IMG = (n) => `${BASE}assets/img/characters/storyMode/${n}?lg=1`;   // 👈 new
@@ -178,4 +180,13 @@ export const Chapter2 = {
       nextChapterId: 'ch3',
     },
   ],
+    onFinish: ({ appState }) => {
+    try {
+      awardBadge('story_ch2');
+      appState.saveToStorage?.();
+    } catch (e) {
+      console.warn('[ch2] onFinish failed', e);
+    }
+  },
+
 };

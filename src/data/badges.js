@@ -30,11 +30,52 @@ export const allBadges = {
   inf_250_10min: { label: '250 🔁',  short: '250 in 10m',  png: 'snowconebadge.png', unlocks: 'cosmic_06' },
 
   // 📖 Story (prologue only)
-  story_prologue: { label: 'Prologue 📖', short: 'Finish Prologue', png: 'snowconebadge.png', unlocks: 'cosmic_02' },
+  // 📖 Story – one per chapter
+  story_prologue: { 
+    label: 'Prologue 📖', 
+    short: 'Finish Prologue', 
+    png: 'snowconebadge.png', 
+    unlocks: 'cosmic_02'       // keep your current unlock here
+  },
+  story_ch1: {
+    label: 'Chapter 1 📖',
+    short: 'Finish Ch. 1',
+    png: 'snowconebadge.png',
+    unlocks: null
+  },
+  story_ch2: {
+    label: 'Chapter 2 📖',
+    short: 'Finish Ch. 2',
+    png: 'snowconebadge.png',
+    unlocks: null
+  },
+  story_ch3: {
+    label: 'Chapter 3 📖',
+    short: 'Finish Ch. 3',
+    png: 'snowconebadge.png',
+    unlocks: null
+  },
+  story_ch4: {
+    label: 'Chapter 4 📖',
+    short: 'Finish Ch. 4',
+    png: 'snowconebadge.png',
+    unlocks: null
+  },
+  story_ch5: {
+    label: 'Chapter 5 📖',
+    short: 'Finish Ch. 5',
+    png: 'snowconebadge.png',
+    unlocks: null
+  },
 
   // 🏆 Completion
-  legend: { label: 'Legend 🏆', short: '100% Game', png: 'snowconebadge.png', unlocks: 'cosmic_04' }
+  legend: { 
+    label: 'Legend 🏆', 
+    short: '100% Game', 
+    png: 'snowconebadge.png', 
+    unlocks: 'cosmic_04' 
+  },
 };
 
 // Handy constant for UIs (e.g., Math Tips intro bubble)
-export const TOTAL_BADGES = Object.keys(allBadges).length; // → 21
+export const TOTAL_BADGES = Object.keys(allBadges).length; // → 26

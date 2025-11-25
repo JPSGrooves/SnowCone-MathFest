@@ -2,6 +2,7 @@
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
 import { pickupPing } from '../ui/pickupPing.js'; // 👈 add this
+import { awardBadge } from '../../../managers/badgeManager.js';
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG      = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
@@ -39,7 +40,7 @@ export const Chapter4 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Glowing Doorway',
-      img: PRO_IMG('forestPath.png'),
+      img: PRO_MED_IMG('forestPath.png'),
       text: `You step past the last row of tents and the air thins, cool and electric.<br><br>
 A glowing doorway hangs in the dark like a rip in the festival, light spilling out in colors you don’t have names for.`,
       soloLabel: 'Next ➡️',
@@ -604,4 +605,13 @@ Every color in the cone answers back in shimmering waves.<br><br>
       choiceAdvanceLabel: 'Lock in your choice ➡️',
     },
   ],
+  onFinish: ({ appState }) => {
+    const a = appState || globalAppState;
+    try {
+      awardBadge('story_ch4');
+      a.saveToStorage?.();
+    } catch (e) {
+      console.warn('[ch4] onFinish failed', e);
+    }
+  },
 };
