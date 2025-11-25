@@ -56,7 +56,7 @@ A glowing doorway hangs in the dark like a rip in the festival, light spilling o
 
 
     // 0B) Dino flip + phone drop – this is where the old onAdvance logic lives now
-    {
+        {
       id: 'c4_portal_phone',
       role: SlideRole.ADVANCE,
       mode: 'solo',
@@ -69,18 +69,14 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
         const a = appState || globalAppState;
         if (!a) return;
 
-        // If you somehow still had the Perfect SnowCone, it goes with the dino.
-        try {
-          if (a.hasItem?.(PERFECT_CONE)) {
-            a.removeItem?.(PERFECT_CONE);
-          }
-        } catch (e) {
-          console.warn('[ch4] failed to remove Perfect SnowCone at portal:', e);
-        }
+        const hasCone  = !!a.hasItem?.(PERFECT_CONE);
+        const hasPhone = !!a.hasItem?.(BEATUP_PHONE);
 
-        // Make sure the player has the beat-up phone.
         try {
-          if (!a.hasItem?.(BEATUP_PHONE)) {
+          // 🅰️ Case 1: You KEPT the cone in ch3 (cone yes, phone no)
+          // → Portal dino finally forces the trade here.
+          if (hasCone && !hasPhone) {
+            a.removeItem?.(PERFECT_CONE);
             a.addItem?.(BEATUP_PHONE, {
               qty: 1,
               meta: {
@@ -89,9 +85,25 @@ They grin, eyes reflecting the portal light, and in one easy motion they snatch 
               },
             });
           }
+          // 🅱️ Case 2: You TRADED in ch3 (cone no, phone yes)
+          // → You already have the phone; portal scene is mostly flavor. No inventory change.
+
+          // 🅾️ Case 3: Weird state (neither cone nor phone somehow)
+          // → Failsafe: at least give the phone so the call scene can still run.
+          const hasPhoneAfter = !!a.hasItem?.(BEATUP_PHONE);
+          if (!hasPhoneAfter) {
+            a.addItem?.(BEATUP_PHONE, {
+              qty: 1,
+              meta: {
+                emoji: '📱',
+                note: 'Cracked screen. Somehow full bars.',
+              },
+            });
+          }
+
           a.saveToStorage?.();
         } catch (e) {
-          console.warn('[ch4] failed to grant Beat-Up Phone at portal:', e);
+          console.warn('[ch4] portal phone inventory sync failed:', e);
         }
       },
     },
