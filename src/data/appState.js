@@ -506,4 +506,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: 'v1.2.0 — Chapter 2: Fab Four' };
+window.devFlags = { build: 'v1.3.0 — StoryMode needs Ch3-5 Edits' };

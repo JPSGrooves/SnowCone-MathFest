@@ -125,25 +125,27 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v1.2.0</h3>
+      <h3>🧠 SnowCone MathFest v1.3.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
 
     <div class="settings-block">
-      <h3>v1.2.0 — Chapter 2: Fab Four</h3>
+      <h3>v1.3.0 — Story CYOA, Badges & Credits (Ch3–Ch5)</h3>
       <p>
-        – 📖 <strong>Story Mode Forest</strong>: <strong>Chapter 2 — Shift: Four Customers</strong> is live — Benjamin Banneker, Emmy Noether, Archimedes, and Luca Pacioli each arrive in a <em>bio → lore → puzzle → happy</em> flow and drop a token; clean finish drip and <strong>Ch.3 handoff</strong><br>
-        – 🪙 <strong>Token grants</strong>: <code>BANNEKER_TOKEN</code>, <code>NOETHER_TOKEN</code>, <code>ARCHIMEDES_TOKEN</code>, <code>PACIOLI_TOKEN</code> — one-shot, idempotent, inventory-driven gates<br>
-        – 🧩 <strong>Puzzles (practical phrasing)</strong>: Banneker timekeeping; Noether 2:3 stage-light pattern (“run the pattern N times”); Archimedes dunk test (3.0 L → 3000 cm³); Pacioli Cone Coin double-entry (Debits Unearned Cone Coins $5 & Cash $1; Credits Sales $5 & Tips Payable $1)<br>
-        – 🖼️ <strong>Portrait pipeline</strong>: high-res <code>PRO_BIG_IMG()</code>/<code>SCN_BIG_IMG()</code> helpers + larger legend band; 11:16 stage locked; zero underlap with bottom bar<br>
-        – 🔊 <strong>Music/mute parity</strong>: Howler one-tap unlock preserved; mute state mirrors UI on every slide<br>
-        – 🎉 <strong>Toasts & grants</strong>: XP +25 per reveal, +500 on chapter finish; celebration toasts are pointer-through and auto-dismiss; grants fire on happy slide only<br>
-        – 🧼 <strong>Stability & repaint</strong>: full unwire on exit (timers/RAF/listeners); background repaint nudge fixes rare stale frames on mobile<br>
-        – 🧪 <strong>QA pass</strong>: four tokens award exactly once; tiny phones keep bottom bar clear; lights puzzle scales; re-entry causes no duplicates<br>
-        – ⭐ <strong>Next</strong>: Chapter 2 completion badge + optional light SFX set (tick, scan, plunk, ledger flip)
+        – 📖 <strong>Story Mode Forest</strong>: Branch web for <strong>Ch.3 → Ch.4 → Ch.5</strong> is now locked — the CYOA “Trade” choice in Ch.3 flows cleanly through the portal/forge in Ch.4 into the two big endings in Ch.5 via <em>flags + inventory + router slides</em><br>
+        – 🍧 <strong>Perfect SnowCone vs Beat-Up Phone</strong>: <code>ch3_tradeChoice</code> sets the path — trading removes <code>MASTER_SIGIL</code> and grants <code>BEATUP_PHONE</code> with a pickup ping; keeping preserves the cone but marks the flag, and Ch.4 reads both to decide which portal/phone flavor you see<br>
+        – 🔨 <strong>Forge logic in the right place</strong>: Chapter 1’s Pocket Check quest is now the canonical forge — it consumes the three shard items, creates the <strong>Perfect SnowCone</strong>, fires a single epic pickup ping, and leaves chapter completion / currency drip to <code>Chapter1.onFinish</code> instead of a giant custom <code>onAdvance</code><br>
+        – ☎️ <strong>Portal, phone, and alignment</strong>: Ch.4’s <code>c4_portal_inventory_tug</code> router steers you into KEEP vs TRADE phone-call variants based on flags; the forge only re-adds the cone if it’s truly reforged, and the alignment GIVE branch now actually removes <code>PERFECT_CONE</code> before handing you into Ch.5<br>
+        – 🧭 <strong>Ch.5 endings router</strong>: <code>c5_entry_router</code> checks <code>hasItem(PERFECT_CONE)</code> and sends you to either the <em>Carry the Festival</em> path or the <em>New Driver</em> path; ending flags and inventory cleanup now match the story (“way home” vs “new driver”) without double-advances or weird state leaks<br>
+        – 🏅 <strong>Story badges + themes</strong>: Ch.1–Ch.5 completion badges are wired through <code>onFinish</code> hooks, and Ch.5 now calls <code>awardBadge('story_ch5')</code> so finishing the chapter always pops the new story badge and runs through the same <code>awardBadge</code> / theme-unlock pipeline as other modes<br>
+        – 📊 <strong>Completion + badge math</strong>: <code>badgeManager</code> now uses a canonical <code>BADGE_ALIAS</code> map and a shared <code>computeCompletionBreakdown()</code> (XP 70% / badges 25% / legend 5%) so Story Mode progress, badges, and the eventual legend unlock all feed into one global completion percent<br>
+        – 🧠 <strong>Chapter-complete signal</strong>: Story engine’s <code>_onAdvance()</code> now fires a <code>sm:chapterComplete</code> event, runs <code>chapter.onFinish</code> once, unlocks the next chapter, and then starts it — keeping XP, badges, and credits centralized instead of hand-wired per slide<br>
+        – 🎬 <strong>Story credits overlay</strong>: New <code>storyCredits</code> overlay lives in <code>storyCredits.js</code>; Ch.5’s <code>onFinish</code> calls <code>scheduleStoryCredits(800)</code> after save + badge so credits roll once per clear, mount inside <code>.sm-game-frame</code> when present, fall back to <code>document.body</code> if needed, and stay idempotent + pointer-through<br>
+        – ⭐ <strong>Next</strong>: Curate copy and art for the branches; test story badges end-to-end; optional pass to have credits roll on first clear only + maybe layer in subtle XP/SFX hooks on key beats
       </p>
     </div>
+
 
     <div class="settings-block">
       <h3>📲 App Info</h3>

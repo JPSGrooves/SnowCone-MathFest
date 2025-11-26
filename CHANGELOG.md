@@ -20,6 +20,159 @@
 * ✅ **v1.0.0 – Final Polish + Launch Ready✨**
 * ✅ **v1.1.0 – Chapter 1: It Has Begun✨**
 * ✅ **v1.2.0 – Chapter 2 in Story Mode✨**
+* ✅ **v1.3.0 – v1.3.0 — Story CYOA, Badges & Credits**
+
+## [1.3.0] – 2025-11-25 — **Story CYOA, Badges & Credits ✨**
+
+### Added
+
+- **Story Mode • Branch Spine for Chapters 3–5**
+  - Locked in the core branching mechanics for **Ch.3 → Ch.4 → Ch.5** using a consistent pattern:
+    - **Flags** = soft memory (what you chose).
+    - **Items** = hard state (what you actually have).
+    - **Router slides** = `ADVANCE` slides that jump by `id` instead of trusting linear order.
+  - This now drives:
+    - The CYOA **“Trade”** choice in **Chapter 3**.
+    - The **portal + phone call** lanes in **Chapter 4**.
+    - The **two big endings** in **Chapter 5**.
+
+- **Chapter 3 • First Real CYOA Node — _The Trade_**
+  - Trade slide wired as a true choice fork:
+    - **On trade:**
+      - Sets `flags.ch3_tradeChoice = 'trade'`.
+      - Consumes the Perfect SnowCone (`MASTER_SIGIL`) via `consumeItems()` fallback → `removeItem()` if needed.
+      - Grants `BEATUP_PHONE` once, with a `pickupPing` only if we actually add it.
+    - **On keep:**
+      - Sets `flags.ch3_tradeChoice = 'keep'`.
+      - Leaves inventory alone (Perfect SnowCone stays), but the flag marks the path.
+  - Result: the story remembers **what you did** and your items reflect **what you actually have**.
+
+- **Chapter 4 • Portal Inventory Tug + Phone Call Router**
+  - New `c4_portal_inventory_tug` slide:
+    - Reads `flags.ch3_tradeChoice` + inventory to decide whether you’re in the **KEEP lane** (cone gets stolen here) or **TRADE lane** (you already have the phone).
+  - Portal “drop” variants:
+    - `c4_portal_phone_keep` — hooded dino **steals the cone** and drops the phone.
+    - `c4_portal_phone_trade` — makes sure `BEATUP_PHONE` exists (for weird saves) and routes you into the call.
+  - Phone call router:
+    - Records `flags.ch4_phoneChoice = 'yes' | 'no'`.
+    - Uses a router slide to branch into:
+      - `c4_post_call_jehnk_approaches_yes`
+      - `c4_post_call_jehnk_approaches_no`
+
+- **Chapter 5 • Endings Router + Story Badge**
+  - A dedicated entry router now looks at:
+    - `hasItem(PERFECT_CONE)` and the branch flags to pick which ending lane you see (**carry-the-festival** vs **new-driver** vibe).
+  - `Chapter5.onFinish` now:
+    - Calls `awardBadge('story_ch5')` so finishing Ch.5 always awards the new story badge.
+    - Saves via `saveToStorage`.
+    - Arms the credits overlay with `scheduleStoryCredits(800)` (see below).
+
+- **Story Credits Overlay**
+  - New `storyCredits` overlay helper (in `storyCredits.js`) that:
+    - Mounts inside `.sm-game-frame` when it exists; falls back to `document.body` as a safety.
+    - Is idempotent (won’t stack multiple overlays).
+    - Uses pointer-through styling so it never blocks UI.
+  - Chapter 5 now calls `scheduleStoryCredits(800)` from `onFinish`:
+    - Credits appear **~0.8s after** the chapter truly ends instead of from random manual triggers.
+
+- **ChapterEngine • Quest `onComplete` Hook**
+  - `chapterEngine`’s quest system now supports a `quest.onComplete(appState, engine)` hook:
+    - First pays out normal `quest.reward` / `completionReward` via `grantReward`.
+    - Then runs `quest.onComplete(...)` for “big” logic like crafting or item fusion.
+
+- **Chapter 1 • Forge Flow on Quest Completion**
+  - Chapter 1 forge now uses that new quest hook instead of a giant `onAdvance` blob:
+    - Side quests grant the shards.
+    - **Pocket Check** quest:
+      - Checks for all three shards.
+      - Crafts the Perfect SnowCone at exactly the right story moment (only if you don’t already have it).
+      - Triggers `pickupPing` just once.
+  - Chapter completion badge + credits are kept separate from forge logic.
+
+- **Completion System • XP / Badges / Legend Blend**
+  - Added `computeCompletionBreakdown(store)` and `getCompletionPercent(store)`:
+    - **XP bucket:** 70% of the bar (normalized over caps).
+    - **Badges bucket:** 25% (non-legend badge fraction).
+    - **Legend bucket:** 5% (only when XP is full **and** all non-legend badges are done and the `legend` badge is owned).
+  - Profile tab now calls `appState.getCompletionPercent()` instead of doing its own math.
+
+- **Story Badge Data + Grouping**
+  - Story badges (including the new **Ch.5** badge) are defined in `data/badges.js`:
+    - Master list lives in one place; `badgeManager` + profile UI both read from it.
+    - Updated grouping arrays so Story badges sit in their own section and the **“how to reach 100%”** copy pulls from the same definitions.
+
+---
+
+### Changed
+
+- **Router Pattern Everywhere (Story)**
+  - All critical branches (Ch.3 Trade, Ch.4 portal and post-call, Ch.5 endings) now:
+    - Jump by slide `id` instead of assuming fixed indices.
+    - Look up `chapter.slides.findIndex(s => s.id === targetId)` and then render.
+  - You can now insert art slides or reorder content around those points **without blowing up the logic**.
+
+- **Chapter 4 • Phone Call Aftermath**
+  - Fixed the bug where players could see both Jehnk reactions in sequence:
+    - The new `c4_post_call_router` reads `flags.ch4_phoneChoice` and jumps to exactly **one** follow-up slide.
+    - Default flavor is the **NO** path if the flag is missing (defensive against weird saves).
+
+- **Story Chapter Completion Flow**
+  - `_onAdvance` in the story engine now:
+    - Grants normal slide rewards.
+    - Detects if a chapter actually finished.
+    - Dispatches a `sm:chapterComplete` event with `{ chapterId, nextChapterId, mode: 'to_next' }`.
+    - Calls `chapter.onFinish(appState, engine)` once.
+    - Unlocks and starts the next chapter when appropriate.
+  - This centralizes:
+    - **+100 XP** chapter-completion bonus.
+    - Chapter-completion SFX (short ding for Ch.1–Ch.4; Ch.5 intentionally silent).
+    - Badge awards (like `story_ch5`) and credits scheduling.
+
+- **Badge/Completion UI**
+  - Profile tab:
+    - Reads unified badge data from `data/badges.js`.
+    - Uses `getCompletionPercent` for the bar instead of its own custom fraction.
+    - Keeps the **“100% game”** explanation aligned with the real badge list and weights.
+
+---
+
+### Fixed
+
+- **Post-call Double-Reaction Bug (Ch.4)**
+  - Previously possible to see both Jehnk reactions after the phone call.
+  - Now impossible: the `c4_post_call_router` picks one lane based on `flags.ch4_phoneChoice` and jumps there; no second reaction path is ever queued.
+
+- **Story State Drift Around Trade/Portal**
+  - Ensured that:
+    - Trading the cone always removes `MASTER_SIGIL` and grants `BEATUP_PHONE` once.
+    - KEEP path steals the cone and drops the phone later at the portal.
+    - TRADE path makes sure the phone exists but never double-grants it.
+  - Inventory, flags, and narrative finally stay in sync across **Chapter 3 and 4**.
+
+---
+
+### Dev Notes (why we coded it this way)
+
+- **Flags + Items + Routers = Future-Proof Story**
+  - Flags remember what you chose; items describe what you’re actually carrying; routers jump by `id`.
+  - That combo means Future-You can shuffle slides, add art, or tweak pacing **without breaking the branch math**.
+
+- **Quest `onComplete` Keeps Forge Clean**
+  - Moving the forge into `quest.onComplete` keeps Chapter 1’s slide code readable:
+    - Quest system handles the “you did all the things.”
+    - Forge hook handles the “craft the cone now.”
+    - Credits, badges, and XP stay in their own lanes.
+
+- **Centralized Completion Math**
+  - Storing the **70/25/5** breakdown in helpers keeps every completion bar honest:
+    - One definition of **“100% game.”**
+    - Profile, grids, and future UI all read from the same calculation.
+
+- **Credits as a Scheduled Overlay**
+  - Using `scheduleStoryCredits(800)` instead of hand-triggering credits makes the emotional beat predictable:
+    - You finish Ch.5, breathe on the last line, *then* the credits roll in.
+    - No more “sometimes it pops, sometimes it doesn’t” energy.
+
 
 # [1.2.0] – 2025-11-10 — **Shift: Four Customers — Chapter 2 Live** 🌌
 
