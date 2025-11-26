@@ -24,13 +24,7 @@ const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
 // ─────────────────────────────
 const SM_UNLOCK_KEY = 'sm_unlocked_chapters_v1';
 
-function _displayFor(itemId){
-  const d = ITEM_DISPLAY?.[itemId] || {};
-  return {
-    name:  d.name  || String(itemId),
-    emoji: d.emoji || '✨'
-  };
-}
+
 
 
 function smLoadUnlocks() {
@@ -373,7 +367,7 @@ export class ChapterEngine {
       if (!slide || slide.id !== 'c5_final_the_end') return;
 
       // ✅ We are on Ch5's final slide and about to leave → start credits in 1s
-      scheduleStoryCredits(1000);
+      scheduleStoryCredits(500);
     } catch (err) {
       console.warn('[Story] failed to schedule credits from Ch5 final:', err);
     }
@@ -537,6 +531,48 @@ export class ChapterEngine {
       this._markVisited('weird'); this._onWeird(slide);
     });
   }
+
+    // ─────────────────────────────────────────────
+  // Side-path: LOOP (aka "Puzzle" button)
+  // Renders a single-screen vignette using slide.loop
+  // ─────────────────────────────────────────────
+  _onLoop(slide) {
+    const loop = slide.loop;
+    if (!loop) {
+      console.warn('[Story] _onLoop called but slide.loop is missing for', {
+        chapterId: this.state?.chapterId,
+        idx: this.state?.idx,
+      });
+      return this._renderSlide();
+    }
+
+    // Basic pieces from the loop payload
+    const title = `<h2 class="sm-ch1-title">${loop.title || ''}</h2>`;
+    const img   = loop.img
+      ? `<img class="sm-ch1-img" src="${loop.img}" alt="${loop.imgAlt ?? ''}">`
+      : '';
+    const text  = `<div class="sm-ch1-text">${loop.text || ''}</div>`;
+
+    const body = `
+      ${title}
+      ${img}
+      ${text}
+      <div class="sm-choice-list">
+        <button class="sm-btn sm-btn-secondary js-back">Back</button>
+      </div>
+    `;
+
+    // Render it into the normal Story frame (background, bottom bar, etc.)
+    this._renderFrame(body);
+
+    // Wire "Back" to return to the main slide
+    const root = document;
+    root.querySelector('.js-back')?.addEventListener('click', () => {
+      // Re-render the main slide we came from
+      this._renderSlide();
+    });
+  }
+
 
 // inside export class ChapterEngine { ... } — place below your other handlers
 _onCustomer(slide){

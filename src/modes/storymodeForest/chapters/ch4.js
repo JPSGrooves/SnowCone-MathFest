@@ -19,6 +19,22 @@ const SCN_BIG_IMG  = (n) => `${BASE}assets/img/modes/storymodeForest/${n}?lg=1`;
 const PERFECT_CONE = ItemIds.MASTER_SIGIL;
 const BEATUP_PHONE = ItemIds.BEATUP_PHONE;
 
+// 🧺 Forge ingredient item ids
+// ❗TODO: swap these four to the ACTUAL ItemIds you are using in storySchema
+// for the "recipe scraps, ratio card, ledger corner, truck artifact" etc.
+// 🧺 Forge ingredient item ids – the four "truck tools" from Chapter 2
+// Wooden Time Piece, Flashlight, Bottle of Water, Jehnk's Ledger
+// 🧺 Forge ingredient item ids – the four "truck tools" from Chapter 2:
+// Wooden Time Piece, Flashlight, Bottle of Water, Jehnk's Ledger
+const FORGE_INGREDIENT_IDS = [
+  ItemIds.BANNEKER_TOKEN,
+  ItemIds.NOETHER_TOKEN,
+  ItemIds.ARCHIMEDES_TOKEN,
+  ItemIds.PACIOLI_TOKEN,
+];
+
+
+
 // pull username once at module load
 const playerName = (() => {
   try {
@@ -378,7 +394,7 @@ He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“Th
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The Truck Driver',
-      img: PRO_IMG('jehnkPortal.png'),
+      img: PRO_IMG('portalDecision.png'),
       text: `You catch yourself staring at him differently now, like you can finally see the edges of something he’s been hiding.<br><br>
 <span style="color: rgb(247, 255, 105);">“Look,”</span> he says. <span style="color: rgb(247, 255, 105);">“I’d walk you back to the truck myself. But now that you’re here… you can know the truth.”</span>`,
       soloLabel: '“Tell me the truth.”',
@@ -390,8 +406,8 @@ He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“Th
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Looped Roads',
-      img: PRO_MED_IMG('itsAllGood.png'),
-      text: `“When I first started SnowCone MathFest,” Jehnk says, “it was all fun, music, and games.<br>
+      img: PRO_BIG_IMG('itsAllGood.png'),
+      text: `“When I first started SnowCone MathFest,” Jehnk says, “it was all good, fun, music, and games.<br>
 I thought I’d just roll in, serve cones, catch sets, ride the good vibes forever.”`,
       soloLabel: 'Next ➡️',
     },
@@ -473,68 +489,69 @@ Handed me the keys with a smile… and a fractions question I couldn’t answer.
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Forge Another',
-      img: PRO_MED_IMG('jehnkPortal.png'),
+      img: PRO_MED_IMG('portalDecision.png'),
       text: `“Always know your fractions,” Jehnk says. “They’re how the truck keeps its balance.”<br>He looks back at you, thoughtful.<br><span style="color: rgb(247, 255, 105);">“So tell me, ${playerName}… do you still have the stuff from when you worked the truck?”</span><br>Recipe scraps, ratio cards, ledger notes, all the little artifacts you’ve picked up over the night—they’re still rattling around in your pockets.<br><span style="color: rgb(247, 255, 105);">“I think we can use them to forge another Perfect SnowCone.”</span>`,
       soloLabel: 'Forge the new cone ➡️',
     },
 
     // 7) Forge another – setup, no item yet
     {
-      id: 'c4_no_cone_forge_action_intro',
-      role: SlideRole.ADVANCE,
-      mode: 'solo',
-      title: 'Reforged',
-      img: PRO_MED_IMG('essentialsTrio33.png'),
-      text: `You spread your truck tools out in the glow of the portal:<br>
-sticky recipe cards, ratio scribbles, a ledger corner stained with syrup.<br><br>
-Piece by piece, you rebuild the sequence—measure, pour, swirl, freeze.`,
-      soloLabel: 'Next ➡️',
-    },
-    // 7) Forge another – actual creation, grant MASTER_SIGIL back
-    {
-      id: 'c4_no_cone_forge_action',
-      role: SlideRole.ADVANCE,
-      mode: 'solo',
-      title: 'Reforged',
-      img: PRO_MED_IMG('essentialsTrio3.png'),
-      text: `The air thickens with mint and neon.<br><br>
+  id: 'c4_no_cone_forge_action',
+  role: SlideRole.ADVANCE,
+  mode: 'solo',
+  title: 'Reforged',
+  img: PRO_MED_IMG('essentialsTrio3.png'),
+  text: `The air thickens with mint and neon.<br><br>
 <span style="color: rgb(247, 255, 105);">“There we go,”</span> Jehnk says as the cone locks into place,
 colors cycling in impossible gradients.<br>
 <span style="color: rgb(247, 255, 105);">“I never cease to amaze myself with my ability to make these things.”</span>`,
-      soloLabel: 'Take the Perfect SnowCone ➡️',
-      onAdvance: ({ appState }) => {
-        const a = appState || globalAppState;
-        if (!a) return;
+  soloLabel: 'Take the Perfect SnowCone ➡️',
+  onAdvance: ({ appState }) => {
+    const a = appState || globalAppState;
+    if (!a) return;
 
+    try {
+      // 🔥 1) Consume one of each forge ingredient if present.
+      for (const ingredientId of FORGE_INGREDIENT_IDS) {
         try {
-          let grantedCone = false;
-
-          if (!a.hasItem?.(PERFECT_CONE)) {
-            a.addItem?.(PERFECT_CONE, {
-              qty: 1,
-            });
-            grantedCone = true;
+          if (a.hasItem?.(ingredientId)) {
+            a.removeItem?.(ingredientId); // same single-arg remove you use elsewhere
           }
-
-          // ✨ Fire pickup ping only if we actually forged a new cone here
-          if (grantedCone) {
-            try {
-              pickupPing({
-                emoji: '🍧',
-                name: 'The Perfect SnowCone',
-                qty: 1,
-              });
-            } catch (e) {
-              console.warn('[ch4] pickupPing failed during forge:', e);
-            }
-          }
-
-          a.saveToStorage?.();
         } catch (e) {
-          console.warn('[ch4] failed to grant Perfect SnowCone during forge:', e);
+          console.warn('[ch4] failed to consume forge ingredient', ingredientId, e);
         }
-      },
-    },
+      }
+
+      // 🍧 2) Grant the Perfect SnowCone if you somehow don't have it yet.
+      let grantedCone = false;
+
+      if (!a.hasItem?.(PERFECT_CONE)) {
+        a.addItem?.(PERFECT_CONE, { qty: 1 });
+        grantedCone = true;
+      }
+
+      // ✨ 3) Fire pickup ping only if we actually forged a new cone here.
+      if (grantedCone) {
+        try {
+          pickupPing({
+            emoji: '🍧',
+            name: 'The Perfect SnowCone',
+            qty: 1,
+          });
+        } catch (e) {
+          console.warn('[ch4] pickupPing failed during forge:', e);
+        }
+      }
+
+      // 💾 4) Persist the new inventory state.
+      a.saveToStorage?.();
+      window.dispatchEvent(new CustomEvent('sm:inventoryChanged'));
+    } catch (e) {
+      console.warn('[ch4] failed to grant Perfect SnowCone during forge:', e);
+    }
+  },
+},
+
 
 
     // 8) Alignment choice – setup part 1
@@ -543,7 +560,7 @@ colors cycling in impossible gradients.<br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Moment of Truth',
-      img: PRO_MED_IMG('portalDecision.png'),
+      img: PRO_MED_IMG('portalGlow2.png'),
       text: `The portal crackles brighter as you hold the Perfect SnowCone up to it.
 Every color in the cone answers back in shimmering waves.<br><br>
 
@@ -557,7 +574,7 @@ Every color in the cone answers back in shimmering waves.<br><br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Moment of Truth',
-      img: PRO_MED_IMG('portalDecision2.png'),
+      img: PRO_MED_IMG('portalDecision.png'),
       text: `<span style="color: rgb(247, 255, 105);">“The Perfect SnowCone only works if you’re being served.
             I could make a million of these things and still never pass through that portal myself.”</span> Then he serves you the SnowCone`,
       soloLabel: 'Next ➡️',

@@ -35,9 +35,9 @@ export const Chapter5 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Crossing Over',
-      img: PRO_IMG('portalGlow2.png'),
+      img: PRO_MED_IMG('jehnkPortal.png'),
       text: `Portal light folds back into itself like a slow breath.<br><br>
-Whatever you chose with Jehnk—keeping the cone or handing it over—has already locked into the math of this place.<br><br>
+Your decision with Jehnk has already locked into the math of this place.<br><br>
 You feel the after-image of the moment hanging in the air, waiting to collapse into one reality or the other.`,
       soloLabel: 'See what became of your choice ➡️',
       onAdvance: ({ appState, engine }) => {
@@ -72,9 +72,9 @@ You feel the after-image of the moment hanging in the air, waiting to collapse i
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_IMG('homeReturn.png'),
+      img: PRO_MED_IMG('jehnkPortal2.png'),
       text: `You tighten your grip on the Perfect SnowCone.<br><br>
-<span style="color: rgb(247, 255, 105);">“I’m sorry,”</span> you tell Jehnk. <span style="color: rgb(247, 255, 105);">“I can’t leave myself stuck here.”</span><br><br>
+<span style="color: rgb(105, 248, 255);">“I’m sorry,”</span> you tell Jehnk. <span style="color: rgb(105, 248, 255);">“I can’t leave myself stuck here.”</span><br><br>
 He studies your face for a long moment, then nods.<br>
 <span style="color: rgb(247, 255, 105);">“I get it,”</span> he says quietly. <span style="color: rgb(247, 255, 105);">“Really. Someone should make it out.”</span>`,
       soloLabel: 'Next ➡️',
@@ -86,7 +86,7 @@ He studies your face for a long moment, then nods.<br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_MED_IMG('homeReturn.png'),
+      img: PRO_MED_IMG('portalGlow2.png'),
       text: `You turn toward the portal. The closer you walk, the more the cone burns cold in your hand,
 every color locking into a perfect ratio of light.<br><br>
 You step through.`,
@@ -99,11 +99,23 @@ You step through.`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_MED_IMG('homeReturn.png'),
+      img: PRO_MED_IMG('homeReturn2.png'),
       text: `When you open your eyes, you’re home.<br><br>
 No portal. No math ghosts. No hooded dinos. Just your regular life,
 waiting patiently like it never left.<br><br>
 But everything feels… different.`,
+      soloLabel: 'Next ➡️',
+    },
+        {
+      id: 'c5_keep_cone_ending_4',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Carry the Festival',
+      img: PRO_MED_IMG('homeReturn3.png'),
+      text: `Now, when you solve an equation, you see the stage lights behind it.
+Every time a pattern untangles in your head, you hear a distant beat.
+Even smashing a random mosquito reminds you of the campsite at Kids Camping,
+of the nights when numbers and fireflies were the same kind of magic.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -113,13 +125,8 @@ But everything feels… different.`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_MED_IMG('homeReturn.png'),
-      text: `Now, when you solve an equation, you see the stage lights behind it.
-Every time a pattern untangles in your head, you hear a distant beat.
-Even smashing a random mosquito reminds you of the campsite at Kids Camping,
-of the nights when numbers and fireflies were the same kind of magic.<br><br>
-SnowCone MathFest hasn’t vanished.<br><br>
-You’re still there, every time you balance something that felt impossible.`,
+      img: PRO_BIG_IMG('homeReturn4.png'),
+      text: `SnowCone MathFest hasn’t vanished.<br><br>You’re still there, every time you balance something that felt impossible.`,
       soloLabel: 'Look back… just once ➡️',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -151,7 +158,7 @@ You’re still there, every time you balance something that felt impossible.`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The New Driver',
-      img: PRO_MED_IMG('truckLoop.png'),
+      img: PRO_MED_IMG('portalDecision2.png'),
       text: `You press the Perfect SnowCone into Jehnk’s hands.<br><br>
 For a second, all three of you—the cone, the driver, and the portal—sync in the same pulse.
 The light flares. The festival hums.<br><br>
@@ -179,7 +186,7 @@ He takes one slow bite and vanishes in a halo of syrup light.`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The New Driver',
-      img: PRO_MED_IMG('truckLoop.png'),
+      img: PRO_MED_IMG('truckLoop2.png'),
       text: `When the glow fades, the keys are in your hand.<br><br>
 You climb into the driver’s seat. You drive.<br><br>
 You try exits. You try back roads. You even try turning the truck completely off.`,
@@ -192,7 +199,7 @@ You try exits. You try back roads. You even try turning the truck completely off
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The New Driver',
-      img: PRO_MED_IMG('truckLoop.png'),
+      img: PRO_MED_IMG('truckLoop4.png'),
       text: `But Jehnk was right. Every route circles back to the same entrance gate.<br><br>
 You’ve lost signal to the tiny dino—the beat-up phone just flashes <b>NO SERVICE</b> in every timeline.<br><br>
 Still, as you pull into SnowCone MathFest for what feels like the 67th time, you see them:<br>
@@ -241,7 +248,7 @@ clutching a ticket instead of a wristband…`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The End?',
-      img: PRO_MED_IMG('festivalFade.png'), // 🔧 subtle, dreamy fest art
+      img: PRO_MED_IMG('truckLoop3.png'), // 🔧 subtle, dreamy fest art
       text: `SnowCone MathFest doesn’t erase cleanly.<br><br>
 For some people, it’s a place on a map—a festival you drive to once,<br>
 then forget after the merch fades and the playlists move on.`,
@@ -249,16 +256,47 @@ then forget after the merch fades and the playlists move on.`,
     },
 
     // Final Epilogue – part 2 (@ Maybe you’re home)
+        // Final Epilogue – part 2 (@ Maybe you’re home)
     {
       id: 'c5_final_the_end_2',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'The End?',
-      img: PRO_MED_IMG('festivalFade.png'),
+      img: PRO_MED_IMG('festivalFade2.png'),
       text: `For you, it’s a loop, or a memory, or a glitch in the road where music and math keep folding into each other.<br><br>
 Maybe you’re at the truck, keys in hand, waiting for the next unlucky soul to wander up with a ticket instead of a wristband.`,
       soloLabel: 'Next ➡️',
+      onAdvance: ({ appState, engine }) => {
+        const a = appState || globalAppState;
+        if (!engine) return;
+
+        const chapter = engine.registry[engine.state.chapterId];
+        if (!chapter) return;
+
+        // We already set these earlier:
+        //  - ending_way_home   (KEEP the cone, go home)
+        //  - ending_driver_loop (GIVE the cone, stay as driver)
+        const flags = a?.flags || {};
+        const isDriver = !!flags.ending_driver_loop;
+
+        // 🚦 If you're the driver, skip the "maybe you're home" slide
+        // and jump straight to the final epilogue button screen.
+        const targetId = isDriver
+          ? 'c5_final_the_end'    // driver: stay in the fest, no "home" slide
+          : 'c5_final_the_end_3'; // way-home ending: show the "maybe you're home" beat
+
+        const idx = chapter.slides.findIndex((s) => s.id === targetId);
+        if (idx >= 0) {
+          engine.state.idx = idx;
+          engine._renderSlide();
+          return 'handled';
+        }
+
+        // fallback: let engine advance linearly if something's weird
+        return false;
+      },
     },
+
 
     // Final Epilogue – part 3 (@ For now, the screen)
     {
@@ -282,7 +320,7 @@ It just knows how to pause.`,
       title: 'The End?',
       img: PRO_MED_IMG('festivalFade.png'), // 🔧 subtle, dreamy fest art
       text: `For now, the screen fades, the music softens,<br>
-and four little words hang at the edge of the UI like a promise:<br><br>
+and two little words hang at the edge of the UI like a promise:<br><br>
 <b>The End?</b>`,
       options: [
         {

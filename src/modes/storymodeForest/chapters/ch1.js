@@ -1,16 +1,23 @@
-// ch1.js (clean)
+// src/modes/storyMode/chapters/ch1.js
 import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
 import { awardBadge } from '../../../managers/badgeManager.js';
-import { pickupPing } from '../ui/pickupPing.js'; 
+import { pickupPing } from '../ui/pickupPing.js';
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG = (name) => `${BASE}assets/img/characters/storyMode/${name}`;
 const SCN_IMG = (name) => `${BASE}assets/img/modes/storymodeForest/${name}`;
 
 // ───────────────── helpers ─────────────────
-const SHARDS = [ItemIds.TRIANGLE_SHARD, ItemIds.SQUARE_SHARD, ItemIds.CIRCLE_SHARD];
-const countShards = (hasItemFn) => SHARDS.reduce((n, id) => n + (hasItemFn(id) ? 1 : 0), 0);
+const SHARDS = [
+  ItemIds.TRIANGLE_SHARD,
+  ItemIds.SQUARE_SHARD,
+  ItemIds.CIRCLE_SHARD,
+];
+
+const countShards = (hasItemFn) =>
+  SHARDS.reduce((n, id) => n + (hasItemFn(id) ? 1 : 0), 0);
+
 
 // ───────────────── chapter ─────────────────
 export const Chapter1 = {
@@ -203,7 +210,8 @@ export const Chapter1 = {
 
         // ✅ bonus screen only if player holds the *square* (mint) item
         // NOTE: change ItemIds.MINT_SQUARE to your actual square item id (e.g. SQUARE_SIGIL, SQUARE_CHIP, etc.)
-        extraWhen: (appState) => appState.hasItem?.(ItemIds.SQUARE_SHARD),
+        extraWhen: (appState) => !!appState?.hasItem?.(ItemIds.SQUARE_SHARD),
+
 
         extra: {
             title: '<span style="color: rgb(164, 255, 164);">Mint Recipe, Eh?</span>',
@@ -229,7 +237,8 @@ export const Chapter1 = {
       // Side choices: dynamic descriptors
       loopLabel: 'Question the Recipes</span>',
       questLabel: (appState) => {
-        const total = (appState.listItems?.() ?? []).reduce((n, it) => n + (it.qty ?? 1), 0);
+        const items = appState?.listItems?.() ?? [];
+        const total = items.reduce((n, it) => n + (it.qty ?? 1), 0);
         return total >= 3 ? 'Forge the Perfect SnowCone' : 'Scavenge more parts';
       },
       weirdLabel: 'A Syrup Story',
