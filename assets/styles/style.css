@@ -1,3 +1,4 @@
+/* ✨ style.css ✨ */
 /* ✨ REFACTORED CSS FOR UNIFIED MENU + MODE BACKGROUND SYSTEM ✨ */
 
 /* 🌌 Global Reset */
@@ -514,3 +515,82 @@ html, body {
 }
 
 /* (keep your existing .cta / .cta-primary styles) */
+/* 🍄 Secret Menu SnowCone XP – "Mushroom Popper" */
+
+/* Invisible hitbox sitting over the cone in the menu art */
+.mushroom-popper-hitbox {
+  position: absolute;
+  /* Centered horizontally, roughly where the cone lives */
+  left: 50%;
+  top: 24vh; /* tweak this if you want it higher/lower */
+  transform: translateX(-50%);
+
+  /* Size feels like the cone head and a bit of cone */
+  width: min(18vh, 26vw);
+  height: min(18vh, 26vw);
+
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  /* Make sure it sits above grid labels but under modals */
+  z-index: 6;
+
+  /* No default button chrome */
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* kill focus ring (we’re using it like a pure hitbox) */
+.mushroom-popper-hitbox:focus {
+  outline: none;
+}
+
+.mushroom-pop {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, 0) scale(0.8);
+
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.9rem, 1.4vh + 0.4rem, 1.4rem);
+  color: #fffd9a;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.85),
+    0 0 10px rgba(255, 255, 150, 0.9),
+    0 0 18px rgba(255, 255, 150, 0.7);
+
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+
+  /* 👇 NEW: float above menu + grid, but under badge-banner if that ever fires */
+  z-index: 9990;
+
+  /* smooth edges over the starfield */
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.75));
+}
+
+
+/* when we toggle this class, the animation plays once then we remove it in JS */
+.mushroom-pop.mushroom-pop-live {
+  animation: mushroom-pop-float 0.9s ease-out forwards;
+}
+
+@keyframes mushroom-pop-float {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.7);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -2px) scale(1.0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -38px) scale(1.05);
+  }
+}
