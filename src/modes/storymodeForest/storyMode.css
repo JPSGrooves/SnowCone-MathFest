@@ -1437,3 +1437,43 @@
   object-fit: contain !important;
   margin: clamp(6px, 1vh, 12px) auto !important;
 }
+/* ─────────────────────────────
+   CH3 – Quiz OPTION buttons slightly larger
+   (only the answers, not the advance button)
+   ───────────────────────────── */
+
+#game-container .sm-ch1[data-chapter="ch3"] .sm-quiz-choices .sm-quiz-choice {
+  /* a touch bigger than the global .sm-btn, but not wild */
+  font-size: clamp(1rem, 1.1vh + 0.45rem, 1.2rem);
+  line-height: 1.2;
+  padding: clamp(0.55rem, 1.6vh, 0.9rem) clamp(0.9rem, 2.2vh, 1.25rem);
+}
+
+/* keep them from shrinking too hard on tiny screens */
+@media (max-width: 380px), (max-height: 640px) {
+  #game-container .sm-ch1[data-chapter="ch3"] .sm-quiz-choices .sm-quiz-choice {
+    font-size: clamp(0.95rem, 1.0vh + 0.4rem, 1.1rem);
+  }
+}
+/* ─────────────────────────────
+   Bigger pink option buttons for key choice/quiz slides
+   (Trade, Call, Forge-adjacent quiz, Moment of Truth)
+   ───────────────────────────── */
+
+.sm-choice-options .sm-btn.sm-choice-option-big,
+.sm-quiz-choices  .sm-btn.sm-quiz-choice-big {
+  /* slightly taller + larger text than baseline sm-btn */
+  padding: clamp(0.7rem, 1.8vh, 1.05rem) clamp(0.95rem, 2.2vh, 1.4rem);
+  font-size: clamp(1.0rem, 1.0vh + 0.55rem, 1.25rem);
+  line-height: 1.15;
+}
+
+/* optional: give them a bit more visual weight without breaking the glow */
+.sm-choice-options .sm-btn.sm-choice-option-big {
+  box-shadow: 0 0 14px rgba(255, 90, 217, 0.55);
+}
+
+.sm-quiz-choices .sm-btn.sm-quiz-choice-big {
+  box-shadow: 0 0 14px rgba(255, 90, 217, 0.55);
+}
+

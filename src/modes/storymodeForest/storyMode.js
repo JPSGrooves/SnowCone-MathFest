@@ -794,7 +794,7 @@ const unlockedCh5 =
             <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue</button>
 
             <button class="sm-btn sm-btn-primary" id="smCh1">
-              Chapter 1 — The Gate
+              Chapter 1 — At the Gates
             </button>
 
             <button
@@ -802,7 +802,7 @@ const unlockedCh5 =
                id="smCh2"
                ${unlockedCh2 ? '' : 'disabled title="Find the Perfect SnowCone in Chapter 1 to unlock"'}
              >
-               Chapter 2 — Shift: Four Customers
+               Chapter 2 — The Four Customers
             </button>
 
             <button
@@ -810,7 +810,7 @@ const unlockedCh5 =
                id="smCh3"
                ${unlockedCh3 ? '' : 'disabled title="Finish Chapter 2 to unlock"'}
             >
-               Chapter 3 — The Acts
+               Chapter 3 — The Music Acts
             </button>
 
             <button
@@ -818,7 +818,7 @@ const unlockedCh5 =
                id="smCh4"
                ${unlockedCh4 ? '' : 'disabled title="Follow the Dino into the forest to unlock"'}
             >
-               Chapter 4 — Into the Forest
+               Chapter 4 — Portal in the Forest
             </button>
 
             <button
@@ -826,7 +826,7 @@ const unlockedCh5 =
               id="smCh5"
               ${unlockedCh5 ? '' : 'disabled title="Finish Chapter 4 to unlock"'}
             >
-              Chapter 5 — Endings
+              Chapter 5 — SnowCone Endings
             </button>
 
           </div>

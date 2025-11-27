@@ -228,8 +228,8 @@ The phone buzzes in your hand—battery icon full, signal bars pegged. Whatever 
       title: 'The Call',
       img: PRO_MED_IMG('tinyDinoHood.png'),
       text: `You thumb the cracked screen. The call connects with a click and a little burst of static.<br><br>
-<span style="color: rgb(143, 190, 255);">“Whoa, it actually worked!”</span> The voice is tiny but unmistakable—the hooded dino.<br><br>
-<span style="color: rgb(143, 190, 255);">“I wasn’t sure the portal would sync up right, but I’m back. My original timeline, my original loop.”</span>`,
+<span style="color: rgb(61, 229, 255);">“Whoa, it actually worked!”</span> The voice is tiny but unmistakable—the hooded dino.<br><br>
+<span style="color: rgb(61, 229, 255);">“I wasn’t sure the portal would sync up right, but I’m back. My original timeline, my original loop.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -240,8 +240,8 @@ The phone buzzes in your hand—battery icon full, signal bars pegged. Whatever 
       title: 'The Call',
       img: PRO_MED_IMG('tinyDinoHood.png'),
       text: `You hear festival noise on their side—same party, different angle.<br><br>
-<span style="color: rgb(143, 190, 255);">“SnowCone MathFest isn’t just a place,”</span> they say.
-<span style="color: rgb(143, 190, 255);">“It’s an in-between. Past, present, future—they all line up here when the symmetry’s just right.”</span>`,
+<span style="color: rgb(61, 229, 255);">“SnowCone MathFest isn’t just a place,”</span> they say.
+<span style="color: rgb(61, 229, 255);">“It’s an in-between. Past, present, future—they all line up here when the symmetry’s just right.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -252,12 +252,13 @@ The phone buzzes in your hand—battery icon full, signal bars pegged. Whatever 
     title: 'The Call',
     img: PRO_IMG('tinyDinoHood.png'),
     text: `There’s a quiet moment between ringtones and bass drops.<br>
-    <span style="color: rgb(143, 190, 255);">“So… ${playerName}, you ready to go home?”</span>`,
+    <span style="color: rgb(61, 229, 255);">“So… ${playerName}, you ready to go home?”</span>`,
+    bigChoices: true,
     choices: [
         {
         id: 'yes',
         label: '“Yeah. I think I’m ready to go home.”',
-        praise: `<span style="color: rgb(143, 190, 255);">“Honestly? Best plan,”</span> the dino says. <span style="color: rgb(143, 190, 255);">“Make another Perfect SnowCone, ride the symmetry out. Clean exit.”</span>`,
+        praise: `<span style="color: rgb(61, 229, 255);">“Honestly? Best plan,”</span> the dino says. <span style="color: rgb(61, 229, 255);">“Make another Perfect SnowCone, ride the symmetry out. Clean exit.”</span>`,
         onSelect: ({ appState }) => {
             const a = appState || globalAppState;
             try {
@@ -272,7 +273,7 @@ The phone buzzes in your hand—battery icon full, signal bars pegged. Whatever 
         {
         id: 'no',
         label: '“No. I’m not done here yet.”',
-        praise: `<span style="color: rgb(143, 190, 255);">“I’m gonna have to advise against that,”</span> they sigh. <span style="color: rgb(143, 190, 255);">“You don’t know Jehnk like I do…”</span>`,
+        praise: `<span style="color: rgb(61, 229, 255);">“I’m gonna have to advise against that,”</span> they sigh. <span style="color: rgb(61, 229, 255);">“You don’t know Jehnk like I do…”</span>`,
         onSelect: ({ appState }) => {
             const a = appState || globalAppState;
             try {
@@ -458,6 +459,7 @@ Handed me the keys with a smile… and a fractions question I couldn’t answer.
       mode: 'quiz3',
       title: 'Fraction Trap',
       text: `“<span style="color: rgb(247, 255, 105);">“If the remix flavor is \\(\\tfrac{2}{3}\\) of each cone, what fraction of the entire batch is remix flavor?”</span><br><br>You think of the total cones, the piece per cone, and how it all stacks together.`,
+      bigQuizOptions: true,
       quiz: {
         options: [
           {
@@ -588,6 +590,7 @@ Every color in the cone answers back in shimmering waves.<br><br>
       title: 'Moment of Truth',
       img: PRO_IMG('essentialsTrio3.png'),
       text: `He looks from the cone to the doorway, then back to you.<br><br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that snowcone.”</span>`,
+      bigChoices: true,
       choices: [
         {
           id: 'c4_choice_keep_cone',

@@ -36,7 +36,7 @@ export const Chapter3 = {
       title: 'Follow the Sound',
       img: PRO_MED_IMG('jehnkNews.png'), // same art for now
       text: `Jehnk leans back to finish his newspaper, stage lights flickering off his shades.<br>
-      <span style="color: rgb(247, 255, 105);">"Best part of SnowCone MathFest?"</span> he grins. <span style="color: rgb(247, 255, 105);">"THE MUSIC! ${playerName}, you can sling cones forever, but if you never see the acts, you’ll miss half the math."</span>`,
+      <span style="color: rgb(247, 255, 105);">"Best part of SnowCone MathFest?"</span> he asks. <span style="color: rgb(247, 255, 105);">"THE MUSIC! ${playerName}, you can sling cones forever, but if you never see the acts, you’ll miss half the math."</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -46,7 +46,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Follow the Sound',
       img: PRO_MED_IMG('jehnkNod.png'), // can swap to a wider festival shot later if you want
-      text: `He points across the grounds:<br><span style="color: rgb(143, 190, 255);">Cosmic Phil</span> at the QuickServe Pavilion,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br>and <span style="color: rgb(217, 164, 255);">Grampy P</span> tucked in by his tent at MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
+      text: `He references the legendary music at the festival:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil</span> over at QuickServe,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br>and <span style="color: rgb(217, 164, 255);">Grampy P</span> by his tent in MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
       soloLabel: 'Head to the first stage ➡️',
     },
 
@@ -61,7 +61,7 @@ export const Chapter3 = {
       title: 'QuickServe Pavilion',
       img: PRO_BIG_IMG('qsPavilion.png'), // pavilion art
       text: `The QuickServe Pavilion glows like a jukebox cracked open.<br>
-      Order boards flicker, mixers pulse, and the line moves in sync with the beat.`,
+      The lights fan out and crowds gather 'round to hear the headline act, <span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -71,7 +71,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'QuickServe Pavilion',
       img: PRO_MED_IMG('phil_06_hype.png'), // same scene for continuity
-      text: `Up on stage, <span style="color: rgb(143, 190, 255);">Cosmic Phil</span> rides a stack of samplers, looping fryer hiss, cup clacks, and register beeps into a steady 1:45 groove.`,
+      text: `Up on stage, <span style="color: rgb(61, 229, 255);">Cosmic Phil</span> jumps in the air with his cosmic keytar, his looping fingers playing jazz/rock chords on full display; keys on fire, always registering 1 minute 45 seconds grooves.`,
       soloLabel: 'Move into the crowd ➡️',
     },
 
@@ -81,9 +81,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Kool Kat’s Review',
       img: PRO_MED_IMG('koolKatStage.png'),
-      text: `Kool Kat is vending the pavilion, slipping SnowCones to the front row like they’re backstage passes.<br>You nudge up beside Kool Kat at the rail.<br>
-      <span style="color: rgb(143, 190, 255);">"Phil records the line,"</span> she says.
-      <span style="color: rgb(143, 190, 255);">"Every order’s a sample. Every ‘Next!’ is a snare drum."</span>`,
+      text: `Kool Kat is vending the pavilion, slipping SnowCones to the front row like they’re backstage passes.<br>You nudge up beside Kool Kat at the rail.<br><br><span style="color: rgb(61, 229, 255);">"Phil is killing it tonight,"</span> she yells.<span style="color: rgb(61, 229, 255);">"He brings the best crowds of the festival and always keeps the vibes pumping."</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -92,21 +90,21 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Kool Kat’s Review',
-      img: PRO_MED_IMG('koolKatStage2.png'),
-      text: `She nods at the scoreboard.
-      <span style="color: rgb(143, 190, 255);">"He builds a loop, runs it for one full batch, then flips the recipe on the next chorus. Same timing, new pattern. That’s his whole thing—keep the structure, scramble the flavors."</span>`,
+      img: PRO_IMG('koolKatStage2.png'),
+      text: `She nods at the stage, where tiny lights climb and fall into sine waves.<br><br><span style="color: rgb(61, 229, 255);">"Phil used to play parking lots,"</span> she shouts over the crowd. <span style="color: rgb(61, 229, 255);">"He’d loop the sound of cars rolling in, fans standing in line, cones getting shaved… then flip all that noise into a groove."</span><br><br><span style="color: rgb(61, 229, 255);">"Now he does the same thing with us,"</span> she gloats. <span style="color: rgb(61, 229, 255);">"He builds a loop from whoever shows up, runs it into one full batch. That’s Phil—keep the structure, scramble the flavors, and make every set feel like the festival is lining up just for you."</span>`,
       soloLabel: 'Before you go… ➡️',
     },
+
     {
       role: SlideRole.ADVANCE,
       mode: 'quiz3',
       title: 'Cosmic Phil – Before You Go…',
-      text: `Kool Kat tilts her sunglasses toward you.<br><span style="color: rgb(143, 190, 255);">\"So, ${playerName}… if you wanted to really vibe with Cosmic Phil tonight, what’s the move?\"</span>`,
+      text: `Kool Kat tilts her sunglasses toward you.<br><span style="color: rgb(61, 229, 255);">\"So, ${playerName}… if you wanted to really vibe with Cosmic Phil tonight, what’s the move?\"</span>`,
       quiz: {
         options: [
           {
             id: 'a',
-            label: 'Listen for the loop length and noticehow the recipe changes.',
+            label: 'Listen for the loop length and notice how the recipe changes.',
             correct: true,
             praise: `Exactly! Cosmic Phil lives on structure with shifting details.`,
           },
@@ -132,7 +130,7 @@ export const Chapter3 = {
       title: 'Kool Kat’s Review',
       img: PRO_MED_IMG('koolKatStage3.png'),
       text: `Her friend appears and lets her know its time to switch shifts...
-      <span style="color: rgb(143, 190, 255);">"Welp, that's my queue! We all work this fest in one way or another, just try to have fun along the way and you'll enjoy every day!"</span>`,
+      <span style="color: rgb(61, 229, 255);">"Welp, that's my queue! We all work this fest in one way or another, just try to have fun along the way and you'll enjoy every day!"</span>`,
       soloLabel: 'Head to Infinity Lake ➡️',
     },
 
@@ -299,13 +297,14 @@ export const Chapter3 = {
     mode: 'choice3',
     title: 'The Trade',
     img: PRO_MED_IMG('dinoTrade.png'),
-    text: `His gaze lands on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your hand.<br><span style="color: rgb(143, 190, 255);">\"That one doesn’t melt easy,\"</span> he whispers. <span style="color: rgb(143, 190, 255);">\"But neither does this.\"</span><br>From his hoodie, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, battery icon somehow full.<br><span style="color: rgb(143, 190, 255);">\"Trade?\"</span>`,
+    text: `His gaze lands on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your hand.<br><span style="color: rgb(61, 229, 255);">\"That one doesn’t melt easy,\"</span> he whispers. <span style="color: rgb(61, 229, 255);">\"But neither does this.\"</span><br>From his hoodie, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, battery icon somehow full.<br><span style="color: rgb(61, 229, 255);">\"Trade?\"</span>`,
     choiceAdvanceLabel: 'Go into the forest ➡️',
+    bigChoices: true,
     choices: [
         {
         id: 'trade',
         label: 'Trade the Perfect SnowCone for the beat-up phone',
-        praise: `<span style="color: rgb(143, 190, 255);">The dino grins. \"Good call. Some signals don’t show up unless you’re tuned in.\"</span>`,
+        praise: `<span style="color: rgb(61, 229, 255);">The dino grins. \"Good call. Some signals don’t show up unless you’re tuned in.\"</span>`,
         onSelect: ({ appState }) => {
             try {
             // 🔹 record the latest choice
@@ -345,7 +344,7 @@ export const Chapter3 = {
         {
         id: 'keep',
         label: 'Keep the Perfect SnowCone',
-        praise: `<span style="color: rgb(143, 190, 255);">The dino shrugs. \"Some legends gotta be carried, not traded.\"</span>`,
+        praise: `<span style="color: rgb(61, 229, 255);">The dino shrugs. \"Some legends gotta be carried, not traded.\"</span>`,
         onSelect: ({ appState }) => {
             try {
             appState.flags = appState.flags || {};
@@ -366,7 +365,7 @@ export const Chapter3 = {
       title: 'Into the Trees',
       img: PRO_MED_IMG('phoneRun.png'),
       text: `The hooded dino nods once and darts back into the branches.<br><br>
-      <span style="color: rgb(143, 190, 255);">"Only way out is through the forest,"</span> he reveals softly from somewhere you can’t quite see.`,
+      <span style="color: rgb(61, 229, 255);">"Only way out is through the forest,"</span> he reveals softly from somewhere you can’t quite see.`,
       soloLabel: 'Next ➡️',
     },
 

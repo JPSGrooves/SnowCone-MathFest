@@ -575,67 +575,84 @@ export class ChapterEngine {
 
 
 // inside export class ChapterEngine { ... } — place below your other handlers
+// inside export class ChapterEngine { ... }
+
 _onCustomer(slide){
-  // inside function _onCustomer(slide) { ... }
-    const C = slide.customer || {};
-    let step = 0;
-    let didReveal = false;
+  const C = slide.customer || {};
+  let step = 0;
+  let didReveal = false;
 
-    const headerHTML = () => `
+  const headerHTML = () => `
     <div class="sm-customer-header">
-        <h2 class="sm-ch1-title sm-customer-title">
+      <h2 class="sm-ch1-title sm-customer-title">
         ${slide.title || `Customer • ${C.name || 'Guest'}`}
-        </h2>
-        <div class="sm-customer-meta sm-customer-step-pill">
+      </h2>
+      <div class="sm-customer-meta sm-customer-step-pill">
         <span class="sm-customer-step">Step ${step + 1}/3</span>
-        </div>
+      </div>
     </div>
-    `;
+  `;
 
-    const card = (s) => `
+  const card = (s) => `
     ${s?.img ? `<img class="sm-ch1-img" src="${s.img}" alt="">` : ''}
     <div class="sm-ch1-text">${s?.text || ''}</div>`;
 
-    // render()
-    const render = () => {
+  const render = () => {
     let inner = '';
-    if (step === 0) inner = card(C.bio);
-    else if (step === 1) inner = card(C.lore);
-    else {
-        inner = `
+
+    if (step === 0) {
+      inner = card(C.bio);
+    } else if (step === 1) {
+      inner = card(C.lore);
+    } else {
+      inner = `
         ${C.puzzle?.img ? `<img class="sm-ch1-img" src="${C.puzzle.img}" alt="">` : ''}
         <div class="sm-ch1-text">${C.puzzle?.prompt || ''}</div>
         <div class="sm-ch1-reveal-hold"></div>`;
     }
 
     const controls = (() => {
-        if (step < 2) {
+      if (step < 2) {
         return `
-            <div class="sm-choice-list">
-            ${step>0 ? `<button class="sm-btn sm-btn-secondary js-prev">Back</button>` : ''}
+          <div class="sm-choice-list">
+            ${step > 0 ? `<button class="sm-btn sm-btn-secondary js-prev">Back</button>` : ''}
             <button class="sm-btn sm-btn-primary js-next">Next ➡️</button>
-            </div>`;
-        }
-        return `
+          </div>`;
+      }
+
+      // step === 2 (puzzle stage)
+      return `
         <div class="sm-choice-list">
-            <button class="sm-btn sm-btn-secondary js-prev">Back</button>
-            <button class="sm-btn sm-btn-primary js-reveal">Reveal</button>
-            <button class="sm-btn sm-btn-primary js-serve ${didReveal ? '' : 'is-disabled'}" ${didReveal ? '' : 'disabled'}>Serve the SnowCone ➡️</button>
+          <button class="sm-btn sm-btn-secondary js-prev">Back</button>
+          <button class="sm-btn sm-btn-primary js-reveal">Reveal</button>
+          <button class="sm-btn sm-btn-primary js-serve ${didReveal ? '' : 'is-disabled'}" ${didReveal ? '' : 'disabled'}>
+            Serve the SnowCone ➡️
+          </button>
         </div>`;
     })();
 
     this._renderFrame(`${headerHTML()}${inner}${controls}`);
 
-
     const root = document;
 
+    // Bio + Lore steps
     if (step < 2) {
-      root.querySelector('.js-prev')?.addEventListener('click', () => { step = Math.max(0, step-1); render(); });
-      root.querySelector('.js-next')?.addEventListener('click', () => { step = Math.min(2, step+1); render(); });
+      root.querySelector('.js-prev')?.addEventListener('click', () => {
+        step = Math.max(0, step - 1);
+        render();
+      });
+
+      root.querySelector('.js-next')?.addEventListener('click', () => {
+        step = Math.min(2, step + 1);
+        render();
+      });
+
       return;
     }
 
-    // step === 2 (Puzzle)
+    // ─────────────────────────────
+    // Puzzle step (step === 2)
+    // ─────────────────────────────
     const revealBtn = root.querySelector('.js-reveal');
     const serveBtn  = root.querySelector('.js-serve');
 
@@ -645,34 +662,49 @@ _onCustomer(slide){
       serveBtn.classList.toggle('is-disabled', !didReveal);
     }
 
+    // REVEAL → fade in answer + checkmark, same pattern as Ch1 quests
     revealBtn?.addEventListener('click', () => {
       const hold = root.querySelector('.sm-ch1-reveal-hold');
       if (hold && !hold.querySelector('.sm-reveal-answer')) {
         const ans = document.createElement('div');
-        ans.className = 'sm-reveal-answer is-open';
+        ans.className = 'sm-reveal-answer is-open'; // CSS handles fade just like Ch1
         ans.innerHTML = C.puzzle?.reveal || '';
         hold.appendChild(ans);
       }
+
       // 🔓 unlock Serve
       didReveal = true;
       if (serveBtn) {
         serveBtn.disabled = false;
         serveBtn.classList.remove('is-disabled');
       }
+
+      // ✅ match Ch1 quest behavior: button goes "Revealed" with checkmark
+      if (revealBtn) {
+        revealBtn.classList.add('is-visited', 'is-disabled');
+        revealBtn.disabled = true;
+        revealBtn.innerHTML = `
+          <span class="sm-check" aria-hidden="true">✓</span> Revealed
+        `;
+      }
     }, { once: true });
 
-    root.querySelector('.js-prev')?.addEventListener('click', () => { step = Math.max(0, step-1); render(); });
+    // Back from puzzle → previous step
+    root.querySelector('.js-prev')?.addEventListener('click', () => {
+      step = Math.max(0, step - 1);
+      render();
+    });
 
+    // Serve only works after reveal
     root.querySelector('.js-serve')?.addEventListener('click', () => {
       if (!didReveal) return; // hard gate
       const chapter = this.registry[this.state.chapterId];
-      this._onAdvance(chapter, slide, { disabled:false });
+      this._onAdvance(chapter, slide, { disabled: false });
     });
   };
 
   render();
 }
-
   /**
    * 3-option quiz:
    * - slide.mode === 'quiz3'
@@ -682,14 +714,24 @@ _onCustomer(slide){
    *   }
    * - slide.text = question/prompt
    */
+    /**
+   * 3-option quiz:
+   * - slide.mode === 'quiz3'
+   * - slide.quiz = {
+   *     options: [{ id, label, correct, praise? }, ...],
+   *     advanceLabel?: string
+   *   }
+   * - slide.text = question/prompt
+   */
   _renderQuizSlide(chapter, slide) {
-    const title = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
-    const img   = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
-    const prompt = slide.text || '';
+    const title   = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
+    const img     = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
+    const prompt  = slide.text || '';
+    const isBig   = !!slide.bigQuizOptions; // 👈 NEW flag
 
     const optionsHtml = (slide.quiz.options || []).map((opt, idx) => `
       <button
-        class="sm-btn sm-btn-secondary sm-quiz-choice"
+        class="sm-btn sm-btn-secondary sm-quiz-choice${isBig ? ' sm-quiz-choice-big' : ''}"
         data-i="${idx}"
         data-correct="${opt.correct ? '1' : '0'}"
       >
@@ -723,9 +765,9 @@ _onCustomer(slide){
 
     this._renderFrame(inner);
 
-    const root = document;
+    const root       = document;
     const advanceBtn = root.querySelector('.js-advance');
-    const note = root.getElementById('smQuizNote');
+    const note       = root.getElementById('smQuizNote');
 
     if (advanceBtn) {
       advanceBtn.disabled = true;
@@ -762,7 +804,7 @@ _onCustomer(slide){
             advanceBtn.classList.remove('is-disabled');
           }
         } else {
-          // gentle "try again", but keep other buttons live
+          // gentle "try again"
           if (note) {
             note.innerHTML = opt.praise || 'Not quite—try another one.';
           }
@@ -777,8 +819,7 @@ _onCustomer(slide){
       this._onAdvance(chapter, slide, { disabled: false });
     });
   }
-
-    /**
+  /**
    * Choice/trade slide:
    * - slide.mode === 'choice3'
    * - slide.choices = [
@@ -786,14 +827,15 @@ _onCustomer(slide){
    *   ]
    * - slide.choiceAdvanceLabel?: string
    */
-    _renderChoiceSlide(chapter, slide) {
+  _renderChoiceSlide(chapter, slide) {
     const title  = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
     const img    = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
     const prompt = slide.text || '';
+    const isBig  = !!slide.bigChoices; // 👈 NEW flag
 
     const optionsHtml = (slide.choices || []).map((opt) => `
       <button
-        class="sm-btn sm-btn-secondary sm-choice-option"
+        class="sm-btn sm-btn-secondary sm-choice-option${isBig ? ' sm-choice-option-big' : ''}"
         data-id="${opt.id}"
       >
         ${opt.label}
@@ -880,8 +922,7 @@ _onCustomer(slide){
       });
     });
 
-    // 🔻 THIS is the key part: portal-style routing
-    // 🔻 THIS is the key part: portal-style routing
+    // 🔻 Portal / next-chapter aware advance
     advanceBtn?.addEventListener('click', () => {
       if (advanceBtn.disabled) return;
 
@@ -889,7 +930,7 @@ _onCustomer(slide){
 
       // If this choice points to another chapter, handle it here
       if (choice && choice.nextChapterId && this.registry[choice.nextChapterId]) {
-        // 1) Same reward plumbing as _onAdvance
+        // 1) Normal reward plumbing
         this._grantSlideRewards(slide);
 
         let handled = false;
@@ -903,7 +944,7 @@ _onCustomer(slide){
         }
         if (handled) return;
 
-        // 2) Treat this as "chapter finished" before portaling out
+        // 2) Finish current chapter before portaling
         if (typeof chapter.onFinish === 'function') {
           try {
             chapter.onFinish({ appState, engine: this });
@@ -912,23 +953,21 @@ _onCustomer(slide){
           }
         }
 
-        // 3) Unlock and portal into the new chapter
+        // 3) Unlock and start the new chapter
         this._unlockChapter(choice.nextChapterId);
         this.start(choice.nextChapterId);
 
-        // Optional: jump to a specific slide id inside that chapter
+        // Optional: jump to specific slide
         if (choice.nextId) {
           this._gotoById(choice.nextId);
         }
         return;
       }
 
-      // Fallback: normal per-slide behavior (same-chapter advance / finish)
+      // Fallback: normal advance
       this._onAdvance(chapter, slide, { disabled: false });
     });
-
   }
-
 
 _onAdvance(chapter, slide, topOpt){
   const last = chapter.slides.length - 1;
