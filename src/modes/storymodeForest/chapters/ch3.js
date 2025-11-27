@@ -33,7 +33,7 @@ export const Chapter3 = {
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Follow the Sound',
+      title: 'Start of the Show',
       img: PRO_MED_IMG('jehnkNews.png'), // same art for now
       text: `Jehnk leans back to finish his newspaper, stage lights flickering off his shades.<br>
       <span style="color: rgb(247, 255, 105);">"Best part of SnowCone MathFest?"</span> he asks. <span style="color: rgb(247, 255, 105);">"THE MUSIC! ${playerName}, you can sling cones forever, but if you never see the acts, you’ll miss half the math."</span>`,
@@ -46,7 +46,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Follow the Sound',
       img: PRO_MED_IMG('jehnkNod.png'), // can swap to a wider festival shot later if you want
-      text: `He references the legendary music of SnowCone MathFest:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil</span> over at QuickServe,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br>and <span style="color: rgb(217, 164, 255);">Grampy P</span> by his tent in MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
+      text: `He references the legendary music of SnowCone MathFest:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil</span> over at QuickServe,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br><span style="color: rgb(217, 164, 255);">Grampy P</span> by his tent in MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
       soloLabel: 'Head to the first stage ➡️',
     },
 
@@ -61,7 +61,7 @@ export const Chapter3 = {
       title: 'QuickServe Pavilion',
       img: PRO_BIG_IMG('qsPavilion.png'), // pavilion art
       text: `The QuickServe Pavilion glows like a cracked open jukebox glowstick.<br>
-      The lights pulse and crowds gather 'round to hear the headline act: <span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
+      The lights pulse and crowds gather 'round to hear the headline act:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -69,9 +69,9 @@ export const Chapter3 = {
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'QuickServe Pavilion',
+      title: 'Cosmic Phil',
       img: PRO_MED_IMG('phil_06_hype.png'), // same scene for continuity
-      text: `Already up on stage, <span style="color: rgb(61, 229, 255);">Cosmic Phil</span> jumps in the air with his trademark cosmic keytar. His looping fingers playing jazzy chords on full display, his keys are on fire, always registering the tastiest 1 minute 45 seconds grooves.`,
+      text: `Already up on stage, <span style="color: rgb(61, 229, 255);">Cosmic Phil</span> jumps in the air with his trademark cosmic keytar. His looping fingers put jazzy chords on full display, keys on fire, always dishing out the tastiest of 1 minute & 45 second grooves.`,
       soloLabel: 'Move into the crowd ➡️',
     },
 
@@ -79,9 +79,9 @@ export const Chapter3 = {
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Kool Kat’s Review',
+      title: 'So we meet again...',
       img: PRO_MED_IMG('koolKatStage.png'),
-      text: `You catch Kool Kat is vending the pavilion, slipping SnowCones to the front row like they’re backstage passes.<br>You nudge up beside her at the rail.<br><br><span style="color: rgb(61, 229, 255);">"Phil is killing it tonight,"</span> she yells.<span style="color: rgb(61, 229, 255);">"He brings the best crowds of the festival and always creates the most cosmic vibes."</span>`,
+      text: `You catch <span style="color: rgb(61, 229, 255);">Kool Kat</span> vending the pavilion, slipping SnowCones to the front row like they’re backstage passes. You nudge up beside her at the rail.<br><br><span style="color: rgb(61, 229, 255);">"Phil is killing it tonight,"</span> she yells.<span style="color: rgb(61, 229, 255);">"He brings the best crowds to the festival and always creates the most cosmic vibes."</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -89,7 +89,7 @@ export const Chapter3 = {
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Kool Kat’s Review',
+      title: 'Origins of Cosmic Phil',
       img: PRO_IMG('koolKatStage2.png'),
       text: `She nods at the stage, where tiny lights climb and fall into sine waves.<br><br><span style="color: rgb(61, 229, 255);">"Phil used to play parking lots,"</span> she shouts over the crowd. <span style="color: rgb(61, 229, 255);">"He’d loop the sound of cars rolling in, fans standing in line, cones getting shaved… then flip all that noise into a groove."</span><br><br><span style="color: rgb(61, 229, 255);">"Now he does the same thing with us,"</span> she gloats. <span style="color: rgb(61, 229, 255);">"He builds a loop from whoever shows up and runs it into one full batch. That’s Phil—keep the structure, scramble the flavors, and make every set feel like the festival is lining up just for you."</span>`,
       soloLabel: 'Before you go… ➡️',
@@ -98,27 +98,27 @@ export const Chapter3 = {
     {
       role: SlideRole.ADVANCE,
       mode: 'quiz3',
-      title: 'Cosmic Phil – Before You Go…',
-      text: `Kool Kat tilts her sunglasses toward you.<br><span style="color: rgb(61, 229, 255);">\"So, ${playerName}… if you wanted to really vibe with Cosmic Phil tonight, what’s the move?\"</span>`,
+      title: 'Concert Vibes',
+      text: `Kool Kat is struck with an important question:<br><span style="color: rgb(61, 229, 255);">\"So, ${playerName}… if someone wants to really vibe with Cosmic Phil tonight, What's the move?\"</span>`,
       quiz: {
         options: [
           {
             id: 'a',
-            label: 'Listen for the loop length and notice how the recipe changes.',
+            label: 'Listen for the keytar solo and vibe out with eyes closed.',
             correct: true,
-            praise: `Exactly! Cosmic Phil lives on structure with shifting details.`,
+            praise: `Exactly! Cosmic Phil's solos try to break the cosmic structure!`,
           },
           {
             id: 'b',
-            label: 'Ignore the beat and just count how many people leave the line.',
+            label: 'Worry about who might be watching while you do a silly dance.',
             correct: false,
-            praise: `That’s crowd control math, not Cosmic Phil’s deal. Try again.`,
+            praise: `Trust your dance and you'll inspire others. Try again.`,
           },
           {
             id: 'c',
             label: 'Talk loudly to people around you while the concert is going on.',
             correct: false,
-            praise: `Shhh..if you were talking about the show it would've been fine...`,
+            praise: `Shhh..at least during the quiet parts. Try again.`,
           },
         ],
         advanceLabel: 'Before you go… ➡️',
@@ -127,10 +127,10 @@ export const Chapter3 = {
         {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Kool Kat’s Review',
+      title: 'Festival Duties',
       img: PRO_MED_IMG('koolKatStage3.png'),
-      text: `Her friend, Mr. Leo, appears and lets her know its time to switch shifts...
-      <span style="color: rgb(61, 229, 255);">"Welp, that's my queue! We all work this fest in one way or another; just try to have fun along the way and you'll enjoy every day!"</span>`,
+      text: `Her friend, Mr. Leo, appears and lets her know it's time to switch shifts...
+      <span style="color: rgb(61, 229, 255);">"Welp, that's my queue! We all work this fest in one way or another; I just try to have fun along the way, so I enjoy every day!"</span>`,
       soloLabel: 'Head to Infinity Lake ➡️',
     },
 
@@ -143,9 +143,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Infinity Lake',
       img: PRO_MED_IMG('infinityLakeStage.png'),
-      text: `You follow a shimmer of reverb down to Infinity Lake. You remember Banneker humming the tune and get excited that you made it this far.<br><br>
-      You see three silhouettes practicing in a lit up tent, preparing for a set on a floating dock, hands over the water—
-      <span style="color: rgb(164, 255, 164);">the Infinity Triplets</span>.`,
+      text: `You follow a shimmer of reverb down to Infinity Lake. You remember Banneker humming the tune and get excited that you made it this far.<br><br>You see three silhouettes practicing in a lit up tent, preparing for a set on a floating dock, hands over the water—<br><span style="color: rgb(164, 255, 164);">The Infinity Triplets</span>.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -153,59 +151,58 @@ export const Chapter3 = {
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Infinity Lake',
+      title: 'Meticulous Echoes',
       img: PRO_MED_IMG('fieldsInfinity.png'),
-      text: `Dr. Kenny Fields has rigged the lake with little buoy lights that pulse on each echo.<br>
-      Every clap throws a ring; every ring doubles back in time.`,
-      soloLabel: 'Move into the crowd ➡️',
+      text: `<span style="color: rgb(164, 255, 164);">Dr. Kenny Fields</span>, taking a break from pancakes, has rigged the lake with little buoy lights that pulse on each echo.<br>
+      Every echo is being trained to send out a calbrated bubble; every bubble doubles back in time and then double bubbles.`,
+      soloLabel: 'Take a break with him ➡️',
     },
 
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Dockside Fan',
-      img: PRO_MED_IMG('ratioFields.png'),
-      text: `A fan in a rain poncho leans over the rail beside you.<br><span style="color: rgb(164, 255, 164);">\"Triplets always run three echoes per beat,\"</span> they shout over the water. <span style="color: rgb(164, 255, 164);">\"First echo for the stage, second for the lake, third for the sky.\"</span><br><br>
-      They point to the buoys. <span style="color: rgb(164, 255, 164);">\"Kenny keeps the lake honest—same tempo every time. The Triplets only change the *spacing* between echoes, never the total loop. That’s why it feels endless but never lost.\"</span>`,
+      title: 'Verifying Results',
+      img: PRO_IMG('ratioFields.png'),
+      text: `He leans back and checks the echoes with headphones.<br><span style="color: rgb(164, 255, 164);">\"Triplets always run three echoes per beat,\"</span> he shouts over the water. <span style="color: rgb(164, 255, 164);">\"First echo for the stage, second for the lake, and third for the sky.\"</span><br><br>He points to the buoys. <span style="color: rgb(164, 255, 164);">\"I'm trying to keep the lake honest, it's same tempo every time but the lake makes it sound different. The Triplets expertly change the *spacing* between echoes, creating perfect loops. That’s why it feels endless but never lost.\"</span>`,
       soloLabel: 'Before you go… ➡️',
     },
     {
       role: SlideRole.ADVANCE,
       mode: 'quiz3',
-      title: 'Infinity Triplets – Before You Go…',
-      text: `The fan grabs the rail.<br><span style="color: rgb(164, 255, 164);">\"One last check, ${playerName}. What’s the trick that makes an Infinity Triplets set feel infinite but still grounded?\"</span>`,
+      title: 'Fields Tests Your Echo',
+      text: `<span style="color: rgb(164, 255, 164);">\"One last check, ${playerName}. What’s the trick that makes an Infinity Triplets set feel infinite but still grounded?\"</span>`,
       quiz: {
         options: [
           {
             id: 'a',
-            label: 'They keep changing tempo randomly so no one can predict the next clap.',
+            label: 'They change the tempo randomly so no one can predict the next clap.',
             correct: false,
-            praise: `Random tempo changes would just feel chaotic, not infinite. Try again.`,
+            praise: `Nope! Random tempo changes would just feel chaotic, not infinite.`,
           },
           {
             id: 'b',
-            label: 'They keep the overall loop length steady while only changing how the three echoes are spaced inside it.',
+            label: 'They keep the loop length steady, but only change how the three echoes are spaced inside it.',
             correct: true,
-            praise: `Yep. Fixed loop, flexible spacing—Infinity in a frame.`,
+            praise: `Yep! Fixed loop, flexible spacing—Infinity in a frame.`,
           },
           {
             id: 'c',
             label: 'They play a giant echo until sunrise and then go home.',
             correct: false,
-            praise: `That’d be dramatic, but not the Triplets’ way.`,
+            praise: `Nah...That’d be dramatic, but hardly infinite.`,
           },
         ],
-        advanceLabel: 'Walk to MathTips Village ➡️',
+        advanceLabel: 'Before you go...➡️',
       },
     },
         {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Dockside Fan',
+      title: 'Sittin at the Dock',
       img: PRO_MED_IMG('fieldsJamming.png'),
-      text: `Fields finds his way to the music again...
-      <span style="color: rgb(164, 255, 164);">"Ah, there it is! The perfect balance of predictability and surprise. Just like math!"</span>`,
-      soloLabel: 'Before you go… ➡️',
+      text: `Fields lets his experiments float on and he finds his way back to the music...
+      <span style="color: rgb(164, 255, 164);">"Ah, there it is! The perfect balance of predictability and surprise. I could analyze it all day, but it's also important to put the calculator down and just listen to the music!"</span>`,
+      soloLabel: 'Go to MathTips Village ➡️',
     },
 
     // ─────────────────────────────────────────
@@ -215,37 +212,36 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'MathTips Village',
-      img: PRO_MED_IMG('mathTipsVillage.png'),
-      text: `The noise of the stages fades into a low hum as you wander into MathTips Village.<br>Lanterns hang from tent poles. Whiteboards glow softly. In the middle of it all, <span style="color: rgb(217, 164, 255);">Grampy P</span> sits by his tent with a notebook and a SnowCone, just listening.<br>He’s not teaching, not preaching—just watching patterns walk by.`,
-      soloLabel: 'Move into the crowd ➡️',
+      img: PRO_IMG('mathTipsVillage.png'),
+      text: `The noise of the stages fades into a low hum as you wander into MathTips Village.<br><br>Lanterns hang from tent poles. Whiteboards glow softly. In the middle of it all, <span style="color: rgb(217, 164, 255);">Grampy P</span> sits by his tent with a notebook and a SnowCone, just listening.<br><br>He’s not teaching, not preaching—just watching patterns walk by. Always ready to jot down a thought or a question.`,
+      soloLabel: 'Move through the tents ➡️',
     },
     // Grampy’s Neighbor – part 1
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Grampy’s Neighbor',
+      title: 'Grampy Watches',
       img: PRO_BIG_IMG('grampyP.png'),
-      text: `A nearby camper taps their pencil against a clipboard.<br><br>
-      <span style="color: rgb(217, 164, 255);">"Grampy P’s whole thing is *questions*,"</span> they say.
-      <span style="color: rgb(217, 164, 255);">"He doesn’t grade you. He just wants to know how you’re thinking."</span>`,
+      text: `A nearby camper taps their pencil against a clipboard as <span style="color: rgb(217, 164, 255);">Grampy P</span> looks up from his notebook and smiles.<br><br><span style="color: rgb(217, 164, 255);">"I used to sit at a desk and circle wrong answers all day,"</span> he admits softly.<br><span style="color: rgb(217, 164, 255);">"Out here, I just listen. I care way more about the story behind your mistake than the mistake itself. If you tell me what you were trying to do, we’re already doing math together."</span>`,
       soloLabel: 'Next ➡️',
     },
-
     // Grampy’s Neighbor – part 2
     {
       role: SlideRole.ADVANCE,
       mode: 'solo',
-      title: 'Grampy’s Neighbor',
+      title: 'Grampy’s Lesson',
       img: PRO_MED_IMG('grampyLesson.png'),
-      text: `They nod at his notebook.
-      <span style="color: rgb(217, 164, 255);">"He writes down good questions like he’s collecting rare trading cards. Math, feelings, stories—it all goes in the same journal."</span>`,
-      soloLabel: 'Before you go… ➡️',
+      text: `A ring of tiny dinosaur campers crowds around his notebook, tails swishing in the dust.<br><br>
+          <span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, sketching a tiny grid, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a missing piece."</span><br>
+          <span style="color: rgb(217, 164, 255);">"If you can tell me what you *already* know, we can usually spot what’s missing together. That’s the whole trick: name the pattern, then nudge it forward one small step."</span>`,
+      soloLabel: 'Take the Test… ➡️',
     },
+
     {
       role: SlideRole.ADVANCE,
       mode: 'quiz3',
-      title: 'Grampy P – Before You Go…',
-      text: `Grampy P gives you a small nod over the rim of his cone.<br><span style="color: rgb(217, 164, 255);">\"Alright, ${playerName}, one last check-in,\"</span> he murmurs. <span style="color: rgb(217, 164, 255);">\"What do you think I care about most out here?\"</span>`,
+      title: 'Grampy P Tests You…',
+      text: `Grampy P gives you a small nod past his guitar,<br><span style="color: rgb(217, 164, 255);">\"Alright, ${playerName}, tell me now,\"</span> he murmurs. <span style="color: rgb(217, 164, 255);">\"What do you think I care about most out here?\"</span>`,
       quiz: {
         options: [
           {
@@ -258,7 +254,7 @@ export const Chapter3 = {
             id: 'b',
             label: 'Collecting as many rare SnowCones as possible.',
             correct: false,
-            praise: `<span style="color: rgb(217, 164, 255);">I like cones, but that’s not what I'm most concerned with.</span>`,
+            praise: `<span style="color: rgb(217, 164, 255);">Nah...I like cones, but that’s not what I'm most concerned with.</span>`,
           },
           {
             id: 'c',
@@ -267,7 +263,7 @@ export const Chapter3 = {
             praise: `<span style="color: rgb(217, 164, 255);">Yeah. The thinking and the questions—that’s my favorite part.</span>`,
           },
         ],
-        advanceLabel: 'Head back toward the truck ➡️',
+        advanceLabel: 'Before you go... ➡️',
       },
     },
         {
@@ -275,9 +271,8 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Grampy’s Neighbor',
       img: PRO_MED_IMG('grampyPoint.png'),
-      text: `Grampy P knows you can't stay, but send a farewell as he points at a dinsoaur trying to get your attention.
-      <span style="color: rgb(217, 164, 255);">"I'll be here if you ever need a fractions lesson, haiku, joke, or how much you should tip your waiter. But it looks like that hooded dino over there wants your attention."</span>`,
-      soloLabel: 'Before you go… ➡️',
+      text: `Grampy P knows you can't stay, but is always sure to give you a warm farewell,<br><span style="color: rgb(217, 164, 255);">"I'll be here if you ever need a fraction lesson, haiku, joke, or to know how much you should tip your waiter...Though, it looks like that hooded dino over there wants your attention."</span>`,
+      soloLabel: 'He points to the dino ➡️',
     },
 
     // ─────────────────────────────────────────
@@ -288,7 +283,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'A Familiar Hood',
       img: PRO_MED_IMG('hoodedDinoPath.png'),
-      text: `On your way back to the truck, the path narrows into trees.<br>A small hooded dino pads out of the shadows—the same one who killed the floodlights and slipped you the MoonChain.<br>He tilts his head, eyes catching the glow from your pockets.`,
+      text: `<span style="color: rgb(61, 229, 255);">Psst!</span><br>A small hooded dino pads out of the shadows—the same one who killed the floodlights and slipped you the MoonChain.<br>He tilts his head, eyes catching the glow from your pockets.`,
       soloLabel: 'Go talk to the dino ➡️',
     },
 
@@ -296,9 +291,9 @@ export const Chapter3 = {
     role: SlideRole.ADVANCE,
     mode: 'choice3',
     title: 'The Trade',
-    img: PRO_MED_IMG('dinoTrade.png'),
-    text: `His gaze lands on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your hand.<br><span style="color: rgb(61, 229, 255);">\"That one doesn’t melt easy,\"</span> he whispers. <span style="color: rgb(61, 229, 255);">\"But neither does this.\"</span><br>From his hoodie, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, battery icon somehow full.<br><span style="color: rgb(61, 229, 255);">\"Trade?\"</span>`,
-    choiceAdvanceLabel: 'Go into the forest ➡️',
+    img: PRO_IMG('dinoTrade.png'),
+    text: `His gaze lands on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your inventory.<br><span style="color: rgb(61, 229, 255);">\"That one doesn’t melt easy,\"</span> he whispers. <span style="color: rgb(61, 229, 255);">\"But neither does this.\"</span><br>From his hoodie, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, battery icon somehow full.<br><span style="color: rgb(61, 229, 255);">\"Trade?\"</span>`,
+    choiceAdvanceLabel: 'The Dino Dips ➡️',
     bigChoices: true,
     choices: [
         {
@@ -364,22 +359,21 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Into the Trees',
       img: PRO_MED_IMG('phoneRun.png'),
-      text: `The hooded dino nods once and darts back into the branches.<br><br>
-      <span style="color: rgb(61, 229, 255);">"Only way out is through the forest,"</span> he reveals softly from somewhere you can’t quite see.`,
+      text: `The hooded dino nods once and darts back into the branches.<br><br>He cryptically states, <span style="color: rgb(61, 229, 255);">"Only way out is through the forest!"</span> You pocket your things and follow the sound of crunching leaves as you head deeper into the woods.`,
       soloLabel: 'Next ➡️',
     },
 
-    // Into the Trees – part 2
-    {
-      role: SlideRole.ADVANCE,
-      mode: 'solo',
-      title: 'Into the Trees',
-      img: PRO_IMG('forestPath.png'),
-      text: `You step off the festival path. The music thins. Crickets and distant subs share a strange, quiet rhythm.<br><br>
-      Step by step, you slip deeper between the trunks, wondering what could possibly be next.`,
-      soloLabel: 'Keep walking ➡️',
-      nextChapterId: 'ch4',
-    },
+  // Into the Trees – part 2
+  {
+    role: SlideRole.ADVANCE,
+    mode: 'solo',
+    title: 'Into the Trees',
+    img: PRO_IMG('forestPath.png'),
+    text: `You step off the festival path. The bass fades first, then the crowd noise, like someone slowly turning down a dial.<br><br>The hooded dino's voice lingers—<span style="color: rgb(61, 229, 255);">“only way out”</span>—looping in your head like a half-finished lyric.<br><br>What did that tiny dino mean? Out of the forest? Out of the festival? Out of whatever this whole thing really is?<br><br>Each step between the trunks feels less like exploring a party and more like walking into the question behind it.`,
+    soloLabel: 'Keep walking ➡️',
+    nextChapterId: 'ch4',
+  },
+
 
   ],
   onFinish: ({ appState }) => {
