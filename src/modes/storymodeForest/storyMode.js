@@ -170,7 +170,7 @@ const PROLOGUE_PAGES = [
         I hated math when I was young.<br>
         It was cold 🥶. It was lifeless 💀. It was just a bunch of numbers 🔢.<br>
         I needed it to move 🕺💃. To sing 🎶🎤. To matter ❤️.<br>
-        That's why I started the SnowCone MathFest 🍧🚚🎉.<br>
+        That's why I went to the SnowCone MathFest 🍧🚚🎉.<br>
         <img src="${PRO_IMG('boredJehnk.png')}" alt="Jehnk bored in math class" class="sm-slide-image">
       </div>`
   },
@@ -190,7 +190,8 @@ const PROLOGUE_PAGES = [
         <img src="${PRO_IMG('iceyTruck.png')}" alt="crystal ice truck" class="sm-slide-image">
       </div>`
   },
-
+  // Page 3 — Pythagorus image
+  { type: 'image', src: PRO_IMG('pythagoraspicture.png'), caption: "Pythagorus - Eyes the Gates" },
   // Page 2 — Pythagorus text
   {
     type: 'html',
@@ -198,13 +199,11 @@ const PROLOGUE_PAGES = [
       <div class="sm-slide-text">
         <strong style="font-size:1.2em; color: yellow;">Pythagorus Explains the Song of Fractions</strong><br><br>
         <span style="color:#00ccff;">"Music is the math you already know 🎶 — deep in your bones 💀🎸.<br><br>
-        When you go up a string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️,
-        yet somehow you can feel the whole journey echo back to you 🔄 from this midpoint.<br><br>
-        It’s as if the universe has whispered its secret 🌌🤫: that harmony lives in the space between two points."</span>
+        When you go up a string and press exactly at its midpoint 📏✂️, you’ve traveled halfway along its path ↔️.
+        Somehow you can feel the whole journey echo back to you 🔄 from this midpoint.<br><br>
+        It’s as if the festival has whispered its secret 🌌🤫: that harmony lives in the space between two points."</span>
       </div>`
   },
-  // Page 3 — Pythagorus image
-  { type: 'image', src: PRO_IMG('pythagoraspicture.png'), caption: "Pythagorus Eyes the Gates" },
     // Page 2A — Pythagorus text response
   {
     type: 'html',
@@ -215,9 +214,9 @@ const PROLOGUE_PAGES = [
             class="sm-slide-image sm-cosmic">
         <strong style="font-size:1.2em; color: yellow;">I served him a SnowCone 🍧...</strong><br>
         ...and knew, that here at SnowCone MathFest 🌈🎉,
-        every neon beat is an octave you’ve already unlocked 🎵🔓 —<br><br>
-        Maybe we're always just halfway to the next octave, but we can always discover the hidden frequencies
-        singing along the path 👆🎶.
+        every neon beat has an octave waiting to be unlocked 🎵🔓.<br><br>
+        I wondered if we're always just halfway to the next note. Hearing where we've been and where we want to go, but always appreciating the hidden, singing frequencies
+        scattered along the path 👆🎶.
       </div>`
   },
 
@@ -245,7 +244,8 @@ const PROLOGUE_PAGES = [
     }
   },
 
-
+  // Page 6 — Euclid image
+  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid decides to grab a cone..." },
 
   // Page 5 — Euclid text
   {
@@ -254,7 +254,7 @@ const PROLOGUE_PAGES = [
       <div class="sm-slide-text">
         <strong style="font-size:1.3em; color: yellow;">Euclid Nears the Truck</strong><br>
         <span style="color:#00ccff;">"All structure, seen or unseen, begins with a line ✏️➡️📏."</span>
-        He paused, tracing his proofs and figures through the void —
+        He pauses, tracing his proofs and figures through the void —
         <span style="color:#00ccff;">"The simplest gesture births every shape, every temple, every constellation above.
         Each angle is a handshake between points 🤝, each intersection is a moment of cosmic agreement.<br><br>
         <img 
@@ -263,11 +263,9 @@ const PROLOGUE_PAGES = [
           class="sm-slide-image sm-slide-image-bram"
         />
         Even a circle is simply a promise kept — every point faithful to its center 🌀.<br>
-        Infinity itself is a patient horizon, waiting for steady interpretation through distant stars 🌌."</span>
+        Infinity itself is a patient horizon, waiting for steady interpretation as we pass through the stars 🌌."</span>
       </div>`
   },
-  // Page 6 — Euclid image
-  { type: 'image', src: PRO_IMG('euclidpicture.png'), caption: "Euclid decides to grab a cone..." },
   {
     type: 'html',
     html: `
@@ -288,8 +286,8 @@ const PROLOGUE_PAGES = [
     items: [
       {
         prompt:
-          "Euclid immediately notices the odd-shaped SnowCone and measures a right triangle with legs of 3 cm and 4 cm. " +
-          "<span style='color:#00ccff'>“What’s the hypotenuse length?”</span> 🤔📐",
+          "Euclid immediately notices the off-shaped SnowCone that measures like a right triangle with legs of 3 cm and 4 cm. " +
+          "<span style='color:#00ccff'>“What is the hypotenuse length?”</span> 🤔📐",
         answer: `5 cm is the longest side, opposite the right angle (3² + 4² = 9 + 16 = 25 → √25 = 5)`,
         sfx: 'smDing2'
       },
@@ -324,7 +322,7 @@ const PROLOGUE_PAGES = [
     html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.2em; color: yellow;">Newton Arrives!</strong><br><br>
-        <span style='color: white;'>Newton:</span> <span style='color: #00ccff;'>\"And every movement has a cause 🪐⚙️. Universal forces sculpt the tapestry of our reality: gravity pulls apples and planets alike, inertia resists every change, and for every action there’s an equal reaction. Even the unseen hand of attraction shapes the universe’s grand ballet.\"</span><br>
+        <span style='color: white;'>Newton:</span> <span style='color: #00ccff;'>\"And every movement has a cause 🪐⚙️. Universal forces sculpt the tapestry of our reality: gravity pulls apples and planets alike, inertia resists every change, and for every action there’s an equal reaction. Even the unseen hand of attraction shapes the festival’s grand ballet.\"</span><br>
         <img src="${PRO_IMG('newtonSky.png')}" alt="newton" class="sm-slide-image sm-slide-legend">
       </div>`
   },
@@ -341,14 +339,14 @@ const PROLOGUE_PAGES = [
 
         It was at that point I felt the festival’s math begin click into place:<br>  
         <em>observe → compare → solve</em>.<br>  
-        The heat of the festival pushes the cone, the chill of the cone pushes back — equal echoes of opposite ways.<br>  
+        The heat of the festival pushes the cone, the chill of the cone pushes back — equal echoes finding a purpose in opposite ways.<br>  
         ♻️<span style="color:#9ff;">(action ⇄ reaction)</span>♻️
       </div>`
   },
 
 
   // Page 9 — Galileo & Newton image
-  { type: 'image', src: PRO_IMG('galileonewtonpicture.png'), caption: "Galileo & Newton discussing the cosmic nature of theire stroll..." },
+  { type: 'image', src: PRO_IMG('galileonewtonpicture.png'), caption: "Galileo & Newton discussing how long it took to get in..." },
 
   // Page 10 — Galileo/Newton practice
   {
@@ -356,14 +354,14 @@ const PROLOGUE_PAGES = [
     title: "Motion Math 🍧🚀",
     items: [
       {
-        prompt: "I informed Galileo that my neon SnowCone truck cruised to the entrance at a steady pace: I traveled 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>",
-        answer: "30 mph (Speed = Distance ÷ Time = 60 ÷ 2)<br> Dude, I thought I'de never get in! 🚀",
+        prompt: "I informed Galileo that my neon SnowCone truck cruised to the entrance at a steady pace: I looped 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>",
+        answer: "30 mph<br>(Speed = Distance ÷ Time = 60 ÷ 2)<br> Dude, I'm back here every year! 🚀",
         sfx: 'smDing'
       },
       {
         prompt: "<strong style='font-size:1.1em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
         "Newton asked, <span style='color: #00ccff;'>\"If you kept driving at 30mph, how far would you cruise in 5 hours?\"</span> 🤔📏<br>",
-        answer: "150 miles (30 × 5)<br> Glad the line wasn't that long! 🌌",
+        answer: "150 miles (30 × 5)<br> Glad I didn't wander that long! 🌌",
         sfx: 'smDing2'
       }
     ]
@@ -375,8 +373,8 @@ const PROLOGUE_PAGES = [
     html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.2em; color: yellow;">Turing &amp; A Friend Walk By</strong><br>
-        <img src="${PRO_IMG('breeze.png')}"alt="breeze" class="sm-slide-image sm-slide-euclid">
-        Turing saw me almost lose myself in the motion of the music, but then I heard him speak softly,
+        <img src="${PRO_IMG('breeze1.png')}"alt="breeze" class="sm-slide-image sm-slide-euclid">
+        Turing saw me almost lose myself in the motion of the music, but then spoke softly,
         <span style='color: #00ccff;'>\"Every puzzle is a hidden message, encoded in the patterns of the world. From the fluttering of a butterfly to the hum of a machine, each mathematical proof, carries its own secret that reveals the logic behind chaos.\"</span><br><br>
       </div>`
   },  
@@ -393,7 +391,7 @@ const PROLOGUE_PAGES = [
           class="sm-slide-image sm-slide-image-bram"
         />
         Brahmagupta spoke even more softly, <span style='color: #00ccff;'>\"Silence is full of numbers; each pause is made of zeroes. Each gap is a canvas for infinity. By listening to the stillness, we trace the balance of forces that govern both sand-grains and galaxies.\"</span><br><br>
-        I quickly realized that gaps and zeroes in life are very postive clues. Math isn't just numbers; it’s the story of life itself, waiting for a curious mind to unfold it.
+        Listening to them talk helped me realize that gaps and zeroes in life are very postive clues. Math isn't just numbers; it’s the story of life itself, waiting for a curious mind to unfold it.
       </div>`
   },
 
@@ -438,7 +436,7 @@ const PROLOGUE_PAGES = [
     html: `
       <div class="sm-slide-text">
         <strong style="font-size:1.2em; color: yellow;">Bombelli Explains...</strong><br>
-        <span style='color: #00ccff;'>\"What you call impossible...I call architecture. I draft my cathedrals in the abstract; each imaginary unit is a soaring arch and every complex plane lays the foundation for realms to be seen. In our hands, ‘i’ becomes brick, and infinity our blueprint. An insight of numbers carves through space itself, and what others dismiss as folly, reveals hidden symmetry and strength.\"</span><br><br> 
+        <span style='color: #00ccff;'>\"What you call impossible...I call architecture. I draft my cathedrals in the abstract; each imaginary unit is a soaring arch and every complex plane lays the foundation for realms to be seen.<br><br>In our hands, ‘i’ becomes brick, and infinity our blueprint. An insight of numbers carves through space itself, and what others dismiss as folly, reveals hidden symmetry and strength.\"</span><br><br> 
         My mind was tossed in a sprightly dance by Bombelli's words, and I concluded that imaginary numbers could indeed explode into real Snowcones.
       </div>`
   },
@@ -489,7 +487,7 @@ const PROLOGUE_PAGES = [
           class="sm-slide-image sm-slide-image-bram"
         />
         At the edge of a wind-whipped SnowCone, her new friend, Gauss, traces arcs in the raindrops, falling like decimal points... <br>
-        <span style='color: #00ccff;'>\"The arcs dance between the droplets, gliding into what seems to be randomness, but in every space lies a formula of fate, waiting to be unveiled.\"</span><br><br>
+        <span style='color: #00ccff;'>\"The arcs dance between the droplets, gliding into what seems to be randomness, but in every space lies a formula that can be seen throughout the fabric of the festival.\"</span><br><br>
       </div>`
   },
 
@@ -540,7 +538,7 @@ const PROLOGUE_PAGES = [
         <strong style="font-size:1.3em; color: yellow;">✨ Cosmic Reflections ✨</strong><br><br>
         We jammed with Pythagoras 🎵🍧; walked Euclid & Bombelli’s arches 🏛️🔮; moved with Galileo & Newton 🚀🎶;
         decoded Turing’s echoes 🤖➕; heard Brahmagupta’s zeros 0️⃣🤫; chased Lovelace’s rhythms 💻🌩️ and Gauss’s patterns 🔢🎉.<br><br>
-        Math is more than numbers—it's music, architecture, motion, code, and the dreams that bind them together.<br>
+        Math is more than numbers—it's music, architecture, motion, code, and the dreams that bind them together.<br><br>
         Keep practicing at QuickServe Pavilion and Infinity Lake, and don't forget about MathTips Village and the Camping Games!<br> 
         OR start your own adventure in Chapter 1!!
       </div>`
@@ -559,7 +557,7 @@ So we start small. We notice. We name. We nudge.
 
 We learn to look twice, then a third time, until the pattern looks back.
 
-Ready to try it the SnowCone way?
+Ready to try it the SnowCone MathFest way?
 `;
 
 // ────────────────────────────────────────────────────────────────────────────────

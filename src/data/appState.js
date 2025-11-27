@@ -506,4 +506,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: 'v1.3.0 — StoryMode needs Ch3-5 Edits' };
+window.devFlags = { build: 'v1.3.0 — Story CYOA, Badges & Credits (Ch3–Ch5)' };

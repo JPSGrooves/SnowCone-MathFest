@@ -28,7 +28,7 @@ export const Chapter1 = {
     {
       title: 'The Gate',
       img: PRO_IMG('gate.png'),
-      text: `When you arrive, it's 2am, dark, dewy, and the festival gate looms. You bought your ticket months ago and can't wait to see what the festival has to offer. A Dino Divider ushers you into a parking spot, and emerging from your car, you decide to make a move.`,
+      text: `When you arrive, it's 2am, dark, dewy, and the festival gate looms. You bought your ticket months ago and can't wait to see what this festival has to offer. A Dino Divider ushers you into a parking spot and, emerging from your car, you decide to make a move.`,
       role: SlideRole.ADVANCE,
       requireAllSidePaths: true,
       topLabel: 'Step up to the gate! ➡️',
@@ -170,7 +170,7 @@ export const Chapter1 = {
       loop: {
         title: '<span style="color: rgb(217, 164, 255);">ShakeDownSquare</span>',
         img: PRO_IMG('shakeSquare.png'),
-        text: `Shakedown Square opens up like a neon, tie-dye canyon. You see <span style='color:rgb(217, 164, 255);'>\"<em>Pi-Pretzels</em>\"</span> tying delicious, unsolvable knots; <span style='color:rgb(217, 164, 255);'>\"Gold Ratio Cones\"</span> selling randomly twisted scones. The tiny hooded dino walks by with a mysterious backpack full of prime crystals: <span style='color:rgb(217, 164, 255);'>\"Three for a Cone Coin? No refunds!\"</span> Another vendor offers fractal tapestries that bloom when you step closer.<br><br>You pocket the urge to explore and turn back toward the truck. Somewhere past the vendors, you can hear Jehnk’s customers lining up fast.`,
+        text: `Shakedown Square opens up like a neon, tie-dye canyon. You see <span style='color:rgb(217, 164, 255);'>\"<em>Pi-Pretzels</em>\"</span> tying delicious, unsolvable knots; <span style='color:rgb(217, 164, 255);'>\"Gold Ratio Cones\"</span> selling randomly twisted scones. A tiny hooded dino walks by with a mysterious backpack full of prime crystals: <span style='color:rgb(217, 164, 255);'>\"Three for a Cone Coin! No refunds!\"</span> Another vendor offers fractal tapestries that only bloom when you step closer.<br><br>You pocket the urge to explore and turn back toward the truck. Somewhere past the vendors, you can hear Jehnk’s customers lining up.`,
       },
       quest: {
         title: '<span style="color: rgb(143, 190, 255);">Turn off the CampLights</span>',
@@ -185,13 +185,13 @@ export const Chapter1 = {
             {
             img: PRO_IMG("breakerBox.png"),
             text: `You give it your best guess. The dino grins, grabs the ON/OFF switch, and snaps it clean to <span style="color: rgb(143, 190, 255);"><b>OFF</b></span>.<br><br>The generator coughs twice, causing the moths to scatter, and the bugless floodlight exhales its final beam into darkness.`,
-            reveal: `He laughs, <span style='color: rgb(143, 190, 255);'>\“Honestly, I was gonna kill the lights either way! Zero was the only number good enough for these lights!\"</span>`,
+            reveal: `<span style='color: rgb(255, 255, 255);'>He laughs,</span> <span style='color: rgb(143, 190, 255);'>\“Honestly, I was gonna kill the lights either way! Zero was the only number good enough for these lights!\"</span>`,
             requireRevealToAdvance: true
             },
             {
             img: PRO_IMG("moonChain.png"), // your circle sigil art
             text: `With the field light gone, the night finally settles in. The tiny dino fishes something from his pocket and sets it in your palm: <span style="color: rgb(143, 190, 255);">A full moon on a stubby little chain</span>.<br><br>The <span style="color: rgb(143, 190, 255);">Moon</span> glows cool and steady. Craters crisping, the keychain casts a pale light across your fingers, while the tents around you settle into a din of whispers.`,
-            reveal: `You receive the <span style="color: rgb(143, 190, 255);"><b>MoonChain</b></span>.`,
+            reveal: `<span style='color: rgb(255, 255, 255);'>You receive the</span> <span style="color: rgb(143, 190, 255);"><b>MoonChain</b></span>.`,
             requireRevealToAdvance: true
             }
         ],
@@ -275,24 +275,24 @@ export const Chapter1 = {
                 img: PRO_IMG('essentialsTrio.png'),
                 imgAlt: 'Triangle Shard (Perpetual Chill), Mint Square recipe (The Ratio & Flavor), and MoonChain (The Shape Model) glowing on a dark field.',
                 text: `On the tailgate, sits a <span style="color: rgb(143, 190, 255);">frost-bit shard</span>, a <span style="color: rgb(164, 255, 164);">mint-square ratio</span>, and a <span style="color:rgb(217, 164, 255);">moonlit chain</span>. Three pieces; one method waiting to click.`,
-                reveal: `These are the festival’s three essentials: <span style="color: rgb(143, 190, 255);"><b>Chill</b> (the shard’s cryo snap)</span>, <span style="color: rgb(164, 255, 164);"><b>Flavor</b> (that 2:3 mint-lime choir)</span>, and <span style="color: rgb(217, 164, 255);"><b>Shapes</b> (the moon’s perfect loop guiding the spiral)</span>.<br><br>
-                        Line them up and you get the method: <span style="color: rgb(143, 190, 255);"><i>Chill</span> → <span style="color: rgb(164, 255, 164);">Mix</span> → <span style="color: rgb(217, 164, 255);">Shape</span></i>. The truck lights breathe brighter, like it knows what comes next.`,
+                reveal: `<span style='color: rgb(255, 255, 255);'>These are the festival’s three essentials:</span> <span style="color: rgb(143, 190, 255);"><b>Chill</b> (the shard’s cryo snap)</span>, <span style="color: rgb(164, 255, 164);"><b>Flavor</b> (that 2:3 mint-lime choir)</span>, <span style='color: rgb(255, 255, 255);'>and</span> <span style="color: rgb(217, 164, 255);"><b>Shapes</b> (the moon’s perfect loop guiding the spiral)</span>.<br><br>
+                        <span style='color: rgb(255, 255, 255);'>Line them up and you get the method:</span> <span style="color: rgb(143, 190, 255);"><i>Chill</span> → <span style="color: rgb(164, 255, 164);">Mix</span> → <span style="color: rgb(217, 164, 255);">Shape</span></i>. <span style='color: rgb(255, 255, 255);'>The truck lights breathe brighter, like it knows what comes next.</span>`,
                 requireRevealToAdvance: true
               },
               {
                 img: PRO_IMG('essentialsTrio2.png'),
                 imgAlt: 'Triangle Shard, Mint Square 2:3 recipe, and MoonChain spiraling together into a single flow.',
                 text: `You lift them up: <span style="color: rgb(143, 190, 255);">cold breath</span>, a <span style='color: rgb(164, 255, 164);'>\"glowing 2:3</span>, and a steady <span style='color:rgb(217, 164, 255);'>\"lunar spin</span>. The ingredients begin to meld.`,
-                reveal: `The pieces <i>lock together</i> with a little cosmic jingle—first a <span style="color: rgb(143, 190, 255);">chill tone</span>, then a <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, then a soft <span style="color:rgb(217, 164, 255);">lunar hum</span>. A halo of neon notes lift from your workbench as the mixture stabilizes.<br><br>
+                reveal: `<span style='color: rgb(255, 255, 255);'>The pieces <i>lock together</i> with a little cosmic jingle—first a</span> <span style="color: rgb(143, 190, 255);">chill tone</span>, <span style='color: rgb(255, 255, 255);'>then a</span> <span style="color: rgb(164, 255, 164);">bright 2:3 chord</span>, <span style='color: rgb(255, 255, 255);'>then a soft</span> <span style="color:rgb(217, 164, 255);">lunar hum</span>. <span style='color: rgb(255, 255, 255);'>A halo of neon notes lift from your workbench as the mixture stabilizes.</span><br><br>
                         <span style="color: rgb(143, 190, 255);"><b>Chill anchors</b></span>. <span style="color: rgb(164, 255, 164);"><b>Flavor harmonizes</b></span>. <span style="color: rgb(217, 164, 255);"><b>Shape guides</b></span>.<br>
-                        The Perfect SnowCone is ready to be born.`,
+                        <span style='color: rgb(255, 255, 255);'>The Perfect SnowCone is ready to be born.</span>`,
                 requireRevealToAdvance: true
               },
               {
                 img: PRO_IMG('essentialsTrio3.png'),
                 text: `Jehnk cues the finale: pack some <span style="color: rgb(217, 164, 255);">ice</span>, pour a steady <span style="color: rgb(164, 255, 164);">syrupy ribbon</span>, finish with a signature <span style="color: rgb(143, 190, 255);">triangle crest</span>.`,
-                reveal: `<span style="color: rgb(247, 255, 105);"><b>The Perfect SnowCone has been crafted!</b></span> Neon bubbles rise and drift like little planets, as the cone gleams in the 2AM glow.<br><br>
-                        The stack sings in three parts—<span style="color: rgb(143, 190, 255);"><b>Chill</b></span> holds the shape, <span style="color: rgb(164, 255, 164);"><b>Flavor</b></span> rings out minty brightness, <span style="color: rgb(217, 255, 255);"><b>Geometry</b></span> keeps the swirl honest. Jehnk grins: <span style='color: rgb(247, 255, 105);'>\"Now you're trained to work the truck!\"</span> 🫧🍧`,
+                reveal: `<span style="color: rgb(247, 255, 105);"><b>The Perfect SnowCone has been crafted!</b></span> <span style='color: rgb(255, 255, 255);'>Neon bubbles rise and drift like little planets, as the cone gleams in the 2AM glow.</span><br><br>
+                        <span style='color: rgb(255, 255, 255);'>The stack sings in three parts—</span><span style="color: rgb(143, 190, 255);"><b>Chill</b></span> <span style='color: rgb(255, 255, 255);'>holds the shape,</span> <span style="color: rgb(164, 255, 164);"><b>Flavor</b></span> <span style='color: rgb(255, 255, 255);'>rings out minty brightness,</span> <span style="color: rgb(217, 255, 255);"><b>Geometry</b></span> <span style='color: rgb(255, 255, 255);'>keeps the swirl honest. Jehnk grins:</span> <span style='color: rgb(247, 255, 105);'>\"Now you're trained to work the truck!\"</span> 🫧🍧`,
                 requireRevealToAdvance: true
               }
             ];
