@@ -46,7 +46,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Follow the Sound',
       img: PRO_MED_IMG('jehnkNod.png'), // can swap to a wider festival shot later if you want
-      text: `He references the legendary music at the festival:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil</span> over at QuickServe,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br>and <span style="color: rgb(217, 164, 255);">Grampy P</span> by his tent in MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
+      text: `He references the legendary music of SnowCone MathFest:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil</span> over at QuickServe,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br>and <span style="color: rgb(217, 164, 255);">Grampy P</span> by his tent in MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
       soloLabel: 'Head to the first stage ➡️',
     },
 
@@ -60,8 +60,8 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'QuickServe Pavilion',
       img: PRO_BIG_IMG('qsPavilion.png'), // pavilion art
-      text: `The QuickServe Pavilion glows like a jukebox cracked open.<br>
-      The lights fan out and crowds gather 'round to hear the headline act, <span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
+      text: `The QuickServe Pavilion glows like a cracked open jukebox glowstick.<br>
+      The lights pulse and crowds gather 'round to hear the headline act: <span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -71,7 +71,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'QuickServe Pavilion',
       img: PRO_MED_IMG('phil_06_hype.png'), // same scene for continuity
-      text: `Up on stage, <span style="color: rgb(61, 229, 255);">Cosmic Phil</span> jumps in the air with his cosmic keytar, his looping fingers playing jazz/rock chords on full display; keys on fire, always registering 1 minute 45 seconds grooves.`,
+      text: `Already up on stage, <span style="color: rgb(61, 229, 255);">Cosmic Phil</span> jumps in the air with his trademark cosmic keytar. His looping fingers playing jazzy chords on full display, his keys are on fire, always registering the tastiest 1 minute 45 seconds grooves.`,
       soloLabel: 'Move into the crowd ➡️',
     },
 
@@ -81,7 +81,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Kool Kat’s Review',
       img: PRO_MED_IMG('koolKatStage.png'),
-      text: `Kool Kat is vending the pavilion, slipping SnowCones to the front row like they’re backstage passes.<br>You nudge up beside Kool Kat at the rail.<br><br><span style="color: rgb(61, 229, 255);">"Phil is killing it tonight,"</span> she yells.<span style="color: rgb(61, 229, 255);">"He brings the best crowds of the festival and always keeps the vibes pumping."</span>`,
+      text: `You catch Kool Kat is vending the pavilion, slipping SnowCones to the front row like they’re backstage passes.<br>You nudge up beside her at the rail.<br><br><span style="color: rgb(61, 229, 255);">"Phil is killing it tonight,"</span> she yells.<span style="color: rgb(61, 229, 255);">"He brings the best crowds of the festival and always creates the most cosmic vibes."</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -91,7 +91,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Kool Kat’s Review',
       img: PRO_IMG('koolKatStage2.png'),
-      text: `She nods at the stage, where tiny lights climb and fall into sine waves.<br><br><span style="color: rgb(61, 229, 255);">"Phil used to play parking lots,"</span> she shouts over the crowd. <span style="color: rgb(61, 229, 255);">"He’d loop the sound of cars rolling in, fans standing in line, cones getting shaved… then flip all that noise into a groove."</span><br><br><span style="color: rgb(61, 229, 255);">"Now he does the same thing with us,"</span> she gloats. <span style="color: rgb(61, 229, 255);">"He builds a loop from whoever shows up, runs it into one full batch. That’s Phil—keep the structure, scramble the flavors, and make every set feel like the festival is lining up just for you."</span>`,
+      text: `She nods at the stage, where tiny lights climb and fall into sine waves.<br><br><span style="color: rgb(61, 229, 255);">"Phil used to play parking lots,"</span> she shouts over the crowd. <span style="color: rgb(61, 229, 255);">"He’d loop the sound of cars rolling in, fans standing in line, cones getting shaved… then flip all that noise into a groove."</span><br><br><span style="color: rgb(61, 229, 255);">"Now he does the same thing with us,"</span> she gloats. <span style="color: rgb(61, 229, 255);">"He builds a loop from whoever shows up and runs it into one full batch. That’s Phil—keep the structure, scramble the flavors, and make every set feel like the festival is lining up just for you."</span>`,
       soloLabel: 'Before you go… ➡️',
     },
 
@@ -129,8 +129,8 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Kool Kat’s Review',
       img: PRO_MED_IMG('koolKatStage3.png'),
-      text: `Her friend appears and lets her know its time to switch shifts...
-      <span style="color: rgb(61, 229, 255);">"Welp, that's my queue! We all work this fest in one way or another, just try to have fun along the way and you'll enjoy every day!"</span>`,
+      text: `Her friend, Mr. Leo, appears and lets her know its time to switch shifts...
+      <span style="color: rgb(61, 229, 255);">"Welp, that's my queue! We all work this fest in one way or another; just try to have fun along the way and you'll enjoy every day!"</span>`,
       soloLabel: 'Head to Infinity Lake ➡️',
     },
 
@@ -143,8 +143,8 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Infinity Lake',
       img: PRO_MED_IMG('infinityLakeStage.png'),
-      text: `You follow a shimmer of reverb down to Infinity Lake.<br><br>
-      Three silhouettes stand on a floating dock, hands over the water—
+      text: `You follow a shimmer of reverb down to Infinity Lake. You remember Banneker humming the tune and get excited that you made it this far.<br><br>
+      You see three silhouettes practicing in a lit up tent, preparing for a set on a floating dock, hands over the water—
       <span style="color: rgb(164, 255, 164);">the Infinity Triplets</span>.`,
       soloLabel: 'Next ➡️',
     },

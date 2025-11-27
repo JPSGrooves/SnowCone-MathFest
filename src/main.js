@@ -1,4 +1,4 @@
-// 🍦 Import core systems
+// 🍦 main.js   - Import core systems
 import { applyBackgroundTheme } from './managers/backgroundManager.js';
 import { openModal } from './modals/cosmicModal.js';
 import './modals/infoModal.js'; // ⛩️ just runs, no export
