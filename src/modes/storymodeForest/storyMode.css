@@ -1524,39 +1524,40 @@
 }
 
 /* ================================
-   CH1 – PRO_IMG sizing
+   CH1 – PRO_IMG sizing (DESKTOP ONLY)
    Close to ch2–5, but ~10% smaller
    ================================ */
 
-/* 1) Chapter-1 art band: bigger than the old 20vh,
-      but still a little under the “hero” look. */
-#game-container .sm-ch1[data-chapter="ch1"] {
-  /* If hero-ish bands are ~40vh in other chapters,
-     this sits about 10–15% under that. */
-  --sm-ch1-art-h: min(34vh, 60vw);
-}
+@media (pointer: fine) {
 
-/* 2) Plain PRO_IMG in Ch1 uses that band.
-      This overrides the old 300px / 20vh clamps. */
-#game-container .sm-ch1[data-chapter="ch1"] .sm-ch1-img,
-#game-container .sm-ch1[data-chapter="ch1"] .sm-ch1-img img {
-  max-height: var(--sm-ch1-art-h) !important;
-  max-width:  min(88%, 540px) !important;
-  width:  auto !important;
-  height: auto !important;
-  object-fit: contain !important;
-  margin: clamp(6px, 1vh, 12px) auto !important;
+  /* 1) Chapter-1 art band: a bit under the hero look */
+  #game-container .sm-ch1[data-chapter="ch1"] {
+    /* If hero-ish bands are ~40vh elsewhere,
+       this sits about 10–15% under that. */
+    --sm-ch1-art-h: min(34vh, 60vw);
+  }
+
+  /* 2) Plain PRO_IMG in Ch1 uses that band */
+  #game-container .sm-ch1[data-chapter="ch1"] .sm-ch1-img,
+  #game-container .sm-ch1[data-chapter="ch1"] .sm-ch1-img img {
+    max-height: var(--sm-ch1-art-h) !important;
+    max-width:  min(88%, 540px) !important;
+    width:  auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    margin: clamp(6px, 1vh, 12px) auto !important;
+  }
 }
 
 /* 3) Short desktops / laptop windows —
       keep the “10% smaller” vibe, just with smaller bands. */
-@media (max-height: 760px) {
+@media (pointer: fine) and (max-height: 760px) {
   #game-container .sm-ch1[data-chapter="ch1"] {
     --sm-ch1-art-h: min(30vh, 54vw);
   }
 }
 
-@media (max-height: 680px) {
+@media (pointer: fine) and (max-height: 680px) {
   #game-container .sm-ch1[data-chapter="ch1"] {
     --sm-ch1-art-h: min(26vh, 50vw);
   }

@@ -133,7 +133,7 @@ export const Chapter2 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Archimedes',
-      img: PRO_MED_IMG('archimedesHappy.png'), // 👈 medium instead of plain PRO_IMG
+      img: PRO_IMG('archimedesHappy.png'), // 👈 medium instead of plain PRO_IMG
       text: `He laughs. <span style="color: rgb(61, 229, 255);">“We balanced it perfectly!”</span> Even tiny cones, tossed in infinity lake, create large ripples. <span style="color: rgb(61, 229, 255);">“Equal weight means equal ripples...unless,”</span> He looks at the cone, trying to solve it like an equation. <span style="color: rgb(61, 229, 255);">“...unless you can't control the force. Don't stress on the uncontrollable forces of the festival; don't take them too seriously. This allows you to go BEYOND the math and use the part of your brain that taps into infinity."</span>`,
       soloLabel: 'Next Customer ➡️',
       grants: [
@@ -169,7 +169,7 @@ export const Chapter2 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Luca Pacioli',
-      img: PRO_MED_IMG('pacioliHappy.png'), // 👈 medium here too
+      img: PRO_IMG('pacioliHappy.png'), // 👈 medium here too
       text: `He checks the book one last time, as you blend syrup into the icy SnowCone. <span style="color: rgb(61, 229, 255);">“Balanced.”</span> <br><br>Setting the tiny glowing ledger in your palm, he grabs the two SnowCones, holding them level as a scale in each hand. <span style="color: rgb(61, 229, 255);">“That's Jehnk's Ledger...you can learn a lot about a person by examining their books.”</span> He winks and strolls happily into the mist with the twin cones held high.`,
       soloLabel: 'Jehnk Jumps In ➡️',
       grants: [
