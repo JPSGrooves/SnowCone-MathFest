@@ -60,7 +60,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'QuickServe Pavilion',
       img: PRO_MED_IMG('qsPavilion.png'), // pavilion art
-      text: `The QuickServe Pavilion glows like a cracked open jukebox glowstick.<br>
+      text: `The QuickServe Pavilion glows like a cracked open jukebox glowstick. This is where the biggest acts play, the main stage, the greatest common denominator.<br>
       The lights pulse and crowds gather 'round to hear the headline act:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
       soloLabel: 'Move Closer ➡️',
     },
@@ -106,7 +106,7 @@ export const Chapter3 = {
             id: 'a',
             label: 'Listen for the keytar solo and holler at the peak.',
             correct: true,
-            praise: `Exactly! Cosmic Phil's solos try to break the cosmic structure!`,
+            praise: `Exactly! It's like he's actively trying to rip a whole in the cosmos!`,
           },
           {
             id: 'b',
@@ -130,7 +130,7 @@ export const Chapter3 = {
       title: 'Festival Duties',
       img: PRO_MED_IMG('koolKatStage3.png'),
       text: `Her friend, <span style="color: rgb(219, 61, 255);">Mr. Leo</span>, appears out of nowhere and lets her know it's time to switch shifts...
-      <span style="color: rgb(61, 229, 255);">"Welp, that's my queue! We all work this fest in one way or another. But I decided a long time ago that I was going to enjoy every day, that includes work and play!"</span>`,
+      <span style="color: rgb(61, 229, 255);">"Welp, that's my queue! We all work this fest in one way or another. But I decided a long time ago that I was going to enjoy every day, and that includes working! Have fun!"</span>`,
       soloLabel: 'Head to Infinity Lake ➡️',
     },
 
@@ -143,7 +143,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Infinity Lake',
       img: PRO_MED_IMG('infinityLakeStage.png'),
-      text: `You follow a shimmer of reverb down to <span style="color: rgb(164, 255, 164);">Infinity Lake</span>. You remember Banneker humming the tune and get excited that you made it this far.<br><br>You see three silhouettes practicing in a lit up tent, preparing for a set on a floating dock, hands over the water—<br><span style="color: rgb(164, 255, 164);">The Infinity Triplets</span>.`,
+      text: `You follow a shimmer of reverb down to <span style="color: rgb(164, 255, 164);">Infinity Lake</span>. You remember Banneker humming the same tune and get excited that it feels so familiar.<br><br>You see three silhouettes practicing the song in a lit up tent, preparing for a set on a floating dock, hands over the water—<br><span style="color: rgb(164, 255, 164);">The Infinity Triplets</span>.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -153,7 +153,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Meticulous Echoes',
       img: PRO_MED_IMG('fieldsInfinity.png'),
-      text: `<span style="color: rgb(164, 255, 164);">Dr. Kenny Fields</span>, taking a break from syrup and pancakes, has rigged the lake with little buoy lights that pulse on each echo.<br><br><span style="color: rgb(164, 255, 164);">"Every echo is being trained to send out a calbrated bubble; every bubble doubles back in time and then double bubbles."</span>`,
+      text: `<span style="color: rgb(164, 255, 164);">Dr. Kenny Fields</span>, taking a break from syrup and pancake troubles, has rigged the lake with little buoy lights and microphones that pulse on each echo.<br><br><span style="color: rgb(164, 255, 164);">"Every echo is being trained to send out a calbrated bubble; every bubble doubles back in time and then we can track the double bubbles."</span>`,
       soloLabel: 'Verify Results ➡️',
     },
 
@@ -162,7 +162,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Verifying Results',
       img: PRO_IMG('ratioFields.png'),
-      text: `He leans back and checks the echoes with headphones.<br><span style="color: rgb(164, 255, 164);">\"The Infinity Triplets always run three echoes per beat,\"</span> he shouts over the water. <span style="color: rgb(164, 255, 164);">\"The first echo is for the stage, the second for the lake, and the third for the sky.\"</span><br><br>He points to the buoys. <span style="color: rgb(164, 255, 164);">\"I'm trying to keep the lake honest, it's same tempo every time but the lake hides their mysteries. These Triplets expertly change the *spacing* between echoes, creating perfect loops with an organic feel. That’s why it feels endless but never lost.\"</span>`,
+      text: `He leans back and checks the echoes with headphones.<br><span style="color: rgb(164, 255, 164);">\"The Infinity Triplets always run three echoes per beat,\"</span> he shouts over the water. <span style="color: rgb(164, 255, 164);">\"The first echo is for the stage, the second for the lake, and the third for the sky.\"</span><br><br>He points to the buoys. <span style="color: rgb(164, 255, 164);">\"I'm trying to keep the lake honest, it's same tempo every time but the lake emphasizes the mystery. These Triplets expertly change the *spacing* between echoes, creating perfect loops with an organic feel. That’s why it seems endless but never lost.\"</span>`,
       soloLabel: 'A Quick Question...➡️',
     },
     {
@@ -199,8 +199,8 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Sittin at the Dock',
       img: PRO_MED_IMG('fieldsJamming.png'),
-      text: `Music helps Fields to break free from infinite experimenting and he always finds his way back to it...
-      <span style="color: rgb(164, 255, 164);">"Ah, there it is! The perfect balance of predictability and surprise. I could analyze The Infinity Triplets all day, but it's just as important to settle down and listen to the music!"</span>`,
+      text: `Music helps Fields to break free from infinite experimenting and he always finds his way back through a tasty jam...
+      <span style="color: rgb(164, 255, 164);">"Ah, there it is! The perfect balance of predictability and surprise. I could analyze The Infinity Triplets' music all day, but it's just as important to settle down and just listen!"</span>`,
       soloLabel: 'Go to MathTips Village ➡️',
     },
 
@@ -212,7 +212,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'MathTips Village',
       img: PRO_IMG('mathTipsVillage.png'),
-      text: `The noise of the stages fades into a low hum as you wander into:<br><span style="color: rgb(217, 164, 255);">MathTips Village</span>.<br><br>Lanterns gleam from tent poles. Whiteboards glow softly. In the middle of it all, <span style="color: rgb(217, 164, 255);">Grampy P</span> sits by his tent with a notebook and a SnowCone, just listening.<br><br>These days, he’s not teaching, not preaching—just watching patterns walk by. Always ready to jot down a thought or a question, he really just wants to here what you know.`,
+      text: `The noise of the stages fades into a low hum as you wander into:<br><span style="color: rgb(217, 164, 255);">MathTips Village</span>.<br><br>Lanterns gleam from tent poles. Whiteboards glow softly. In the middle of it all, <span style="color: rgb(217, 164, 255);">Grampy P</span> sits by his tent with a notebook and a SnowCone, just listening.<br><br>These days, he’s not teaching, not preaching—just watching the patterns walk by. Always ready to jot down a thought or a question, he really just wants to hear what people know.`,
       soloLabel: 'Tell me more...➡️',
     },
     // Grampy’s Neighbor – part 1
@@ -230,7 +230,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Grampy’s Lesson',
       img: PRO_MED_IMG('grampyLesson.png'),
-      text: `A ring of tiny dinosaur campers crowds around his chalkboard, tails swishing in the dust.<span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, pointing to the equation, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster."</span><br><br><span style="color: rgb(217, 164, 255);">"When you show your work, we can usually spot the monster. The trick? Find the monster, then you can tell it what to do."</span>`,
+      text: `A ring of tiny dinosaur campers crowds around his chalkboard, tails swishing in the dust.<span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, pointing to the equation, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster. When you show your work, we can usually spot the monster.<br>The trick? Find the monster, then you can tell it what to do."</span>`,
       soloLabel: 'A question for you… ➡️',
     },
 
@@ -238,7 +238,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'quiz3',
       title: 'Grampy P Tests You…',
-      text: `Grampy P gives you a small nod past his guitar,<br><span style="color: rgb(217, 164, 255);">\"Alright, ${playerName}, tell me now,\"</span> he murmurs. <span style="color: rgb(217, 164, 255);">\"What do you think I care about most out here?\"</span>`,
+      text: `Grampy P gives you a small nod past his students,<br><span style="color: rgb(217, 164, 255);">\"Alright, ${playerName}, tell me now,\"</span> he says, <span style="color: rgb(217, 164, 255);">\"what do you think I care about most at SnowCone MathFest?\"</span>`,
       quiz: {
         options: [
           {
@@ -268,7 +268,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Grampy’s Neighbor',
       img: PRO_MED_IMG('grampyPoint.png'),
-      text: `Grampy P knows you can't stay, but runs over to give you a warm farewell, <span style="color: rgb(217, 164, 255);">"I'll be here if you ever need a fraction lesson, haiku, joke, or to know how much to tip your waiter!"</span><br><br>He notices a hooded dino behind you in the bushes, <span style="color: rgb(217, 164, 255);">"Although, it looks like someone else wants your attention. See ya!"</span>`,
+      text: `Grampy P knows you can't stay, but runs over to give you a warm farewell, <span style="color: rgb(217, 164, 255);">"I'll be here if you ever need a fraction lesson, haiku, joke, or to use my "how to tip your waiter" calculator functions!"</span><br><br>He notices a hooded dino behind you in the bushes, <span style="color: rgb(217, 164, 255);">"Although, it looks like someone else wants your attention. See ya!"</span>`,
       soloLabel: 'He points to the dino ➡️',
     },
 
@@ -289,7 +289,7 @@ export const Chapter3 = {
     mode: 'choice3',
     title: 'The Trade?',
     img: PRO_IMG('dinoTrade.png'),
-    text: `He eyes <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your inventory.<br>From his hoodie pocket, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, but battery icon somehow full. He says:<br><span style="color: rgb(61, 229, 255);">\"We should trade!\"</span>`,
+    text: `He eyes <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your inventory.<br>From his hoodie pocket, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, but a surprisingly full battery. He says:<br><span style="color: rgb(61, 229, 255);">\"We should trade!\"</span>`,
     choiceAdvanceLabel: 'The Dino Dips Out ➡️',
     bigChoices: true,
     choices: [
@@ -356,7 +356,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Into the Trees',
       img: PRO_MED_IMG('phoneRun.png'),
-      text: `The hooded dino nods once and darts back into the branches.<br><br>He cryptically states, <span style="color: rgb(61, 229, 255);">"Only way out is through the forest!"</span> You pat your full inventory bag and follow the sound of his crunching leaves, heading deeper and deeper into the woods.`,
+      text: `The hooded dino grins and darts back into the branches.<br><br>He cryptically states, <span style="color: rgb(61, 229, 255);">"Follow me! The only way out is through the forest!"</span> You close your inventory bag and follow the sound of crunching leaves, heading deeper and deeper into the woods.`,
       soloLabel: 'Follow the Dino...➡️',
     },
 
@@ -366,7 +366,7 @@ export const Chapter3 = {
     mode: 'solo',
     title: 'The Endless Meander',
     img: PRO_IMG('forestPath.png'),
-    text: `You're stepping completely away from the festival. The bass fades first, then the crowd noise, like someone slowly turning down a dial.<br><br>The hooded dino's voice lingers—<span style="color: rgb(61, 229, 255);">“the only way out”</span>—looping in your head like a half-finished lyric.<br><br>What did that tiny dino mean? Out of the forest? Out of the festival? Out of whatever this whole thing really is?<br><br>Each step feels less like exploring a festival and more like walking into the questions behind it.`,
+    text: `You're stepping completely away from the festival. The bass fades first, then the crowd noise, like someone slowly turning down a dial.<br><br>The hooded dino's voice lingers—<span style="color: rgb(61, 229, 255);">“the only way out”</span>—looping in your head like a half-finished lyric.<br><br>What did that tiny dino mean? Out of the forest? Out of the festival? Out of this world? Out of my mind?<br><br>Each step feels less like exploring a festival and more like walking into the questions behind it.`,
     soloLabel: 'Keep walking ➡️',
     nextChapterId: 'ch4',
   },

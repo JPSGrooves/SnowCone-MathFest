@@ -56,7 +56,7 @@ export const Chapter1 = {
         },
         {
         img: PRO_MED_IMG('triangleHand.png'),
-        text: `She presses a shimmering shard into your palm.<br><br><span style='color: rgb(143, 190, 255);'>\“Around this fest, folks <b>trade</b> little finds for favors, shortcuts, songs...maybe even secrets. Start collecting with this and you can use them later!\"</span><br><br>She winks, <span style='color: rgb(143, 190, 255);'>\“Here’s your first trinket!\"</span>`
+        text: `She presses a shimmering shard into your palm.<br><span style='color: rgb(143, 190, 255);'>\“Around this fest, folks <b>trade</b> little finds for favors, shortcuts, songs...maybe even secrets. Start collecting with this and you can use them later!\"</span><br><br>She winks, <span style='color: rgb(143, 190, 255);'>\“Here’s your first trinket!\"</span>`
         }
       ],
       reward: {
@@ -115,7 +115,7 @@ export const Chapter1 = {
         steps: [
             {
             img: PRO_IMG('bikerDino.png'), // add this asset
-            text: `You edge along the festival perimeter and slip toward an open gap. A biker dino swiftly steps in; he's firm, yet calm and sympathetic.<br><br><span style='color:rgb(217, 164, 255);'>\"Sorry, I can't let you in. This is literally my only job.\"</span> He lowers his voice: <span style='color:rgb(217, 164, 255);'>\"But...answer a question and I’ll give you a coveted festival secret:<br><br> The <i>festival grounds</i> have a perimeter of 2 miles. What’s the area?\"</span>`,
+            text: `You edge along the festival perimeter and slip toward an open gap. A biker dino swiftly steps in; he's firm, yet calm and sympathetic.<br><span style='color:rgb(217, 164, 255);'>\"Sorry, I can't let you in. This is literally my only job.\"</span> He lowers his voice: <span style='color:rgb(217, 164, 255);'>\"But...answer a question and I’ll give you a coveted festival secret:<br><br> The <i>festival grounds</i> have a perimeter of 2 miles. What’s the area?\"</span>`,
             reveal: `<span style="color: rgb(217, 164, 255);">4 sides = .5 miles each,<br>The area = .5 × .5 = <b>.25 square miles</b>.</span>`,
             requireRevealToAdvance: true
             },
@@ -160,7 +160,7 @@ export const Chapter1 = {
     // 3) Walkabout
     {
       title: '<span style="color: rgb(247, 255, 105);">You\'re in! Explore?</span>',
-      img: PRO_MED_IMG('jehnkExplore.png'),
+      img: PRO_IMG('jehnkExplore.png'),
       text: `<span style='color: rgb(247, 255, 105);'>\"Hey man, I can hold down the first shift. Go check out the SnowCone MathFest!\"</span> Jehnk waves you off as he starts setting up his truck booth for the night.`,
       role: SlideRole.ADVANCE,
       requireAllSidePaths: true,
