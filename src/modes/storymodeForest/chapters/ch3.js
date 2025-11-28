@@ -230,7 +230,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Grampy’s Lesson',
       img: PRO_MED_IMG('grampyLesson.png'),
-      text: `A ring of tiny dinosaur campers crowds around his notebook, tails swishing in the dust.<br><span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, sketching a tiny grid, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster."</span><br><br><span style="color: rgb(217, 164, 255);">"If you can tell me what you *already* know, we can usually spot the monster together. That’s the whole trick: name the monster, and then you can tell it what to do."</span>`,
+      text: `A ring of tiny dinosaur campers crowds around his chalkboard, tails swishing in the dust.<span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, pointing to the equation, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster."</span><br><br><span style="color: rgb(217, 164, 255);">"If you can tell me what you *already* know, we can usually spot the monster together. The trick? Name the monster, and then you can tell it what to do."</span>`,
       soloLabel: 'A question for you… ➡️',
     },
 
@@ -289,7 +289,7 @@ export const Chapter3 = {
     mode: 'choice3',
     title: 'The Trade?',
     img: PRO_IMG('dinoTrade.png'),
-    text: `He eyes <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your inventory.<br>From his hoodie pocket, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, but battery icon somehow full.<br><span style="color: rgb(61, 229, 255);">\"We should trade?\"</span>`,
+    text: `He eyes <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your inventory.<br>From his hoodie pocket, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, but battery icon somehow full.<br><span style="color: rgb(61, 229, 255);">\"We should trade!\"</span>`,
     choiceAdvanceLabel: 'The Dino Dips ➡️',
     bigChoices: true,
     choices: [
@@ -356,7 +356,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Into the Trees',
       img: PRO_MED_IMG('phoneRun.png'),
-      text: `The hooded dino nods once and darts back into the branches.<br><br>He cryptically states, <span style="color: rgb(61, 229, 255);">"Only way out is through the forest!"</span> You pat your full inventory bad and follow the sound of his crunching leaves, head deeper and deeper into the woods.`,
+      text: `The hooded dino nods once and darts back into the branches.<br><br>He cryptically states, <span style="color: rgb(61, 229, 255);">"Only way out is through the forest!"</span> You pat your full inventory bag and follow the sound of his crunching leaves, heading deeper and deeper into the woods.`,
       soloLabel: 'Follow the Dino...➡️',
     },
 
@@ -366,7 +366,7 @@ export const Chapter3 = {
     mode: 'solo',
     title: 'The Endless Meander',
     img: PRO_IMG('forestPath.png'),
-    text: `You step completely away from the festival. The bass fades first, then the crowd noise, like someone slowly turning down a dial.<br><br>The hooded dino's voice lingers—<span style="color: rgb(61, 229, 255);">“only way out”</span>—looping in your head like a half-finished lyric.<br><br>What did that tiny dino mean? Out of the forest? Out of the festival? Out of whatever this whole thing really is?<br><br>Each step feels less like exploring a festival and more like walking into the questions behind it.`,
+    text: `You're stepping completely away from the festival. The bass fades first, then the crowd noise, like someone slowly turning down a dial.<br><br>The hooded dino's voice lingers—<span style="color: rgb(61, 229, 255);">“the only way out”</span>—looping in your head like a half-finished lyric.<br><br>What did that tiny dino mean? Out of the forest? Out of the festival? Out of whatever this whole thing really is?<br><br>Each step feels less like exploring a festival and more like walking into the questions behind it.`,
     soloLabel: 'Keep walking ➡️',
     nextChapterId: 'ch4',
   },
