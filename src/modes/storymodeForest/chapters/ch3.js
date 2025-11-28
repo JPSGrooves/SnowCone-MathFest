@@ -230,7 +230,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Grampy’s Lesson',
       img: PRO_MED_IMG('grampyLesson.png'),
-      text: `A ring of tiny dinosaur campers crowds around his chalkboard, tails swishing in the dust.<span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, pointing to the equation, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster."</span><br><br><span style="color: rgb(217, 164, 255);">"If you can tell me what you *already* know, we can usually spot the monster together. The trick? Name the monster, and then you can tell it what to do."</span>`,
+      text: `A ring of tiny dinosaur campers crowds around his chalkboard, tails swishing in the dust.<span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, pointing to the equation, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster."</span><br><br><span style="color: rgb(217, 164, 255);">"When you show your work, we can usually spot the monster. The trick? Find the monster, then you can tell it what to do."</span>`,
       soloLabel: 'A question for you… ➡️',
     },
 
@@ -268,7 +268,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Grampy’s Neighbor',
       img: PRO_MED_IMG('grampyPoint.png'),
-      text: `Grampy P knows you can't stay, but runs over to give you a warm farewell,<br><span style="color: rgb(217, 164, 255);">"I'll be here if you ever need a fraction lesson, haiku, joke, or to know how much you should tip your waiter...Although, it looks like that hooded dino over there wants your attention. See ya!"</span>`,
+      text: `Grampy P knows you can't stay, but runs over to give you a warm farewell, <span style="color: rgb(217, 164, 255);">"I'll be here if you ever need a fraction lesson, haiku, joke, or to know how much to tip your waiter!"</span><br><br>He notices a hooded dino behind you in the bushes, <span style="color: rgb(217, 164, 255);">"Although, it looks like someone else wants your attention. See ya!"</span>`,
       soloLabel: 'He points to the dino ➡️',
     },
 
@@ -280,7 +280,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'A Familiar Hood',
       img: PRO_MED_IMG('hoodedDinoPath.png'),
-      text: `<span style="color: rgb(61, 229, 255);">"Psst!"</span><br>A small hooded dino pads out of the shadows—the same one who killed the floodlights and slipped you the MoonChain...<br>He tilts his head, eyes catching the glow from your pockets.<span style="color: rgb(61, 229, 255);">"Are your pockets feeling a little full?"</span>`,
+      text: `<span style="color: rgb(61, 229, 255);">"Psst!"</span>The small hooded dino calls from the shadows—the same dino who killed the floodlights and slipped you the MoonChain...<br>He tilts his head, eyes catching the glow from your pockets.<span style="color: rgb(61, 229, 255);">"Are your pockets feeling a little full?"</span>`,
       soloLabel: 'Go talk to the dino ➡️',
     },
 
@@ -289,8 +289,8 @@ export const Chapter3 = {
     mode: 'choice3',
     title: 'The Trade?',
     img: PRO_IMG('dinoTrade.png'),
-    text: `He eyes <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your inventory.<br>From his hoodie pocket, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, but battery icon somehow full.<br><span style="color: rgb(61, 229, 255);">\"We should trade!\"</span>`,
-    choiceAdvanceLabel: 'The Dino Dips ➡️',
+    text: `He eyes <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> in your inventory.<br>From his hoodie pocket, he pulls a <b>beat-up cell phone</b>—cracked screen, dented sides, but battery icon somehow full. He says:<br><span style="color: rgb(61, 229, 255);">\"We should trade!\"</span>`,
+    choiceAdvanceLabel: 'The Dino Dips Out ➡️',
     bigChoices: true,
     choices: [
         {
