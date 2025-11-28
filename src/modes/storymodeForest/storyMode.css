@@ -138,7 +138,6 @@
 
   /* kill earlier line-clamp/crop behavior */
   display: block;
-  -webkit-line-clamp: unset;
   overflow: visible;
 
   white-space: normal;
@@ -1477,3 +1476,88 @@
   box-shadow: 0 0 14px rgba(255, 90, 217, 0.55);
 }
 
+/* ================================
+   CH2 portraits – short desktop fix
+   Target: ~600px window height
+   Only shrink the art, keep it proportional
+   ================================ */
+@media (pointer: fine) and (max-height: 600px) {
+  /* Medium portraits (PRO_MED_IMG → ?md=1) */
+  #game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="md=1"] {
+    max-height: min(30vh, 56vw) !important;  /* scales with stage */
+    max-width:  min(82%, 520px) !important;
+    height: auto !important;
+    width:  auto !important;
+    object-fit: contain !important;
+  }
+
+  /* Hero portraits (PRO_BIG_IMG → ?lg=1), in case any show up */
+  #game-container .sm-ch1[data-chapter="ch2"] .sm-ch1-img[src*="lg=1"] {
+    max-height: min(32vh, 60vw) !important;
+    max-width:  min(86%, 560px) !important;
+    height: auto !important;
+    width:  auto !important;
+    object-fit: contain !important;
+  }
+}
+/* ================================
+   CH1 medium portraits – desktop-only bump
+   Target: comfy desktop (big window), but
+   keep the 600px / short-screen safety.
+   ================================ */
+@media (pointer: fine) and (min-height: 780px) {
+  /* If Ch1 has at least one ?md=1 image, give the art band more room */
+  #game-container .sm-ch1:has(.sm-ch1-img[src*="md=1"]) {
+    --sm-ch1-art-h: min(34vh, 56vw);
+  }
+
+  /* And let those ?md=1 images actually use it */
+  #game-container .sm-ch1 .sm-ch1-img[src*="md=1"],
+  #game-container .sm-ch1-img[src*="md=1"] {
+    max-width:  min(92%, 560px) !important;
+    max-height: min(34vh, 56vw) !important;
+    height: auto !important;
+    width:  auto !important;
+    object-fit: contain !important;
+    margin: clamp(6px, 1vh, 12px) auto !important;
+  }
+}
+
+/* ================================
+   CH1 – PRO_IMG sizing
+   Close to ch2–5, but ~10% smaller
+   ================================ */
+
+/* 1) Chapter-1 art band: bigger than the old 20vh,
+      but still a little under the “hero” look. */
+#game-container .sm-ch1[data-chapter="ch1"] {
+  /* If hero-ish bands are ~40vh in other chapters,
+     this sits about 10–15% under that. */
+  --sm-ch1-art-h: min(34vh, 60vw);
+}
+
+/* 2) Plain PRO_IMG in Ch1 uses that band.
+      This overrides the old 300px / 20vh clamps. */
+#game-container .sm-ch1[data-chapter="ch1"] .sm-ch1-img,
+#game-container .sm-ch1[data-chapter="ch1"] .sm-ch1-img img {
+  max-height: var(--sm-ch1-art-h) !important;
+  max-width:  min(88%, 540px) !important;
+  width:  auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  margin: clamp(6px, 1vh, 12px) auto !important;
+}
+
+/* 3) Short desktops / laptop windows —
+      keep the “10% smaller” vibe, just with smaller bands. */
+@media (max-height: 760px) {
+  #game-container .sm-ch1[data-chapter="ch1"] {
+    --sm-ch1-art-h: min(30vh, 54vw);
+  }
+}
+
+@media (max-height: 680px) {
+  #game-container .sm-ch1[data-chapter="ch1"] {
+    --sm-ch1-art-h: min(26vh, 50vw);
+  }
+}

@@ -59,7 +59,7 @@ export const Chapter3 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'QuickServe Pavilion',
-      img: PRO_BIG_IMG('qsPavilion.png'), // pavilion art
+      img: PRO_MED_IMG('qsPavilion.png'), // pavilion art
       text: `The QuickServe Pavilion glows like a cracked open jukebox glowstick.<br>
       The lights pulse and crowds gather 'round to hear the headline act:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
       soloLabel: 'Move Closer ➡️',

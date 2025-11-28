@@ -6,6 +6,7 @@ import { pickupPing } from '../ui/pickupPing.js';
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG = (name) => `${BASE}assets/img/characters/storyMode/${name}`;
+const PRO_MED_IMG = (name) => `${BASE}assets/img/characters/storyMode/${name}?md=1`;
 const SCN_IMG = (name) => `${BASE}assets/img/modes/storymodeForest/${name}`;
 
 // ───────────────── helpers ─────────────────
@@ -54,7 +55,7 @@ export const Chapter1 = {
         requireRevealToAdvance: true
         },
         {
-        img: PRO_IMG('triangleHand.png'),
+        img: PRO_MED_IMG('triangleHand.png'),
         text: `She presses a shimmering shard into your palm.<br><br><span style='color: rgb(143, 190, 255);'>\“Around this fest, folks <b>trade</b> little finds for favors, shortcuts, songs...maybe even secrets. Start collecting with this and you can use them later!\"</span><br><br>She winks, <span style='color: rgb(143, 190, 255);'>\“Here’s your first trinket!\"</span>`
         }
       ],
@@ -159,7 +160,7 @@ export const Chapter1 = {
     // 3) Walkabout
     {
       title: '<span style="color: rgb(247, 255, 105);">You\'re in! Explore?</span>',
-      img: PRO_IMG('jehnkExplore.png'),
+      img: PRO_MED_IMG('jehnkExplore.png'),
       text: `<span style='color: rgb(247, 255, 105);'>\"Hey man, I can hold down the first shift. Go check out the SnowCone MathFest!\"</span> Jehnk waves you off as he starts setting up his truck booth for the night.`,
       role: SlideRole.ADVANCE,
       requireAllSidePaths: true,
