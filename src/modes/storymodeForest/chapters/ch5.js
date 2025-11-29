@@ -36,9 +36,7 @@ export const Chapter5 = {
       mode: 'solo',
       title: 'Crossing Over',
       img: PRO_MED_IMG('jehnkPortal.png'),
-      text: `Portal light folds back into itself like a slow breath.<br><br>
-Your decision with Jehnk has already locked into the math of this place.<br><br>
-You feel the after-image of the moment hanging in the air, waiting to collapse into one reality or the other.`,
+      text: `Portal light folds back into itself like a slow breath.<br><br>Your decision with Jehnk has already locked into the math of this place.<br><br>You feel the after-image of the moment hanging in the air, waiting to collapse into one reality or the other.`,
       soloLabel: 'See what became of your choice ➡️',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -72,11 +70,8 @@ You feel the after-image of the moment hanging in the air, waiting to collapse i
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_MED_IMG('jehnkPortal2.png'),
-      text: `You tighten your grip on the Perfect SnowCone.<br><br>
-<span style="color: rgb(105, 248, 255);">“I’m sorry,”</span> you tell Jehnk. <span style="color: rgb(105, 248, 255);">“I can’t leave myself stuck here.”</span><br><br>
-He studies your face for a long moment, then nods.<br>
-<span style="color: rgb(247, 255, 105);">“I get it,”</span> he says quietly. <span style="color: rgb(247, 255, 105);">“Really. Someone should make it out.”</span>`,
+      img: PRO_MED_IMG('portalDecision4.png'),
+      text: `You tighten your grip on the Perfect SnowCone.<br><br><span style="color: rgb(105, 248, 255);">“I’m sorry,”</span> you tell Jehnk. <span style="color: rgb(105, 248, 255);">“I can’t leave myself stuck here.”</span><br><br>He studies your face for a long moment, then nods.<br><span style="color: rgb(247, 255, 105);">“I get it,”</span> he says quietly. <span style="color: rgb(247, 255, 105);">“Really. Someone should make it out.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -86,10 +81,8 @@ He studies your face for a long moment, then nods.<br>
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_MED_IMG('portalGlow2.png'),
-      text: `You turn toward the portal. The closer you walk, the more the cone burns cold in your hand,
-every color locking into a perfect ratio of light.<br><br>
-You step through.`,
+      img: PRO_MED_IMG('portalGlow3.png'),
+      text: `You turn toward the portal. The closer you walk, the more the cone burns cold in your hand, every color locking into a perfect ratio of light.<br><br>You step through.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -99,11 +92,8 @@ You step through.`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_MED_IMG('homeReturn2.png'),
-      text: `When you open your eyes, you’re home.<br><br>
-No portal. No math ghosts. No hooded dinos. Just your regular life,
-waiting patiently like it never left.<br><br>
-But everything feels… different.`,
+      img: PRO_MED_IMG('homeReturn3.png'),
+      text: `When you open your eyes, you’re home.<br><br>No portal. No math ghosts. No hooded dinos. Just your regular life, waiting patiently like it never left.<br><br>But everything feels… different.`,
       soloLabel: 'Next ➡️',
     },
         {
@@ -111,13 +101,21 @@ But everything feels… different.`,
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_MED_IMG('homeReturn3.png'),
-      text: `Now, when you solve an equation, you see the stage lights behind it.
-Every time a pattern untangles in your head, you hear a distant beat.
-Even smashing a random mosquito reminds you of the campsite at Kids Camping,
-of the nights when numbers and fireflies were the same kind of magic.`,
+      img: PRO_MED_IMG('homeReturn2.png'),
+      text: `Now, when you solve an equation, you see the stage lights behind it. Every time a pattern untangles in your head, you hear a distant beat. Even smashing a random mosquito reminds you of the campsite at Kids Camping, of the nights when numbers and fireflies were the same kind of magic.`,
       soloLabel: 'Next ➡️',
     },
+    
+        {
+      id: 'c5_keep_cone_ending_5',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Carry the Festival',
+      img: PRO_MED_IMG('homeReturn5.png'), // <- new art goes here
+      text: `The Perfect SnowCone lives in the back of your mind now, quiet and steady.<br><br>On the walk to school, in the grocery line, standing at the sink doing dishes—you catch flashes of neon in reflections: a doorway in the window glass, a glow in the corner of your eye.<br><br>Every time you double-check a fraction or balance a schedule, it’s like you’re lining up the symmetry again, just enough for the festival to peek through.`,
+      soloLabel: 'Next ➡️',
+    },
+
 
     // Keep Cone Ending – part 4 (@ Now, when you solve…) – keeps original id + onAdvance
     {
@@ -159,10 +157,7 @@ of the nights when numbers and fireflies were the same kind of magic.`,
       mode: 'solo',
       title: 'The New Driver',
       img: PRO_MED_IMG('portalDecision2.png'),
-      text: `You press the Perfect SnowCone into Jehnk’s hands.<br><br>
-For a second, all three of you—the cone, the driver, and the portal—sync in the same pulse.
-The light flares. The festival hums.<br><br>
-<span style="color: rgb(247, 255, 105);">“You sure about this?”</span> he asks.`,
+      text: `You press the Perfect SnowCone into Jehnk’s hands.<br><br>For a second, all three of you—the cone, the driver, and the portal—sync in the same pulse. The light flares. The festival hums.<br><br><span style="color: rgb(247, 255, 105);">“You sure about this?”</span> he asks.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -173,10 +168,7 @@ The light flares. The festival hums.<br><br>
       mode: 'solo',
       title: 'The New Driver',
       img: PRO_MED_IMG('truckLoop.png'),
-      text: `You nod. You know the truck, the math, the ghosts, the menu beats.
-You know the way the festival feels at 2am when the main stage dies down
-but the real weirdness is just getting started.<br><br>
-He takes one slow bite and vanishes in a halo of syrup light.`,
+      text: `You nod. You know the truck, the math, the ghosts, the menu beats. You know the way the festival feels at 2am when the main stage dies down but the real weirdness is just getting started.<br><br>He takes one slow bite and vanishes in a halo of syrup light.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -187,9 +179,7 @@ He takes one slow bite and vanishes in a halo of syrup light.`,
       mode: 'solo',
       title: 'The New Driver',
       img: PRO_MED_IMG('truckLoop2.png'),
-      text: `When the glow fades, the keys are in your hand.<br><br>
-You climb into the driver’s seat. You drive.<br><br>
-You try exits. You try back roads. You even try turning the truck completely off.`,
+      text: `When the glow fades, the keys are in your hand.<br><br>You climb into the driver’s seat. You drive.<br><br>You try exits. You try back roads. You even try turning the truck completely off.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -200,11 +190,7 @@ You try exits. You try back roads. You even try turning the truck completely off
       mode: 'solo',
       title: 'The New Driver',
       img: PRO_MED_IMG('truckLoop4.png'),
-      text: `But Jehnk was right. Every route circles back to the same entrance gate.<br><br>
-You’ve lost signal to the tiny dino—the beat-up phone just flashes <b>NO SERVICE</b> in every timeline.<br><br>
-Still, as you pull into SnowCone MathFest for what feels like the 67th time, you see them:<br>
-a poor, stranded potential customer, standing at the start of the line,
-clutching a ticket instead of a wristband…`,
+      text: `But Jehnk was right. Every route circles back to the same entrance gate.<br><br>You’ve lost signal to the tiny dino—the beat-up phone just flashes <b>NO SERVICE</b> in every timeline.<br><br>Still, as you pull into SnowCone MathFest for what feels like the 67th time, you see them:<br>a poor, stranded potential customer, standing at the start of the line, clutching a ticket instead of a wristband…`,
       soloLabel: 'Serve the next customer ➡️',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -249,9 +235,7 @@ clutching a ticket instead of a wristband…`,
       mode: 'solo',
       title: 'The End?',
       img: PRO_MED_IMG('truckLoop3.png'), // 🔧 subtle, dreamy fest art
-      text: `SnowCone MathFest doesn’t erase cleanly.<br><br>
-For some people, it’s a place on a map—a festival you drive to once,<br>
-then forget after the merch fades and the playlists move on.`,
+      text: `SnowCone MathFest doesn’t erase cleanly.<br><br>For some people, it’s a place on a map—a festival you drive to once,<br>then forget after the merch fades and the playlists move on.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -263,8 +247,7 @@ then forget after the merch fades and the playlists move on.`,
       mode: 'solo',
       title: 'The End?',
       img: PRO_MED_IMG('festivalFade2.png'),
-      text: `For you, it’s a loop, or a memory, or a glitch in the road where music and math keep folding into each other.<br><br>
-Maybe you’re at the truck, keys in hand, waiting for the next unlucky soul to wander up with a ticket instead of a wristband.`,
+      text: `For you, it’s a loop, or a memory, or a glitch in the road where music and math keep folding into each other.<br><br>Maybe you’re at the truck, keys in hand, waiting for the next unlucky soul to wander up with a ticket instead of a wristband.`,
       soloLabel: 'Next ➡️',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -305,10 +288,7 @@ Maybe you’re at the truck, keys in hand, waiting for the next unlucky soul to 
       mode: 'solo',
       title: 'The End?',
       img: PRO_MED_IMG('festivalFade.png'),
-      text: `Maybe you’re home, staring at homework or spreadsheets or a fresh notebook page,<br>
-feeling the ghost-beat of the festival under every pattern you notice.<br><br>
-Either way, the story’s not exactly over.<br><br>
-It just knows how to pause.`,
+      text: `Maybe you’re home, staring at homework or spreadsheets or a fresh notebook page,<br>feeling the ghost-beat of the festival under every pattern you notice.<br><br>Either way, the story’s not exactly over.<br><br>It just knows how to pause.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -319,9 +299,7 @@ It just knows how to pause.`,
       mode: 'ending',
       title: 'The End?',
       img: PRO_MED_IMG('festivalFade.png'), // 🔧 subtle, dreamy fest art
-      text: `For now, the screen fades, the music softens,<br>
-and two little words hang at the edge of the UI like a promise:<br><br>
-<b>The End?</b>`,
+      text: `For now, the screen fades, the music softens,<br>and two little words hang at the edge of the UI like a promise:<br><br><b>The End?</b>`,
       options: [
         {
           label: 'Back to Menu',
