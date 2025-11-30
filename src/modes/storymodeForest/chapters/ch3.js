@@ -46,7 +46,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Follow the Sound',
       img: PRO_MED_IMG('jehnkNod.png'), // can swap to a wider festival shot later if you want
-      text: `He references the legendary music of SnowCone MathFest:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil</span> over at QuickServe,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br><span style="color: rgb(217, 164, 255);">Grampy P</span> by his tent in MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
+      text: `He references the legendary music of SnowCone MathFest:<br><br><span style="color: rgb(61, 229, 255);">Cosmic Phil</span> over at QuickServe,<br><span style="color: rgb(164, 255, 164);">Infinity Triplets</span> looping by Infinity Lake,<br><span style="color: rgb(217, 164, 255);">Grampy P</span> by his tent in MathTips Village.<br><br><span style="color: rgb(247, 255, 105);">"Clock out for a minute. Go see what the ghosts are dancing to."</span>`,
       soloLabel: 'Go to QuickServe Pavilion ➡️',
     },
 
@@ -60,7 +60,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'QuickServe Pavilion',
       img: PRO_MED_IMG('qsPavilion.png'), // pavilion art
-      text: `The QuickServe Pavilion glows like a cracked open jukebox glowstick. This is where the biggest acts play, the main stage, the greatest common denominator.<br>
+      text: `The QuickServe Pavilion glows like a cracked open glowstick. This is where the biggest acts play, the main stage, the greatest common denominator.<br>
       The lights pulse and crowds gather 'round to hear the headline act:<br><span style="color: rgb(61, 229, 255);">Cosmic Phil.</span>`,
       soloLabel: 'Move Closer ➡️',
     },
@@ -162,7 +162,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Verifying Results',
       img: PRO_IMG('ratioFields.png'),
-      text: `He leans back and checks the echoes with headphones.<br><span style="color: rgb(164, 255, 164);">\"The Infinity Triplets always run three echoes per beat,\"</span> he shouts over the water. <span style="color: rgb(164, 255, 164);">\"The first echo is for the stage, the second for the lake, and the third for the sky.\"</span><br><br>He points to the buoys. <span style="color: rgb(164, 255, 164);">\"I'm trying to keep the lake honest, it's same tempo every time but the lake emphasizes the mystery. These Triplets expertly change the *spacing* between echoes, creating perfect loops with an organic feel. That’s why it seems endless but never lost.\"</span>`,
+      text: `He leans back and checks the echoes with headphones.<br><span style="color: rgb(164, 255, 164);">\"The Infinity Triplets always run three echoes per beat,\"</span> he shouts over the water. <span style="color: rgb(164, 255, 164);">\"The first echo is for the stage, the second for the lake, and the third for the sky.\"</span><br><br>He points to the buoys. <span style="color: rgb(164, 255, 164);">\"I'm trying to keep the lake honest, it's the same tempo every time but the lake emphasizes the mystery. The Infinity Triplets expertly reflect the *spacing* between echoes, creating perfect loops within them for an organic feel. That’s why it seems endless but never lost.\"</span>`,
       soloLabel: 'A Quick Question...➡️',
     },
     {
@@ -230,7 +230,7 @@ export const Chapter3 = {
       mode: 'solo',
       title: 'Grampy’s Lesson',
       img: PRO_MED_IMG('grampyLesson.png'),
-      text: `A ring of tiny dinosaur campers crowds around his chalkboard, tails swishing in the dust.<span style="color: rgb(217, 164, 255);">"See, little ones,"</span> Grampy P says, pointing to the equation, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster. When you show your work, we can usually spot the monster.<br>The trick? Find the monster, then you can tell it what to do."</span>`,
+      text: `A ring of tiny dinosaur campers crowds around his chalkboard, tails swishing in the dust.<span style="color: rgb(217, 164, 255);">"See, little ones,"</span> he says, pointing to the equation, <span style="color: rgb(217, 164, 255);">"every tough problem is just a story with a monster. When you show your work, we can usually spot the monster.<br>The trick? Find the monster, then you can tell it what to do."</span>`,
       soloLabel: 'A question for you… ➡️',
     },
 

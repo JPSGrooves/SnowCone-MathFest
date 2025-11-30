@@ -57,7 +57,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Glowing Doorway',
       img: PRO_MED_IMG('forestPath.png'),
-      text: `The festival thins out behind you until it’s just trees and path and your own footsteps.<br><br>Up ahead, a band of neon magenta and electric violet hangs in the dark—tall and narrow like a doorway. Every time you walk, the path seems to stretch with it, distance turning slippery, like wanting to reach the light is what’s actually pulling you forward.`,
+      text: `The festival thins out behind you until it’s just trees, path, and your own footsteps.<br><br>Up ahead, a band of neon magenta and electric violet hangs in the dark—tall and narrow like a doorway. Every time you walk, the path seems to stretch with it, distance turning slippery, like wanting to reach the light is what’s actually pulling you forward.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -134,7 +134,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Drop',
       img: PRO_MED_IMG('dinoDrop.png'),
-      text: `In one smooth twist they roll away with the cone, cradling it to their chest like it’s a relay baton.<br><br>They toss something heavy and familiar to the ground by your feet: a <b>beat-up cell phone</b>, already buzzing like it’s been waiting for this moment—cracked screen, dented sides, bars somehow full.<br><br><span style="color: rgb(61, 229, 255);">“I’ll call you from the other side,”</span> they grin, backing toward the neon doorway, portal light flickering across their hood.`,
+      text: `In one smooth twist they roll away with the cone, cradling it to their chest like it’s a relay baton.<br><br>They toss something heavy and familiar to the ground by your feet: a <b>beat-up cell phone</b>, already buzzing like it’s been waiting for this moment—cracked screen, dented sides, bars somehow full.<br><span style="color: rgb(61, 229, 255);">“I’ll call you from the other side,”</span> they grin, backing toward the neon doorway.`,
       soloLabel: 'Pick up the phone…',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -196,7 +196,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Drop',
       img: PRO_IMG('celly.png'),
-      text: `You pull out the <b>beat-up cell phone</b> you traded for, tilting it so the portal light spills across the cracked glass. You notice the battery and signal are running strong. The hum from the doorway and the buzz in your hand sync up like they’ve been trying to find each other all night.<br><br>The leaves answer with a softer rustle this time. The tiny hooded dino steps out, hands spread in a chill “easy, I come in peace” gesture.`,
+      text: `You pull out the <b>beat-up cell phone</b> you traded for, tilting it so the portal light spills across the cracked glass. You notice the battery and signal are running strong. The hum from the doorway and the buzz in your hand sync up like they’ve been trying to find each other all night.<br><br>The leaves answer with a softer rustle this time. The tiny hooded dino steps out, hands spread in a chill <span style="color: rgb(61, 229, 255);">“easy, I come in peace”</span> gesture.`,
       soloLabel: 'Listen to him ➡️',
     },
 // 0B-2b) TRADED – portal sync & reassurance
@@ -253,7 +253,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Jump',
       img: PRO_MED_IMG('portalDino.png'),
-      text: `He hovers at the edge of the portal, hoodie tugged sideways by the neon wind.<br><br><span style="color: rgb(61, 229, 255);">“For what it’s worth,”</span> he says, <span style="color: rgb(61, 229, 255);">“I was stuck in this place way before Jehnk ever figured out the math.”</span><br><br>He shifts his weight, one clawed foot already inside the glow.<br><span style="color: rgb(61, 229, 255);">“He made mistakes, sure. Got dazzled by the truck, by the loops.”</span>`,
+      text: `He hovers at the edge of the portal, hoodie tugged sideways by the neon wind.<br><span style="color: rgb(61, 229, 255);">“For what it’s worth,”</span> he says, <span style="color: rgb(61, 229, 255);">“I was stuck in this place way before Jehnk ever figured out the math.”</span><br><br>He shifts his weight, one clawed foot already inside the glow.<br><span style="color: rgb(61, 229, 255);">“He made mistakes, sure. Got dazzled by the truck, by the loops.”</span>`,
       soloLabel: '“But the trap…?” ➡️',
     },
 
@@ -263,7 +263,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Jump',
       img: PRO_MED_IMG('dinoPortalEnter.png'),
-      text: `<span style="color: rgb(61, 229, 255);">“But the trap?”</span> He jerks his chin toward the light. <span style="color: rgb(61, 229, 255);">“That blueprint wasn’t his.”</span><br><br>The portal crackles louder, colors sliding toward a hot band of magenta and cyan around the edges.<br><br>He gives you a quick, crooked grin.<br><span style="color: rgb(61, 229, 255);">“Loops are complicated. We’ll talk on the call… if the line holds.”</span><br><br>Then he turns and jumps, his silhouette swallowed by the neon flame, leaving only the hum of the portal and the buzz of the phone in your hand.`,
+      text: `<span style="color: rgb(61, 229, 255);">“But the trap?”</span> He jerks his chin toward the light. <span style="color: rgb(61, 229, 255);">“The blueprint wasn’t his.”</span> The portal crackles louder, colors sliding toward a hot band of magenta and cyan around the edges.<br>He gives you a quick, crooked grin.<br><span style="color: rgb(61, 229, 255);">“Loops are complicated. We’ll talk on the call… if the line holds.”</span><br><br>Then he turns and jumps, his silhouette swallowed by the neon flame, leaving behind only the hum of the portal.`,
       soloLabel: 'Wait for the call ➡️',
     },
 
@@ -283,7 +283,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Call',
       img: PRO_MED_IMG('tinyDinoHood.png'),
-      text: `You hear festival noise on their side—same party, different angle.<br><br><span style="color: rgb(61, 229, 255);">“SnowCone MathFest isn’t just a place,”</span> they say.<span style="color: rgb(61, 229, 255);">“It’s an in-between. Past, present, future—they all line up here when the symmetry’s just right.”</span>`,
+      text: `You hear festival noise on their side, it sounds like the same party, but a different angle.<br><br><span style="color: rgb(61, 229, 255);">“SnowCone MathFest isn’t just a place,”</span> he says.<span style="color: rgb(61, 229, 255);">“It’s an in-between. Past, present, future: they all line up here when the symmetry’s just right. My call is going to get cut off, but I wanted you to know that I'm off to find the original Truck Driver!”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -293,13 +293,13 @@ export const Chapter4 = {
     mode: 'choice3',
     title: 'The Call',
     img: PRO_IMG('tinyDinoHood.png'),
-    text: `There’s a quiet moment between ringtones and bass drops.<br><span style="color: rgb(61, 229, 255);">“So… ${playerName}, you ready to go home?”</span>`,
+    text: `There’s a quiet moment between phone static and bass drops.<br><span style="color: rgb(61, 229, 255);">“So… ${playerName}, you wanna come back to the other side?”</span>`,
     bigChoices: true,
     choices: [
         {
         id: 'yes',
         label: '“Yeah. I think I’m ready to go home.”',
-        praise: `<span style="color: rgb(61, 229, 255);">“Honestly? Best plan,”</span> the dino says. <span style="color: rgb(61, 229, 255);">“Make another Perfect SnowCone and you can ride the symmetry out. Clean exit.”</span>`,
+        praise: `<span style="color: rgb(61, 229, 255);">“Honestly? Best plan,”</span> the dino says. <span style="color: rgb(61, 229, 255);">“Figure out how to make another Perfect SnowCone and you can ride the symmetry out. Clean exit.”</span>`,
         onSelect: ({ appState }) => {
             const a = appState || globalAppState;
             try {
@@ -313,7 +313,7 @@ export const Chapter4 = {
         },
         {
         id: 'no',
-        label: '“No. I’m not done here yet.”',
+        label: '“No. I’m not done here yet...”',
         praise: `<span style="color: rgb(61, 229, 255);">“I’m gonna have to advise against that,”</span> they sigh. <span style="color: rgb(61, 229, 255);">“You don’t know this place like I do…”</span>`,
         onSelect: ({ appState }) => {
             const a = appState || globalAppState;
@@ -337,7 +337,7 @@ export const Chapter4 = {
     mode: 'solo',
     title: 'The Truck Driver',
     img: PRO_BIG_IMG('jehnkPortal.png'),
-    text: `The call drops. The portal hums.<br><br>Behind you, footsteps crunch on the grass.`,
+    text: `The call drops. The portal hums.<br><br>Emerging from the path behind you, footsteps crunch on the grass.`,
     soloLabel: 'Greet Jehnk ➡️',
     onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -370,7 +370,7 @@ export const Chapter4 = {
     mode: 'solo',
     title: 'The Truck Driver',
     img: PRO_MED_IMG('jehnkPortal.png'),
-    text: `A shadow leans into the portal glow as the last bit of static fades from your ear.<br><br><span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.<br><br><span style="color: rgb(247, 255, 105);">“If you’re really ready to go home…”</span> he adds, stepping closer, <span style="color: rgb(247, 255, 105);">“maybe there’s still a way out for me too.”</span>`,
+    text: `His shadow leans into the portal glow as you lower the phone from your ear.<br><br><span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.<br><br><span style="color: rgb(247, 255, 105);">“If you’re really ready to go home…”</span> he offers, stepping closer, <span style="color: rgb(247, 255, 105);">“maybe there’s still a way out for me too.”</span>`,
     soloLabel: 'Next ➡️',
     onAdvance: ({ engine }) => {
         if (!engine) return;
@@ -394,7 +394,7 @@ export const Chapter4 = {
     mode: 'solo',
     title: 'The Truck Driver',
     img: PRO_MED_IMG('jehnkPortal.png'),
-    text: `A shadow leans into the portal glow as the last bit of static fades from your ear.<br><br><span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.<br><br><span style="color: rgb(247, 255, 105);">“Glad to hear you’re starting to like this place,”</span> he adds with a half-smile. <span style="color: rgb(247, 255, 105);">“I sounded like that once.”</span>`,
+    text: `His shadow leans into the portal glow as you lower the phone from your ear.<br><br><span style="color: rgb(247, 255, 105);">“Ahh… I see you found the portal,”</span> a familiar voice says.<br><br><span style="color: rgb(247, 255, 105);">“Glad to hear you’re starting to like this place,”</span> he adds with a half-smile. <span style="color: rgb(247, 255, 105);">“I sounded like that once.”</span>`,
     soloLabel: 'Next ➡️',
     onAdvance: ({ engine }) => {
         if (!engine) return;
@@ -420,7 +420,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Truck Driver',
       img: PRO_MED_IMG('jehnkPortal2.png'),
-      text: `You turn. Jehnk stands there, hands in his pockets, neon from the doorway tracing the edge of his hoodie.<br><br><span style="color: rgb(247, 255, 105);">“Did the tiny dino in the hood lead you here?”</span><br>He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“They’ve been a menace ever since I got this place started.”</span>`,
+      text: `As Jehnk goes on, shoulders and hands shrugging, the neon from the doorway traces the edge of his hoodie.<br><br><span style="color: rgb(247, 255, 105);">“Did the tiny dino in the hood lead you here?”</span> He shakes his head, half-smiling. <span style="color: rgb(247, 255, 105);">“He's been a menace ever since I got to this place.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -430,7 +430,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Truck Driver',
       img: PRO_MED_IMG('portalDecision.png'),
-      text: `You catch yourself staring at him differently now, like you can finally see the edges of something he’s been hiding.<br><br><span style="color: rgb(247, 255, 105);">“Look,”</span> he says. <span style="color: rgb(247, 255, 105);">“I’d walk you back to the truck myself. But now that you’re here… you can know the truth.”</span>`,
+      text: `You catch yourself staring at him differently now, like you can finally see the edges of something he’s been hiding.<br><br><span style="color: rgb(247, 255, 105);">“Look,”</span> he says. <span style="color: rgb(247, 255, 105);">“I’d walk you back to the truck myself. But now that you’re here… I know I won't be able to hide the truth.”</span>`,
       soloLabel: '“Tell me the truth.”',
     },
 
@@ -441,7 +441,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Looped Roads',
       img: PRO_BIG_IMG('itsAllGood.png'),
-      text: `“When I first started SnowCone MathFest,” Jehnk says, “it was all good: fun, music, games, you name it.<br>I thought I’d just roll in, serve cones, catch sets, ride the good vibes forever.”`,
+      text: `<span style="color: rgb(247, 255, 105);">“When I first started SnowCone MathFest,”</span> Jehnk says, <span style="color: rgb(247, 255, 105);">“it was all good: fun, music, games, you name it.<br>I thought I’d just roll in, serve cones, catch sets, ride the good vibes forever.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -463,7 +463,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Looped Roads',
       img: PRO_MED_IMG('jehnkNightDrive2.png'),
-      text: `He nods toward the doorway.<br><span style="color: rgb(247, 255, 105);">“The old driver? He didn’t warn me. He was one of those lifer road types—sunburnt hands, faded festival wristbands up both arms, eyes that never quite left the rearview. He tricked me into taking over the truck. Handed me the keys with a smile, like he was doing me a favor… and then… a fractions question I couldn’t answer.”</span>`,
+      text: `He nods toward the doorway.<br><span style="color: rgb(247, 255, 105);">“The old driver? He didn’t warn me. He was one of those lifer road types—sunburnt hands, faded festival wristbands up both arms, eyes that never quite left the rearview. He tricked me into taking over the truck. Handed me the keys with a smile, like he was doing me a favor… and then… he hit me with a fractions question I couldn’t answer.”</span>`,
       soloLabel: '“What do fractions have to do with this?”',
     },
 
@@ -475,7 +475,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'How He Got Me',
       img: PRO_MED_IMG('jehnkNightDrive3.png'),
-      text: `“<span style="color: rgb(247, 255, 105);">You know how he got me?”</span> Jehnk asks. <span style="color: rgb(247, 255, 105);">“Fractions. Same old truck, same old recipes. I just couldn’t see the splits.”</span><br>He sketches a ghost of an order in the air between you, invisible cups lining up in rows.<br><span style="color: rgb(247, 255, 105);">“He hit me with a question kind of like this…”</span>`,
+      text: `“<span style="color: rgb(247, 255, 105);">You know how he got me?”</span> Jehnk asks. <span style="color: rgb(247, 255, 105);">“Fractions. I never paid attention to those lessons in high school. I just couldn’t see the splits.”</span><br>He pantomimes the first SnowCone he ever served, pooring syrup on an invisible order.<br><span style="color: rgb(247, 255, 105);">“He knew I had a weakness and went straight for it…”</span>`,
       soloLabel: 'Hear the question ➡️',
     },
 
@@ -485,30 +485,30 @@ export const Chapter4 = {
       role: SlideRole.ADVANCE,
       mode: 'quiz3',
       title: 'Fraction Trap',
-      text: `<span style="color: rgb(247, 255, 105);">“Here’s the one that got me,”</span> Jehnk says.<br><br><span style="color: rgb(247, 255, 105);">“The remix syrup pitcher is 2/3 full.<br>I pour out 3/4 of what’s in there into the machine.<br><br>What fraction of a full pitcher did I just pour?”</span>`,
+      text: `<br><br><span style="color: rgb(247, 255, 105);">“Here’s the one that got me,”</span> Jehnk says.<br><br><span style="color: rgb(247, 255, 105);">“The blue syrup bottle is 2/3 full.<br>I pour out 3/4 of what’s in there, onto the cone.<br><br>What fraction of a full syrup bottle did I just pour?”</span>`,
       bigQuizOptions: true,
       quiz: {
         options: [
           {
             id: 'c4_frac_opt_correct',
-            label: '1/2 of a full pitcher',
+            label: '1/2 of a full bottle',
             correct: true,
-            praise: `Nice.<br>You’re taking 3/4 of 2/3.<br>Multiply straight across: 2 × 3 = 6 and 3 × 4 = 12, so 6/12 = 1/2.<br>Half a pitcher of pure remix. 💫`,
+            praise: `<span style="color: rgb(247, 255, 105);">Correct!<br>You’re taking 3/4 of 2/3.<br>Multiply straight across: 2 × 3 = 6 and 3 × 4 = 12, so 6/12 = 1/2.<br>Half a bottle of pure azur.</span> 💫`,
           },
           {
             id: 'c4_frac_opt_wrong_1',
-            label: '3/4 of a full pitcher',
+            label: '3/4 of a full bottle',
             correct: false,
-            praise: `That would be 3/4 of a *full* pitcher.<br>You only had 2/3 to start, so you’re taking 3/4 of a smaller amount.`,
+            praise: `<span style="color: rgb(247, 255, 105);">That would be 3/4 of a *full* bottle.<br>You only had 2/3 to start, so you’re taking 3/4 of a smaller amount.</span>`,
           },
           {
             id: 'c4_frac_opt_wrong_2',
-            label: '5/6 of a full pitcher',
+            label: '5/6 of a full bottle',
             correct: false,
-            praise: `5/6 is bigger than 2/3.<br>You can’t pour out more syrup than you even had in the pitcher.`,
+            praise: `<span style="color: rgb(247, 255, 105);">5/6 is bigger than 2/3.<br>You can’t pour out more syrup than you even had in the bottle.</span>`,
           },
         ],
-        advanceLabel: 'Okay… so what now? ➡️',
+        advanceLabel: 'Those Tricky Fractions! ➡️',
       },
     },
 
@@ -520,7 +520,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Forge Another',
       img: PRO_MED_IMG('portalDecision.png'),
-      text: `“Always know your fractions,” Jehnk says. “They’re how the truck keeps its balance.”<br>He looks back at you, thoughtful.<br><span style="color: rgb(247, 255, 105);">“So tell me, ${playerName}… do you still have the stuff from when you worked the truck?”</span><br>Recipe scraps, ratio cards, ledger notes, all the little artifacts you’ve picked up over the night—they’re still rattling around in your pockets.<br><span style="color: rgb(247, 255, 105);">“I think we can use them to forge another Perfect SnowCone.”</span>`,
+      text: `<span style="color: rgb(247, 255, 105);">“Always know your fractions,”</span> Jehnk says. <span style="color: rgb(247, 255, 105);">“They’re how the festival stays in balance.”</span> He looks back at you, thoughtfully. <span style="color: rgb(247, 255, 105);">“So tell me, ${playerName}… do you still have the items from when you worked the truck?”</span><br>Recipe scraps, ratio cards, ledger notes, all the little artifacts you’ve picked up over the night—they’re still rattling around in your pockets.<br><span style="color: rgb(247, 255, 105);">“I think we can use them to forge another Perfect SnowCone.”</span>`,
       soloLabel: 'Forge the new cone ➡️',
     },
 
@@ -531,8 +531,8 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Tools of the Truck',
       img: PRO_MED_IMG('forgeTools.png'), // <- or whatever art you use for timepiece/flashlight/water/ledger
-      text: `Jehnk lays everything out on a crate between you: the wooden time piece, the scuffed flashlight, a cold bottle of water, and his scribbled ledger.<br><br><span style="color: rgb(247, 255, 105);">“Water for the ice,”</span> he says, tapping the bottle.<br><span style="color: rgb(247, 255, 105);">“Time piece for how long we pour.”</span><br><span style="color: rgb(247, 255, 105);">“Flashlight for the sparkle.”</span><br><span style="color: rgb(247, 255, 105);">“Ledger so the fractions stay honest.”</span><br><br>He nods at the spread. <span style="color: rgb(247, 255, 105);">“Everything we need to build one more.”</span>`,
-      soloLabel: 'Use the tools ➡️',
+      text: `Jehnk lays everything out on a crate between you: the wooden time piece, the scuffed flashlight, a cold bottle of water, and his scribbled ledger.<br><br><span style="color: rgb(247, 255, 105);">“Water for the ice.”</span><br><span style="color: rgb(247, 255, 105);">“Time piece for how long to pour.”</span><br><span style="color: rgb(247, 255, 105);">“The flashlight for the sparkle.”</span><br><span style="color: rgb(247, 255, 105);">“A ledger, to help it stay honest.”</span><br><br>He nods at the spread. <span style="color: rgb(247, 255, 105);">“Everything we need to build The Perfect SnowCone.”</span>`,
+      soloLabel: 'Merge the tools ➡️',
     },
 
 
@@ -543,7 +543,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Reforged',
       img: PRO_MED_IMG('essentialsTrio3.png'),
-      text: `The air thickens with mint and neon.<br><br><span style="color: rgb(247, 255, 105);">“There we go,”</span> Jehnk says as the cone locks into place, colors cycling in impossible gradients.<br><span style="color: rgb(247, 255, 105);">“I never cease to amaze myself with my ability to make these things.”</span>`,
+      text: `The air thickens with mint and neon as Jehnk performs what could only be called SnowCone Magic, forming <span style="color: rgb(247, 255, 105);">The Perfect Snowcone</span> in the blink of an eye.<br><br><span style="color: rgb(247, 255, 105);">“There we go,”</span> Jehnk says as the cone locks into place, colors cycling in impossible gradients.<br><span style="color: rgb(247, 255, 105);">“I never cease to amaze myself with my ability to make these things.”</span>`,
       soloLabel: 'Take the Perfect SnowCone ➡️',
       onAdvance: ({ appState }) => {
         const a = appState || globalAppState;
@@ -580,19 +580,30 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Moment of Truth',
       img: PRO_MED_IMG('portalGlow3.png'),
-      text: `The portal crackles brighter as you hold the Perfect SnowCone up to it. Every color in the cone answers back in shimmering waves.<br><br><span style="color: rgb(247, 255, 105);">“Okay, ${playerName}, here comes the moment of truth.”</span>`,
+      text: `The portal crackles brighter as Jehnk holds <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> up to it. Every color in the cone answers back in shimmering waves.<br><br><span style="color: rgb(247, 255, 105);">“Okay, ${playerName}, here comes the moment of truth. I'm not gonna lie to you like I was lied to. I'm going to ask you to make an important decision.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
-        // 8) Alignment choice – setup part 2 (this is where he actually serves you the cone)
+    // 8A) Alignment choice – setup part 2 (philosophy + setup)
     {
       id: 'c4_alignment_choice_2',
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Moment of Truth',
       img: PRO_MED_IMG('portalDecision4.png'),
-      text: `<span style="color: rgb(247, 255, 105);">“The Perfect SnowCone only works if you’re being served. I could make a million of these things and still never pass through that portal myself.”</span> Then he serves you the SnowCone`,
-      soloLabel: 'Next ➡️',
+      text: `<span style="color: rgb(247, 255, 105);">“You see, ${playerName}, <b>The Perfect SnowCone<b> only works if you’re being served,”</span> Jehnk says, steadying the cup in his hand. <span style="color: rgb(247, 255, 105);">“Math is like that too,”</span> he goes on. <span style="color: rgb(247, 255, 105);">“Add, subtract—something always moves. You never get to keep everything and still give everything away.”</span>`,
+      soloLabel: 'Watch what he does ➡️',
+    },
+
+    // 8B) Alignment choice – he actually serves you + grant item
+    {
+      id: 'c4_alignment_choice_3',
+      role: SlideRole.ADVANCE,
+      mode: 'solo',
+      title: 'Moment of Truth',
+      img: PRO_MED_IMG('portalDecision4.png'),
+      text: `He moves the SnowCone your way, slow and careful, like he’s solving for x in real time.<br><span style="color: rgb(247, 255, 105);">“If I serve this to you, it opens your path,”</span> he says.<span style="color: rgb(247, 255, 105);">“If you were to serve it back to me… that opens mine.”</span><br><br>The portal hums at the edge of your vision, waiting to see who this cone is really for.`,
+      soloLabel: 'Recieve the Cone ➡️',
       onAdvance: ({ appState }) => {
         const a = appState || globalAppState;
         if (!a) return;
@@ -628,6 +639,7 @@ export const Chapter4 = {
       },
     },
 
+
     // 8) Alignment choice – keep it or serve Jehnk, then jump to ch5
     {
       id: 'c4_alignment_choice',
@@ -635,12 +647,12 @@ export const Chapter4 = {
       mode: 'choice3',
       title: 'Moment of Truth',
       img: PRO_IMG('essentialsTrio3.png'),
-      text: `He looks from the cone to the doorway, then back to you.<br><br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that snowcone.”</span>`,
+      text: `He looks at the portal, and then solemnly back to you, holding the cone he just served you.<br><br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that SnowCone.”</span>`,
       bigChoices: true,
       choices: [
         {
           id: 'c4_choice_keep_cone',
-          label: 'Keep the SnowCone and step toward the portal.',
+          label: 'Keep the SnowCone and step into the portal.',
           nextChapterId: 'ch5',
           nextId: 'c5_keep_cone_ending_1',
           onSelect: ({ appState }) => {

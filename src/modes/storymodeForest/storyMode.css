@@ -1562,3 +1562,50 @@
     --sm-ch1-art-h: min(26vh, 50vw);
   }
 }
+/* ================================
+   Story Mode – tighten gap between
+   solo/choice buttons and bottom bar
+   (Ch1–Ch5, mobile & desktop)
+   ================================ */
+
+/* 1) Shrink the reserved space under the main choice/solo button row
+      for ALL story chapters that use this stack */
+#game-container .sm-choice-list {
+  /* keep ~40% of bar height as buffer instead of 100% */
+  margin-bottom: calc(var(--sm-bbar-h) * 0.4 + max(0.4vh, env(safe-area-inset-bottom))) !important;
+}
+
+/* 2) Ease up the global bottom padding for chapter frames
+      so content in Ch1–Ch5 can sit closer to the cone coin row */
+#game-container .sm-ch1,
+#game-container .sm-ch1-wrap,
+#game-container .sm-chapter-menu {
+  padding-bottom: calc(var(--sm-bbar-h) * 0.4 + max(0.6vh, env(safe-area-inset-bottom))) !important;
+}
+/* ─────────────────────────────
+   Story Mode – fade-to-black for Ch5 → Credits
+   ───────────────────────────── */
+
+.sm-blackout {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9998;               /* just under credits (9999) */
+  animation: smBlackoutFade 320ms ease forwards;
+}
+
+@keyframes smBlackoutFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Optional: smooth fade-out when credits close */
+.sm-credits-overlay {
+  transition: opacity 260ms ease;
+}
+
+.sm-credits-overlay.is-fading-out {
+  opacity: 0;
+}

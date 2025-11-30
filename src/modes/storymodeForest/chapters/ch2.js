@@ -45,7 +45,7 @@ export const Chapter2 = {
       customer: {
         name: 'Benjamin Banneker',
         bio: {
-          img: PRO_BIG_IMG('banneker.png'),
+          img: PRO_IMG('banneker.png'),
           text: `First up, Banneker sets a wooden timepiece on the counter. Self-taught astronomer, almanac author, and surveyor. <span style='color: rgb(61, 229, 255);'>\"Evening,\"</span> he says. <span style='color: rgb(61, 229, 255);'>\"Clock has you right on time.\"</span>`,
         },
         lore: {

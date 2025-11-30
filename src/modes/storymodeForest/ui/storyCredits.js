@@ -69,8 +69,15 @@ export function showStoryCredits() {
 
   const btn = overlay.querySelector('.sm-credits-btn');
 
-  const closeAndReturn = () => {
+    const closeAndReturn = () => {
     overlay.classList.add('is-fading-out');
+
+    // also clear any blackout that might still be sitting behind us
+    const blackout = document.querySelector('.sm-blackout');
+    if (blackout) {
+      blackout.remove();
+    }
+
     setTimeout(() => {
       overlay.remove();
     }, 260);
@@ -78,6 +85,7 @@ export function showStoryCredits() {
     // Let storyMode.js handle the actual menu transition
     window.dispatchEvent(new CustomEvent('sm:backToChapterMenu'));
   };
+
 
   btn?.addEventListener('click', closeAndReturn);
 
@@ -87,4 +95,27 @@ export function showStoryCredits() {
       closeAndReturn();
     }
   });
+}
+export function fadeToStoryCreditsFromCh5() {
+  // don’t double-run if we’re already in the middle of this
+  if (document.querySelector('.sm-credits-overlay') ||
+      document.querySelector('.sm-blackout')) {
+    return;
+  }
+
+  const host = document.querySelector('.sm-aspect-wrap') || document.body;
+  if (!host) return;
+
+  const blackout = document.createElement('div');
+  blackout.className = 'sm-blackout';
+  host.appendChild(blackout);
+
+  const handleEnd = () => {
+    blackout.removeEventListener('animationend', handleEnd);
+
+    // Once we’re fully black, roll credits on top
+    showStoryCredits();
+  };
+
+  blackout.addEventListener('animationend', handleEnd);
 }
