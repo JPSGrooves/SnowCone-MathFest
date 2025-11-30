@@ -73,7 +73,7 @@ export const Chapter5 = {
       mode: 'solo',
       title: 'Carry the Festival',
       img: PRO_MED_IMG('portalDecision4.png'),
-      text: `You tighten your grip on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span>.<br><br><span style="color: rgb(105, 248, 255);">“I’m sorry,”</span> you tell Jehnk. <span style="color: rgb(105, 248, 255);">“I just can't here.”</span><br><br>He studies your face for a long moment, then nods.<br><span style="color: rgb(247, 255, 105);">“I get it,”</span> he says quietly. <span style="color: rgb(247, 255, 105);">“Really. Someone should make it out.”</span>`,
+      text: `You tighten your grip on <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span>.<br><br><span style="color: rgb(105, 248, 255);">“I’m sorry,”</span> you tell Jehnk. <span style="color: rgb(105, 248, 255);">“I just can't stay here.”</span><br><br>He studies your face for a long moment, then nods.<br><span style="color: rgb(247, 255, 105);">“I get it,”</span> he says quietly. <span style="color: rgb(247, 255, 105);">“Really. Someone should make it out.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -84,7 +84,7 @@ export const Chapter5 = {
       mode: 'solo',
       title: 'Carry the Festival',
       img: PRO_MED_IMG('portalGlow3.png'),
-      text: `You turn toward the portal. The closer you walk, the more the cone burns cold in your hand, every color locking into a perfect ratio of light.<br><br>You step through.`,
+      text: `Accepting your decision, you turn toward the portal. The closer you walk, the more the cone burns cold in your hand, every color locking into a perfect ratio of light.<br><br>You step through.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -95,7 +95,7 @@ export const Chapter5 = {
       mode: 'solo',
       title: 'Carry the Festival',
       img: PRO_MED_IMG('homeReturn3.png'),
-      text: `When you open your eyes, you’re home.<br><br>No portal. No math ghosts. No hooded dinos. Just your regular life, waiting patiently like it never left.<br><br>But everything feels… different.`,
+      text: `When you open your eyes, you’re home.<br><br>No portal. No math ghosts. No hooded dinos. Just your regular life, waiting patiently like it never left, homework included...<br><br>But everything feels… different.`,
       soloLabel: 'Next ➡️',
     },
         {
@@ -104,7 +104,7 @@ export const Chapter5 = {
       mode: 'solo',
       title: 'Carry the Festival',
       img: PRO_MED_IMG('homeReturn2.png'),
-      text: `Now, when you solve an equation, you see the stage lights behind it. Every time a pattern untangles in your head, you hear a distant beat. Even smashing a random mosquito reminds you of the Camping Games you played, of the nights when numbers and lightning bugs were the same kind of magic.`,
+      text: `Now, whenever you fold a shirt, you see the fractions behind it. Every time a towel tumbles in a dryer, you hear a distant beat. Even smashing a random bug reminds you of the mosquitos in the camping areas, of the nights when numbers and lightning bugs were the same kind of magic.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -114,7 +114,7 @@ export const Chapter5 = {
       mode: 'solo',
       title: 'Carry the Festival',
       img: PRO_MED_IMG('homeReturn5.png'), // <- new art goes here
-      text: `<span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> lives in the back of your mind now, quiet and steady.<br><br>On the walk to school, in the grocery line, standing at the sink doing dishes—you catch flashes of neon in reflections: a doorway in the window glass, a glow in the corner of your eye. Every time you double-check a fraction or balance a schedule, it’s like you’re lining up the symmetry again, just enough for the festival to peek through.`,
+      text: `<span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> lives in the back of your mind now, quiet and steady.<br><br>On the walk to school, in the grocery line, standing at the sink doing dishes—you catch flashes of neon in reflections: a doorway in the window glass, a glow in the corner of your eye. Every time you check your bank account, you remember Pacioli and how to balance those books!`,
       soloLabel: 'Next ➡️',
     },
 
@@ -126,7 +126,7 @@ export const Chapter5 = {
       mode: 'solo',
       title: 'Carry the Festival',
       img: PRO_MED_IMG('homeReturn4.png'),
-      text: `SnowCone MathFest hasn’t vanished.<br><br>You’re still there, every time you ask yourself when you would ever use the math you learned in school, you remember SnowCone MathFest doing something you felt was impossible. Math and music, together.<br><br>And maybe that’s enough to keep the festival alive, as long as you keep carrying it with you.`,
+      text: `SnowCone MathFest hasn’t vanished.<br><br>You’re still there, every time you ask yourself "Why did I learn this in school?" you remember SnowCone MathFest doing something you felt was impossible. Math can be interesting.<br><br>And maybe that’s enough to keep the festival alive, as long as you keep carrying it with you.`,
       soloLabel: 'Look back… just once ➡️',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -301,7 +301,7 @@ export const Chapter5 = {
   mode: 'solo',
   title: 'The End?',
   img: PRO_MED_IMG('festivalFade.png'),
-  text: `For now, the screen fades, the music softens,<br>and two little words hang at the edge of the UI like a promise:<br><b>The End?</b><br><br>This run is over, but the choices you made are baked into the festival’s math now; whether you carried the cone home or stayed to drive the truck, there’s one constant left on the board:<br>you can always pick up the line again whenever you come back.`,
+  text: `For now, the screen fades, the music softens, and two little words hang off the truck window like a promise:<br><b>The End?</b><br><br>This run is over, but the choices you made are baked into the festival’s math now; whether you carried the cone home or stayed to drive the truck, you made it this far and can always return to forge a new SnowCone.`,
   soloLabel: 'Thank you for playing!🎉',
   onAdvance: ({ appState, engine }) => {
     // Visually: fade to black, then show credits overlay.

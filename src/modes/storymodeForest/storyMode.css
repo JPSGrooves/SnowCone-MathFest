@@ -1261,6 +1261,9 @@
 /* ─────────────────────────────
    Story Mode – Credits Overlay
    ───────────────────────────── */
+/* ─────────────────────────────
+   Story Mode – Credits Overlay
+   ───────────────────────────── */
 
 .sm-credits-overlay {
   position: fixed;
@@ -1310,9 +1313,13 @@
   position: relative;
   margin-top: 0.35rem;
   padding-block: 0.5rem;
-  overflow: hidden; /* ⛓️ keep the roll INSIDE the panel */
+  overflow: hidden; /* keep the roll INSIDE the panel */
   border-radius: 10px;
-  background: linear-gradient(to bottom, rgba(5, 10, 24, 0.95), rgba(3, 6, 14, 0.95));
+  background: linear-gradient(
+    to bottom,
+    rgba(5, 10, 24, 0.95),
+    rgba(3, 6, 14, 0.95)
+  );
 
   /* soft fade at top/bottom of the scroll, if supported */
   -webkit-mask-image: linear-gradient(
@@ -1331,94 +1338,106 @@
   );
 }
 
-/* The actual rolling column of rows */
+/* The actual rolling column of rows
+   NOTE: no animation here by default */
 .sm-credits-roll {
-  position: relative;
+  position: absolute;  /* ⬅️ key: we control it relative to the window */
+  left: 0;
+  right: 0;
+  top: 100%;          /* ⬅️ start fully below the window */
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  animation: smCreditsRoll 22s linear infinite;
+  transform: translateY(0); /* base state */
 }
 
+/* Apply animation only when we add .is-rolling via JS */
+.sm-credits-roll.is-rolling {
+  animation: smCreditsRoll 30s linear forwards;
+}
+
+/* Movie-style crawl: from below bottom → past top */
 @keyframes smCreditsRoll {
   0% {
-    transform: translateY(100%);
+    transform: translateY(0);        /* sitting just below view */
   }
   100% {
-    transform: translateY(-100%);
+    transform: translateY(-100%);    /* rolled entire height upward */
   }
+}
+
+.sm-credits-thanks {
+  margin-top: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 238, 0.08),
+    rgba(143, 190, 255, 0.06)
+  );
+
+  font-family: "Orbitron", system-ui, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: #eaffff;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(0, 255, 238, 0.35);
 }
 
 /* Individual lines */
 .sm-credits-row {
   display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.15rem 0.75rem;
-  font-size: 0.9rem;
-  font-family: "Orbitron", system-ui, sans-serif;
-  color: #dff6ff;
-  white-space: nowrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  gap: 0.1rem;
+  padding: 0.25rem 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
 }
 
-.sm-credits-role {
-  opacity: 0.7;
-}
-
-.sm-credits-name {
-  font-weight: 600;
-}
-
-/* Button stays readable & on-brand */
 .sm-credits-btn {
   margin-top: 0.9rem;
   align-self: center;
   min-width: 60%;
 }
 
-/* If you want to be extra sure it’s visible, you can tune sm-btn-primary: */
 .sm-btn.sm-credits-btn {
   background: linear-gradient(135deg, #18c9ff, #45ffb3);
   color: #020409;
   border: none;
 }
-/* ─────────────────────────────
-   Story Mode – Credits row polish
-   (presentation only, box sizing unchanged)
-   ───────────────────────────── */
 
-/* Stack each credit as ROLE (small) over NAME (bold), all centered */
-.sm-credits-row {
-  flex-direction: column;          /* was row */
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  gap: 0.1rem;
-  padding: 0.25rem 0.4rem;        /* just vertical breathing room */
-}
-
-/* subtle separators, but super low-key */
-.sm-credits-row:not(:last-child) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-/* role line – lighter, “header-ish” */
+/* Role/name styling */
 .sm-credits-role {
   order: 1;
   font-size: 0.78rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  opacity: 0.72;
+  color: #9ad1ff;
+  opacity: 0.78;
 }
 
-/* name line – main focus */
 .sm-credits-name {
   order: 2;
   font-size: 0.9rem;
   font-weight: 700;
+  color: #eaffff;
   opacity: 0.98;
 }
+
+/* Color safety: keep everything light on dark */
+.sm-credits-panel {
+  color: #eaffff;
+}
+
 /* ───────── MEDIUM portraits/scenes (?md=1) ───────── */
 /* Sits cleanly between default PRO_IMG and PRO_BIG_IMG. */
 
@@ -1608,4 +1627,43 @@
 
 .sm-credits-overlay.is-fading-out {
   opacity: 0;
+}
+/* ─────────────────────────────
+   Story Mode – Credits color fix
+   (force light text on dark panel)
+   ───────────────────────────── */
+
+.sm-credits-panel {
+  color: #eaffff; /* default text inside panel = soft white */
+}
+
+.sm-credits-title {
+  color: #f7ffb5; /* keep your warm title glow */
+}
+
+.sm-credits-sub {
+  color: #9ad1ff;
+}
+
+/* Each scrolling line uses light colors explicitly */
+.sm-credits-row {
+  color: #dff6ff;         /* base color */
+}
+
+.sm-credits-role {
+  color: #9ad1ff;         /* softer, “label-ish” */
+  opacity: 0.78;
+}
+
+.sm-credits-name {
+  color: #eaffff;         /* main focus: bright white */
+  opacity: 0.98;
+}
+/* 🔧 Credits: make the viewing window actually tall */
+.sm-credits-list {
+  /* let it grow inside the panel */
+  flex: 1 1 auto;
+  
+  /* claim a real window height instead of collapsing to padding */
+  min-height: clamp(200px, 40vh, 360px);
 }
