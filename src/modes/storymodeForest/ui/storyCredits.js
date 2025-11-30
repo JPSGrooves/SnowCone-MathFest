@@ -110,12 +110,24 @@ export function fadeToStoryCreditsFromCh5() {
   blackout.className = 'sm-blackout';
   host.appendChild(blackout);
 
-  const handleEnd = () => {
-    blackout.removeEventListener('animationend', handleEnd);
+  let done = false;
 
-    // Once we’re fully black, roll credits on top
+  const safeShow = () => {
+    if (done) return;
+    done = true;
+    blackout.removeEventListener('animationend', handleEnd);
     showStoryCredits();
   };
 
+  const handleEnd = () => {
+    safeShow();
+  };
+
+  // primary: wait for the CSS animation to finish
   blackout.addEventListener('animationend', handleEnd);
+
+  // fallback: if animation never fires (Safari / reduced motion / CSS bug),
+  // still roll credits after roughly the blackout duration.
+  const CSS_DURATION_MS = 260; // match your blackout animation length
+  setTimeout(safeShow, CSS_DURATION_MS + 80);
 }

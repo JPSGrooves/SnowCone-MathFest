@@ -125,7 +125,7 @@ export const Chapter5 = {
       role: SlideRole.ADVANCE,
       mode: 'solo',
       title: 'Carry the Festival',
-      img: PRO_BIG_IMG('homeReturn4.png'),
+      img: PRO_MED_IMG('homeReturn4.png'),
       text: `SnowCone MathFest hasn’t vanished.<br><br>You’re still there, every time you ask yourself when you would ever use the math you learned in school, you remember SnowCone MathFest doing something you felt was impossible. Math and music, together.<br><br>And maybe that’s enough to keep the festival alive, as long as you keep carrying it with you.`,
       soloLabel: 'Look back… just once ➡️',
       onAdvance: ({ appState, engine }) => {
@@ -296,22 +296,22 @@ export const Chapter5 = {
 
     // Final Epilogue – part 4 (keeps original id + options)
     {
-      id: 'c5_final_the_end',
-      role: SlideRole.EPILOGUE,
-      mode: 'solo',
-      title: 'The End?',
-      img: PRO_MED_IMG('festivalFade.png'),
-      text: `For now, the screen fades, the music softens,<br>and two little words hang at the edge of the UI like a promise:<br><br><b>The End?</b>`,
-      soloLabel: 'Thank you for playing!🎉',
-      onAdvance: ({ appState, engine }) => {
-        // Visually: fade to black, then show credits overlay.
-        // Routing: credits overlay’s button / click-outside still
-        // dispatches "sm:backToChapterMenu", so Story Mode
-        // handles the actual hop back to the chapter menu.
-        fadeToStoryCreditsFromCh5();
-        return 'handled';
-      },
-    },
+  id: 'c5_final_the_end',
+  role: SlideRole.EPILOGUE,
+  mode: 'solo',
+  title: 'The End?',
+  img: PRO_MED_IMG('festivalFade.png'),
+  text: `For now, the screen fades, the music softens,<br>and two little words hang at the edge of the UI like a promise:<br><b>The End?</b><br><br>This run is over, but the choices you made are baked into the festival’s math now; whether you carried the cone home or stayed to drive the truck, there’s one constant left on the board:<br>you can always pick up the line again whenever you come back.`,
+  soloLabel: 'Thank you for playing!🎉',
+  onAdvance: ({ appState, engine }) => {
+    // Visually: fade to black, then show credits overlay.
+    // Routing: credits overlay’s button / click-outside still
+    // dispatches "sm:backToChapterMenu", so Story Mode
+    // handles the actual hop back to the chapter menu.
+    fadeToStoryCreditsFromCh5();
+    return 'handled';
+  },
+},
 
 
 
