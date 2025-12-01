@@ -4,6 +4,10 @@ import { Howl } from 'howler';
 let qsTrack = null;
 let currentFile = null;
 
+// 🌈 NEW: track state for visibility guard
+let qsWasPlayingOnHide = false;
+let qsVisibilityGuardAttached = false;
+
 const qsTracks = [
   'quikserveST_OG.mp3',
   'KKtribute.mp3',
@@ -12,6 +16,44 @@ const qsTracks = [
 
 const basePath = `${import.meta.env.BASE_URL}assets/audio/tracks/`;
 const fadeDuration = 1000;
+
+//////////////////////////////
+// 🧬 Attach QS Visibility Guard (once)
+//////////////////////////////
+function attachQuickServeVisibilityGuard() {
+  if (qsVisibilityGuardAttached) return;
+  qsVisibilityGuardAttached = true;
+
+  document.addEventListener('visibilitychange', () => {
+    // If there's no QS track loaded, nothing to do
+    if (!qsTrack) {
+      qsWasPlayingOnHide = false;
+      return;
+    }
+
+    try {
+      if (document.hidden) {
+        // On hide: remember if we were playing and pause
+        if (qsTrack.playing()) {
+          qsWasPlayingOnHide = true;
+          qsTrack.pause();
+          console.log('👻 QS paused on tab hide');
+        } else {
+          qsWasPlayingOnHide = false;
+        }
+      } else {
+        // On show: only resume if we paused it ourselves
+        if (qsWasPlayingOnHide && !qsTrack.playing()) {
+          qsTrack.play();
+          console.log('🌞 QS resumed on tab show');
+        }
+        qsWasPlayingOnHide = false;
+      }
+    } catch (err) {
+      console.warn('⚠️ QS visibility handler error:', err);
+    }
+  });
+}
 
 //////////////////////////////
 // 🚀 Start a Random Track
@@ -33,6 +75,7 @@ export async function playQSRandomTrack() {
       console.log(`🛑 QS Track finished: ${file}`);
       qsTrack = null;
       currentFile = null;
+      qsWasPlayingOnHide = false; // 🧹 safety
     },
 
     onplayerror: (_, err) => {
@@ -40,6 +83,9 @@ export async function playQSRandomTrack() {
       qsTrack.once('unlock', () => qsTrack.play());
     }
   });
+
+  // 🌈 make sure our visibility guard is watching
+  attachQuickServeVisibilityGuard();
 
   qsTrack.play();
   console.log(`🎧 QS Track started: ${file}`);
@@ -50,7 +96,10 @@ export async function playQSRandomTrack() {
 //////////////////////////////
 export function stopQS() {
   return new Promise((resolve) => {
-    if (!qsTrack) return resolve();
+    if (!qsTrack) {
+      qsWasPlayingOnHide = false;
+      return resolve();
+    }
 
     try {
       qsTrack.fade(qsTrack.volume(), 0, fadeDuration);
@@ -71,6 +120,7 @@ export function stopQS() {
 
       qsTrack = null;
       currentFile = null;
+      qsWasPlayingOnHide = false; // 🧹 don't try to resume a dead track
       resolve();
     }, fadeDuration);
   });

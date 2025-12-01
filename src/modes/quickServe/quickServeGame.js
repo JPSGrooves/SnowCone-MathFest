@@ -6,7 +6,6 @@ import * as phil from './quickServePhil.js';
 import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { showMenu } from '../../managers/sceneManager.js';
 import { playCorrect, playIncorrect } from './soundFX.js';
-import { playTrack, stopTrack } from '../../managers/musicManager.js';
 import { stopQS, playQSRandomTrack } from './quickServeMusic.js';
 import { renderGameUI } from './quickServe.js'; // 💥 Need to export this!
 import { generateProblem } from '../../logic/mathBrain.js';
