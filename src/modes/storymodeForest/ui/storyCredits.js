@@ -78,8 +78,8 @@ export function showStoryCredits() {
 
   overlay.innerHTML = `
     <div class="sm-credits-panel sm-fade-in">
-      <div class="sm-credits-title">SnowCone MathFest – Story Mode</div>
-      <div class="sm-credits-sub">Chapters 1–5 · Beta Build</div>
+      <div class="sm-credits-title">SnowCone MathFest<br>Story Mode</div>
+      <div class="sm-credits-sub">Playful Credits Roll</div>
 
       <div class="sm-credits-list">
         <div class="sm-credits-roll">
