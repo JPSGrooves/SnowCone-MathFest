@@ -593,3 +593,214 @@ html, body {
     transform: translate(-50%, -32px) scale(1);
   }
 }
+/* Full-screen-ish overlay inside menu wrapper */
+.menu-highscore-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  background: rgba(4, 8, 24, 0.72); /* festival night glass */
+  z-index: 40; /* above truck + labels but below global modals */
+}
+
+/* Hidden state helper */
+.menu-highscore-overlay.hidden {
+  display: none;
+}
+
+/* The small card over the truck – no scroll */
+.menu-highscore-panel {
+  width: min(340px, 90vw);
+  max-height: 70vh;
+  padding: 16px 18px 18px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 10% 0%, rgba(95, 255, 234, 0.16), transparent 60%),
+              radial-gradient(circle at 90% 100%, rgba(255, 184, 240, 0.14), transparent 55%),
+              rgba(8, 10, 30, 0.96);
+  border: 1px solid rgba(180, 255, 255, 0.3);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.7),
+    0 0 22px rgba(168, 255, 255, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden; /* 🚫 no scrollbars */
+}
+
+/* Title + subtitle */
+.menu-highscore-title {
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f7ffff;
+  text-align: center;
+}
+
+.menu-highscore-sub {
+  font-size: 0.78rem;
+  text-align: center;
+  color: rgba(230, 255, 255, 0.85);
+}
+
+/* Stat grid – small and tidy */
+.menu-highscore-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Individual stat card */
+.menu-highscore-card {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(25, 40, 80, 0.9),
+    rgba(15, 15, 40, 0.9)
+  );
+  border: 1px solid rgba(160, 230, 255, 0.35);
+}
+
+.menu-highscore-card h3 {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e9fcff;
+}
+
+.menu-highscore-card .stat-line {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(210, 240, 255, 0.95);
+}
+
+/* Close button */
+.menu-highscore-close {
+  margin-top: 8px;
+  align-self: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: radial-gradient(circle at 20% 0%, #fffef0 0, #ffd3f7 35%, #80fff1 95%);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  color: #15152b;
+}
+
+.menu-highscore-close:active {
+  transform: translateY(1px) scale(0.99);
+}
+/* 🏆 Invisible High Score hitbox over the truck */
+/* 🏆 Invisible High Score hitbox over the truck */
+.menu-frame {
+  position: relative;
+}
+
+.menu-highscore-hitbox {
+  position: absolute;
+  left: 50%;
+  top: 70%;              /* tuned to sit over the truck */
+  transform: translateX(-50%);
+  width: 38%;
+  height: 15%;
+  z-index: 20;
+  cursor: pointer;
+
+  /* invisible but tappable */
+  background: transparent;
+  border: none;
+}
+
+/* Accessibility: visible focus ring */
+.menu-highscore-hitbox:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 3px;
+}
+
+
+/* 🏆 High Score Overlay */
+/* 🏆 High Score Overlay */
+.hs-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 260; /* above menu */
+  pointer-events: auto;   /* 👈 was none – overlay can now catch clicks */
+}
+
+.hs-overlay.hidden {
+  display: none;
+}
+
+.hs-card {
+  pointer-events: auto;
+  max-width: min(480px, 90vw);
+  max-height: 90vh;
+  padding: 1.5rem 1.75rem;
+  border-radius: 18px;
+  background: rgba(4, 8, 24, 0.96);
+  border: 1px solid rgba(0, 255, 200, 0.7);
+  box-shadow:
+    0 0 40px rgba(0, 255, 200, 0.5),
+    0 0 80px rgba(140, 120, 255, 0.35);
+  color: #fefcff;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  text-align: left;
+  position: relative;
+}
+
+.hs-card h2 {
+  font-size: 1.35rem;
+  margin: 0 0 0.25rem;
+}
+
+.hs-subtitle {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.hs-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.hs-entry h3 {
+  font-size: 0.95rem;
+  margin: 0 0 0.25rem;
+}
+
+.hs-entry p {
+  margin: 0.05rem 0;
+  font-size: 0.85rem;
+}
+
+.hs-entry span {
+  color: #7fffd4;
+}
+
+/* Close button */
+.hs-close-btn {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Optional: prevent background scrolling when any modal is open */
+body.modal-open {
+  overflow: hidden;
+}

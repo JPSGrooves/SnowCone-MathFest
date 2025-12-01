@@ -692,6 +692,7 @@ export function stopStoryMode() {
 
   const container = document.querySelector(SELECTORS.container);
   if (container) {
+    container.innerHTML = '';    // 🧼 hard clear like other modes
     container.classList.add('hidden');
     container.style.display = 'none';
   }

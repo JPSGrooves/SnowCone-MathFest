@@ -61,6 +61,14 @@
               <div class="menu-label infinity">♾️<br>Infinity Lake</div>
               <div class="menu-label options label-options">⚙️ Options</div>
             </div>
+
+            <!-- 🏆 Invisible High Score button over the truck (between Infinity Lake + Options) -->
+            <button
+              type="button"
+              class="menu-highscore-hitbox"
+              aria-label="View High Scores"
+            ></button>
+
           </div>
           
         </div> <!-- end .aspect-wrap -->
@@ -127,6 +135,57 @@
       </div>
     </div>
 
+        <!-- 🏆 High Score Overlay (simple, no-scroll card) -->
+    <div
+      id="highScoreOverlay"
+      class="hs-overlay hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="hsTitle"
+    >
+      <div class="hs-card">
+        <button
+          type="button"
+          class="hs-close-btn"
+          aria-label="Close high scores"
+        >
+          ✖
+        </button>
+
+        <h2 id="hsTitle">High Scores</h2>
+        <p class="hs-subtitle">Saved on this device</p>
+
+        <div class="hs-grid">
+          <section class="hs-entry">
+            <h3>⛺ Camping Games</h3>
+            <p>
+              Camping Score:
+              <span id="hsCampingScore">0</span>
+            </p>
+          </section>
+
+          <section class="hs-entry">
+            <h3>🍧 QuickServe Pavilion</h3>
+            <p>
+              Best Run:
+              <span id="hsQuickServeScore">0</span>
+            </p>
+          </section>
+
+          <section class="hs-entry">
+            <h3>♾️ Infinity Lake</h3>
+            <p>
+              High Score:
+              <span id="hsInfinityScore">0</span>
+            </p>
+            <p>
+              Longest Streak:
+              <span id="hsInfinityStreak">0</span>
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
 
     <!-- 🌌 Cosmic Background Dimmer -->
     <div id="cosmicOverlay" class="modal-overlay hidden"></div>

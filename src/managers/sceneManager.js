@@ -9,18 +9,17 @@ import { loadInfinityMode, stopInfinityMode } from '../modes/infinityLake/infini
 
 import { applyBackgroundTheme } from './backgroundManager.js';
 
-
-
-
 //////////////////////////////
 // 🚀 GLOBAL SCENE SWAPPER
 //////////////////////////////
 export function startMode(modeName) {
   console.log(`🌀 Switching to ${modeName}...`);
 
-  cleanupCurrentMode(); // <- 🔥 Universal Nuke
+  // 🔥 Universal Nuke for whatever was running before
+  cleanupCurrentMode();
 
-  appState.setMode(modeName); // 🧠 MobX tracks active mode
+  // 🧠 MobX tracks active mode
+  appState.setMode(modeName);
 
   switch (modeName) {
     case 'quickServe':
@@ -48,15 +47,18 @@ export function startMode(modeName) {
 //////////////////////////////
 function cleanupCurrentMode() {
   const container = document.getElementById('game-container');
-  const menuWrapper = document.querySelector('.menu-wrapper');
 
-  // ✅ UI Reset
+  if (!container) {
+    console.warn('⚠️ No #game-container found during cleanup.');
+    return;
+  }
+
+  // ✅ UI Reset – just the game area
   container.classList.add('hidden');
   container.innerHTML = '';
   container.style.display = 'none';
-  menuWrapper?.classList.remove('hidden');
 
-  // ✅ Reset Background
+  // ✅ Reset Background to base menu/theme
   applyBackgroundTheme();
 
   // ✅ Kill running systems based on last mode
@@ -81,16 +83,18 @@ function cleanupCurrentMode() {
       break;
   }
 
-  // ✅ Clear global trash later like music, chatbots, etc. if needed
+  // 🧺 If we ever add global music/chatbot/etc. cleanup, it lives here.
 }
 
 export function showMenu() {
   const menuWrapper = document.querySelector('.menu-wrapper');
   const container = document.getElementById('game-container');
 
-  container.innerHTML = '';
-  container.classList.add('hidden');
-  container.style.display = 'none';
+  if (container) {
+    container.innerHTML = '';
+    container.classList.add('hidden');
+    container.style.display = 'none';
+  }
 
   menuWrapper?.classList.remove('hidden');
 }

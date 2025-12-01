@@ -275,13 +275,28 @@ function setupEventHandlers() {
   document.getElementById('backToMenu')?.addEventListener('click', () => {
     activateInputHandler(null); // disable hotkeys
     document.body.classList.remove('il-active', 'qs-active');
-    returnToMenu(); // or whatever scene-switcher you use
+    returnToMenu();
   });
+
   document.getElementById('resetGame')?.addEventListener('click', startGame);
+
+  // 🔴 REMOVE the old “dummy stats” handler for endGame
+  // document.getElementById('endGame')?.addEventListener('click', () => {
+  //   console.log('🛑 End Game pressed – show result popup here');
+  //   showResultPopup({
+  //     score: score,
+  //     highScore: appState.profile.infinityHighScore || 0,
+  //     streak: 0,
+  //     time: '1:45'
+  //   });
+  // });
+
+  // ✅ NEW: just call the real end-game pipe
   document.getElementById('endGame')?.addEventListener('click', () => {
-    console.log('🛑 End Game pressed – show result popup here');
-    // Future: showResultPopup(); or renderEndGameStats();
+    console.log('🛑 End Game pressed – finalize run');
+    endInfinityGame();
   });
+
   document.getElementById('ilPlayAgainBtn')?.addEventListener('click', () => {
     closeResultPopup();
     startGame();
@@ -291,21 +306,9 @@ function setupEventHandlers() {
     closeResultPopup();
     returnToMenu();
   });
-  document.getElementById('endGame')?.addEventListener('click', () => {
-    console.log('🛑 End Game pressed – show result popup here');
-
-    // replace with real values when you track them
-    showResultPopup({
-      score: score,
-      highScore: appState.profile.infinityHighScore || 0,
-      streak: 0,
-      time: '1:45'
-    });
-  });
 
   answerBtns.forEach(btn => btn.addEventListener('click', () => handleAnswer(btn)));
 
-  // Add these 👇
   document.querySelectorAll('.mode-buttons button').forEach(btn => {
     btn.addEventListener('click', () => {
       const mode = btn.dataset.mode;
@@ -316,6 +319,7 @@ function setupEventHandlers() {
       flashModeName();
     });
   });
+
   function updateMuteButtonLabel() {
     const icon = document.getElementById('muteToggle');
     const muted = Howler._muted;
@@ -329,8 +333,6 @@ function setupEventHandlers() {
     updateMuteButtonLabel();
     flashMuteIcon();
   });
-
-
 }
 
 
@@ -560,32 +562,14 @@ function showResult(msg, color) {
 }
 
 /*popup*/
-function showResultPopup() {
+function showResultPopup({ score, highScore, streak, time }) {
   const popup = document.getElementById('ilResultPopup');
   if (!popup) return;
 
-  const endTime = Date.now();
-  const elapsed = formatElapsedTime(endTime - startTime);
-
-  const isNewHighScore = score > (appState.profile.infinityHighScore || 0);
-  const isNewStreak = streak > (appState.profile.infinityLongestStreak || 0);
-
-  if (isNewHighScore) {
-    appState.profile.infinityHighScore = score;
-    launchConfetti(); // or `launchConfetti('score')`
-  }
-
-  if (isNewStreak) {
-    appState.profile.infinityLongestStreak = streak;
-    launchConfetti(); // or `launchConfetti('streak')`
-  }
-
-
   document.getElementById('ilScoreFinal').textContent = score;
-  document.getElementById('ilHighScore').textContent = appState.profile.infinityHighScore;
-  document.getElementById('ilStreak').textContent = appState.profile.infinityLongestStreak;
-  document.getElementById('ilTime').textContent = elapsed;
-  document.getElementById('ilStreak').textContent = appState.profile.infinityLongestStreak;
+  document.getElementById('ilHighScore').textContent = highScore;
+  document.getElementById('ilStreak').textContent = streak;
+  document.getElementById('ilTime').textContent = time;
 
   popup.classList.remove('hidden');
 }
@@ -659,32 +643,45 @@ function updateModeButtonUI() {
 
 function endInfinityGame() {
   console.log('♾️ Ending Infinity Mode...');
-  
-  const endTime = Date.now();
-  const elapsed = formatElapsedTime(endTime - startTime);
 
-  const isNewHighScore = score > (appState.profile.infinityHighScore || 0);
-  const isNewStreak = maxStreak > (appState.profile.infinityLongestStreak || 0);
+  const endTime   = Date.now();
+  const elapsedMs = endTime - startTime;
+  const seconds   = Math.floor(elapsedMs / 1000);
+  const timeLabel = formatElapsedTime(elapsedMs);
 
+  const prevHigh    = appState.profile.infinityHighScore || 0;
+  const prevLongest = appState.profile.infinityLongestStreak || 0;
+
+  const isNewHighScore = score > prevHigh;
+  const isNewStreak    = maxStreak > prevLongest;
+
+  // 🧠 Commit record updates into the profile
   runInAction(() => {
     if (isNewHighScore) {
       appState.profile.infinityHighScore = score;
     }
-
     if (isNewStreak) {
       appState.profile.infinityLongestStreak = maxStreak;
     }
   });
 
-  showResultPopup({
+  // 📊 Meta progression: Infinity XP, time, mirrored badge gates
+  finalizeInfinityRun({
     score,
-    highScore: appState.profile.infinityHighScore,
-    streak: appState.profile.infinityLongestStreak,
-    time: elapsed
+    seconds
   });
 
+  // 🎛️ Render the popup with fresh values from profile
+  showResultPopup({
+    score,
+    highScore: appState.profile.infinityHighScore || 0,
+    streak:    appState.profile.infinityLongestStreak || 0,
+    time:      timeLabel
+  });
+
+  // 🎉 Only fire a big celebration when a record is broken
   if (isNewHighScore || isNewStreak) {
-    launchConfetti(); // 💥 celebrate after showing results
+    launchConfetti();
   }
 }
 

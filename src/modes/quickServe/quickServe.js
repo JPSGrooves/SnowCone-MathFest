@@ -243,7 +243,9 @@ export function returnToMenu() {
 function cleanUpQuickServe() {
   console.log('🧹 Cleaning up QuickServe');
 
-  stopQS(); // 🔇 Kill QuickServe music every single time cleanup is called
+  document.body.classList.remove('qs-active'); // 🧽 clear mode flag
+
+  stopQS();
   stopGameLogic();
   gridFX.stopGridPulse();
   phil.resetPhil();
@@ -252,6 +254,7 @@ function cleanUpQuickServe() {
   clearGameContainer();
   appState.clearCurrentMode();
 }
+
 
 //////////////////////////////
 // 🔄 Background Refresh
