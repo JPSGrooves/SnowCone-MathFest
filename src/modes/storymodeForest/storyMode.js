@@ -150,6 +150,8 @@ let __lastPlayTs = 0;
 let __smLastStoryTrack = null;
 let __smRotateTimer = null;
 
+let __smRotateLock = false;
+
 
 // Assets
 const BASE = import.meta.env.BASE_URL;
@@ -1306,46 +1308,86 @@ function ensureStoryLoop() {
  * - rotate: don't loop; when song ends we'll start another
  */
 function kickStoryMusic({ forceNew = false, rotate = false } = {}) {
+  // Don’t fight the browser if we’re backgrounded
+  if (typeof document !== 'undefined' && document.hidden) return;
+
   const wantId = pickNextStoryTrack(__smLastStoryTrack);
   if (!wantId) return;
 
   unlockHowlerCtx();
 
-  const curId = (() => { try { return currentTrackId?.(); } catch { return null; } })();
-  const needChange = forceNew ? (STORY_TRACKS.length > 1 ? true : !isPlaying?.())
-                              : (!isPlaying?.() || curId !== wantId);
+  let curId = null;
+  let playing = false;
+  try {
+    curId   = currentTrackId?.();
+    playing = isPlaying?.();
+  } catch {
+    // ignore, fall back to defaults
+  }
+
+  // Decide whether we *actually* need to change tracks
+  const needChange = forceNew
+    ? (STORY_TRACKS.length > 1 ? true : !playing)
+    : (!playing || curId !== wantId);
 
   if (needChange) {
     try {
-      console.log('[StoryMusic] play →', wantId, '(prev was', __smLastStoryTrack, ')');
+      // 🔇 Let musicManager handle crossfades/cleanup; we just request the id.
       playTrack(wantId);
       __smLastStoryTrack = wantId;
-    } catch {}
+      // console.log('[StoryMusic] play →', wantId, '(prev was', curId, ')');
+    } catch (err) {
+      console.warn('[StoryMusic] playTrack failed:', err);
+    }
   }
 
+  // In “rotation” mode we explicitly *don’t* force looping —
+  // we want each track to end naturally and then our rotation timer
+  // will spin up the next one. If rotate is false, we fall back to “loop story”.
   if (rotate) {
-    try { if (getLooping?.()) toggleLoop(); } catch {}
+    try {
+      if (getLooping?.()) toggleLoop(); // ensure non-loop for rotation mode
+    } catch {}
   } else {
     ensureStoryLoop();
   }
 }
 
 function startStoryRotation() {
-  try { if (getLooping?.()) toggleLoop(); } catch {} // rotation mode = not looping
+  // Rotation mode = non-looping; we advance when tracks end.
+  try {
+    if (getLooping?.()) toggleLoop();
+  } catch {}
+
   if (__smRotateTimer) return;
+
   __smRotateTimer = setInterval(() => {
     try {
-      if (!isPlaying?.()) {
+      if (typeof document !== 'undefined' && document.hidden) return;
+
+      // If we’ve just asked for a track, chill for a moment.
+      if (__smRotateLock) return;
+
+      const playing = isPlaying?.();
+      if (!playing) {
+        __smRotateLock = true;
         kickStoryMusic({ forceNew: true, rotate: true });
+
+        // Give Howler ~1s to spin up before we ask again
+        setTimeout(() => { __smRotateLock = false; }, 1100);
       }
-    } catch {}
+    } catch (err) {
+      console.warn('[StoryMusic] rotation tick error:', err);
+    }
   }, 1000);
 }
 
-
-
 function stopStoryRotation() {
-  if (__smRotateTimer) { clearInterval(__smRotateTimer); __smRotateTimer = null; }
+  if (__smRotateTimer) {
+    clearInterval(__smRotateTimer);
+    __smRotateTimer = null;
+  }
+  __smRotateLock = false;
 }
 
 

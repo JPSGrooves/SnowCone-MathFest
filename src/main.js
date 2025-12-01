@@ -10,6 +10,8 @@ import { playTransition } from './managers/transitionManager.js'; // still avail
 import { initBadgeManager } from './managers/badgeManager.js';
 import { startAchievementsWatcher } from './achievementsWatcher.js';
 
+import { wireMusicVisibilityGuard } from './managers/musicVisibility.js';
+
 // 🍧 Anti–Double-Tap Zoom Shield (esp. iOS Safari)
 let lastTouchTime = 0;
 document.addEventListener('touchend', (e) => {
@@ -90,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
     Howler.volume(appState.settings.mute ? 0 : 1);
     console.log("🔊 MobX mute autorun ran.");
   });
+
+  // 🔊 Wire tab-visibility → music auto-pause/resume once at startup
+  wireMusicVisibilityGuard();
 
   const startup = document.getElementById('startup-screen');
   if (!startup) {
