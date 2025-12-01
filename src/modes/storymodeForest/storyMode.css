@@ -1667,3 +1667,25 @@
   /* claim a real window height instead of collapsing to padding */
   min-height: clamp(200px, 40vh, 360px);
 }
+/* ──────────────────────────────────────────────
+   iOS PWA: fix MathTips chat underlap
+   Only when installed (standalone) on small screens
+   ────────────────────────────────────────────── */
+@media (display-mode: standalone) and (max-width: 768px) {
+
+  /* Let the frame shrink when the keyboard appears */
+  .mt-aspect-wrap {
+    height: 100svh;
+    max-height: 100svh;
+  }
+
+  /* Give extra room so chat + input sit above the bar */
+  .mt-grid {
+    padding-bottom: calc(var(--mt-bar-h) * 1.3 + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Tiny lift to keep the input row breathing */
+  .chat-input-zone {
+    margin-bottom: 0.4rem;
+  }
+}
