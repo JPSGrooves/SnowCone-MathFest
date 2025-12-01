@@ -506,4 +506,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: 'v1.3.0 — Story CYOA, Badges & Credits (Ch3–Ch5)' };
+window.devFlags = { build: 'v1.4.0 — High Score Release' };

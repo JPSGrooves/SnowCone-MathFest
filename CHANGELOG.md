@@ -21,6 +21,140 @@
 * ✅ **v1.1.0 – Chapter 1: It Has Begun✨**
 * ✅ **v1.2.0 – Chapter 2 in Story Mode✨**
 * ✅ **v1.3.0 – v1.3.0 — Story CYOA, Badges & Credits**
+* ✅ **v1.4.0 – High Score Release**
+
+## [1.4.0] – 2025-11-30 — **High Score Release + Credits & Music Guard ✨**
+
+### Added
+
+#### Invisible High Score Truck Button (Main Menu)
+
+- New `<button class="menu-highscore-hitbox">` sits invisibly over the festival truck on the main menu.
+- Scales inside the **11:16 stage** so the hitbox stays locked to the truck on phones and desktop.
+- Keyboard-focusable with a visible outline for accessibility.
+
+#### High Score Overlay Card (Meta HUD)
+
+- New `#highScoreOverlay` dialog shows top stats without leaving the menu:
+  - **Camping Games:** current Camping Score.
+  - **QuickServe Pavilion:** best run.
+  - **Infinity Lake:** high score + longest streak.
+- Uses a compact neon card (`.hs-card`) centered on screen; no scrolling needed, fits on small phones.
+- Reuses your existing `#cosmicOverlay` dimmer:
+  - Clicking the truck → opens overlay.
+  - Clicking the ❌ or dimmer → closes overlay and restores background scroll.
+
+#### App-wide Music Visibility Guard
+
+- New `wireMusicVisibilityGuard()` in `main.js` listens for `document.visibilitychange`.
+- On **hide**: pauses whatever track was playing (Story, Kids, Infinity, Jukebox, etc.) and remembers which one.
+- On **show**: resumes only the track that was playing when the tab/app got hidden.
+- Gives the whole app “native app” behavior: lock phone → music pauses; unlock → music continues if it was actually playing.
+
+#### QuickServe “Private Booth” Visibility Guard
+
+- `quickServeMusic.js` now has its own `attachQuickServeVisibilityGuard()` with:
+  - `qsWasPlayingOnHide` + `qsVisibilityGuardAttached` state.
+- On **hide**: pauses QS music and flags that it was playing.
+- On **show**: resumes only if QS paused itself; never fights the global guard.
+- Result: QuickServe finally follows the same “pause on background / resume on foreground” rhythm as the other modes.
+
+#### Infinity Lake — High Score + Badge Pipeline
+
+- End-of-run handler now:
+  - Updates score, streak, longest streak, solved count in `appState`.
+  - Calls `checkInfinityBadgesByScore()` to award Infinity badges off **score + elapsed time**.
+- High Score and Longest Streak fields:
+  - First run → both match that run.
+  - Later runs → only update when you beat your previous record.
+- Clean separation:
+  - One function for ending the run.
+  - One for drawing the popup.
+  - One for XP/time/badge bookkeeping.
+
+#### Story Credits “Thank You” Block (Soft Promo)
+
+- `THANK_YOU_TEXT` now carries a short, text-only outro:
+  - Thanks players for spending real life at SnowCone MathFest.
+  - Invites them to tell friends who’d love “weird math, neon nights, and too many SnowCones.”
+  - Suggests searching **“SnowCone MathFest”** and **“JPS Grooves”** for soundtrack + updates.
+- Kept as data, not layout, so you can keep editing copy without touching CSS or JS.
+
+---
+
+### Changed
+
+#### Story Credits Roll — Layout & Flow
+
+- Credits viewport `.sm-credits-list` now has a real vertical footprint:
+  - `min-height: clamp(200px, 40vh, 360px);` so the last lines don’t get chopped at the bottom of the window.
+- Credits overlay (`.sm-credits-overlay`) stays as a fixed, centered panel over a soft radial gradient and blackout, tuned for the 11:16 stage.
+
+#### Credits Blackout — Mobile-Safe Guardrail
+
+- `fadeToStoryCreditsFromCh5()` now:
+  - Listens for `animationend` / `webkitAnimationEnd` on `.sm-blackout`.
+  - Adds a **600ms timeout** fallback that calls `showStoryCredits()` if the animation event never fires (mobile Safari safety net).
+- Prevents the rare case of “blackout fades but credits never appear,” especially on iOS.
+
+#### Pickup Toasts & XP Popups — Moved for Story Credits
+
+- Inventory pickup toasts + XP pop stack have been moved to the lower screen, just above the story bottom bar:
+  - `.pickup-stack` now anchors near the bottom using `bottom: calc(var(--sm-bbar-h) + safe-area + 8px)`.
+- XP popups (`.sm-xp-popup`) have their animation nuked to avoid flicker over credits and other overlays.
+
+#### Menu as Launcher — Cleaner Scene Manager Hand-off
+
+- `setupMenu()` now:
+  - Calls `applyBackgroundTheme()` once.
+  - Installs both the mushroom popper and the new High Score hitbox before wiring the mode labels.
+- Static per-mode imports are being phased out in favor of a central scene manager controlling mode loading and teardown.
+
+---
+
+### Fixed
+
+#### Credits vs. Toasts Stacking Weirdness (Mobile)
+
+- Prior behavior: `.pickup-stack` lived at a huge `z-index`, so XP / pickup toasts could float above the credits overlay on mobile during chapter completion.
+- Now:
+  - Credits overlay owns the visual top.
+  - Toasts sit lower and animate without stealing focus from the “movie ending” moment.
+
+#### Infinity Lake End-Of-Run Drift
+
+- Fixed cases where:
+  - End button felt spooky / no-op, or
+  - High Score / Streak didn’t match the just-finished run.
+- Sanity path now guaranteed:
+  - Play 5–10 problems → score & streak tick as before.
+  - End ♾️ → popup shows correct stats.
+  - High Score / Longest Streak only bump when you truly beat your record.
+
+#### Music Zombies After Backgrounding
+
+- Global + QuickServe visibility guards prevent:
+  - Tracks continuing after you lock the phone or switch apps.
+  - Dead runs suddenly resuming music after you’ve already stopped them from a result popup.
+
+---
+
+### Dev Notes (why we coded it this way)
+
+#### High Scores as Meta HUD, Not a New Mode
+
+- Invisible truck hitbox + small overlay card means you get a **“pro app” stats peek** without cluttering the map or adding a new scene to maintain.
+
+#### Visibility Guards = Respect the Player’s Device
+
+- Centralized tab/lock logic avoids every mode reinventing “pause on background.”
+- QS gets a local guard right next to its Howl, so it never conflicts with the global music manager but still feels first-class.
+
+#### Credits as Mini Film Outro
+
+- Bigger scroll window + `THANK_YOU_TEXT` promo block gives the ending a proper “sit with it” beat.
+- Toasts and popups are pushed down so the credits can own the emotional top of the screen.
+
 
 ## [1.3.0] – 2025-11-25 — **Story CYOA, Badges & Credits ✨**
 

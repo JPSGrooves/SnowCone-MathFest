@@ -831,7 +831,7 @@ _onCustomer(slide){
     const title  = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
     const img    = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
     const prompt = slide.text || '';
-    const isBig  = !!slide.bigChoices; // 👈 NEW flag
+    const isBig  = !!slide.bigChoices; // 👈 flag for beefy buttons
 
     const optionsHtml = (slide.choices || []).map((opt) => `
       <button
@@ -933,6 +933,7 @@ _onCustomer(slide){
         // 1) Normal reward plumbing
         this._grantSlideRewards(slide);
 
+        // 2) Optional slide-level override
         let handled = false;
         if (typeof slide.onAdvance === 'function') {
           try {
@@ -944,7 +945,19 @@ _onCustomer(slide){
         }
         if (handled) return;
 
-        // 2) Finish current chapter before portaling
+        // 3) Tell StoryMode this chapter is COMPLETE → XP + QuikServemilestone SFX
+        try {
+          const detail = {
+            chapterId:    this.state?.chapterId || null,
+            nextChapterId: choice.nextChapterId,
+            mode:         'to_next',
+          };
+          window.dispatchEvent(new CustomEvent('sm:chapterComplete', { detail }));
+        } catch (err) {
+          console.warn('[Story] chapterComplete event (choice3) failed:', err);
+        }
+
+        // 4) Finish current chapter before portaling
         if (typeof chapter.onFinish === 'function') {
           try {
             chapter.onFinish({ appState, engine: this });
@@ -953,14 +966,15 @@ _onCustomer(slide){
           }
         }
 
-        // 3) Unlock and start the new chapter
+        // 5) Unlock and start the new chapter
         this._unlockChapter(choice.nextChapterId);
         this.start(choice.nextChapterId);
 
-        // Optional: jump to specific slide
+        // 6) Optional: jump to specific slide
         if (choice.nextId) {
           this._gotoById(choice.nextId);
         }
+
         return;
       }
 

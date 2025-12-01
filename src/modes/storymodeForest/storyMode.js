@@ -232,12 +232,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "🎸 When Pythagorus presses a 60cm string exactly halfway ⏱️ (30 cm), what fraction of the original length is vibrating? 🤔➗",
         answer: "1/2 (Half the string, twice the pitch — an octave higher! 🎵)",
-        sfx: 'smDing'
+        sfx: 'honk1'
       },
       {
         prompt: "And when he presses at 20cm?",
         answer: "2/3 (vibrates, creating a fifth above the original note! 🎶)",
-        sfx: 'smDing2'
+        sfx: 'honk2'
       }
     ],
     interactive: {
@@ -291,7 +291,7 @@ const PROLOGUE_PAGES = [
           "Euclid immediately notices the off-shaped SnowCone that measures like a right triangle with legs of 3 cm and 4 cm. " +
           "<span style='color:#00ccff'>“What is the hypotenuse length?”</span> 🤔📐",
         answer: `5 cm is the longest side, opposite the right angle (3² + 4² = 9 + 16 = 25 → √25 = 5)`,
-        sfx: 'smDing2'
+        sfx: 'honk2'
       },
       {
         prompt:
@@ -299,7 +299,7 @@ const PROLOGUE_PAGES = [
           "Next, Euclid sketches the perfect SnowCone: two equal sides of 6 cm and a top edge of 4 cm. " +
           "<span style='color:#00ccff'>“What’s the perimeter of this neon triangle?”</span> 🤔📏",
         answer: `16 cm (6 + 6 + 4 = 16) <span style='color:#00ccff;'>▽</span>!!`,
-        sfx: 'smDing'
+        sfx: 'honk1'
       }
     ]
   },
@@ -358,13 +358,13 @@ const PROLOGUE_PAGES = [
       {
         prompt: "I informed Galileo that my neon SnowCone truck cruised to the entrance at a steady pace: I looped 60 miles in 2 hours. He asked, <span style='color: #00ccff;'>\"What was your average speed?\"</span> 🤔🚚<br>",
         answer: "30 mph<br>(Speed = Distance ÷ Time = 60 ÷ 2)<br> Dude, I'm back here every year! 🚀",
-        sfx: 'smDing'
+        sfx: 'honk1'
       },
       {
         prompt: "<strong style='font-size:1.1em; color: yellow;'>Follow-Up 🍧🔍</strong><br>" +
         "Newton asked, <span style='color: #00ccff;'>\"If you kept driving at 30mph, how far would you cruise in 5 hours?\"</span> 🤔📏<br>",
         answer: "150 miles (30 × 5)<br> Glad I didn't wander that long! 🌌",
-        sfx: 'smDing2'
+        sfx: 'honk2'
       }
     ]
   },
@@ -408,12 +408,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "Turing was excited to see the SnowCones and said, <span style='color: #00ccff;'>\"I would like to have f(3) scoops using my doubling-plus-one function of f(x) = 2x + 1.\"</span> 🤔🍧<br>",
         answer: "2 × 3 + 1 = 7 = f(3) = 7 scoops!!🍧",
-        sfx: 'smDing2'
+        sfx: 'honk2'
       },
       {
         prompt: "Brahmagupta heard me say I couldn't stack that many scoops and asked Turing: <span style='color: #00ccff;'>\"What happens when a whole scoop is multiplied or divided by 0?\"</span> 🤔<br>",
         answer: "It melts to nothing! (The scoops are reduced by the silence.)",
-        sfx: 'smDing'
+        sfx: 'honk1'
       }
     ]
   },
@@ -452,12 +452,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "Stepping up for his first Snowcone of the MathFest, Bombelli, was trying to figure out how to get an impossible SnowCone and asked, <span style='color: #00ccff;'>What is the square root of −1?🤔</span><br>",
         answer: "i (Imaginary, but essential for an impossible SnowCones.)",
-        sfx: 'smDing'
+        sfx: 'honk1'
       },
       {
         prompt: "Euclid, figuring out how he could offer ME an imaginary Snowcone, asked, <span style='color: #00ccff;'>Can I have i² SnowCones?</span><br>",
         answer: "That's −1! (He looped it right back to me!)",
-        sfx: 'smDing2'
+        sfx: 'honk2'
       }
     ]
   },
@@ -506,12 +506,12 @@ const PROLOGUE_PAGES = [
       {
         prompt: "Before snagging a SnowCone, Lovelace pondered whether the weather might cancel the MathFest: <span style='color: #00ccff;'>\"If thunder repeats every 5 seconds, how many repeats happen in 20 seconds?\"🤔</span><br>",
         answer: "4 repitions (20 ÷ 5)",
-        sfx: 'smDing2'
+        sfx: 'honk2'
       },
       {
         prompt: "Gauss knew he wasn't leaving without a SnowCone. He mused at the neon rain, noting that a drop fell every 0.25 seconds: <br> <span style='color: #00ccff;'>\"If the storm lasts 2.5 seconds, how many drops hit the ground?\"</span> 🤔<br>",
         answer: "10 drops = (2.5 ÷ 0.25)",
-        sfx: 'smDing'
+        sfx: 'honk1'
       }
     ]
   },
@@ -612,23 +612,29 @@ function onChaptersChanged(e) {
 }
 
 // 🔔 Chapter-complete XP + SFX hook
+// 🔔 Chapter-complete XP + SFX hook
 function onChapterComplete(e) {
   const detail = e?.detail || {};
   const chapterId = detail.chapterId;
+
+  console.log('[StoryMode] sm:chapterComplete fired:', detail);
 
   if (!chapterId) return;
 
   // We only care about numbered chapters ch1–ch5.
   // Prologue already has its own 500 XP + badge flow.
-  if (!/^ch[1-5]$/.test(chapterId)) return;
+  if (!/^ch[1-5]$/.test(chapterId)) {
+    console.log('[StoryMode] chapterComplete ignored (not a main chapter):', chapterId);
+    return;
+  }
 
   // 🌟 100 XP per chapter completion, with the same popup system
   try {
-    // No anchor → center-screen popup, like a little "chapter clear" toast
     awardXP(100, {
       anchor: null,
       reason: `chapter ${chapterId} complete`,
     });
+    console.log('[StoryMode] XP awarded for chapter:', chapterId);
   } catch (err) {
     console.warn('[StoryMode] chapter XP award failed:', err);
   }
@@ -637,11 +643,13 @@ function onChapterComplete(e) {
   const n = Number(chapterId.replace('ch', '')) || 0;
   if (n >= 1 && n <= 4) {
     try {
-      // Same SFX family as Prologue practice reveals
-      playSFX('smDing');
+      console.log('[StoryMode] playing chapter-complete SFX for', chapterId);
+      playSFX('QuikServemilestone');
     } catch (err) {
       console.warn('[StoryMode] chapter complete SFX failed:', err);
     }
+  } else {
+    console.log('[StoryMode] no SFX for final chapter', chapterId);
   }
 }
 
@@ -1392,13 +1400,44 @@ function stopStoryRotation() {
 }
 
 
+const smDing = new Howl({
+  src: [`${BASE}assets/audio/SFX/honk1.mp3`],
+  volume: 0.25,
+});
 
-const smDing = new Howl({ src: [`${BASE}assets/audio/SFX/smDing.mp3`], volume: .25 });
-const smDing2 = new Howl({ src: [`${BASE}assets/audio/SFX/smDing2.mp3`], volume: .25 });
+const smDing2 = new Howl({
+  src: [`${BASE}assets/audio/SFX/honk2.mp3`],
+  volume: 0.25,
+});
+
+// 🔊 NEW: Story-mode use of the QuickServe milestone chime
+const smMilestone = new Howl({
+  src: [`${BASE}assets/audio/SFX/QuikServemilestone.mp3`], // 👈 check this path/name
+  volume: 0.6,                                             // 🔊 louder over music
+});
 
 function playSFX(name) {
-  if (name === 'smDing') smDing.play();
-  else if (name === 'smDing2') smDing2.play();
+  console.log('[StoryMode] playSFX called with:', name);
+
+  // Make sure Howler is actually alive and unmuted before we play
+  try {
+    unlockHowlerCtx();
+  } catch (err) {
+    console.warn('[StoryMode] unlockHowlerCtx failed (safe to ignore):', err);
+  }
+
+  if (name === 'honk1') {
+    smDing.play();
+  } else if (name === 'honk2') {
+    smDing2.play();
+  } else if (name === 'QuikServemilestone') {
+    try {
+      smMilestone.play();
+    } catch (err) {
+      console.warn('[StoryMode] smMilestone.play() failed, falling back to honk1:', err);
+      smDing.play();
+    }
+  }
 }
 
 
