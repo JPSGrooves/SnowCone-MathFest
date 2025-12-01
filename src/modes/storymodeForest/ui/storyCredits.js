@@ -5,10 +5,10 @@
 let creditsTimer = null;
 
 const THANK_YOU_TEXT = `
-Thank you for spending a little bit of your real life at SnowCone MathFest. 
-Every click, choice, and “wait, what?” moment helps keep this world alive and evolving. 
-Share it with a friend, a student, a teacher, or anyone who could use a sprinkle of experimental math magic in their day.
+Thank you for spending a little bit of your real life at SnowCone MathFest. Every click, choice, and “wait, what?” moment helps keep this world alive and evolving. If you had fun, tell someone who’d love weird math, neon nights, and too many SnowCones. Search “SnowCone MathFest” and “JPS Grooves” to find the soundtrack, updates, and future festival news.
+— JPS Grooves
 `.trim();
+
 
 const CREDITS_LINES = [
   ['SnowCone MathFest', 'Created by Jeremy Smith'],
@@ -25,6 +25,7 @@ const CREDITS_LINES = [
   ['Love & Gratitude', 'You, the player'],
 ];
 
+const EXTRA_CREDITS_SPACERS = 4; // how many “blank rows” to scroll after the last line
 
 /**
  * Schedule the story credits overlay to appear after a short delay.
@@ -66,9 +67,13 @@ export function showStoryCredits() {
       line,
     ]);
 
+  // 🔹 NEW: add a few empty rows so the last real line gets time in the window
+  const spacerRows = Array.from({ length: EXTRA_CREDITS_SPACERS }, () => ['', ' ']);
+
   const allCredits = [
     ...CREDITS_LINES,
     ...thankYouLines,
+    ...spacerRows, // 👈 gives you that extra scroll “runout” after the last name
   ];
 
   overlay.innerHTML = `
