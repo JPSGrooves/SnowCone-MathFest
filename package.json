@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:native": "vite build --config vite.config.native.js",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "live": "npm run build && npm run deploy",
@@ -69,6 +70,8 @@
     "not IE 11"
   ],
   "dependencies": {
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4",
     "canvas-confetti": "^1.9.3",
     "dotenv": "^16.5.0",
     "fuse.js": "^7.1.0",
@@ -80,7 +83,7 @@
     "semver": "^7.7.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.5.1",
+    "@capacitor/cli": "^7.4.4",
     "eslint-plugin-import": "^2.31.0",
     "gh-pages": "^6.0.0",
     "happy-dom": "^18.0.1",

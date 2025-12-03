@@ -120,6 +120,44 @@ git commit -m "🌈 Locking in current dev state" --no-verify
 git push origin main --no-verify
 ```
 
+Re-run:
+```bash
+npm run build:native
+npx cap copy ios
+npx cap sync ios
+```
+
+You can go back to main and:
+
+delete mathTips golden test
+
+fix ant game lifecycle
+
+tweak story
+
+push to GitHub
+
+deploy to gh-pages
+➜ Nothing about iOS breaks.
+
+When you want to refresh the iOS build:
+
+Merge those changes into store-wrap-ios (later).
+
+
+
+Then Build/Run in Xcode again.
+
+So yeah: keep treating the web version like normal. Capacitor is just a sidecar. It doesn’t poison your gh-pages setup.
+
+
+
+
+
+
+
+
+
 
 feat: transition system + startup screen + mode launch polish
 ---

@@ -44,6 +44,7 @@ const HANDLERS = {
   unlockAudioOnce: null,
   onStartCamping: null,
   onBackToMenuIntro: null,
+  onBackFromMain: null,
   onMuteClick: null,
   onIconTwist: null,
 };
@@ -377,8 +378,10 @@ function renderMainUI() {
   `;
 
   // return hook now targets the square back button
-  hookReturnButton('kcBack');
-  document.querySelectorAll('.kc-aspect-wrap, .kc-game-frame, .kc-grid').forEach(preventDoubleTapZoom);
+  // local zoom shield
+  document
+    .querySelectorAll('.kc-aspect-wrap, .kc-game-frame, .kc-grid')
+    .forEach(preventDoubleTapZoom);
 }
 
 
@@ -394,7 +397,17 @@ function onTentsAll() {
 
 
 function wireMainHandlers() {
-  // Mute toggle (square)
+  // 🔙 Back button – go through our local returnToMenu, which calls stopKidsMode()
+  const backBtn = document.getElementById('kcBack');
+  if (backBtn) {
+    HANDLERS.onBackFromMain = () => {
+      try { stopTrack(); } catch {}
+      returnToMenu();              // 👈 this already awaits stopKidsMode + forceKillAntAttack
+    };
+    backBtn.addEventListener('click', HANDLERS.onBackFromMain);
+  }
+
+  // 🔇 / 🔊 Mute toggle (square)
   const muteBtn = document.getElementById('kcMute');
   if (muteBtn) {
     HANDLERS.onMuteClick = () => {
@@ -406,7 +419,7 @@ function wireMainHandlers() {
     applyMuteVisual(muteBtn);
   }
 
-  // Title dino twirl (unchanged)
+  // 🦕 Title dino twirl (unchanged)
   HANDLERS.onIconTwist = (ev) => {
     const icon = ev.currentTarget;
     icon.classList.remove('twisting');
@@ -418,21 +431,35 @@ function wireMainHandlers() {
   });
 
   wireKidsBadgeListeners();
+
   const container = document.querySelector(SELECTORS.container);
   container?.addEventListener('kc:tents-all', onTentsAll, { once: true, passive: true });
 }
 
 function unwireMainHandlers() {
+  // 🔙 Back
+  const backBtn = document.getElementById('kcBack');
+  if (backBtn && HANDLERS.onBackFromMain) {
+    backBtn.removeEventListener('click', HANDLERS.onBackFromMain);
+  }
+  HANDLERS.onBackFromMain = null;
+
+  // 🔇 / 🔊 Mute
   const muteBtn = document.getElementById('kcMute');
-  if (muteBtn && HANDLERS.onMuteClick) muteBtn.removeEventListener('click', HANDLERS.onMuteClick);
+  if (muteBtn && HANDLERS.onMuteClick) {
+    muteBtn.removeEventListener('click', HANDLERS.onMuteClick);
+  }
   HANDLERS.onMuteClick = null;
 
+  // 🦕 Title dino twirl
   if (HANDLERS.onIconTwist) {
     document.querySelectorAll('.kc-icon, .kc-title img.kc-icon').forEach(el => {
       el.removeEventListener('click', HANDLERS.onIconTwist);
     });
   }
   HANDLERS.onIconTwist = null;
+
+  // badges & tents
   unwireKidsBadgeListeners();
   const container = document.querySelector(SELECTORS.container);
   container?.removeEventListener('kc:tents-all', onTentsAll);
@@ -522,18 +549,45 @@ async function bootGames() {
     globalThis.__KC_BOOT_LOCK__ = false; // allow future clicks
   }
 }
+function updateCampingHighScore(currentScore) {
+  const score = Number(currentScore) || 0;
+  try {
+    runInAction(() => {
+      // Ensure profile exists
+      const profile = appState.profile || (appState.profile = {});
+      const prev =
+        typeof profile.campingHighScore === 'number'
+          ? profile.campingHighScore
+          : 0;
+
+      if (score > prev) {
+        profile.campingHighScore = score;
+        // optional debug:
+        // console.log('[kc] New camping high score:', score);
+      }
+    });
+  } catch (err) {
+    console.warn('[kc] updateCampingHighScore failed', err);
+  }
+}
 
 // ────────────────────────────────────────────────────────────────────────────────
 // UI helpers
 // ────────────────────────────────────────────────────────────────────────────────
 export function updatePopUI() {
   const popSpan = document.getElementById('popCount');
-  if (popSpan) popSpan.textContent = appState.popCount;
+  const current = Number(appState.popCount) || 0;
 
-  emitCampScore(); // ✅ let the Kids XP listener run
+  if (popSpan) popSpan.textContent = current;
+
+  // Let XP / listeners know the score changed
+  emitCampScore();
+
+  // 🏕️ Keep lifetime best in profile
+  updateCampingHighScore(current);
 
   // 10k camping score → badge (once)
-  if (!_awarded.camp10k && (appState.popCount || 0) >= 10_000) {
+  if (!_awarded.camp10k && current >= 10_000) {
     _awarded.camp10k = true;
     awardBadge('kids_camp_10k'); // alias to your canonical id if needed
   }

@@ -1,8 +1,8 @@
-// vite.config.js
+// vite.config.native.js
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/SnowCone-MathFest/',   // keep GH Pages path
+  base: '/',                     // for capacitor://localhost
   server: {
     port: 5173,
     strictPort: true,

@@ -156,14 +156,19 @@ function openHighScoreOverlay() {
   const dimmer  = document.getElementById('cosmicOverlay');
   if (!overlay || !dimmer) return;
 
+  // 🏕️ Camping: show lifetime best, not current run
   const campingScore =
-    typeof appState.popCount === 'number' ? appState.popCount : 0;
+    typeof appState.profile?.campingHighScore === 'number'
+      ? appState.profile.campingHighScore
+      : 0;
 
+  // 🍔 QuickServe: use profile high score, then stats fallback
   const quickServeScore =
     appState.profile?.qsHighScore ??
     appState.stats?.quickServe?.topScore ??
     0;
 
+  // ♾️ Infinity lake (already good)
   const infinityScore =
     appState.profile?.infinityHighScore ?? 0;
 
