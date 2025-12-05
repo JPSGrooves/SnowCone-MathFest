@@ -14,11 +14,15 @@ import { wireMusicVisibilityGuard } from './managers/musicVisibility.js';
 
 // 🍧 Anti–Double-Tap Zoom Shield (esp. iOS Safari)
 let lastTouchTime = 0;
-document.addEventListener('touchend', (e) => {
-  const now = new Date().getTime();
-  if (now - lastTouchTime <= 300) e.preventDefault();
-  lastTouchTime = now;
-}, true);
+document.addEventListener(
+  'touchend',
+  (e) => {
+    const now = new Date().getTime();
+    if (now - lastTouchTime <= 300) e.preventDefault();
+    lastTouchTime = now;
+  },
+  true
+);
 
 // 🛡️ Extra Safari Gesture Block (prevents zoom glitching)
 document.addEventListener('gesturestart', (e) => {
@@ -31,13 +35,26 @@ document.addEventListener('gestureend', (e) => {
   e.preventDefault();
 });
 
-
 // 🔐 Optional: Vite env check
 if (import.meta.env?.VITE_SECRET_KEY) {
-  console.log("🔐 VITE_SECRET_KEY:", import.meta.env.VITE_SECRET_KEY);
+  console.log('🔐 VITE_SECRET_KEY:', import.meta.env.VITE_SECRET_KEY);
 } else {
-  console.warn("🚨 No VITE_SECRET_KEY found. Is .env missing?");
+  console.warn('🚨 No VITE_SECRET_KEY found. Is .env missing?');
 }
+
+// 🧠 Platform flag: 'web' (browser) or 'ios' (Capacitor build)
+// eslint-disable-next-line no-undef
+const PLATFORM = import.meta.env.VITE_PLATFORM || 'web';
+
+if (PLATFORM === 'ios') {
+  document.documentElement.classList.add('platform-ios');
+  console.log('📱 Running inside iOS shell (platform-ios)');
+}
+
+
+// tag <html data-platform="web|ios"> so CSS can branch
+document.documentElement.dataset.platform = PLATFORM;
+console.log('🧠 SnowCone platform:', PLATFORM);
 
 // 🌍 Inject favicons with proper base path
 const base = import.meta.env.BASE_URL;
@@ -47,10 +64,10 @@ const links = [
   { rel: 'icon', type: 'image/png', sizes: '192x192', href: `${base}icon-192.png` },
   { rel: 'icon', type: 'image/png', sizes: '512x512', href: `${base}icon-512.png` },
   { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` },
-  { rel: 'manifest', href: `${base}manifest.json` }
+  { rel: 'manifest', href: `${base}manifest.json` },
 ];
 
-links.forEach(attrs => {
+links.forEach((attrs) => {
   const link = document.createElement('link');
   Object.entries(attrs).forEach(([key, val]) => link.setAttribute(key, val));
   document.head.appendChild(link);
@@ -58,39 +75,40 @@ links.forEach(attrs => {
 
 // ✅ OPTIONAL: tiny in-file test kit (so you don't need a separate file)
 function attachDevHarness() {
-  const w = (globalThis || window);
+  const w = globalThis || window;
   w.appState = appState; // <-- console: appState.setTheme('summer')
 
   // lightweight badge/xp helpers
   w.scTest = {
-    award: id => (import('./managers/badgeManager.js').then(m => m.awardBadge(id))),
+    award: (id) => import('./managers/badgeManager.js').then((m) => m.awardBadge(id)),
     playJukebox: () => document.dispatchEvent(new Event('sc:jukebox-play', { bubbles: true })),
-    addStory: n => appState.addStoryXP(n),
-    addKids:  n => appState.addKidsCampingXP(n),
-    addQS:    n => appState.addQuickServeXP(n),
-    addInf:   n => appState.addInfinityXP(n),
+    addStory: (n) => appState.addStoryXP(n),
+    addKids: (n) => appState.addKidsCampingXP(n),
+    addQS: (n) => appState.addQuickServeXP(n),
+    addInf: (n) => appState.addInfinityXP(n),
     breakdown: async () => {
       const { computeCompletionBreakdown } = await import('./managers/completionManager.js');
       const b = computeCompletionBreakdown(appState);
-      console.table(b.xp.buckets); console.log(b);
+      console.table(b.xp.buckets);
+      console.log(b);
       return b;
-    }
+    },
   };
   console.log('✅ Dev globals: appState, scTest');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📦 DOM ready. Starting app...');
-  initBadgeManager(appState);          // 1) init badge store
-  startAchievementsWatcher(appState);  // 2) wire autoruns AFTER manager
+  initBadgeManager(appState); // 1) init badge store
+  startAchievementsWatcher(appState); // 2) wire autoruns AFTER manager
   if (import.meta.env.DEV) attachDevHarness();
 
   applyBackgroundTheme();
-  console.log("🎨 Background applied.");
+  console.log('🎨 Background applied.');
 
   autorun(() => {
     Howler.volume(appState.settings.mute ? 0 : 1);
-    console.log("🔊 MobX mute autorun ran.");
+    console.log('🔊 MobX mute autorun ran.');
   });
 
   // 🔊 Wire tab-visibility → music auto-pause/resume once at startup
@@ -101,15 +119,15 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('❌ #startup-screen not found! Cannot start app.');
     return;
   } else {
-    console.log("🚀 Found #startup-screen");
+    console.log('🚀 Found #startup-screen');
   }
 
   setTimeout(() => {
-    console.log("🕒 Fading out startup...");
+    console.log('🕒 Fading out startup...');
     startup.style.opacity = 0;
 
     setTimeout(() => {
-      console.log("🔥 Removing startup, launching menu...");
+      console.log('🔥 Removing startup, launching menu...');
       startup.remove();
       setupMenu();
     }, 600);
