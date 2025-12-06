@@ -371,7 +371,7 @@ html, body {
   }
 }
 
-@media (max-width: 319px), (max-height: 519px) {  /* was 399 / 499 */
+@media (max-width: 279px), (max-height: 519px) {  /* was 399 / 499 */
   html, body { overflow: hidden; }
 
   .menu-frame,
