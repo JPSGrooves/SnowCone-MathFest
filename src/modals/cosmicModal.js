@@ -33,17 +33,21 @@ export function closeModal() {
   overlay?.classList.add('hidden');
 }
 
-function wireOverlayClose() {
-  const overlay = document.getElementById('cosmicOverlay');
-  if (!overlay) return;
+function wireOutsideClickClose() {
+  document.addEventListener('click', (e) => {
+    const modal   = document.getElementById('cosmicModal');
+    const overlay = document.getElementById('cosmicOverlay');
 
-  overlay.addEventListener('click', (e) => {
-    // Only close if the cosmic modal is currently visible
-    const modal = document.getElementById('cosmicModal');
-    if (!modal) return;
+    if (!modal || !overlay) return;
+
+    // If modal isn't actually open, bail.
     if (modal.classList.contains('hidden')) return;
 
-    console.log('🌓 Cosmic overlay clicked – closing modal');
+    // If the click is *inside* the modal box, ignore it.
+    if (modal.contains(e.target)) return;
+
+    // At this point, modal is open and the click was outside the box:
+    console.log('🌓 Outside click detected – closing cosmic modal');
     closeModal();
   });
 }
@@ -119,9 +123,10 @@ function setupTabListeners() {
 //////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
-  wireOverlayClose();   // 👈 add this line
+  wireOutsideClickClose();   // 👈 new call
   console.log('🧊 Cosmic modal listeners wired.');
 });
+
 
 
 window.openModal = openModal;
