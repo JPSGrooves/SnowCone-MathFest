@@ -371,7 +371,7 @@ html, body {
   }
 }
 
-@media (max-width: 319px), (max-height: 519px) {  /* was 399 / 499 */
+@media (max-width: 279px), (max-height: 519px) {  /* was 399 / 499 */
   html, body { overflow: hidden; }
 
   .menu-frame,
@@ -803,4 +803,8 @@ html, body {
 /* Optional: prevent background scrolling when any modal is open */
 body.modal-open {
   overflow: hidden;
+}
+/* 🍏 iOS-only: push main menu title down ~15% of the viewport */
+:root[data-platform="ios"] .menu-title-top {
+  margin-top: 7vh; /* ⬇️ shove it down ~15% only in the iOS build */
 }

@@ -2,40 +2,77 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
     <meta name="theme-color" content="#00ff88" />
     <title>SnowCone MathFest</title>
 
     <!-- ✨ Fonts & Styles -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./assets/styles/style.css" />
     <link rel="stylesheet" href="/assets/styles/cosmicModal.css" />
     <link rel="stylesheet" href="/assets/styles/transition.css" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./assets/img/icons/icon-192.png?v=4">
-    <link rel="apple-touch-icon" sizes="167x167" href="./assets/img/icons/icon-167.png?v=4">
-    <link rel="apple-touch-icon" sizes="152x152" href="./assets/img/icons/icon-152.png?v=4">
-    <link rel="apple-touch-icon" sizes="120x120" href="./assets/img/icons/icon-120.png?v=4">
-    <meta name="apple-mobile-web-app-title" content="SnowCone MathFest">
-
-
-
-
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./assets/img/icons/icon-192.png?v=4"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="167x167"
+      href="./assets/img/icons/icon-167.png?v=4"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="./assets/img/icons/icon-152.png?v=4"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="./assets/img/icons/icon-120.png?v=4"
+    />
+    <meta name="apple-mobile-web-app-title" content="SnowCone MathFest" />
   </head>
+
   <body>
+    <!-- 🚀 Startup / Splash -->
     <div id="startup-screen">
-      <img class="startup-stars" src="assets/img/transitions/transitionStars.png" />
-      <img class="startup-cone" src="assets/img/transitions/snowCone.png" />
+      <img
+        class="startup-stars"
+        src="assets/img/transitions/transitionStars.png"
+        alt=""
+      />
+      <img
+        class="startup-cone"
+        src="assets/img/transitions/snowCone.png"
+        alt="SnowCone MathFest"
+      />
     </div>
 
     <!-- 🌌 Cosmic Background -->
-    <img src="assets/img/branding/starfield.png" class="menu-floater" />
+    <img
+      src="assets/img/branding/starfield.png"
+      class="menu-floater"
+      alt=""
+    />
+
+    <!-- 🌌 Cosmic Background -->
+    <img
+      src="assets/img/branding/starfield.png"
+      class="menu-floater"
+      alt=""
+    />
 
     <!-- 🍧 Main Menu Layout w/ Decoupled Background -->
     <div class="menu-wrapper">
       <div class="menu-layout">
-    
-        <!-- 🌀 Aspect-Controlled Container -->
         <div class="aspect-wrap">
           <img
             id="menuImage"
@@ -54,65 +91,121 @@
 
             <!-- 🍧 Labels Grid -->
             <div class="menu-grid">
-              <div class="menu-label kids">⛺<br>Camping<br>Games</div>
-              <div class="menu-label quick">🍧<br>QuickServe<br>Pavilion</div>
-              <div class="menu-label tips">🧮<br>MathTips<br>Village</div>
-              <div class="menu-label story">📖<br>Story Mode<br>Forest</div>
-              <div class="menu-label infinity">♾️<br>Infinity Lake</div>
-              <div class="menu-label options label-options">⚙️ Options</div>
+              <div class="menu-label kids">
+                ⛺<br />Camping<br />Games
+              </div>
+              <div class="menu-label quick">
+                🍧<br />QuickServe<br />Pavilion
+              </div>
+              <div class="menu-label tips">
+                🧮<br />MathTips<br />Village
+              </div>
+              <div class="menu-label story">
+                📖<br />Story Mode<br />Forest
+              </div>
+              <div class="menu-label infinity">
+                ♾️<br />Infinity Lake
+              </div>
+              <div class="menu-label options label-options">
+                ⚙️ Options
+              </div>
             </div>
 
-            <!-- 🏆 Invisible High Score button over the truck (between Infinity Lake + Options) -->
+            <!-- 🏆 Invisible High Score button over the truck -->
             <button
               type="button"
               class="menu-highscore-hitbox"
               aria-label="View High Scores"
             ></button>
-
           </div>
-          
-        </div> <!-- end .aspect-wrap -->
-
+        </div>
       </div>
     </div>
-
-
-
 
     <!-- 🎮 Game Container for Modes -->
     <div id="game-container" class="hidden"></div>
 
+
     <!-- 🧊 Info Modal -->
-    <div id="infoModal" class="cosmic-modal hidden" role="dialog" aria-labelledby="infoTitle" aria-modal="true">
+    <div
+      id="infoModal"
+      class="cosmic-modal hidden"
+      role="dialog"
+      aria-labelledby="infoTitle"
+      aria-modal="true"
+    >
       <div class="cosmic-modal-inner scrollable-modal">
-        <button class="close-modal" type="button" aria-label="Close" onclick="closeInfoModal()">✖</button>
+        <button
+          class="close-modal"
+          type="button"
+          aria-label="Close"
+          onclick="closeInfoModal()"
+        >
+          ✖
+        </button>
 
         <header class="modal-hero">
           <h2 id="infoTitle">🍧 SnowCone MathFest</h2>
           <p class="tagline">Neon math. Real music. Zero fluff.</p>
           <p class="byline">
-            Built end-to-end by <strong>JPS Grooves</strong> — developer · musician · educator · illustrator.
+            Built end-to-end by <strong>JPS Grooves</strong> — developer ·
+            musician · educator · illustrator.
           </p>
           <nav class="cta-row">
-            <a class="cta cta-primary" href="https://JPSGrooves.com" target="_blank" rel="noopener">🌐 Visit JPSGrooves.com</a>
-            <a class="cta" href="https://open.spotify.com/artist/436k9RrQa35PJ357R5Kq6c?si=32xgVLQJRgmQxEMhzul9GA" target="_blank" rel="noopener">🎧 Spotify</a>
-            <a class="cta" href="https://music.apple.com/us/album/jps-grooves/1755334789" target="_blank" rel="noopener">🍎 Apple Music</a>
-            <a class="cta" href="https://soundcloud.com/jpsgrooves" target="_blank" rel="noopener">🔊 SoundCloud</a>
+            <a
+              class="cta cta-primary"
+              href="https://JPSGrooves.com"
+              target="_blank"
+              rel="noopener"
+              >🌐 Visit JPSGrooves.com</a
+            >
+            <a
+              class="cta"
+              href="https://open.spotify.com/artist/436k9RrQa35PJ357R5Kq6c?si=32xgVLQJRgmQxEMhzul9GA"
+              target="_blank"
+              rel="noopener"
+              >🎧 Spotify</a
+            >
+            <a
+              class="cta"
+              href="https://music.apple.com/us/album/jps-grooves/1755334789"
+              target="_blank"
+              rel="noopener"
+              >🍎 Apple Music</a
+            >
+            <a
+              class="cta"
+              href="https://soundcloud.com/jpsgrooves"
+              target="_blank"
+              rel="noopener"
+              >🔊 SoundCloud</a
+            >
           </nav>
         </header>
 
         <section class="tab-content">
           <h3>What is SnowCone MathFest?</h3>
           <p>
-            An interactive math adventure wrapped in rhythm, story, and arcade-style feedback.  
-            It runs as an app, remembers your progress in your browser, and rewards practice with XP, badges, and unlockable themes.
+            An interactive math adventure wrapped in rhythm, story, and
+            arcade-style feedback. It runs as an app, remembers your progress in
+            your browser, and rewards practice with XP, badges, and unlockable
+            themes.
           </p>
 
           <h3>Modes & Zones</h3>
           <ul class="dot-list">
-            <li>💠 <strong>QuickServe:</strong> Solve fast, earn XP, jam with Cosmic Phil.</li>
-            <li>🌲 <strong>StoryMode:</strong> Work the truck, meet math ghosts, unravel the lore.</li>
-            <li>♾️ <strong>Infinity:</strong> Free play + endless combos by the Lake.</li>
+            <li>
+              💠 <strong>QuickServe:</strong> Solve fast, earn XP, jam with
+              Cosmic Phil.
+            </li>
+            <li>
+              🌲 <strong>StoryMode:</strong> Work the truck, meet math ghosts,
+              unravel the lore.
+            </li>
+            <li>
+              ♾️ <strong>Infinity:</strong> Free play + endless combos by the
+              Lake.
+            </li>
             <li>😺 <strong>MathTips:</strong> Grampy P taught micro lessons.</li>
             <li>⛺ <strong>Camping:</strong> Tactile, fidget-friendly fun.</li>
           </ul>
@@ -121,21 +214,30 @@
           <ul class="dot-list">
             <li>Tap a zone on the map to jump into a mode.</li>
             <li>Your XP and badges save automatically in your browser.</li>
-            <li>Practice daily, unlock themes, and keep the groove going.</li>
+            <li>
+              Practice daily, unlock themes, and keep the groove going.
+            </li>
           </ul>
 
           <p class="support-note">
-            Like it? Share it & come say hi at <a href="https://JPSGrooves.com" target="_blank" rel="noopener">JPSGrooves.com</a>.  
-            This project is part of my larger music/art portfolio and is not affiliated with any educational institution.
-            <br><br>
+            Like it? Share it & come say hi at
+            <a
+              href="https://JPSGrooves.com"
+              target="_blank"
+              rel="noopener"
+              >JPSGrooves.com</a
+            >.
+            <br />
+            This project is part of my larger music/art portfolio and is not
+            affiliated with any educational institution.
+            <br /><br />
             Made with 💖 and 🎵 by JPS Grooves, 2026.
-
           </p>
         </section>
       </div>
     </div>
 
-        <!-- 🏆 High Score Overlay (simple, no-scroll card) -->
+    <!-- 🏆 High Score Overlay (simple, no-scroll card) -->
     <div
       id="highScoreOverlay"
       class="hs-overlay hidden"

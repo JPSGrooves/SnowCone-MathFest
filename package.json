@@ -91,6 +91,7 @@
     "jsdom": "^26.1.0",
     "lint-staged": "^16.1.0",
     "prettier-plugin-tailwindcss": "^0.6.12",
+    "source-map-js": "^1.2.1",
     "vite": "6.3.5",
     "vitest": "^3.2.2"
   }

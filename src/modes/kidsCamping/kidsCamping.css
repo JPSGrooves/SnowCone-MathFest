@@ -1771,3 +1771,12 @@ html.kc-no-zoom, body.kc-no-zoom { overscroll-behavior: contain; }
   background: #2a2a2acc;
   box-shadow: 0 6px 16px #00000060, inset 0 0 8px #ff337722;
 }
+/* 🍏 iOS-only: Kids Camping intro + main grid pushdown
+   Mirrors Infinity’s :root[data-platform="ios"] body.il-active … rules */
+:root[data-platform="ios"] body.kc-active .kc-intro {
+  padding-top: 7vh; /* same bevel space you used for IL/QS */
+}
+
+:root[data-platform="ios"] body.kc-active .kc-grid {
+  padding-top: 7vh; /* pushes title & zones down under the fake bezel */
+}

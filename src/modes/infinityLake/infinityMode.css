@@ -1031,3 +1031,12 @@
   overflow-wrap: anywhere;
   line-height: 1.1;
 }
+/* 🍏 iOS-only: Infinity Lake intro pushdown */
+:root[data-platform="ios"] body.il-active .il-intro {
+  padding-top: 7vh; /* mirror QS bevel space */
+}
+
+/* 🍏 iOS-only: Infinity Lake main game pushdown */
+:root[data-platform="ios"] body.il-active .il-grid {
+  padding-top: 7vh; /* pushes title/stage/math/controls down */
+}

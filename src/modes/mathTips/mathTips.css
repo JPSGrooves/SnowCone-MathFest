@@ -1285,3 +1285,17 @@ body { margin: 0; }
 .mt-content { grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }
 .chat-window { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
+/* 🍏 iOS-only: MathTips intro + main grid pushdown
+   Mirrors Kids Camping / Infinity fake bezel spacing */
+:root[data-platform="ios"] body.mt-active .mt-intro {
+  padding-top: 7vh; /* push intro stack down under the faux bezel */
+}
+
+:root[data-platform="ios"] body.mt-active .mt-grid {
+  padding-top: 7vh; /* same bevel space for the chat header + window */
+}
+
+/* iOS safe-area: keep footer above the home bar */
+:root[data-platform="ios"] body.mt-active .mt-footer {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.4rem);
+}

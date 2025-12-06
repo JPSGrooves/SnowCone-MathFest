@@ -1689,3 +1689,41 @@
     margin-bottom: 0.4rem;
   }
 }
+/* 🍏 iOS-only: Story Mode intro + menus pushdown
+   Mirrors Kids Camping’s :root[data-platform="ios"] body.kc-active … rules */
+:root[data-platform="ios"] body.sm-active .sm-intro {
+  padding-top: 7vh; /* push intro stack down under the fake bezel */
+}
+
+:root[data-platform="ios"] body.sm-active .sm-chapter-menu {
+  padding-top: 7vh; /* chapter select screen pushed down too */
+}
+
+:root[data-platform="ios"] body.sm-active .sm-prologue {
+  padding-top: 7vh; /* prologue reader & slides respect the same bar */
+}
+/* 🍏 iOS-only: push down main Story chapters 1–5 under the fake top bar */
+:root[data-platform="ios"] body.sm-active .sm-ch1[data-chapter="ch1"],
+:root[data-platform="ios"] body.sm-active .sm-ch1[data-chapter="ch2"],
+:root[data-platform="ios"] body.sm-active .sm-ch1[data-chapter="ch3"],
+:root[data-platform="ios"] body.sm-active .sm-ch1[data-chapter="ch4"],
+:root[data-platform="ios"] body.sm-active .sm-ch1[data-chapter="ch5"] {
+  padding-top: 7vh;
+}
+/* 🍏 iOS-only: ultra-tight gap above the bottom bar (Ch1) */
+:root[data-platform="ios"] body.sm-active #game-container .sm-ch1 .sm-choice-list {
+  /* was 0.18 → now 0.12 for a tighter baseline */
+  margin-bottom: calc(var(--sm-bbar-h) * 0.12 + max(0.25vh, env(safe-area-inset-bottom))) !important;
+}
+
+/* Last row (usually the main CTA) gets EVEN closer */
+:root[data-platform="ios"] body.sm-active #game-container .sm-ch1 .sm-ch1-wrap > .sm-choice-list:last-of-type {
+  margin-bottom: calc(var(--sm-bbar-h) * 0.08 + max(0.2vh, env(safe-area-inset-bottom))) !important;
+}
+
+/* Ease the frame padding too so it doesn’t fight us */
+:root[data-platform="ios"] body.sm-active #game-container .sm-ch1,
+:root[data-platform="ios"] body.sm-active #game-container .sm-ch1-wrap {
+  /* was 0.25 → trim it a bit */
+  padding-bottom: calc(var(--sm-bbar-h) * 0.20 + max(0.35vh, env(safe-area-inset-bottom))) !important;
+}

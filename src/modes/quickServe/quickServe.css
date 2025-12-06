@@ -917,3 +917,12 @@
 #qsResultPopup h2 {
   font-size: clamp(1.2rem, 3vh, 2rem);
 }
+/* 🍏 iOS-only: QuickServe intro pushdown */
+:root[data-platform="ios"] body.qs-active .qs-intro {
+  padding-top: 7vh;
+}
+
+/* 🍏 iOS-only: QuickServe main game pushdown */
+:root[data-platform="ios"] body.qs-active .qs-grid {
+  padding-top: 7vh;
+}

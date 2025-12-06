@@ -647,12 +647,12 @@ export const Chapter4 = {
       mode: 'choice3',
       title: 'Moment of Truth',
       img: PRO_IMG('essentialsTrio3.png'),
-      text: `He looks at the portal, and then solemnly back to you, holding the cone he just served you.<br><br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that SnowCone.”</span>`,
+      text: `He looks at the portal, and then solemnly back to you, holding the cone he just served you.<br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that SnowCone.”</span>`,
       bigChoices: true,
       choices: [
         {
           id: 'c4_choice_keep_cone',
-          label: 'Keep the SnowCone and step into the portal.',
+          label: 'Keep the Perfect SnowCone.',
           nextChapterId: 'ch5',
           nextId: 'c5_keep_cone_ending_1',
           onSelect: ({ appState }) => {
@@ -665,7 +665,7 @@ export const Chapter4 = {
         },
         {
           id: 'c4_choice_give_cone',
-          label: '"Serve" Jehnk the SnowCone and watch him go.',
+          label: '"Serve" Jehnk the Perfect SnowCone.',
           nextChapterId: 'ch5',
           nextId: 'c5_give_cone_ending_1',
           onSelect: ({ appState }) => {

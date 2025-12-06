@@ -137,6 +137,9 @@ const SELECTORS = {
   menuWrapper: '.menu-wrapper',
 };
 
+// 🔹 Body flag for iOS padding tweaks (mirrors Kids Camping's kc-active)
+const SM_BODY_CLASS = 'sm-active';
+
 const STORY_TRACKS = ['prologue', 'bonusTime', 'patchrelaxes' ];
 
 let elRoot = null;
@@ -662,6 +665,9 @@ function loadStoryMode() {
   smStartInventoryWatcher();
   swapModeBackground('storymodeForest');
 
+  // 🔹 mark body so iOS-only CSS can target Story the same way as Kids Camping
+  document.body.classList.add(SM_BODY_CLASS);
+
   const container = document.querySelector(SELECTORS.container);
   const menuWrapper = document.querySelector(SELECTORS.menuWrapper);
   menuWrapper?.classList.add('hidden');
@@ -679,11 +685,9 @@ function loadStoryMode() {
   wireSMAudioUnlockOnce();
 
   // Global listeners — add once
-  // Global listeners — add once
   if (!__smWired) {
     window.addEventListener('sm:backToChapterMenu', backToChapterMenu);
     window.addEventListener('sm:chaptersChanged', onChaptersChanged);
-    // 🔔 NEW: chapter completion (ch1–ch5) → XP + maybe SFX
     window.addEventListener('sm:chapterComplete', onChapterComplete);
     __smWired = true;
   }
@@ -694,6 +698,9 @@ export function stopStoryMode() {
   unwireSMAudioUnlock();
   smStopInventoryWatcher();
   stopStoryRotation();
+
+  // 🔹 clear Story body flag so iOS padding stops applying
+  document.body.classList.remove(SM_BODY_CLASS);
 
   try { stopTrack(); } catch {}
   try { if (getLooping()) toggleLoop(); } catch {}

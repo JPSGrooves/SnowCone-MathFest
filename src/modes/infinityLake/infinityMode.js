@@ -130,6 +130,9 @@ export function loadInfinityMode() {
 }
 
 export function stopInfinityMode() {
+  // 🧼 Always clear the body flag so iOS CSS stops applying
+  document.body.classList.remove('il-active');
+
   const container = document.getElementById('game-container');
   container.innerHTML = '';
   container.classList.add('hidden');
@@ -138,6 +141,7 @@ export function stopInfinityMode() {
   cleanupEventHandlers();
   console.log('♾️ Infinity Mode cleaned up!');
 }
+
 function renderIntroScreen() {
   const container = document.getElementById('game-container');
 

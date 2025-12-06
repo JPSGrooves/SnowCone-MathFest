@@ -53,6 +53,8 @@ HANDLERS.onAntsFull = null;
 HANDLERS.onParkingComplete = null;
 // kidsCamping.js
 
+const KC_BODY_CLASS = 'kc-active';
+
 // put this near your other HANDLERS keys
 HANDLERS.onAntRoundProgress = null;
 
@@ -111,12 +113,17 @@ function emitCampScore() {
 export function loadKidsMode() {
   enableIosLoupeKiller(document.getElementById('game-container'));
   enableGestureCage();                 // ⬅️ turn the cage on
+
+  // 🔹 NEW: mark body so iOS-only CSS can target this mode
+  document.body.classList.add(KC_BODY_CLASS);
+
   // Reset score & set mode
   runInAction(() => { appState.popCount = 0; });
   appState.setMode('kids');
   updatePopUI();
 
-  disableNoSelectForKids();
+  // 🔹 NEW: actually ENABLE the kids no-select shield
+  enableNoSelectForKids();
 
   // Show container, hide menu
   const container = document.querySelector(SELECTORS.container);
@@ -140,17 +147,23 @@ export function loadKidsMode() {
   wireIntroHandlers();
   wireAudioUnlockOnce();
 
-  // XP watcher (100 XP / 1000 score)
+  // XP watcher (100 XP / 1000 score – global XP bucket)
   startXPWatcher();
 
-  // Prevent accidental zoom
+  // Prevent accidental zoom just inside the frame
   document.querySelectorAll('.kc-aspect-wrap, .kc-game-frame').forEach(preventDoubleTapZoom);
 }
 
 export async function stopKidsMode() {
   disableIosLoupeKiller(document.getElementById('game-container'));
   disableGestureCage();                // ⬅️ lift the cage
+
+  // 🔹 NEW: clear body flag so iOS padding stops applying
+  document.body.classList.remove(KC_BODY_CLASS);
+
+  // 🔹 NEW: turn off the no-select guard when we leave Kids Mode
   disableNoSelectForKids();
+
   try { stopTrack(); } catch {}
   try { cleanupTentLineGame(); } catch {}
 

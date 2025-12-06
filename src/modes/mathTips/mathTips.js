@@ -29,6 +29,7 @@ let detachAutoScroll; // cleanup handle returned by attachAutoScroller()
 let __mtMusicStarted = false; // prevents double-starts across re-renders
 let _mtOwnsMusic = false; // ← NEW: track if MathTips started playback
 
+const MT_BODY_CLASS = 'mt-active'; // 🍏 iOS bezel targeting for MathTips
 
 const MT = {
   containerSel: '#game-container',
@@ -127,6 +128,9 @@ export function loadMathTips() {
   console.log('🧠 Loading Math Tips Mode');
   appState.setMode('mathtips');
 
+  // 🍏 mark body so iOS-only CSS can push this mode down under the fake bezel
+  document.body.classList.add(MT_BODY_CLASS);
+
   try { swapModeBackground('mathTips'); }
   catch { applyBackgroundTheme(`${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png`); }
 
@@ -159,8 +163,10 @@ export function stopMathTips() {
   } catch {}
   _mtOwnsMusic = false;
 
-
   __mtMusicStarted = false;
+
+  // 🍏 drop the MathTips body flag so iOS padding stops applying
+  document.body.classList.remove(MT_BODY_CLASS);
 
   const container = document.querySelector(MT.containerSel);
   if (container) {
@@ -272,34 +278,62 @@ function renderMainUI() {
           />
 
           <div class="mt-grid">
-            <div class="mt-header"><h1>🐱 Math Tips Village</h1></div>
-            <div class="mt-content">
+            <!-- 🟡 HEADER ROW -->
+            <header class="mt-header">
+              <h1>🐱 Math Tips Village</h1>
+            </header>
+
+            <!-- 🔵 MAIN CONTENT: chat + input -->
+            <section class="mt-content">
               <div class="chat-window" id="chatOutput"></div>
+
               <div class="chat-input-zone">
-                <input id="userInput" type="text" placeholder="Ask something cosmic…"/>
+                <input
+                  id="userInput"
+                  type="text"
+                  placeholder="Ask something cosmic…"
+                />
                 <button id="sendBtn">Send</button>
               </div>
-            </div>
-          </div>
+            </section>
 
-          <div class="mt-bottom-bar">
-            <button id="mtBackToMenu" class="mt-square-btn mt-left">🔙</button>
-            <div class="mt-bottom-row">
-              <button id="copyTranscript"  class="mt-btn mt-btn-cyan mt-small">📋 Copy</button>
-              <button id="exportChatJson" class="mt-btn mt-btn-cyan mt-small">📤 Export</button>
-            </div>
-            <button id="mtMute" class="mt-square-btn mt-right ${isMuted() ? 'muted' : ''}">
-              ${isMuted() ? '🔇' : '🔊'}
-            </button>
+            <!-- 🟣 FOOTER ROW: Back | Copy/Export | Mute -->
+            <footer class="mt-footer">
+              <div class="mt-bottom-bar">
+                <button id="mtBackToMenu" class="mt-square-btn mt-left">🔙</button>
+
+                <div class="mt-bottom-row">
+                  <button
+                    id="copyTranscript"
+                    class="mt-btn mt-btn-cyan mt-small"
+                  >
+                    📋 Copy
+                  </button>
+                  <button
+                    id="exportChatJson"
+                    class="mt-btn mt-btn-cyan mt-small"
+                  >
+                    📤 Export
+                  </button>
+                </div>
+
+                <button
+                  id="mtMute"
+                  class="mt-square-btn mt-right ${isMuted() ? 'muted' : ''}"
+                >
+                  ${isMuted() ? '🔇' : '🔊'}
+                </button>
+              </div>
+            </footer>
           </div>
         </div>
-
       </div>
     </div>
   `;
 
   // ensure center-stack isn't inheriting pointer-events:none from the bar
-  document.querySelector('.mt-center-stack')?.style.setProperty('pointer-events', 'auto');
+  document.querySelector('.mt-center-stack')
+    ?.style.setProperty('pointer-events', 'auto');
 
   // cache
   inputEl   = document.getElementById('userInput');
@@ -311,7 +345,7 @@ function renderMainUI() {
   // 🔽 respectful auto-scroll
   try { detachAutoScroll = attachAutoScroller('chatOutput'); } catch {}
 
-  // 🎵 Start MathTips with kittyPaws, then let global Jukebox rules run (no loop forcing)
+  // 🎵 Start MathTips with kittyPaws, then let global Jukebox rules run
   try {
     const needStart =
       (typeof currentTrackId === 'function' && currentTrackId() !== 'kittyPaws') ||
@@ -319,14 +353,13 @@ function renderMainUI() {
 
     if (needStart) {
       playTrackUnlocked('kittyPaws');
-      _mtOwnsMusic = true;   // ← MathTips owns this playback session
+      _mtOwnsMusic = true;
     } else {
-      _mtOwnsMusic = false;  // already playing and not started by us
+      _mtOwnsMusic = false;
     }
 
     __mtMusicStarted = true;
   } catch {}
-
 
   startChat();
 }
