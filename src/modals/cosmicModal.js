@@ -33,6 +33,21 @@ export function closeModal() {
   overlay?.classList.add('hidden');
 }
 
+function wireOverlayClose() {
+  const overlay = document.getElementById('cosmicOverlay');
+  if (!overlay) return;
+
+  overlay.addEventListener('click', (e) => {
+    // Only close if the cosmic modal is currently visible
+    const modal = document.getElementById('cosmicModal');
+    if (!modal) return;
+    if (modal.classList.contains('hidden')) return;
+
+    console.log('🌓 Cosmic overlay clicked – closing modal');
+    closeModal();
+  });
+}
+
 //////////////////////////////
 // 🎛️ Render Tabs
 //////////////////////////////
@@ -104,8 +119,10 @@ function setupTabListeners() {
 //////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
+  wireOverlayClose();   // 👈 add this line
   console.log('🧊 Cosmic modal listeners wired.');
 });
+
 
 window.openModal = openModal;
 
