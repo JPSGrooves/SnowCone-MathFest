@@ -125,7 +125,7 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v1.3.0</h3>
+      <h3>🧠 SnowCone MathFest v1.4.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>

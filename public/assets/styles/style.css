@@ -543,6 +543,11 @@ html, body {
   -webkit-appearance: none;
 }
 
+/* 🍏 iOS-only: nudge the hitbox lower to match the shifted art */
+:root[data-platform='ios'] .mushroom-popper-hitbox {
+  top: 30vh; /* tweak this until it hugs the cone just right */
+}
+
 /* kill focus ring (we’re using it like a pure hitbox) */
 .mushroom-popper-hitbox:focus {
   outline: none;
@@ -806,5 +811,5 @@ body.modal-open {
 }
 /* 🍏 iOS-only: push main menu title down ~15% of the viewport */
 :root[data-platform="ios"] .menu-title-top {
-  margin-top: 7vh; /* ⬇️ shove it down ~15% only in the iOS build */
+  margin-top: 9vh; /* ⬇️ shove it down ~15% only in the iOS build */
 }

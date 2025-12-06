@@ -1,5 +1,36 @@
 import { appState } from '../data/appState.js';
 
+// 🧠 Mirror the platform flag from main.js
+const PLATFORM = import.meta.env.VITE_PLATFORM || 'web';
+
+// 🍎 Per-theme iOS art overrides
+const IOS_THEME_FILES = {
+  // default map screen
+  menubackground: 'menubackgroundiOS.png', // note the capital B
+
+  // seasons / holidays
+  spring:     'springiOS.png',
+  summer:     'summeriOS.png',
+  fall:       'falliOS.png',
+  winter:     'winteriOS.png',
+  halloween:  'halloweeniOS.png',
+  harvest:    'harvestiOS.png',
+  christmas:  'christmasiOS.png',
+  newyear:    'newyeariOS.png',
+  valentine:  'valentineiOS.png',
+  freedom:    'freedomiOS.png',
+
+  // cosmic variants
+  cosmic_01: 'cosmic_01iOS.png',
+  cosmic_02: 'cosmic_02iOS.png',
+  cosmic_03: 'cosmic_03iOS.png',
+  cosmic_04: 'cosmic_04iOS.png',
+  cosmic_05: 'cosmic_05iOS.png',
+  cosmic_06: 'cosmic_06iOS.png',
+  cosmic_07: 'cosmic_07iOS.png', // safe even if you add this one later
+};
+
+
 export function applyBackgroundTheme() {
   const bg = document.getElementById('menuImage');
   if (!bg) {
@@ -14,20 +45,34 @@ export function applyBackgroundTheme() {
     appState.setSetting('theme', theme);
   }
 
-   // 🚧 guard: if locked, fall back to default
+  // 🚧 guard: if locked, fall back to default
   if (!appState.hasTheme(theme)) {
     console.warn('🔒 Theme locked, falling back:', theme);
     theme = 'menubackground';
     appState.setSetting('theme', theme);
   }
 
-  bg.src = `assets/img/branding/${theme}.png`;
-  console.log('🧊 Background set to:', theme);
+  // 🍎 iOS gets different art *for the same theme name*
+  bg.src = resolveMenuBackgroundFile(theme);
+  console.log('🧊 Background set to:', theme, 'file:', bg.src);
 
   // 🎨 Update label glow colors
   applyLabelColors(theme);
 }
 
+function resolveMenuBackgroundFile(theme) {
+  let filename;
+
+  // 🍎 If we’re in the iOS build and have a custom file, use that
+  if (PLATFORM === 'ios' && IOS_THEME_FILES[theme]) {
+    filename = IOS_THEME_FILES[theme];
+  } else {
+    // otherwise fall back to the shared web asset (theme.png)
+    filename = `${theme}.png`;
+  }
+
+  return `assets/img/branding/${filename}`;
+}
 function applyLabelColors(theme) {
   const colors = labelColorMap[theme];
   if (!colors) return;
@@ -41,13 +86,14 @@ function applyLabelColors(theme) {
 export function swapBackground(themeName) {
   const bg = document.getElementById('menuImage');
   if (!bg) {
-    console.warn("🚨 No #menuImage found to swap.");
+    console.warn('🚨 No #menuImage found to swap.');
     return;
   }
 
   appState.setSetting('theme', themeName); // 🧠 persist new theme
-  bg.src = `assets/img/branding/${themeName}.png`;
-  console.log(`🌌 Swapped to theme: ${themeName}`);
+  bg.src = resolveMenuBackgroundFile(themeName);
+
+  console.log(`🌌 Swapped to theme: ${themeName} (file: ${bg.src})`);
 }
 
 // 🧪 dev tool: call from console
