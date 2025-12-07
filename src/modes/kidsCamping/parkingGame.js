@@ -145,7 +145,7 @@ export function initParkingGame(container) {
   container.innerHTML = `
     <div class="kc-parking-wrap">
       <div id="parkingIntro" class="kc-parking-intro-row">
-        <div class="kc-parking-intro">Park the Cars!</div>
+        <div class="kc-parking-intro">Park<br>the<br>Cars!</div>
       </div>
 
       <!-- 🛣️ intro lane gets injected before the real car zone -->

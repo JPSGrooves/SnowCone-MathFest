@@ -1,4 +1,0 @@
-[
-  ["quiz fractions 3", "quiz:\\s*fractions[\\s\\S]*?(simplify 12/18|1\\/2 \\+ 1\\/3)"],
-  ["score", "score:\\s*0\\/3"]
-]

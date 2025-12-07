@@ -1,5 +1,0 @@
-[
-  ["help", "lessons menu\\s*→\\s*fractions, percent, roots"],
-  ["simplify 12/18", "→\\s*2/3"],
-  ["15% of 80", "→\\s*12"]
-]

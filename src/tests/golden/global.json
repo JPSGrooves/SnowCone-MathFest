@@ -1,7 +1,0 @@
-[
-  ["how are you", "good vibes"],
-  ["what's your name", "(^|\\b)grampy p(\\b|$)"],
-  ["help", "mode lessons[\\s\\S]*mode quiz[\\s\\S]*mode lore[\\s\\S]*mode recipes[\\s\\S]*mode status[\\s\\S]*mode calc"],
-  ["mode calc", "calc|calculator|rolled into"],
-  ["exit", "back to the commons"]
-]
