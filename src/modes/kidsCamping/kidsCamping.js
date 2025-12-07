@@ -13,6 +13,7 @@ import { initMosquitoGame } from './mosquitoGame.js';
 import { enableGestureCage, disableGestureCage } from '../../utils/gestureCage.js';
 import { enableIosLoupeKiller, disableIosLoupeKiller } from '../../utils/iosLoupeKiller.js';
 import { awardBadge } from '../../managers/badgeManager.js';
+import { restartMenuTitleNeon } from '../../menu/menu.js'; // 🆕 neon kick
 
 
 
@@ -629,6 +630,9 @@ function applyMuteVisual(btn) {
 // ────────────────────────────────────────────────────────────────────────────────
 // Navigation
 // ────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
+// Navigation
+// ────────────────────────────────────────────────────────────────────────────────
 function returnToMenu() {
   playTransition(async () => {
     try {
@@ -641,8 +645,18 @@ function returnToMenu() {
     } catch (e) {
       console.error('[kc] returnToMenu: stopKidsMode error', e);
     }
-    document.querySelector(SELECTORS.menuWrapper)?.classList.remove('hidden');
+
+    const menuWrapper = document.querySelector(SELECTORS.menuWrapper);
+    if (menuWrapper) {
+      menuWrapper.classList.remove('hidden');
+    }
+
     applyBackgroundTheme();
+
+    // ✨ SAFARI FIX:
+    // after a heavy mode like Kids Camping, force the main
+    // title's neon animation to restart so it keeps glowing.
+    restartMenuTitleNeon();
   });
 }
 

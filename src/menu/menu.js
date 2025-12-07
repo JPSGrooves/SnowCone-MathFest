@@ -8,6 +8,28 @@ import '../modals/infoModal.js';
 import { playTransition } from '../managers/transitionManager.js';
 import { startMode } from '../managers/sceneManager.js';
 
+// src/menu/menu.js
+
+// 🔁 Force the main title's neon animation to restart.
+// Safari/WKWebView sometimes "freezes" filter animations
+// after modes with heavy CSS/filters. We just toggle the
+// animation property inline to kick the keyframes again.
+export function restartMenuTitleNeon() {
+  const title = document.querySelector('.menu-title-top');
+  if (!title) return;
+
+  // Kill current animation (inline)
+  title.style.animation = 'none';
+
+  // Force a reflow so the browser actually commits that change
+  // eslint-disable-next-line no-unused-expressions
+  title.offsetWidth;
+
+  // Drop back to stylesheet-defined animation
+  title.style.animation = '';
+}
+
+
 // 🍄 Secret XP popup helper ("mushroom popper" visual)
 function spawnMushroomPopup(label, anchorRect) {
   const pop = document.createElement('div');
@@ -104,7 +126,6 @@ export function setupMenu() {
   installMushroomPopper(menuWrapper);
   installHighScoreHitbox(menuWrapper);
 
-
   const labelToMode = {
     kids: 'kids',
     quick: 'quickServe',
@@ -157,6 +178,9 @@ export function setupMenu() {
   });
 
   menuWrapper.classList.remove('hidden');
+
+  // 💡 Make sure the neon cycle is active whenever the menu is visible
+  restartMenuTitleNeon();
 }
 // 🏆 High Score overlay helpers
 function openHighScoreOverlay() {

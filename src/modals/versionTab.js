@@ -9,14 +9,26 @@ import { appState } from '../data/appState.js';
 function exportSaveSnapshot() {
   // 1) First-class exporter if you provide it.
   if (typeof appState?.toJSON === 'function') {
-    try { return appState.toJSON(); } catch {}
+    try {
+      return appState.toJSON();
+    } catch {
+      // fall through
+    }
   }
 
   // 2) Structured clone (modern browsers).
-  try { return structuredClone(appState); } catch {}
+  try {
+    return structuredClone(appState);
+  } catch {
+    // fall through
+  }
 
   // 3) JSON round-trip (skips functions/reactions, may drop non-plain props).
-  try { return JSON.parse(JSON.stringify(appState)); } catch {}
+  try {
+    return JSON.parse(JSON.stringify(appState));
+  } catch {
+    // fall through
+  }
 
   // 4) Minimal curated snapshot (last resort—tweak as your state evolves).
   try {
@@ -38,10 +50,15 @@ function exportSaveSnapshot() {
 function isStandaloneMode() {
   // iOS Safari PWA: navigator.standalone === true
   // Other PWAs: matchMedia('(display-mode: standalone)')
-  return (
-    (window.navigator && window.navigator.standalone === true) ||
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-  );
+  try {
+    return (
+      (window.navigator && window.navigator.standalone === true) ||
+      (window.matchMedia &&
+        window.matchMedia('(display-mode: standalone)').matches)
+    );
+  } catch {
+    return false;
+  }
 }
 
 async function fallbackShareOrOpen(filename, blob) {
@@ -49,7 +66,11 @@ async function fallbackShareOrOpen(filename, blob) {
   try {
     const file = new File([blob], filename, { type: blob.type });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'SnowCone Save', text: 'SnowCone MathFest save file' });
+      await navigator.share({
+        files: [file],
+        title: 'SnowCone Save',
+        text: 'SnowCone MathFest save file',
+      });
       return true;
     }
   } catch {
@@ -89,7 +110,11 @@ async function downloadBlob(filename, blob) {
     a.click();
     // Let the browser grab the bytes before we clean up
     setTimeout(() => {
-      try { URL.revokeObjectURL(url); } catch {}
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        // ignore
+      }
       a.remove();
     }, 1500);
     return true;
@@ -120,8 +145,14 @@ async function downloadJSON(filename, data) {
 
 export function renderVersionTab() {
   const build = window?.devFlags?.build || 'unknown';
-  // (unused) Keeping this note of your prior pattern:
-  // const backup = JSON.stringify(appState, null, 2);
+
+  // Runtime check: are we running as an installed app / standalone PWA?
+  // We gate copy on this so browser users keep the current PWA instructions,
+  // while installed-app users get “native app” style wording.
+  const isApp =
+    typeof window !== 'undefined'
+      ? isStandaloneMode()
+      : false;
 
   return `
     <div class="settings-block">
@@ -144,10 +175,16 @@ export function renderVersionTab() {
       </p>
     </div>
 
-
-
     <div class="settings-block">
       <h3>📲 App Info</h3>
+      ${
+        isApp
+          ? `
+      <p>You’re running the SnowCone MathFest app on this device.</p>
+      <p>Your progress is stored locally in the app’s save data. Deleting the app or clearing its storage will erase your festival progress on this device.</p>
+      <p>You can still back up or move your save using the tools below if you want to jump between devices.</p>
+      `
+          : `
       <p>This app works offline after install!<br>To save your data, don't clear site storage.</p>
       <p>If you're on an iPhone or iPad using Safari:<br>
         Tap the <strong>Share</strong> icon, then choose <strong>"Add to Home Screen"</strong> to install the app.</p>
@@ -155,6 +192,8 @@ export function renderVersionTab() {
         You can install this app for offline play:
       </p>
       <button class="track-button" id="installAppBtn" style="display: none;">📲 Install App</button>
+      `
+      }
     </div>
 
     <div class="settings-block">
@@ -202,9 +241,13 @@ export function setupVersionTabUI() {
           const raw = JSON.stringify(exportSaveSnapshot(), null, 2);
           // Friendly fallback: copy to clipboard as a last resort.
           await navigator.clipboard?.writeText(raw);
-          alert('Copied save JSON to clipboard. Paste into a file named snowcone_save_data.json');
+          alert(
+            'Copied save JSON to clipboard. Paste into a file named snowcone_save_data.json'
+          );
         } catch {
-          alert('⚠️ Could not download or copy save. Try from a regular browser tab instead of PWA.');
+          alert(
+            '⚠️ Could not download or copy save. Try from a regular browser tab instead of PWA.'
+          );
         }
       }
     });
@@ -216,7 +259,9 @@ export function setupVersionTabUI() {
         try {
           localStorage.clear();
           sessionStorage.clear();
-        } catch {}
+        } catch {
+          // ignore
+        }
         location.reload();
       }
     });
@@ -233,9 +278,10 @@ export function setupVersionTabUI() {
       reader.onload = (event) => {
         try {
           // FileReader gives string or ArrayBuffer; ensure string:
-          const text = typeof event.target.result === 'string'
-            ? event.target.result
-            : new TextDecoder().decode(event.target.result);
+          const text =
+            typeof event.target.result === 'string'
+              ? event.target.result
+              : new TextDecoder().decode(event.target.result);
           const incoming = JSON.parse(text);
 
           // Cautious merge: prefer your appState helpers if they exist.
@@ -256,8 +302,11 @@ export function setupVersionTabUI() {
         }
       };
       // Use readAsArrayBuffer → robust TextDecoder path for all encodings
-      try { reader.readAsArrayBuffer(file); }
-      catch { reader.readAsText(file); }
+      try {
+        reader.readAsArrayBuffer(file);
+      } catch {
+        reader.readAsText(file);
+      }
     });
   }
 }
