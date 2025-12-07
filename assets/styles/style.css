@@ -809,7 +809,11 @@ html, body {
 body.modal-open {
   overflow: hidden;
 }
-/* 🍏 iOS-only: push main menu title down ~15% of the viewport */
 :root[data-platform="ios"] .menu-title-top {
-  margin-top: 9vh; /* ⬇️ shove it down ~15% only in the iOS build */
+  margin-top: 6vh;              /* ✂️ no layout push */
+  transform: translateY(4vh); /* 📱 push further only on iOS */
+}
+
+:root[data-platform="ios"] .menu-title-top:hover {
+  transform: translateY(4vh) scale(1.05);
 }
