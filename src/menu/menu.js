@@ -141,7 +141,15 @@ export function setupMenu() {
   const title = document.querySelector('.menu-title-top');
   // openInfoModal is attached globally by infoModal.js
   // eslint-disable-next-line no-undef
-  title?.addEventListener('click', () => openInfoModal('info'));
+  title?.addEventListener('click', () => {
+    if (window.openInfoModal) {
+      console.log('🪩 Title clicked – opening info modal via global');
+      window.openInfoModal(); // no need for the 'info' arg
+    } else {
+      console.warn('⚠️ window.openInfoModal not found');
+    }
+  });
+
 
   autorun(() => {
     const theme = appState.settings?.theme;

@@ -32,24 +32,36 @@ export function closeModal() {
   overlay?.classList.remove('show');
   overlay?.classList.add('hidden');
 }
+function wireOverlayClose() {
+  const overlay = document.getElementById('cosmicOverlay');
+  if (!overlay) return;
 
-function wireOutsideClickClose() {
-  document.addEventListener('click', (e) => {
-    const modal   = document.getElementById('cosmicModal');
-    const overlay = document.getElementById('cosmicOverlay');
+  const handleOverlayHit = (e) => {
+    const modal = document.getElementById('cosmicModal');
+    if (!modal) return;
 
-    if (!modal || !overlay) return;
-
-    // If modal isn't actually open, bail.
+    // If cosmic modal isn't open, bail
     if (modal.classList.contains('hidden')) return;
 
-    // If the click is *inside* the modal box, ignore it.
+    // If the click/tap originated *inside* the modal, ignore
     if (modal.contains(e.target)) return;
 
-    // At this point, modal is open and the click was outside the box:
-    console.log('🌓 Outside click detected – closing cosmic modal');
+    // If the High Score overlay is using the same dimmer, let *that* logic win
+    const hsOverlay = document.getElementById('highScoreOverlay');
+    if (hsOverlay && !hsOverlay.classList.contains('hidden')) {
+      return;
+    }
+
+    console.log('🌓 Cosmic overlay hit (tap/click) – closing cosmic modal');
+    e.stopPropagation();
+    e.preventDefault();
     closeModal();
-  });
+  };
+
+  // 🔑 iOS safety: listen to all three
+  overlay.addEventListener('touchend', handleOverlayHit);
+  overlay.addEventListener('pointerdown', handleOverlayHit);
+  overlay.addEventListener('click', handleOverlayHit);
 }
 
 //////////////////////////////
@@ -123,10 +135,9 @@ function setupTabListeners() {
 //////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
-  wireOutsideClickClose();   // 👈 new call
+  wireOverlayClose();   // 👈 this line is important
   console.log('🧊 Cosmic modal listeners wired.');
 });
-
 
 
 window.openModal = openModal;
