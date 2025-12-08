@@ -48,14 +48,42 @@ function exportSaveSnapshot() {
 }
 
 function isStandaloneMode() {
-  // iOS Safari PWA: navigator.standalone === true
-  // Other PWAs: matchMedia('(display-mode: standalone)')
   try {
-    return (
-      (window.navigator && window.navigator.standalone === true) ||
-      (window.matchMedia &&
-        window.matchMedia('(display-mode: standalone)').matches)
-    );
+    // 0) Native wrapper / WKWebView-style shell (your Xcode app)
+    // Many iOS WebViews expose window.webkit.messageHandlers for JS ↔ native bridges.
+    // We treat that as "app-like" so the copy matches the native experience.
+    if (
+      typeof window !== 'undefined' &&
+      window.webkit &&
+      window.webkit.messageHandlers
+    ) {
+      return true;
+    }
+
+    // 1) iOS Safari PWA launched from home screen
+    if (window.navigator && window.navigator.standalone === true) {
+      return true;
+    }
+
+    // 2) Other installed PWAs (Chrome, Android, desktop)
+    if (
+      window.matchMedia &&
+      window.matchMedia('(display-mode: standalone)').matches
+    ) {
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+// Simple UA sniff just for copy (not logic)
+function isIOSDevice() {
+  try {
+    const ua = window.navigator?.userAgent || '';
+    return /iPhone|iPad|iPod/i.test(ua);
   } catch {
     return false;
   }
@@ -154,6 +182,8 @@ export function renderVersionTab() {
       ? isStandaloneMode()
       : false;
 
+  const isiOSApp = isApp && typeof window !== 'undefined' && isIOSDevice();
+
   return `
     <div class="settings-block">
       <h3>🧠 SnowCone MathFest v1.4.0</h3>
@@ -204,6 +234,18 @@ export function renderVersionTab() {
         <strong>⬇️ Download Save:</strong><br>
         Exports your current game progress (XP, badges, themes) as a <code>.json</code> file.
       </p>
+
+      ${
+        isiOSApp
+          ? `
+      <p>
+        On an iPhone or iPad, you can choose <strong>iCloud Drive</strong> when saving this file
+        if you want a cloud backup. Later, you can re-import that same file on another device
+        to restore your SnowCone festival progress.
+      </p>
+      `
+          : ''
+      }
 
       <p>
         <strong>📤 Import Save:</strong><br>

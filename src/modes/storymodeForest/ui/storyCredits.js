@@ -16,7 +16,7 @@ const CREDITS_LINES = [
   ['Story Mode – Code & Game Logic', 'Jeremy Smith & Patch'],
   ['Original Soundtrack', 'JPS Grooves'],
   ['Art & UI Direction', 'Jeremy Smith'],
-  ['Pink Jeep Background', 'Abery'],
+  ['Pink Expert', 'Abery'],
   ['UX, Layout & Polish', 'Jeremy Smith'],
   ['Relentless Tester', 'Jeremy Smith'],
   ['Chaos Clickers', 'M Boots and G Man'],
