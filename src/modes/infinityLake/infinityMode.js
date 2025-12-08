@@ -18,6 +18,7 @@ import { awardBadge } from '../../managers/badgeManager.js';
 
 
 
+
 let answerBtns = [];
 let score = 0;
 let currentCorrect = null;
@@ -733,4 +734,14 @@ export function finalizeInfinityRun(stats) {
   if (sc >= 50  && seconds <= 120)  awardBadge('inf_50_2min');
   if (sc >= 100 && seconds <= 240)  awardBadge('inf_100_4min');
   if (sc >= 250 && seconds <= 600)  awardBadge('inf_250_10min');
+
+  // 🌀 Legendary Cone: Infinity Flow (100-streak lifetime)
+  try {
+    const longest = Number(appState.profile?.infinityLongestStreak ?? 0);
+    if (longest >= 100) {
+      awardBadge('leg_infinity_flow');
+    }
+  } catch (e) {
+    console.warn('[infinity] failed to award leg_infinity_flow', e);
+  }
 }

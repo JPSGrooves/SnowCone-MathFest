@@ -39,8 +39,120 @@ html, body {
   flex-direction: column;
   opacity: 1;
   transition: opacity 0.5s ease;
+  pointer-events: auto; /* 👈 was none; card + button need clicks */
+}
+
+/* fade-out state driven by JS (startup-hide class) */
+#startup-screen.startup-hide {
+  opacity: 0;
   pointer-events: none;
 }
+
+/* ──────────────────────────────────────────────────────────
+   Startup festival welcome card (under the cone)
+   ────────────────────────────────────────────────────────── */
+
+/* Main card container */
+#startup-screen .startup-festival-card {
+  margin-top: 1.5rem;
+  max-width: 92%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.9rem;
+
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+
+  /* 🔥 make the text actually visible */
+  color: #f6feff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+
+  font-size: clamp(0.9rem, 1.7vw, 1.05rem);
+  line-height: 1.5;
+
+  /* 🌟 NEW: fade in after the cone */
+  opacity: 0;
+  transform: translateY(8px);
+  animation: startupCardIn 0.8s ease-out 2s forwards;
+}
+@keyframes startupCardIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Welcome */
+#startup-screen .startup-welcome-line {
+  margin: 0 0 0.3rem 0;
+  font-weight: 700;
+  font-size: 1.50em;         /* 🔸 slightly bigger than the rest */
+  letter-spacing: 0.03em;    /* tiny bit of breathing room */
+}
+
+/* Streak line under welcome */
+#startup-screen .startup-streak-line {
+  margin: 0 0 0.35rem 0;
+  font-size: 0.9em;
+  opacity: 0.95;
+}
+
+
+
+/* Title / band name */
+#startup-screen .startup-title-line {
+  margin: 0 0 0.3rem 0;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Main line */
+#startup-screen .startup-main-line {
+  margin: 0 0 0.3rem 0;
+}
+
+/* Completion line */
+#startup-screen .startup-progress-line {
+  margin: 0 0 0.25rem 0;
+  opacity: 0.95;
+}
+
+/* Suggestion / badge nudge */
+#startup-screen .startup-suggestion-line {
+  margin: 0 0 0.6rem 0;
+  opacity: 0.9;
+}
+
+/* Play button → simple pill */
+#startup-screen .startup-play-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.25rem;
+  padding: 0.42rem 1.7rem;
+  border-radius: 999px;
+  border: none;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  cursor: pointer;
+
+  background: #f6ff8a;
+  color: #191919;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
+}
+
+#startup-screen .startup-play-btn:active {
+  transform: scale(0.97);
+}
+
 
 .startup-stars {
   position: absolute;

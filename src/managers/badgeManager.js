@@ -1,10 +1,10 @@
 // 📦 src/managers/badgeManager.js
 import { autorun } from 'mobx';
-import { allBadges as badgeDefs } from '../data/badges.js'; // 👈 use the big master list
+import { allBadges as badgeDefs } from '../data/badges.js';
 
-export const allBadges = badgeDefs; // 👈 re-export for callers (like profileTab)
+export const allBadges = badgeDefs;
 
-let store = null; // injected appState lives here
+let store = null;
 
 // 🗂️ Grouping for the grid UI
 const grouped = {
@@ -28,10 +28,16 @@ const grouped = {
     'story_ch4',
     'story_ch5',
   ],
-  '🏆 Completion': [
-    'legend'
+  '🌀 Legendary Cones': [
+    'legend',
+    'leg_festival_regular',
+    'leg_streak30',
+    'leg_infinity_flow',
+    'leg_dual_endings',
+    'leg_menu_cone_clicker',
   ],
 };
+
 
 // 🔐 helpers
 function hasBadge(id) {
@@ -129,13 +135,14 @@ export function renderBadgeGrid() {
 export function initBadgeManager(appStateRef) {
   store = appStateRef;
 
+  // 🌀 Re-render badge grid whenever badge count changes
   autorun(() => {
-    // 👀 explicitly read length so this autorun tracks badge changes
     const _badgeCount = store.profile?.badges?.length || 0;
     const grid = document.getElementById('badgeGrid');
-    if (grid) renderBadgeGrid(); // re-render on count change OR when grid exists
+    if (grid) renderBadgeGrid();
   });
 
+  // 🎉 Badge popup banner
   autorun(() => {
     if (!store) return;
     const popup = store.uiState?.pendingBadgePopup;
@@ -145,13 +152,33 @@ export function initBadgeManager(appStateRef) {
     const banner = document.createElement('div');
     banner.className = 'badge-banner';
     banner.textContent = `🎉 New badge unlocked: ${name}! Check Options ✨`;
-    banner.style.pointerEvents = 'none';       // defense-in-depth
-    banner.setAttribute('role', 'status');     // screen readers can announce
+    banner.style.pointerEvents = 'none';
+    banner.setAttribute('role', 'status');
     banner.setAttribute('aria-live', 'polite');
     document.body.appendChild(banner);
 
     setTimeout(() => banner.remove(), 5000);
     store.clearPendingBadgePopup?.();
+  });
+
+  // 🌙/🏕️ Legendary Cones from daily streak
+  autorun(() => {
+    if (!store) return;
+    const streak = Number(store.profile?.streakDays ?? 0);
+
+    // 7-day: Festival Regular 🌙
+    if (streak >= 7) {
+      try { awardBadge('leg_festival_regular'); } catch (e) {
+        console.warn('[badges] failed to award leg_festival_regular', e);
+      }
+    }
+
+    // 30-day: Festival Local 🏕️
+    if (streak >= 30) {
+      try { awardBadge('leg_streak30'); } catch (e) {
+        console.warn('[badges] failed to award leg_streak30', e);
+      }
+    }
   });
 }
 // 🔔 JUKEBOX-ONLY "play music" badge

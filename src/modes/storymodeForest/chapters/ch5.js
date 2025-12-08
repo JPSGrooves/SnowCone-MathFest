@@ -316,10 +316,20 @@ export const Chapter5 = {
 
 
   ],
-  onFinish: ({ appState }) => {
+    onFinish: ({ appState }) => {
     const a = appState || globalAppState;
     try {
+      // Normal chapter badge
       awardBadge('story_ch5');
+
+      // 🌀 Legendary Cone: Dual Endings
+      const haveWay    = typeof a.getFlag === 'function' ? a.getFlag('ending_way_home', false)    : !!(a.flags && a.flags.ending_way_home);
+      const haveDriver = typeof a.getFlag === 'function' ? a.getFlag('ending_driver_loop', false) : !!(a.flags && a.flags.ending_driver_loop);
+
+      if (haveWay && haveDriver) {
+        awardBadge('leg_dual_endings');
+      }
+
       a.saveToStorage?.();
     } catch (e) {
       console.warn('[ch5] onFinish failed', e);

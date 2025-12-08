@@ -812,7 +812,7 @@ const unlockedCh5 =
             <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue</button>
 
             <button class="sm-btn sm-btn-primary" id="smCh1">
-              Chapter 1 — At the Gates
+              Chapter 1 — I got a Ticket!
             </button>
 
             <button
@@ -820,7 +820,7 @@ const unlockedCh5 =
                id="smCh2"
                ${unlockedCh2 ? '' : 'disabled title="Find the Perfect SnowCone in Chapter 1 to unlock"'}
              >
-               Chapter 2 — The Four Customers
+               Chapter 2 — Four Customers
             </button>
 
             <button
@@ -828,7 +828,7 @@ const unlockedCh5 =
                id="smCh3"
                ${unlockedCh3 ? '' : 'disabled title="Finish Chapter 2 to unlock"'}
             >
-               Chapter 3 — The Music Acts
+               Chapter 3 — See the Music
             </button>
 
             <button

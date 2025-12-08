@@ -7,6 +7,8 @@ import { applyBackgroundTheme } from '../managers/backgroundManager.js';
 import '../modals/infoModal.js';
 import { playTransition } from '../managers/transitionManager.js';
 import { startMode } from '../managers/sceneManager.js';
+import { awardBadge } from '../managers/badgeManager.js'; 
+
 
 // src/menu/menu.js
 
@@ -73,9 +75,29 @@ function installMushroomPopper(menuWrapper) {
     ev.preventDefault();
 
     try {
+      // +1 XP per tap (existing behavior)
       appState.addXP(1);
+
+      // 🧮 Track lifetime cone taps via flags
+      const prev = typeof appState.getFlag === 'function'
+        ? Number(appState.getFlag('menuConeClicks', 0) || 0)
+        : Number((appState.flags && appState.flags.menuConeClicks) || 0);
+
+      const next = prev + 1;
+
+      if (typeof appState.setFlag === 'function') {
+        appState.setFlag('menuConeClicks', next);
+      } else {
+        appState.flags = appState.flags || {};
+        appState.flags.menuConeClicks = next;
+      }
+
+      // 🌀 Legendary Cone: Cone Clicker (1000 taps)
+      if (next >= 1000) {
+        awardBadge('leg_menu_cone_clicker');
+      }
     } catch (err) {
-      console.warn('🍄 Mushroom popper XP failed', err);
+      console.warn('🍄 Mushroom popper XP/Legendary failed', err);
     }
 
     const rect = btn.getBoundingClientRect();
@@ -86,7 +108,6 @@ function installMushroomPopper(menuWrapper) {
 
   menuWrapper.appendChild(btn);
 }
-
 /**
  * 🔢 Fill high score panel with current profile values
  * Right now we feature Infinity Lake (canonical high score).
@@ -233,23 +254,27 @@ function closeHighScoreOverlay() {
 }
 // 🏆 Install High Score hitbox over the truck
 // 🏆 Install High Score hitbox over the truck
+// 🏆 Install High Score hitbox over the truck
+// 🏆 Install High Score hitbox over the truck
 function installHighScoreHitbox(menuWrapper) {
   if (!menuWrapper) return;
 
-  const btn     = menuWrapper.querySelector('.menu-highscore-hitbox');
-  const overlay = document.getElementById('highScoreOverlay');
+  const btn      = menuWrapper.querySelector('.menu-highscore-hitbox');
+  const overlay  = document.getElementById('highScoreOverlay');
   const closeBtn = overlay?.querySelector('.hs-close-btn');
   const dimmer   = document.getElementById('cosmicOverlay');
 
   if (!btn || !overlay) return;
 
-  const handleTap = (ev) => {
+  // ✅ Use CLICK instead of pointerdown so the target element
+  // is locked before the dimmer/overlay appear.
+  const handleClick = (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
     openHighScoreOverlay();
   };
 
-  btn.addEventListener('pointerdown', handleTap);
+  btn.addEventListener('click', handleClick);
 
   // ✖ explicit close button
   closeBtn?.addEventListener('click', (ev) => {
@@ -264,9 +289,9 @@ function installHighScoreHitbox(menuWrapper) {
     }
   });
 
-  // 🖱️ NEW: click anywhere outside the card to close
+  // 🖱️ Click anywhere outside the card to close
   overlay.addEventListener('click', (ev) => {
-    // if the click is NOT inside .hs-card, close it
+    // Only close if the click is *not* inside the card
     if (!ev.target.closest('.hs-card')) {
       closeHighScoreOverlay();
     }

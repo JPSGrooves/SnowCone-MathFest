@@ -1,4 +1,4 @@
-// /src/tabs/profileTab.js — single-source completion (badges-only model)
+// /src/tabs/profileTab.js — completion bar + Legendary copy
 
 import { appState } from '../data/appState.js';
 import { renderBadgeGrid, allBadges } from '../managers/badgeManager.js';
@@ -7,9 +7,20 @@ import { COMPLETION_CONFIG } from '../managers/completionManager.js';
 export function renderProfileTab() {
   // For the “how to” copy only:
   const caps = COMPLETION_CONFIG?.xpCaps || { global: 5000, story: 0, kidsCamping: 0, quickServe: 0, infinity: 0 };
-  const extraCap = Math.max(0, (caps.global || 0) - ((caps.story || 0) + (caps.kidsCamping || 0) + (caps.quickServe || 0) + (caps.infinity || 0)));
+  const extraCap = Math.max(
+    0,
+    (caps.global || 0) -
+      ((caps.story || 0) + (caps.kidsCamping || 0) + (caps.quickServe || 0) + (caps.infinity || 0))
+  );
 
-  const nonLegendTotal = Object.keys(allBadges).filter(id => id !== 'legend').length;
+  // 🔎 Pull counts from the same math the bar uses
+  const breakdown = appState.getCompletionBreakdown
+    ? appState.getCompletionBreakdown()
+    : null;
+
+  const nonLegendTotal =
+    breakdown?.badges?.nonLegendTotal ??
+    Object.keys(allBadges).filter(id => id !== 'legend').length;
 
   return `
     <div class="settings-block">
@@ -18,7 +29,7 @@ export function renderProfileTab() {
     </div>
 
     <div class="settings-block">
-      <h3>📈 Completion</h3>
+      <h3>📈 Legendary Cones</h3>
       <div class="xp-bar-wrap">
         <div class="xp-bar" id="xpBar"></div>
       </div>
@@ -34,8 +45,9 @@ export function renderProfileTab() {
     <div class="settings-block">
       <h3>🎯 How to reach 100%</h3>
       <ul class="completion-brief">
-        <li><strong>Badges (95%)</strong> — Unlock all <strong>${nonLegendTotal}</strong> non-legend badges.</li>
+        <li><strong>Badges (95%)</strong> — Unlock all <strong>${nonLegendTotal}</strong> core (non-legendary) badges.</li>
         <li><strong>Legend (5%)</strong> — After that, the <em>Legend</em> badge completes the bar.</li>
+        <li><strong>Bonus Legendary Cones (0%)</strong> — Extra long-arc flex badges that don’t move the % bar.</li>
       </ul>
     </div>
   `;

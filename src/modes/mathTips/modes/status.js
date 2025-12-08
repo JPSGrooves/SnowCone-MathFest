@@ -6,6 +6,7 @@
 import { composeReply } from '../conversationPolicy.js';
 import { helpCard } from './_kit.js';
 import { appState } from '../../../data/appState.js';
+import { awardBadge } from '../../../managers/badgeManager.js';
 
 // ───────────────────────────────────────────────────────────────────────────────
 // Exported helper used by qabot.js (keep signature + markup stable)
@@ -146,7 +147,7 @@ export function handle(text = '') {
 
   // streak
   if (/streak|days\s+in\s+a\s+row/.test(t)) {
-    const streak = Number(appState?.profile?.streak ?? 0);
+    const streak = Number(appState?.profile?.streakDays ?? 0);
     return {
       html: composeReply({
         part: { html: `<p>you’ve visited ${streak} day${streak === 1 ? '' : 's'} in a row.</p>` },
@@ -201,5 +202,7 @@ export function handle(text = '') {
     })
   };
 }
+
+
 
 export default { start, handle, renderBoothsHelp };

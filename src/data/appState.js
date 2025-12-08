@@ -229,19 +229,33 @@ class AppState {
   getCompletionPercent() {
     try {
       const owned = new Set(this.profile?.badges || []);
-      const allIds = Object.keys(BADGES || {});
-      const nonLegendIds = allIds.filter(id => id !== 'legend');
+
+      // entries: [id, meta] so we can honor legendary flag
+      const allEntries = Object.entries(BADGES || {});
+
+      // Only "core" badges (exclude legend + any legendary extras)
+      const nonLegendEntries = allEntries.filter(([id, meta]) => {
+        if (id === 'legend') return false;
+        if (meta && meta.legendary) return false;
+        return true;
+      });
+
+      const nonLegendIds = nonLegendEntries.map(([id]) => id);
 
       const nonLegendOwned = nonLegendIds.filter(id => owned.has(id)).length;
-      const haveLegend = owned.has('legend');
+      const haveLegend     = owned.has('legend');
 
-      const nonLegendFrac = nonLegendIds.length ? (nonLegendOwned / nonLegendIds.length) : 0;
+      const nonLegendFrac = nonLegendIds.length
+        ? (nonLegendOwned / nonLegendIds.length)
+        : 0;
+
       const pct = (nonLegendFrac * 95) + (haveLegend ? 5 : 0);
 
       return Math.round(Math.min(100, Math.max(0, pct)));
     } catch {
+      // Fallback: approximate, still only giving 5% for legend
       const haveLegend = !!this.profile?.badges?.includes?.('legend');
-      const total = (this.profile?.badges || []).length;
+      const total      = (this.profile?.badges || []).length;
       const nonLegendOwned = haveLegend ? (total - 1) : total;
       const approx = (nonLegendOwned / Math.max(1, total)) * 95 + (haveLegend ? 5 : 0);
       return Math.round(Math.min(100, Math.max(0, approx)));
@@ -250,13 +264,22 @@ class AppState {
 
   getCompletionBreakdown() {
     const owned = new Set(this.profile?.badges || []);
-    const allIds = Object.keys(BADGES || {});
-    const nonLegendIds = allIds.filter(id => id !== 'legend');
+    const allEntries = Object.entries(BADGES || {});
+
+    const nonLegendEntries = allEntries.filter(([id, meta]) => {
+      if (id === 'legend') return false;
+      if (meta && meta.legendary) return false;
+      return true;
+    });
+
+    const nonLegendIds = nonLegendEntries.map(([id]) => id);
 
     const nonLegendOwned = nonLegendIds.filter(id => owned.has(id)).length;
-    const haveLegend = owned.has('legend');
+    const haveLegend     = owned.has('legend');
 
-    const nonLegendFrac = nonLegendIds.length ? (nonLegendOwned / nonLegendIds.length) : 0;
+    const nonLegendFrac = nonLegendIds.length
+      ? (nonLegendOwned / nonLegendIds.length)
+      : 0;
 
     const totalPercent = Math.round(
       Math.min(100, (nonLegendFrac * 95) + (haveLegend ? 5 : 0))
@@ -448,19 +471,26 @@ class AppState {
     const today = this.getNYDayKey();
     const last  = this.profile.lastStreakDayKey;
 
+    // first ever visit
     if (!last) {
       this.profile.lastStreakDayKey = today;
       this.profile.streakDays = 1;
       return this.profile.streakDays;
     }
-    if (last === today) return this.profile.streakDays;
 
+    // already counted today
+    if (last === today) {
+      return this.profile.streakDays;
+    }
+
+    // check if we continued from "yesterday" (NY time)
     const yest = this.getNYDayKey(Date.now() - 86400000);
-    this.profile.streakDays = (last === yest) ? (this.profile.streakDays + 1) : 1;
+    this.profile.streakDays =
+      (last === yest) ? (this.profile.streakDays + 1) : 1;
+
     this.profile.lastStreakDayKey = today;
     return this.profile.streakDays;
   }
-
   // ── Badges / Themes ─────────────────────────────────────────────────────────
   hasBadge(id) {
     return Array.isArray(this.profile.badges) && this.profile.badges.includes(id);

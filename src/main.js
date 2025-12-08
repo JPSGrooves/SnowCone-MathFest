@@ -11,6 +11,7 @@ import { initBadgeManager } from './managers/badgeManager.js';
 import { startAchievementsWatcher } from './achievementsWatcher.js';
 
 import { wireMusicVisibilityGuard } from './managers/musicVisibility.js';
+import { renderFestivalWelcomeOnStartup } from './ui/festivalWelcomeView.js'; 
 
 // 🍧 Anti–Double-Tap Zoom Shield (esp. iOS Safari)
 let lastTouchTime = 0;
@@ -99,8 +100,8 @@ function attachDevHarness() {
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📦 DOM ready. Starting app...');
-  initBadgeManager(appState); // 1) init badge store
-  startAchievementsWatcher(appState); // 2) wire autoruns AFTER manager
+  initBadgeManager(appState);          // 1) init badge store
+  startAchievementsWatcher(appState);  // 2) wire autoruns AFTER manager
   if (import.meta.env.DEV) attachDevHarness();
 
   applyBackgroundTheme();
@@ -122,14 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Found #startup-screen');
   }
 
-  setTimeout(() => {
-    console.log('🕒 Fading out startup...');
-    startup.style.opacity = 0;
-
-    setTimeout(() => {
-      console.log('🔥 Removing startup, launching menu...');
-      startup.remove();
-      setupMenu();
-    }, 600);
-  }, 2500);
+  // 🧊 Render the Festival Progress card under the cone.
+  // When the player taps "Play Game", we fade out and launch the menu.
+  renderFestivalWelcomeOnStartup(() => {
+    console.log('🔥 Launching menu from startup Play Game…');
+    setupMenu();
+  });
 });

@@ -11,11 +11,11 @@ export const allBadges = {
   talk_grampy:    { label: 'Chatty Cat 😺',   short: 'Talk to Grampy P',   png: 'snowconebadge.png', unlocks: null },
 
   // 🧸 Kids Mode
-  kids_cars_speed:    { label: 'Grid Sprint 🚗',    short: 'Park cars < 60s',   png: 'snowconebadge.png', unlocks: 'spring' },
-  kids_camp_10k:      { label: 'Camper 🏕️',        short: 'Camping 10,000',    png: 'snowconebadge.png', unlocks: 'harvest' },
-  kids_mosquito:      { label: 'Mosquito Slayer 🦟',short: 'Squash the skeeter',png: 'snowconebadge.png', unlocks: 'newyear' },
-  kids_ants_streak10: { label: 'Ant Nemesis 🐜',    short: 'Beat red ants ×10', png: 'snowconebadge.png', unlocks: 'halloween' },
-  kids_tents_all:     { label: 'Starlit Tents ⛺',  short: 'Light all tents',    png: 'snowconebadge.png', unlocks: 'christmas' },
+  kids_cars_speed:    { label: 'Grid Sprint 🚗',     short: 'Park Cars < 60s',    png: 'snowconebadge.png', unlocks: 'spring' },
+  kids_camp_10k:      { label: 'Camper 🏕️',         short: 'Camping 10,000',     png: 'snowconebadge.png', unlocks: 'harvest' },
+  kids_mosquito:      { label: 'Mosquito Slayer 🦟', short: 'Squash the Skeeter', png: 'snowconebadge.png', unlocks: 'newyear' },
+  kids_ants_streak10: { label: 'Ant Nemesis 🐜',     short: 'Beat Red Ants ×10',  png: 'snowconebadge.png', unlocks: 'halloween' },
+  kids_tents_all:     { label: 'Starlit Tents ⛺',   short: 'Light All Tents',     png: 'snowconebadge.png', unlocks: 'christmas' },
 
   // ⚡ Quick Serve (25 / 50 / 75 / 100)
   quick_25:   { label: 'QS 25 ⚡',   short: 'QS: 25pts',   png: 'snowconebadge.png', unlocks: null },
@@ -29,13 +29,12 @@ export const allBadges = {
   inf_100_4min:  { label: '100 🔁',  short: '100 in 4m',   png: 'snowconebadge.png', unlocks: 'valentine' },
   inf_250_10min: { label: '250 🔁',  short: '250 in 10m',  png: 'snowconebadge.png', unlocks: 'cosmic_06' },
 
-  // 📖 Story (prologue only)
   // 📖 Story – one per chapter
   story_prologue: { 
     label: 'Prologue 📖', 
     short: 'Finish Prologue', 
     png: 'snowconebadge.png', 
-    unlocks: 'cosmic_02'       // keep your current unlock here
+    unlocks: 'cosmic_02'
   },
   story_ch1: {
     label: 'Chapter 1 📖',
@@ -68,7 +67,44 @@ export const allBadges = {
     unlocks: null
   },
 
-  // 🏆 Completion
+  // 🌀 Legendary Cones (bonus flex goals – do NOT affect 100% math)
+  leg_festival_regular: {
+    label: 'Festival Regular 🌙',
+    short: '7 Day Streak!',
+    png: 'snowconebadge.png',
+    unlocks: null,
+    legendary: true,
+  },
+  leg_streak30: {
+    label: 'Festival Local 🏕️',
+    short: '30 Day Streak!',
+    png: 'snowconebadge.png',
+    unlocks: null,
+    legendary: true,
+  },
+  leg_infinity_flow: {
+    label: 'Infinity Flow ♾️',
+    short: 'IL 100-Streak',
+    png: 'snowconebadge.png',
+    unlocks: null,
+    legendary: true,
+  },
+  leg_dual_endings: {
+    label: 'Dual Endings 🎭',
+    short: 'Both Story Endings',
+    png: 'snowconebadge.png',
+    unlocks: null,
+    legendary: true,
+  },
+  leg_menu_cone_clicker: {
+    label: 'Cone Clicker 🍧',
+    short: 'Tap Cone 1000×',
+    png: 'snowconebadge.png',
+    unlocks: null,
+    legendary: true,
+  },
+
+  // 🏆 Completion capstone
   legend: { 
     label: 'Legend 🏆', 
     short: '100% Game', 
@@ -78,4 +114,4 @@ export const allBadges = {
 };
 
 // Handy constant for UIs (e.g., Math Tips intro bubble)
-export const TOTAL_BADGES = Object.keys(allBadges).length; // → 26
+export const TOTAL_BADGES = Object.keys(allBadges).length;
