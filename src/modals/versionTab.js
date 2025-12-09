@@ -190,21 +190,6 @@ export function renderVersionTab() {
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
-
-    <div class="settings-block">
-      <h3>v1.4.0 — High Score Release + Credits &amp; Music Guard ✨</h3>
-      <p>
-        – 🚚 <strong>Truck-tap High Score HUD</strong>: invisible <code>.menu-highscore-hitbox</code> now rides on top of the festival truck on the main menu; keyboard-focusable and scaled to the 11:16 stage so tapping the truck pops stats on phones and desktop without adding a new mode<br>
-        – 📈 <strong>High Score overlay card</strong>: new <code>#highScoreOverlay</code> dialog reuses the cosmic dimmer to show Camping Score, QuickServe best run, and Infinity high score + longest streak in a compact neon card that fits even tiny phones<br>
-        – 🎧 <strong>App-wide music visibility guard</strong>: <code>wireMusicVisibilityGuard()</code> in <code>main.js</code> listens for <code>visibilitychange</code> and pauses whatever track was playing when the tab/app goes to the background, then resumes only that track on return for proper “native app” lock/unlock behavior<br>
-        – 🎛️ <strong>QuickServe private booth guard</strong>: <code>attachQuickServeVisibilityGuard()</code> in <code>quickServeMusic.js</code> keeps its own <code>qsWasPlayingOnHide</code> flag so QS music pauses/resumes cleanly without fighting the global guard or resurrecting dead runs after result popups<br>
-        – ♾️ <strong>Infinity Lake high score pipeline</strong>: end-of-run handler now updates score, streak, longest streak, and solved count in <code>appState</code>, calls <code>checkInfinityBadgesByScore()</code> off score + elapsed time, and only bumps High Score / Longest Streak when you actually beat your previous record<br>
-        – 🎬 <strong>Story credits layout + safety net</strong>: credits viewport (<code>.sm-credits-list</code>) gets a real min-height so lines don’t clip; blackout hand-off uses <code>animationend</code> + a 600ms timeout fallback to guarantee <code>showStoryCredits()</code> runs even on cranky mobile Safari<br>
-        – 🍬 <strong>Toasts moved under the “movie”</strong>: <code>.pickup-stack</code> and Story XP popups are anchored just above the bottom bar so inventory/XP toasts still fire but never sit on top of the credits; <code>THANK_YOU_TEXT</code> adds a soft promo outro (tell a friend, search “SnowCone MathFest” / “JPS Grooves”) as data-only copy you can tweak anytime<br>
-        – ⭐ <strong>Next</strong>: Light copy/visual polish on the High Score card, wire any final Infinity/QuickServe badge tiers off the new data, and decide if the credits “thank you” should appear on first-clear only or every lap through the forest
-      </p>
-    </div>
-
     <div class="settings-block">
       <h3>📲 App Info</h3>
       ${
@@ -215,7 +200,7 @@ export function renderVersionTab() {
       <p>You can still back up or move your save using the tools below if you want to jump between devices.</p>
       `
           : `
-      <p>This app works offline after install!<br>To save your data, don't clear site storage.</p>
+      <p>You can install this app!<br>To save your data, don't clear site storage.</p>
       <p>If you're on an iPhone or iPad using Safari:<br>
         Tap the <strong>Share</strong> icon, then choose <strong>"Add to Home Screen"</strong> to install the app.</p>
       <p>If you're using Android or Chrome:<br>
@@ -225,6 +210,26 @@ export function renderVersionTab() {
       `
       }
     </div>
+
+    ${
+      !isApp
+        ? `
+    <div class="settings-block">
+      <h3>🍎 Get the iOS App</h3>
+      <p>
+        Playing in the browser? On iPhone or iPad you can grab the
+        <strong>SnowCone MathFest</strong> app from the App Store for a more “regular app”
+        feel with Screen Time &amp; parental controls.
+      </p>
+      <button class="track-button" id="openIOSAppBtn">🍎 Open App Store</button>
+      <p style="font-size: 0.8em; opacity: 0.85; margin-top: 0.4rem;">
+        For now this opens the main App Store page. Once the festival is live on iOS,
+        this will jump straight to the SnowCone MathFest listing.
+      </p>
+    </div>
+        `
+        : ''
+    }
 
     <div class="settings-block">
       <h3>🧰 Tools</h3>
@@ -263,6 +268,21 @@ export function renderVersionTab() {
       <button class="track-button" id="importSaveBtn">📤 Import Save</button>
       <button class="track-button" id="resetProgress">☠️ Reset Progress</button>
     </div>
+    
+    <div class="settings-block">
+      <h3>v1.4.0 — High Score Release + Credits &amp; Music Guard ✨</h3>
+      <p>
+        – 🚚 <strong>Truck-tap High Score HUD</strong>: invisible <code>.menu-highscore-hitbox</code> now rides on top of the festival truck on the main menu; keyboard-focusable and scaled to the 11:16 stage so tapping the truck pops stats on phones and desktop without adding a new mode<br>
+        – 📈 <strong>High Score overlay card</strong>: new <code>#highScoreOverlay</code> dialog reuses the cosmic dimmer to show Camping Score, QuickServe best run, and Infinity high score + longest streak in a compact neon card that fits even tiny phones<br>
+        – 🎧 <strong>App-wide music visibility guard</strong>: <code>wireMusicVisibilityGuard()</code> in <code>main.js</code> listens for <code>visibilitychange</code> and pauses whatever track was playing when the tab/app goes to the background, then resumes only that track on return for proper “native app” lock/unlock behavior<br>
+        – 🎛️ <strong>QuickServe private booth guard</strong>: <code>attachQuickServeVisibilityGuard()</code> in <code>quickServeMusic.js</code> keeps its own <code>qsWasPlayingOnHide</code> flag so QS music pauses/resumes cleanly without fighting the global guard or resurrecting dead runs after result popups<br>
+        – ♾️ <strong>Infinity Lake high score pipeline</strong>: end-of-run handler now updates score, streak, longest streak, and solved count in <code>appState</code>, calls <code>checkInfinityBadgesByScore()</code> off score + elapsed time, and only bumps High Score / Longest Streak when you actually beat your previous record<br>
+        – 🎬 <strong>Story credits layout + safety net</strong>: credits viewport (<code>.sm-credits-list</code>) gets a real min-height so lines don’t clip; blackout hand-off uses <code>animationend</code> + a 600ms timeout fallback to guarantee <code>showStoryCredits()</code> runs even on cranky mobile Safari<br>
+        – 🍬 <strong>Toasts moved under the “movie”</strong>: <code>.pickup-stack</code> and Story XP popups are anchored just above the bottom bar so inventory/XP toasts still fire but never sit on top of the credits; <code>THANK_YOU_TEXT</code> adds a soft promo outro (tell a friend, search “SnowCone MathFest” / “JPS Grooves”) as data-only copy you can tweak anytime<br>
+        – ⭐ <strong>Next</strong>: Light copy/visual polish on the High Score card, wire any final Infinity/QuickServe badge tiers off the new data, and decide if the credits “thank you” should appear on first-clear only or every lap through the forest
+      </p>
+    </div>
+
   `;
 }
 
@@ -271,6 +291,15 @@ export function setupVersionTabUI() {
   const resetBtn = document.getElementById('resetProgress');
   const importBtn = document.getElementById('importSaveBtn');
   const importInput = document.getElementById('importSave');
+
+  // 🍎 “Get the iOS App” CTA – browser only
+  const openIOSAppBtn = document.getElementById('openIOSAppBtn');
+  if (openIOSAppBtn) {
+    openIOSAppBtn.addEventListener('click', () => {
+      // Temporary: take them to the App Store homepage
+      window.open('https://www.apple.com/app-store/', '_blank', 'noopener,noreferrer');
+    });
+  }
 
   if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
@@ -294,6 +323,9 @@ export function setupVersionTabUI() {
       }
     });
   }
+
+  // ...rest of setupVersionTabUI unchanged...
+
 
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
@@ -349,6 +381,16 @@ export function setupVersionTabUI() {
       } catch {
         reader.readAsText(file);
       }
+    });
+  }
+
+  // 📲 Wire "Open App Store Page" CTA (browser-only; not rendered when isApp === true)
+  const iosBtn = document.getElementById('openIOSAppBtn');
+  if (iosBtn) {
+    iosBtn.addEventListener('click', () => {
+      // 🔗 TODO: replace with your real App Store URL
+      const url = 'https://example.com/snowcone-mathfest-ios';
+      window.open(url, '_blank', 'noopener,noreferrer');
     });
   }
 }
