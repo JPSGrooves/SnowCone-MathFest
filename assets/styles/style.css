@@ -144,8 +144,8 @@ html, body {
   font-size: clamp(0.9rem, 1.6vw, 1.05rem);
   cursor: pointer;
 
-  background: #f6ff8a;
-  color: #191919;
+  background: linear-gradient(135deg, #fffd9a 0%, #ff80f0 50%, #80fff1 100%);
+  color: #101020;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
 }
 
