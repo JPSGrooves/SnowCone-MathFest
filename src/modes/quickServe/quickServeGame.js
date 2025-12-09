@@ -7,14 +7,11 @@ import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { showMenu } from '../../managers/sceneManager.js';
 import { playCorrect, playIncorrect } from './soundFX.js';
 import { stopQS, playQSRandomTrack } from './quickServeMusic.js';
-import { renderGameUI } from './quickServe.js'; // 💥 Need to export this!
+import { renderGameUI, showQuickServeResults } from './quickServe.js';
 import { generateProblem } from '../../logic/mathBrain.js';
 import { launchConfetti } from '../../utils/confetti.js';
 import { maybeAwardQuickServeBadges, finalizeQuickServeRun } from './quickServeBadges.js';
 import { awardBadge } from '../../managers/badgeManager.js';
-
-
-
 
 //////////////////////////////
 // 🔥 Game State
@@ -31,6 +28,22 @@ let currentCorrectAnswer = 0;
 let currentXP = 3;
 let currentPoints = 1;
 let totalSessionXP = 0;
+
+// 📊 Session stats for the result overlay
+let totalServed = 0;
+let totalMissed = 0;
+let easyMisses = 0;
+let mediumMisses = 0;
+let hardMisses = 0;
+
+// 🧮 Last missed problem (for Phil’s specific hint)
+let lastMissedEquation = null;
+let lastMissedAnswer = null;
+let lastMissedMode = null;
+
+// 🧠 meta for the current problem & last missed one
+let currentProblemMeta = null;
+let lastMissedMeta = null;
 
 //////////////////////////////
 // 🚀 Scene Lifecycle
@@ -91,11 +104,9 @@ export function setMathMode(mode) {
   console.log(`🌈 Mode set to: ${mode}`);
 }
 
-
 export function setCurrentAnswer(val) {
   currentAnswer = val;
 }
-
 
 //////////////////////////////
 // 🎮 Runtime Logic
@@ -105,6 +116,25 @@ function resetGameState() {
   timeRemaining = 105;
   currentAnswer = '';
   gameRunning = false;
+
+  // 🍧 per-run XP tally
+  totalSessionXP = 0;
+
+  // 📊 per-run stats for the result popup
+  totalServed = 0;
+  totalMissed = 0;
+  easyMisses = 0;
+  mediumMisses = 0;
+  hardMisses = 0;
+
+  // 🧮 clear last-miss memory
+  lastMissedEquation = null;
+  lastMissedAnswer = null;
+  lastMissedMode = null;
+  lastMissedMeta = null;
+
+  // 🧠 clear current meta
+  currentProblemMeta = null;
 }
 
 function startGame() {
@@ -118,6 +148,7 @@ function startGame() {
 
   renderProblem();
 }
+
 function highlightModeButton(mode) {
   const map = {
     addSub: 'plusMinus',
@@ -130,7 +161,6 @@ function highlightModeButton(mode) {
     btn.classList.toggle('active-mode', btn.id === activeId);
   });
 }
-
 
 function modeToButtonId(mode) {
   switch (mode) {
@@ -152,26 +182,53 @@ function startTimer() {
     timerDisplay.textContent = formatTime(timeRemaining);
 
     if (timeRemaining <= 0) {
+      // 🎯 snapshot the old high score BEFORE finalize mutates it
+      const prevHigh = appState.profile?.qsHighScore ?? 0;
+
       finalizeQuickServeRun(score);
+
+      const didBeatHigh = score > prevHigh;
+
       clearInterval(timerInterval);
-      endGame();
+      endGame(didBeatHigh);
     }
   }, 1000);
 }
 
-function endGame() {
+function endGame(didBeatHighScore = false) {
   gameRunning = false;
   clearInterval(timerInterval);
   phil.philCelebrate();
   gridFX.stopGridPulse();
 
-  // ✅ finalizeQuickServeRun(score) already ran in the timer branch.
-  // that function updates XP, badges, and high score.
-  // just render the results UI off of the now-updated appState.
-  showResultScreen();
+  // 🌟 New: detect a "perfect shift"
+  const perfectRun = totalServed > 0 && totalMissed === 0;
+
+  // 🎉 Confetti if high score OR perfect run
+  if (didBeatHighScore || perfectRun) {
+    launchConfetti();
+  }
+
+  // 🧠 hand stats + last missed (with meta) to the Phil overlay in quickServe.js
+  showQuickServeResults({
+    score,
+    served:       totalServed,
+    missed:       totalMissed,
+    easyMisses,
+    mediumMisses,
+    hardMisses,
+    lastMissed: lastMissedEquation && lastMissedAnswer != null
+      ? {
+          eq:     lastMissedEquation,     // "7 × 8"
+          answer: lastMissedAnswer,       // 56
+          mode:   lastMissedMode,         // 'multiDiv', etc.
+          meta:   lastMissedMeta || null, // full step info from mathBrain (if any)
+        }
+      : null,
+    // 🌟 pass this through for the popup to show a little line
+    perfectRun,
+  });
 }
-
-
 
 //////////////////////////////
 // 🔢 Game Functions
@@ -191,8 +248,6 @@ function updateScore() {
   const scoreDisplay = document.getElementById('qsScore');
   if (scoreDisplay) scoreDisplay.textContent = score;
 }
-
-
 
 function submitAnswer() {
   const problemEl = document.getElementById('mathProblem');
@@ -214,8 +269,10 @@ function submitAnswer() {
   }
 }
 
-
 function handleCorrect() {
+  // 📊 one more cone successfully served
+  totalServed++;
+
   // 🎯 score exactly by mode points (no double bump)
   score += currentPoints;
   updateScore();
@@ -242,10 +299,35 @@ function handleCorrect() {
   renderProblem();
 }
 
-
-
-
 function handleIncorrect() {
+  // 📊 track a miss + which lane it came from
+  totalMissed++;
+
+  switch (currentMathMode) {
+    case 'addSub':
+      easyMisses++;
+      break;
+    case 'multiDiv':
+      mediumMisses++;
+      break;
+    case 'algebra':
+      hardMisses++;
+      break;
+  }
+
+  // 🧮 remember the last missed equation + correct answer + meta
+  const problemEl = document.getElementById('mathProblem');
+  if (problemEl) {
+    // renderProblem() formats like "7 × 8 = ?"
+    const rawText = problemEl.textContent || '';
+    lastMissedEquation = rawText.replace('= ?', '').trim(); // "7 × 8"
+  } else {
+    lastMissedEquation = null;
+  }
+  lastMissedAnswer = currentCorrectAnswer;
+  lastMissedMode = currentMathMode;
+  lastMissedMeta = currentProblemMeta || null;
+
   showResultMsg(false, 0);
   gridFX.bumpGridGlow('bad');
   phil.triggerGlitch();
@@ -256,12 +338,19 @@ function handleIncorrect() {
   updateAnswerDisplay();
 }
 
-
 function renderProblem() {
-  const { equation, answer, xp = 3, points = 1 } = generateProblem(currentMathMode);
+  const {
+    equation,
+    answer,
+    xp = 3,
+    points = 1,
+    meta = null,
+  } = generateProblem(currentMathMode);
+
   currentCorrectAnswer = answer;
   currentXP = xp;
   currentPoints = points;
+  currentProblemMeta = meta;
 
   const problemEl = document.getElementById('mathProblem');
   if (problemEl) {
@@ -269,8 +358,6 @@ function renderProblem() {
     problemEl.dataset.answer = answer.toString();
   }
 }
-
-
 
 function showResultMsg(isCorrect, xp = 0) {
   const resultMsg = document.getElementById('qsResultMsg');
@@ -298,85 +385,12 @@ function showResultMsg(isCorrect, xp = 0) {
   }, 1500);
 }
 
-
 function checkBadgeUnlock() {
   const xp = Number(appState.profile?.xp) || 0;
   const has = (appState.profile?.badges || []).includes('cone_master');
   if (xp >= 100 && !has) {
     awardBadge('cone_master');
   }
-}
-
-
-//////////////////////////////
-// 🏆 Result Screen
-//////////////////////////////
-// ——— replace showResultScreen() ———
-function showResultScreen() {
-  const container = document.getElementById('game-container');
-  if (!container) {
-    console.warn('⚠️ No game-container found for result popup.');
-    return;
-  }
-
-  // pull final state after finalizeQuickServeRun
-  const isNewHighScore = score > (appState.profile.qsHighScore ?? 0);
-  if (isNewHighScore) launchConfetti();
-
-  const popup = document.createElement('div');
-  popup.classList.add('result-popup');
-  popup.id = 'qsResultPopup'; // 👈 lets CSS target QS popup specifically
-  popup.innerHTML = buildResultHTML(isNewHighScore);
-
-  container.appendChild(popup);
-
-  // 🔘 compact button ids (IL-style)
-  const playAgainBtn = popup.querySelector('#qsPlayAgainBtn');
-  const backBtn      = popup.querySelector('#qsBackBtn');
-
-  playAgainBtn?.addEventListener('click', handlePlayAgain);
-  backBtn?.addEventListener('click', handleReturnToMenu);
-
-  playAgainBtn?.focus();
-}
-
-// ——— replace buildResultHTML() ———
-function buildResultHTML(isNewHighScore) {
-  const highScore = appState.profile.qsHighScore ?? 0;
-  const highScoreMsg = isNewHighScore
-    ? `<p class="new-highscore-msg">🎉 New High Score!</p>`
-    : '';
-
-  return `
-    <h2>🍧 Show Complete!</h2>
-    <p>Score: ${score}</p>
-    ${highScoreMsg}
-    <p>High Score: ${highScore}</p>
-    <p>XP Earned: ${totalSessionXP}</p>
-
-    <!-- 🔘 wrap in a row like IL -->
-    <div class="qs-result-buttons">
-      <button id="qsBackBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
-      <button id="qsPlayAgainBtn" class="play-again-btn">🔁 Play Again</button>
-    </div>
-  `;
-}
-
-
-async function handlePlayAgain() {
-  document.querySelector('.result-popup')?.remove();
-  await stopQS();
-  stopGameLogic();
-  renderGameUI();
-  setTimeout(() => playQSRandomTrack(), 50);
-}
-
-function handleReturnToMenu() {
-  document.querySelector('.result-popup')?.remove();
-  stopQS();
-  stopTrack();
-  stopGameLogic();
-  showMenu();
 }
 
 function toggleNegative() {
@@ -391,9 +405,6 @@ function clearAnswer() {
   updateAnswerDisplay();
 }
 
-
-
-// ✅ Keypad Helpers (export for keypad use)
 // ✅ Keypad Helpers (export for keypad use)
 export {
   toggleNegative,

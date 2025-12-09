@@ -926,3 +926,103 @@
 :root[data-platform="ios"] body.qs-active .qs-grid {
   padding-top: 7vh;
 }
+/* 🌙 QuickServe – end-of-shift overlay */
+.qs-result-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  background: radial-gradient(circle at 50% 15%, rgba(0, 255, 238, 0.2), transparent 55%),
+              rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.qs-result-overlay.hidden {
+  display: none;
+}
+
+/* 🍧 QS popup card */
+.qs-result-popup {
+  position: relative;
+  z-index: 901;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.6rem, 1.6vh, 1.4rem);
+  padding: clamp(1rem, 2.5vh, 2rem);
+  width: clamp(260px, 90vw, 420px);
+  max-height: 90vh;
+  overflow: auto;
+
+  background: rgba(0, 0, 0, 0.96);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  box-shadow: 0 0 24px #00ffeeaa;
+  text-align: center;
+  font-size: clamp(0.95rem, 2vh, 1.2rem);
+
+  animation:
+    qs-popup-in 0.5s ease-out forwards,
+    qs-popup-glow 2.4s ease-in-out infinite;
+}
+
+.qs-result-popup h2 {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.3rem, 2.6vh, 2.1rem);
+  color: #00ffee;
+  text-shadow: 0 0 8px #00ffee88;
+}
+
+.qs-result-popup p {
+  margin: 0.15rem 0;
+  color: #ffffff;
+}
+
+/* Phil’s teaching line */
+.qs-tip-line {
+  margin-top: 0.4rem;
+  font-size: 0.95em;
+  line-height: 1.35;
+  color: #e9fcff;
+}
+
+/* Buttons row */
+.qs-result-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+/* Reuse existing button styles but shrink a bit in the popup */
+.qs-result-popup .start-show-btn,
+.qs-result-popup .back-to-menu-btn {
+  font-size: clamp(0.85rem, 1.4vh, 1.05rem);
+  line-height: 1.05;
+  padding: clamp(0.35rem, 1vh, 0.55rem) clamp(0.8rem, 1.6vh, 1.1rem);
+  min-width: clamp(110px, 24vw, 180px);
+  border-radius: 12px;
+  box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes qs-popup-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes qs-popup-glow {
+  0%, 100% {
+    box-shadow: 0 0 16px #00ffee66, 0 0 32px #00ffee33;
+  }
+  50% {
+    box-shadow: 0 0 26px #00ffeeaa, 0 0 42px #00ffee66;
+  }
+}

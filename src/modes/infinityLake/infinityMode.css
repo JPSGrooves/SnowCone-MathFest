@@ -231,23 +231,25 @@
 
 
 /* === ♾️ IL Intro Screen === */
+/* === ♾️ IL Intro Screen === */
 .il-intro {
   flex: 1;
   display: grid;
-  grid-template-rows: auto auto auto auto;
-  flex-direction: column;
-  justify-content: flex-start;
+  grid-template-rows: auto auto auto;
+  justify-content: center;
   justify-items: center;
-  align-items: start;
-  gap: 1rem;
+  align-items: center;
+
+  gap: clamp(0.6rem, 1.5vh, 1rem);
+  width: 100%;
   height: 100%;
   max-height: 100%;
-  width: 100%;
   box-sizing: border-box;
   transition: opacity 0.4s ease;
-  overflow: visible;
-  padding: 1rem;
+  overflow: hidden;
+  padding: clamp(0.5rem, 2vh, 1rem);
 }
+
 
 
 
@@ -502,16 +504,7 @@
   box-shadow: 0 0 12px #cc33ff77;
 }
 
-.il-intro {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100svh;
-  aspect-ratio: 11 / 16;
-  max-width: 100vw;
-  overflow: hidden;
-}
+
 
 .il-intro-stack {
   z-index: 2;
@@ -583,6 +576,55 @@
   color: white;
   margin: 0.25rem 0;
 }
+
+/* 🌌 Full-screen dim overlay for results */
+.il-result-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  background: radial-gradient(circle at 50% 20%, rgba(0, 255, 238, 0.18), transparent 55%),
+              rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;   /* block clicks to the game */
+}
+
+/* hide the whole overlay when not in use */
+#ilResultOverlay.hidden {
+  display: none;
+}
+
+/* keep your existing popup card — now it lives inside the overlay */
+.il-result-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.8rem, 2vh, 2rem);
+  padding: clamp(1rem, 2.5vh, 2rem);
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid #00ffeeaa;
+  border-radius: 16px;
+  box-shadow: 0 0 24px #00ffeeaa;
+  text-align: center;
+  width: clamp(260px, 90vw, 420px);
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow: auto;
+  font-size: clamp(1rem, 2.2vh, 1.4rem);
+  animation:
+    popupFadeIn 0.6s ease-out forwards,
+    popupGlow 2.5s ease-in-out infinite;
+}
+
+/* you can keep or remove the old #ilResultPopup.hidden rule — it's harmless now */
+
 
 .il-result-buttons {
   display: flex;
@@ -1039,4 +1081,44 @@
 /* 🍏 iOS-only: Infinity Lake main game pushdown */
 :root[data-platform="ios"] body.il-active .il-grid {
   padding-top: 7vh; /* pushes title/stage/math/controls down */
+}
+
+.il-tip-line {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: #e9fcff;
+  opacity: 0.95;
+  text-align: left;
+}
+/* ── IL intro bubble: let it wrap, no clipping ───────────────────── */
+.il-speech {
+  /* Let the content size the box, but keep a reasonable cap */
+  height: auto;
+  max-height: 32svh;                    /* a little taller than before */
+  overflow: visible;                    /* no hidden last line */
+
+  /* Kill the old line-clamp / flexbox “box” behavior */
+  display: block;                       /* override -webkit-box */
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: initial;
+  text-overflow: clip;
+
+  /* Wrapping behavior */
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
+
+  /* Keep the newer font scaling */
+  font-size: clamp(0.95rem, 0.65rem + 2.1svw, 1.3rem);
+  line-height: 1.15;
+}
+
+/* How-to line: slightly smaller + breathing room */
+.il-speech .il-howto {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.9em;                     /* ~10% smaller than header text */
+  color: #e9fcff;
+  opacity: 0.95;
 }

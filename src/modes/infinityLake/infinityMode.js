@@ -38,6 +38,25 @@ let nextTrigger = sfxIntervals[0];
 let solvedCount = 0;     // how many problems the player solved this run
 let currentMode = 'addsub'; // you use this but never declared it
 
+// 🧮 NEW: mistake tracking so we can teach something
+let wrongCount = 0;
+const modeMisses = {
+  addsub: 0,
+  multdiv: 0,
+  alg: 0,
+};
+
+
+// last problem we *served*
+let lastProblemMeta = null;
+
+// last problem we *missed*, by mode (so we can pick the hardest lane)
+const lastMissByMode = {
+  addsub: null,
+  multdiv: null,
+  alg: null,
+};
+
 // ⬇️ replace the old checkInfinityBadges() with this
 function checkInfinityBadgesByScore() {
   const seconds = Math.floor((Date.now() - startTime) / 1000);
@@ -160,8 +179,9 @@ function renderIntroScreen() {
           <div class="il-intro-stack">
             <div class="il-speech">
               Hi! We're the <strong>Infinity Triplets</strong>!<br>
-              We keep the math beats pumping all night long!<br>
-              Infinity Awaits!
+              <span class="il-howto">
+                Tap the correct answer to build your streak, switch modes to change the kind of math, and see how high you can push your score.
+              </span>
             </div>
 
             <div class="triplet-wrapper">
@@ -220,7 +240,6 @@ function renderUI() {
             />
           </div>
 
-
           <!-- 🧠 Math & Answer UI -->
           <div class="il-math">
             <div id="mathProblem">-- + -- = ?</div>
@@ -247,23 +266,33 @@ function renderUI() {
             </div>
             <div class="utility-buttons">
               <button id="backToMenu">Main<br>Menu</button>
-              <button id="endGame">End<br>♾️</button>
+              <button id="endGame">Results<br>♾️</button>
               <button id="muteToggle">🔇<br>Mute</button>
             </div>
           </div>
 
         </div>
-        <div class="il-result-popup hidden" id="ilResultPopup">
-          <h2>🎉 Set Complete!</h2>
 
-          <p><strong>Score:</strong> <span id="ilScoreFinal">0</span></p>
-          <p><strong>High Score:</strong> <span id="ilHighScore">0</span></p>
-          <p><strong>Longest Streak:</strong> <span id="ilStreak">0</span></p>
-          <p><strong>Time Played:</strong> <span id="ilTime">0:00</span></p>
+        <!-- 🎉 Result overlay + popup -->
+        <div class="il-result-overlay hidden" id="ilResultOverlay">
+          <div class="il-result-popup" id="ilResultPopup">
+            <h2>🎉 Set Complete!</h2>
 
-          <div class="il-result-buttons">
-            <button id="ilPlayAgainBtn" class="start-show-btn">🔁 Play Again</button>
-            <button id="ilBackBtn" class="back-to-menu-btn">🔙 to Menu</button>
+            <p><strong>Score:</strong> <span id="ilScoreFinal">0</span></p>
+            <p><strong>Streak:</strong> <span id="ilStreakRun">0</span></p>
+            <p><strong>High Score:</strong> <span id="ilHighScore">0</span></p>
+            <p><strong>Longest Streak:</strong> <span id="ilStreak">0</span></p>
+
+            <!-- 🧠 Teaching tip line -->
+            <p class="il-tip-line">
+              <strong>Feedback:</strong>
+              <span id="ilTipText"></span>
+            </p>
+
+            <div class="il-result-buttons">
+              <button id="ilPlayAgainBtn" class="start-show-btn">🔁 Play Again</button>
+              <button id="ilBackBtn" class="back-to-menu-btn">🔙 to Menu</button>
+            </div>
           </div>
         </div>
       </div>
@@ -365,13 +394,27 @@ function returnToMenu() {
 }
 
 function startGame() {
+  // re-arm keyboard for a fresh set
+  activateInputHandler('infinity');
+
   score = 0;
   streak = 0;
   maxStreak = 0; // Reset session max
-  solvedCount = 0;            // ⬅️ reset
-  streakFlipFlop = true; // Start with milestone SFX
+  solvedCount = 0;
+  streakFlipFlop = true;
   patternIndex = 0;
-  nextTrigger = sfxIntervals[0]; // First trigger at 3
+  nextTrigger = sfxIntervals[0];
+
+  // 🧮 reset teaching stats
+  wrongCount = 0;
+  modeMisses.addsub = 0;
+  modeMisses.multdiv = 0;
+  modeMisses.alg = 0;
+  lastProblemMeta = null;
+  lastMissByMode.addsub = null;
+  lastMissByMode.multdiv = null;
+  lastMissByMode.alg = null;
+
   updateScore();
   updateStreak();
   newProblem();
@@ -399,14 +442,17 @@ function newProblem() {
   let b = Math.floor(Math.random() * 20) + 1;
   let correctAnswer;
   let question;
+  let op = null; // 🧮 track what kind of problem this is
 
   switch (mode) {
     case 'addsub': {
       const head = `<span class="il-problem-head">Add. and Sub.</span>`;
       if (addsubToggle) {
+        op = '+';
         correctAnswer = a + b;
         question = `${head}<br>${a} + ${b} = ?`;
       } else {
+        op = '−';
         correctAnswer = a - b;
         question = `${head}<br>${a} − ${b} = ?`;
       }
@@ -417,12 +463,14 @@ function newProblem() {
     case 'multdiv': {
       const head = `<span class="il-problem-head">Mult. and Div.</span>`;
       if (multdivToggle) {
+        op = '×';
         correctAnswer = a * b;
         question = `${head}<br>${a} × ${b} = ?`;
       } else {
         // clean division
-        b = Math.floor(Math.random() * 9) + 1;           // 1–9
-        correctAnswer = Math.floor(Math.random() * 10) + 1; // 1–10
+        op = '÷';
+        b = Math.floor(Math.random() * 9) + 1;                // 1–9
+        correctAnswer = Math.floor(Math.random() * 10) + 1;   // 1–10
         a = b * correctAnswer;
         question = `${head}<br>${a} ÷ ${b} = ?`;
       }
@@ -432,41 +480,50 @@ function newProblem() {
 
     case 'alg': {
       const head = `<span class="il-problem-head">Solve for 𝒙</span>`;
-      const ops = ['+', '-', '×', '÷'];
-      let op = ops[Math.floor(Math.random() * ops.length)];
+      // 🔧 use the SAME glyphs we check for later
+      const ops = ['+', '−', '×', '÷'];
+      op = ops[Math.floor(Math.random() * ops.length)];
       let result;
 
       correctAnswer = a; // default
 
       if (op === '+') {
+        // 𝒙 + b = result  (x is a)
         result = a + b;
+        correctAnswer = a;
         question = `${head}<br>𝒙 + ${b} = ${result}`;
-      }
-      else if (op === '-') {
+      } else if (op === '−') {
+        // 𝒙 − b = result (x is a)
         result = a - b;
+        correctAnswer = a;
         question = `${head}<br>𝒙 − ${b} = ${result}`;
-      }
-      else if (op === '×') {
+      } else if (op === '×') {
+        // 𝒙 × b = result (x is a)
         result = a * b;
         correctAnswer = a;
         question = `${head}<br>𝒙 × ${b} = ${result}`;
-      }
-      else if (op === '÷') {
-        // clean division: a = b * x
-        correctAnswer = Math.floor(Math.random() * 10) + 1;
-        b = Math.floor(Math.random() * 9) + 1;
+      } else if (op === '÷') {
+        // a ÷ 𝒙 = b, where a = b * x
+        correctAnswer = Math.floor(Math.random() * 10) + 1; // 1–10
+        b = Math.floor(Math.random() * 9) + 1;              // 1–9
         a = b * correctAnswer;
         question = `${head}<br>${a} ÷ 𝒙 = ${b}`;
       }
 
       break;
     }
-
   }
 
-
-
   currentCorrect = correctAnswer;
+
+  // 📝 remember this problem so we can talk about it later
+  lastProblemMeta = {
+    mode,
+    op,
+    a,
+    b,
+    correct: correctAnswer,
+  };
 
   // 🎲 Generate 2 fake options that aren’t the correct answer
   let options = [correctAnswer];
@@ -478,10 +535,10 @@ function newProblem() {
     } else {
       options.push(Math.floor(Math.random() * 50)); // 💥 backup junk answer
     }
+    if (++tries > 10) break;
   }
 
-
-
+  options = options.slice(0, 3);
   options.sort(() => Math.random() - 0.5);
 
   // ✍️ Inject into DOM
@@ -497,7 +554,7 @@ function handleAnswer(btn) {
   if (guess === currentCorrect) {
     handleCorrect();
   } else {
-    handleIncorrect();
+    handleIncorrect(guess);
   }
 }
 
@@ -525,13 +582,11 @@ function handleCorrect() {
   }
 
   score += points;
-  streak++; 
-  solvedCount++; // ✅ safe to keep for analytics if you still want attempts tracked
+  streak++;
+  solvedCount++;
 
-  // ⬇️ score-based badge checks (replaces the attempts-based call)
   checkInfinityBadgesByScore();
 
-  // 🎯 Interval SFX logic (unchanged)
   console.log(`🌈 Streak now at: ${streak}`);
   if (streak === nextTrigger) {
     console.log('💥 Triggering SFX burst!');
@@ -549,8 +604,21 @@ function handleCorrect() {
   newProblem();
 }
 
+function handleIncorrect(guess) {
+  const mode = appState.getGameMode();
 
-function handleIncorrect() {
+  // 🧮 Track mistakes for end-of-set coaching
+  wrongCount += 1;
+  if (mode && Object.prototype.hasOwnProperty.call(modeMisses, mode)) {
+    modeMisses[mode] += 1;
+
+    // remember the last missed problem for this mode
+    lastMissByMode[mode] = {
+      ...(lastProblemMeta || {}),
+      guess,
+    };
+  }
+
   streak = 0;
   updateStreak();
   showResult('❌ Nope. Try again!', '#ff5555');
@@ -567,21 +635,43 @@ function showResult(msg, color) {
 }
 
 /*popup*/
-function showResultPopup({ score, highScore, streak, time }) {
-  const popup = document.getElementById('ilResultPopup');
-  if (!popup) return;
+function showResultPopup({ score, highScore, streak, longest, time }) {
+  const overlay = document.getElementById('ilResultOverlay');
+  const popup   = document.getElementById('ilResultPopup');
+  if (!overlay || !popup) return;
 
-  document.getElementById('ilScoreFinal').textContent = score;
-  document.getElementById('ilHighScore').textContent = highScore;
-  document.getElementById('ilStreak').textContent = streak;
-  document.getElementById('ilTime').textContent = time;
+  // 🌊 This run
+  const scoreEl     = document.getElementById('ilScoreFinal');
+  const streakRunEl = document.getElementById('ilStreakRun');
 
-  popup.classList.remove('hidden');
+  if (scoreEl)     scoreEl.textContent     = score;
+  if (streakRunEl) streakRunEl.textContent = streak;
+
+  // 🏅 Lifetime records
+  const highScoreEl   = document.getElementById('ilHighScore');
+  const longestEl     = document.getElementById('ilStreak');
+
+  if (highScoreEl) highScoreEl.textContent = highScore;
+  if (longestEl)   longestEl.textContent   = longest;
+
+  // (time is still available if you ever want to log/use it,
+  // but we don't show it in the popup anymore)
+
+  // 🧠 Teaching tip
+  const tipEl = document.getElementById('ilTipText');
+  if (tipEl) {
+    tipEl.textContent = buildInfinityTip();
+  }
+
+  // 🔒 freeze hotkeys while modal is up
+  activateInputHandler(null);
+
+  overlay.classList.remove('hidden');
 }
 
 function closeResultPopup() {
-  const popup = document.getElementById('ilResultPopup');
-  if (popup) popup.classList.add('hidden');
+  const overlay = document.getElementById('ilResultOverlay');
+  if (overlay) overlay.classList.add('hidden');
 }
 
 
@@ -602,6 +692,122 @@ function formatElapsedTime(ms) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
+function buildMiniLesson(meta) {
+  if (!meta || !meta.mode) return '';
+
+  const { mode, op, a, b, correct, guess } = meta;
+  const guessNote =
+    typeof guess === 'number' && guess !== correct
+      ? ` You picked ${guess}, but the correct answer is ${correct}.`
+      : '';
+
+  // 🧠 Algebra gets the richest coaching
+  if (mode === 'alg') {
+    if (op === '+') {
+      const result = correct + b;
+      return `I noticed this one gave you trouble: 𝒙 + ${b} = ${result}.${guessNote} Next time, subtract ${b} from ${result}: ${result} − ${b} = ${correct}, so 𝒙 = ${correct}.`;
+    }
+    if (op === '−') {
+      const result = correct - b;
+      return `I noticed this one gave you trouble: 𝒙 − ${b} = ${result}.${guessNote} Next time, add ${b} to ${result}: ${result} + ${b} = ${correct}, so 𝒙 = ${correct}.`;
+    }
+    if (op === '×') {
+      const result = correct * b;
+      return `I noticed this one gave you trouble: 𝒙 × ${b} = ${result}.${guessNote} Next time, divide both sides by ${b}: ${result} ÷ ${b} = ${correct}, so 𝒙 = ${correct}.`;
+    }
+    if (op === '÷') {
+      // a ÷ 𝒙 = b  where a = b * correct
+      return `I noticed this one gave you trouble: ${a} ÷ 𝒙 = ${b}.${guessNote} Next time, think “what number times ${b} gives ${a}?” That’s ${correct}, so 𝒙 = ${correct}.`;
+    }
+  }
+
+  // ✏️ Mult / Div – better strategies
+  if (mode === 'multdiv') {
+    if (op === '×') {
+      const big   = Math.max(a, b);
+      const small = Math.min(a, b);
+
+      // If one factor is multi-digit, split THAT one into tens + ones
+      if (big >= 10) {
+        const tens  = Math.floor(big / 10) * 10;  // e.g. 14 → 10
+        const ones  = big - tens;                 // e.g. 14 → 4
+        const part1 = small * tens;
+        const part2 = small * ones;
+
+        if (ones > 0) {
+          // 14 × 6 → 10×6 + 4×6
+          return `Questions like ${a} × ${b} = ? were the trickiest.${guessNote} Try breaking ${big} into ${tens} and ${ones}: ${small}×${tens} = ${part1} and ${small}×${ones} = ${part2}, then add them: ${part1} + ${part2} = ${correct}.`;
+        }
+
+        // Clean tens like 20, 30, etc.
+        return `Questions like ${a} × ${b} = ? were the trickiest.${guessNote} Here ${big} is already a tens number, so you can think “${big} is how many tens of ${small}?” — ${small}×${big} = ${correct}.`;
+      }
+
+      // Both factors are 1-digit → simple groups-of story
+      return `Questions like ${a} × ${b} = ? were the trickiest.${guessNote} Try seeing it as ${small} groups of ${big}. Picture ${big} once, then twice, then ${small} times in total — all stacked together to make ${correct}.`;
+    }
+
+    if (op === '÷') {
+      return `Questions like ${a} ÷ ${b} = ? tripped you up.${guessNote} Try asking “${b} times what equals ${a}?” — that missing factor is your answer.`;
+    }
+  }
+
+  // ➕➖ Add / Sub – simple nudge
+  if (mode === 'addsub') {
+    if (op === '+') {
+      return `A few ${a} + ${b} = ? problems were off.${guessNote} Next time, stack the numbers in your head and add the ones place first, then tens.`;
+    }
+    if (op === '−') {
+      return `A few ${a} − ${b} = ? problems were off.${guessNote} Try slowing down just enough to check if you need to borrow before you answer.`;
+    }
+  }
+
+  return '';
+}
+
+function buildInfinityTip() {
+  // 🍼 No questions answered at all
+  if (solvedCount === 0 && score === 0) {
+    return 'Try answering a few warm-up questions first. Your first streak is always the hardest — then the flow kicks in.';
+  }
+
+  const hasMisses = wrongCount > 0;
+
+  // 🌟 Perfect set
+  if (!hasMisses && score > 0) {
+    return 'Perfect set! No misses this time. Try nudging the difficulty by switching modes or chasing an even longer streak.';
+  }
+
+  // 🧊 Opening vibe depending on how many went wrong
+  let opening;
+  if (wrongCount <= 3) {
+    opening = 'Good job this set — just a few bumps along the way.';
+  } else if (wrongCount <= 8) {
+    opening = 'You’re getting the Infinity rhythm. This run had some rough spots, but that’s exactly how your brain levels up.';
+  } else {
+    opening = 'This one was more of a practice set, which is perfect — the clean runs always come after a few messy ones.';
+  }
+
+  // 🎯 Pick the hardest lane you struggled in: alg → multdiv → addsub
+  let focusMode = null;
+  if (modeMisses.alg > 0) {
+    focusMode = 'alg';
+  } else if (modeMisses.multdiv > 0) {
+    focusMode = 'multdiv';
+  } else if (modeMisses.addsub > 0) {
+    focusMode = 'addsub';
+  }
+
+  const meta = focusMode ? lastMissByMode[focusMode] : null;
+  const lesson = buildMiniLesson(meta);
+
+  if (!lesson) {
+    // fallback to your old “generic coaching” if somehow we have no meta
+    return `${opening} Most misses were in ${focusMode || 'your current mode'}. Try watching the operation label before you tap.`;
+  }
+
+  return `${opening} ${lesson} Want another go? Hit “Play Again” and try to beat this set.`;
+}
 
 
 function flashModeName() {
@@ -676,12 +882,17 @@ function endInfinityGame() {
     seconds
   });
 
+  // 🎯 Separate “this run” vs “lifetime” for the popup
+  const runStreak      = maxStreak;
+  const lifetimeStreak = appState.profile.infinityLongestStreak || 0;
+
   // 🎛️ Render the popup with fresh values from profile
   showResultPopup({
     score,
+    streak:  runStreak,       // this set’s best chain
     highScore: appState.profile.infinityHighScore || 0,
-    streak:    appState.profile.infinityLongestStreak || 0,
-    time:      timeLabel
+    longest: lifetimeStreak,  // all-time record
+    time:    timeLabel        // still computed, but no longer shown
   });
 
   // 🎉 Only fire a big celebration when a record is broken

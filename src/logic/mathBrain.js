@@ -1,3 +1,4 @@
+
 // 🧠 mathBrain.js — Universal Math Engine
 
 //////////////////////////////
@@ -27,8 +28,10 @@ function generateAddSub() {
 
   let equation = '';
   let answer = 0;
+  let op = '+';
 
   if (useSubtraction) {
+    op = '-';
     if (Math.random() < 0.3) {
       equation = `${a} - ${b}`;
       answer = a - b;
@@ -38,6 +41,7 @@ function generateAddSub() {
       answer = hi - lo;
     }
   } else {
+    op = '+';
     equation = `${a} + ${b}`;
     answer = a + b;
   }
@@ -46,7 +50,13 @@ function generateAddSub() {
     equation,
     answer,
     xp: 3,
-    points: 1
+    points: 1,
+    meta: {
+      type: 'addSub',
+      op,
+      a,
+      b,
+    },
   };
 }
 
@@ -55,14 +65,16 @@ function generateAddSub() {
 //////////////////////////////
 function generateMultiDiv() {
   const useDivision = Math.random() < 0.5;
-  let a, b, equation, answer;
+  let a, b, equation, answer, op;
 
   if (useDivision) {
+    op = '÷';
     b = getRandomInt(2, 9);
     answer = getRandomInt(2, 12);
     a = b * answer;
     equation = `${a} ÷ ${b}`;
   } else {
+    op = '×';
     a = getRandomInt(2, 12);
     b = getRandomInt(2, 12);
     answer = a * b;
@@ -73,7 +85,13 @@ function generateMultiDiv() {
     equation,
     answer,
     xp: 5,
-    points: 3
+    points: 3,
+    meta: {
+      type: 'multiDiv',
+      op,
+      a,
+      b,
+    },
   };
 }
 
@@ -103,12 +121,40 @@ function generateAlgebra() {
     answer = left / right;
   }
 
+  // 🧱 Step list so Phil can literally walk them through it
+  const steps = [
+    {
+      expr: `${x} ${sign1} ${y}`,
+      value: left,
+    },
+    {
+      expr: `${w} ${sign2} ${z}`,
+      value: right,
+    },
+    {
+      expr: op === '×' ? `${left} × ${right}` : `${left} ÷ ${right}`,
+      value: answer,
+    },
+  ];
 
   return {
     equation,
     answer,
     xp: 8,
-    points: 5
+    points: 5,
+    meta: {
+      type: 'algebraTwoBinops',
+      x,
+      y,
+      w,
+      z,
+      sign1,
+      sign2,
+      op,
+      left,
+      right,
+      steps,
+    },
   };
 }
 

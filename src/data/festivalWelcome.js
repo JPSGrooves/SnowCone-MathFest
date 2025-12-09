@@ -203,7 +203,7 @@ function getStreakDays() {
 const BAND_MESSAGES = [
   {
     id: 'band_0',
-    title: 'Baby Cone',
+    title: 'Rank: Baby Cone',
     line: 'Day-one festival vibes. Every scoop counts.',
   },
   {
