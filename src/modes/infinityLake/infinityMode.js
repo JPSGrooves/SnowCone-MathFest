@@ -11,6 +11,10 @@ import { launchConfetti } from '../../utils/confetti.js';
 import { runInAction } from 'mobx';
 import { playInfinityLoop } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
+import { Howl, Howler } from 'howler';
+import { hapticSuccess } from '../../utils/haptics.js';
+
+
 
 
 
@@ -666,7 +670,15 @@ function showResultPopup({ score, highScore, streak, longest, time }) {
   // 🔒 freeze hotkeys while modal is up
   activateInputHandler(null);
 
+  // 📺 Show overlay
   overlay.classList.remove('hidden');
+
+  // 📳 Soft “set complete” buzz
+  try {
+    hapticSuccess();
+  } catch (e) {
+    console.warn('[Infinity] hapticSuccess failed:', e);
+  }
 }
 
 function closeResultPopup() {
@@ -818,7 +830,8 @@ function flashModeName() {
   setTimeout(() => el.remove(), 1200);
 }
 function flashMuteIcon() {
-  const icon = document.querySelector('#muteIcon'); // Whatever ID/class you use
+  // just flash the mute button itself
+  const icon = document.getElementById('muteToggle');
   if (!icon) return;
   icon.classList.add('flash');
   setTimeout(() => icon.classList.remove('flash'), 400);
@@ -903,20 +916,29 @@ function endInfinityGame() {
 
 
 function playStreakBurst() {
-  console.log('💥 Triggering SFX burst!');
-  const file = streakFlipFlop
-    ? 'QuikServemilestone.mp3'
-    : 'QuikServepoints100.mp3';
+  // 🔇 Respect global mute via Howler
+  try {
+    if (Howler?._muted) {
+      return;
+    }
+  } catch {
+    // if Howler isn't ready for some reason, just fail silently
+  }
 
-  const sfx = new Howl({
-    src: [`${import.meta.env.BASE_URL}assets/audio/SFX/${file}`],
-    volume: 1.0
-  });
+  const file = streakFlipFlop ? 'honk1.mp3' : 'honk2.mp3';
 
-  sfx.play();
-  streakFlipFlop = !streakFlipFlop;
+  try {
+    const sfx = new Howl({
+      src: [`${import.meta.env.BASE_URL}assets/audio/SFX/${file}`],
+      volume: 0.4, // softer, still punchy for streak hype
+    });
+
+    sfx.play();
+    streakFlipFlop = !streakFlipFlop;
+  } catch (err) {
+    console.warn('[Infinity] streak SFX failed:', err);
+  }
 }
-
 
 
 

@@ -1,8 +1,10 @@
 // 📦 src/managers/badgeManager.js
 import { autorun } from 'mobx';
 import { allBadges as badgeDefs } from '../data/badges.js';
+import { hapticSuccess } from '../utils/haptics.js'; // 📳 badge feelz
 
 export const allBadges = badgeDefs;
+
 
 let store = null;
 
@@ -58,20 +60,89 @@ function unlockThemeIfAny(id) {
   // store.setSetting?.('theme', theme);
 }
 
+
 // 🎁 public API
 // src/managers/badgeManager.js
 const BADGE_ALIAS = { play_music: 'listened_music' };
 
-export function awardBadge(id) {
-  if (!store) { console.warn('badgeManager not initialized yet'); return false; }
-  const canonical = BADGE_ALIAS[id] || id;
-  if (!canonical || store.profile.badges.includes(canonical)) return false;
-  if (!allBadges[canonical]) { console.warn('Unknown badge id:', canonical); return false; }
+// Badges that should buzz EVERY time the award path is hit
+// (QS, Infinity Lake, Story chapters)
+const HAPTIC_ALWAYS_BADGES = new Set([
+  // ⚡ QuickServe
+  'quick_25',
+  'quick_50',
+  'quick_75',
+  'quick_100',
 
-  store.unlockBadge?.(canonical);
-  const unlockTheme = allBadges[canonical]?.unlocks;
-  if (unlockTheme) store.unlockTheme?.(unlockTheme);
-  return true;
+  // 🔁 Infinity Lake
+  'inf_25_1min',
+  'inf_50_2min',
+  'inf_100_4min',
+  'inf_250_10min',
+
+  // 📖 Story Forest
+  'story_prologue',
+  'story_ch1',
+  'story_ch2',
+  'story_ch3',
+  'story_ch4',
+  'story_ch5',
+]);
+
+
+export function awardBadge(id, options = {}) {
+  if (!store) {
+    console.warn('badgeManager not initialized yet');
+    return false;
+  }
+
+  const { silent = false } = options;
+
+  const canonical = BADGE_ALIAS[id] || id;
+  if (!canonical) return false;
+
+  const badgeDef = allBadges[canonical];
+  if (!badgeDef) {
+    console.warn('Unknown badge id:', canonical);
+    return false;
+  }
+
+  // Make sure profile + badges array exist
+  const profile = store.profile || (store.profile = {});
+  if (!Array.isArray(profile.badges)) {
+    profile.badges = [];
+  }
+
+  const alreadyHas = profile.badges.includes(canonical);
+  const isNew = !alreadyHas;
+
+  // 🧊 Idempotent data: only actually *add* the badge once
+  if (isNew) {
+    // Let appState handle array update, popup flag, persistence, etc.
+    store.unlockBadge?.(canonical);
+
+    const unlockTheme = badgeDef.unlocks;
+    if (unlockTheme) {
+      store.unlockTheme?.(unlockTheme);
+    }
+  }
+
+  // 📳 Haptics logic
+  if (!silent) {
+    const wantsRepeatHaptic = HAPTIC_ALWAYS_BADGES.has(canonical);
+
+    // New badges: always buzz, no matter what type.
+    // Already-owned badges: buzz again ONLY if on the whitelist
+    if (isNew || wantsRepeatHaptic) {
+      try {
+        hapticSuccess();
+      } catch (err) {
+        console.warn('[badges] haptic error', err);
+      }
+    }
+  }
+
+  return isNew;
 }
 
 

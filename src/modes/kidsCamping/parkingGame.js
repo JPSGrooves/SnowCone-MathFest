@@ -2,6 +2,8 @@
 
 import { Howl } from 'howler';
 import { appState } from '../../data/appState.js';
+import { awardBadge } from '../../managers/badgeManager.js'; // 🏅 new
+
 
 
 const parkingSprites = [
@@ -26,10 +28,12 @@ let awardedXP = 0;
 
 let parkingRoot = null;
 let previousPopCount = 0; // stores last known XP state
-// ===== Parking Intro (Mario Kart-style) =====
 let introController = null;
 let nextButtonHonkIdx = 0;
-let finalElapsedMs = null; // ⏱️ frozen when the 11th car is parked
+let finalElapsedMs = null;
+
+// 🆕 track the order in which cars actually get parked
+let parkedSequence = [];
 
 
 function prefersReducedMotion() {
@@ -137,7 +141,8 @@ export function initParkingGame(container) {
   startTime = null;
   currentCarIndex = -1;
   sessionPoints = 0;
-  finalElapsedMs = null; // ⬅️ add this
+  finalElapsedMs = null;
+  parkedSequence = []; // 🆕 clear order tracking
 
   const ordinals = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th'];
   arrivalOrder = shuffle([...ordinals]);
@@ -189,6 +194,7 @@ export function initParkingGame(container) {
       wrapEl?.removeAttribute('data-intro');
     }
 
+  
     if (!gameStarted) {
       startGameTimer();
       const introRow = document.getElementById('parkingIntro');
@@ -226,6 +232,7 @@ function showCar(index) {
     console.error('🚫 Failed to load:', car.src);
     try { holder.remove(); } catch {}
     parkedCars.add(index);
+    
 
     // If that auto-park finished the set, freeze elapsed now and celebrate.
     if (parkedCars.size >= parkingSprites.length && startTime) {
@@ -319,7 +326,6 @@ function cycleNextCar() {
 }
 
 function triggerFinalCelebration() {
-  // guard against re-entry
   if (!gameStarted) return;
   gameStarted = false;
 
@@ -328,12 +334,27 @@ function triggerFinalCelebration() {
     ? finalElapsedMs
     : (startTime ? (Date.now() - startTime) : Infinity);
 
-  // “≤ 60s” earns a bonus
+  // 🧾 snapshot sequence + "in-order" check
+  const sequence = parkedSequence.slice();
+  const inOrder =
+    sequence.length === parkingSprites.length &&
+    sequence.every((idx, i) => idx === i);
+
+  // “≤ 60s” earns a bonus to Camping Score
   const speedBonus = elapsed <= 60_000 ? 100 : 0;
   if (speedBonus) {
     appState.incrementPopCount(speedBonus);
     checkXPBatchAwardFromTotal();
     updatePopUI?.();
+  }
+
+  // 🏅 Hardcore badge: only if ALL cars, in order, under 60s
+  if (elapsed <= 60_000 && inOrder) {
+    try {
+      awardBadge('kids_cars_speed');
+    } catch (e) {
+      console.warn('[parkingGame] failed to award kids_cars_speed badge', e);
+    }
   }
 
   // 🎉 mini finale
@@ -352,26 +373,23 @@ function triggerFinalCelebration() {
   finale.textContent = '🏁 All Parked!';
   carZone.appendChild(finale);
 
-  // fade in overlay (avoid CSS race)
   finale.style.animation = 'none';
   requestAnimationFrame(() => {
     finale.style.opacity = '1';
     finale.style.transition = 'opacity 0.4s ease';
   });
 
-  // 🔔 dispatch completion once with the elapsed
+  // 🔔 dispatch completion with richer detail
   parkingRoot?.dispatchEvent(new CustomEvent('kcParkingComplete', {
-    detail: { elapsedMs: elapsed },
+    detail: { elapsedMs: elapsed, inOrder, sequence },
     bubbles: true
   }));
 
-  // fade out + cleanup
   setTimeout(() => {
     finale.style.opacity = '0';
     setTimeout(() => finale.remove(), 400);
   }, 2000);
 
-  // reset back to intro
   setTimeout(() => { resetGame(); }, 2500);
 }
 
@@ -400,6 +418,9 @@ function handleHonk(index, carEl) {
   // reached the needed honks => park this car
   if (honks === honkLimit) {
     parkedCars.add(index);
+
+    // 🆕 record the order this car was parked in
+    parkedSequence.push(index);
 
     // ⏱️ if that was the final car, freeze the elapsed now (before any overlay/animations)
     if (parkedCars.size >= parkingSprites.length && startTime) {

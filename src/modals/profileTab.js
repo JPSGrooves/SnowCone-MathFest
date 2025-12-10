@@ -29,7 +29,7 @@ export function renderProfileTab() {
     </div>
 
     <div class="settings-block">
-      <h3>📈 Legendary Cones</h3>
+      <h3>📈 SnowCone Completion</h3>
       <div class="xp-bar-wrap">
         <div class="xp-bar" id="xpBar"></div>
       </div>

@@ -2,6 +2,15 @@ import { Howl, Howler } from 'howler';
 
 
 let currentTrack = null;
+
+// 💿 Global music loudness (master ceiling for all modes)
+const DEFAULT_MUSIC_VOLUME = 0.7; // was 1.0 – this is noticeably softer without feeling quiet
+
+function getMusicVolume() {
+  // Future-proof: if you ever add appState.settings.musicVolume, plug it in here.
+  return DEFAULT_MUSIC_VOLUME;
+}
+
 let rafId = null;
 const fadeDuration = 1000;
 
@@ -48,7 +57,8 @@ export function playTrack(id = getFirstTrackId()) {
     currentTrack = new Howl({
       src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${track.file}`],
       loop: looping,
-      volume: 1,//*changed from volume: Howler._muted ? 0 : 1, *//      
+      // 🔊 softer global ceiling instead of raw 1.0
+      volume: getMusicVolume(),
       html5: true,
 
       onplay: () => {

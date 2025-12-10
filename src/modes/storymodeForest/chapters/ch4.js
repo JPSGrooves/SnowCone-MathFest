@@ -3,6 +3,7 @@ import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
 import { pickupPing } from '../ui/pickupPing.js'; // 👈 add this
 import { awardBadge } from '../../../managers/badgeManager.js';
+import { hapticSuccess } from '../../../utils/haptics.js'; // 👈 ADD THIS
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG      = (n) => `${BASE}assets/img/characters/storyMode/${n}`;
@@ -617,7 +618,7 @@ export const Chapter4 = {
             grantedCone = true;
           }
 
-          // ✨ 2) Only fire pickupPing if we *just* awarded it here.
+          // ✨ 2) Only fire pickupPing + haptics if we *just* awarded it here.
           if (grantedCone) {
             try {
               pickupPing({
@@ -625,8 +626,11 @@ export const Chapter4 = {
                 name: 'The Perfect SnowCone',
                 qty: 1,
               });
+
+              // 📳 Haptic: forging the Perfect SnowCone should *feel* special
+              hapticSuccess();
             } catch (e) {
-              console.warn('[ch4 alignment] pickupPing failed:', e);
+              console.warn('[ch4 alignment] pickupPing / haptics failed:', e);
             }
           }
 

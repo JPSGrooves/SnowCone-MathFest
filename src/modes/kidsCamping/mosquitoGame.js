@@ -1,8 +1,10 @@
 // /src/modes/kidsCamping/mosquitoGame.js
 import { Howl } from 'howler';
+import { hapticSuccess } from '../../utils/haptics.js'; // 📳 add this
 
 const SFX_BASE = `${import.meta.env.BASE_URL}assets/audio/SFX/`;
 const MOSQ_SFX  = SFX_BASE + 'mosquito.mp3';
+
 
 export function initMosquitoGame(opts = {}) {
   const {
@@ -337,8 +339,18 @@ export function initMosquitoGame(opts = {}) {
     try {
       const sfx = new Howl({ src: [MOSQ_SFX], volume: 0.14 }); // -50%
       sfx.play();
-    } catch {}
+
+      // 📳 Tiny “good swat” haptic – local, not tied to badges
+      try {
+        hapticSuccess();
+      } catch (e) {
+        console.warn('[mosquitoGame] hapticSuccess failed:', e);
+      }
+    } catch (err) {
+      console.warn('[mosquitoGame] splat SFX failed:', err);
+    }
   }
+
 
   // Public API
   return { enable, disable, cleanup };

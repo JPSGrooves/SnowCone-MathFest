@@ -130,8 +130,26 @@ export const Chapter5 = {
       soloLabel: 'Look back… just once ➡️',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
+
         if (a?.setFlag) {
+          // mark this ending as seen
           a.setFlag('ending_way_home', true);
+
+          // 🔍 check if we now have both endings
+          const haveWay = true; // we just set it
+          const haveDriver =
+            typeof a.getFlag === 'function'
+              ? a.getFlag('ending_driver_loop', false)
+              : !!(a.flags && a.flags.ending_driver_loop);
+
+          if (haveWay && haveDriver) {
+            try {
+              awardBadge('leg_dual_endings');
+            } catch (e) {
+              console.warn('[ch5] award leg_dual_endings (home path) failed:', e);
+            }
+          }
+
           a.saveToStorage?.();
         }
 
@@ -139,7 +157,6 @@ export const Chapter5 = {
         const chapter = engine.registry[engine.state.chapterId];
         if (!chapter) return;
 
-        // 👇 Jump to the FIRST epilogue slide, not the last
         const idx = chapter.slides.findIndex((s) => s.id === 'c5_final_the_end_1');
         if (idx >= 0) {
           engine.state.idx = idx;
@@ -148,6 +165,7 @@ export const Chapter5 = {
         }
         return false;
       },
+
     },
 
 
@@ -206,8 +224,26 @@ export const Chapter5 = {
             console.warn('[ch5] remove cone in driver ending failed:', e);
           }
         }
+
         if (a?.setFlag) {
+          // mark this ending as seen
           a.setFlag('ending_driver_loop', true);
+
+          // 🔍 check if we now have both endings
+          const haveDriver = true; // we just set it
+          const haveWay =
+            typeof a.getFlag === 'function'
+              ? a.getFlag('ending_way_home', false)
+              : !!(a.flags && a.flags.ending_way_home);
+
+          if (haveWay && haveDriver) {
+            try {
+              awardBadge('leg_dual_endings');
+            } catch (e) {
+              console.warn('[ch5] award leg_dual_endings (driver path) failed:', e);
+            }
+          }
+
           a.saveToStorage?.();
         }
 
@@ -215,7 +251,6 @@ export const Chapter5 = {
         const chapter = engine.registry[engine.state.chapterId];
         if (!chapter) return;
 
-        // 👇 Again: go to epilogue part 1, not the last slide
         const idx = chapter.slides.findIndex((s) => s.id === 'c5_final_the_end_1');
         if (idx >= 0) {
           engine.state.idx = idx;
@@ -224,6 +259,7 @@ export const Chapter5 = {
         }
         return false;
       },
+
     },
 
     // 3) Shared final slide: The End?
@@ -303,14 +339,22 @@ export const Chapter5 = {
   img: PRO_MED_IMG('festivalFade.png'),
   text: `For now, the screen fades, the music softens, and two little words hang off the truck window like a promise:<br><b>The End?</b><br><br>This run is over, but the choices you made are baked into the festival’s math now; whether you carried the cone home or stayed to drive the truck, you made it this far and can always return to forge a new SnowCone.`,
   soloLabel: 'Thank you for playing!🎉',
-  onAdvance: ({ appState, engine }) => {
-    // Visually: fade to black, then show credits overlay.
-    // Routing: credits overlay’s button / click-outside still
-    // dispatches "sm:backToChapterMenu", so Story Mode
-    // handles the actual hop back to the chapter menu.
+    onAdvance: ({ appState, engine }) => {
+    const a = appState || globalAppState;
+
+    // 🎖 Make sure the Chapter 5 badge always unlocks
+    try {
+      awardBadge('story_ch5');   // safe to call multiple times; it’s idempotent
+      a?.saveToStorage?.();
+    } catch (e) {
+      console.warn('[ch5_final_the_end] failed to award story_ch5', e);
+    }
+
+    // Then do your visual exit as before
     fadeToStoryCreditsFromCh5();
     return 'handled';
   },
+
 },
 
 

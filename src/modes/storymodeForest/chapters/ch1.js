@@ -3,6 +3,8 @@ import { SlideRole, ItemIds } from '../../../data/storySchema.js';
 import { appState as globalAppState } from '../../../data/appState.js';
 import { awardBadge } from '../../../managers/badgeManager.js';
 import { pickupPing } from '../ui/pickupPing.js';
+import { hapticSuccess } from '../../../utils/haptics.js'; // 📳 buzz on Perfect SnowCone forge
+
 
 const BASE = import.meta.env.BASE_URL;
 const PRO_IMG = (name) => `${BASE}assets/img/characters/storyMode/${name}`;
@@ -236,7 +238,7 @@ export const Chapter1 = {
       requireVisited: ['weird','loop'],
 
       // Side choices: dynamic descriptors
-      loopLabel: 'Question the Recipes</span>',
+      loopLabel: 'Question the Recipes',
       questLabel: (appState) => {
         const items = appState?.listItems?.() ?? [];
         const total = items.reduce((n, it) => n + (it.qty ?? 1), 0);
@@ -351,7 +353,7 @@ export const Chapter1 = {
             return;
           }
 
-          // consume the three parts
+          // 🧊 consume the three parts
           try {
             if (typeof appState.consumeItems === 'function') {
               appState.consumeItems(need);
@@ -362,7 +364,7 @@ export const Chapter1 = {
             console.warn('[ch1 Pocket Check] consume parts failed:', e);
           }
 
-          // award the Perfect SnowCone itself
+          // 🍧 award the Perfect SnowCone itself
           try {
             appState.addItem(
               MASTER_SIGIL_ID,
@@ -373,7 +375,7 @@ export const Chapter1 = {
             console.warn('[ch1 Pocket Check] add master item failed:', e);
           }
 
-          // one epic pickup ping (but not stacked right on the chapter badge)
+          // ✨ one epic pickup ping (but not stacked right on the chapter badge)
           try {
             pickupPing({
               kind: 'item',
@@ -387,12 +389,19 @@ export const Chapter1 = {
             console.warn('[ch1 Pocket Check] epic ping failed:', e);
           }
 
-          // quiet currency bump → match your previous 300 + 200 pattern
+          // 💰 quiet currency bump → match your previous 300 + 200 pattern
           try {
             appState.addCurrency?.(300);
             appState.addCurrency?.(200);
           } catch (e) {
             console.warn('[ch1 Pocket Check] currency bump failed:', e);
+          }
+
+          // 📳 NOW: haptic buzz, exactly once per forge
+          try {
+            hapticSuccess();
+          } catch (e) {
+            console.warn('[ch1 Pocket Check] hapticSuccess failed:', e);
           }
 
           // keep the chip visually in sync
@@ -433,82 +442,24 @@ export const Chapter1 = {
         // /src/modes/storyMode/chapters/ch1.js — last slide object
         // ch1.js — replace the entire onAdvance handler on the last slide with this:
 
-onAdvance: ({ appState }) => {
-  // IDs we expect to consume to craft
-  const need = [ItemIds.TRIANGLE_SHARD, ItemIds.SQUARE_SHARD, ItemIds.CIRCLE_SHARD];
+      // ❗️ last slide of ch1 – onAdvance should NOT forge anymore
+      onAdvance: ({ appState }) => {
+        try {
+          // quiet drip if you still want a top-off here
+          appState.addCurrency?.(200);
+        } catch (e) {
+          console.warn('[ch1 forge-lite] currency drip failed:', e);
+        }
 
-  // tolerate missing master id in schema
-  const MASTER_SIGIL_ID = (ItemIds && ItemIds.MASTER_SIGIL) ? ItemIds.MASTER_SIGIL : 'master_sigil';
+        try {
+          refreshCashChip();
+          appState.saveToStorage?.();
+        } catch (e) {
+          console.warn('[ch1 forge-lite] save/refresh failed:', e);
+        }
 
-  // helpers
-  const hasItem = (id) => !!appState?.hasItem?.(id);
-  const hasAllParts = need.every(hasItem);
-  const alreadyForged = hasItem(MASTER_SIGIL_ID);
-
-  // DEV: one-shot state debug so we can *see* why it didn’t fire
-  console.log('[ch1 forge] parts:', {
-    triangle: hasItem(ItemIds.TRIANGLE_SHARD),
-    square:   hasItem(ItemIds.SQUARE_SHARD),
-    circle:   hasItem(ItemIds.CIRCLE_SHARD),
-    hasAllParts,
-    alreadyForged,
-    MASTER_SIGIL_ID,
-  });
-
-  // If the player currently has all three parts, we ALWAYS do the epic ping (celebration),
-  // even if they already forged before.
-  if (hasAllParts) {
-    try {
-      pickupPing({
-        kind: 'item',
-        emoji: '🍧',
-        name: 'Perfect SnowCone',
-        qty: 1,
-        variant: 'epic',
-        durationMs: 2600
-      });
-    } catch (e) {
-      console.warn('[ch1 forge] epic ping failed:', e);
-    }
-  }
-
-  // Only *add* the Perfect SnowCone + consume parts if not already forged
-  if (hasAllParts && !alreadyForged) {
-    // consume parts safely
-    try {
-      if (typeof appState.consumeItems === 'function') {
-        appState.consumeItems(need);
-      } else {
-        need.forEach(id => { try { appState.removeItem?.(id); } catch {} });
+        // no shard checks, no MASTER_SIGIL logic here
       }
-    } catch (e) {
-      console.warn('[ch1 forge] consume parts failed:', e);
-    }
-
-    // award the crafted result
-    try {
-      appState.addItem(MASTER_SIGIL_ID, { name: 'Perfect SnowCone', meta: { emoji: '🍧' } });
-      console.log('[ch1 forge] added Master Sigil item:', MASTER_SIGIL_ID);
-    } catch (e) {
-      console.warn('[ch1 forge] add master item failed:', e);
-    }
-
-    // quiet currency bump (no cash ping), then refresh chip
-    try { appState.addCurrency?.(300); } catch {}
-    refreshCashChip();
-
-  } else {
-    // Not all parts? Just explain in log so you know why no add happened.
-    if (!hasAllParts) console.log('[ch1 forge] skipped (missing parts)');
-    if (alreadyForged) console.log('[ch1 forge] skipped (already forged)');
-  }
-
-  // chapter finish drip (quiet)
-  try { appState.addCurrency?.(200); } catch {}
-  refreshCashChip();
-
-  try { appState.saveToStorage?.(); } catch {}
-}
 
 
 

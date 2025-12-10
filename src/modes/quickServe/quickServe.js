@@ -17,6 +17,8 @@ import {
 
 import { playQSRandomTrack, stopQS } from './quickServeMusic.js';
 import { activateInputHandler } from '../../managers/inputManager.js';
+import { hapticSuccess } from '../../utils/haptics.js';
+
 
 // ❌ no need to import awardBadge or finalizeQuickServeRun here
 // import { awardBadge } from '../../managers/badgeManager.js';
@@ -218,7 +220,6 @@ export function renderGameUI() {
   setupQuickServeResultButtons();
 }
 
-
 //////////////////////////////
 // 🔊 Mute Button Logic
 //////////////////////////////
@@ -226,15 +227,19 @@ function setupMuteButton() {
   const muteBtn = document.getElementById('muteBtn');
   if (!muteBtn) return;
 
+  const getHowler = () => window.Howler ?? globalThis.Howler;
+
   const updateLabel = () => {
-    muteBtn.textContent = Howler._muted ? '🔇 Unmute' : '🔊 Mute';
+    const H = getHowler();
+    const muted = !!H?._muted;
+    muteBtn.textContent = muted ? '🔇 Unmute' : '🔊 Mute';
   };
 
   muteBtn.addEventListener('click', () => {
-    const nowMuted = toggleMute();  // 🔇 actually flip sound
+    // musicManager handles the actual muting
+    toggleMute();
     updateLabel();
   });
-
 
   updateLabel();
 }
@@ -242,7 +247,9 @@ function setupMuteButton() {
 export function updateMuteButtonLabel() {
   const muteBtn = document.getElementById('muteBtn');
   if (!muteBtn) return;
-  muteBtn.textContent = Howler._muted ? '🔇 Unmute' : '🔊 Mute';
+  const H = window.Howler ?? globalThis.Howler;
+  const muted = !!H?._muted;
+  muteBtn.textContent = muted ? '🔇 Unmute' : '🔊 Mute';
 }
 
 
@@ -401,11 +408,20 @@ export function showQuickServeResults(rawStats = {}) {
     tipEl.textContent = buildQuickServeTip(stats);
   }
 
-  // Optional: pause hotkeys while modal is up, if QS uses them.
+  // 🛑 Pause hotkeys while modal is up
   activateInputHandler(null);
 
+  // 📺 Show overlay
   overlay.classList.remove('hidden');
+
+  // 📳 Soft “shift complete” buzz
+  try {
+    hapticSuccess();
+  } catch (e) {
+    console.warn('[QuickServe] hapticSuccess failed:', e);
+  }
 }
+
 
 function buildQuickServeTip(stats) {
   const score        = Number(stats.score        ?? 0);

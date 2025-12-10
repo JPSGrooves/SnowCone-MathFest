@@ -69,6 +69,23 @@ function pickNextBadgeTarget({ preferLegendary = false } = {}) {
 
   return { id, name: niceName };
 }
+// Do they actually have *all* the legendary cone badges?
+function hasAllLegendaryCones(profile) {
+  try {
+    const owned = new Set(profile?.badges || []);
+    const entries = Object.entries(BADGES || {});
+
+    const legendaryIds = entries
+      .filter(([id, meta]) => !!meta?.legendary) // leg_* cones only
+      .map(([id]) => id);
+
+    if (!legendaryIds.length) return false; // defensive, but in practice we have some
+
+    return legendaryIds.every(id => owned.has(id));
+  } catch {
+    return false;
+  }
+}
 
 // ───────────────────────────────────────────────────────────────
 // Completion / streak snapshot
@@ -110,23 +127,22 @@ function getCompletionSnapshot() {
 export function getFestivalWelcomeModel() {
   const { pct, legendDone, badgesFrac } = getCompletionSnapshot();
 
-  const profile   = appState?.profile || {};
-  const username  = profile.username || 'Friend';
-  const streakRaw = profile.streakDays ?? 0;
+  const profile    = appState?.profile || {};
+  const username   = profile.username || 'Friend';
+  const streakRaw  = profile.streakDays ?? 0;
   const streakDays = Number.isFinite(Number(streakRaw)) ? Number(streakRaw) : 0;
 
-  // 👇 first-time flag: if we've never marked it, this is the first welcome
   const firstVisit = !profile.hasSeenWelcome;
   if (firstVisit) {
-    // mark once so future boots get "Welcome back"
     profile.hasSeenWelcome = true;
   }
 
-  const greeting = firstVisit ? 'Welcome' : 'Welcome back';
+  const greeting        = firstVisit ? 'Welcome' : 'Welcome back';
+  const allCoreDone     = badgesFrac >= 1;
+  const allLegendaryOwn = hasAllLegendaryCones(profile);
 
-
-  // State 12: fully complete (legend + 100%)
-  if (legendDone && pct >= 100) {
+  // State 12: FULL COMPLETE = core 100% + *all* legendary cones + Legend badge
+  if (legendDone && allLegendaryOwn && pct >= 100) {
     return {
       kind: 'full_complete',
       greeting,
@@ -140,9 +156,8 @@ export function getFestivalWelcomeModel() {
     };
   }
 
-  // State 11: all core badges done, no legend yet ⇒ push legendary cones
-  const allCoreDone = badgesFrac >= 1;
-  if (allCoreDone && !legendDone) {
+  // State 11: core is done, but legendary layer is not fully cleared yet
+  if (allCoreDone && (!legendDone || !allLegendaryOwn)) {
     const target = pickNextBadgeTarget({ preferLegendary: true });
 
     const suggestionText = target
@@ -162,7 +177,7 @@ export function getFestivalWelcomeModel() {
     };
   }
 
-  // States 0–10: normal 10% bands
+  // States 0–10: normal 10% bands (unchanged)
   const bandIndex = Math.max(0, Math.min(9, Math.floor(pct / 10)));
   const band = BAND_MESSAGES[bandIndex];
 

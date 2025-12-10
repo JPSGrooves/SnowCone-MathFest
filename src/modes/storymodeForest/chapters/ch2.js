@@ -1,6 +1,8 @@
 // /src/modes/storyMode/chapters/ch2.js
 import { SlideRole, ItemIds, ITEM_DISPLAY } from '../../../data/storySchema.js';
 import { awardBadge } from '../../../managers/badgeManager.js';
+import { hapticSuccess } from '../../../utils/haptics.js'; // 📳 chapter clear buzz
+
 
 const BASE = import.meta.env.BASE_URL;
 

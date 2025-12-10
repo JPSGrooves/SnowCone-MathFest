@@ -388,9 +388,11 @@ function showResultMsg(isCorrect, xp = 0) {
 function checkBadgeUnlock() {
   const xp = Number(appState.profile?.xp) || 0;
   const has = (appState.profile?.badges || []).includes('cone_master');
-  if (xp >= 100 && !has) {
-    awardBadge('cone_master');
-  }
+
+  // Badge temporarily disabled:
+  // if (xp >= 100 && !has) {
+  //   awardBadge('cone_master');
+  // }
 }
 
 function toggleNegative() {
