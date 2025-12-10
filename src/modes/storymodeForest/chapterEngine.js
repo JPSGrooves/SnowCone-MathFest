@@ -26,6 +26,9 @@ const SM_UNLOCK_KEY = 'sm_unlocked_chapters_v1';
 
 
 
+// e.g. in chapterEngine.js or storyMode entry
+console.log('📖 [Story] iOS test build – v2025-12-10-01');
+
 
 function smLoadUnlocks() {
   try {
@@ -246,6 +249,53 @@ export class ChapterEngine {
       });
     });
   }
+    _renderJournalSlide(chapter, slide) {
+    const title = `<h2 class="sm-ch1-title">${slide.title || ''}</h2>`;
+    const img   = slide.img ? `<img class="sm-ch1-img" src="${slide.img}" alt="">` : '';
+    const text  = slide.text ? `<div class="sm-ch1-text">${slide.text}</div>` : '';
+
+    const isFirst = this.state.idx === 0;
+    const isLast  = this.state.idx === (chapter.slides.length - 1);
+    const nextLabel =
+      slide.soloLabel ||
+      (isLast ? 'Back to Story Menu' : 'Next ➡️');
+
+    const inner = `
+      ${title}
+      ${img}
+      ${text}
+      <div class="sm-choice-list">
+        <button
+          class="sm-btn sm-btn-secondary js-journal-prev"
+          ${isFirst ? 'disabled' : ''}
+        >
+          ⬅️ Back
+        </button>
+        <button class="sm-btn sm-btn-primary js-journal-next">
+          ${nextLabel}
+        </button>
+      </div>
+    `;
+
+    this._renderFrame(inner);
+
+    const root    = document;
+    const prevBtn = root.querySelector('.js-journal-prev');
+    const nextBtn = root.querySelector('.js-journal-next');
+
+    // Back = go to previous slide (no rewards, no hooks)
+    prevBtn?.addEventListener('click', () => {
+      if (this.state.idx > 0) {
+        this._goto(this.state.idx - 1);
+      }
+    });
+
+    // Next = use normal advance plumbing (rewards + onAdvance + finish)
+    nextBtn?.addEventListener('click', () => {
+      this._onAdvance(chapter, slide, { disabled: false });
+    });
+  }
+
 
 
 
@@ -405,7 +455,7 @@ export class ChapterEngine {
 
 
 
-  _renderSlide(){
+    _renderSlide(){
     const chapter = this.registry[this.state.chapterId];
     const slide = chapter.slides[this.state.idx];
 
@@ -440,6 +490,14 @@ export class ChapterEngine {
       this._renderEndingSlide(chapter, slide);
       return;
     }
+
+    // 🌟 NEW: Creator's Journal linear panels (Back / Next only)
+    if (slide?.mode === 'journal') {
+      this._renderJournalSlide(chapter, slide);
+      return;
+    }
+
+
 
     // ───────────────────────────────────────────
     // Gating: require side-path visits before "Advance"

@@ -126,6 +126,30 @@ npm run build:native
 npx cap copy ios
 npx cap sync ios
 ```
+1. Lock in the native build pipeline
+
+From now on, whenever you change the game code and want it in Xcode, you’ll use two builds:
+
+Web / GitHub Pages build (what you already do):
+```bash
+npm run build        # uses --mode web  (base = /SnowCone-MathFest/)
+npm run live         # if you’re deploying to gh-pages
+```
+```bash
+npm run build 
+npm run live
+```
+
+iOS / Capacitor build:
+```bash
+npm run build:native   # vite build --mode ios   (base = '/')
+npx cap copy ios       # copy fresh dist into ios/App/App/public
+```
+```bash
+npm run build:native 
+npx cap copy ios
+```
+# (optional) npx cap open ios   # if Xcode isn’t already open
 
 You can go back to main and:
 

@@ -1,5 +1,6 @@
+// src/managers/musicManager.js
 import { Howl, Howler } from 'howler';
-
+import { isIOSNative } from '../utils/platform.js'; // 🔍 single source of truth
 
 let currentTrack = null;
 
@@ -15,33 +16,41 @@ let rafId = null;
 const fadeDuration = 1000;
 
 // 🔥 Track List
-// managers/musicManager.js
-// ...existing imports & code...
+// managers/musicManager.js — full catalog (includes iOS-only tracks)
+const allTracks = [
+  { id: 'quikserve',      name: 'QuikServe OG',         file: 'quikserveST_OG.mp3' },
+  { id: 'kktribute',      name: 'KK Tribute',           file: 'KKtribute.mp3' },
+  { id: 'softdown',       name: 'Soft Down Math Vibes', file: 'softDownMathVibes.mp3' },
+  { id: 'infadd',         name: 'Infinity Addition',    file: 'InfinityAddition.mp3' },
+  { id: 'sc90',           name: 'SnowCone 90',          file: 'sc_90.mp3' },
+  { id: 'nothingorg',     name: 'Nothing Organic',      file: 'nothing_organic.mp3' },
+  { id: 'secrets',        name: 'Secrets of Math',      file: 'secretsOfMath.mp3' },
+  { id: 'stoopidelectro', name: 'Stoopid Electro',      file: 'stoopidElectro.mp3' },
+  { id: 'prologue',       name: 'Story Prologue',       file: 'prologueTrack.mp3' },
+  { id: 'kittyPaws',      name: 'Kitty Paws',           file: 'kittyPaws.mp3' },
+  { id: 'patchrelaxes',   name: 'Patch Relaxes',        file: 'patchRelaxes.mp3' },
+  { id: 'bonusTime',      name: 'Bonus Time',           file: 'bonusTime.mp3' },
 
-// managers/musicManager.js — 🔥 Track List
-const tracks = [
-  { id: 'quikserve',  name: 'QuikServe OG',         file: 'quikserveST_OG.mp3' },
-  { id: 'kktribute',  name: 'KK Tribute',           file: 'KKtribute.mp3' },
-  { id: 'softdown',   name: 'Soft Down Math Vibes', file: 'softDownMathVibes.mp3' },
-  { id: 'infadd',     name: 'Infinity Addition',    file: 'InfinityAddition.mp3' },
-  { id: 'sc90',       name: 'SnowCone 90',          file: 'sc_90.mp3' },
-  { id: 'nothingorg', name: 'Nothing Organic',      file: 'nothing_organic.mp3' },
-  { id: 'secrets',    name: 'Secrets of Math',      file: 'secretsOfMath.mp3' },
-  { id: 'stoopidelectro',name: 'Stoopid Electro',   file: 'stoopidElectro.mp3' },
-  { id: 'prologue',   name: 'Story Prologue',       file: 'prologueTrack.mp3' },
-  { id: 'kittyPaws',  name: 'Kitty Paws',           file: 'kittyPaws.mp3' },
-  { id: 'patchrelaxes', name: 'Patch Relaxes',      file: 'patchRelaxes.mp3' },
-  { id: 'bonusTime',  name: 'Bonus Time',           file: 'bonusTime.mp3' },
+  // 🦟 iOS-exclusive: only shows up in native iOS shell
+  {
+    id: 'mosquitoSmash',
+    name: 'Mosquito Smash',
+    file: 'mosquitoSmash.mp3',
+    iosExclusive: true,
+  },
 ];
 
-// ...rest of file unchanged...
-
+// 🧊 Public-facing track list (filtered by environment)
+// - iOS native shell → includes Mosquito Smash and any future iosExclusive tracks
+// - Browser / PWA → excludes all iosExclusive tracks entirely
+const tracks = isIOSNative()
+  ? allTracks
+  : allTracks.filter(t => !t.iosExclusive);
 
 let looping = false;
 let shuffling = false;
 let currentIndex = 0;
 let trackLoop = null;
-
 
 //////////////////////////////
 // 🚀 Play Track
@@ -213,7 +222,8 @@ export function getShuffling() {
 function getCurrentTrackIndex() {
   if (!currentTrack) return 0;
   const src = currentTrack._src;
-  return tracks.findIndex(t => src.includes(t.file)) || 0;
+  const idx = tracks.findIndex(t => src.includes(t.file));
+  return idx >= 0 ? idx : 0;
 }
 
 //////////////////////////////
@@ -235,7 +245,8 @@ function startProgressUpdater() {
     bar.value = percent.toFixed(1);
     bar.max = 100;
 
-    const format = (n) => `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, '0')}`;
+    const format = (n) =>
+      `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, '0')}`;
     timer.textContent = `${format(seek)} / ${format(duration)}`;
 
     rafId = requestAnimationFrame(update);
@@ -267,6 +278,7 @@ export function currentTrackId() {
 }
 
 export function getTrackList() {
+  // Already filtered by environment via `tracks`
   return tracks;
 }
 
@@ -293,6 +305,7 @@ function updateTrackLabel(name = currentTrackName()) {
     label.textContent = name;
   }
 }
+
 export function scrubTo(percent) {
   if (!currentTrack) return;
   const duration = currentTrack.duration();
@@ -308,8 +321,8 @@ export function getCurrentSeekPercent() {
   return (currentTrack.seek() || 0) / duration;
 }
 
+// 🎣 Infinity Lake loop keeps its own curated list
 const infinityTrackIds = ['infadd', 'nothingorg', 'secrets', 'patchrelaxes', 'stoopidelectro'];
-
 
 function shuffleInfinityTrackList() {
   return infinityTrackIds
@@ -332,9 +345,7 @@ export function playInfinityLoop() {
   }
 }
 
+// 🧊 Infinity just uses the global player, so stopping is simple
 export function stopInfinityLoop() {
-  if (trackLoop) {
-    trackLoop.stop();
-    isPlaying = false;
-  }
+  stopTrack();
 }

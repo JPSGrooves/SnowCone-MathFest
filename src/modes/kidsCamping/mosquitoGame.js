@@ -1,6 +1,6 @@
 // /src/modes/kidsCamping/mosquitoGame.js
 import { Howl } from 'howler';
-import { hapticSuccess } from '../../utils/haptics.js'; // 📳 add this
+import { hapticTap } from '../../utils/haptics.js'; // 📳 add this
 
 const SFX_BASE = `${import.meta.env.BASE_URL}assets/audio/SFX/`;
 const MOSQ_SFX  = SFX_BASE + 'mosquito.mp3';
@@ -342,9 +342,9 @@ export function initMosquitoGame(opts = {}) {
 
       // 📳 Tiny “good swat” haptic – local, not tied to badges
       try {
-        hapticSuccess();
+        hapticTap();
       } catch (e) {
-        console.warn('[mosquitoGame] hapticSuccess failed:', e);
+        console.warn('[mosquitoGame] hapticTap failed:', e);
       }
     } catch (err) {
       console.warn('[mosquitoGame] splat SFX failed:', err);

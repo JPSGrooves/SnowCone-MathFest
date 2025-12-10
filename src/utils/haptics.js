@@ -1,44 +1,107 @@
 // src/utils/haptics.js
+// 🔊 SnowCone MathFest – unified haptics layer
 
-// We’re coding this way so:
-// 1) It never crashes if vibration/Haptics isn’t available.
-// 2) It works both in browser-only PWA and in native (Capacitor) builds.
-// 3) The rest of the app just calls tiny named helpers like hapticTap().
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { isIOSNative } from './platform.js';
 
-let canVibrate = false;
-
-try {
-  canVibrate =
-    typeof navigator !== 'undefined' &&
-    typeof navigator.vibrate === 'function';
-} catch (err) {
-  canVibrate = false;
+// Internal: safe call wrapper so we never crash the game
+async function safeNativeCall(fn, label) {
+  try {
+    await fn();
+  } catch (err) {
+    console.warn(`[HAPTICS] native ${label} failed`, err);
+  }
 }
 
-// ─────────────────────────────────────────
-// Basic patterns using the Vibration API
-// ─────────────────────────────────────────
-
-export function hapticSuccess() {
-  console.log('[HAPTICS] hapticSuccess() fired');
-  if (!canVibrate) return;
-  navigator.vibrate([0, 30, 40, 30]);
+// Small helper so we don't explode in non-browser / SSR-ish situations
+function canVibrate() {
+  try {
+    return typeof navigator !== 'undefined' && !!navigator.vibrate;
+  } catch {
+    return false;
+  }
 }
 
+function vibrate(pattern) {
+  if (!canVibrate()) return;
+  try {
+    navigator.vibrate(pattern);
+  } catch {
+    // ignore – some browsers lie about vibrate support
+  }
+}
+
+// 🧊 Light tap – menus, small clicks
 export function hapticTap() {
-  console.log('[HAPTICS] hapticTap() fired');
-  if (!canVibrate) return;
-  navigator.vibrate(15);
+  // Web / PWA path → use navigator.vibrate when available
+  if (!isIOSNative()) {
+    vibrate(15);
+    return;
+  }
+
+  // Native iOS shell → Capacitor haptics
+  if (!Haptics) {
+    // ultra-defensive: if plugin is missing for some reason, fall back to web vibe
+    vibrate(15);
+    return;
+  }
+
+  safeNativeCall(
+    () => Haptics.impact({ style: ImpactStyle.Light }),
+    'tap'
+  );
 }
 
+// 🎯 Medium impact – correct answers, good actions
+export function hapticSuccess() {
+  if (!isIOSNative()) {
+    vibrate(50);
+    return;
+  }
+
+  if (!Haptics) {
+    vibrate(50);
+    return;
+  }
+
+  safeNativeCall(
+    () => Haptics.notification({ type: NotificationType.Success }),
+    'success'
+  );
+}
+
+// ⚠️ Error feedback – wrong answer, blocked action
 export function hapticError() {
-  console.log('[HAPTICS] hapticError() fired');
-  if (!canVibrate) return;
-  navigator.vibrate([0, 20, 30, 20, 30, 20]);
+  if (!isIOSNative()) {
+    vibrate(80);
+    return;
+  }
+
+  if (!Haptics) {
+    vibrate(80);
+    return;
+  }
+
+  safeNativeCall(
+    () => Haptics.notification({ type: NotificationType.Error }),
+    'error'
+  );
 }
 
+// 🌊 Soft pulse – special rewards, XP, badges
 export function hapticSoftPulse() {
-  console.log('[HAPTICS] hapticSoftPulse() fired');
-  if (!canVibrate) return;
-  navigator.vibrate(10);
+  if (!isIOSNative()) {
+    vibrate([0, 25, 10, 25]);
+    return;
+  }
+
+  if (!Haptics) {
+    vibrate([0, 25, 10, 25]);
+    return;
+  }
+
+  safeNativeCall(
+    () => Haptics.impact({ style: ImpactStyle.Medium }),
+    'softPulse'
+  );
 }

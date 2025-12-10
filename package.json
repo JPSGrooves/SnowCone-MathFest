@@ -71,6 +71,7 @@
   ],
   "dependencies": {
     "@capacitor/core": "^7.4.4",
+    "@capacitor/haptics": "^7.0.3",
     "@capacitor/ios": "^7.4.4",
     "canvas-confetti": "^1.9.3",
     "dotenv": "^16.5.0",

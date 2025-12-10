@@ -1727,3 +1727,88 @@
   /* was 0.25 → trim it a bit */
   padding-bottom: calc(var(--sm-bbar-h) * 0.20 + max(0.35vh, env(safe-area-inset-bottom))) !important;
 }
+/* 🍏 iOS-only: push down Creator's Journal under the fake top bar */
+:root[data-platform="ios"] body.sm-active .sm-ch1[data-chapter="chJournal"] {
+  padding-top: 7vh;
+}
+/* ──────────────────────────────────────────────
+   Creator's Journal – solo slide layout tuning
+   ────────────────────────────────────────────── */
+
+/* Make solo sections a flex column so content + button behave nicely */
+.sm-solo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Journal-only: pad bottom so text never collides with the button */
+.sm-aspect-wrap[data-chapter="chJournal"] .sm-solo {
+  padding-bottom: 13vh; /* space for the teal button + a little breathing room */
+}
+
+/* Journal-only: pin the main advance button just above Cone Coins HUD */
+.sm-aspect-wrap[data-chapter="chJournal"] .sm-solo .sm-btn-primary {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 8.5vh; /* tweak this number until it lines up perfectly above Cone Coins */
+}
+
+/* Keep the text block from stretching all the way down */
+.sm-aspect-wrap[data-chapter="chJournal"] .sm-solo .sm-body,
+.sm-aspect-wrap[data-chapter="chJournal"] .sm-solo .sm-solo-text {
+  max-height: 100%;
+}
+
+/* Optional: center-only button row so we don't get weird extra margins */
+.sm-aspect-wrap[data-chapter="chJournal"] .sm-solo .sm-actions {
+  justify-content: center;
+}
+/* ─────────────────────────────
+   Creator's Journal layout (chJournal)
+   Title up top, buttons hugging bottom
+   ───────────────────────────── */
+
+#game-container .sm-ch1[data-chapter="chJournal"] .sm-ch1-wrap {
+  /* Fill the frame and pin top / bottom */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* title up, buttons down */
+  align-items: center;
+}
+
+/* Extra breathing room so first line of text doesn't touch the title */
+#game-container .sm-ch1[data-chapter="chJournal"] .sm-ch1-title {
+  margin-top: clamp(0.4rem, 1.2vh, 0.8rem);
+  margin-bottom: clamp(0.8rem, 2vh, 1.3rem);
+}
+
+/* Journal body: slightly smaller + comfy line-height so long entries fit */
+#game-container .sm-ch1[data-chapter="chJournal"] .sm-ch1-text {
+  max-width: 70ch;
+  font-size: clamp(0.95rem, 0.9vh + 0.55rem, 1.1rem);
+  line-height: 1.24;
+}
+
+/* Keep the Back/Next row tight to the bottom bar, like your image slides */
+#game-container .sm-ch1[data-chapter="chJournal"] .sm-choice-list {
+  margin-top: clamp(0.6rem, 1.4vh, 1rem);
+  /* reuse your global bottom buffer so it's just above Cone Coins */
+  margin-bottom: calc(var(--sm-bbar-h) * 0.4 + max(0.6vh, env(safe-area-inset-bottom))) !important;
+}
+/* Locked / iOS-only chapter tile in chapter menu (web only) */
+.sm-chapter-locked-ios {
+  opacity: 0.55;
+  filter: grayscale(0.35);
+  cursor: default;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.08) inset;
+  text-align: center;
+}
+
+.sm-chapter-locked-ios:hover {
+  filter: grayscale(0.35); /* no brighten on hover */
+}
+
+

@@ -33,6 +33,8 @@ import { pickupPing } from './ui/pickupPing.js';
 // src/modes/storyMode/storyMode.js
 import { appState } from '../../data/appState.js';
 import { scheduleStoryCredits } from './ui/storyCredits.js';
+import { isIOSNative } from '../../utils/platform.js'; // 👈 unified platform helper
+
 
 
 
@@ -141,6 +143,17 @@ const SELECTORS = {
 const SM_BODY_CLASS = 'sm-active';
 
 const STORY_TRACKS = ['prologue', 'bonusTime', 'patchrelaxes' ];
+
+// 🔍 Native iOS detector for exclusive content.
+// Your WKWebView / native wrapper should set window.SC_IOS_NATIVE = true
+// inside the paid iOS app. Browsers will not see this.
+// 🔍 StoryMode iOS-native gate – delegates to shared platform helper
+function isIOSNativeExclusive() {
+  // We keep the name so all existing StoryMode code keeps working,
+  // but the actual “are we native?” logic lives in src/utils/platform.js.
+  return isIOSNative();
+}
+
 
 let elRoot = null;
 let keyHandler = null;
@@ -781,24 +794,27 @@ function renderChapterMenu() {
   if (!container) return;
 
   const unlockedSet = smGetUnlocked();
-const devUnlock = !!window.devFlags?.unlockAllChapters;
+  const devUnlock = !!window.devFlags?.unlockAllChapters;
 
-const unlockedCh2 =
-  devUnlock ||
-  unlockedSet.has('ch2') ||
-  appState.hasItem?.(ItemIds.MASTER_SIGIL);
+  const unlockedCh2 =
+    devUnlock ||
+    unlockedSet.has('ch2') ||
+    appState.hasItem?.(ItemIds.MASTER_SIGIL);
 
-const unlockedCh3 =
-  devUnlock ||
-  unlockedSet.has('ch3');
+  const unlockedCh3 =
+    devUnlock ||
+    unlockedSet.has('ch3');
 
-const unlockedCh4 =
-  devUnlock ||
-  unlockedSet.has('ch4');
+  const unlockedCh4 =
+    devUnlock ||
+    unlockedSet.has('ch4');
 
-const unlockedCh5 =
-  devUnlock ||
-  unlockedSet.has('ch5');
+  const unlockedCh5 =
+    devUnlock ||
+    unlockedSet.has('ch5');
+
+  // 🔍 is this the native iOS build?
+  const iosExclusive = isIOSNativeExclusive();
 
   container.innerHTML = `
     <div class="sm-aspect-wrap">
@@ -847,6 +863,21 @@ const unlockedCh5 =
               Chapter 5 — SnowCone Endings
             </button>
 
+
+
+            <!-- 🌟 Always visible, but only clickable in native iOS -->
+            <button
+              class="sm-btn ${
+                iosExclusive
+                  ? 'sm-btn-primary'
+                  : 'sm-btn-secondary sm-btn-locked'
+              }"
+              id="smChJournal"
+              ${iosExclusive ? '' : 'disabled aria-disabled="true" title="Available in the iOS app"'}
+            >
+              Creator&apos;s Journal (iOS Exclusive)
+            </button>
+
           </div>
 
           <div class="sm-chapter-note">
@@ -887,7 +918,6 @@ const unlockedCh5 =
 
   wireHandlersForCurrentRoot();
 }
-
 function renderPrologueReader() {
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
@@ -1168,6 +1198,16 @@ function wireHandlersForCurrentRoot() {
     if (e.target.closest('#smCh3'))       { smSetChapterFlag('ch3'); getEngine().start('ch3'); return; }
     if (e.target.closest('#smCh4'))       { smSetChapterFlag('ch4'); getEngine().start('ch4'); return; }
     if (e.target.closest('#smCh5'))       { smSetChapterFlag('ch5'); getEngine().start('ch5'); return; }
+
+
+    // 🌟 NEW: iOS-only Creator's Journal chapter
+    if (e.target.closest('#smChJournal')) {
+      // Hard gate: if someone somehow sees this in browser, ignore.
+      if (!isIOSNativeExclusive()) return;
+      smSetChapterFlag('chJournal');
+      getEngine().start('chJournal');
+      return;
+    }
 
     // Prologue flow
     if (e.target.closest('#smSkipType')) { elRoot?.__smDoneFast?.(); return; }
