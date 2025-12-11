@@ -1,22 +1,29 @@
 // src/utils/platform.js
 
-// 🌐 Unified platform detection — stays dynamic
+// 🧠 Are we running the *iOS build* of SnowCone (built with .env.ios)?
+export function isIOSBuild() {
+  const platform = import.meta.env?.VITE_PLATFORM || 'web';
+  return platform === 'ios';
+}
+
+// 🌐 Unified platform detection — but *only* true for the iOS build
 export function isIOSNative() {
   const w = typeof window !== 'undefined' ? window : globalThis;
 
-  // 1) Native flag injected by Capacitor/WKWebView
-  const nativeFlag = !!w.SC_IOS_NATIVE;
+  // 1) If this isn't the iOS-flavored bundle, we are never "native iOS"
+  if (!isIOSBuild()) return false;
 
-  // 2) Capacitor presence check (extra safety)
-  const hasCapacitor = !!w.Capacitor;
+  // 2) Native hints only relevant *inside* that bundle
+  const nativeFlag   = !!w.SC_IOS_NATIVE;    // set by your WKWebView shell
+  const hasCapacitor = !!w.Capacitor;        // Capacitor bridge present
+  const ua           = w.navigator?.userAgent || '';
+  const isiOSUA      = /iPhone|iPad|iPod/i.test(ua);
 
-  // 3) Build-time env from Vite (--mode ios + .env.ios)
-  const envFlag = import.meta.env?.VITE_PLATFORM === 'ios';
-
-  return nativeFlag || hasCapacitor || envFlag;
+  // Any of these is enough *once* we know we're in the iOS build
+  return nativeFlag || hasCapacitor || isiOSUA;
 }
 
+// Optional label helper if you want it for logging/UI
 export function getPlatformLabel() {
   return isIOSNative() ? 'ios-native' : 'web';
 }
-

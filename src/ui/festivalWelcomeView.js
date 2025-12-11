@@ -41,6 +41,7 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
     inner.appendChild(card);
   }
 
+  
   const model = getFestivalWelcomeModel();
 
   const streak = Number(model.streakDays ?? 0);
