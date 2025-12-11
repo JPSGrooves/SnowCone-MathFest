@@ -169,7 +169,7 @@ html, body {
   opacity: 0;
   z-index: 2;
   animation: fadeInCone 1s ease 1.5s forwards;
-  transform: translateY(-13vh); /* 🍧 move up 8% of the viewport height */
+  transform: translateY(-6vh); /* 🍧 move up 8% of the viewport height */
 }
 
 @keyframes fadeInStars {
@@ -657,7 +657,7 @@ html, body {
 
 /* 🍏 iOS-only: nudge the hitbox lower to match the shifted art */
 :root[data-platform='ios'] .mushroom-popper-hitbox {
-  top: 30vh; /* tweak this until it hugs the cone just right */
+  top: 35vh; /* tweak this until it hugs the cone just right */
 }
 
 /* kill focus ring (we’re using it like a pure hitbox) */
@@ -928,68 +928,4 @@ body.modal-open {
 
 :root[data-platform="ios"] .menu-title-top:hover {
   transform: translateY(4vh) scale(1.05);
-}
-/* 📱 Orientation Lock Overlay (iOS native portrait-only) */
-.orientation-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 300; /* above game, menu, high scores, cosmic overlay */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 20% 0%, rgba(0, 255, 200, 0.16), transparent 55%),
-              radial-gradient(circle at 80% 100%, rgba(255, 180, 240, 0.18), transparent 55%),
-              rgba(0, 0, 0, 0.9);
-  pointer-events: auto;
-}
-
-.orientation-overlay.hidden {
-  display: none;
-}
-
-.orientation-card {
-  max-width: min(360px, 82vw);
-  padding: 1.2rem 1.4rem 1.1rem;
-  border-radius: 18px;
-  background: rgba(4, 10, 26, 0.96);
-  border: 1px solid rgba(0, 255, 200, 0.7);
-  box-shadow:
-    0 0 30px rgba(0, 255, 200, 0.6),
-    0 0 60px rgba(140, 120, 255, 0.45);
-  text-align: center;
-  font-family: 'Orbitron', system-ui, sans-serif;
-  color: #eaffff;
-}
-
-.orientation-emoji {
-  font-size: 1.8rem;
-  margin: 0 0 0.3rem;
-}
-
-.orientation-main {
-  margin: 0 0 0.35rem;
-  font-size: 0.98rem;
-}
-
-.orientation-sub {
-  margin: 0;
-  font-size: 0.8rem;
-  opacity: 0.9;
-}
-
-/* When orientation is "blocked", fade out app layers under the overlay */
-body.orientation-blocked .menu-wrapper,
-body.orientation-blocked #game-container,
-body.orientation-blocked #startup-screen,
-body.orientation-blocked #cosmicOverlay,
-body.orientation-blocked #cosmicModal,
-body.orientation-blocked #highScoreOverlay {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Keep background stars alive so it still feels like the festival */
-body.orientation-blocked .menu-floater,
-body.orientation-blocked .background-floater {
-  opacity: 0.9;
 }
