@@ -66,14 +66,9 @@ function unlockThemeIfAny(id) {
 const BADGE_ALIAS = { play_music: 'listened_music' };
 
 // Badges that should buzz EVERY time the award path is hit
-// (QS, Infinity Lake, Story chapters)
+// (Infinity Lake + Story chapters).
+// ⚡ QuickServe handles its own per-run milestone haptics.
 const HAPTIC_ALWAYS_BADGES = new Set([
-  // ⚡ QuickServe
-  'quick_25',
-  'quick_50',
-  'quick_75',
-  'quick_100',
-
   // 🔁 Infinity Lake
   'inf_25_1min',
   'inf_50_2min',

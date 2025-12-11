@@ -8,6 +8,8 @@ import '../modals/infoModal.js';
 import { playTransition } from '../managers/transitionManager.js';
 import { startMode } from '../managers/sceneManager.js';
 import { awardBadge } from '../managers/badgeManager.js'; 
+import { hapticTap } from '../utils/haptics.js'; // 📳 tiny cone tap vibes
+
 
 
 // src/menu/menu.js
@@ -73,6 +75,13 @@ function installMushroomPopper(menuWrapper) {
   const handleTap = (ev) => {
     ev.stopPropagation();
     ev.preventDefault();
+
+    // 📳 Soft, spam-safe tap haptic
+    try {
+      hapticTap();
+    } catch (err) {
+      console.warn('🍄 Mushroom popper haptic failed', err);
+    }
 
     try {
       // +1 XP per tap (existing behavior)

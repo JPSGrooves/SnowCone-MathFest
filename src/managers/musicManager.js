@@ -43,9 +43,14 @@ const allTracks = [
 // 🧊 Public-facing track list (filtered by environment)
 // - iOS native shell → includes Mosquito Smash and any future iosExclusive tracks
 // - Browser / PWA → excludes all iosExclusive tracks entirely
-const tracks = isIOSNative()
-  ? allTracks
-  : allTracks.filter(t => !t.iosExclusive);
+function getTracks() {
+  // ⚠️ IMPORTANT:
+  // This runs at *call time*, not at module import time.
+  // That means it can see `isIOSNative()` AFTER the native shell injects SC_IOS_NATIVE.
+  return isIOSNative()
+    ? allTracks
+    : allTracks.filter(t => !t.iosExclusive);
+}
 
 let looping = false;
 let shuffling = false;
@@ -56,6 +61,7 @@ let trackLoop = null;
 // 🚀 Play Track
 //////////////////////////////
 export function playTrack(id = getFirstTrackId()) {
+  const tracks = getTracks();
   const track = tracks.find(t => t.id === id);
   if (!track) {
     console.warn(`⚠️ Track "${id}" not found.`);
@@ -119,6 +125,7 @@ export function stopTrack(callback) {
 // 🔀 True Random Track
 //////////////////////////////
 export function playRandomTrack() {
+  const tracks = getTracks();
   const currentIndex = getCurrentTrackIndex();
   let randomIndex;
 
@@ -140,6 +147,7 @@ export function skipNext() {
     return;
   }
 
+  const tracks = getTracks();
   const index = getCurrentTrackIndex();
   const next = (index + 1) % tracks.length;
   stopTrack(() => {
@@ -156,6 +164,7 @@ export function skipPrev() {
     return;
   }
 
+  const tracks = getTracks();
   const index = getCurrentTrackIndex();
   const prev = (index - 1 + tracks.length) % tracks.length;
   stopTrack(() => {
@@ -221,6 +230,7 @@ export function getShuffling() {
 //////////////////////////////
 function getCurrentTrackIndex() {
   if (!currentTrack) return 0;
+  const tracks = getTracks();
   const src = currentTrack._src;
   const idx = tracks.findIndex(t => src.includes(t.file));
   return idx >= 0 ? idx : 0;
@@ -265,6 +275,7 @@ export function isPlaying() {
 
 export function currentTrackName() {
   if (!currentTrack) return '(none)';
+  const tracks = getTracks();
   const src = currentTrack._src;
   const track = tracks.find(t => src.includes(t.file));
   return track?.name || '(unknown)';
@@ -272,14 +283,15 @@ export function currentTrackName() {
 
 export function currentTrackId() {
   if (!currentTrack) return '';
+  const tracks = getTracks();
   const src = currentTrack._src;
   const track = tracks.find(t => src.includes(t.file));
   return track?.id ?? '';
 }
 
 export function getTrackList() {
-  // Already filtered by environment via `tracks`
-  return tracks;
+  // Already filtered by environment via `getTracks()`
+  return getTracks();
 }
 
 //////////////////////////////
@@ -293,6 +305,7 @@ export function initMusicPlayer() {
 // 🌠 Fallback
 //////////////////////////////
 function getFirstTrackId() {
+  const tracks = getTracks();
   return tracks[0]?.id ?? '';
 }
 

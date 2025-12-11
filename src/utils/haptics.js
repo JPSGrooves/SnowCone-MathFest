@@ -8,6 +8,7 @@ import { isIOSNative } from './platform.js';
 async function safeNativeCall(fn, label) {
   try {
     await fn();
+    // console.log(`[HAPTICS] native ${label} ok`);
   } catch (err) {
     console.warn(`[HAPTICS] native ${label} failed`, err);
   }
@@ -31,17 +32,17 @@ function vibrate(pattern) {
   }
 }
 
+// Central helper so we can log what path we’re taking
+function usingNativeHaptics() {
+  const native = isIOSNative();
+  // console.log('[HAPTICS] usingNativeHaptics?', { native, hasPlugin: !!Haptics });
+  return native && !!Haptics;
+}
+
 // 🧊 Light tap – menus, small clicks
 export function hapticTap() {
-  // Web / PWA path → use navigator.vibrate when available
-  if (!isIOSNative()) {
-    vibrate(15);
-    return;
-  }
-
-  // Native iOS shell → Capacitor haptics
-  if (!Haptics) {
-    // ultra-defensive: if plugin is missing for some reason, fall back to web vibe
+  if (!usingNativeHaptics()) {
+    // Web / PWA path → use navigator.vibrate when available
     vibrate(15);
     return;
   }
@@ -54,12 +55,7 @@ export function hapticTap() {
 
 // 🎯 Medium impact – correct answers, good actions
 export function hapticSuccess() {
-  if (!isIOSNative()) {
-    vibrate(50);
-    return;
-  }
-
-  if (!Haptics) {
+  if (!usingNativeHaptics()) {
     vibrate(50);
     return;
   }
@@ -72,12 +68,7 @@ export function hapticSuccess() {
 
 // ⚠️ Error feedback – wrong answer, blocked action
 export function hapticError() {
-  if (!isIOSNative()) {
-    vibrate(80);
-    return;
-  }
-
-  if (!Haptics) {
+  if (!usingNativeHaptics()) {
     vibrate(80);
     return;
   }
@@ -90,12 +81,7 @@ export function hapticError() {
 
 // 🌊 Soft pulse – special rewards, XP, badges
 export function hapticSoftPulse() {
-  if (!isIOSNative()) {
-    vibrate([0, 25, 10, 25]);
-    return;
-  }
-
-  if (!Haptics) {
+  if (!usingNativeHaptics()) {
     vibrate([0, 25, 10, 25]);
     return;
   }

@@ -12,7 +12,9 @@ import { runInAction } from 'mobx';
 import { playInfinityLoop } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
 import { Howl, Howler } from 'howler';
-import { hapticSuccess } from '../../utils/haptics.js';
+import { hapticSuccess, hapticError, hapticSoftPulse } from '../../utils/haptics.js';
+
+
 
 
 
@@ -50,6 +52,12 @@ const modeMisses = {
   alg: 0,
 };
 
+// 🌟 NEW: per-run Infinity milestone flags (25 / 50 / 100 / 250)
+let hit25ThisRun  = false;
+let hit50ThisRun  = false;
+let hit100ThisRun = false;
+let hit250ThisRun = false;
+
 
 // last problem we *served*
 let lastProblemMeta = null;
@@ -62,15 +70,44 @@ const lastMissByMode = {
 };
 
 // ⬇️ replace the old checkInfinityBadges() with this
+// ⬇️ now: run-local milestone haptics only (no badge awards here)
 function checkInfinityBadgesByScore() {
   const seconds = Math.floor((Date.now() - startTime) / 1000);
 
-  // 🏅 time-gated, score-based thresholds
-  // (keeping numeric thresholds identical to your old attempt counts: 25, 50, 100, 250 — now interpreted as POINTS)
-  if (score >= 25  && seconds <= 60)   awardBadge('inf_25_1min');
-  if (score >= 50  && seconds <= 120)  awardBadge('inf_50_2min');
-  if (score >= 100 && seconds <= 240)  awardBadge('inf_100_4min');
-  if (score >= 250 && seconds <= 600)  awardBadge('inf_250_10min');
+  let hitSomething = false;
+
+  if (!hit25ThisRun && score >= 25 && seconds <= 60) {
+    hit25ThisRun = true;
+    hitSomething = true;
+    console.log('♾️ Hit 25-point Infinity milestone this run');
+  }
+
+  if (!hit50ThisRun && score >= 50 && seconds <= 120) {
+    hit50ThisRun = true;
+    hitSomething = true;
+    console.log('♾️ Hit 50-point Infinity milestone this run');
+  }
+
+  if (!hit100ThisRun && score >= 100 && seconds <= 240) {
+    hit100ThisRun = true;
+    hitSomething = true;
+    console.log('♾️ Hit 100-point Infinity milestone this run');
+  }
+
+  if (!hit250ThisRun && score >= 250 && seconds <= 600) {
+    hit250ThisRun = true;
+    hitSomething = true;
+    console.log('♾️ Hit 250-point Infinity milestone this run');
+  }
+
+  if (hitSomething) {
+    try {
+      // 🌊 soft, special reward buzz (mirrors QS behavior)
+      hapticSoftPulse();
+    } catch (err) {
+      console.warn('[Infinity] milestone hapticSoftPulse failed:', err);
+    }
+  }
 }
 
 
@@ -419,6 +456,12 @@ function startGame() {
   lastMissByMode.multdiv = null;
   lastMissByMode.alg = null;
 
+  // 🌟 reset per-run Infinity milestones
+  hit25ThisRun  = false;
+  hit50ThisRun  = false;
+  hit100ThisRun = false;
+  hit250ThisRun = false;
+
   updateScore();
   updateStreak();
   newProblem();
@@ -626,6 +669,13 @@ function handleIncorrect(guess) {
   streak = 0;
   updateStreak();
   showResult('❌ Nope. Try again!', '#ff5555');
+
+  // 📳 Wrong-answer haptic
+  try {
+    hapticError();
+  } catch (err) {
+    console.warn('[Infinity] hapticError failed:', err);
+  }
 }
 
 function updateScore() {
@@ -963,10 +1013,18 @@ export function finalizeInfinityRun(stats) {
   // ⬇️ score-based mirror (keeps identical time gates & numeric thresholds)
   const sc = Math.max(0, Number(stats.score) || 0);
 
-  if (sc >= 25  && seconds <= 60)   awardBadge('inf_25_1min');
-  if (sc >= 50  && seconds <= 120)  awardBadge('inf_50_2min');
-  if (sc >= 100 && seconds <= 240)  awardBadge('inf_100_4min');
-  if (sc >= 250 && seconds <= 600)  awardBadge('inf_250_10min');
+  if (sc >= 25  && seconds <= 60) {
+    awardBadge('inf_25_1min', { silent: true });
+  }
+  if (sc >= 50  && seconds <= 120) {
+    awardBadge('inf_50_2min', { silent: true });
+  }
+  if (sc >= 100 && seconds <= 240) {
+    awardBadge('inf_100_4min', { silent: true });
+  }
+  if (sc >= 250 && seconds <= 600) {
+    awardBadge('inf_250_10min', { silent: true });
+  }
 
   // 🌀 Legendary Cone: Infinity Flow (100-streak lifetime)
   try {

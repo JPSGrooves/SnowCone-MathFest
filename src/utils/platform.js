@@ -1,14 +1,22 @@
 // src/utils/platform.js
 
 // 🌐 Unified platform detection — stays dynamic
-// 🔍 True *only* inside the native iOS app.
-// Your WKWebView / native shell should inject:  window.SC_IOS_NATIVE = true;
-// Browsers (even on iPhone/iPad) will NOT set this, so this stays false on web.
 export function isIOSNative() {
-  if (typeof window === 'undefined') return false;
-  return window.SC_IOS_NATIVE === true;
+  const w = typeof window !== 'undefined' ? window : globalThis;
+
+  // 1) Native flag injected by Capacitor/WKWebView
+  const nativeFlag = !!w.SC_IOS_NATIVE;
+
+  // 2) Capacitor presence check (extra safety)
+  const hasCapacitor = !!w.Capacitor;
+
+  // 3) Build-time env from Vite (--mode ios + .env.ios)
+  const envFlag = import.meta.env?.VITE_PLATFORM === 'ios';
+
+  return nativeFlag || hasCapacitor || envFlag;
 }
 
 export function getPlatformLabel() {
   return isIOSNative() ? 'ios-native' : 'web';
 }
+

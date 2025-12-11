@@ -10,8 +10,11 @@ import { stopQS, playQSRandomTrack } from './quickServeMusic.js';
 import { renderGameUI, showQuickServeResults } from './quickServe.js';
 import { generateProblem } from '../../logic/mathBrain.js';
 import { launchConfetti } from '../../utils/confetti.js';
-import { maybeAwardQuickServeBadges, finalizeQuickServeRun } from './quickServeBadges.js';
+import { maybeAwardQuickServeBadges, finalizeQuickServeRun, resetQuickServeRunMilestones } from './quickServeBadges.js';
 import { awardBadge } from '../../managers/badgeManager.js';
+import { hapticError } from '../../utils/haptics.js';
+
+
 
 //////////////////////////////
 // 🔥 Game State
@@ -135,6 +138,9 @@ function resetGameState() {
 
   // 🧠 clear current meta
   currentProblemMeta = null;
+
+  // 🌟 Reset QS milestone haptics for this shift
+  resetQuickServeRunMilestones();
 }
 
 function startGame() {
@@ -332,6 +338,13 @@ function handleIncorrect() {
   gridFX.bumpGridGlow('bad');
   phil.triggerGlitch();
   playIncorrect();
+
+  // 📳 Wrong-answer haptic
+  try {
+    hapticError();
+  } catch (err) {
+    console.warn('[QuickServe] hapticError failed', err);
+  }
 
   // 💀 RESET answer display to '0' after wrong guess
   currentAnswer = '';

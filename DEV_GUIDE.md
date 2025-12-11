@@ -149,6 +149,39 @@ npx cap copy ios       # copy fresh dist into ios/App/App/public
 npm run build:native 
 npx cap copy ios
 ```
+
+
+
+
+
+
+
+
+
+
+🔁 Fresh iOS sync without guessing
+
+In your project root:
+
+# 1) Build fresh web bundle
+npm run build
+
+# 2) Push updated assets into ios/App/public
+npx cap copy ios
+# or
+npx cap sync ios
+
+
+Then in Xcode:
+
+Product → Clean Build Folder…
+
+Rebuild & run on device, not just simulator (haptics won’t feel on sim).
+
+If after that you still see the 📖 [Story] iOS test build – v2025-12-10-01 log, we’re definitely on the right bundle.
+
+
+
 # (optional) npx cap open ios   # if Xcode isn’t already open
 
 You can go back to main and:

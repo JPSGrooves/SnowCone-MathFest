@@ -68,6 +68,7 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
     <button type="button" class="startup-play-btn">
       Play Game
     </button>
+    This is a neon musical math festival! Explore each mode while listening to the tunes, and try to complete the whole festival!
   `;
 
 
