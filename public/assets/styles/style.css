@@ -169,7 +169,7 @@ html, body {
   opacity: 0;
   z-index: 2;
   animation: fadeInCone 1s ease 1.5s forwards;
-  transform: translateY(-13vh); /* 🍧 move up 8% of the viewport height */
+  transform: translateY(-6vh); /* 🍧 move up 8% of the viewport height */
 }
 
 @keyframes fadeInStars {
@@ -657,7 +657,7 @@ html, body {
 
 /* 🍏 iOS-only: nudge the hitbox lower to match the shifted art */
 :root[data-platform='ios'] .mushroom-popper-hitbox {
-  top: 30vh; /* tweak this until it hugs the cone just right */
+  top: 35vh; /* tweak this until it hugs the cone just right */
 }
 
 /* kill focus ring (we’re using it like a pure hitbox) */

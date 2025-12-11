@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode web",
-    "build:native": "vite build --mode ios",
+    "build:native": "vite build --mode ios && npx cap copy ios && npx cap sync ios",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "live": "npm run build && npm run deploy",
