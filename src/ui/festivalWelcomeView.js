@@ -50,17 +50,18 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
     <p class="startup-welcome-line">
       ${model.greeting}, ${model.username}!
     </p>
-    <p class="startup-streak-line">
-      ${streakLabel}
-    </p>
+    SnowCone MathFest is a neon musical math festival! Explore each mode while listening to the tunes, and try to complete the whole festival!<br><br>
     <p class="startup-title-line">
       ${model.title}
     </p>
-    <p class="startup-main-line">
-      ${model.line}
+    <p class="startup-streak-line">
+      ${streakLabel}
     </p>
     <p class="startup-progress-line">
       Festival Completion: <strong>${model.percent}%</strong>
+    </p>
+    <p class="startup-main-line">
+      ${model.line}
     </p>
     <p class="startup-suggestion-line">
       ${model.suggestionText}
@@ -68,7 +69,6 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
     <button type="button" class="startup-play-btn">
       Play Game
     </button>
-    This is a neon musical math festival! Explore each mode while listening to the tunes, and try to complete the whole festival!
   `;
 
 

@@ -756,7 +756,7 @@ function renderIntroScreen() {
           <div class="sm-intro-stack">
             <div class="sm-speech">
               My name’s <span class="glitch-name" data-text="Jeh̶n̶k̶">Jeh̶n̶k̶</span> — curator of SnowCone MathFest.
-              The syrup stains never wash out and the math ghosts won’t stop lining up.
+              This place tells the story of the Snowcone MathFest!
               Pull up a chair. I’ll tell you how it all began…
             </div>
 
@@ -825,7 +825,7 @@ function renderChapterMenu() {
           <h2 class="sm-chapter-title">Story Mode Forest</h2>
 
           <div class="sm-chapter-list">
-            <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue</button>
+            <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue - Start Here!</button>
 
             <button class="sm-btn sm-btn-primary" id="smCh1">
               Chapter 1 — I got a Ticket!
@@ -881,7 +881,7 @@ function renderChapterMenu() {
           </div>
 
           <div class="sm-chapter-note">
-            Pick Prologue to begin! <br> Future chapters unlock as you play.
+            Pick Prologue to begin! <br> Read and click through each slide for deep lore and origins of the festival. Future chapters unlock as you play. iOS app users get exclusive access to the Creator's Journal!
           </div>
 
           <div class="sm-bottom-bar">
