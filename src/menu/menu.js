@@ -230,7 +230,7 @@ function openHighScoreOverlay() {
     appState.stats?.quickServe?.topScore ??
     0;
 
-  // ♾️ Infinity lake (already good)
+  // ♾️ Infinity Lake (already good)
   const infinityScore =
     appState.profile?.infinityHighScore ?? 0;
 
@@ -246,6 +246,13 @@ function openHighScoreOverlay() {
   if (quickEl)    quickEl.textContent    = quickServeScore;
   if (infinityEl) infinityEl.textContent = infinityScore;
   if (streakEl)   streakEl.textContent   = infinityStreak;
+
+  // 📳 Tiny haptic nudge when the high score sheet appears
+  try {
+    hapticTap();
+  } catch (err) {
+    console.warn('🏆 High score haptic failed (safe to ignore):', err);
+  }
 
   document.body.classList.add('modal-open');
   dimmer.classList.remove('hidden');
