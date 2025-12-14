@@ -212,39 +212,39 @@ export function setupMenu() {
   // 💡 Make sure the neon cycle is active whenever the menu is visible
   restartMenuTitleNeon();
 }
-// 🏆 High Score overlay helpers
 function openHighScoreOverlay() {
   const overlay = document.getElementById('highScoreOverlay');
   const dimmer  = document.getElementById('cosmicOverlay');
   if (!overlay || !dimmer) return;
 
-  // 🏕️ Camping: show lifetime best, not current run
+  const profile = appState.profile || {};
+  const stats   = appState.stats || {};
+
+  // 🏕️ Camping: lifetime best, not current run
   const campingScore =
-    typeof appState.profile?.campingHighScore === 'number'
-      ? appState.profile.campingHighScore
+    typeof profile.campingHighScore === 'number'
+      ? profile.campingHighScore
       : 0;
 
-  // 🍔 QuickServe: use profile high score, then stats fallback
+  // 🍔 QuickServe: profile high score, then stats fallback
   const quickServeScore =
-    appState.profile?.qsHighScore ??
-    appState.stats?.quickServe?.topScore ??
-    0;
+    typeof profile.qsHighScore === 'number'
+      ? profile.qsHighScore
+      : (stats.quickServe?.topScore ?? 0);
 
-  // ♾️ Infinity Lake (already good)
-  const infinityScore =
-    appState.profile?.infinityHighScore ?? 0;
-
+  // ♾️ Infinity Lake: longest streak only (no raw points)
   const infinityStreak =
-    appState.profile?.infinityLongestStreak ?? 0;
+    typeof profile.infinityLongestStreak === 'number'
+      ? profile.infinityLongestStreak
+      : 0;
 
+  // 🎯 Hook up the 3 visual slots
   const campingEl  = document.getElementById('hsCampingScore');
   const quickEl    = document.getElementById('hsQuickServeScore');
-  const infinityEl = document.getElementById('hsInfinityScore');
   const streakEl   = document.getElementById('hsInfinityStreak');
 
   if (campingEl)  campingEl.textContent  = campingScore;
   if (quickEl)    quickEl.textContent    = quickServeScore;
-  if (infinityEl) infinityEl.textContent = infinityScore;
   if (streakEl)   streakEl.textContent   = infinityStreak;
 
   // 📳 Tiny haptic nudge when the high score sheet appears
@@ -263,6 +263,12 @@ function closeHighScoreOverlay() {
   const overlay = document.getElementById('highScoreOverlay');
   const dimmer  = document.getElementById('cosmicOverlay');
   if (!overlay || !dimmer) return;
+
+  try {
+    hapticTap(); // same tiny tap vibe you use on open
+  } catch (err) {
+    console.warn('🏆 High score close haptic failed (safe to ignore):', err);
+  }
 
   overlay.classList.add('hidden');
   dimmer.classList.add('hidden');

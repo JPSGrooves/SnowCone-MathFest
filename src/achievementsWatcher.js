@@ -37,61 +37,43 @@ function numberOrZero(val) {
 // Game Center: Leaderboard + Achievement ID maps
 // ───────────────────────────────────────────────────────────────────────────────
 
-// 🏆 Leaderboard IDs – these MUST match App Store Connect later.
-// You can rename these to the real Apple IDs when you create them.
+// 🏆 Leaderboard IDs – v1: 3 core boards.
+// These IDs must match what you configure in App Store Connect.
 const LEADERBOARDS = {
-  campingHighScore: 'gc_camping_high',       // Camping Score (lifetime best)
-  quickServeHigh:   'gc_quickserve_high',    // QuickServe profile.qsHighScore
-  infinityHigh:     'gc_infinity_high',      // Infinity profile.infinityHighScore
-  infinityStreak:   'gc_infinity_streak',    // Infinity profile.infinityLongestStreak
+  campingHighScore: 'scmf.camping.highscore',        // Camping games lifetime best
+  quickServeHigh:   'scmf.quickserve.highscore',     // QuickServe profile.qsHighScore
+  infinityStreak:   'scmf.infinity.longeststreak',   // Infinity Lake longest streak
 };
 
-// 🥇 Badge → Achievement mapping.
-// Keys: your internal badge IDs from badges.js
-// Values: Game Center achievement IDs you’ll configure in App Store Connect.
+
+// 🥇 Badge → Achievement mapping (v1).
+// Keys: internal badge IDs from src/data/badges.js
+// Values: Game Center achievement IDs defined in App Store Connect.
+//
+// This is your v1 “festival core” set of 10 achievements.
+
 const BADGE_TO_ACHIEVEMENT = {
-  // 🌀 Legendary Cones
-  leg_menu_cone_clicker: 'gc_cone_clicker',
-  leg_festival_regular:  'gc_7day_streak',
-  leg_streak30:          'gc_30day_streak',
-  leg_infinity_flow:     'gc_infinity_flow',
-  leg_dual_endings:      'gc_dual_endings',
-  legend:                'gc_legend_100pct',
+  // 📖 Story Mode
+  story_prologue:      'scmf.story.prologue',      // Finish Prologue
+  leg_dual_endings:    'scmf.story.dual_endings',  // See both endings
 
-  // 🌍 Core-ish / “feel good” achievements
-  first_steps:    'gc_first_xp',
-  math_zen:       'gc_1000_xp',
-  mode_tour:      'gc_mode_tour',
-  theme_swap:     'gc_theme_swap',
-  listened_music: 'gc_listened_music',
-  talk_grampy:    'gc_grampy_chat',
-
-  // 🧸 Kids Camping highlights
-  kids_cars_speed:    'gc_kids_cars_speed',
-  kids_camp_10k:      'gc_kids_camp_10k',
-  kids_mosquito:      'gc_kids_mosquito',
-  kids_ants_streak10: 'gc_kids_ants_streak10',
-  kids_tents_all:     'gc_kids_tents_all',
+  // 🌀 Legendary
+  legend:              'scmf.legend',              // Earn the Legendary Cone (100% completion)
 
   // ⚡ QuickServe
-  quick_25:  'gc_qs_25',
-  quick_50:  'gc_qs_50',
-  quick_75:  'gc_qs_75',
-  quick_100: 'gc_qs_100',
+  quick_50:            'scmf.qs.shift_50',         // Serve 50 cones in one shift
+  quick_100:           'scmf.qs.shift_100',        // Serve 100 cones in one shift
 
-  // ♾️ Infinity
-  inf_25_1min:   'gc_inf_25',
-  inf_50_2min:   'gc_inf_50',
-  inf_100_4min:  'gc_inf_100',
-  inf_250_10min: 'gc_inf_250',
+  // ♾️ Infinity Lake
+  inf_100_4min:        'scmf.il.streak_100',       // 100 points in 4 minutes
+  inf_250_10min:       'scmf.il.streak_250',       // 250 points in 10 minutes
 
-  // 📖 Story beats
-  story_prologue: 'gc_story_prologue',
-  story_ch1:      'gc_story_ch1',
-  story_ch2:      'gc_story_ch2',
-  story_ch3:      'gc_story_ch3',
-  story_ch4:      'gc_story_ch4',
-  story_ch5:      'gc_story_ch5',
+  // 🧠 Meta / festival-wide
+  talk_grampy:         'scmf.meta.grampyp',        // Talk to Grampy P
+  leg_festival_regular:'scmf.meta.streak7',       // 7-day streak (Festival Regular)
+
+  // 🧸 Kids Camping
+  kids_mosquito:       'scmf.camp.mosquito',       // Smash the mosquito
 };
 
 // ───────────────────────────────────────────────────────────────────────────────
@@ -102,7 +84,6 @@ function createHighScoreWatcher(appState) {
   const lastSent = {
     campingHighScore: 0,
     quickServeHigh: 0,
-    infinityHigh: 0,
     infinityStreak: 0,
   };
 
@@ -111,10 +92,9 @@ function createHighScoreWatcher(appState) {
 
     const camping = numberOrZero(profile.campingHighScore);
     const qs      = numberOrZero(profile.qsHighScore);
-    const inf     = numberOrZero(profile.infinityHighScore);
     const streak  = numberOrZero(profile.infinityLongestStreak);
 
-    // 🏕️ Camping
+    // 🏕️ Camping – lifetime best camping score
     if (camping > lastSent.campingHighScore) {
       lastSent.campingHighScore = camping;
       GameCenter.reportLeaderboardScore({
@@ -123,7 +103,7 @@ function createHighScoreWatcher(appState) {
       });
     }
 
-    // 🍔 QuickServe
+    // 🍔 QuickServe – overall high score for shifts
     if (qs > lastSent.quickServeHigh) {
       lastSent.quickServeHigh = qs;
       GameCenter.reportLeaderboardScore({
@@ -132,16 +112,7 @@ function createHighScoreWatcher(appState) {
       });
     }
 
-    // ♾️ Infinity score
-    if (inf > lastSent.infinityHigh) {
-      lastSent.infinityHigh = inf;
-      GameCenter.reportLeaderboardScore({
-        boardId: LEADERBOARDS.infinityHigh,
-        value: inf,
-      });
-    }
-
-    // ♾️ Infinity longest streak
+    // ♾️ Infinity Lake – longest streak only
     if (streak > lastSent.infinityStreak) {
       lastSent.infinityStreak = streak;
       GameCenter.reportLeaderboardScore({

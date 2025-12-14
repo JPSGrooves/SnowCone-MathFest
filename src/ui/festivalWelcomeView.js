@@ -51,7 +51,7 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
     <p class="startup-welcome-line">
       ${model.greeting}, ${model.username}!
     </p>
-    SnowCone MathFest is a neon musical math festival!<br>Explore each mode while listening to the tunes,<br>and try to complete the whole festival!<br><br>
+    SnowCone MathFest is a neon math festival!<br>Explore each mode while listening to the tunes, and try to complete the whole festival!<br><br>
     <p class="startup-title-line">
       ${model.title}
     </p>

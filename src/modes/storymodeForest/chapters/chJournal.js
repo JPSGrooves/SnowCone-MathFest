@@ -75,7 +75,7 @@ export const CreatorsJournal = {
       role: SlideRole.ADVANCE,
       mode: 'journal',   // 👈
       title: 'Journal Entry #3',
-      text: `<em style="color: rgb(247, 255, 105);">SnowCone Classrooms</em><br><br>I built SnowCone MathFest with my kids and other explorers in mind. I wanted to create something that would make math fun and engaging for young learners. The app is designed to be easy to use, with colorful graphics and interactive elements that will keep kids interested.<br><br>But the major sidequest was to make sure that the app was educational. Each mode tries to engage the user in a different math concept, from basic addition and subtraction to more advanced topics like geometry and algebra.<br><br>My hope is that learners will not only have fun playing the game, but also learn something new along the way. I have to admit, I never knew who Carl Guess or Ada Lovelace was before this experience!`,
+      text: `<em style="color: rgb(247, 255, 105);">SnowCone Classrooms</em><br><br>I built SnowCone MathFest with my kids and other explorers in mind. I wanted to create something that would make math fun and engaging for young learners. The app is designed to be easy to use, with colorful graphics and interactive elements that will keep kids interested.<br>The major sidequest was to make sure that the app was educational. Each mode tries to engage the user in a different math concept, from basic addition and subtraction to more advanced topics like geometry and algebra.<br><br>My hope is that learners will not only have fun playing the game, but also learn something new along the way. I have to admit, I never knew who Ada Lovelace was before this experience!`,
       soloLabel: 'Next ➡️',
     },
     {
@@ -117,7 +117,7 @@ export const CreatorsJournal = {
       role: SlideRole.ADVANCE,
       mode: 'journal',   // 👈
       title: 'Journal Entry #5',
-      text: `<em style="color: rgb(247, 255, 105);">SnowCone Release Plans</em><br><br> This has all gone way too far lol. I never thought any of this would ever get released in such a well developed way.<br><br>This final product definitely spawned from my failure to create the first version. It motivated me to really plan it out and do it right. Along the way in that process I realized I really had something unique and I stuck with it (for almost a year, as of the time fo this writing!).<br><br>If I can get this released on multiple platforms it would far surpass my greatest expectations. For the first time ever, I'm releasing an app, a game, an album, a vinyl, and an experience that will come to be known as SnowCone MathFest.<br><br>Release date imminent 1/1/2026 for the web version, and then 1/11/2026 for the iOS version.`,
+      text: `<em style="color: rgb(247, 255, 105);">SnowCone Release Plans</em><br><br> This has all gone way too far lol. I never thought any of this would ever get released in such a well developed way. This final product definitely spawned from my failure to create the first version. It motivated me to really plan it out and do it right. Along the way in that process I realized I really had something unique and I stuck with it (for almost a year, as of the time fo this writing!).<br><br>If I can get this released on multiple platforms it would far surpass my greatest expectations. For the first time ever, I'm releasing an app, a game, an album, a vinyl, and an experience that will come to be known as SnowCone MathFest.<br><br>Release date: 1/1/2026 for the web version, and then 1/11/2026 for iOS.`,
       soloLabel: 'Next ➡️',
     },
     {
@@ -126,7 +126,7 @@ export const CreatorsJournal = {
       mode: 'journal',   // 👈
       title: 'Journal Snapshot #5',
       img: PRO_MED_IMG('retro6.png'),
-      text: `<em>Snapshot #5 – The Opening Background</em><br><br>This background image was created for the opening scene of SnowCone MathFest. It features the design route I took that set the measurements for all the other themes. If you haven't unlocked and checked out the other themes, there are some very cool ones edited by yours truly, but this one will always be the first.`,
+      text: `<em>Snapshot #5 – The Opening Background</em><br><br>This background image was created for the opening scene of SnowCone MathFest. It features the design route I took that set the tone for all the other themes. If you haven't checked out the other themes, there are some very cool ones edited by yours truly, but this one will always be the first.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -189,8 +189,7 @@ export const CreatorsJournal = {
       mode: 'journal',   // 👈
       title: 'Journal Snapshot #8',
       img: PRO_MED_IMG('retro9.png'),
-      text: `
-        <em>Snapshot #8 – Money Geometry</em><br><br>If I can forge the perfect SnowCone, maybe things will change. Just like Jehnk, I'm looking for that right mixture of ingredients that moves me to where I'd really like to be. But notice: no ads, no paywalls. Just a one-time purchase for something I made with my heart and soul.`,
+      text: `<em>Snapshot #8 – Money Geometry</em><br><br>If I can forge the perfect SnowCone, maybe things will change. Just like Jehnk, I'm looking for that right mixture of ingredients that moves me to where I'd really like to be. But notice: no ads, no paywalls. Just a one-time purchase for something I made with my heart and soul.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -231,7 +230,7 @@ export const CreatorsJournal = {
       mode: 'journal',   // 👈
       title: 'Journal Snapshot #10',
       img: PRO_IMG('retro11.png'),
-      text: `<em>Snapshot #10 – Next Game?</em><br><br>This dude aint even done with the first iOS SnowCone MathFest build, and he's talking nexxt games already? I must be crazy, but I've really found this process to be rewarding and fun. As for what's next, well, let's just say that I'm already brainstorming ideas for a new game (and album, and book...). Who knows, maybe it'll be another game, or maybe something completely different. Either way, what we have made here feels important to me and I feel so grateful you tagged along!`,
+      text: `<em>Snapshot #10 – Next Game?</em><br><br>This dude aint even done with the first iOS SnowCone MathFest build, and he's talking next games already? I must be crazy, but I've really found this process to be rewarding and fun. As for what's next, well, let's just say that I'm already brainstorming ideas for a new game (and album, and book...). Who knows, maybe it'll be another game, or maybe something completely different. Either way, what we have made here feels important to me and I feel so grateful you tagged along!`,
       soloLabel: 'Back to Story Menu',
     },
   ],
