@@ -565,3 +565,19 @@ body.neon-progress #trackTimer {
   min-height: 96px;        /* tiny floor for consistency */
   aspect-ratio: auto;      /* stop forcing short cards */
 }
+/* 🛡️ Cosmic Modal: enforce solid event shield (match infoModal behavior) */
+#cosmicModal {
+  pointer-events: auto !important; /* the overlay RECEIVES all taps */
+}
+
+#cosmicModal * {
+  pointer-events: auto; /* inner content still works normally */
+}
+
+/* 🧱 MENU BEHIND MUST NOT RECEIVE EVENTS WHEN COSMIC MODAL IS OPEN */
+#cosmicModal:not(.hidden) ~ .menu-wrapper,
+#cosmicModal:not(.hidden) ~ .menu-layout,
+#cosmicModal:not(.hidden) ~ .menu-frame,
+#cosmicModal:not(.hidden) ~ #game-container {
+  pointer-events: none !important;
+}
