@@ -104,7 +104,18 @@ class AppState {
 
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
+
+    // 1) Hydrate from localStorage
     this.loadFromStorage();
+
+    // 2) Immediately reconcile daily streak for THIS launch.
+    //    This runs on web, iOS, anywhere this singleton is created.
+    try {
+      const streakNow = this.touchDailyStreak();
+      console.log('📆 Daily streak reconciled on boot:', streakNow);
+    } catch (err) {
+      console.warn('⚠️ touchDailyStreak failed on boot (safe to ignore):', err);
+    }
   }
 
     // ── Flags / story markers ─────────────────────────────────────────────
@@ -470,27 +481,33 @@ class AppState {
   touchDailyStreak() {
     const today = this.getNYDayKey();
     const last  = this.profile.lastStreakDayKey;
+    const before = this.profile.streakDays;
 
-    // first ever visit
+    const yest = this.getNYDayKey(Date.now() - 86400000);
+
+    // original logic...
     if (!last) {
       this.profile.lastStreakDayKey = today;
       this.profile.streakDays = 1;
-      return this.profile.streakDays;
+    } else if (last === today) {
+      // no-op
+    } else {
+      this.profile.streakDays =
+        (last === yest) ? (this.profile.streakDays + 1) : 1;
+      this.profile.lastStreakDayKey = today;
     }
 
-    // already counted today
-    if (last === today) {
-      return this.profile.streakDays;
-    }
+    console.log('📆 touchDailyStreak', {
+      last,
+      today,
+      yesterday: yest,
+      before,
+      after: this.profile.streakDays,
+    });
 
-    // check if we continued from "yesterday" (NY time)
-    const yest = this.getNYDayKey(Date.now() - 86400000);
-    this.profile.streakDays =
-      (last === yest) ? (this.profile.streakDays + 1) : 1;
-
-    this.profile.lastStreakDayKey = today;
     return this.profile.streakDays;
   }
+
   // ── Badges / Themes ─────────────────────────────────────────────────────────
   hasBadge(id) {
     return Array.isArray(this.profile.badges) && this.profile.badges.includes(id);
@@ -536,4 +553,4 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: 'v1.4.0 — High Score Release' };
+window.devFlags = { build: 'v1.5.0 — iOS Review Ready ✨' };

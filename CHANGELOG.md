@@ -22,6 +22,84 @@
 * ✅ **v1.2.0 – Chapter 2 in Story Mode✨**
 * ✅ **v1.3.0 – v1.3.0 — Story CYOA, Badges & Credits**
 * ✅ **v1.4.0 – High Score Release**
+* ✅ **v1.5.0 – iOS Review Ready✨**
+
+
+# [1.5.0] – 2025-12-14 — iOS Review Ready ✨
+
+## Added
+
+### Truck-Tap High Score HUD (Main Menu)
+
+- Invisible, accessible hitbox placed directly over the festival truck.
+- Scales perfectly inside the **11:16 stage** across phones and desktop.
+- Tap or keyboard-focus to open stats instantly — no new mode required.
+
+### High Score Overlay (Meta Stats Card)
+
+- New neon overlay displays:
+  - **Kids Camping:** best overall score
+  - **QuickServe Pavilion:** best single shift
+  - **Infinity Lake:** high score + longest streak
+- Uses the existing cosmic dimmer for visual consistency.
+- Fully mobile-safe — no scrolling, no clipping, no accidental background taps.
+
+### App-Wide Music Visibility Guard
+
+- Global `visibilitychange` handling ensures:
+  - Music pauses when the app backgrounds or locks.
+  - Only the previously playing track resumes on return.
+- Prevents “ghost music” and restores native-app behavior on iOS.
+
+### QuickServe Private Booth Audio Guard
+
+- QuickServe now manages its own playback state independently.
+- Prevents music from restarting after results screens or fighting the global guard.
+
+### Infinity Lake — Record-Safe Scoring Pipeline
+
+- End-of-run logic now:
+  - Updates score, streak, longest streak, and solve count cleanly.
+  - Awards badges based on score + elapsed time.
+  - Only updates high score or longest streak when a true record is beaten.
+- Eliminates score drift and false record bumps.
+
+### Story Credits Safety & Layout Pass
+
+- Credits viewport now has a guaranteed minimum height.
+- Credits reveal is protected by both animation listeners and a timed fallback.
+- Ensures the finale always resolves correctly on iOS Safari and WKWebView.
+
+### Celebration & Toast Re-Anchoring
+
+- XP and pickup toasts are anchored above the bottom bar.
+- Celebrations remain visible without covering credits or blocking interaction.
+
+---
+
+## Changed
+
+- Menu now acts as a true launcher hub — background themes apply once, overlays layer cleanly, and modal focus stays contained.
+- Story credits behave more like a short film outro, with fewer UI distractions.
+
+---
+
+## Fixed
+
+- Resolved rare cases where credits could fail to appear after Chapter 5.
+- Fixed Infinity Lake cases where displayed stats didn’t match the just-finished run.
+- Eliminated music continuing or resurrecting after app backgrounding.
+- Improved overlay focus handling in native iOS builds.
+
+---
+
+## Dev Notes
+
+> *“v1.5.0 isn’t about new modes — it’s about trust.  
+> Scores are honest. Music respects the device. Credits land every time.  
+> This is the build you hand to Apple.”* 🍧
+
+
 
 ## [1.4.0] – 2025-11-30 — **High Score Release + Credits & Music Guard ✨**
 

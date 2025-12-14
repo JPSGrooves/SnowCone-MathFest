@@ -1,19 +1,65 @@
 // 🎛️ cosmicModal.js – Sacred Modal System 🍧🚛
 import { autorun } from 'mobx';
 import { appState } from '../data/appState.js';
+import { hapticTap } from '../utils/haptics.js'; // 📳 modal tap vibes
 
 import { renderProfileTab, setupProfileTabUI } from './profileTab.js';
 import { renderThemesTab, setupThemesTabUI } from './themesTab.js';
 import { renderMusicTab, setupMusicTabUI } from './musicTab.js';
 import { renderVersionTab, setupVersionTabUI } from './versionTab.js';
 
+// 🍧 WKWebView tap-through shield (Capacitor iOS only)
+let COSMIC_BLOCK_UNTIL = 0;
+
+function isIOSNativeShell() {
+  // You already log: "Running inside iOS shell (platform-ios)"
+  // and you inject SC_IOS_NATIVE. We'll support both.
+  const root = document.documentElement;
+  const platform = root?.dataset?.platform;
+  const flag = typeof window !== 'undefined' && window.SC_IOS_NATIVE === true;
+  return platform === 'ios' || flag;
+}
+
+function blockUnderlyingTapsFor(ms = 350) {
+  COSMIC_BLOCK_UNTIL = Date.now() + ms;
+}
+
+// Capture-phase killer: stops clicks/taps BEFORE menu labels see them
+function installCosmicTapThroughShield() {
+  const killer = (e) => {
+    if (Date.now() < COSMIC_BLOCK_UNTIL) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+  };
+
+  // We listen to the full set, capture-phase
+  document.addEventListener('pointerdown', killer, true);
+  document.addEventListener('touchstart', killer, { capture: true, passive: false });
+  document.addEventListener('touchend', killer, { capture: true, passive: false });
+  document.addEventListener('click', killer, true);
+}
+
 //////////////////////////////
 // 🚀 Open / Close Modal
 //////////////////////////////
 export function openModal(tab = 'profile') {
-  const modal = document.getElementById('cosmicModal');
+  const modal   = document.getElementById('cosmicModal');
   const overlay = document.getElementById('cosmicOverlay');
   if (!modal) return console.warn('🛑 cosmicModal not found');
+
+  // Already open? Don't re-open or re-render (prevents "flash")
+  if (!modal.classList.contains('hidden')) {
+    return;
+  }
+
+  try {
+    hapticTap();
+  } catch (err) {
+    console.warn('📳 cosmic open haptic failed (safe):', err);
+  }
 
   modal.classList.remove('hidden');
   overlay?.classList.remove('hidden');
@@ -25,10 +71,19 @@ export function openModal(tab = 'profile') {
 }
 
 export function closeModal() {
-  const modal = document.getElementById('cosmicModal');
+  const modal   = document.getElementById('cosmicModal');
   const overlay = document.getElementById('cosmicOverlay');
 
-  modal?.classList.add('hidden');
+  if (!modal || modal.classList.contains('hidden')) return;
+
+  try { hapticTap(); } catch {}
+
+  // 🧊 KEY: in WKWebView, swallow the tail-end event burst
+  if (isIOSNativeShell()) {
+    blockUnderlyingTapsFor(350);
+  }
+
+  modal.classList.add('hidden');
   overlay?.classList.remove('show');
   overlay?.classList.add('hidden');
 }
@@ -36,32 +91,41 @@ function wireOverlayClose() {
   const overlay = document.getElementById('cosmicOverlay');
   if (!overlay) return;
 
-  const handleOverlayHit = (e) => {
+  const handleOverlayDown = (e) => {
     const modal = document.getElementById('cosmicModal');
-    if (!modal) return;
+    if (!modal || modal.classList.contains('hidden')) return;
 
-    // If cosmic modal isn't open, bail
-    if (modal.classList.contains('hidden')) return;
-
-    // If the click/tap originated *inside* the modal, ignore
+    // If the interaction started inside the modal, ignore
     if (modal.contains(e.target)) return;
 
-    // If the High Score overlay is using the same dimmer, let *that* logic win
+    // If the High Score overlay is up, don't compete
     const hsOverlay = document.getElementById('highScoreOverlay');
-    if (hsOverlay && !hsOverlay.classList.contains('hidden')) {
-      return;
-    }
+    if (hsOverlay && !hsOverlay.classList.contains('hidden')) return;
 
-    console.log('🌓 Cosmic overlay hit (tap/click) – closing cosmic modal');
-    e.stopPropagation();
+    // Stop THIS event hard
     e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
     closeModal();
   };
 
-  // 🔑 iOS safety: listen to all three
-  overlay.addEventListener('touchend', handleOverlayHit);
-  overlay.addEventListener('pointerdown', handleOverlayHit);
-  overlay.addEventListener('click', handleOverlayHit);
+  overlay.addEventListener('pointerdown', handleOverlayDown, { passive: false });
+  overlay.addEventListener('touchstart', handleOverlayDown, { passive: false });
+
+  // Optional: if any click slips through, still block it
+  overlay.addEventListener(
+    'click',
+    (e) => {
+      if (!document.getElementById('cosmicModal')?.classList.contains('hidden')) return;
+      if (isIOSNativeShell()) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+    },
+    true
+  );
 }
 
 //////////////////////////////
@@ -119,10 +183,26 @@ function setupTabListeners() {
     btn.addEventListener('click', handleTabClick);
   });
 
-  document.querySelector('.label-options')?.addEventListener('click', () => {
-    console.log('⚙️ Options clicked – opening modal');
-    openModal('profile');
-  });
+  const optionsLabel = document.querySelector('.label-options');
+  if (optionsLabel) {
+    optionsLabel.addEventListener('click', (e) => {
+      console.log('⚙️ Options clicked');
+
+      // Don't let this click bubble to anything weird behind it
+      e.preventDefault();
+      e.stopPropagation();
+
+      const modal = document.getElementById('cosmicModal');
+
+      if (modal && !modal.classList.contains('hidden')) {
+        // If already open, treat this tap as "close"
+        closeModal();
+      } else {
+        // Was closed → open fresh on Profile tab
+        openModal('profile');
+      }
+    });
+  }
 
   document.querySelector('.modal-close')?.addEventListener('click', () => {
     console.log('❌ Closing modal from global listener');
@@ -135,9 +215,11 @@ function setupTabListeners() {
 //////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
-  wireOverlayClose();   // 👈 this line is important
+  installCosmicTapThroughShield(); // 👈 add this
+  wireOverlayClose();
   console.log('🧊 Cosmic modal listeners wired.');
 });
+
 
 
 window.openModal = openModal;

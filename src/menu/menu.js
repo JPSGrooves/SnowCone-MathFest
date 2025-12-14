@@ -232,19 +232,26 @@ function openHighScoreOverlay() {
       ? profile.qsHighScore
       : (stats.quickServe?.topScore ?? 0);
 
-  // ♾️ Infinity Lake: longest streak only (no raw points)
+  // ♾️ Infinity Lake: keep BOTH raw high score (local only) and longest streak
+  const infinityScore =
+    typeof profile.infinityHighScore === 'number'
+      ? profile.infinityHighScore
+      : (stats.infinityLake?.topScore ?? 0);
+
   const infinityStreak =
     typeof profile.infinityLongestStreak === 'number'
       ? profile.infinityLongestStreak
       : 0;
 
-  // 🎯 Hook up the 3 visual slots
+  // 🎯 Hook up the visual slots
   const campingEl  = document.getElementById('hsCampingScore');
   const quickEl    = document.getElementById('hsQuickServeScore');
+  const infinityEl = document.getElementById('hsInfinityScore');
   const streakEl   = document.getElementById('hsInfinityStreak');
 
   if (campingEl)  campingEl.textContent  = campingScore;
   if (quickEl)    quickEl.textContent    = quickServeScore;
+  if (infinityEl) infinityEl.textContent = infinityScore;
   if (streakEl)   streakEl.textContent   = infinityStreak;
 
   // 📳 Tiny haptic nudge when the high score sheet appears

@@ -186,31 +186,11 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v1.4.0</h3>
+      <h3>🧠 SnowCone MathFest v1.5.0</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
     <div class="settings-block">
-      <h3>📲 App Info</h3>
-      ${
-        isApp
-          ? `
-      <p>You’re running the SnowCone MathFest app on this device.</p>
-      <p>Your progress is stored locally in the app’s save data. Deleting the app or clearing its storage will erase your festival progress on this device.</p>
-      <p>You can still back up or move your save using the tools below if you want to jump between devices.</p>
-      `
-          : `
-      <p>You can install this app!<br>To save your data, don't clear site storage.</p>
-      <p>If you're on an iPhone or iPad using Safari:<br>
-        Tap the <strong>Share</strong> icon, then choose <strong>"Add to Home Screen"</strong> to install the app.</p>
-      <p>If you're using Android or Chrome:<br>
-        You can install this app for offline play:
-      </p>
-      <button class="track-button" id="installAppBtn" style="display: none;">📲 Install App</button>
-      `
-      }
-    </div>
-
     ${
       !isApp
         ? `
@@ -230,6 +210,26 @@ export function renderVersionTab() {
         `
         : ''
     }
+      <h3>📲 App Info</h3>
+    ${
+        isApp
+          ? `
+      <p>You’re running the SnowCone MathFest app on this device.</p>
+      <p>Your progress is stored locally in the app’s save data. Deleting the app or clearing its storage will erase your festival progress on this device.</p>
+      <p>You can still back up or move your save using the tools below if you want to jump between devices.</p>
+      `
+          : `
+      <p>You can install this app!<br>To save your data, don't clear site storage.</p>
+      <p>If you're on an iPhone or iPad using Safari:<br>
+        Tap the <strong>Share</strong> icon, then choose <strong>"Add to Home Screen"</strong> to install the app.</p>
+      <p>If you're using Android or Chrome:<br>
+        You can install this app for offline play:
+      </p>
+      <button class="track-button" id="installAppBtn" style="display: none;">📲 Install App</button>
+      `
+      }
+    </div>
+
 
     <div class="settings-block">
       <h3>🧰 Tools</h3>
@@ -270,19 +270,18 @@ export function renderVersionTab() {
     </div>
     
     <div class="settings-block">
-      <h3>v1.4.0 — High Score Release + Credits &amp; Music Guard ✨</h3>
+      <h3>v1.5.0 — iOS Review Ready ✨</h3>
       <p>
-        – 🚚 <strong>Truck-tap High Score HUD</strong>: invisible <code>.menu-highscore-hitbox</code> now rides on top of the festival truck on the main menu; keyboard-focusable and scaled to the 11:16 stage so tapping the truck pops stats on phones and desktop without adding a new mode<br>
-        – 📈 <strong>High Score overlay card</strong>: new <code>#highScoreOverlay</code> dialog reuses the cosmic dimmer to show Camping Score, QuickServe best run, and Infinity high score + longest streak in a compact neon card that fits even tiny phones<br>
-        – 🎧 <strong>App-wide music visibility guard</strong>: <code>wireMusicVisibilityGuard()</code> in <code>main.js</code> listens for <code>visibilitychange</code> and pauses whatever track was playing when the tab/app goes to the background, then resumes only that track on return for proper “native app” lock/unlock behavior<br>
-        – 🎛️ <strong>QuickServe private booth guard</strong>: <code>attachQuickServeVisibilityGuard()</code> in <code>quickServeMusic.js</code> keeps its own <code>qsWasPlayingOnHide</code> flag so QS music pauses/resumes cleanly without fighting the global guard or resurrecting dead runs after result popups<br>
-        – ♾️ <strong>Infinity Lake high score pipeline</strong>: end-of-run handler now updates score, streak, longest streak, and solved count in <code>appState</code>, calls <code>checkInfinityBadgesByScore()</code> off score + elapsed time, and only bumps High Score / Longest Streak when you actually beat your previous record<br>
-        – 🎬 <strong>Story credits layout + safety net</strong>: credits viewport (<code>.sm-credits-list</code>) gets a real min-height so lines don’t clip; blackout hand-off uses <code>animationend</code> + a 600ms timeout fallback to guarantee <code>showStoryCredits()</code> runs even on cranky mobile Safari<br>
-        – 🍬 <strong>Toasts moved under the “movie”</strong>: <code>.pickup-stack</code> and Story XP popups are anchored just above the bottom bar so inventory/XP toasts still fire but never sit on top of the credits; <code>THANK_YOU_TEXT</code> adds a soft promo outro (tell a friend, search “SnowCone MathFest” / “JPS Grooves”) as data-only copy you can tweak anytime<br>
-        – ⭐ <strong>Next</strong>: Light copy/visual polish on the High Score card, wire any final Infinity/QuickServe badge tiers off the new data, and decide if the credits “thank you” should appear on first-clear only or every lap through the forest
+        – 🚚 <strong>Truck-Tap High Score HUD</strong>: invisible, accessible <code>.menu-highscore-hitbox</code> rides directly on top of the festival truck; scales perfectly inside the 11:16 stage so tapping (or keyboard-focusing) the truck instantly opens stats on phones and desktop — no new mode added<br><br>
+        – 📈 <strong>High Score overlay card</strong>: new <code>#highScoreOverlay</code> reuses the cosmic dimmer to display Camping best score, QuickServe best shift, and Infinity Lake high score + longest streak in a compact neon card that fits even the smallest phones with no scrolling or clipping<br><br>
+        – 🎧 <strong>App-wide music visibility guard</strong>: <code>wireMusicVisibilityGuard()</code> listens for <code>visibilitychange</code> and pauses whatever track was playing when the app backgrounds or locks, then resumes only that track on return for true native-app audio behavior on iOS<br><br>
+        – 🎛️ <strong>QuickServe private booth audio guard</strong>: <code>attachQuickServeVisibilityGuard()</code> in <code>quickServeMusic.js</code> tracks its own playback state so QuickServe music pauses and resumes cleanly without fighting the global guard or resurrecting finished runs after result screens<br><br>
+        – ♾️ <strong>Infinity Lake record-safe scoring pipeline</strong>: end-of-run logic now updates score, streak, longest streak, and solved count deterministically, awards badges based on score + elapsed time, and only bumps High Score or Longest Streak when a true record is beaten — no drift, no false wins<br><br>
+        – 🎬 <strong>Story credits layout + safety net</strong>: credits viewport (<code>.sm-credits-list</code>) now has a guaranteed minimum height, and the blackout hand-off uses <code>animationend</code> with a timed fallback to guarantee <code>showStoryCredits()</code> always fires, even on cranky iOS Safari / WKWebView<br><br>
+        – 🍬 <strong>Celebrations moved under the “movie”</strong>: <code>.pickup-stack</code> and Story XP popups are anchored just above the bottom bar so rewards remain visible without covering the credits; <code>THANK_YOU_TEXT</code> adds a soft, data-only promo outro you can tweak anytime without touching layout code<br><br>
+        – ⭐ <strong>Next</strong>: light visual polish on the High Score card, wire any final Infinity / QuickServe badge tiers off the stabilized score data, and decide whether the credits “thank you” appears on first-clear only or every full loop through the forest
       </p>
     </div>
-
   `;
 }
 
