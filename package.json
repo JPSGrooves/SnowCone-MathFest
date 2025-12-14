@@ -84,6 +84,7 @@
     "semver": "^7.7.2"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^7.4.4",
     "eslint-plugin-import": "^2.31.0",
     "gh-pages": "^6.0.0",
