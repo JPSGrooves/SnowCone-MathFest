@@ -128,6 +128,48 @@ function createBadgeWatcher(appState) {
     Array.isArray(appState.profile?.badges) ? appState.profile.badges : []
   );
 
+  // ───────────────────────────────────────────────────────────────
+  // 🔁 Sync ALL owned badges → Game Center achievements
+  // This solves:
+  //  - watcher wired after badge award
+  //  - GC bridge not ready at the moment of award
+  //  - cold boots where badge exists but GC never got it
+  //
+  // Safe because reporting 100% repeatedly is idempotent on GC.
+  // ───────────────────────────────────────────────────────────────
+  const syncAllOwnedAchievements = () => {
+    const raw = appState.profile?.badges;
+    const owned = Array.isArray(raw) ? raw : [];
+
+    for (const id of owned) {
+      const achievementId = BADGE_TO_ACHIEVEMENT[id];
+      if (!achievementId) continue;
+
+      try {
+        GameCenter.reportAchievement({
+          achievementId,
+          percent: 100,
+        });
+      } catch (e) {
+        // If native isn't ready yet, this may throw; we'll retry via scheduled sync.
+        console.warn('[GC] reportAchievement sync failed:', achievementId, e);
+      }
+    }
+  };
+
+  // Debounced sync — lets GC bridge finish booting before we blast calls
+  let syncTimer = null;
+  const scheduleSync = (ms = 1200) => {
+    if (syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => {
+      syncTimer = null;
+      syncAllOwnedAchievements();
+    }, ms);
+  };
+
+  // Do an initial sync shortly after wiring (GC bridge often comes online slightly later)
+  scheduleSync(1500);
+
   return autorun(() => {
     const raw = appState.profile?.badges;
     const nowIds = Array.isArray(raw) ? raw.slice() : [];
@@ -138,16 +180,23 @@ function createBadgeWatcher(appState) {
       if (!lastBadgeSet.has(id)) {
         const achievementId = BADGE_TO_ACHIEVEMENT[id];
         if (achievementId) {
-          // Full completion; you could later do partial % for grindy goals.
-          GameCenter.reportAchievement({
-            achievementId,
-            percent: 100,
-          });
+          try {
+            GameCenter.reportAchievement({
+              achievementId,
+              percent: 100,
+            });
+          } catch (e) {
+            console.warn('[GC] reportAchievement new-badge failed:', achievementId, e);
+          }
         }
       }
     }
 
     lastBadgeSet = nowSet;
+
+    // 🚑 Always schedule a sync after any badge change.
+    // This covers “GC wasn’t ready when the new-badge call happened”.
+    scheduleSync(900);
   });
 }
 

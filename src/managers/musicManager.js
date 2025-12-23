@@ -4,8 +4,14 @@ import { isIOSNative } from '../utils/platform.js'; // 🔍 single source of tru
 
 let currentTrack = null;
 
+// Track meta for UI + index lookup
+let currentTrackMeta = null;
+
+// Optional override for end behavior (StoryMode wants to own rotation)
+let currentEndOverride = null;
+
 // 💿 Global music loudness (master ceiling for all modes)
-const DEFAULT_MUSIC_VOLUME = 0.7; // was 1.0 – this is noticeably softer without feeling quiet
+const DEFAULT_MUSIC_VOLUME = 0.7; // was 1.0 – noticeably softer without feeling quiet
 
 function getMusicVolume() {
   // Future-proof: if you ever add appState.settings.musicVolume, plug it in here.
@@ -54,50 +60,158 @@ function getTracks() {
 
 let looping = false;
 let shuffling = false;
-let currentIndex = 0;
-let trackLoop = null;
 
 //////////////////////////////
-// 🚀 Play Track
+// 🎛️ Preload cache (for StoryMode + future)
 //////////////////////////////
-export function playTrack(id = getFirstTrackId()) {
+const howlCache = new Map(); // id -> { howl, meta, html5 }
+
+/**
+ * Preload tracks into a cache so first play is fast and transitions are smoother.
+ * Only use this for small curated sets (like StoryMode's 3 tracks) to avoid memory bloat.
+ */
+export function preloadTracks(ids = [], opts = {}) {
+  const {
+    html5 = true,
+    volume = getMusicVolume(),
+  } = opts;
+
   const tracks = getTracks();
-  const track = tracks.find(t => t.id === id);
-  if (!track) {
-    console.warn(`⚠️ Track "${id}" not found.`);
+  ids
+    .filter(Boolean)
+    .forEach((id) => {
+      const meta = tracks.find(t => t.id === id);
+      if (!meta) return;
+
+      // If cached with same html5 setting, keep it
+      const cached = howlCache.get(id);
+      if (cached?.howl && cached.html5 === html5) return;
+
+      try {
+        const howl = new Howl({
+          src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${meta.file}`],
+          loop: false,
+          volume: volume,
+          html5,
+          preload: true,
+          onloaderror: (_, err) => {
+            console.warn('⚠️ Preload load error:', id, err);
+          },
+        });
+
+        howlCache.set(id, { howl, meta, html5 });
+      } catch (e) {
+        console.warn('⚠️ preloadTracks failed for', id, e);
+      }
+    });
+}
+
+/**
+ * Optional: clear cached/preloaded tracks.
+ */
+export function unloadPreloadedTracks(ids = null) {
+  if (!ids) {
+    howlCache.forEach(({ howl }) => {
+      try { howl.unload(); } catch {}
+    });
+    howlCache.clear();
     return;
   }
 
-  stopTrack(() => {
-    currentTrack = new Howl({
-      src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${track.file}`],
-      loop: looping,
-      // 🔊 softer global ceiling instead of raw 1.0
-      volume: getMusicVolume(),
-      html5: true,
-
-      onplay: () => {
-        updateTrackLabel(track.name);
-        startProgressUpdater();
-      },
-      onend: () => {
-        if (looping) return;
-
-        if (shuffling) {
-          playRandomTrack();
-        } else {
-          skipNext(); // <-- this line makes it play next normally
-        }
-      },
-      onplayerror: (_, err) => {
-        console.warn('⚠️ Play error:', err);
-        currentTrack.once('unlock', () => currentTrack.play());
-      }
-    });
-
-    currentTrack.play();
-    startProgressUpdater(); // don't wait for onplay
+  ids.filter(Boolean).forEach((id) => {
+    const cached = howlCache.get(id);
+    if (cached?.howl) {
+      try { cached.howl.unload(); } catch {}
+    }
+    howlCache.delete(id);
   });
+}
+
+//////////////////////////////
+// 🧠 Track resolver
+//////////////////////////////
+function resolveTrackMeta(id) {
+  const tracks = getTracks();
+  return tracks.find(t => t.id === id) || null;
+}
+
+function makeHowl(meta, opts = {}) {
+  const {
+    html5 = true,
+    volume = getMusicVolume(),
+  } = opts;
+
+  return new Howl({
+    src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${meta.file}`],
+    loop: looping,
+    volume,
+    html5,
+    preload: true,
+  });
+}
+
+function getHowlFor(meta, opts = {}) {
+  const {
+    useCache = false,
+    html5 = true,
+    volume = getMusicVolume(),
+  } = opts;
+
+  if (useCache) {
+    const cached = howlCache.get(meta.id);
+    if (cached?.howl && cached.html5 === html5) {
+      // ensure desired volume (safe)
+      try { cached.howl.volume(volume); } catch {}
+      return cached.howl;
+    }
+
+    // create & store if missing
+    const howl = makeHowl(meta, { html5, volume });
+    howlCache.set(meta.id, { howl, meta, html5 });
+    return howl;
+  }
+
+  return makeHowl(meta, { html5, volume });
+}
+
+//////////////////////////////
+// 🧩 Attach handlers (single source of truth)
+//////////////////////////////
+function bindHowlHandlers(howl, meta, opts = {}) {
+  const { onEnd = null } = opts;
+
+  // Clear any prior listeners (important when reusing cached Howls)
+  try { howl.off(); } catch {}
+
+  howl.on('play', () => {
+    updateTrackLabel(meta.name);
+    startProgressUpdater();
+  });
+
+  howl.on('end', () => {
+    // 1) Caller-owned end behavior (StoryMode rotation)
+    if (typeof onEnd === 'function') {
+      try { onEnd(meta.id); } catch (e) { console.warn('⚠️ onEnd override error:', e); }
+      return;
+    }
+
+    // 2) Default behavior (your existing music player rules)
+    if (looping) return;
+
+    if (shuffling) {
+      playRandomTrack();
+    } else {
+      skipNext(); // <-- keeps your normal "album next" behavior
+    }
+  });
+
+  howl.on('playerror', (_, err) => {
+    console.warn('⚠️ Play error:', err);
+    howl.once('unlock', () => howl.play());
+  });
+
+  // store override reference (debug / sanity)
+  currentEndOverride = onEnd || null;
 }
 
 //////////////////////////////
@@ -109,16 +223,140 @@ export function stopTrack(callback) {
     return;
   }
 
-  currentTrack.fade(currentTrack.volume(), 0, fadeDuration);
+  const t = currentTrack;
+  const shouldUnload = !isHowlCached(t); // ✅ key line
+
+  try { t.off('end'); } catch {}
+
+  try {
+    t.fade(t.volume(), 0, fadeDuration);
+  } catch {}
+
   setTimeout(() => {
-    currentTrack.stop();
-    currentTrack.unload();
-    currentTrack = null;
-    updateTrackLabel('(none)');
-    callback?.();
-  }, fadeDuration);
+    try { prevHowl.off(); } catch {}
+    try { prevHowl.stop(); } catch {}
+
+    // ✅ Don't unload if cached
+    if (!isHowlCached(prevHowl)) {
+      try { prevHowl.unload(); } catch {}
+    } else {
+      try { prevHowl.seek(0); } catch {}
+    }
+
+    if (currentTrackMeta && currentTrackMeta.id === nextMeta.id) {
+      updateTrackLabel(nextMeta.name);
+    }
+  }, crossfadeMs);
 
   cancelAnimationFrame(rafId);
+}
+
+//////////////////////////////
+// 🌊 Crossfade transition (seamless-ish)
+//////////////////////////////
+function crossfadeTo(nextHowl, nextMeta, opts = {}) {
+  const {
+    crossfadeMs = fadeDuration,
+    onEnd = null,
+    volume = getMusicVolume(),
+  } = opts;
+
+  const prevHowl = currentTrack;
+  const prevMeta = currentTrackMeta;
+
+  // If nothing playing, just play clean
+  if (!prevHowl) {
+    currentTrack = nextHowl;
+    currentTrackMeta = nextMeta;
+    bindHowlHandlers(nextHowl, nextMeta, { onEnd });
+
+    try { nextHowl.stop(); } catch {}
+    try { nextHowl.seek(0); } catch {}
+    try { nextHowl.volume(volume); } catch {}
+    try { nextHowl.play(); } catch {}
+
+    startProgressUpdater();
+    return;
+  }
+
+  // Set new as current immediately (UI + progress now points to new)
+  currentTrack = nextHowl;
+  currentTrackMeta = nextMeta;
+  bindHowlHandlers(nextHowl, nextMeta, { onEnd });
+
+  // Prepare both volumes
+  let prevVol = 0;
+  try { prevVol = prevHowl.volume(); } catch { prevVol = volume; }
+
+  try { nextHowl.stop(); } catch {}
+  try { nextHowl.seek(0); } catch {}
+
+  // Start new at 0, then fade up
+  try { nextHowl.volume(0); } catch {}
+  try { nextHowl.play(); } catch {}
+
+  // Fade in new
+  try { nextHowl.fade(0, volume, crossfadeMs); } catch {}
+
+  // Fade out previous
+  try { prevHowl.fade(prevVol, 0, crossfadeMs); } catch {}
+
+  // After fade, kill old track
+  setTimeout(() => {
+    // In case something else swapped tracks again, only stop/unload the old one
+    try { prevHowl.off(); } catch {}
+    try { prevHowl.stop(); } catch {}
+    try { prevHowl.unload(); } catch {}
+
+    // If we were still showing old meta (rare), refresh label
+    if (currentTrackMeta && currentTrackMeta.id === nextMeta.id) {
+      updateTrackLabel(nextMeta.name);
+    }
+  }, crossfadeMs);
+
+  startProgressUpdater();
+}
+
+//////////////////////////////
+// 🚀 Play Track
+//////////////////////////////
+export function playTrack(id = getFirstTrackId(), opts = {}) {
+  const {
+    onEnd = null,           // override end behavior (StoryMode!)
+    crossfadeMs = 0,        // if > 0, do real crossfade instead of stop-then-play
+    html5 = true,           // override html5 per play (StoryMode can use WebAudio)
+    useCache = false,       // use cached/preloaded howl if available
+    volume = getMusicVolume(),
+  } = opts;
+
+  const meta = resolveTrackMeta(id);
+  if (!meta) {
+    console.warn(`⚠️ Track "${id}" not found.`);
+    return;
+  }
+
+  // Build or reuse howl
+  const nextHowl = getHowlFor(meta, { useCache, html5, volume });
+
+  // If crossfading, do NOT call stopTrack() (it delays playback by fadeDuration)
+  if (crossfadeMs > 0) {
+    crossfadeTo(nextHowl, meta, { crossfadeMs, onEnd, volume });
+    return;
+  }
+
+  // Default legacy behavior (your original): fade out fully, then start next
+  stopTrack(() => {
+    currentTrack = nextHowl;
+    currentTrackMeta = meta;
+    bindHowlHandlers(nextHowl, meta, { onEnd });
+
+    try { nextHowl.stop(); } catch {}
+    try { nextHowl.seek(0); } catch {}
+    try { nextHowl.volume(volume); } catch {}
+
+    try { nextHowl.play(); } catch {}
+    startProgressUpdater(); // don't wait for onplay
+  });
 }
 
 //////////////////////////////
@@ -232,7 +470,7 @@ function getCurrentTrackIndex() {
   if (!currentTrack) return 0;
   const tracks = getTracks();
   const src = currentTrack._src;
-  const idx = tracks.findIndex(t => src.includes(t.file));
+  const idx = tracks.findIndex(t => src && src.includes(t.file));
   return idx >= 0 ? idx : 0;
 }
 
@@ -277,16 +515,16 @@ export function currentTrackName() {
   if (!currentTrack) return '(none)';
   const tracks = getTracks();
   const src = currentTrack._src;
-  const track = tracks.find(t => src.includes(t.file));
-  return track?.name || '(unknown)';
+  const track = tracks.find(t => src && src.includes(t.file));
+  return track?.name || currentTrackMeta?.name || '(unknown)';
 }
 
 export function currentTrackId() {
   if (!currentTrack) return '';
   const tracks = getTracks();
   const src = currentTrack._src;
-  const track = tracks.find(t => src.includes(t.file));
-  return track?.id ?? '';
+  const track = tracks.find(t => src && src.includes(t.file));
+  return track?.id ?? currentTrackMeta?.id ?? '';
 }
 
 export function getTrackList() {
@@ -361,4 +599,12 @@ export function playInfinityLoop() {
 // 🧊 Infinity just uses the global player, so stopping is simple
 export function stopInfinityLoop() {
   stopTrack();
+}
+// managers/musicManager.js
+
+function isHowlCached(howl) {
+  for (const entry of howlCache.values()) {
+    if (entry?.howl === howl) return true;
+  }
+  return false;
 }

@@ -171,7 +171,7 @@ export const Chapter1 = {
       questLabel: 'Turn off the CampLights',
       weirdLabel: 'More Syrup Bubbles?',
       loop: {
-        title: '<span style="color: rgb(217, 164, 255);">ShakeDownSquare</span>',
+        title: '<span style="color: rgb(217, 164, 255);">ShakeDown Square</span>',
         img: PRO_IMG('shakeSquare.png'),
         text: `Shakedown Square opens up like a neon, tie-dye canyon. You see <span style='color:rgb(217, 164, 255);'>\"<em>Pi-Pretzels</em>\"</span> tying delicious, unsolvable knots; <span style='color:rgb(217, 164, 255);'>\"Gold Ratio Cones\"</span> selling randomly twisted scones. A tiny hooded dino walks by with a mysterious backpack full of prime crystals: <span style='color:rgb(217, 164, 255);'>\"Three for a Cone Coin! No refunds!\"</span> Another vendor offers fractal tapestries that only bloom when you step closer.<br><br>You pocket the urge to explore and turn back toward the truck. Somewhere past the vendors, you can hear Jehnk’s customers lining up.`,
       },

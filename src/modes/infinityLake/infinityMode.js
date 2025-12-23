@@ -71,33 +71,54 @@ const lastMissByMode = {
 
 // ⬇️ replace the old checkInfinityBadges() with this
 // ⬇️ now: run-local milestone haptics only (no badge awards here)
+// ⬇️ replace the old checkInfinityBadgesByScore() with this
+// now: run-local milestone haptics + REAL badge awards (so GC can mirror immediately)
 function checkInfinityBadgesByScore() {
   const seconds = Math.floor((Date.now() - startTime) / 1000);
 
   let hitSomething = false;
 
+  // helper: award once, persist immediately (important on iOS if user bounces out fast)
+  const awardOnce = (badgeId) => {
+    try {
+      // silent:true so we don't double-buzz (we do hapticSoftPulse below)
+      const isNew = awardBadge(badgeId, { silent: true });
+
+      // Force persistence immediately so Back→Menu can't "lose" it on iOS
+      if (isNew) {
+        try { appState?.saveToStorage?.(); } catch {}
+      }
+    } catch (e) {
+      console.warn('[Infinity] awardBadge failed:', badgeId, e);
+    }
+  };
+
   if (!hit25ThisRun && score >= 25 && seconds <= 60) {
     hit25ThisRun = true;
     hitSomething = true;
     console.log('♾️ Hit 25-point Infinity milestone this run');
+    awardOnce('inf_25_1min');
   }
 
   if (!hit50ThisRun && score >= 50 && seconds <= 120) {
     hit50ThisRun = true;
     hitSomething = true;
     console.log('♾️ Hit 50-point Infinity milestone this run');
+    awardOnce('inf_50_2min');
   }
 
   if (!hit100ThisRun && score >= 100 && seconds <= 240) {
     hit100ThisRun = true;
     hitSomething = true;
     console.log('♾️ Hit 100-point Infinity milestone this run');
+    awardOnce('inf_100_4min');
   }
 
   if (!hit250ThisRun && score >= 250 && seconds <= 600) {
     hit250ThisRun = true;
     hitSomething = true;
     console.log('♾️ Hit 250-point Infinity milestone this run');
+    awardOnce('inf_250_10min');
   }
 
   if (hitSomething) {
@@ -426,6 +447,9 @@ function cleanupEventHandlers() {
 
 
 function returnToMenu() {
+  // 🧷 safety flush (won't double-award because we gate by hitXXThisRun)
+  try { checkInfinityBadgesByScore(); } catch {}
+
   stopTrack(); // 💥 nukes the Howl
   playTransition(() => {
     stopInfinityMode();
@@ -433,6 +457,7 @@ function returnToMenu() {
     applyBackgroundTheme();
   });
 }
+
 
 function startGame() {
   // re-arm keyboard for a fresh set

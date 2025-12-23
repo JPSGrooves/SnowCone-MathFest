@@ -20,6 +20,7 @@ import {
   getLooping,
   currentTrackId,
   isPlaying,
+  preloadTracks,          // 👈 add this
 } from '../../managers/musicManager.js';
 import { Howl } from 'howler';
 import { awardBadge } from '../../managers/badgeManager.js';
@@ -141,8 +142,6 @@ const SELECTORS = {
 
 // 🔹 Body flag for iOS padding tweaks (mirrors Kids Camping's kc-active)
 const SM_BODY_CLASS = 'sm-active';
-
-const STORY_TRACKS = ['prologue', 'bonusTime', 'patchrelaxes' ];
 
 // 🔍 Native iOS detector for exclusive content.
 // Your WKWebView / native wrapper should set window.SC_IOS_NATIVE = true
@@ -910,11 +909,12 @@ function renderChapterMenu() {
   elRoot = container.querySelector('.sm-aspect-wrap');
   repaintBackground();
 
+  unlockHowlerCtx();
+
   // Story music: random track, no loop; rotation handles next picks
-  if (!isPlaying?.()) {
-    kickStoryMusic({ forceNew: true, rotate: true });
-    startStoryRotation();
-  }
+  // Story music: 3-track forever rotation (Story-owned end behavior)
+  startStoryRotation();
+
 
   wireHandlersForCurrentRoot();
 }
@@ -1326,26 +1326,15 @@ export { loadStoryMode };
 function unlockHowlerCtx() {
   try {
     const H = window.Howler ?? globalThis.Howler;
-    if (H && H._muted) H.mute(false);
-    if (H?.ctx && H.ctx.state === 'suspended') { H.ctx.resume().catch(() => {}); }
+
+    // ✅ DO NOT auto-unmute here (respect user mute)
+    if (H?.ctx && H.ctx.state === 'suspended') {
+      H.ctx.resume().catch(() => {});
+    }
   } catch {}
 }
 
-function pickNextStoryTrack(excludeId = null) {
-  try {
-    const pool = STORY_TRACKS.filter(Boolean);
-    if (!pool.length) return null;
 
-    // prefer the last-played id if we have it, else ask manager
-    const curOrLast = excludeId ?? __smLastStoryTrack ?? (() => { try { return currentTrackId?.(); } catch { return null; } })();
-
-    const eligible = pool.length > 1 ? pool.filter(id => id !== curOrLast) : pool;
-    const idx = Math.floor(Math.random() * eligible.length);
-    return eligible[idx] ?? pool[0];
-  } catch {
-    return STORY_TRACKS[0] ?? null;
-  }
-}
 
 function backToChapterMenu() {
   smSetChapterFlag(null);
@@ -1353,98 +1342,116 @@ function backToChapterMenu() {
   wireHandlersForCurrentRoot();
 }
 
-function ensureStoryLoop() {
-  try { if (!getLooping?.()) toggleLoop(); } catch {}
+
+// ─────────────────────────────────────────────────────────────
+// StoryMode: 3-track forever rotation (no back-to-back repeats)
+// Uses musicManager's onEnd override + crossfade + preload cache
+// ─────────────────────────────────────────────────────────────
+
+const STORY_TRACKS = ['prologue', 'bonusTime', 'patchrelaxes'];
+
+let __smStoryRotating = false;
+let __smStoryBag = [];
+let __smStoryLast = null;
+
+function smShuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
-/**
- * Kick story music:
- * - random pick from STORY_TRACKS
- * - never same as last
- * - rotate: don't loop; when song ends we'll start another
- */
-function kickStoryMusic({ forceNew = false, rotate = false } = {}) {
-  // Don’t fight the browser if we’re backgrounded
-  if (typeof document !== 'undefined' && document.hidden) return;
-
-  const wantId = pickNextStoryTrack(__smLastStoryTrack);
-  if (!wantId) return;
-
-  unlockHowlerCtx();
-
-  let curId = null;
-  let playing = false;
-  try {
-    curId   = currentTrackId?.();
-    playing = isPlaying?.();
-  } catch {
-    // ignore, fall back to defaults
+function smRefillBag() {
+  const pool = STORY_TRACKS.filter(Boolean);
+  if (!pool.length) {
+    __smStoryBag = [];
+    return;
   }
 
-  // Decide whether we *actually* need to change tracks
-  const needChange = forceNew
-    ? (STORY_TRACKS.length > 1 ? true : !playing)
-    : (!playing || curId !== wantId);
+  const bag = smShuffle([...pool]);
 
-  if (needChange) {
-    try {
-      // 🔇 Let musicManager handle crossfades/cleanup; we just request the id.
-      playTrack(wantId);
-      __smLastStoryTrack = wantId;
-      // console.log('[StoryMusic] play →', wantId, '(prev was', curId, ')');
-    } catch (err) {
-      console.warn('[StoryMusic] playTrack failed:', err);
-    }
+  // prevent wrap repeat: first of new bag can't equal last played
+  if (bag.length > 1 && __smStoryLast && bag[0] === __smStoryLast) {
+    const swapIdx = 1 + ((Math.random() * (bag.length - 1)) | 0);
+    [bag[0], bag[swapIdx]] = [bag[swapIdx], bag[0]];
   }
 
-  // In “rotation” mode we explicitly *don’t* force looping —
-  // we want each track to end naturally and then our rotation timer
-  // will spin up the next one. If rotate is false, we fall back to “loop story”.
-  if (rotate) {
-    try {
-      if (getLooping?.()) toggleLoop(); // ensure non-loop for rotation mode
-    } catch {}
-  } else {
-    ensureStoryLoop();
+  __smStoryBag = bag;
+}
+
+function smNextTrackId() {
+  if (!__smStoryBag.length) smRefillBag();
+
+  let next = __smStoryBag.shift() || null;
+
+  // extra guard: never back-to-back
+  if (next && __smStoryLast && next === __smStoryLast) {
+    next = __smStoryBag.shift() || next;
   }
+
+  return next;
+}
+
+function smPlayStory(id) {
+  if (!id) return;
+
+  // Rotation mode must be non-looping
+  try { if (getLooping?.()) toggleLoop(); } catch {}
+
+  // Crossfade makes it feel continuous (no 1s silence)
+  playTrack(id, {
+    onEnd: smOnStoryEnd,
+    crossfadeMs: 650,
+    html5: false,     // WebAudio tends to be smoother for “seamless” transitions
+    useCache: true,   // reuse preloaded Howls
+  });
+
+  __smStoryLast = id;
+}
+
+function smOnStoryEnd(endedId) {
+  if (!__smStoryRotating) return;
+
+  // endedId is the one that just finished; keep the no-repeat rule tight
+  __smStoryLast = endedId || __smStoryLast;
+
+  const next = smNextTrackId();
+  smPlayStory(next);
 }
 
 function startStoryRotation() {
-  // Rotation mode = non-looping; we advance when tracks end.
+  if (__smStoryRotating) return;
+  __smStoryRotating = true;
+
+  // Preload + cache ONLY these 3 (keeps memory reasonable)
+  preloadTracks(STORY_TRACKS, { html5: false });
+
+  // If we’re already playing a Story track, just adopt it (don’t restart it)
+  let cur = '';
+  let playing = false;
   try {
-    if (getLooping?.()) toggleLoop();
+    cur = currentTrackId?.();
+    playing = !!isPlaying?.();
   } catch {}
 
-  if (__smRotateTimer) return;
+  if (playing && cur && STORY_TRACKS.includes(cur)) {
+    __smStoryLast = cur;
+    return; // ✅ do NOT replay / restart
+  }
 
-  __smRotateTimer = setInterval(() => {
-    try {
-      if (typeof document !== 'undefined' && document.hidden) return;
-
-      // If we’ve just asked for a track, chill for a moment.
-      if (__smRotateLock) return;
-
-      const playing = isPlaying?.();
-      if (!playing) {
-        __smRotateLock = true;
-        kickStoryMusic({ forceNew: true, rotate: true });
-
-        // Give Howler ~1s to spin up before we ask again
-        setTimeout(() => { __smRotateLock = false; }, 1100);
-      }
-    } catch (err) {
-      console.warn('[StoryMusic] rotation tick error:', err);
-    }
-  }, 1000);
+  // Start fresh
+  const first = smNextTrackId();
+  smPlayStory(first);
 }
 
 function stopStoryRotation() {
-  if (__smRotateTimer) {
-    clearInterval(__smRotateTimer);
-    __smRotateTimer = null;
-  }
-  __smRotateLock = false;
+  __smStoryRotating = false;
+  __smStoryBag = [];
+  __smStoryLast = null;
 }
+
+
 
 
 const smDing = new Howl({
@@ -1464,26 +1471,15 @@ const smMilestone = new Howl({
 });
 
 function playSFX(name) {
-  console.log('[StoryMode] playSFX called with:', name);
+  // ✅ If muted, do nothing (Howler mute already handles it, but this avoids edge cases)
+  if (isMuted?.() || (window.Howler ?? globalThis.Howler)?._muted) return;
 
-  // Make sure Howler is actually alive and unmuted before we play
-  try {
-    unlockHowlerCtx();
-  } catch (err) {
-    console.warn('[StoryMode] unlockHowlerCtx failed (safe to ignore):', err);
-  }
+  try { unlockHowlerCtx(); } catch {}
 
-  if (name === 'honk1') {
-    smDing.play();
-  } else if (name === 'honk2') {
-    smDing2.play();
-  } else if (name === 'QuikServemilestone') {
-    try {
-      smMilestone.play();
-    } catch (err) {
-      console.warn('[StoryMode] smMilestone.play() failed, falling back to honk1:', err);
-      smDing.play();
-    }
+  if (name === 'honk1') smDing.play();
+  else if (name === 'honk2') smDing2.play();
+  else if (name === 'QuikServemilestone') {
+    try { smMilestone.play(); } catch { smDing.play(); }
   }
 }
 

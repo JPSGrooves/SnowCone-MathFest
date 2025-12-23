@@ -58,7 +58,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Glowing Doorway',
       img: PRO_MED_IMG('forestPath.png'),
-      text: `The festival thins out behind you until it’s just trees, path, and your own footsteps.<br><br>Up ahead, a band of neon magenta and electric violet hangs in the dark—tall and narrow like a doorway. Every time you walk, the path seems to stretch with it, distance turning slippery, like wanting to reach the light is what’s actually pulling you forward.`,
+      text: `The festival thins out behind you until it’s just the trees, the path, and the beat of your own footsteps.<br><br>Up ahead, a band of neon magenta and electric violet hangs in the dark—tall and narrow like a doorway. Every time you walk, the path seems to stretch with it, distance turning slippery, like wanting to reach the light is what’s actually pulling you forward.`,
       soloLabel: 'Next ➡️',
     },
 
@@ -70,7 +70,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Glowing Doorway',
       img: PRO_MED_IMG('portalGlow.png'),
-      text: `You push past the last curtain of branches and the path finally quits stretching away from you.<br><br>The portal is right there now—tall and bright, humming like a speaker stack caught on one perfect note. Bands of magenta, cyan, and ultraviolet fold over each other in slow waves, casting moving shadows across the trees.`,
+      text: `You push past the last curtain of branches and the path finally stops stretching away from you.<br><br>The portal is right there now—tall and bright, humming like a speaker stack caught on one perfect note. Bands of magenta, cyan, and ultraviolet fold over each other in slow waves, casting moving shadows across the trees.`,
       soloLabel: 'Step up to the edge ➡️',
     },
 
@@ -125,7 +125,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Drop',
       img: PRO_IMG('dinoSteal.png'),
-      text: `You pull <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> out of your bag, letting the portal light crawl across the layers—mint glow, neon swirl, that impossible shimmer at the top.<br><br>Then a sudden burst of leaves explode in a familiar rustle. The tiny hooded dino sprints out of the trees and collides with you in a low tackle, claws wrapping around your wrist. Their scales are rough and cool against your skin, but the grip is weirdly careful—urgent and gentle at the same time—so you let go.`,
+      text: `You pull <span style="color: rgb(247, 255, 105);">The Perfect SnowCone</span> out of your bag, letting the portal light crawl across the layers—mint glow, neon swirl, that impossible shimmer at the top.<br><br>Then a sudden burst of leaves explode in a familiar rustle. The tiny hooded dino sprints out of the trees and collides with you in a low tackle, claws wrapping around your wrist. His scales are rough and cool against your skin, but the grip is weirdly careful—gentle but urgent at the same time—so you let go.`,
       soloLabel: 'Next ➡️',
     },
 // 0B-1b) KEPT the cone – forced swap happens *here*
@@ -135,7 +135,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Drop',
       img: PRO_MED_IMG('dinoDrop.png'),
-      text: `In one smooth twist they roll away with the cone, cradling it to their chest like it’s a relay baton.<br><br>They toss something heavy and familiar to the ground by your feet: a <b>beat-up cell phone</b>, already buzzing like it’s been waiting for this moment—cracked screen, dented sides, bars somehow full.<br><span style="color: rgb(61, 229, 255);">“I’ll call you from the other side,”</span> they grin, backing toward the neon doorway.`,
+      text: `In one smooth twist he rolls away with the cone, cradling it to his chest like it’s a relay baton.<br><br>He tosses something heavy and familiar to the ground by your feet: a <b>beat-up cell phone</b>, already buzzing, like it’s been waiting for this moment—cracked screen, dented sides, bars somehow full.<br><span style="color: rgb(61, 229, 255);">“I’ll call you from the other side,”</span> he grins, backing toward the neon doorway.`,
       soloLabel: 'Pick up the phone…',
       onAdvance: ({ appState, engine }) => {
         const a = appState || globalAppState;
@@ -274,7 +274,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Call',
       img: PRO_MED_IMG('celly.png'),
-      text: `You thumb the cracked screen. The call connects with a click and a little burst of static.<br><br><span style="color: rgb(61, 229, 255);">“Whoa, it actually worked!”</span> The voice is tiny but unmistakable—the hooded dino.<br><br><span style="color: rgb(61, 229, 255);">“I wasn’t sure the portal would sync up right, but I’m back. My original timeline, my original loop.”</span>`,
+      text: `You thumb the cracked screen. The call connects with a click and a little burst of static.<br><br><span style="color: rgb(61, 229, 255);">“Whoa, it actually worked!”</span> The voice is tiny but unmistakable—it's the hooded dino.<br><br><span style="color: rgb(61, 229, 255);">“I wasn’t sure the portal would sync up correctly, but I’m back. My original timeline, my original loop.”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -284,7 +284,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'The Call',
       img: PRO_MED_IMG('tinyDinoHood.png'),
-      text: `You hear festival noise on their side, it sounds like the same party, but a different angle.<br><br><span style="color: rgb(61, 229, 255);">“SnowCone MathFest isn’t just a place,”</span> he says.<span style="color: rgb(61, 229, 255);">“It’s an in-between. Past, present, future: they all line up here when the symmetry’s just right. My call is going to get cut off, but I wanted you to know that I'm off to find the original Truck Driver!”</span>`,
+      text: `You hear festival noise on his side, it sounds like the same party, but a different angle.<br><br><span style="color: rgb(61, 229, 255);">“SnowCone MathFest isn’t just a place,”</span> he says.<span style="color: rgb(61, 229, 255);">“It’s an in-between. Past, present, future: they all line up here when the symmetry’s just right. My call is going to get cut off, but I wanted you to know that I'm off to find the original Truck Driver! How exciting!”</span>`,
       soloLabel: 'Next ➡️',
     },
 
@@ -592,7 +592,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Moment of Truth',
       img: PRO_MED_IMG('portalDecision4.png'),
-      text: `<span style="color: rgb(247, 255, 105);">“You see, ${playerName}, <b>The Perfect SnowCone</b> only works if you’re being served,”</span> Jehnk says, steadying the cup in his hand. <span style="color: rgb(247, 255, 105);">“Math is like that too,”</span> he goes on. <span style="color: rgb(247, 255, 105);">“Add, subtract—something always moves. You never get to keep everything and still give everything away.”</span>`,
+      text: `<span style="color: rgb(247, 255, 105);">“You see, ${playerName}, <b>The Perfect SnowCone</b> only works if you’re being served,”</span> Jehnk says, steadying the cup in his hand. <span style="color: rgb(247, 255, 105);">“Math is like that too,”</span> he goes on. <span style="color: rgb(247, 255, 105);">“Add, subtract—something always stays. You never get to keep everything and can never give everything away.”</span>`,
       soloLabel: 'Watch what he does ➡️',
     },
 
@@ -603,7 +603,7 @@ export const Chapter4 = {
       mode: 'solo',
       title: 'Moment of Truth',
       img: PRO_MED_IMG('portalDecision4.png'),
-      text: `He moves the SnowCone your way, slow and careful, like he’s solving for x in real time.<br><span style="color: rgb(247, 255, 105);">“If I serve this to you, it opens your path,”</span> he says.<span style="color: rgb(247, 255, 105);">“If you were to serve it back to me… that opens mine.”</span><br><br>The portal hums at the edge of your vision, waiting to see who this cone is really for.`,
+      text: `He moves the SnowCone toward you, slow and careful, like he’s solving for x in real time.<br><span style="color: rgb(247, 255, 105);">“If I serve this to you, it opens the portal for you to return home,”</span> he says. <span style="color: rgb(247, 255, 105);">“If you were to serve it back to me… that opens the portal for me.”</span><br><br>The portal hums at the edge of your peripheral, waiting to see who this cone is really for.`,
       soloLabel: 'Recieve the Cone ➡️',
       onAdvance: ({ appState }) => {
         const a = appState || globalAppState;
@@ -651,7 +651,7 @@ export const Chapter4 = {
       mode: 'choice3',
       title: 'Moment of Truth',
       img: PRO_IMG('essentialsTrio3.png'),
-      text: `He looks at the portal, and then solemnly back to you, holding the cone he just served you.<br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that SnowCone.”</span>`,
+      text: `He looks at the portal, and then solemnly back to you, nodding at the cone he just served you.<br><span style="color: rgb(247, 255, 105);">“So the choice is yours. You can walk through that portal and go home…</span><br><span style="color: rgb(247, 255, 105);">…or you can save me from this loop and serve me that SnowCone.”</span>`,
       bigChoices: true,
       choices: [
         {
