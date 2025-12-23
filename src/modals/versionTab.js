@@ -203,8 +203,7 @@ export function renderVersionTab() {
       </p>
       <button class="track-button" id="openIOSAppBtn">🍎 Open App Store</button>
       <p style="font-size: 0.8em; opacity: 0.85; margin-top: 0.4rem;">
-        For now this opens the main App Store page. Once the festival is live on iOS,
-        this will jump straight to the SnowCone MathFest listing.
+        This opens the SnowCone MathFest listing on the App Store.
       </p>
     </div>
         `
@@ -291,15 +290,6 @@ export function setupVersionTabUI() {
   const importBtn = document.getElementById('importSaveBtn');
   const importInput = document.getElementById('importSave');
 
-  // 🍎 “Get the iOS App” CTA – browser only
-  const openIOSAppBtn = document.getElementById('openIOSAppBtn');
-  if (openIOSAppBtn) {
-    openIOSAppBtn.addEventListener('click', () => {
-      // Temporary: take them to the App Store homepage
-      window.open('https://www.apple.com/app-store/', '_blank', 'noopener,noreferrer');
-    });
-  }
-
   if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
       try {
@@ -382,14 +372,14 @@ export function setupVersionTabUI() {
       }
     });
   }
-
-  // 📲 Wire "Open App Store Page" CTA (browser-only; not rendered when isApp === true)
-  const iosBtn = document.getElementById('openIOSAppBtn');
-  if (iosBtn) {
-    iosBtn.addEventListener('click', () => {
-      // 🔗 TODO: replace with your real App Store URL
-      const url = 'https://example.com/snowcone-mathfest-ios';
+  // 🍎 “Get the iOS App” CTA – browser only
+  // (This button only exists when !isApp in renderVersionTab(), so this is safe.)
+  const openIOSAppBtn = document.getElementById('openIOSAppBtn');
+  if (openIOSAppBtn) {
+    openIOSAppBtn.addEventListener('click', () => {
+      const url = 'https://apps.apple.com/us/app/snowcone-mathfest/id6756327336';
       window.open(url, '_blank', 'noopener,noreferrer');
     });
   }
+
 }
