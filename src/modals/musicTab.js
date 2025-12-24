@@ -210,9 +210,10 @@ export function setupMusicTabUI() {
   //////////////////////////////
   trackSelect?.addEventListener('change', () => {
     const selectedTrack = trackSelect.value;
-    playTrack(selectedTrack);
+    playTrack(selectedTrack, { fadeMs: 0 }); // 🚀 instant switch
     settleUISoon();
   });
+
 
   //////////////////////////////
   // 🚀 Sync UI on Load

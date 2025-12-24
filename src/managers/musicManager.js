@@ -2,6 +2,23 @@
 import { Howl, Howler } from 'howler';
 import { isIOSNative } from '../utils/platform.js'; // 🔍 single source of truth
 
+// 🧠 Action token: every play/stop increments, so old fade timers can’t kill new tracks
+let _actionSeq = 0;
+let _stopTimer = null;
+
+function bumpSeq() {
+  _actionSeq += 1;
+  return _actionSeq;
+}
+
+function clearStopTimer() {
+  if (_stopTimer) {
+    try { clearTimeout(_stopTimer); } catch {}
+    _stopTimer = null;
+  }
+}
+
+
 // iOS: prefer WebAudio so the hardware silent switch behaves consistently.
 // (HTML5 <audio> is the one that tends to ignore the silent switch.)
 function preferWebAudioOnIOS() {
@@ -169,6 +186,13 @@ function makeHowl(meta, opts = {}) {
     volume,
     html5,
     preload: true,
+
+    onloaderror: (_, err) => {
+      console.warn('⚠️ LOAD ERROR:', meta.id, meta.file, 'html5=', html5, err);
+    },
+    onplayerror: (_, err) => {
+      console.warn('⚠️ PLAY ERROR:', meta.id, meta.file, 'html5=', html5, err);
+    },
   });
 }
 
@@ -239,38 +263,69 @@ function bindHowlHandlers(howl, meta, opts = {}) {
 //////////////////////////////
 // 🛑 Stop Track (with Fade)
 //////////////////////////////
-export function stopTrack(callback) {
+// 🛑 Stop Track (with Fade) — guarded against race conditions
+// ✅ CHANGE 1: let stopTrack optionally *use* a provided seq instead of bumping again
+export function stopTrack(callback, opts = {}) {
+  const { fadeMs = fadeDuration, seq = bumpSeq() } = opts; // 👈 NEW: seq param w/ default bump
+
   if (!currentTrack) {
     callback?.();
     return;
   }
 
   const t = currentTrack;
-  const shouldUnload = !isHowlCached(t); // ✅ key line
 
-  try { t.off('end'); } catch {}
+  clearStopTimer();
 
+  // stop progress updates
+  try { cancelAnimationFrame(rafId); } catch {}
+  rafId = null;
+
+  // detach handlers so we don’t auto-skip while stopping
+  try { t.off(); } catch {}
+
+  // immediate stop
+  if (!fadeMs || fadeMs <= 0) {
+    try { t.stop(); } catch {}
+
+    if (isHowlCached(t)) {
+      try { t.seek(0); } catch {}
+    } else {
+      try { t.unload(); } catch {}
+    }
+
+    if (currentTrack === t) currentTrack = null;
+    currentTrackMeta = null;
+    currentEndOverride = null;
+
+    callback?.();
+    return;
+  }
+
+  // fade out
   try {
-    t.fade(t.volume(), 0, fadeDuration);
+    const v = typeof t.volume === 'function' ? t.volume() : getMusicVolume();
+    t.fade(v, 0, fadeMs);
   } catch {}
 
-  setTimeout(() => {
-    try { prevHowl.off(); } catch {}
-    try { prevHowl.stop(); } catch {}
+  _stopTimer = setTimeout(() => {
+    // 🔒 Only execute if no newer play/stop has happened
+    if (_actionSeq !== seq) return;
 
-    // ✅ Don't unload if cached
-    if (!isHowlCached(prevHowl)) {
-      try { prevHowl.unload(); } catch {}
+    try { t.stop(); } catch {}
+
+    if (isHowlCached(t)) {
+      try { t.seek(0); } catch {}
     } else {
-      try { prevHowl.seek(0); } catch {}
+      try { t.unload(); } catch {}
     }
 
-    if (currentTrackMeta && currentTrackMeta.id === nextMeta.id) {
-      updateTrackLabel(nextMeta.name);
-    }
-  }, crossfadeMs);
+    if (currentTrack === t) currentTrack = null;
+    currentTrackMeta = null;
+    currentEndOverride = null;
 
-  cancelAnimationFrame(rafId);
+    callback?.();
+  }, fadeMs + 20);
 }
 
 //////////////////////////////
@@ -342,14 +397,20 @@ function crossfadeTo(nextHowl, nextMeta, opts = {}) {
 //////////////////////////////
 // 🚀 Play Track
 //////////////////////////////
+// 🚀 Play Track — atomic + can switch instantly with fadeMs:0
+// ✅ CHANGE 2: in playTrack, bump ONCE and pass that same seq into stopTrack
 export function playTrack(id = getFirstTrackId(), opts = {}) {
   const {
     onEnd = null,
     crossfadeMs = 0,
-    html5 = getDefaultHtml5(),  // 👈 was true
+    html5 = getDefaultHtml5(),
     useCache = false,
     volume = getMusicVolume(),
+    fadeMs = fadeDuration,
   } = opts;
+
+  const seq = bumpSeq();     // ✅ ONE bump for the whole operation
+  clearStopTimer();
 
   const meta = resolveTrackMeta(id);
   if (!meta) {
@@ -357,17 +418,17 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
     return;
   }
 
-  // Build or reuse howl
   const nextHowl = getHowlFor(meta, { useCache, html5, volume });
 
-  // If crossfading, do NOT call stopTrack() (it delays playback by fadeDuration)
   if (crossfadeMs > 0) {
     crossfadeTo(nextHowl, meta, { crossfadeMs, onEnd, volume });
     return;
   }
 
-  // Default legacy behavior (your original): fade out fully, then start next
   stopTrack(() => {
+    // 🔒 Guard now works (stopTrack did NOT bump again)
+    if (_actionSeq !== seq) return;
+
     currentTrack = nextHowl;
     currentTrackMeta = meta;
     bindHowlHandlers(nextHowl, meta, { onEnd });
@@ -375,15 +436,16 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
     try { nextHowl.stop(); } catch {}
     try { nextHowl.seek(0); } catch {}
     try { nextHowl.volume(volume); } catch {}
-
     try { nextHowl.play(); } catch {}
-    startProgressUpdater(); // don't wait for onplay
-  });
+
+    startProgressUpdater();
+  }, { fadeMs, seq }); // 👈 pass same seq
 }
 
 //////////////////////////////
 // 🔀 True Random Track
 //////////////////////////////
+// 🔀 True Random Track
 export function playRandomTrack() {
   const tracks = getTracks();
   const currentIndex = getCurrentTrackIndex();
@@ -393,14 +455,11 @@ export function playRandomTrack() {
     randomIndex = Math.floor(Math.random() * tracks.length);
   } while (tracks.length > 1 && randomIndex === currentIndex);
 
-  stopTrack(() => {
-    playTrack(tracks[randomIndex].id);
-  });
+  // Let playTrack own stopping
+  playTrack(tracks[randomIndex].id, { fadeMs: 0 });
 }
 
-//////////////////////////////
 // ⏭️ Skip Next (Respects Shuffle)
-//////////////////////////////
 export function skipNext() {
   if (shuffling) {
     playRandomTrack();
@@ -410,14 +469,11 @@ export function skipNext() {
   const tracks = getTracks();
   const index = getCurrentTrackIndex();
   const next = (index + 1) % tracks.length;
-  stopTrack(() => {
-    playTrack(tracks[next].id);
-  });
+
+  playTrack(tracks[next].id, { fadeMs: 0 });
 }
 
-//////////////////////////////
 // ⏮️ Skip Prev (Respects Shuffle)
-//////////////////////////////
 export function skipPrev() {
   if (shuffling) {
     playRandomTrack();
@@ -427,9 +483,8 @@ export function skipPrev() {
   const tracks = getTracks();
   const index = getCurrentTrackIndex();
   const prev = (index - 1 + tracks.length) % tracks.length;
-  stopTrack(() => {
-    playTrack(tracks[prev].id);
-  });
+
+  playTrack(tracks[prev].id, { fadeMs: 0 });
 }
 
 //////////////////////////////
@@ -453,7 +508,15 @@ export function togglePlayPause() {
 //////////////////////////////
 // 🔇 Mute Controls
 //////////////////////////////
-export function toggleMute() {
+// 🔇 Mute Controls
+export function toggleMute(desired) {
+  // If caller passes a boolean, set explicitly.
+  if (typeof desired === 'boolean') {
+    Howler.mute(desired);
+    return desired;
+  }
+
+  // Otherwise toggle
   const muted = !Howler._muted;
   Howler.mute(muted);
   return muted;
