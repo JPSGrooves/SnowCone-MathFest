@@ -2,9 +2,7 @@
 import { Howl, Howler } from 'howler';
 import { isIOSNative } from '../utils/platform.js'; // 🔍 single source of truth
 
-// 🧠 Action token: every play/stop increments, so old fade timers can’t kill new tracks
-let _actionSeq = 0;
-let _stopTimer = null;
+
 
 function bumpSeq() {
   _actionSeq += 1;
@@ -18,163 +16,15 @@ function clearStopTimer() {
   }
 }
 
-// ==============================
-// 🍧 iOS Wake / Audio Recovery
-// ==============================
-
-// iOS will suspend/interupt WebAudio when screen locks / app backgrounds.
-// Sometimes Howler doesn't recover automatically, so we force resume
-// and if needed, rebuild the audio context.
-
-// One-time attachment guard
-let _wakeHandlersAttached = false;
-
-// Throttle so we don't spam resume calls
-let _lastWakeKick = 0;
-
-function _now() {
-  return Date.now ? Date.now() : new Date().getTime();
-}
-
-async function _resumeHowlerContext(reason = 'unknown') {
-  try {
-    const ctx = Howler?.ctx;
-    if (!ctx) return false;
-
-    // iOS can be: 'suspended', 'interrupted', or sometimes 'running' but dead.
-    if (ctx.state !== 'running') {
-      try {
-        await ctx.resume();
-        // console.log('🎧 Howler ctx resumed via', reason, 'state=', ctx.state);
-      } catch (e) {
-        // console.warn('⚠️ ctx.resume failed via', reason, e);
-      }
-    }
-
-    return (Howler?.ctx?.state === 'running');
-  } catch (e) {
-    // console.warn('⚠️ _resumeHowlerContext error', reason, e);
-    return false;
-  }
-}
-
-function _rebuildHowlerContext(reason = 'unknown') {
-  // Only do this as a last resort.
-  // Howler has some private helpers; we try those first, then a safe-ish manual rebuild.
-  try {
-    // console.log('🧯 Rebuilding Howler audio context via', reason);
-
-    if (typeof Howler?._setupAudioContext === 'function') {
-      Howler._setupAudioContext();
-      return true;
-    }
-
-    // Manual fallback (best effort)
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return false;
-
-    Howler.ctx = new AC();
-
-    // masterGain is how Howler routes volume/mute.
-    try {
-      Howler.masterGain = Howler.ctx.createGain();
-      Howler.masterGain.gain.value = typeof Howler.volume === 'function' ? Howler.volume() : 1;
-      Howler.masterGain.connect(Howler.ctx.destination);
-    } catch {}
-
-    return true;
-  } catch (e) {
-    // console.warn('⚠️ _rebuildHowlerContext failed', reason, e);
-    return false;
-  }
-}
-
-function _nukeDeadHowls(reason = 'unknown') {
-  try {
-    const list = Howler?._howls || [];
-    for (const h of list) {
-      try { h.stop(); } catch {}
-      try { h.unload(); } catch {}
-    }
-  } catch {}
-
-  // ✅ flush your cache too (otherwise you might reuse unloaded howls)
-  try {
-    if (typeof howlCache !== 'undefined' && howlCache?.clear) {
-      howlCache.clear();
-    }
-  } catch {}
-
-}
-
-async function _kickAudioEngine(reason = 'wake') {
-  const t = _now();
-  if (t - _lastWakeKick < 250) return; // throttle
-  _lastWakeKick = t;
-
-  // 1) Resume if possible
-  const ok = await _resumeHowlerContext(reason);
-  if (ok) return;
-
-  // 2) If resume didn't work, rebuild ctx
-  const rebuilt = _rebuildHowlerContext(reason);
-  if (rebuilt) {
-    await _resumeHowlerContext(`${reason}:afterRebuild`);
-  }
-
-  // 3) If still not running, hard reset howls (last resort)
-  if (Howler?.ctx && Howler.ctx.state !== 'running') {
-    _nukeDeadHowls(`${reason}:stillNotRunning`);
-    _rebuildHowlerContext(`${reason}:afterNuke`);
-    await _resumeHowlerContext(`${reason}:afterNukeRebuild`);
-  }
-}
-
-function _attachIOSWakeHandlers() {
-  if (_wakeHandlersAttached) return;
-  _wakeHandlersAttached = true;
-
-  // 🔑 This is the big one: screen lock/unlock often fires visibility changes.
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      _kickAudioEngine('visibilitychange:show');
-      setTimeout(() => _kickAudioEngine('visibilitychange:show:delayed'), 300);
-    }
-  });
-
-
-  // iOS Safari/WKWebView sometimes needs these too
-  window.addEventListener('pageshow', () => _kickAudioEngine('pageshow'), { passive: true });
-  window.addEventListener('focus', () => _kickAudioEngine('focus'), { passive: true });
-
-  // If the user taps after unlock, that gesture is a perfect "resume ctx" moment.
-  window.addEventListener('pointerdown', () => _kickAudioEngine('pointerdown'), { passive: true });
-
-  // Capacitor native: catch actual foreground/background transitions
-  // (Safe: if plugin isn't available, it just no-ops.)
-  (async () => {
-    try {
-      const mod = await import('@capacitor/app');
-      const App = mod?.App;
-      if (!App?.addListener) return;
-
-      App.addListener('appStateChange', (state) => {
-        if (state?.isActive) _kickAudioEngine('capacitor:active');
-      });
-    } catch {
-      // no-op (web build or plugin not present)
-    }
-  })();
-}
-
+// ─────────────────────────────────────────────────────────────
 // iOS: prefer WebAudio so the hardware silent switch behaves consistently.
-// (HTML5 <audio> is the one that tends to ignore the silent switch.)
+// NOTE: Whether silent switch mutes you ALSO depends on native AVAudioSession category.
+// ─────────────────────────────────────────────────────────────
 function preferWebAudioOnIOS() {
   try {
     const ua = navigator.userAgent || '';
     const isiOS =
       /iPad|iPhone|iPod/.test(ua) ||
-      // iPadOS reports as Mac sometimes:
       (ua.includes('Mac') && 'ontouchend' in document);
     return isiOS;
   } catch {
@@ -183,47 +33,33 @@ function preferWebAudioOnIOS() {
 }
 
 function getDefaultHtml5() {
-  // html5:true = <audio>
-  // html5:false = WebAudio
+  // html5:true  => <audio>
+  // html5:false => WebAudio
   return preferWebAudioOnIOS() ? false : true;
 }
 
-// iOS-specific: don't let Howler auto-suspend fight us after unlock.
-try {
-  if (preferWebAudioOnIOS()) {
-    Howler.autoSuspend = false; // ✅ prevents "stuck suspended" edge cases
-  }
-} catch {}
-
-// Attach wake handlers immediately (safe + idempotent)
-if (preferWebAudioOnIOS() || isIOSNative()) {
-  _attachIOSWakeHandlers();
-  try { Howler.autoSuspend = false; } catch {}
-}
-
-
-
-let currentTrack = null;
-
-// Track meta for UI + index lookup
-let currentTrackMeta = null;
-
-// Optional override for end behavior (StoryMode wants to own rotation)
-let currentEndOverride = null;
-
-// 💿 Global music loudness (master ceiling for all modes)
-const DEFAULT_MUSIC_VOLUME = 0.7; // was 1.0 – noticeably softer without feeling quiet
+// ─────────────────────────────────────────────────────────────
+// Global music loudness (master ceiling for all modes)
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_MUSIC_VOLUME = 0.7;
 
 function getMusicVolume() {
-  // Future-proof: if you ever add appState.settings.musicVolume, plug it in here.
   return DEFAULT_MUSIC_VOLUME;
 }
+
+let currentTrack = null;
+let currentTrackMeta = null;
+let currentEndOverride = null;
 
 let rafId = null;
 const fadeDuration = 1000;
 
-// 🔥 Track List
-// managers/musicManager.js — full catalog (includes iOS-only tracks)
+let looping = false;
+let shuffling = false;
+
+// ─────────────────────────────────────────────────────────────
+// 🔥 Track Catalog (includes iOS-only tracks)
+// ─────────────────────────────────────────────────────────────
 const allTracks = [
   { id: 'quikserve',      name: 'QuikServe OG',         file: 'quikserveST_OG.mp3' },
   { id: 'kktribute',      name: 'KK Tribute',           file: 'KKtribute.mp3' },
@@ -239,38 +75,310 @@ const allTracks = [
   { id: 'bonusTime',      name: 'Bonus Time',           file: 'bonusTime.mp3' },
 
   // 🦟 iOS-exclusive: only shows up in native iOS shell
-  {
-    id: 'lastRun',
-    name: 'Last Run',
-    file: 'lastRun.mp3',
-    iosExclusive: true,
-  },
+  { id: 'lastRun', name: 'Last Run', file: 'lastRun.mp3', iosExclusive: true },
 ];
 
-// 🧊 Public-facing track list (filtered by environment)
-// - iOS native shell → includes Mosquito Smash and any future iosExclusive tracks
-// - Browser / PWA → excludes all iosExclusive tracks entirely
+// Filtered by environment at call time
 function getTracks() {
-  // ⚠️ IMPORTANT:
-  // This runs at *call time*, not at module import time.
-  // That means it can see `isIOSNative()` AFTER the native shell injects SC_IOS_NATIVE.
   return isIOSNative()
     ? allTracks
     : allTracks.filter(t => !t.iosExclusive);
 }
 
-let looping = false;
-let shuffling = false;
+// ─────────────────────────────────────────────────────────────
+// 🧊 Mode “Scopes” (THIS is what makes musicManager rule everything)
+// A scope can temporarily:
+// - limit the playlist pool (e.g. QuickServe only)
+// - force shuffle/loop defaults for that mode
+// And then restore the prior state cleanly on exit.
+// ─────────────────────────────────────────────────────────────
+let _activePoolIds = null; // null => full catalog (filtered), else array of ids
 
-//////////////////////////////
-// 🎛️ Preload cache (for StoryMode + future)
-//////////////////////////////
+const _scopeStack = [];
+export function pushMusicScope(scope = {}) {
+  // Save current state
+  _scopeStack.push({
+    poolIds: _activePoolIds ? [..._activePoolIds] : null,
+    shuffling,
+    looping,
+  });
+
+  // Apply scope overrides (only if provided)
+  if (Array.isArray(scope.poolIds)) {
+    setMusicPool(scope.poolIds);
+  }
+  if (typeof scope.shuffling === 'boolean') {
+    setShuffle(scope.shuffling);
+  }
+  if (typeof scope.looping === 'boolean') {
+    setLoop(scope.looping);
+  }
+
+  emitMusicState();
+}
+
+export function popMusicScope() {
+  const prev = _scopeStack.pop();
+  if (!prev) return;
+
+  // Restore
+  setMusicPool(prev.poolIds);
+  setShuffle(prev.shuffling);
+  setLoop(prev.looping);
+
+  emitMusicState();
+}
+
+// Pool affects skip/prev/random + “current index” behavior.
+// It does NOT hide tracks from Settings UI (that still uses getTrackList()).
+export function setMusicPool(idsOrNull) {
+  if (!idsOrNull) {
+    _activePoolIds = null;
+    emitMusicState();
+    return;
+  }
+
+  const cleaned = (idsOrNull || [])
+    .filter(Boolean)
+    .map(String);
+
+  // Keep only ids that exist in env-visible tracks
+  const visible = new Set(getTracks().map(t => t.id));
+  _activePoolIds = cleaned.filter(id => visible.has(id));
+
+  emitMusicState();
+}
+
+export function getMusicPool() {
+  return _activePoolIds ? [..._activePoolIds] : null;
+}
+
+// Active list for controls (skip/random/prev)
+function getActiveList() {
+  const visibleTracks = getTracks();
+  if (!_activePoolIds || !_activePoolIds.length) return visibleTracks;
+
+  const byId = new Map(visibleTracks.map(t => [t.id, t]));
+  return _activePoolIds.map(id => byId.get(id)).filter(Boolean);
+}
+// 🧠 Action token: every play/stop increments, so old fade timers can’t kill new tracks
+let _actionSeq = 0;
+let _stopTimer = null;
+
+// 🔥 iOS/WKWebView survival guard
+// When the app backgrounds, WebAudio often suspends.
+// On foreground, we resume the AudioContext and (if needed) rebuild the active Howl.
+let _lifecycleWired = false;
+let _bgSnapshot = null;
+let _pendingGestureResume = null;
+
+// Track what the last play call used (so we recreate consistently)
+let _lastPlayOpts = {
+  html5: null,
+  useCache: false,
+  volume: DEFAULT_MUSIC_VOLUME,
+};
+
+function getHowlerCtx() {
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+    return H?.ctx || null;
+  } catch {
+    return null;
+  }
+}
+
+function resumeHowlerCtxSafe() {
+  try {
+    const ctx = getHowlerCtx();
+    if (!ctx) return false;
+    if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+      ctx.resume().catch(() => {});
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function snapshotPlaybackState() {
+  const id =
+    currentTrackMeta?.id ||
+    (typeof currentTrackId === 'function' ? currentTrackId() : '') ||
+    '';
+
+  let seek = 0;
+  let vol = getMusicVolume();
+
+  try { seek = Number(currentTrack?.seek?.() || 0) || 0; } catch {}
+  try { vol = Number(currentTrack?.volume?.() ?? vol) || vol; } catch {}
+
+  const wasPlaying = !!(currentTrack && typeof currentTrack.playing === 'function' && currentTrack.playing());
+
+  return {
+    id,
+    seek,
+    wasPlaying,
+    volume: vol,
+    html5: _lastPlayOpts.html5 ?? getDefaultHtml5(),
+    useCache: !!_lastPlayOpts.useCache,
+    // Keep the StoryMode override alive if it was owning end behavior
+    onEnd: currentEndOverride || null,
+  };
+}
+
+function rememberForGestureResume(snap) {
+  if (!snap?.id) return;
+  _pendingGestureResume = snap;
+
+  // One-shot “user gesture” unlock fallback (some iOS states require it)
+  const handler = () => {
+    const s = _pendingGestureResume;
+    _pendingGestureResume = null;
+    try { resumeHowlerCtxSafe(); } catch {}
+    if (s?.wasPlaying) {
+      // Try again (hard rebuild)
+      hardResumeFromSnapshot(s);
+    }
+  };
+
+  // If we already attached once, don’t spam.
+  // We attach fresh because `{ once:true }` auto-cleans.
+  try { document.body.addEventListener('touchstart', handler, { once: true, passive: true }); } catch {}
+  try { document.body.addEventListener('click', handler, { once: true }); } catch {}
+}
+
+function hardResumeFromSnapshot(snap) {
+  if (!snap?.id) return;
+
+  // 🚫 If user muted globally, don’t fight them
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+    if (H?._muted) return;
+  } catch {}
+
+  // This is the key: rebuild + continue from seek
+  playTrack(snap.id, {
+    fadeMs: 0,
+    crossfadeMs: 0,
+    html5: snap.html5,
+    useCache: snap.useCache,
+    volume: snap.volume,
+    startAt: snap.seek,
+    onEnd: snap.onEnd,
+  });
+}
+
+async function wireCapacitorAppLifecycle(onBg, onFg) {
+  // Only in native shells; safe to fail in web/PWA
+  try {
+    const w = window ?? globalThis;
+    if (!w.Capacitor) return;
+
+    // Prefer official App plugin events
+    const mod = await import('@capacitor/app').catch(() => null);
+    const App = mod?.App;
+    if (!App?.addListener) return;
+
+    App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) onFg();
+      else onBg();
+    });
+  } catch {
+    // ignore
+  }
+}
+
+function wireMusicLifecycleGuardsOnce() {
+  if (_lifecycleWired) return;
+  _lifecycleWired = true;
+
+  // Howler sometimes “helpfully” suspends; in WKWebView this can get sticky.
+  // Disabling autoSuspend reduces the chance of a dead ctx after background.
+  try { Howler.autoSuspend = false; } catch {}
+
+  const onBackground = () => {
+    // Save state
+    _bgSnapshot = snapshotPlaybackState();
+
+    // Pause cleanly (don’t stop/unload)
+    try {
+      if (currentTrack && currentTrack.playing?.()) currentTrack.pause();
+    } catch {}
+
+    // Stop UI progress RAF
+    try { cancelAnimationFrame(rafId); } catch {}
+    rafId = null;
+
+    // Clear any pending stop timers (avoid race killing on resume)
+    clearStopTimer();
+  };
+
+  const onForeground = () => {
+    // Kick the AudioContext back awake
+    resumeHowlerCtxSafe();
+
+    const snap = _bgSnapshot;
+    _bgSnapshot = null;
+
+    if (!snap?.id) return;
+
+    // If we *weren’t* playing, do nothing (respect user pause)
+    if (!snap.wasPlaying) return;
+
+    // 🧠 Try a soft resume first
+    let ok = false;
+    try {
+      if (currentTrack && currentTrackMeta?.id === snap.id) {
+        // If we still have the same howl, seek back then play
+        try { currentTrack.seek(snap.seek); } catch {}
+        currentTrack.play();
+        ok = true;
+      }
+    } catch {}
+
+    // 🔥 If soft resume fails (or iOS lies), do the hard rebuild
+    // We wait a hair so iOS can finish re-activating audio routing.
+    setTimeout(() => {
+      // If something else started since, don’t stomp it
+      if (!snap?.id) return;
+
+      const ctx = getHowlerCtx();
+      const ctxBad = !!ctx && (ctx.state === 'suspended' || ctx.state === 'interrupted');
+
+      const stillNotPlaying = (() => {
+        try { return !(currentTrack && currentTrack.playing?.()); } catch { return true; }
+      })();
+
+      // If ctx is still bad OR we’re not actually playing, rebuild.
+      if (ctxBad || stillNotPlaying || !ok) {
+        hardResumeFromSnapshot(snap);
+        // If iOS blocks it until user gesture, keep a backup hook
+        rememberForGestureResume(snap);
+      }
+    }, 180);
+  };
+
+  // Web lifecycle signals (work in browser + native)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) onBackground();
+    else onForeground();
+  });
+
+  window.addEventListener('pagehide', onBackground);
+  window.addEventListener('pageshow', onForeground);
+  window.addEventListener('blur', onBackground);
+  window.addEventListener('focus', onForeground);
+
+  // Native lifecycle (Capacitor)
+  wireCapacitorAppLifecycle(onBackground, onForeground);
+}
+
+// ─────────────────────────────────────────────────────────────
+// 🎛️ Preload cache (StoryMode + future)
+// ─────────────────────────────────────────────────────────────
 const howlCache = new Map(); // id -> { howl, meta, html5 }
 
-/**
- * Preload tracks into a cache so first play is fast and transitions are smoother.
- * Only use this for small curated sets (like StoryMode's 3 tracks) to avoid memory bloat.
- */
 export function preloadTracks(ids = [], opts = {}) {
   const {
     html5 = getDefaultHtml5(),
@@ -278,38 +386,32 @@ export function preloadTracks(ids = [], opts = {}) {
   } = opts;
 
   const tracks = getTracks();
-  ids
-    .filter(Boolean)
-    .forEach((id) => {
-      const meta = tracks.find(t => t.id === id);
-      if (!meta) return;
+  ids.filter(Boolean).forEach((id) => {
+    const meta = tracks.find(t => t.id === id);
+    if (!meta) return;
 
-      // If cached with same html5 setting, keep it
-      const cached = howlCache.get(id);
-      if (cached?.howl && cached.html5 === html5) return;
+    const cached = howlCache.get(id);
+    if (cached?.howl && cached.html5 === html5) return;
 
-      try {
-        const howl = new Howl({
-          src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${meta.file}`],
-          loop: false,
-          volume: volume,
-          html5,
-          preload: true,
-          onloaderror: (_, err) => {
-            console.warn('⚠️ Preload load error:', id, err);
-          },
-        });
+    try {
+      const howl = new Howl({
+        src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${meta.file}`],
+        loop: false,
+        volume,
+        html5,
+        preload: true,
+        onloaderror: (_, err) => {
+          console.warn('⚠️ Preload load error:', id, err);
+        },
+      });
 
-        howlCache.set(id, { howl, meta, html5 });
-      } catch (e) {
-        console.warn('⚠️ preloadTracks failed for', id, e);
-      }
-    });
+      howlCache.set(id, { howl, meta, html5 });
+    } catch (e) {
+      console.warn('⚠️ preloadTracks failed for', id, e);
+    }
+  });
 }
 
-/**
- * Optional: clear cached/preloaded tracks.
- */
 export function unloadPreloadedTracks(ids = null) {
   if (!ids) {
     howlCache.forEach(({ howl }) => {
@@ -328,9 +430,9 @@ export function unloadPreloadedTracks(ids = null) {
   });
 }
 
-//////////////////////////////
-// 🧠 Track resolver
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 🧠 Track resolver + Howl creation
+// ─────────────────────────────────────────────────────────────
 function resolveTrackMeta(id) {
   const tracks = getTracks();
   return tracks.find(t => t.id === id) || null;
@@ -349,23 +451,11 @@ function makeHowl(meta, opts = {}) {
     html5,
     preload: true,
 
-    onloaderror: async function (_id, err) {
+    onloaderror: (_, err) => {
       console.warn('⚠️ LOAD ERROR:', meta.id, meta.file, 'html5=', html5, err);
-      await _kickAudioEngine(`loaderror:${meta.id}`);
     },
-
-    // ✅ IMPORTANT: use function() so `this` is the Howl instance
-    onplayerror: async function (_id, err) {
+    onplayerror: (_, err) => {
       console.warn('⚠️ PLAY ERROR:', meta.id, meta.file, 'html5=', html5, err);
-
-      await _kickAudioEngine(`playerror:${meta.id}`);
-
-      try {
-        const ctxOk = (Howler?.ctx?.state === 'running');
-        if (ctxOk) {
-          this.play(); // ✅ now actually works
-        }
-      } catch {}
     },
   });
 }
@@ -380,12 +470,10 @@ function getHowlFor(meta, opts = {}) {
   if (useCache) {
     const cached = howlCache.get(meta.id);
     if (cached?.howl && cached.html5 === html5) {
-      // ensure desired volume (safe)
       try { cached.howl.volume(volume); } catch {}
       return cached.howl;
     }
 
-    // create & store if missing
     const howl = makeHowl(meta, { html5, volume });
     howlCache.set(meta.id, { howl, meta, html5 });
     return howl;
@@ -394,51 +482,61 @@ function getHowlFor(meta, opts = {}) {
   return makeHowl(meta, { html5, volume });
 }
 
-//////////////////////////////
-// 🧩 Attach handlers (single source of truth)
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 🧩 Handlers (single source of truth)
+// ─────────────────────────────────────────────────────────────
 function bindHowlHandlers(howl, meta, opts = {}) {
   const { onEnd = null } = opts;
 
-  // Clear any prior listeners (important when reusing cached Howls)
+  // If cached Howl reused, clear listeners first
   try { howl.off(); } catch {}
 
   howl.on('play', () => {
     updateTrackLabel(meta.name);
     startProgressUpdater();
+    emitMusicState();
   });
 
+  howl.on('pause', () => emitMusicState());
+
+  howl.on('stop', () => emitMusicState());
+
   howl.on('end', () => {
-    // 1) Caller-owned end behavior (StoryMode rotation)
+    emitMusicState();
+
+    // 1) Caller-owned end behavior (Story rotation)
     if (typeof onEnd === 'function') {
       try { onEnd(meta.id); } catch (e) { console.warn('⚠️ onEnd override error:', e); }
       return;
     }
 
-    // 2) Default behavior (your existing music player rules)
+    // 2) Default behavior
     if (looping) return;
 
     if (shuffling) {
       playRandomTrack();
     } else {
-      skipNext(); // <-- keeps your normal "album next" behavior
+      skipNext();
     }
   });
 
-  // store override reference (debug / sanity)
+  howl.on('playerror', (_, err) => {
+    console.warn('⚠️ Play error:', err);
+    howl.once('unlock', () => howl.play());
+  });
+
   currentEndOverride = onEnd || null;
 }
 
-//////////////////////////////
-// 🛑 Stop Track (with Fade)
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 // 🛑 Stop Track (with Fade) — guarded against race conditions
-// ✅ CHANGE 1: let stopTrack optionally *use* a provided seq instead of bumping again
+// ─────────────────────────────────────────────────────────────
 export function stopTrack(callback, opts = {}) {
-  const { fadeMs = fadeDuration, seq = bumpSeq() } = opts; // 👈 NEW: seq param w/ default bump
+  const { fadeMs = fadeDuration, seq = bumpSeq() } = opts;
 
   if (!currentTrack) {
     callback?.();
+    emitMusicState();
     return;
   }
 
@@ -446,14 +544,11 @@ export function stopTrack(callback, opts = {}) {
 
   clearStopTimer();
 
-  // stop progress updates
   try { cancelAnimationFrame(rafId); } catch {}
   rafId = null;
 
-  // detach handlers so we don’t auto-skip while stopping
   try { t.off(); } catch {}
 
-  // immediate stop
   if (!fadeMs || fadeMs <= 0) {
     try { t.stop(); } catch {}
 
@@ -468,17 +563,16 @@ export function stopTrack(callback, opts = {}) {
     currentEndOverride = null;
 
     callback?.();
+    emitMusicState();
     return;
   }
 
-  // fade out
   try {
     const v = typeof t.volume === 'function' ? t.volume() : getMusicVolume();
     t.fade(v, 0, fadeMs);
   } catch {}
 
   _stopTimer = setTimeout(() => {
-    // 🔒 Only execute if no newer play/stop has happened
     if (_actionSeq !== seq) return;
 
     try { t.stop(); } catch {}
@@ -494,23 +588,23 @@ export function stopTrack(callback, opts = {}) {
     currentEndOverride = null;
 
     callback?.();
+    emitMusicState();
   }, fadeMs + 20);
 }
 
-//////////////////////////////
-// 🌊 Crossfade transition (seamless-ish)
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 🌊 Crossfade transition
+// ─────────────────────────────────────────────────────────────
 function crossfadeTo(nextHowl, nextMeta, opts = {}) {
   const {
     crossfadeMs = fadeDuration,
     onEnd = null,
     volume = getMusicVolume(),
+    startAt = null, // 👈 NEW
   } = opts;
 
   const prevHowl = currentTrack;
-  const prevMeta = currentTrackMeta;
 
-  // If nothing playing, just play clean
   if (!prevHowl) {
     currentTrack = nextHowl;
     currentTrackMeta = nextMeta;
@@ -521,18 +615,22 @@ function crossfadeTo(nextHowl, nextMeta, opts = {}) {
     try { nextHowl.volume(volume); } catch {}
     try { nextHowl.play(); } catch {}
 
+    if (typeof startAt === 'number' && isFinite(startAt) && startAt > 0) {
+      setTimeout(() => {
+        try { nextHowl.seek(startAt); } catch {}
+      }, 0);
+    }
+
     startProgressUpdater();
     return;
   }
 
-  // Set new as current immediately (UI + progress now points to new)
   currentTrack = nextHowl;
   currentTrackMeta = nextMeta;
   bindHowlHandlers(nextHowl, nextMeta, { onEnd });
 
-  // Prepare both volumes
-  let prevVol = 0;
-  try { prevVol = prevHowl.volume(); } catch { prevVol = volume; }
+  let prevVol = volume;
+  try { prevVol = prevHowl.volume(); } catch {}
 
   try { nextHowl.stop(); } catch {}
   try { nextHowl.seek(0); } catch {}
@@ -541,33 +639,38 @@ function crossfadeTo(nextHowl, nextMeta, opts = {}) {
   try { nextHowl.volume(0); } catch {}
   try { nextHowl.play(); } catch {}
 
-  // Fade in new
-  try { nextHowl.fade(0, volume, crossfadeMs); } catch {}
+  if (typeof startAt === 'number' && isFinite(startAt) && startAt > 0) {
+    setTimeout(() => {
+      try { nextHowl.seek(startAt); } catch {}
+    }, 0);
+  }
 
-  // Fade out previous
+  try { nextHowl.fade(0, volume, crossfadeMs); } catch {}
   try { prevHowl.fade(prevVol, 0, crossfadeMs); } catch {}
 
-  // After fade, kill old track
   setTimeout(() => {
-    // In case something else swapped tracks again, only stop/unload the old one
     try { prevHowl.off(); } catch {}
     try { prevHowl.stop(); } catch {}
-    try { prevHowl.unload(); } catch {}
 
-    // If we were still showing old meta (rare), refresh label
+    // ✅ IMPORTANT: don’t unload cached Howls (preloaded Story tracks, etc.)
+    if (isHowlCached(prevHowl)) {
+      try { prevHowl.seek(0); } catch {}
+      try { prevHowl.volume(volume); } catch {}
+    } else {
+      try { prevHowl.unload(); } catch {}
+    }
+
     if (currentTrackMeta && currentTrackMeta.id === nextMeta.id) {
       updateTrackLabel(nextMeta.name);
     }
-  }, crossfadeMs);
+  }, crossfadeMs + 20);
 
   startProgressUpdater();
 }
 
-//////////////////////////////
-// 🚀 Play Track
-//////////////////////////////
-// 🚀 Play Track — atomic + can switch instantly with fadeMs:0
-// ✅ CHANGE 2: in playTrack, bump ONCE and pass that same seq into stopTrack
+// ─────────────────────────────────────────────────────────────
+// 🚀 Play Track — atomic + can switch instantly
+// ─────────────────────────────────────────────────────────────
 export function playTrack(id = getFirstTrackId(), opts = {}) {
   const {
     onEnd = null,
@@ -576,7 +679,14 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
     useCache = false,
     volume = getMusicVolume(),
     fadeMs = fadeDuration,
+    startAt = null, // 👈 NEW
   } = opts;
+
+  // ✅ Wire survival guards once, early
+  wireMusicLifecycleGuardsOnce();
+
+  // Remember how we played last time (so resume rebuild matches)
+  _lastPlayOpts = { html5, useCache, volume };
 
   const seq = bumpSeq();     // ✅ ONE bump for the whole operation
   clearStopTimer();
@@ -590,12 +700,11 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
   const nextHowl = getHowlFor(meta, { useCache, html5, volume });
 
   if (crossfadeMs > 0) {
-    crossfadeTo(nextHowl, meta, { crossfadeMs, onEnd, volume });
+    crossfadeTo(nextHowl, meta, { crossfadeMs, onEnd, volume, startAt }); // 👈 pass through
     return;
   }
 
   stopTrack(() => {
-    // 🔒 Guard now works (stopTrack did NOT bump again)
     if (_actionSeq !== seq) return;
 
     currentTrack = nextHowl;
@@ -605,18 +714,28 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
     try { nextHowl.stop(); } catch {}
     try { nextHowl.seek(0); } catch {}
     try { nextHowl.volume(volume); } catch {}
+
+    // ✅ Start playback
     try { nextHowl.play(); } catch {}
 
+    // ✅ NEW: restore position after play starts (more reliable in iOS)
+    if (typeof startAt === 'number' && isFinite(startAt) && startAt > 0) {
+      setTimeout(() => {
+        try { nextHowl.seek(startAt); } catch {}
+      }, 0);
+    }
+
     startProgressUpdater();
-  }, { fadeMs, seq }); // 👈 pass same seq
+  }, { fadeMs, seq });
 }
 
-//////////////////////////////
-// 🔀 True Random Track
-//////////////////////////////
-// 🔀 True Random Track
+// ─────────────────────────────────────────────────────────────
+// 🔀 Random / Skip / Prev (NOW respects active pool)
+// ─────────────────────────────────────────────────────────────
 export function playRandomTrack() {
-  const tracks = getTracks();
+  const tracks = getActiveList();
+  if (!tracks.length) return;
+
   const currentIndex = getCurrentTrackIndex();
   let randomIndex;
 
@@ -624,70 +743,71 @@ export function playRandomTrack() {
     randomIndex = Math.floor(Math.random() * tracks.length);
   } while (tracks.length > 1 && randomIndex === currentIndex);
 
-  // Let playTrack own stopping
   playTrack(tracks[randomIndex].id, { fadeMs: 0 });
 }
 
-// ⏭️ Skip Next (Respects Shuffle)
 export function skipNext() {
+  const tracks = getActiveList();
+  if (!tracks.length) return;
+
   if (shuffling) {
     playRandomTrack();
     return;
   }
 
-  const tracks = getTracks();
   const index = getCurrentTrackIndex();
   const next = (index + 1) % tracks.length;
-
   playTrack(tracks[next].id, { fadeMs: 0 });
 }
 
-// ⏮️ Skip Prev (Respects Shuffle)
 export function skipPrev() {
+  const tracks = getActiveList();
+  if (!tracks.length) return;
+
   if (shuffling) {
     playRandomTrack();
     return;
   }
 
-  const tracks = getTracks();
   const index = getCurrentTrackIndex();
   const prev = (index - 1 + tracks.length) % tracks.length;
-
   playTrack(tracks[prev].id, { fadeMs: 0 });
 }
 
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 // ⏯️ Play / Pause Toggle
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 export function togglePlayPause() {
   if (!currentTrack) {
     playTrack();
+    emitMusicState();
     return;
   }
 
   if (currentTrack.playing()) {
     currentTrack.pause();
-    cancelAnimationFrame(rafId);
+    try { cancelAnimationFrame(rafId); } catch {}
+    emitMusicState();
   } else {
     currentTrack.play();
     startProgressUpdater();
+    emitMusicState();
   }
 }
 
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 // 🔇 Mute Controls
-//////////////////////////////
-// 🔇 Mute Controls
+// ─────────────────────────────────────────────────────────────
 export function toggleMute(desired) {
-  // If caller passes a boolean, set explicitly.
   if (typeof desired === 'boolean') {
     Howler.mute(desired);
+    emitMusicState();
     return desired;
   }
 
-  // Otherwise toggle
   const muted = !Howler._muted;
   Howler.mute(muted);
+  emitMusicState();
   return muted;
 }
 
@@ -695,12 +815,20 @@ export function isMuted() {
   return Howler._muted;
 }
 
-//////////////////////////////
-// 🔁 Loop / 🔀 Shuffle
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 🔁 Loop / 🔀 Shuffle (add explicit setters for sanity)
+// ─────────────────────────────────────────────────────────────
 export function toggleLoop() {
   looping = !looping;
   if (currentTrack) currentTrack.loop(looping);
+  emitMusicState();
+  return looping;
+}
+
+export function setLoop(val) {
+  looping = !!val;
+  if (currentTrack) currentTrack.loop(looping);
+  emitMusicState();
   return looping;
 }
 
@@ -710,6 +838,13 @@ export function getLooping() {
 
 export function toggleShuffle() {
   shuffling = !shuffling;
+  emitMusicState();
+  return shuffling;
+}
+
+export function setShuffle(val) {
+  shuffling = !!val;
+  emitMusicState();
   return shuffling;
 }
 
@@ -717,20 +852,21 @@ export function getShuffling() {
   return shuffling;
 }
 
-//////////////////////////////
-// 🔢 Get Current Index
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 🔢 Current Index (within active pool if set)
+// ─────────────────────────────────────────────────────────────
 function getCurrentTrackIndex() {
   if (!currentTrack) return 0;
-  const tracks = getTracks();
+
+  const list = getActiveList();
   const src = currentTrack._src;
-  const idx = tracks.findIndex(t => src && src.includes(t.file));
+  const idx = list.findIndex(t => src && src.includes(t.file));
   return idx >= 0 ? idx : 0;
 }
 
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 // ⏳ Progress Updater
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 function startProgressUpdater() {
   const bar = document.getElementById('trackProgress');
   const timer = document.getElementById('trackTimer');
@@ -738,7 +874,7 @@ function startProgressUpdater() {
   if (!bar || !timer || !currentTrack) return;
 
   function update() {
-    if (!currentTrack) return; // allow paused seek to show
+    if (!currentTrack) return;
 
     const seek = currentTrack.seek() || 0;
     const duration = currentTrack.duration() || 1;
@@ -754,61 +890,54 @@ function startProgressUpdater() {
     rafId = requestAnimationFrame(update);
   }
 
-  cancelAnimationFrame(rafId);
+  try { cancelAnimationFrame(rafId); } catch {}
   rafId = requestAnimationFrame(update);
 }
 
-//////////////////////////////
-// 🎯 Getters
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 🎯 Getters (track label uses real meta first)
+// ─────────────────────────────────────────────────────────────
 export function isPlaying() {
   return currentTrack?.playing() ?? false;
 }
 
 export function currentTrackName() {
   if (!currentTrack) return '(none)';
-  const tracks = getTracks();
-  const src = currentTrack._src;
-  const track = tracks.find(t => src && src.includes(t.file));
-  return track?.name || currentTrackMeta?.name || '(unknown)';
+  return currentTrackMeta?.name || '(unknown)';
 }
 
 export function currentTrackId() {
   if (!currentTrack) return '';
-  const tracks = getTracks();
-  const src = currentTrack._src;
-  const track = tracks.find(t => src && src.includes(t.file));
-  return track?.id ?? currentTrackMeta?.id ?? '';
+  return currentTrackMeta?.id || '';
 }
 
 export function getTrackList() {
-  // Already filtered by environment via `getTracks()`
+  // Settings UI uses full list (filtered only by iOS native availability)
   return getTracks();
 }
 
-//////////////////////////////
-// 🌌 Init (optional)
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 🌌 Init
+// ─────────────────────────────────────────────────────────────
 export function initMusicPlayer() {
   updateTrackLabel('(none)');
+  emitMusicState();
 }
 
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 // 🌠 Fallback
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
 function getFirstTrackId() {
   const tracks = getTracks();
   return tracks[0]?.id ?? '';
 }
 
-//////////////////////////////
-// 💫 Label Updater (Internal)
-//////////////////////////////
+// ─────────────────────────────────────────────────────────────
+// 💫 Label Updater
+// ─────────────────────────────────────────────────────────────
 function updateTrackLabel(name = currentTrackName()) {
   const label = document.getElementById('currentTrack');
-  if (label) {
-    label.textContent = name;
-  }
+  if (label) label.textContent = name;
 }
 
 export function scrubTo(percent) {
@@ -826,39 +955,71 @@ export function getCurrentSeekPercent() {
   return (currentTrack.seek() || 0) / duration;
 }
 
-// 🎣 Infinity Lake loop keeps its own curated list
+// ─────────────────────────────────────────────────────────────
+// 🧊 Infinity Loop (keep API, now powered by pool + shuffle)
+// ─────────────────────────────────────────────────────────────
 const infinityTrackIds = ['infadd', 'nothingorg', 'secrets', 'patchrelaxes', 'stoopidelectro'];
 
-function shuffleInfinityTrackList() {
-  return infinityTrackIds
-    .map(id => ({ id, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(obj => obj.id);
-}
-
-let infQueue = shuffleInfinityTrackList();
-let infIndex = 0;
+let _infScopeOn = false;
 
 export function playInfinityLoop() {
-  const nextId = infQueue[infIndex];
+  // Infinity wants its own curated pool + shuffle on
+  if (!_infScopeOn) {
+    pushMusicScope({ poolIds: infinityTrackIds, shuffling: true, looping: false });
+    _infScopeOn = true;
+  }
+  // Start if not already
+  if (!isPlaying()) playRandomTrack();
+}
 
-  playTrack(nextId);
-
-  infIndex = (infIndex + 1) % infQueue.length;
-  if (infIndex === 0) {
-    infQueue = shuffleInfinityTrackList(); // reshuffle after full loop
+export function stopInfinityLoop() {
+  stopTrack();
+  if (_infScopeOn) {
+    popMusicScope();
+    _infScopeOn = false;
   }
 }
 
-// 🧊 Infinity just uses the global player, so stopping is simple
-export function stopInfinityLoop() {
-  stopTrack();
-}
-// managers/musicManager.js
-
+// ─────────────────────────────────────────────────────────────
+// Cache detection
+// ─────────────────────────────────────────────────────────────
 function isHowlCached(howl) {
   for (const entry of howlCache.values()) {
     if (entry?.howl === howl) return true;
   }
   return false;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 🔔 State subscription (MusicTab stops guessing with timeouts)
+// ─────────────────────────────────────────────────────────────
+const _listeners = new Set();
+
+export function getMusicState() {
+  return {
+    playing: isPlaying(),
+    muted: isMuted(),
+    looping,
+    shuffling,
+    trackId: currentTrackId(),
+    trackName: currentTrackName(),
+    pool: getMusicPool(),
+  };
+}
+
+export function subscribeMusicState(fn) {
+  if (typeof fn !== 'function') return () => {};
+  _listeners.add(fn);
+  // immediate fire
+  try { fn(getMusicState()); } catch {}
+  return () => {
+    _listeners.delete(fn);
+  };
+}
+
+function emitMusicState() {
+  const state = getMusicState();
+  _listeners.forEach((fn) => {
+    try { fn(state); } catch {}
+  });
 }

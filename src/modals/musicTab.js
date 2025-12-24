@@ -1,11 +1,4 @@
 // /src/settings/musicTab.js
-// SnowCone MathFest — Settings » Music Tab (Jukebox)
-// Layout: 
-//   Row 1 → ⏮️  ⏯️  ⏭️
-//   Row 2 → 🔁  🔀  🔇/🔊
-//
-// Keeps checkbox + button + musicManager mute in sync.
-// Awards 'play_music' badge on first successful play via button.
 
 import {
   playTrack,
@@ -23,18 +16,19 @@ import {
   getTrackList,
   scrubTo,
   isMuted,
-  toggleMute
+  toggleMute,
+  subscribeMusicState,   // 👈 NEW
+  getMusicState          // 👈 optional but nice
 } from '../managers/musicManager.js';
 
 import { appState } from '../data/appState.js';
 import { awardBadge } from '../managers/badgeManager.js';
 
-// one-time guard so we only award once per session (badgeManager also de-dupes)
 let _awardedPlayMusic = false;
 
-//////////////////////////////
-// 🔥 Render Music Tab
-//////////////////////////////
+// Keep one subscription per mount
+let _unsubMusic = null;
+
 export function renderMusicTab() {
   const muted = safeIsMuted();
   const loopActive = getLooping();
@@ -72,16 +66,13 @@ export function renderMusicTab() {
       <input type="range" id="trackProgress" value="0" min="0" max="100" />
       <div id="trackTimer">0:00 / 0:00</div>
 
-      <!-- 🎛️ 2×3 control grid -->
       <div class="jukebox-controls">
-        <!-- Row 1 -->
         <button id="btnPrev" class="icon-btn grid-rew" title="Rewind">⏮️</button>
         <button id="btnPlayPause" class="icon-btn grid-play" title="Play/Pause">
           ${playing ? '⏸️' : '▶️'}
         </button>
         <button id="btnNext" class="icon-btn grid-ff" title="Fast-Forward">⏭️</button>
 
-        <!-- Row 2 -->
         <button id="btnLoop" class="icon-btn grid-loop ${loopActive ? 'active' : ''}" title="Loop">🔁</button>
         <button id="btnShuffle" class="icon-btn grid-shuffle ${shuffleActive ? 'active' : ''}" title="Shuffle">🔀</button>
         <button id="btnMute"
@@ -106,9 +97,6 @@ export function renderMusicTab() {
   `;
 }
 
-//////////////////////////////
-// 🎧 Setup Jukebox UI
-//////////////////////////////
 export function setupMusicTabUI() {
   const muteToggle   = document.getElementById('muteToggle');
   const glowToggle   = document.getElementById('glowToggle');
@@ -123,31 +111,43 @@ export function setupMusicTabUI() {
 
   document.body.classList.toggle('neon-progress', glowToggle?.checked);
 
-  //////////////////////////////
+  // 🔥 Subscribe once: UI becomes reactive instead of guessing with timeouts
+  try { _unsubMusic?.(); } catch {}
+  _unsubMusic = subscribeMusicState((state) => {
+    // state: {playing, muted, looping, shuffling, trackName, trackId, pool}
+    setPlayButtonUI(state.playing);
+    updateTrackLabelUI(state.playing ? state.trackName : 'Push ▶️ to Play');
+    updateMuteUI(state.muted);
+
+    if (loopBtn) loopBtn.classList.toggle('active', !!state.looping);
+    if (shuffleBtn) shuffleBtn.classList.toggle('active', !!state.shuffling);
+
+    // Keep dropdown selection in sync if the currently playing track exists in list
+    if (trackSelect && state.trackId) {
+      const opt = trackSelect.querySelector(`option[value="${state.trackId}"]`);
+      if (opt) trackSelect.value = state.trackId;
+    }
+
+    if (muteToggle) muteToggle.checked = !!state.muted;
+  });
+
   // 🔇 Global Mute (Checkbox)
-  //////////////////////////////
   muteToggle?.addEventListener('change', () => {
     setMuted(muteToggle.checked);
   });
 
-  //////////////////////////////
   // 🔇/🔊 Jukebox Mute Button
-  //////////////////////////////
   muteBtn?.addEventListener('click', () => {
-    const currentlyMuted = getMutedState();
+    const currentlyMuted = safeIsMuted();
     setMuted(!currentlyMuted);
   });
 
-  //////////////////////////////
   // ✨ Neon Glow Toggle
-  //////////////////////////////
   glowToggle?.addEventListener('change', () => {
     document.body.classList.toggle('neon-progress', glowToggle.checked);
   });
 
-  //////////////////////////////
   // 🎚️ Scrubbing (Seek)
-  //////////////////////////////
   progressBar?.addEventListener('input', (e) => {
     const percent = parseFloat(e.target.value) / 100;
     if (!isNaN(percent) && percent >= 0 && percent <= 1) {
@@ -155,101 +155,58 @@ export function setupMusicTabUI() {
     }
   });
 
-  //////////////////////////////
-  // ⏯️ Play / Pause  (🏅 badge hooks here)
-  //////////////////////////////
+  // ⏯️ Play / Pause (badge)
   playPauseBtn?.addEventListener('click', () => {
-    const wasPlaying = (playPauseBtn.dataset.playing === '1') || isPlaying();
-
+    const wasPlaying = isPlaying();
     togglePlayPause();
 
-    // Optimistic UI
+    // Badge on transition into playing from this button
     const nowPlaying = !wasPlaying;
-    setPlayButtonUI(nowPlaying);
-
-    // 🏅 Award only on transition into playing from this button
     if (!_awardedPlayMusic && !wasPlaying && nowPlaying) {
       try { awardBadge('play_music'); } catch {}
       _awardedPlayMusic = true;
     }
-
-    settleUISoon();
   });
 
-  //////////////////////////////
   // ⏭️ Next / ⏮️ Prev
-  //////////////////////////////
-  nextBtn?.addEventListener('click', () => {
-    skipNext();
-    settleUISoon();
-  });
+  nextBtn?.addEventListener('click', () => skipNext());
+  prevBtn?.addEventListener('click', () => skipPrev());
 
-  prevBtn?.addEventListener('click', () => {
-    skipPrev();
-    settleUISoon();
-  });
-
-  //////////////////////////////
   // 🔁 Loop
-  //////////////////////////////
   loopBtn?.addEventListener('click', () => {
-    const looping = toggleLoop();
-    loopBtn.classList.toggle('active', looping);
+    const on = toggleLoop();
+    loopBtn.classList.toggle('active', on);
   });
 
-  //////////////////////////////
   // 🔀 Shuffle
-  //////////////////////////////
   shuffleBtn?.addEventListener('click', () => {
-    const shuffling = toggleShuffle();
-    shuffleBtn.classList.toggle('active', shuffling);
+    const on = toggleShuffle();
+    shuffleBtn.classList.toggle('active', on);
   });
 
-  //////////////////////////////
   // 🎧 Select Track (Auto Play)
-  //////////////////////////////
   trackSelect?.addEventListener('change', () => {
     const selectedTrack = trackSelect.value;
-    playTrack(selectedTrack, { fadeMs: 0 }); // 🚀 instant switch
-    settleUISoon();
+    playTrack(selectedTrack, { fadeMs: 0 });
   });
 
-
-  //////////////////////////////
-  // 🚀 Sync UI on Load
-  //////////////////////////////
-  requestAnimationFrame(() => {
-    syncButtonStates();
-    updateMuteUI(); // ensure checkbox + button match current global state
-  });
-}
-
-//////////////////////////////
-// 🎛️ UI Sync
-//////////////////////////////
-function syncButtonStates() {
-  updateTrackLabel();
-  updatePlayPauseButton();
-}
-
-function updateTrackLabel() {
-  const label = document.getElementById('currentTrack');
-  if (label) {
-    const name = isPlaying() ? currentTrackName() : 'Push ▶️ to Play';
-    label.textContent = name;
+  // Initial sync
+  try {
+    const s = getMusicState?.();
+    if (s) {
+      setPlayButtonUI(!!s.playing);
+      updateTrackLabelUI(s.playing ? s.trackName : 'Push ▶️ to Play');
+      updateMuteUI(!!s.muted);
+    } else {
+      updateMuteUI(safeIsMuted());
+    }
+  } catch {
+    updateMuteUI(safeIsMuted());
   }
 }
 
-function updatePlayPauseButton() {
-  setPlayButtonUI(isPlaying());
-}
-
-//////////////////////////////
-// 🛑 External Kill Switch
-//////////////////////////////
 export function stopMusicPlayer() {
   stopTrack();
-  syncButtonStates();
 }
 
 function setPlayButtonUI(playing) {
@@ -259,37 +216,28 @@ function setPlayButtonUI(playing) {
   btn.textContent = playing ? '⏸️' : '▶️';
 }
 
-function settleUISoon(delay = 120) {
-  setTimeout(() => {
-    updateTrackLabel();
-    setPlayButtonUI(isPlaying());
-    updateMuteUI();
-  }, delay);
+function updateTrackLabelUI(text) {
+  const label = document.getElementById('currentTrack');
+  if (label) label.textContent = text;
 }
 
-//////////////////////////////
+// ─────────────────────────────────────────────
 // 🔇 Unified Mute Control
-//////////////////////////////
+// ─────────────────────────────────────────────
 function setMuted(desired) {
   const target = !!desired;
   const now = safeIsMuted();
 
-  // Prefer musicManager as source of truth.
   try {
-    if (toggleMute.length >= 1) {
-      toggleMute(target);       // if it accepts a boolean
-    } else if (now !== target) {
-      toggleMute();             // toggle-only signature
-    }
+    // toggleMute supports boolean signature in your manager
+    toggleMute(target);
   } catch {
     if (now !== target) {
       try { toggleMute(); } catch {}
     }
   }
 
-  // Mirror into appState for UI/Theming coherence
   try { appState.setSetting('mute', target); } catch {}
-
   updateMuteUI(target);
 }
 
@@ -297,9 +245,8 @@ function updateMuteUI(muted = safeIsMuted()) {
   const muteToggle = document.getElementById('muteToggle');
   const muteBtn    = document.getElementById('btnMute');
 
-  if (muteToggle) {
-    muteToggle.checked = !!muted;
-  }
+  if (muteToggle) muteToggle.checked = !!muted;
+
   if (muteBtn) {
     muteBtn.dataset.muted = muted ? '1' : '0';
     muteBtn.classList.toggle('active', muted);
@@ -307,10 +254,6 @@ function updateMuteUI(muted = safeIsMuted()) {
     muteBtn.title = muted ? 'Unmute' : 'Mute';
     muteBtn.textContent = muted ? '🔇' : '🔊';
   }
-}
-
-function getMutedState() {
-  return safeIsMuted();
 }
 
 function safeIsMuted() {

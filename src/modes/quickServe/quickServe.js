@@ -1,10 +1,21 @@
 // 🍧 quickServe.js — Cosmic Scene Loader 🚛🔥
-
+// quickServe.js
 import './quickServe.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
-import { stopTrack, toggleMute } from '../../managers/musicManager.js';
+
+// ✅ Use only musicManager (no separate QS Howl player anymore)
+import {
+  stopTrack,
+  toggleMute,
+  pushMusicScope,
+  popMusicScope,
+  playRandomTrack,
+  setMusicPool,
+  setShuffle,
+  setLoop
+} from '../../managers/musicManager.js';
 
 import * as phil from './quickServePhil.js';
 import * as gridFX from './quickServeGridFX.js';
@@ -15,7 +26,6 @@ import {
   resetCurrentAnswer
 } from './quickServeGame.js';
 
-import { playQSRandomTrack, stopQS } from './quickServeMusic.js';
 import { activateInputHandler } from '../../managers/inputManager.js';
 import { hapticSuccess } from '../../utils/haptics.js';
 
@@ -24,6 +34,8 @@ import { hapticSuccess } from '../../utils/haptics.js';
 // import { awardBadge } from '../../managers/badgeManager.js';
 // import { finalizeQuickServeRun } from './quickServeBadges.js';
 
+const QS_TRACK_IDS = ['quikserve', 'kktribute', 'softdown'];
+let _qsMusicScopeOn = false;
 
 
 //////////////////////////////
@@ -93,8 +105,22 @@ function renderIntroScreen() {
   // Start the show
   document.getElementById('startShowBtn')?.addEventListener('click', () => {
     playTransition(() => {
-      playQSRandomTrack();   // 🎧 DJ Booth spins up
-      renderGameUI();        // (main UI unchanged)
+
+      // 🎧 QS takes over music cleanly (curated pool + shuffle, no loop)
+      if (!_qsMusicScopeOn) {
+        pushMusicScope({ poolIds: QS_TRACK_IDS, shuffling: true, looping: false });
+        _qsMusicScopeOn = true;
+      } else {
+        // safety if re-entering
+        setMusicPool(QS_TRACK_IDS);
+        setShuffle(true);
+        setLoop(false);
+      }
+
+      // Start a random QS track; on end, musicManager sees shuffling=true and picks another.
+      playRandomTrack();
+
+      renderGameUI();
     });
   });
 
@@ -257,8 +283,14 @@ export function updateMuteButtonLabel() {
 // 🔙 Return to Menu
 //////////////////////////////
 export function returnToMenu() {
-  stopQS();      // 🔇 Kill QS booth
-  stopTrack();   // 🔇 Just in case jukebox sneaks back (failsafe)
+  // 🔇 Kill QS music (global player)
+  stopTrack();
+
+  // Restore whatever music state existed before QS took over
+  if (_qsMusicScopeOn) {
+    popMusicScope();
+    _qsMusicScopeOn = false;
+  }
 
   playTransition(() => {
     cleanUpQuickServe();
@@ -267,23 +299,30 @@ export function returnToMenu() {
   });
 }
 
+
 //////////////////////////////
 // ♻️ Cleanup
 //////////////////////////////
 function cleanUpQuickServe() {
   console.log('🧹 Cleaning up QuickServe');
 
-  document.body.classList.remove('qs-active'); // 🧽 clear mode flag
+  document.body.classList.remove('qs-active');
 
-  stopQS();
   stopGameLogic();
   gridFX.stopGridPulse();
   phil.resetPhil();
   resetCurrentAnswer();
 
+  // failsafe: if we somehow didn’t pop scope yet
+  if (_qsMusicScopeOn) {
+    try { popMusicScope(); } catch {}
+    _qsMusicScopeOn = false;
+  }
+
   clearGameContainer();
   appState.clearCurrentMode();
 }
+
 
 
 //////////////////////////////
