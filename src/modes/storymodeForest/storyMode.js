@@ -1326,13 +1326,12 @@ export { loadStoryMode };
 function unlockHowlerCtx() {
   try {
     const H = window.Howler ?? globalThis.Howler;
-
-    // ✅ DO NOT auto-unmute here (respect user mute)
     if (H?.ctx && H.ctx.state === 'suspended') {
       H.ctx.resume().catch(() => {});
     }
   } catch {}
 }
+
 
 
 

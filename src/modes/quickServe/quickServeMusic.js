@@ -1,4 +1,6 @@
-// 🎧 quickServeMusic.js — QuickServe's Private DJ Booth
+// 🎧 quickServeMusic.js — QuickServe's Private DJ Booth (iOS silent-switch friendly) 🍧
+// Key fix: html5:false => WebAudio, which matches Story Mode behavior.
+
 import { Howl } from 'howler';
 
 let qsTrack = null;
@@ -16,6 +18,9 @@ const qsTracks = [
 
 const basePath = `${import.meta.env.BASE_URL}assets/audio/tracks/`;
 const fadeDuration = 1000;
+
+// Optional: match musicManager's global ceiling vibe (you set 0.7 there)
+const DEFAULT_QS_VOL = 0.7;
 
 //////////////////////////////
 // 🧬 Attach QS Visibility Guard (once)
@@ -68,8 +73,12 @@ export async function playQSRandomTrack() {
   qsTrack = new Howl({
     src: [`${basePath}${file}`],
     loop: false,
-    volume: 1.0,
-    html5: true,
+    volume: DEFAULT_QS_VOL,
+
+    // ✅ THE FIX:
+    // html5:true uses <audio> (often ignores iOS silent switch)
+    // html5:false uses WebAudio (matches Story Mode behavior)
+    html5: false,
 
     onend: () => {
       console.log(`🛑 QS Track finished: ${file}`);

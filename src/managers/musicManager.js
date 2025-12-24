@@ -2,6 +2,28 @@
 import { Howl, Howler } from 'howler';
 import { isIOSNative } from '../utils/platform.js'; // 🔍 single source of truth
 
+// iOS: prefer WebAudio so the hardware silent switch behaves consistently.
+// (HTML5 <audio> is the one that tends to ignore the silent switch.)
+function preferWebAudioOnIOS() {
+  try {
+    const ua = navigator.userAgent || '';
+    const isiOS =
+      /iPad|iPhone|iPod/.test(ua) ||
+      // iPadOS reports as Mac sometimes:
+      (ua.includes('Mac') && 'ontouchend' in document);
+    return isiOS;
+  } catch {
+    return false;
+  }
+}
+
+function getDefaultHtml5() {
+  // html5:true = <audio>
+  // html5:false = WebAudio
+  return preferWebAudioOnIOS() ? false : true;
+}
+
+
 let currentTrack = null;
 
 // Track meta for UI + index lookup
@@ -39,9 +61,9 @@ const allTracks = [
 
   // 🦟 iOS-exclusive: only shows up in native iOS shell
   {
-    id: 'mosquitoSmash',
-    name: 'Mosquito Smash',
-    file: 'mosquitoSmash.mp3',
+    id: 'lastRun',
+    name: 'Last Run',
+    file: 'lastRun.mp3',
     iosExclusive: true,
   },
 ];
@@ -72,7 +94,7 @@ const howlCache = new Map(); // id -> { howl, meta, html5 }
  */
 export function preloadTracks(ids = [], opts = {}) {
   const {
-    html5 = true,
+    html5 = getDefaultHtml5(),
     volume = getMusicVolume(),
   } = opts;
 
@@ -137,7 +159,7 @@ function resolveTrackMeta(id) {
 
 function makeHowl(meta, opts = {}) {
   const {
-    html5 = true,
+    html5 = getDefaultHtml5(),
     volume = getMusicVolume(),
   } = opts;
 
@@ -153,7 +175,7 @@ function makeHowl(meta, opts = {}) {
 function getHowlFor(meta, opts = {}) {
   const {
     useCache = false,
-    html5 = true,
+    html5 = getDefaultHtml5(),
     volume = getMusicVolume(),
   } = opts;
 
@@ -322,10 +344,10 @@ function crossfadeTo(nextHowl, nextMeta, opts = {}) {
 //////////////////////////////
 export function playTrack(id = getFirstTrackId(), opts = {}) {
   const {
-    onEnd = null,           // override end behavior (StoryMode!)
-    crossfadeMs = 0,        // if > 0, do real crossfade instead of stop-then-play
-    html5 = true,           // override html5 per play (StoryMode can use WebAudio)
-    useCache = false,       // use cached/preloaded howl if available
+    onEnd = null,
+    crossfadeMs = 0,
+    html5 = getDefaultHtml5(),  // 👈 was true
+    useCache = false,
     volume = getMusicVolume(),
   } = opts;
 
