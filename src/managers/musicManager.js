@@ -33,9 +33,15 @@ function preferWebAudioOnIOS() {
 }
 
 function getDefaultHtml5() {
-  // html5:true  => <audio>
+  // html5:true  => <audio> element
   // html5:false => WebAudio
-  return preferWebAudioOnIOS() ? false : true;
+  //
+  // iOS Safari/WKWebView + WebAudio is the #1 source of "audio died but playing=true".
+  // Using HTML5 audio for MUSIC is more resilient across interruptions/background/foreground.
+  const isiOS = preferWebAudioOnIOS();
+
+  if (isiOS) return true;     // ✅ FORCE html5 on iOS
+  return true;                // desktop defaults fine as html5 too
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -179,6 +185,110 @@ let _lastPlayOpts = {
   volume: DEFAULT_MUSIC_VOLUME,
 };
 
+// ─────────────────────────────────────────────────────────────
+// Native-triggerable lifecycle handlers (shared by web + native)
+// ─────────────────────────────────────────────────────────────
+function handleMusicBackground() {
+  // Save state
+  _bgSnapshot = snapshotPlaybackState();
+
+  // Pause cleanly (don’t stop/unload)
+  try {
+    if (currentTrack && currentTrack.playing?.()) currentTrack.pause();
+  } catch {}
+
+  // Stop UI progress RAF
+  try { cancelAnimationFrame(rafId); } catch {}
+  rafId = null;
+
+  // Clear any pending stop timers (avoid race killing on resume)
+  clearStopTimer();
+}
+
+function handleMusicForeground() {
+  if (!_isBackgrounded) return;    // ✅ guard
+  _isBackgrounded = false;
+
+  // Kick the AudioContext back awake (harmless even if html5:true)
+  resumeHowlerCtxSafe();
+
+  const snap = _bgSnapshot;
+  _bgSnapshot = null;
+
+  if (!snap?.id) return;
+  if (!snap.wasPlaying) return; // respect user pause
+
+  // ✅ iOS fix: skip soft resume — it often "plays" silently.
+  // Always rebuild the Howl and restore seek.
+  hardResumeFromSnapshot(snap);
+
+  // If iOS blocks playback until a gesture, keep a one-shot fallback.
+  rememberForGestureResume(snap);
+}
+
+function wireMusicLifecycleGuardsOnce() {
+  if (_lifecycleWired) return;
+  _lifecycleWired = true;
+
+  try { Howler.autoSuspend = false; } catch {}
+
+  // ─────────────────────────────────────────────────────────────
+  // 🧠 iOS lifecycle de-dupe gate
+  // ─────────────────────────────────────────────────────────────
+  let _isBg = false;
+  let _lastFlipAt = 0;
+
+  function bgOnce(reason = '') {
+    const now = Date.now();
+    if (_isBg && (now - _lastFlipAt) < 150) return;
+    if (_isBg) return;
+    _isBg = true;
+    _lastFlipAt = now;
+    try { handleMusicBackground(); } catch {}
+  }
+
+  function fgOnce(reason = '') {
+    const now = Date.now();
+    if (!_isBg && (now - _lastFlipAt) < 150) return;
+    if (!_isBg) return;
+    _isBg = false;
+    _lastFlipAt = now;
+    try { handleMusicForeground(); } catch {}
+  }
+
+  // Web lifecycle signals (browser + WKWebView)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) bgOnce('visibilitychange');
+    else fgOnce('visibilitychange');
+  });
+
+  window.addEventListener('pagehide', () => bgOnce('pagehide'));
+  window.addEventListener('pageshow', () => fgOnce('pageshow'));
+
+  // ✅ Native WKWebView/Capacitor bridge events (YOUR ViewController)
+  window.addEventListener('scmf:nativeBackground', () => bgOnce('native'));
+  window.addEventListener('scmf:nativeForeground', () => fgOnce('native'));
+
+  // 🚫 IMPORTANT:
+  // Do NOT also wire @capacitor/app appStateChange in native iOS.
+  // It flips during sheets/modals and causes the audio zombie state.
+  // If you ever need it for Android later, gate it like this:
+  const hasNativeBridge = (typeof window !== 'undefined') && window.SC_IOS_NATIVE === true;
+
+  if (!hasNativeBridge) {
+    wireCapacitorAppLifecycle(() => bgOnce('capacitor'), () => fgOnce('capacitor'));
+  }
+}
+
+// Optional exports (handy if you ever want to call directly)
+export function nativeMusicDidBackground() {
+  try { handleMusicBackground(); } catch {}
+}
+export function nativeMusicDidForeground() {
+  try { handleMusicForeground(); } catch {}
+}
+
+
 function getHowlerCtx() {
   try {
     const H = window.Howler ?? globalThis.Howler;
@@ -288,92 +398,6 @@ async function wireCapacitorAppLifecycle(onBg, onFg) {
     // ignore
   }
 }
-
-function wireMusicLifecycleGuardsOnce() {
-  if (_lifecycleWired) return;
-  _lifecycleWired = true;
-
-  // Howler sometimes “helpfully” suspends; in WKWebView this can get sticky.
-  // Disabling autoSuspend reduces the chance of a dead ctx after background.
-  try { Howler.autoSuspend = false; } catch {}
-
-  const onBackground = () => {
-    // Save state
-    _bgSnapshot = snapshotPlaybackState();
-
-    // Pause cleanly (don’t stop/unload)
-    try {
-      if (currentTrack && currentTrack.playing?.()) currentTrack.pause();
-    } catch {}
-
-    // Stop UI progress RAF
-    try { cancelAnimationFrame(rafId); } catch {}
-    rafId = null;
-
-    // Clear any pending stop timers (avoid race killing on resume)
-    clearStopTimer();
-  };
-
-  const onForeground = () => {
-    // Kick the AudioContext back awake
-    resumeHowlerCtxSafe();
-
-    const snap = _bgSnapshot;
-    _bgSnapshot = null;
-
-    if (!snap?.id) return;
-
-    // If we *weren’t* playing, do nothing (respect user pause)
-    if (!snap.wasPlaying) return;
-
-    // 🧠 Try a soft resume first
-    let ok = false;
-    try {
-      if (currentTrack && currentTrackMeta?.id === snap.id) {
-        // If we still have the same howl, seek back then play
-        try { currentTrack.seek(snap.seek); } catch {}
-        currentTrack.play();
-        ok = true;
-      }
-    } catch {}
-
-    // 🔥 If soft resume fails (or iOS lies), do the hard rebuild
-    // We wait a hair so iOS can finish re-activating audio routing.
-    setTimeout(() => {
-      // If something else started since, don’t stomp it
-      if (!snap?.id) return;
-
-      const ctx = getHowlerCtx();
-      const ctxBad = !!ctx && (ctx.state === 'suspended' || ctx.state === 'interrupted');
-
-      const stillNotPlaying = (() => {
-        try { return !(currentTrack && currentTrack.playing?.()); } catch { return true; }
-      })();
-
-      // If ctx is still bad OR we’re not actually playing, rebuild.
-      if (ctxBad || stillNotPlaying || !ok) {
-        hardResumeFromSnapshot(snap);
-        // If iOS blocks it until user gesture, keep a backup hook
-        rememberForGestureResume(snap);
-      }
-    }, 180);
-  };
-
-  // Web lifecycle signals (work in browser + native)
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) onBackground();
-    else onForeground();
-  });
-
-  window.addEventListener('pagehide', onBackground);
-  window.addEventListener('pageshow', onForeground);
-  window.addEventListener('blur', onBackground);
-  window.addEventListener('focus', onForeground);
-
-  // Native lifecycle (Capacitor)
-  wireCapacitorAppLifecycle(onBackground, onForeground);
-}
-
 // ─────────────────────────────────────────────────────────────
 // 🎛️ Preload cache (StoryMode + future)
 // ─────────────────────────────────────────────────────────────

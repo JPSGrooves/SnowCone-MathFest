@@ -1399,10 +1399,11 @@ function smPlayStory(id) {
   try { if (getLooping?.()) toggleLoop(); } catch {}
 
   // Crossfade makes it feel continuous (no 1s silence)
+  // ✅ iOS/WKWebView reliability: force HTML5 audio here
   playTrack(id, {
     onEnd: smOnStoryEnd,
     crossfadeMs: 650,
-    html5: false,     // WebAudio tends to be smoother for “seamless” transitions
+    html5: true,      // ✅ was false — this is the bug source
     useCache: true,   // reuse preloaded Howls
   });
 
@@ -1424,7 +1425,8 @@ function startStoryRotation() {
   __smStoryRotating = true;
 
   // Preload + cache ONLY these 3 (keeps memory reasonable)
-  preloadTracks(STORY_TRACKS, { html5: false });
+  // ✅ Must match playTrack html5 mode, or cache mismatch causes weirdness
+  preloadTracks(STORY_TRACKS, { html5: true });
 
   // If we’re already playing a Story track, just adopt it (don’t restart it)
   let cur = '';

@@ -11,90 +11,221 @@ import WebKit
 import GameKit
 import AVFoundation
 
-final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
+final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKNavigationDelegate {
 
     // MARK: - Game Center state
-
     private var gcAuthInProgress = false
     private var gcQueuedActions: [() -> Void] = []
 
-    // MARK: - Layout constraints
-
-    private var webViewPinned = false
-    private var webViewPinConstraints: [NSLayoutConstraint] = []
-
     // MARK: - Constants
-
     private let handlerName = "gameCenterBridge"
 
-    // MARK: - Lifecycle
+    // MARK: - Lifecycle observers
+    private var lifecycleObserversWired = false
+    private var audioObserversWired = false
 
+    // MARK: - WebView readiness + JS event queue
+    private var scmfWebReady = false
+    private var scmfPendingEvents: [String] = []
+    private var lastBgFgState: Bool? = nil   // true = foreground, false = background (dedupe)
+
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+
         print("🍧🍧🍧 [SCMF] ViewController.viewDidLoad – native shell is LIVE 🍧🍧🍧")
 
-        // ✅ Optional: make iOS audio behavior intentional.
-        // - .ambient / .soloAmbient  => RESPECTS the silent switch (muted when phone is on silent)
-        // - .playback               => IGNORES silent switch (always plays if your app volume isn't muted)
-        //
-        // If you think "ambient might be fucking us", that usually means:
-        // your phone is on silent, so audio correctly doesn't play.
-        configureAudioSession(category: .playback)
+        // ✅ Make sure we can detect when the web app is truly ready.
+        self.webView?.navigationDelegate = self
 
-        // ✅ Inject the native flag EARLY (document start) so platform.js can see it reliably.
+        // ✅ Silent switch behavior:
+        // - .ambient / .soloAmbient => RESPECTS silent switch
+        // - .playback               => IGNORES silent switch
+        configureAudioSession(category: .ambient)
+
+        // ✅ Native lifecycle -> JS event bridge
+        wireNativeLifecycleBridgeOnce()
+
+        // ✅ Audio interruption/route-change bridge
+        wireAudioSessionNotificationsOnce()
+
+        // ✅ Inject native flag EARLY
         installNativeFlagUserScript()
 
-        // ✅ Register JS -> native bridge.
+        // ✅ Register JS -> native bridge (Game Center)
         registerGameCenterBridgeHandler()
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        // A second "belt + suspenders" injection in case the webView reloads.
-        injectIOSNativeFlagOnceLoaded()
     }
 
     deinit {
         if let webView = self.webView {
             webView.configuration.userContentController.removeScriptMessageHandler(forName: handlerName)
         }
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    // MARK: - WKNavigationDelegate (WebView is ready)
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        scmfWebReady = true
+
+        // Belt + suspenders: set the flag again after load
+        webView.evaluateJavaScript("window.SC_IOS_NATIVE = true;") { _, _ in }
+
+        print("⚡️  WebView loaded (didFinish) ✅")
+        scmfFlushPendingEvents()
     }
 
     // MARK: - Audio Session
-
     private func configureAudioSession(category: AVAudioSession.Category) {
         do {
             let session = AVAudioSession.sharedInstance()
-
-            // mixWithOthers keeps background music from other apps if user wants that vibe.
-            // Remove it if you want SCMF to take full control.
             try session.setCategory(category, options: [.mixWithOthers])
             try session.setActive(true)
-
-            print("🔊 [SCMF] AVAudioSession category:", category.rawValue)
+            print("🔇 AVAudioSession set to \(category.rawValue)")
         } catch {
             print("⚠️ [SCMF] AVAudioSession setup failed:", error.localizedDescription)
         }
     }
 
-    // MARK: - Native Flag Injection (EARLY)
+    private func reactivateAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setActive(true)
+            print("🔊 [SCMF] AVAudioSession re-activated ✅")
+        } catch {
+            print("⚠️ [SCMF] AVAudioSession re-activate failed:", error.localizedDescription)
+        }
+    }
 
+    // MARK: - Native Lifecycle -> queued JS Events
+    private func wireNativeLifecycleBridgeOnce() {
+        if lifecycleObserversWired { return }
+        lifecycleObserversWired = true
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(onWillResignActive),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(onDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(onDidEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(onWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+
+        print("✅ [SCMF] Wired native lifecycle bridge (bg/fg) → JS events")
+    }
+
+    @objc private func onWillResignActive() {
+        // about to background / app switch
+        emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
+    }
+
+    @objc private func onDidEnterBackground() {
+        // fully backgrounded
+        emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
+    }
+
+    @objc private func onWillEnterForeground() {
+        // coming back
+        reactivateAudioSession()
+        emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
+    }
+
+    @objc private func onDidBecomeActive() {
+        reactivateAudioSession()
+        emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
+    }
+
+    private func emitBgFg(isForeground: Bool, eventName: String) {
+        // ✅ Dedupe spam (iOS can fire multiple notifications)
+        if lastBgFgState == isForeground { return }
+        lastBgFgState = isForeground
+
+        scmfEmitEventToJS(eventName)
+    }
+
+    // MARK: - Audio session notifications (interruptions, route changes)
+    private func wireAudioSessionNotificationsOnce() {
+        if audioObserversWired { return }
+        audioObserversWired = true
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAudioInterruption(_:)),
+            name: AVAudioSession.interruptionNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAudioRouteChange(_:)),
+            name: AVAudioSession.routeChangeNotification,
+            object: nil
+        )
+
+        print("✅ [SCMF] Wired AVAudioSession interruption + route change observers")
+    }
+
+    @objc private func handleAudioInterruption(_ notification: Notification) {
+        guard
+            let info = notification.userInfo,
+            let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeValue)
+        else { return }
+
+        switch type {
+        case .began:
+            print("📵 [SCMF] Audio interruption began")
+            emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
+
+        case .ended:
+            print("📳 [SCMF] Audio interruption ended")
+            reactivateAudioSession()
+            emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
+
+        @unknown default:
+            break
+        }
+    }
+
+    @objc private func handleAudioRouteChange(_ notification: Notification) {
+        print("🎧 [SCMF] Audio route changed")
+        reactivateAudioSession()
+        emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
+    }
+
+    // MARK: - Native Flag Injection (EARLY)
     private func installNativeFlagUserScript() {
         guard let webView = self.webView else {
             print("⚠️ [SCMF] webView is nil – cannot install native flag user script yet.")
             return
         }
 
-        // Remove any prior scripts if hot-reloaded
         let uc = webView.configuration.userContentController
+
+        // Only remove our scripts if you later add more; for now, safe to clear
         uc.removeAllUserScripts()
 
         let js = """
         (function(){
-          try {
-            window.SC_IOS_NATIVE = true;
-          } catch(e) {}
+          try { window.SC_IOS_NATIVE = true; } catch(e) {}
         })();
         """
 
@@ -104,32 +235,70 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
         print("✅ [SCMF] Installed WKUserScript: SC_IOS_NATIVE=true (document start)")
     }
 
-    // MARK: - Native Flag Injection (Backup)
-
-    private func injectIOSNativeFlagOnceLoaded() {
+    // MARK: - JS Event Bridge (queue until WebView is ready + app active)
+    private func scmfEmitEventToJS(_ eventName: String) {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self, let webView = self.webView else {
-                print("⚠️ [SCMF] webView is nil – cannot inject SC_IOS_NATIVE yet.")
+            guard let self = self else { return }
+
+            // If we're not active, queue it (WKWebView eval can fail in background)
+            if UIApplication.shared.applicationState != .active {
+                self.scmfPendingEvents.append(eventName)
                 return
             }
 
-            let js = "window.SC_IOS_NATIVE = true;"
-            webView.evaluateJavaScript(js) { _, error in
-                if let error = error {
-                    print("⚠️ [SCMF] Failed to set SC_IOS_NATIVE:", error.localizedDescription)
-                } else {
-                    print("✅ [SCMF] SC_IOS_NATIVE flag set (backup)")
+            guard let webView = self.webView else {
+                self.scmfPendingEvents.append(eventName)
+                return
+            }
+
+            // If web isn't ready yet, queue it
+            if !self.scmfWebReady || webView.isLoading || webView.url == nil || webView.window == nil {
+                self.scmfPendingEvents.append(eventName)
+                return
+            }
+
+            let js = """
+            (function(){
+              try { window.dispatchEvent(new Event('\(eventName)')); } catch(e) {}
+            })();
+            """
+
+            webView.evaluateJavaScript(js) { [weak self] _, error in
+                guard let self = self else { return }
+                if error != nil {
+                    // If eval fails, queue it and try later (next didFinish/foreground)
+                    self.scmfPendingEvents.append(eventName)
                 }
             }
         }
     }
 
-    // MARK: - Game Center Bridge Registration
+    private func scmfFlushPendingEvents() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
 
+            if UIApplication.shared.applicationState != .active { return }
+            guard let webView = self.webView else { return }
+            if !self.scmfWebReady || webView.isLoading || webView.url == nil || webView.window == nil { return }
+            if self.scmfPendingEvents.isEmpty { return }
+
+            let toSend = self.scmfPendingEvents
+            self.scmfPendingEvents.removeAll()
+
+            for ev in toSend {
+                let js = "window.dispatchEvent(new Event('\(ev)'));"
+                webView.evaluateJavaScript(js, completionHandler: nil)
+            }
+
+            print("📬 [SCMF] Flushed \(toSend.count) queued JS events ✅")
+        }
+    }
+
+    // MARK: - Game Center Bridge Registration
     private func registerGameCenterBridgeHandler() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self, let webView = self.webView else {
-                print("⚠️ [SCMF][GC] webView is nil – cannot register \(self?.handlerName ?? "handler") yet.")
+                print("⚠️ [SCMF][GC] webView is nil – cannot register handler yet.")
                 return
             }
 
@@ -142,7 +311,6 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
     }
 
     // MARK: - WKScriptMessageHandler
-
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard message.name == handlerName else { return }
 
@@ -163,7 +331,6 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
     }
 
     // MARK: - Payload Router
-
     private func handleGameCenterPayload(_ payload: [String: Any]) {
         let type = (payload["type"] as? String) ?? ""
         print("🍧📨 [SCMF][GC] payload:", payload)
@@ -202,7 +369,6 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
     }
 
     // MARK: - Game Center Auth
-
     private func ensureGameCenterAuthenticated(_ action: @escaping () -> Void) {
         if GKLocalPlayer.local.isAuthenticated {
             action()
@@ -215,7 +381,6 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
         gcAuthInProgress = true
 
         let player = GKLocalPlayer.local
-
         player.authenticateHandler = { [weak self] vc, error in
             guard let self = self else { return }
 
@@ -249,7 +414,6 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
     }
 
     // MARK: - Submitters
-
     private func submitAchievement(achievementId: String, percent: Double) {
         guard GKLocalPlayer.local.isAuthenticated else {
             print("🍧⚠️ [SCMF][GC] submitAchievement called while not authed")
@@ -302,7 +466,6 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
     }
 
     // MARK: - Coercion helpers
-
     private func coerceInt(_ any: Any?) -> Int {
         if let n = any as? Int { return n }
         if let n = any as? Double { return Int(n) }
@@ -317,39 +480,5 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler {
         if let n = any as? Float { return Double(n) }
         if let s = any as? String, let n = Double(s) { return n }
         return 0.0
-    }
-
-    // MARK: - Layout (safe-area pinning)
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        pinWebViewToSafeAreaOnce()
-    }
-
-    private func pinWebViewToSafeAreaOnce() {
-        guard let webView = self.webView else {
-            print("⚠️ [SCMF] webView is nil – cannot layout SnowCone shell.")
-            return
-        }
-
-        // Only pin once; re-pinning every layout pass is constraint-chaos.
-        if webViewPinned { return }
-        webViewPinned = true
-
-        webView.translatesAutoresizingMaskIntoConstraints = false
-
-        // Deactivate only our own stored constraints (not random internal webView constraints)
-        NSLayoutConstraint.deactivate(webViewPinConstraints)
-        webViewPinConstraints.removeAll()
-
-        webViewPinConstraints = [
-            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        NSLayoutConstraint.activate(webViewPinConstraints)
-
-        print("📐 [SCMF] webView pinned to safe area once ✅")
     }
 }
