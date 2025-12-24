@@ -18,6 +18,154 @@ function clearStopTimer() {
   }
 }
 
+// ==============================
+// 🍧 iOS Wake / Audio Recovery
+// ==============================
+
+// iOS will suspend/interupt WebAudio when screen locks / app backgrounds.
+// Sometimes Howler doesn't recover automatically, so we force resume
+// and if needed, rebuild the audio context.
+
+// One-time attachment guard
+let _wakeHandlersAttached = false;
+
+// Throttle so we don't spam resume calls
+let _lastWakeKick = 0;
+
+function _now() {
+  return Date.now ? Date.now() : new Date().getTime();
+}
+
+async function _resumeHowlerContext(reason = 'unknown') {
+  try {
+    const ctx = Howler?.ctx;
+    if (!ctx) return false;
+
+    // iOS can be: 'suspended', 'interrupted', or sometimes 'running' but dead.
+    if (ctx.state !== 'running') {
+      try {
+        await ctx.resume();
+        // console.log('🎧 Howler ctx resumed via', reason, 'state=', ctx.state);
+      } catch (e) {
+        // console.warn('⚠️ ctx.resume failed via', reason, e);
+      }
+    }
+
+    return (Howler?.ctx?.state === 'running');
+  } catch (e) {
+    // console.warn('⚠️ _resumeHowlerContext error', reason, e);
+    return false;
+  }
+}
+
+function _rebuildHowlerContext(reason = 'unknown') {
+  // Only do this as a last resort.
+  // Howler has some private helpers; we try those first, then a safe-ish manual rebuild.
+  try {
+    // console.log('🧯 Rebuilding Howler audio context via', reason);
+
+    if (typeof Howler?._setupAudioContext === 'function') {
+      Howler._setupAudioContext();
+      return true;
+    }
+
+    // Manual fallback (best effort)
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+
+    Howler.ctx = new AC();
+
+    // masterGain is how Howler routes volume/mute.
+    try {
+      Howler.masterGain = Howler.ctx.createGain();
+      Howler.masterGain.gain.value = typeof Howler.volume === 'function' ? Howler.volume() : 1;
+      Howler.masterGain.connect(Howler.ctx.destination);
+    } catch {}
+
+    return true;
+  } catch (e) {
+    // console.warn('⚠️ _rebuildHowlerContext failed', reason, e);
+    return false;
+  }
+}
+
+function _nukeDeadHowls(reason = 'unknown') {
+  try {
+    const list = Howler?._howls || [];
+    for (const h of list) {
+      try { h.stop(); } catch {}
+      try { h.unload(); } catch {}
+    }
+  } catch {}
+
+  // ✅ flush your cache too (otherwise you might reuse unloaded howls)
+  try {
+    if (typeof howlCache !== 'undefined' && howlCache?.clear) {
+      howlCache.clear();
+    }
+  } catch {}
+
+}
+
+async function _kickAudioEngine(reason = 'wake') {
+  const t = _now();
+  if (t - _lastWakeKick < 250) return; // throttle
+  _lastWakeKick = t;
+
+  // 1) Resume if possible
+  const ok = await _resumeHowlerContext(reason);
+  if (ok) return;
+
+  // 2) If resume didn't work, rebuild ctx
+  const rebuilt = _rebuildHowlerContext(reason);
+  if (rebuilt) {
+    await _resumeHowlerContext(`${reason}:afterRebuild`);
+  }
+
+  // 3) If still not running, hard reset howls (last resort)
+  if (Howler?.ctx && Howler.ctx.state !== 'running') {
+    _nukeDeadHowls(`${reason}:stillNotRunning`);
+    _rebuildHowlerContext(`${reason}:afterNuke`);
+    await _resumeHowlerContext(`${reason}:afterNukeRebuild`);
+  }
+}
+
+function _attachIOSWakeHandlers() {
+  if (_wakeHandlersAttached) return;
+  _wakeHandlersAttached = true;
+
+  // 🔑 This is the big one: screen lock/unlock often fires visibility changes.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      _kickAudioEngine('visibilitychange:show');
+      setTimeout(() => _kickAudioEngine('visibilitychange:show:delayed'), 300);
+    }
+  });
+
+
+  // iOS Safari/WKWebView sometimes needs these too
+  window.addEventListener('pageshow', () => _kickAudioEngine('pageshow'), { passive: true });
+  window.addEventListener('focus', () => _kickAudioEngine('focus'), { passive: true });
+
+  // If the user taps after unlock, that gesture is a perfect "resume ctx" moment.
+  window.addEventListener('pointerdown', () => _kickAudioEngine('pointerdown'), { passive: true });
+
+  // Capacitor native: catch actual foreground/background transitions
+  // (Safe: if plugin isn't available, it just no-ops.)
+  (async () => {
+    try {
+      const mod = await import('@capacitor/app');
+      const App = mod?.App;
+      if (!App?.addListener) return;
+
+      App.addListener('appStateChange', (state) => {
+        if (state?.isActive) _kickAudioEngine('capacitor:active');
+      });
+    } catch {
+      // no-op (web build or plugin not present)
+    }
+  })();
+}
 
 // iOS: prefer WebAudio so the hardware silent switch behaves consistently.
 // (HTML5 <audio> is the one that tends to ignore the silent switch.)
@@ -39,6 +187,20 @@ function getDefaultHtml5() {
   // html5:false = WebAudio
   return preferWebAudioOnIOS() ? false : true;
 }
+
+// iOS-specific: don't let Howler auto-suspend fight us after unlock.
+try {
+  if (preferWebAudioOnIOS()) {
+    Howler.autoSuspend = false; // ✅ prevents "stuck suspended" edge cases
+  }
+} catch {}
+
+// Attach wake handlers immediately (safe + idempotent)
+if (preferWebAudioOnIOS() || isIOSNative()) {
+  _attachIOSWakeHandlers();
+  try { Howler.autoSuspend = false; } catch {}
+}
+
 
 
 let currentTrack = null;
@@ -187,11 +349,23 @@ function makeHowl(meta, opts = {}) {
     html5,
     preload: true,
 
-    onloaderror: (_, err) => {
+    onloaderror: async function (_id, err) {
       console.warn('⚠️ LOAD ERROR:', meta.id, meta.file, 'html5=', html5, err);
+      await _kickAudioEngine(`loaderror:${meta.id}`);
     },
-    onplayerror: (_, err) => {
+
+    // ✅ IMPORTANT: use function() so `this` is the Howl instance
+    onplayerror: async function (_id, err) {
       console.warn('⚠️ PLAY ERROR:', meta.id, meta.file, 'html5=', html5, err);
+
+      await _kickAudioEngine(`playerror:${meta.id}`);
+
+      try {
+        const ctxOk = (Howler?.ctx?.state === 'running');
+        if (ctxOk) {
+          this.play(); // ✅ now actually works
+        }
+      } catch {}
     },
   });
 }
@@ -249,11 +423,6 @@ function bindHowlHandlers(howl, meta, opts = {}) {
     } else {
       skipNext(); // <-- keeps your normal "album next" behavior
     }
-  });
-
-  howl.on('playerror', (_, err) => {
-    console.warn('⚠️ Play error:', err);
-    howl.once('unlock', () => howl.play());
   });
 
   // store override reference (debug / sanity)

@@ -70,6 +70,7 @@
     "not IE 11"
   ],
   "dependencies": {
+    "@capacitor/app": "^7.1.1",
     "@capacitor/core": "^7.4.4",
     "@capacitor/haptics": "^7.0.3",
     "@capacitor/ios": "^7.4.4",
