@@ -1,5 +1,7 @@
 # SnowCone MathFest 🍧✨
 
+PURCHASE ON iOS TODAY!!
+
 A neon-festival math game world built for browser **and** iOS (via Capacitor).  
 Play quick arcade modes, story-driven chapters, and kid-friendly mini-games — all wrapped in a shiny 11:16 “phone stage” vibe.
 
@@ -39,15 +41,3 @@ Play quick arcade modes, story-driven chapters, and kid-friendly mini-games — 
 - **MobX** (state)
 - **Howler** (audio)
 - **Capacitor** (iOS app wrapper)
-- (Optional/where used) Pixi / GSAP / custom canvas / SVG overlays
-
-> If any of these don’t match your current repo anymore, update this list to match reality.
-
----
-
-## 🚀 Getting Started (Web)
-
-### 1) Clone
-```bash
-git clone <YOUR_REPO_URL>
-cd <YOUR_REPO_FOLDER>
