@@ -41,3 +41,12 @@ Play quick arcade modes, story-driven chapters, and kid-friendly mini-games — 
 - **MobX** (state)
 - **Howler** (audio)
 - **Capacitor** (iOS app wrapper)
+
+## License
+Copyright (c) 2025 Jeremy Smith (JPSGrooves)
+
+All Rights Reserved.
+
+No part of this repository (code, assets, or other contents) may be used, copied,
+modified, merged, published, distributed, sublicensed, and/or sold without
+explicit prior written permission from the copyright holder.
