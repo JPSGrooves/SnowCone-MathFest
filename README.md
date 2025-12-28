@@ -1,22 +1,42 @@
 # SnowCone MathFest 🍧✨
 
-PURCHASE ON iOS TODAY!!
+### Support the festival — grab the iOS app 🍏💛  
+**Buy on iOS:** https://apps.apple.com/us/app/snowcone-mathfest/id6756327336  
+**Repo:** https://github.com/JPSGrooves/SnowCone-MathFest
 
-A neon-festival math game world built for browser **and** iOS (via Capacitor).  
-Play quick arcade modes, story-driven chapters, and kid-friendly mini-games — all wrapped in a shiny 11:16 “phone stage” vibe.
+SnowCone MathFest (SCMF) is a neon-festival math game world built for browser **and** iOS (via Capacitor).  
+Arcade modes, story chapters, and kid-friendly mini-games — all wrapped in a shiny **11:16 “phone stage”** vibe.
 
-> **Status:** Active development  
-> **Platforms:** Web (browser) + iOS (Capacitor)
+> If you enjoy the free browser build, buying the iOS app is like tipping the snowcone stand. 🍧  
+> It directly supports future games (including the next Apple-exclusive simulator).
+
+---
+
+## 🌐 Play (Browser)
+
+This repo is public because it powers the **free browser version** (GitHub Pages).  
+If you’re here to play or peek — welcome to the festival 😎
+
+---
+
+## 🍏 iOS App
+
+The iOS build is the “official” packaged version.
+
+**Purchase / install here:**  
+https://apps.apple.com/us/app/snowcone-mathfest/id6756327336
+
+Buying the app is the cleanest way to support the project — like grabbing a snowcone so the stand stays open. 🍧✨
 
 ---
 
 ## 🌈 What is this?
 
-**SnowCone MathFest (SCMF)** is a playful math-and-story game universe:  
-- Festival-style menus & characters  
-- Multiple game “modes” (mini-games, story mode, score systems)  
-- Designed to feel great on phones *and* desktops  
-- Built with modern web tooling, then packaged for iOS
+**SnowCone MathFest** is a playful math-and-story universe:
+- Festival-style menus & characters
+- Multiple game “modes” (mini-games, story mode, score systems)
+- Designed to feel great on phones *and* desktops
+- Built as a modern web app, then packaged for iOS with Capacitor
 
 ---
 
@@ -24,25 +44,28 @@ Play quick arcade modes, story-driven chapters, and kid-friendly mini-games — 
 
 - **Multiple Modes**
   - Quick arcade-style sessions
-  - Story Mode chapters / narrative slides + math choices
+  - Story Mode chapters (narrative slides + math choices)
   - Kids Camping mini-games (parking, tents, etc.)
 - **Responsive 11:16 stage layout**
   - Built to look like a phone screen even on desktop
 - **Score / XP / badges systems**
 - **Custom aesthetic**
-  - Neon UI, character art, music-first vibe
+  - Neon UI + characters + music-first vibe
 
 ---
 
 ## 🧰 Tech Stack
 
-- **Vite** (build tool / dev server)
-- **JavaScript / ES Modules**
+- **Vite**
+- **JavaScript (ES Modules)**
 - **MobX** (state)
 - **Howler** (audio)
-- **Capacitor** (iOS app wrapper)
+- **Capacitor** (iOS wrapper)
 
-## License
+---
+
+## 🔒 License (All Rights Reserved)
+
 Copyright (c) 2025 Jeremy Smith (JPSGrooves)
 
 All Rights Reserved.
