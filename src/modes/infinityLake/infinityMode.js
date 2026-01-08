@@ -22,6 +22,27 @@ import { hapticSuccess, hapticError, hapticSoftPulse } from '../../utils/haptics
 
 
 
+// 🧷 Run commit guard (prevents double-paying XP/time if player hits Results then exits)
+let didCommitThisRun = false;
+
+// 🧼 Store exact handler refs so removeEventListener actually works
+let onEndGameClick = null;
+let onBackToMenuClick = null;
+let onMuteClick = null;
+
+// Answer button handlers: Map<buttonEl, fn>
+let answerBtnHandlerMap = new Map();
+
+// Mode button handlers: Map<buttonEl, fn>
+let modeBtnHandlerMap = new Map();
+
+// Popup handlers (if your popup exists each run)
+let onPlayAgainClick = null;
+let onPopupBackClick = null;
+
+// Intro handlers
+let onIntroBackClick = null;
+let onIntroStartClick = null;
 
 
 
@@ -215,6 +236,10 @@ export function stopInfinityMode() {
   // 🧼 Always clear the body flag so iOS CSS stops applying
   document.body.classList.remove('il-active');
 
+  // ✅ hard reset run state so intro is truly "no run"
+  startTime = 0;
+  didCommitThisRun = false;
+
   const container = document.getElementById('game-container');
   container.innerHTML = '';
   container.classList.add('hidden');
@@ -223,6 +248,7 @@ export function stopInfinityMode() {
   cleanupEventHandlers();
   console.log('♾️ Infinity Mode cleaned up!');
 }
+
 
 function renderIntroScreen() {
   const container = document.getElementById('game-container');
@@ -368,87 +394,141 @@ function renderUI() {
 }
 
 function setupEventHandlers() {
-  document.getElementById('backToMenu')?.addEventListener('click', () => {
-    activateInputHandler(null); // disable hotkeys
-    document.body.classList.remove('il-active', 'qs-active');
-    returnToMenu();
+  // 🔙 Main Menu
+  const backBtn = document.getElementById('backToMenu');
+  if (backBtn) {
+    if (onBackToMenuClick) backBtn.removeEventListener('click', onBackToMenuClick);
+    onBackToMenuClick = returnToMenu;
+    backBtn.addEventListener('click', onBackToMenuClick);
+  }
+
+  // ♾️ Results
+  const endBtn = document.getElementById('endGame');
+  if (endBtn) {
+    if (onEndGameClick) endBtn.removeEventListener('click', onEndGameClick);
+    onEndGameClick = () => {
+      console.log('🛑 End Game pressed – finalize run');
+      endInfinityGame();
+    };
+    endBtn.addEventListener('click', onEndGameClick);
+  }
+
+  // 🔇 Mute
+  const muteBtn = document.getElementById('muteToggle');
+  if (muteBtn) {
+    if (onMuteClick) muteBtn.removeEventListener('click', onMuteClick);
+    onMuteClick = () => {
+      toggleMute();
+      updateMuteButtonLabel();
+      flashMuteIcon();
+    };
+    muteBtn.addEventListener('click', onMuteClick);
+  }
+
+  // ✅ Answer buttons (store handler per button)
+  answerBtnHandlerMap = new Map();
+  answerBtns = Array.from(document.querySelectorAll('.ans-btn'));
+
+  answerBtns.forEach((btn) => {
+    const fn = (e) => handleAnswer(e.currentTarget);
+    answerBtnHandlerMap.set(btn, fn);
+    btn.addEventListener('click', fn);
   });
 
-  document.getElementById('resetGame')?.addEventListener('click', startGame);
-
-  // 🔴 REMOVE the old “dummy stats” handler for endGame
-  // document.getElementById('endGame')?.addEventListener('click', () => {
-  //   console.log('🛑 End Game pressed – show result popup here');
-  //   showResultPopup({
-  //     score: score,
-  //     highScore: appState.profile.infinityHighScore || 0,
-  //     streak: 0,
-  //     time: '1:45'
-  //   });
-  // });
-
-  // ✅ NEW: just call the real end-game pipe
-  document.getElementById('endGame')?.addEventListener('click', () => {
-    console.log('🛑 End Game pressed – finalize run');
-    endInfinityGame();
-  });
-
-  document.getElementById('ilPlayAgainBtn')?.addEventListener('click', () => {
-    closeResultPopup();
-    startGame();
-  });
-
-  document.getElementById('ilBackBtn')?.addEventListener('click', () => {
-    closeResultPopup();
-    returnToMenu();
-  });
-
-  answerBtns.forEach(btn => btn.addEventListener('click', () => handleAnswer(btn)));
-
-  document.querySelectorAll('.mode-buttons button').forEach(btn => {
-    btn.addEventListener('click', () => {
+  // ✅ Mode buttons (store handler per button)
+  modeBtnHandlerMap = new Map();
+  document.querySelectorAll('.mode-buttons button').forEach((btn) => {
+    const fn = () => {
       const mode = btn.dataset.mode;
       if (!mode) return;
       appState.setGameMode(mode);
       updateModeButtonUI();
       newProblem();
       flashModeName();
-    });
+    };
+    modeBtnHandlerMap.set(btn, fn);
+    btn.addEventListener('click', fn);
   });
 
-  function updateMuteButtonLabel() {
-    const icon = document.getElementById('muteToggle');
-    const muted = Howler._muted;
-    if (icon) {
-      icon.innerHTML = muted ? '🔇<br>Unmute' : '🔊<br>Mute';
-    }
+  // Popup buttons (only if present)
+  const playAgain = document.getElementById('ilPlayAgainBtn');
+  if (playAgain) {
+    if (onPlayAgainClick) playAgain.removeEventListener('click', onPlayAgainClick);
+    onPlayAgainClick = () => {
+      closeResultPopup();
+      startGame();
+    };
+    playAgain.addEventListener('click', onPlayAgainClick);
   }
 
-  document.getElementById('muteToggle')?.addEventListener('click', () => {
-    toggleMute();
-    updateMuteButtonLabel();
-    flashMuteIcon();
-  });
+  const popupBack = document.getElementById('ilBackBtn');
+  if (popupBack) {
+    if (onPopupBackClick) popupBack.removeEventListener('click', onPopupBackClick);
+    onPopupBackClick = () => {
+      closeResultPopup();
+      returnToMenu();
+    };
+    popupBack.addEventListener('click', onPopupBackClick);
+  }
 }
 
 
 
 function cleanupEventHandlers() {
-  document.getElementById('backToMenu')?.removeEventListener('click', returnToMenu);
-  document.getElementById('resetGame')?.removeEventListener('click', startGame);
-  document.getElementById('endGame')?.removeEventListener('click', () => {});
+  const backBtn = document.getElementById('backToMenu');
+  if (backBtn && onBackToMenuClick) {
+    backBtn.removeEventListener('click', onBackToMenuClick);
+  }
 
+  const endBtn = document.getElementById('endGame');
+  if (endBtn && onEndGameClick) {
+    endBtn.removeEventListener('click', onEndGameClick);
+  }
 
-  if (!answerBtns || !Array.isArray(answerBtns)) return; // 🍃 Chill if no game yet
+  const muteBtn = document.getElementById('muteToggle');
+  if (muteBtn && onMuteClick) {
+    muteBtn.removeEventListener('click', onMuteClick);
+  }
 
-  answerBtns.forEach(btn => btn.removeEventListener('click', handleAnswer));
+  // Answer buttons
+  if (answerBtnHandlerMap && answerBtnHandlerMap.size) {
+    for (const [btn, fn] of answerBtnHandlerMap.entries()) {
+      try { btn.removeEventListener('click', fn); } catch {}
+    }
+  }
+  answerBtnHandlerMap = new Map();
+
+  // Mode buttons
+  if (modeBtnHandlerMap && modeBtnHandlerMap.size) {
+    for (const [btn, fn] of modeBtnHandlerMap.entries()) {
+      try { btn.removeEventListener('click', fn); } catch {}
+    }
+  }
+  modeBtnHandlerMap = new Map();
+
+  // Popup buttons
+  const playAgain = document.getElementById('ilPlayAgainBtn');
+  if (playAgain && onPlayAgainClick) {
+    playAgain.removeEventListener('click', onPlayAgainClick);
+  }
+
+  const popupBack = document.getElementById('ilBackBtn');
+  if (popupBack && onPopupBackClick) {
+    popupBack.removeEventListener('click', onPopupBackClick);
+  }
+
+  onEndGameClick = null;
+  onBackToMenuClick = null;
+  onMuteClick = null;
+  onPlayAgainClick = null;
+  onPopupBackClick = null;
 }
 
 
 
 function returnToMenu() {
-  // 🧷 safety flush (won't double-award because we gate by hitXXThisRun)
-  try { checkInfinityBadgesByScore(); } catch {}
+  // ✅ Commit run even if player leaves early (no popup)
+  commitInfinityRun({ reason: 'exit_menu', showPopup: false });
 
   stopTrack(); // 💥 nukes the Howl
   playTransition(() => {
@@ -459,19 +539,23 @@ function returnToMenu() {
 }
 
 
+
 function startGame() {
   // re-arm keyboard for a fresh set
   activateInputHandler('infinity');
 
+  // ✅ re-arm commit + start time immediately (safer)
+  didCommitThisRun = false;
+  startTime = Date.now();
+
   score = 0;
   streak = 0;
-  maxStreak = 0; // Reset session max
+  maxStreak = 0;
   solvedCount = 0;
   streakFlipFlop = true;
   patternIndex = 0;
   nextTrigger = sfxIntervals[0];
 
-  // 🧮 reset teaching stats
   wrongCount = 0;
   modeMisses.addsub = 0;
   modeMisses.multdiv = 0;
@@ -481,7 +565,6 @@ function startGame() {
   lastMissByMode.multdiv = null;
   lastMissByMode.alg = null;
 
-  // 🌟 reset per-run Infinity milestones
   hit25ThisRun  = false;
   hit50ThisRun  = false;
   hit100ThisRun = false;
@@ -490,7 +573,6 @@ function startGame() {
   updateScore();
   updateStreak();
   newProblem();
-  startTime = Date.now();
 }
 
 function updateStreak() {
@@ -940,53 +1022,95 @@ function updateModeButtonUI() {
   });
 }
 
-function endInfinityGame() {
-  console.log('♾️ Ending Infinity Mode...');
+function commitInfinityRun({ reason = 'unknown', showPopup = false } = {}) {
+  // If we never started a set (still on intro), do nothing.
+  if (!startTime || startTime <= 0) {
+    return;
+  }
 
-  const endTime   = Date.now();
-  const elapsedMs = endTime - startTime;
-  const seconds   = Math.floor(elapsedMs / 1000);
-  const timeLabel = formatElapsedTime(elapsedMs);
+  // Prevent double-commit if user triggers multiple exit paths
+  if (didCommitThisRun) {
+    return;
+  }
+  didCommitThisRun = true;
 
-  const prevHigh    = appState.profile.infinityHighScore || 0;
+  const endTime = Date.now();
+  const elapsedMs = Math.max(0, endTime - startTime);
+  const seconds = Math.floor(elapsedMs / 1000);
+
+  // 1) Score-based badge checks (the “live” path w/ your run flags + haptic pulse)
+  try {
+    checkInfinityBadgesByScore();
+  } catch (e) {
+    console.warn('[Infinity] checkInfinityBadgesByScore failed during commit:', e);
+  }
+
+  // 2) Update record stats (high score + longest streak) even if player exits early
+  const prevHigh = appState.profile.infinityHighScore || 0;
   const prevLongest = appState.profile.infinityLongestStreak || 0;
 
   const isNewHighScore = score > prevHigh;
-  const isNewStreak    = maxStreak > prevLongest;
+  const isNewStreak = maxStreak > prevLongest;
 
-  // 🧠 Commit record updates into the profile
-  runInAction(() => {
-    if (isNewHighScore) {
-      appState.profile.infinityHighScore = score;
-    }
-    if (isNewStreak) {
-      appState.profile.infinityLongestStreak = maxStreak;
-    }
-  });
-
-  // 📊 Meta progression: Infinity XP, time, mirrored badge gates
-  finalizeInfinityRun({
-    score,
-    seconds
-  });
-
-  // 🎯 Separate “this run” vs “lifetime” for the popup
-  const runStreak      = maxStreak;
-  const lifetimeStreak = appState.profile.infinityLongestStreak || 0;
-
-  // 🎛️ Render the popup with fresh values from profile
-  showResultPopup({
-    score,
-    streak:  runStreak,       // this set’s best chain
-    highScore: appState.profile.infinityHighScore || 0,
-    longest: lifetimeStreak,  // all-time record
-    time:    timeLabel        // still computed, but no longer shown
-  });
-
-  // 🎉 Only fire a big celebration when a record is broken
-  if (isNewHighScore || isNewStreak) {
-    launchConfetti();
+  try {
+    runInAction(() => {
+      if (isNewHighScore) appState.profile.infinityHighScore = score;
+      if (isNewStreak) appState.profile.infinityLongestStreak = maxStreak;
+    });
+  } catch (e) {
+    console.warn('[Infinity] failed to commit profile records:', e);
   }
+
+  // 3) Meta progression: Infinity XP + Time + mirror badge gates
+  try {
+    finalizeInfinityRun({ score, seconds });
+  } catch (e) {
+    console.warn('[Infinity] finalizeInfinityRun failed during commit:', e);
+  }
+
+  // 4) Force persistence immediately (important on iOS if user bounces / app suspends)
+  try {
+    appState?.saveToStorage?.();
+  } catch (e) {
+    console.warn('[Infinity] saveToStorage failed during commit:', e);
+  }
+
+  // 5) Optional popup celebration (Results button path)
+  if (showPopup) {
+    try {
+      const timeLabel = typeof formatElapsedTime === 'function'
+        ? formatElapsedTime(elapsedMs)
+        : `${seconds}s`;
+
+      const runStreak = maxStreak;
+      const lifetimeStreak = appState.profile.infinityLongestStreak || 0;
+
+      showResultPopup({
+        score,
+        streak: runStreak,
+        highScore: appState.profile.infinityHighScore || 0,
+        longest: lifetimeStreak,
+        time: timeLabel
+      });
+
+      // Confetti only when breaking records (matches your current behavior)
+      if (isNewHighScore || isNewStreak) {
+        launchConfetti();
+      }
+    } catch (e) {
+      console.warn('[Infinity] showPopup failed during commit:', e);
+    }
+  }
+
+  console.log(`♾️ commitInfinityRun ok | reason=${reason} | score=${score} | seconds=${seconds}`);
+}
+
+
+function endInfinityGame() {
+  console.log('♾️ Ending Infinity Mode...');
+
+  // ✅ Single pipe: commits score/streak/xp/time + awards + (optional) popup
+  commitInfinityRun({ reason: 'end_button', showPopup: true });
 }
 
 
