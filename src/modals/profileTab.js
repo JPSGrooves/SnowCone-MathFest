@@ -1,8 +1,9 @@
-// /src/tabs/profileTab.js — completion bar + Legendary copy
+// src/tabs/profileTab.js — completion bar + Legendary copy
 
 import { appState } from '../data/appState.js';
 import { renderBadgeGrid, allBadges } from '../managers/badgeManager.js';
 import { COMPLETION_CONFIG } from '../managers/completionManager.js';
+import { INTRO_COPY_HTML } from '../content/introCopy.js';
 
 export function renderProfileTab() {
   // For the “how to” copy only:
@@ -34,6 +35,13 @@ export function renderProfileTab() {
         <div class="xp-bar" id="xpBar"></div>
       </div>
       <span id="xpPercentText">0%</span>
+    </div>
+
+    <!-- ✅ Intro copy moved here (between completion + cones) -->
+    <div class="settings-block">
+      <p class="profile-intro-copy" style="margin:0;line-height:1.35;">
+        ${INTRO_COPY_HTML}
+      </p>
     </div>
 
     <div class="settings-block">

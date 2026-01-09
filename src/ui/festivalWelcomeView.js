@@ -41,37 +41,43 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
     inner.appendChild(card);
   }
 
-  
   const model = getFestivalWelcomeModel();
 
   const streak = Number(model.streakDays ?? 0);
   const streakLabel = `Daily Streak: ${streak} day${streak === 1 ? '' : 's'}`;
 
+
+
   card.innerHTML = `
+
     <p class="startup-welcome-line">
       ${model.greeting}, ${model.username}!
     </p>
-    SnowCone MathFest is a neon math festival!<br>Explore each mode while listening to the tunes, and try to complete the whole festival!<br><br>
+
     <p class="startup-title-line">
       ${model.title}
     </p>
+
     <p class="startup-streak-line">
       ${streakLabel}
     </p>
+
     <p class="startup-progress-line">
       Festival Completion: <strong>${model.percent}%</strong>
     </p>
+
     <p class="startup-main-line">
       ${model.line}
     </p>
+
     <p class="startup-suggestion-line">
       ${model.suggestionText}
     </p>
+
     <button type="button" class="startup-play-btn">
       Play Game
     </button>
   `;
-
 
   const playBtn = card.querySelector('.startup-play-btn');
   if (playBtn) {

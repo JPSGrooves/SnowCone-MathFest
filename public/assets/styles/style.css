@@ -554,13 +554,37 @@ html, body {
   caret-color: auto !important;
 }
 /* somewhere global */
+/* ✅ Badge toast: NEVER cover bottom keypad (top-safe-area toast) */
 .badge-banner{
-  position:fixed; left:50%; bottom:16px; transform:translateX(-50%);
-  background:rgba(0,0,0,.85); color:#fff; padding:10px 14px;
-  border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.35);
-  font-weight:600; z-index:9999; backdrop-filter:saturate(140%) blur(4px);
-  pointer-events: none; /* 👈 taps/clicks pass through to the game */
+  position: fixed;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  bottom: auto;
+
+  transform: translateX(-50%);
+  width: min(520px, 92vw);
+
+  background: rgba(0,0,0,.55); /* lower opacity so keypad/game stays readable */
+  color: #fff;
+
+  padding: 8px 12px;
+  border-radius: 12px;
+
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.14);
+  backdrop-filter: saturate(140%) blur(6px);
+
+  font-weight: 600;
+  font-size: clamp(0.78rem, 1.5vh, 0.95rem);
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0,0,0,.65);
+
+  z-index: 9999;
+
+  pointer-events: none; /* taps/clicks pass through */
 }
+
 /* Layout */
 .modal-hero { text-align: center; margin-bottom: 1rem; }
 .tagline { color: #9ff; margin: .25rem 0 .5rem; text-shadow: 0 0 8px #00ffee66; }
@@ -928,4 +952,143 @@ body.modal-open {
 
 :root[data-platform="ios"] .menu-title-top:hover {
   transform: translateY(4vh) scale(1.05);
+}
+/* ✅ Bigger startup logo (responsive, no jank) */
+.startup-cone {
+  /* was: width: 30vw; max-width: 250px; */
+  width: clamp(220px, 40vw, 360px);   /* 📱 bigger on mobile, capped on desktop */
+  max-width: none;                    /* clamp handles the cap now */
+  height: auto;
+
+  opacity: 0;
+  z-index: 2;
+  animation: fadeInCone 1s ease 1.5s forwards;
+
+  transform: translateY(-6vh);        /* keep your current vertical vibe */
+}
+/* 🎛 Tighten vertical spacing ONLY on startup */
+#startup-screen {
+  /* keep your existing props */
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  pointer-events: auto;
+
+  /* ✅ NEW: control spacing between stacked items */
+  gap: clamp(10px, 1.6vh, 18px);
+}
+
+/* ✅ Remove the old margin gap so "gap" controls it */
+#startup-screen .startup-festival-card {
+  margin-top: 0; /* was 1.5rem */
+  max-width: 92%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.9rem;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  color: #f6feff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+  font-size: clamp(0.9rem, 1.7vw, 1.05rem);
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: startupCardIn 0.8s ease-out 2s forwards;
+}
+
+/* ✅ Make logo bigger AND stop pulling it so far upward */
+.startup-cone {
+  width: min(56vw, 340px); /* was 30vw / 250px max */
+  max-width: 340px;
+  opacity: 0;
+  z-index: 2;
+  animation: fadeInCone 1s ease 1.5s forwards;
+
+  /* was translateY(-6vh) — that creates the dead space you’re seeing */
+  transform: translateY(-2vh);
+}
+/* ✅ tighter stack spacing on startup only */
+#startup-screen {
+  /* keep your existing props */
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  pointer-events: auto;
+
+  /* 🔥 MORE closer */
+  gap: clamp(2px, 0.6vh, 8px);
+}
+
+/* ✅ logo: stop pulling it up so hard + give a tiny negative bottom margin */
+.startup-cone {
+  width: min(60vw, 360px);
+  max-width: 360px;
+  opacity: 0;
+  z-index: 2;
+  animation: fadeInCone 1s ease 1.5s forwards;
+
+  /* 🔥 pull up way less (or set to 0 if you want it dead centered) */
+  transform: translateY(-0.5vh);
+
+  /* 🔥 eats a little extra gap under the logo */
+  margin-bottom: -6px;
+}
+
+/* ✅ card: kill extra spacing above it */
+#startup-screen .startup-festival-card {
+  margin-top: 0; /* keep at 0 */
+}
+/* ──────────────────────────────────────────────────────────
+   Startup spacing + logo scale (SCOPED to startup only)
+   ────────────────────────────────────────────────────────── */
+
+/* Use flex gap instead of stacking margins (cleaner + less jank) */
+#startup-screen {
+  gap: clamp(10px, 2.2vh, 22px);
+}
+
+/* Bigger logo, but capped so it never explodes on desktop */
+#startup-screen .startup-cone {
+  width: clamp(240px, 62vw, 420px);
+  max-width: 420px;
+  height: auto;
+
+  /* bring it DOWN a bit so it hugs the card more */
+  transform: translateY(-2.5vh);
+
+  opacity: 0;
+  z-index: 2;
+  animation: fadeInCone 1s ease 1.5s forwards;
+}
+
+/* Card: remove margin-top (gap handles spacing now) + bump readability */
+#startup-screen .startup-festival-card {
+  margin-top: 0; /* 👈 was 1.5rem */
+  font-size: clamp(1.0rem, 1.9vw, 1.15rem);
+  line-height: 1.55;
+}
+
+/* Slight bump for the “words below the logo” */
+#startup-screen .startup-welcome-line {
+  font-size: 1.65em; /* was 1.50em */
+}
+
+#startup-screen .startup-streak-line {
+  font-size: 0.98em; /* was 0.9em */
 }
