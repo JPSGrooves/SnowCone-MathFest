@@ -303,7 +303,7 @@ function switchMode(mode) {
   newProblem();               // ⬅️ was generateNewProblem(); fix the name
 }
 
-
+//removed to keep user playing..: <button id="ilBackBtn" class="back-to-menu-btn">🔙 to Menu</button>
 function renderUI() {
   const container = document.getElementById('game-container');
   container.innerHTML = `
@@ -379,7 +379,6 @@ function renderUI() {
 
             <div class="il-result-buttons">
               <button id="ilPlayAgainBtn" class="start-show-btn">🔁 Play Again</button>
-              <button id="ilBackBtn" class="back-to-menu-btn">🔙 to Menu</button>
             </div>
           </div>
         </div>
@@ -975,7 +974,10 @@ function buildInfinityTip() {
     return `${opening} Most misses were in ${focusMode || 'your current mode'}. Try watching the operation label before you tap.`;
   }
 
-  return `${opening} ${lesson} Want another go? Hit “Play Again” and try to beat this set.`;
+  // inside buildInfinityTip()
+
+  return `${opening} ${lesson}\n\nWant another go? Hit “Play Again” and try to beat this set.`;
+
 }
 
 

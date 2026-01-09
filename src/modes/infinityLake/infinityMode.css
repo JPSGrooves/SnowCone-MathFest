@@ -1122,3 +1122,62 @@
   color: #e9fcff;
   opacity: 0.95;
 }
+/* Optional: make labels pop */
+#ilTipText strong {
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+/* infinityMode.css */
+#ilTipText {
+  white-space: pre-line; /* respects \n as line breaks */
+}
+/* ✅ IL: remove empty bottom space — make the frame a single full-height row */
+body.il-active .il-game-frame{
+  grid-template-rows: 1fr !important;
+}
+
+/* belt + suspenders: ensure grid occupies the full frame */
+body.il-active .il-grid{
+  height: 100%;
+}
+/* ─────────────────────────────────────────────────────────────
+   ✅ IL: Fix button-row air gap + let Stage absorb extra height
+   Scoped to Infinity only (body.il-active) so nothing else breaks
+   ───────────────────────────────────────────────────────────── */
+
+/* 1) Make the stage row be the “flexible sponge” that grows */
+body.il-active .il-grid{
+  /* title | stage (grows) | math | controls */
+  grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+
+  /* prevents the grid from distributing extra space weirdly */
+  align-content: stretch;
+}
+
+/* Let stage actually fill the row we gave it */
+body.il-active .il-stage{
+  height: 100%;
+  min-height: 0; /* important for minmax(0,1fr) layouts */
+}
+
+/* 2) Kill the forced separation between the two control rows */
+body.il-active .il-controls{
+  justify-content: flex-start !important; /* was space-between */
+  gap: 0.35rem !important;               /* small, controlled spacing */
+}
+
+/* Safety: no mystery margins on the inner rows */
+body.il-active .il-controls .mode-buttons,
+body.il-active .il-controls .utility-buttons{
+  margin: 0 !important;
+}
+
+/* Optional: tighten bottom padding so the bottom row sits lower (safe-area aware) */
+body.il-active .il-grid{
+  padding: 1rem 1rem max(0.55rem, env(safe-area-inset-bottom)) 1rem !important;
+}
+/* Optional: bigger triplets when stage grows */
+body.il-active .il-stage .il-triplet-img{
+  max-width: clamp(240px, 62vw, 560px);
+  max-height: 100%;
+}
