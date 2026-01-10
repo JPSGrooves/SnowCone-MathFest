@@ -268,7 +268,7 @@ function renderIntroScreen() {
             <div class="il-speech">
               Hi! We're the <strong>Infinity Triplets</strong>!<br>
               <span class="il-howto">
-                Tap the correct answer to build your streak, switch modes to change the kind of math, and see how high you can push your score.
+                No timer! Jam out and tap the correct answers to build a record streak! Harder problems score more points!
               </span>
             </div>
 

@@ -73,9 +73,9 @@ function renderIntroScreen() {
         <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
         <div class="qs-intro">
           <div class="phil-speech">
-            Yo! I’m <strong>Cosmic Phil</strong>!<br/>
-              See how many points you can stack in <strong>1:45</strong>.
-              Harder problems hit harder — bigger points, bigger XP.<br/>
+            <strong>Yo! I’m Cosmic Phil</strong>!<br/>
+              Solve as many problems as you can in <strong>1:45</strong>.
+              Harder problems score more points and XP.<br/>
             🎸 Rock on to your next high score!
           </div>
 
@@ -135,7 +135,8 @@ function renderIntroScreen() {
 
 //////////////////////////////
 // 🎮 Main Game Screen
-//////////////////////////////
+/////////////////////////////
+//          removed for pay loop    <button id="qsBackBtn" class="back-to-menu-btn">🔙 Back to Menu</button>)
 export function renderGameUI() {
   const container = getGameContainer();
 
@@ -220,7 +221,6 @@ export function renderGameUI() {
 
             <div class="qs-result-buttons">
               <button id="qsPlayAgainBtn" class="start-show-btn">🔁 Run another shift</button>
-              <button id="qsBackBtn" class="back-to-menu-btn">🔙 Back to Menu</button>
             </div>
           </div>
         </div>

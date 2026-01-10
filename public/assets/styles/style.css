@@ -1092,3 +1092,49 @@ body.modal-open {
 #startup-screen .startup-streak-line {
   font-size: 0.98em; /* was 0.9em */
 }
+/* ──────────────────────────────────────────────────────────
+   Startup: remove the black box behind intro text
+   (put this at the END of style.css)
+   ────────────────────────────────────────────────────────── */
+#startup-screen .startup-festival-card {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+/* ──────────────────────────────────────────────────────────
+   Startup: bigger title/logo PNG (aspect preserved)
+   (put this at the END of style.css)
+   ────────────────────────────────────────────────────────── */
+#startup-screen .startup-cone {
+  width: clamp(320px, 72vw, 560px); /* bigger overall */
+  max-width: 560px;
+  height: auto;                    /* ✅ preserves PNG dimensions */
+  
+  /* optional positioning — keeping your vibe but safer with larger art */
+  transform: translateY(-1.5vh);
+
+  /* keep your fade timing */
+  opacity: 0;
+  z-index: 2;
+  animation: fadeInCone 1s ease 1.5s forwards;
+}
+/* ──────────────────────────────────────────────────────────
+   Startup: SUPER tight logo-to-text spacing (END OF FILE)
+   ────────────────────────────────────────────────────────── */
+#startup-screen{
+  gap: 0 !important;                 /* 🔥 remove flex gap entirely */
+}
+
+/* pull logo DOWN and eat space under it */
+#startup-screen .startup-cone{
+  transform: translateY(1.2vh) !important;   /* bring it closer to the card */
+  margin-bottom: -34px !important;           /* 🔥 hard-snug */
+}
+
+/* make sure card isn't adding its own top spacing */
+#startup-screen .startup-festival-card{
+  margin-top: 0 !important;
+  padding-top: 0.5rem !important;            /* optional: tighter top padding */
+}
