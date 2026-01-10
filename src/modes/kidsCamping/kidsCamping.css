@@ -1120,11 +1120,24 @@
   position: relative; /* For absolute positioning */
 }
 
+/* ✅ Vite-safe: no raw url('file.png') here */
 .kc-ant-zone {
   position: relative;
-  background: url('picnicBlanket.png') center/cover no-repeat;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)); /* ✨ softer, lighter */
+
+  /* JS sets this variable to url(...) */
+  --kc-ant-bg: none;
+
+  background-image: var(--kc-ant-bg);
+  background-repeat: repeat;
+  background-size: 75%;
+  background-position: center;
+
+  /* fallback if image fails */
+  background-color: rgba(0,0,0,0.08);
+
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
 }
+
 
 .kc-ant-zone::before {
   content: "";

@@ -153,7 +153,12 @@ npx cap copy ios
 
 
 
-
+I guess we are in dev repo now...
+```bash
+cd /Users/jeremy/dev/SnowCone-MathFest
+npm run build:native
+npx cap open ios
+```
 
 
 
