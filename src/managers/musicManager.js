@@ -3,6 +3,8 @@ import { Howl, Howler } from 'howler';
 import { isIOSNative } from '../utils/platform.js'; // 🔍 single source of truth
 
 
+let _isBackgrounded = false;
+
 
 function bumpSeq() {
   _actionSeq += 1;
@@ -33,16 +35,25 @@ function preferWebAudioOnIOS() {
 }
 
 function getDefaultHtml5() {
-  // html5:true  => <audio> element
-  // html5:false => WebAudio
-  //
-  // iOS Safari/WKWebView + WebAudio is the #1 source of "audio died but playing=true".
-  // Using HTML5 audio for MUSIC is more resilient across interruptions/background/foreground.
+  // html5:true  => <audio> element (more resilient for background, BUT acts like media on iOS)
+  // html5:false => WebAudio (best chance to respect Silent Switch when native is .ambient)
+
   const isiOS = preferWebAudioOnIOS();
 
-  if (isiOS) return true;     // ✅ FORCE html5 on iOS
-  return true;                // desktop defaults fine as html5 too
+  // ✅ Option A: On iOS we ALWAYS force WebAudio.
+  if (isiOS) return false;
+
+  // Desktop: ok either way; keep your preference
+  return true;
 }
+function forceHtml5ForOptionA(requestedHtml5) {
+  // If you are committed to Option A, iOS must never use html5 audio.
+  const isiOS = preferWebAudioOnIOS();
+  if (isiOS) return false;
+  return !!requestedHtml5;
+}
+
+
 
 // ─────────────────────────────────────────────────────────────
 // Global music loudness (master ceiling for all modes)
@@ -206,8 +217,8 @@ function handleMusicBackground() {
 }
 
 function handleMusicForeground() {
-  if (!_isBackgrounded) return;    // ✅ guard
-  _isBackgrounded = false;
+  // ✅ if we never backgrounded, do nothing
+  if (!_isBackgrounded && !_bgSnapshot) return;
 
   // Kick the AudioContext back awake (harmless even if html5:true)
   resumeHowlerCtxSafe();
@@ -218,11 +229,10 @@ function handleMusicForeground() {
   if (!snap?.id) return;
   if (!snap.wasPlaying) return; // respect user pause
 
-  // ✅ iOS fix: skip soft resume — it often "plays" silently.
-  // Always rebuild the Howl and restore seek.
+  // Try immediate rebuild resume
   hardResumeFromSnapshot(snap);
 
-  // If iOS blocks playback until a gesture, keep a one-shot fallback.
+  // ✅ If iOS blocks it until gesture, we’ll finish on first tap/click
   rememberForGestureResume(snap);
 }
 
@@ -244,6 +254,10 @@ function wireMusicLifecycleGuardsOnce() {
     if (_isBg) return;
     _isBg = true;
     _lastFlipAt = now;
+
+    // ✅ keep module-wide truth in sync
+    _isBackgrounded = true;
+
     try { handleMusicBackground(); } catch {}
   }
 
@@ -253,8 +267,13 @@ function wireMusicLifecycleGuardsOnce() {
     if (!_isBg) return;
     _isBg = false;
     _lastFlipAt = now;
+
+    // ✅ keep module-wide truth in sync
+    _isBackgrounded = false;
+
     try { handleMusicForeground(); } catch {}
   }
+
 
   // Web lifecycle signals (browser + WKWebView)
   document.addEventListener('visibilitychange', () => {
@@ -337,25 +356,110 @@ function snapshotPlaybackState() {
   };
 }
 
+function tryImmediateGestureResume(snap) {
+  if (!snap?.id) return false;
+
+  // don't fight mute
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+    if (H?._muted) return true;
+  } catch {}
+
+  // 1) resume audio context
+  try { resumeHowlerCtxSafe(); } catch {}
+
+  // 2) if currentTrack exists and matches, try to just play it NOW
+  try {
+    if (currentTrack && currentTrackMeta?.id === snap.id) {
+      // restore seek first (iOS is picky)
+      if (typeof snap.seek === 'number' && isFinite(snap.seek) && snap.seek > 0) {
+        try { currentTrack.seek(snap.seek); } catch {}
+      }
+      try { currentTrack.volume(snap.volume ?? getMusicVolume()); } catch {}
+      try { currentTrack.play(); } catch {}
+      return true;
+    }
+  } catch {}
+
+  // 3) rebuild a new howl and play immediately (no stopTrack, no fades)
+  const meta = resolveTrackMeta(snap.id);
+  if (!meta) return false;
+
+  const enforcedHtml5 = forceHtml5ForOptionA(snap.html5);
+  const howl = makeHowl(meta, { html5: enforcedHtml5, volume: snap.volume ?? getMusicVolume() });
+
+  // adopt it as current immediately
+  currentTrack = howl;
+  currentTrackMeta = meta;
+  bindHowlHandlers(howl, meta, { onEnd: snap.onEnd || null });
+
+  try { howl.stop(); } catch {}
+  try { howl.seek(0); } catch {}
+  try { howl.volume(snap.volume ?? getMusicVolume()); } catch {}
+
+  // IMPORTANT: play FIRST inside gesture
+  try { howl.play(); } catch {}
+
+  // then seek (some iOS builds only honor seek after play)
+  if (typeof snap.seek === 'number' && isFinite(snap.seek) && snap.seek > 0) {
+    try { howl.seek(snap.seek); } catch {}
+  }
+
+  startProgressUpdater();
+  emitMusicState();
+  return true;
+}
+
+
+let _gestureResumeArmed = false;
+
 function rememberForGestureResume(snap) {
   if (!snap?.id) return;
+
+  // If user muted globally, do nothing
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+    if (H?._muted) return;
+  } catch {}
+
   _pendingGestureResume = snap;
 
-  // One-shot “user gesture” unlock fallback (some iOS states require it)
-  const handler = () => {
+  // ✅ Only arm once until it fires
+  if (_gestureResumeArmed) return;
+  _gestureResumeArmed = true;
+
+  const fire = () => {
+    _gestureResumeArmed = false;
+
     const s = _pendingGestureResume;
     _pendingGestureResume = null;
-    try { resumeHowlerCtxSafe(); } catch {}
-    if (s?.wasPlaying) {
-      // Try again (hard rebuild)
-      hardResumeFromSnapshot(s);
+
+    if (!s?.id || !s.wasPlaying) return;
+
+    // ✅ do it right now, inside the gesture stack
+    const ok = tryImmediateGestureResume(s);
+
+    // if it failed, last-ditch: your older rebuild path
+    if (!ok) {
+      try { resumeHowlerCtxSafe(); } catch {}
+      try { hardResumeFromSnapshot(s); } catch {}
     }
   };
 
-  // If we already attached once, don’t spam.
-  // We attach fresh because `{ once:true }` auto-cleans.
-  try { document.body.addEventListener('touchstart', handler, { once: true, passive: true }); } catch {}
-  try { document.body.addEventListener('click', handler, { once: true }); } catch {}
+
+  // ✅ Capture phase catches the gesture early, before UI swallows it
+  const optsCapture = { capture: true, passive: false };
+
+  // pointerdown is the most reliable modern signal
+  try { window.addEventListener('pointerdown', fire, { ...optsCapture, once: true }); } catch {}
+  // fallback for older iOS
+  try { window.addEventListener('touchstart', fire, { ...optsCapture, once: true }); } catch {}
+  try { window.addEventListener('mousedown', fire, { capture: true, once: true }); } catch {}
+  // keyboard fallback (simulators / desktop)
+  try { window.addEventListener('keydown', fire, { capture: true, once: true }); } catch {}
+
+  try { document.addEventListener('pointerdown', fire, { ...optsCapture, once: true }); } catch {}
+  try { document.addEventListener('touchstart', fire, { ...optsCapture, once: true }); } catch {}
 }
 
 function hardResumeFromSnapshot(snap) {
@@ -367,7 +471,14 @@ function hardResumeFromSnapshot(snap) {
     if (H?._muted) return;
   } catch {}
 
-  // This is the key: rebuild + continue from seek
+  // ✅ Kill any zombied instance before rebuilding
+  try {
+    if (currentTrack) {
+      try { currentTrack.off?.(); } catch {}
+      try { currentTrack.stop?.(); } catch {}
+    }
+  } catch {}
+
   playTrack(snap.id, {
     fadeMs: 0,
     crossfadeMs: 0,
@@ -378,6 +489,7 @@ function hardResumeFromSnapshot(snap) {
     onEnd: snap.onEnd,
   });
 }
+
 
 async function wireCapacitorAppLifecycle(onBg, onFg) {
   // Only in native shells; safe to fail in web/PWA
@@ -409,27 +521,29 @@ export function preloadTracks(ids = [], opts = {}) {
     volume = getMusicVolume(),
   } = opts;
 
+  const enforcedHtml5 = forceHtml5ForOptionA(html5);
+
   const tracks = getTracks();
   ids.filter(Boolean).forEach((id) => {
     const meta = tracks.find(t => t.id === id);
     if (!meta) return;
 
     const cached = howlCache.get(id);
-    if (cached?.howl && cached.html5 === html5) return;
+    if (cached?.howl && cached.html5 === enforcedHtml5) return;
 
     try {
       const howl = new Howl({
         src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${meta.file}`],
         loop: false,
         volume,
-        html5,
+        html5: enforcedHtml5,
         preload: true,
         onloaderror: (_, err) => {
           console.warn('⚠️ Preload load error:', id, err);
         },
       });
 
-      howlCache.set(id, { howl, meta, html5 });
+      howlCache.set(id, { howl, meta, html5: enforcedHtml5 });
     } catch (e) {
       console.warn('⚠️ preloadTracks failed for', id, e);
     }
@@ -468,18 +582,21 @@ function makeHowl(meta, opts = {}) {
     volume = getMusicVolume(),
   } = opts;
 
+  // ✅ ENFORCE Option A at the source (critical)
+  const enforcedHtml5 = forceHtml5ForOptionA(html5);
+
   return new Howl({
     src: [`${import.meta.env.BASE_URL}assets/audio/tracks/${meta.file}`],
     loop: looping,
     volume,
-    html5,
+    html5: enforcedHtml5,
     preload: true,
 
     onloaderror: (_, err) => {
-      console.warn('⚠️ LOAD ERROR:', meta.id, meta.file, 'html5=', html5, err);
+      console.warn('⚠️ LOAD ERROR:', meta.id, meta.file, 'html5=', enforcedHtml5, err);
     },
     onplayerror: (_, err) => {
-      console.warn('⚠️ PLAY ERROR:', meta.id, meta.file, 'html5=', html5, err);
+      console.warn('⚠️ PLAY ERROR:', meta.id, meta.file, 'html5=', enforcedHtml5, err);
     },
   });
 }
@@ -710,7 +827,8 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
   wireMusicLifecycleGuardsOnce();
 
   // Remember how we played last time (so resume rebuild matches)
-  _lastPlayOpts = { html5, useCache, volume };
+  const enforcedHtml5 = forceHtml5ForOptionA(html5);
+  _lastPlayOpts = { html5: enforcedHtml5, useCache, volume };
 
   const seq = bumpSeq();     // ✅ ONE bump for the whole operation
   clearStopTimer();
@@ -721,7 +839,7 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
     return;
   }
 
-  const nextHowl = getHowlFor(meta, { useCache, html5, volume });
+  const nextHowl = getHowlFor(meta, { useCache, html5: enforcedHtml5, volume });
 
   if (crossfadeMs > 0) {
     crossfadeTo(nextHowl, meta, { crossfadeMs, onEnd, volume, startAt }); // 👈 pass through
@@ -944,6 +1062,7 @@ export function getTrackList() {
 // 🌌 Init
 // ─────────────────────────────────────────────────────────────
 export function initMusicPlayer() {
+  wireMusicLifecycleGuardsOnce(); // ✅ arm lifecycle + gesture safety early
   updateTrackLabel('(none)');
   emitMusicState();
 }
@@ -1047,3 +1166,4 @@ function emitMusicState() {
     try { fn(state); } catch {}
   });
 }
+
