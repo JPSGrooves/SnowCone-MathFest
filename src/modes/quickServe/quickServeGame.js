@@ -6,7 +6,6 @@ import * as phil from './quickServePhil.js';
 import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { showMenu } from '../../managers/sceneManager.js';
 import { playCorrect, playIncorrect } from './soundFX.js';
-import { stopQS, playQSRandomTrack } from './quickServeMusic.js';
 import { renderGameUI, showQuickServeResults } from './quickServe.js';
 import { generateProblem } from '../../logic/mathBrain.js';
 import { launchConfetti } from '../../utils/confetti.js';

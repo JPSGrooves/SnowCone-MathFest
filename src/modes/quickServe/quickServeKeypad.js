@@ -8,9 +8,7 @@ import {
 } from './quickServeGame.js';
 
 import { stopGameLogic, startGameLogic } from './quickServeGame.js';
-import { stopTrack, playTrack } from '../../managers/musicManager.js';
 import { returnToMenu } from './quickServe.js'; // 🌟 Full QS exit
-import { stopQS, playQSRandomTrack } from './quickServeMusic.js'; // ✅ up top
 import { setMathMode } from './quickServeGame.js';
 import { setCurrentAnswer } from './quickServeGame.js'; // 💥 you'll add this below
 import { toggleMute } from '../../managers/musicManager.js';
@@ -96,14 +94,14 @@ export function setupKeypad() {
   });
 
   // 🧼 Control Buttons
-  safeBind('reset', async () => {
-    console.log('🔁 Resetting QuickServe and restarting track');
+  safeBind('reset', () => {
+    console.log('🔁 Resetting QuickServe game only');
 
-    await stopQS();         // 🌟 wait for music to fully stop
+    // Music is owned by quickServe.js + musicManager.js.
+    // Reset should restart the shift, not spawn another DJ booth.
     stopGameLogic();
-    setMathMode('addSub');  // 🧠 Reset to default
+    setMathMode('addSub');
     startGameLogic();
-    playQSRandomTrack();    // 🎧 spin fresh vibes
   });
 
   safeBind('neg', toggleNegative);

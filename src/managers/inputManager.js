@@ -13,7 +13,6 @@ import { endQuickServeGame } from '../modes/quickServe/quickServeGame.js';
 import { toggleMute } from '../managers/musicManager.js';
 import { setMathMode, resetCurrentAnswer } from '../modes/quickServe/quickServeGame.js';
 import { highlightModeButton } from '../modes/quickServe/quickServeKeypad.js';
-import { playQSRandomTrack, stopQS } from '../modes/quickServe/quickServeMusic.js';
 import { stopGameLogic, startGameLogic } from '../modes/quickServe/quickServeGame.js';
 import { appState } from '../data/appState.js';
 import { endInfinityGame, newProblem, flashModeName } from '../modes/infinityLake/infinityMode.js';
@@ -121,18 +120,19 @@ function handleQuickServeKeys(e, key, shift) {
     }
     return;
   }
-  if (key === 'r' && shift) {
-    e.preventDefault();
-    document.getElementById('reset')?.click(); // simulate button
-    stopQS();
-    stopGameLogic();
-    setMathMode('addSub');         // Reset math mode to base
-    resetCurrentAnswer();          // Clear the input
-    highlightModeButton('addSub'); // 👈 make sure this updates UI glow
-    startGameLogic();              // Restart engine
-    playQSRandomTrack();           // Spin up DJ booth
-    return;
-  }
+    if (key === 'r' && shift) {
+      e.preventDefault();
+
+      // Restart the QuickServe shift only.
+      // Do NOT touch music here — quickServe.js owns the QS music scope.
+      stopGameLogic();
+      setMathMode('addSub');
+      resetCurrentAnswer();
+      highlightModeButton('addSub');
+      startGameLogic();
+
+      return;
+    }
 
 
     if (key === 'm') {
