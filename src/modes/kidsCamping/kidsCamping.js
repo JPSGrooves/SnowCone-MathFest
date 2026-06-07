@@ -239,7 +239,7 @@ function renderIntroScreen() {
         <div class="kc-intro">
           <div class="kc-intro-stack">
             <div class="kc-speech">
-              Heyo! We're the Dino Dividers! Let's chill out and play some camping games! Be sure to watch out for ants and mosquitoes!
+              Heyo! We're the Dino Dividers! Let's chill out and play: Ant Attack, Tent Line, Parking Panic, and Mosquito Mash!<br/>
             </div>
             <div class="director-wrapper">
               <img id="directorSpriteIntro" class="director-img"

@@ -1,49 +1,39 @@
 import UIKit
 import Capacitor
-import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    private func configureAudioSessionToRespectSilentSwitch() {
-        let session = AVAudioSession.sharedInstance()
-        do {
-            // ✅ .ambient respects the iPhone Silent switch
-            // ✅ mixWithOthers lets background audio (like Spotify) keep playing
-            try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
-            try session.setActive(true)
-            print("🔇 AVAudioSession set to .ambient (respects Silent switch)")
-        } catch {
-            print("⚠️ Failed to set AVAudioSession category: \(error)")
-        }
-    }
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
 
-    func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // ✅ Single source of truth
+        SCMFAudioSession.shared.apply()
 
-        configureAudioSessionToRespectSilentSwitch()
         return true
     }
 
-    func applicationWillResignActive(_ application: UIApplication) {}
-    func applicationDidEnterBackground(_ application: UIApplication) {}
-    func applicationWillEnterForeground(_ application: UIApplication) {}
-    func applicationDidBecomeActive(_ application: UIApplication) {}
-    func applicationWillTerminate(_ application: UIApplication) {}
-
-    func application(_ app: UIApplication,
-                     open url: URL,
-                     options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+    func application(
+        _ app: UIApplication,
+        open url: URL,
+        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+    ) -> Bool {
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
 
-    func application(_ application: UIApplication,
-                     continue userActivity: NSUserActivity,
-                     restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        return ApplicationDelegateProxy.shared.application(application,
-                                                          continue: userActivity,
-                                                          restorationHandler: restorationHandler)
+    func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
+        return ApplicationDelegateProxy.shared.application(
+            application,
+            continue: userActivity,
+            restorationHandler: restorationHandler
+        )
     }
 }

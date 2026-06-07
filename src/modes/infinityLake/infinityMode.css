@@ -1073,10 +1073,17 @@
   overflow-wrap: anywhere;
   line-height: 1.1;
 }
-/* 🍏 iOS-only: Infinity Lake intro pushdown */
+/* 🍏 iOS-only: Infinity Lake intro pushdown (SAFE + stable) */
 :root[data-platform="ios"] body.il-active .il-intro {
-  padding-top: 7vh; /* mirror QS bevel space */
+  /* keep your existing padding vibe, but add notch-safe push */
+  padding-top: calc(env(safe-area-inset-top) + 2.2rem);
+
+  /* keep side/bottom padding consistent with your base rule */
+  padding-left: clamp(0.5rem, 2vh, 1rem);
+  padding-right: clamp(0.5rem, 2vh, 1rem);
+  padding-bottom: clamp(0.5rem, 2vh, 1rem);
 }
+
 
 /* 🍏 iOS-only: Infinity Lake main game pushdown */
 :root[data-platform="ios"] body.il-active .il-grid {
@@ -1180,4 +1187,14 @@ body.il-active .il-grid{
 body.il-active .il-stage .il-triplet-img{
   max-width: clamp(240px, 62vw, 560px);
   max-height: 100%;
+}
+/* 🍏 iOS: simple hard pushdown (NO safe-area inset) */
+:root[data-platform="ios"] body.il-active .il-grid{
+  /* was: padding: 1rem 1rem max(...) 1rem !important; */
+  padding: 3.2rem 1rem 0.55rem 1rem !important; /* 👈 adjust 3.2rem as needed */
+}
+
+/* If you also want the INTRO grid pushed the same way */
+:root[data-platform="ios"] body.il-active .il-intro{
+  padding-top: 3.2rem !important; /* 👈 same nudge */
 }

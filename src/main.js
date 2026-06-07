@@ -12,6 +12,11 @@ import { startAchievementsWatcher } from './achievementsWatcher.js';
 
 import { wireMusicVisibilityGuard } from './managers/musicVisibility.js';
 import { renderFestivalWelcomeOnStartup } from './ui/festivalWelcomeView.js'; 
+import { installJsCrashCatcher } from './utils/jsCrashCatcher.js';
+
+
+installJsCrashCatcher();
+
 
 // 🍧 Anti–Double-Tap Zoom Shield (esp. iOS Safari)
 let lastTouchTime = 0;

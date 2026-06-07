@@ -40,7 +40,7 @@ export function getIntroMessage(appStateLike) {
     `Game Completion: <strong>${completionPct}</strong>`,
     `Total XP: <strong>${pad(xp, 4)}</strong>`,
     `Badge Count: <strong>${earnedBadges}/${totalBadges}</strong>`,
-    `<em style="color:#8ef;">Step on into MathTips Village and find your MathVibes with Grampy P!</em>`
+    `<em style="color:#8ef;">Talk to Grampy P and discover lessons, recipes, lore and more!</em>`
   ];
 
   return `

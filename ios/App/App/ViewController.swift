@@ -17,8 +17,9 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
     private var gcAuthInProgress = false
     private var gcQueuedActions: [() -> Void] = []
 
-    // MARK: - Constants
-    private let handlerName = "gameCenterBridge"
+    // MARK: - Handler Names (WKScriptMessageHandler)
+    private let gameCenterHandlerName = "gameCenterBridge"
+    private let audioHandlerName = "scmfAudioBridge" // optional: JS can change audio policy
 
     // MARK: - Lifecycle observers
     private var lifecycleObserversWired = false
@@ -29,6 +30,15 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
     private var scmfPendingEvents: [String] = []
     private var lastBgFgState: Bool? = nil   // true = foreground, false = background (dedupe)
 
+    // MARK: - Script install guards
+    private var scmfScriptsInstalled = false
+    private var scmfGameCenterHandlerRegistered = false
+    private var scmfAudioHandlerRegistered = false
+
+    // MARK: - Debug toggles
+    private let debugJSBridge = true
+    private let debugNativeHapticTestOnLaunch = false  // set true for one-shot native buzz test
+
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,10 +48,8 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
         // ✅ Make sure we can detect when the web app is truly ready.
         self.webView?.navigationDelegate = self
 
-        // ✅ Silent switch behavior:
-        // - .ambient / .soloAmbient => RESPECTS silent switch
-        // - .playback               => IGNORES silent switch
-        configureAudioSession(category: .ambient)
+        // ✅ Apply SCMF audio policy (single source of truth)
+        SCMFAudioSession.shared.apply()
 
         // ✅ Native lifecycle -> JS event bridge
         wireNativeLifecycleBridgeOnce()
@@ -49,16 +57,38 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
         // ✅ Audio interruption/route-change bridge
         wireAudioSessionNotificationsOnce()
 
-        // ✅ Inject native flag EARLY
-        installNativeFlagUserScript()
+        // ✅ Inject native flag EARLY (DO NOT remove Capacitor scripts)
+        installScmfUserScriptsOnce()
 
-        // ✅ Register JS -> native bridge (Game Center)
-        registerGameCenterBridgeHandler()
+        // ✅ Register JS -> native bridges
+        registerGameCenterBridgeHandlerOnce()
+        registerAudioBridgeHandlerOnce()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        // Optional: native-only haptic proof (bypasses Capacitor/JS entirely)
+        if debugNativeHapticTestOnLaunch {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                let gen = UIImpactFeedbackGenerator(style: .heavy)
+                gen.prepare()
+                gen.impactOccurred()
+                print("✅ [SCMF] Native haptic test fired (heavy)")
+            }
+        }
+
+        // Try flushing queued events after the view is visible
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+            self?.scmfFlushPendingEvents()
+        }
     }
 
     deinit {
         if let webView = self.webView {
-            webView.configuration.userContentController.removeScriptMessageHandler(forName: handlerName)
+            let uc = webView.configuration.userContentController
+            uc.removeScriptMessageHandler(forName: gameCenterHandlerName)
+            uc.removeScriptMessageHandler(forName: audioHandlerName)
         }
         NotificationCenter.default.removeObserver(self)
     }
@@ -66,34 +96,8 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
     // MARK: - WKNavigationDelegate (WebView is ready)
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         scmfWebReady = true
-
-        // Belt + suspenders: set the flag again after load
-        webView.evaluateJavaScript("window.SC_IOS_NATIVE = true;") { _, _ in }
-
         print("⚡️  WebView loaded (didFinish) ✅")
         scmfFlushPendingEvents()
-    }
-
-    // MARK: - Audio Session
-    private func configureAudioSession(category: AVAudioSession.Category) {
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(category, options: [.mixWithOthers])
-            try session.setActive(true)
-            print("🔇 AVAudioSession set to \(category.rawValue)")
-        } catch {
-            print("⚠️ [SCMF] AVAudioSession setup failed:", error.localizedDescription)
-        }
-    }
-
-    private func reactivateAudioSession() {
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setActive(true)
-            print("🔊 [SCMF] AVAudioSession re-activated ✅")
-        } catch {
-            print("⚠️ [SCMF] AVAudioSession re-activate failed:", error.localizedDescription)
-        }
     }
 
     // MARK: - Native Lifecycle -> queued JS Events
@@ -132,32 +136,50 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
         print("✅ [SCMF] Wired native lifecycle bridge (bg/fg) → JS events")
     }
 
+    // MARK: - Lifecycle (replace the four @objc handlers)
+
+    private var scmfDidDeactivateForBg = false
+
     @objc private func onWillResignActive() {
-        // about to background / app switch
+        // ⚠️ DO NOT deactivate here.
+        // willResignActive fires for modals/sheets/control center and causes "audio zombie"
         emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
     }
 
     @objc private func onDidEnterBackground() {
-        // fully backgrounded
+        // ✅ Only deactivate once, and only when actually backgrounded.
+        if SCMFAudioSession.shared.policy == .respectSilentSwitch && !scmfDidDeactivateForBg {
+            scmfDidDeactivateForBg = true
+            SCMFAudioSession.shared.deactivate()
+        }
         emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
     }
 
     @objc private func onWillEnterForeground() {
-        // coming back
-        reactivateAudioSession()
+        // ✅ Foreground pre-wake (ok to call apply)
+        SCMFAudioSession.shared.reactivateIfNeeded()
         emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
     }
 
     @objc private func onDidBecomeActive() {
-        reactivateAudioSession()
+        // ✅ Clear background-deactivate latch
+        scmfDidDeactivateForBg = false
+
+        // ✅ Re-apply policy
+        SCMFAudioSession.shared.reactivateIfNeeded()
         emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) { [weak self] in
+            self?.scmfFlushPendingEvents()
+        }
     }
+
+    
 
     private func emitBgFg(isForeground: Bool, eventName: String) {
         // ✅ Dedupe spam (iOS can fire multiple notifications)
         if lastBgFgState == isForeground { return }
         lastBgFgState = isForeground
-
         scmfEmitEventToJS(eventName)
     }
 
@@ -193,11 +215,14 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
         switch type {
         case .began:
             print("📵 [SCMF] Audio interruption began")
-            emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
+            // ✅ Don't fake a background event.
+            // Let JS pause naturally if it receives a playerror.
+            // (Foreground event will come on .ended)
+
 
         case .ended:
             print("📳 [SCMF] Audio interruption ended")
-            reactivateAudioSession()
+            SCMFAudioSession.shared.reactivateIfNeeded()
             emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
 
         @unknown default:
@@ -207,32 +232,46 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
 
     @objc private func handleAudioRouteChange(_ notification: Notification) {
         print("🎧 [SCMF] Audio route changed")
-        reactivateAudioSession()
+        SCMFAudioSession.shared.reactivateIfNeeded()
         emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
     }
+    
+    
+    
+    // MARK: - SCMF User Scripts (EARLY) — DO NOT remove all scripts
+    private func installScmfUserScriptsOnce() {
+        if scmfScriptsInstalled { return }
+        scmfScriptsInstalled = true
 
-    // MARK: - Native Flag Injection (EARLY)
-    private func installNativeFlagUserScript() {
         guard let webView = self.webView else {
-            print("⚠️ [SCMF] webView is nil – cannot install native flag user script yet.")
+            print("⚠️ [SCMF] webView is nil – cannot install SCMF scripts yet.")
             return
         }
 
         let uc = webView.configuration.userContentController
 
-        // Only remove our scripts if you later add more; for now, safe to clear
-        uc.removeAllUserScripts()
+        // 🚫 Do NOT call uc.removeAllUserScripts() here.
+        // That can wipe Capacitor’s internal scripts and break plugin bridging (including Haptics).
 
         let js = """
         (function(){
-          try { window.SC_IOS_NATIVE = true; } catch(e) {}
+          try {
+            window.SC_IOS_NATIVE = true;
+
+            // Stable helper for native->JS events
+            if (!window.__SCMF_emitNativeEvent) {
+              window.__SCMF_emitNativeEvent = function(name) {
+                try { window.dispatchEvent(new Event(String(name))); } catch(e) {}
+              };
+            }
+          } catch(e) {}
         })();
         """
 
         let script = WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: true)
         uc.addUserScript(script)
 
-        print("✅ [SCMF] Installed WKUserScript: SC_IOS_NATIVE=true (document start)")
+        print("✅ [SCMF] Installed WKUserScript: SC_IOS_NATIVE + __SCMF_emitNativeEvent (document start)")
     }
 
     // MARK: - JS Event Bridge (queue until WebView is ready + app active)
@@ -240,35 +279,62 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            // If we're not active, queue it (WKWebView eval can fail in background)
             if UIApplication.shared.applicationState != .active {
+                if self.debugJSBridge { print("📦 [SCMF][JS] queued (inactive):", eventName) }
                 self.scmfPendingEvents.append(eventName)
                 return
             }
 
             guard let webView = self.webView else {
+                if self.debugJSBridge { print("📦 [SCMF][JS] queued (no webView):", eventName) }
                 self.scmfPendingEvents.append(eventName)
                 return
             }
 
-            // If web isn't ready yet, queue it
             if !self.scmfWebReady || webView.isLoading || webView.url == nil || webView.window == nil {
+                if self.debugJSBridge { print("📦 [SCMF][JS] queued (not ready):", eventName) }
                 self.scmfPendingEvents.append(eventName)
                 return
             }
 
-            let js = """
-            (function(){
-              try { window.dispatchEvent(new Event('\(eventName)')); } catch(e) {}
-            })();
-            """
-
-            webView.evaluateJavaScript(js) { [weak self] _, error in
+            self.scmfDispatchEvent(webView: webView, eventName: eventName) { [weak self] ok in
                 guard let self = self else { return }
-                if error != nil {
-                    // If eval fails, queue it and try later (next didFinish/foreground)
+                if !ok {
+                    if self.debugJSBridge { print("📦 [SCMF][JS] eval failed → re-queue:", eventName) }
                     self.scmfPendingEvents.append(eventName)
                 }
+            }
+        }
+    }
+
+    private func scmfDispatchEvent(webView: WKWebView, eventName: String, completion: @escaping (Bool) -> Void) {
+        if #available(iOS 14.0, *) {
+            let js = "window.__SCMF_emitNativeEvent(eventName);"
+            let args: [String: Any] = ["eventName": eventName]
+
+            webView.callAsyncJavaScript(js, arguments: args, in: nil, in: .page) { result in
+                switch result {
+                case .success:
+                    completion(true)
+                case .failure(let error):
+                    if self.debugJSBridge {
+                        print("⚡️ [SCMF][JS] callAsyncJavaScript error:", error.localizedDescription)
+                    }
+                    completion(false)
+                }
+            }
+            return
+        }
+
+        let fallback = "window.__SCMF_emitNativeEvent('\(eventName)');"
+        webView.evaluateJavaScript(fallback) { _, error in
+            if let error = error {
+                if self.debugJSBridge {
+                    print("⚡️ [SCMF][JS] evaluateJavaScript error:", error.localizedDescription)
+                }
+                completion(false)
+            } else {
+                completion(true)
             }
         }
     }
@@ -286,8 +352,7 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
             self.scmfPendingEvents.removeAll()
 
             for ev in toSend {
-                let js = "window.dispatchEvent(new Event('\(ev)'));"
-                webView.evaluateJavaScript(js, completionHandler: nil)
+                self.scmfDispatchEvent(webView: webView, eventName: ev) { _ in }
             }
 
             print("📬 [SCMF] Flushed \(toSend.count) queued JS events ✅")
@@ -295,7 +360,10 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
     }
 
     // MARK: - Game Center Bridge Registration
-    private func registerGameCenterBridgeHandler() {
+    private func registerGameCenterBridgeHandlerOnce() {
+        if scmfGameCenterHandlerRegistered { return }
+        scmfGameCenterHandlerRegistered = true
+
         DispatchQueue.main.async { [weak self] in
             guard let self = self, let webView = self.webView else {
                 print("⚠️ [SCMF][GC] webView is nil – cannot register handler yet.")
@@ -303,34 +371,101 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
             }
 
             let uc = webView.configuration.userContentController
-            uc.removeScriptMessageHandler(forName: self.handlerName)
-            uc.add(self, name: self.handlerName)
+            uc.removeScriptMessageHandler(forName: self.gameCenterHandlerName)
+            uc.add(self, name: self.gameCenterHandlerName)
 
-            print("✅ [SCMF][GC] Registered WKScriptMessageHandler:", self.handlerName)
+            print("✅ [SCMF][GC] Registered WKScriptMessageHandler:", self.gameCenterHandlerName)
+        }
+    }
+
+    // MARK: - Audio Bridge Registration (optional)
+    private func registerAudioBridgeHandlerOnce() {
+        if scmfAudioHandlerRegistered { return }
+        scmfAudioHandlerRegistered = true
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let webView = self.webView else {
+                print("⚠️ [SCMF][Audio] webView is nil – cannot register handler yet.")
+                return
+            }
+
+            let uc = webView.configuration.userContentController
+            uc.removeScriptMessageHandler(forName: self.audioHandlerName)
+            uc.add(self, name: self.audioHandlerName)
+
+            print("✅ [SCMF][Audio] Registered WKScriptMessageHandler:", self.audioHandlerName)
         }
     }
 
     // MARK: - WKScriptMessageHandler
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard message.name == handlerName else { return }
+        if debugJSBridge {
+            print("🧃 [SCMF] didReceive name=\(message.name) body=\(message.body)")
+        }
 
-        if let dict = message.body as? [String: Any] {
-            handleGameCenterPayload(dict)
+        if message.name == gameCenterHandlerName {
+            if let dict = message.body as? [String: Any] {
+                handleGameCenterPayload(dict)
+                return
+            }
+
+            if let str = message.body as? String,
+               let data = str.data(using: .utf8),
+               let obj = try? JSONSerialization.jsonObject(with: data, options: []),
+               let dict = obj as? [String: Any] {
+                handleGameCenterPayload(dict)
+                return
+            }
+
+            print("🍧⚠️ [SCMF][GC] Unhandled message.body type:", type(of: message.body))
             return
         }
 
-        if let str = message.body as? String,
-           let data = str.data(using: .utf8),
-           let obj = try? JSONSerialization.jsonObject(with: data, options: []),
-           let dict = obj as? [String: Any] {
-            handleGameCenterPayload(dict)
+        if message.name == audioHandlerName {
+            if let dict = message.body as? [String: Any] {
+                handleAudioPayload(dict)
+                return
+            }
+
+            if let str = message.body as? String,
+               let data = str.data(using: .utf8),
+               let obj = try? JSONSerialization.jsonObject(with: data, options: []),
+               let dict = obj as? [String: Any] {
+                handleAudioPayload(dict)
+                return
+            }
+
+            print("🔊⚠️ [SCMF][Audio] Unhandled message.body type:", type(of: message.body))
             return
         }
 
-        print("🍧⚠️ [SCMF][GC] Unhandled message.body type:", type(of: message.body))
+        if debugJSBridge {
+            print("⚠️ [SCMF] Unknown WKScriptMessageHandler:", message.name)
+        }
     }
 
-    // MARK: - Payload Router
+    // MARK: - Audio Payload Router (optional)
+    // MARK: - Audio Payload Router (optional)
+    private func handleAudioPayload(_ payload: [String: Any]) {
+        let type = (payload["type"] as? String) ?? ""
+
+        switch type {
+        case "setPolicy":
+            let raw = (payload["policy"] as? String) ?? ""
+            if let policy = SCMFAudioSession.Policy(rawValue: raw) {
+                SCMFAudioSession.shared.setPolicy(policy)
+                print("🔊 [SCMF][Audio] policy set via JS:", raw)
+            } else {
+                print("🔊⚠️ [SCMF][Audio] unknown policy:", raw)
+            }
+
+        default:
+            print("🔊⚠️ [SCMF][Audio] unknown payload type:", type, "payload:", payload)
+        }
+    }
+
+
+    // MARK: - Game Center Payload Router
     private func handleGameCenterPayload(_ payload: [String: Any]) {
         let type = (payload["type"] as? String) ?? ""
         print("🍧📨 [SCMF][GC] payload:", payload)

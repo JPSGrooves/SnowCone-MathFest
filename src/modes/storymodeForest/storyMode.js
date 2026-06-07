@@ -755,7 +755,7 @@ function renderIntroScreen() {
           <div class="sm-intro-stack">
             <div class="sm-speech">
               My name’s <span class="glitch-name" data-text="Jeh̶n̶k̶">Jeh̶n̶k̶</span> — curator of SnowCone MathFest.
-              This place tells the story of the Snowcone MathFest!
+              This is the story of the SnowCone MathFest!
               Pull up a chair. I’ll tell you how it all began…
             </div>
 

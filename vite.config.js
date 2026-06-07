@@ -5,9 +5,9 @@ export default defineConfig(({ mode }) => {
   const isIosBuild = mode === 'ios';
 
   return {
-    // 📦 Web build → GitHub Pages, iOS build → Capacitor bundle
-    // ⬇️ this is the important part
-    base: isIosBuild ? './' : '/SnowCone-MathFest/',
+    // ✅ iOS/Capacitor wants root paths (capacitor://localhost/)
+    // ✅ Web/GH Pages wants repo subpath
+    base: isIosBuild ? '/' : '/SnowCone-MathFest/',
 
     server: {
       port: 5173,

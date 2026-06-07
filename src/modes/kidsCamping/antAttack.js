@@ -170,8 +170,13 @@ export function initAntAttackGame(container, updatePopUICallbackParam) {
   const zone = container.querySelector('.kc-ant-zone');
   const picnic = `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/picnicBlanket.png`;
   const img = new Image();
-  img.onload  = () => { zone.style.backgroundImage = `url(${picnic})`; zone.style.backgroundRepeat = 'repeat'; zone.style.backgroundSize = '75%'; zone.style.backgroundPosition = 'center'; };
-  img.onerror = () => { zone.style.backgroundColor  = '#f0e0d0'; };
+  img.onload = () => {
+    zone.style.setProperty('--kc-ant-bg', `url(${picnic})`);
+  };
+  img.onerror = () => {
+    zone.style.setProperty('--kc-ant-bg', 'none');
+    zone.style.backgroundColor = '#f0e0d0';
+  };
   img.src = picnic;
 
   // Button handler (pointerdown for mobile snappiness)
