@@ -28,8 +28,8 @@ function blockUnderlyingTapsFor(ms = 350) {
 function installCosmicTapThroughShield() {
   const killer = (e) => {
     if (Date.now() < COSMIC_BLOCK_UNTIL) {
-      e.preventDefault();
-      e.stopPropagation();
+      e?.preventDefault?.();
+      e?.stopPropagation?.();
       e.stopImmediatePropagation();
       return false;
     }
@@ -103,8 +103,8 @@ function wireOverlayClose() {
     if (hsOverlay && !hsOverlay.classList.contains('hidden')) return;
 
     // Stop THIS event hard
-    e.preventDefault();
-    e.stopPropagation();
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
     e.stopImmediatePropagation();
 
     closeModal();
@@ -119,8 +119,8 @@ function wireOverlayClose() {
     (e) => {
       if (!document.getElementById('cosmicModal')?.classList.contains('hidden')) return;
       if (isIOSNativeShell()) {
-        e.preventDefault();
-        e.stopPropagation();
+        e?.preventDefault?.();
+        e?.stopPropagation?.();
         e.stopImmediatePropagation();
       }
     },
@@ -189,8 +189,8 @@ function setupTabListeners() {
       console.log('⚙️ Options clicked');
 
       // Don't let this click bubble to anything weird behind it
-      e.preventDefault();
-      e.stopPropagation();
+      e?.preventDefault?.();
+      e?.stopPropagation?.();
 
       const modal = document.getElementById('cosmicModal');
 
@@ -242,7 +242,7 @@ autorun(() => {
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
+  e?.preventDefault?.();
   deferredPrompt = e;
 
   const installBtn = document.getElementById('installAppBtn');

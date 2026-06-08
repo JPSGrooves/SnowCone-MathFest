@@ -1,70 +1,46 @@
 // 🎧 soundFX.js — Cosmic SFX Engine 🍧🚛🔥
+// Native iOS SFX route lives in src/managers/sfxManager.js.
+// Browser fallback still works through Howler there.
 
-import { Howl, Howler } from 'howler';
+import {
+  playCorrectSfx,
+  playIncorrectSfx,
+  playMilestoneSfx,
+  playPoints100Sfx,
+} from '../../managers/sfxManager.js';
 
-//////////////////////////////
-// 🔊 SFX Map (Vite-safe paths)
-//////////////////////////////
-const sfxMap = {
-  correct: `${import.meta.env.BASE_URL}assets/audio/SFX/correct.mp3`,
-  incorrect: `${import.meta.env.BASE_URL}assets/audio/SFX/incorrect.mp3`,
-  milestone: `${import.meta.env.BASE_URL}assets/audio/SFX/QuikServepointsmilestone.mp3`,
-  points100: `${import.meta.env.BASE_URL}assets/audio/SFX/QuikServepoints100.mp3`
-};
+let sfxMuted = false;
 
-//////////////////////////////
-// 🚀 Load SFX Objects
-//////////////////////////////
-const SFX_VOLUME = 0.2; // 🔥 Turned way down but still audible
-
-const sfx = {};
-for (const [key, path] of Object.entries(sfxMap)) {
-  sfx[key] = new Howl({
-    src: [path],
-    volume: Howler._muted ? 0 : SFX_VOLUME
-  });
+function canPlay() {
+  return !sfxMuted;
 }
 
-//////////////////////////////
-// 🔥 Generic Play Handler
-//////////////////////////////
-function playSFX(name) {
-  const sound = sfx[name];
-  if (!sound) {
-    console.warn(`⚠️ SFX "${name}" not found.`);
-    return;
-  }
-  sound.play();
-}
-
-//////////////////////////////
-// 🚀 Public SFX Triggers
-//////////////////////////////
 export function playCorrect() {
-  playSFX('correct');
+  if (!canPlay()) return;
+  playCorrectSfx();
 }
 
 export function playIncorrect() {
-  playSFX('incorrect');
+  if (!canPlay()) return;
+  playIncorrectSfx();
 }
 
 export function playMilestone() {
-  playSFX('milestone');
+  if (!canPlay()) return;
+  playMilestoneSfx();
 }
 
 export function playPoints100() {
-  playSFX('points100');
+  if (!canPlay()) return;
+  playPoints100Sfx();
 }
 
-//////////////////////////////
-// 🔇 Global Mute Control
-//////////////////////////////
 export function toggleSFXMute() {
-  const isMuted = Howler._muted;
-  Howler.mute(!isMuted);
-  return !isMuted;
+  sfxMuted = !sfxMuted;
+  console.log(`🔇 SFX ${sfxMuted ? 'Muted' : 'Unmuted'}`);
+  return sfxMuted;
 }
 
 export function isSFXMuted() {
-  return Howler._muted;
+  return sfxMuted;
 }

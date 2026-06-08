@@ -82,8 +82,8 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
   const playBtn = card.querySelector('.startup-play-btn');
   if (playBtn) {
     playBtn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
+      ev?.preventDefault?.();
+      ev?.stopPropagation?.();
       hideStartupScreen(onPlay);
     });
   }

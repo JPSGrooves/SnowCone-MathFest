@@ -9,8 +9,8 @@ export function enableIosLoupeKiller(scope = document.getElementById('game-conta
   const block = (e) => {
     // Allow explicit opt-in areas
     if (e.target.closest('.allow-select, input, textarea, [data-allow-select]')) return;
-    e.preventDefault();
-    e.stopPropagation();
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
   };
 
   // 1) Kill selection & context

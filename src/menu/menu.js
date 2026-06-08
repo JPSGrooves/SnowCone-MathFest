@@ -73,8 +73,8 @@ function installMushroomPopper(menuWrapper) {
   btn.setAttribute('aria-label', 'Secret SnowCone XP');
 
   const handleTap = (ev) => {
-    ev.stopPropagation();
-    ev.preventDefault();
+    ev?.stopPropagation?.();
+    ev?.preventDefault?.();
 
     // 📳 Soft, spam-safe tap haptic
     try {
@@ -298,8 +298,8 @@ function installHighScoreHitbox(menuWrapper) {
   // ✅ Use CLICK instead of pointerdown so the target element
   // is locked before the dimmer/overlay appear.
   const handleClick = (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
+    ev?.preventDefault?.();
+    ev?.stopPropagation?.();
     openHighScoreOverlay();
   };
 
@@ -307,7 +307,7 @@ function installHighScoreHitbox(menuWrapper) {
 
   // ✖ explicit close button
   closeBtn?.addEventListener('click', (ev) => {
-    ev.preventDefault();
+    ev?.preventDefault?.();
     closeHighScoreOverlay();
   });
 

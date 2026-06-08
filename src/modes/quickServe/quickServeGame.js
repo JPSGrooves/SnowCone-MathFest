@@ -5,7 +5,10 @@ import * as gridFX from './quickServeGridFX.js';
 import * as phil from './quickServePhil.js';
 import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { showMenu } from '../../managers/sceneManager.js';
-import { playCorrect, playIncorrect } from './soundFX.js';
+import {
+  playCorrectSfx,
+  playIncorrectSfx,
+} from '../../managers/sfxManager.js';
 import { renderGameUI, showQuickServeResults } from './quickServe.js';
 import { generateProblem } from '../../logic/mathBrain.js';
 import { launchConfetti } from '../../utils/confetti.js';
@@ -293,7 +296,7 @@ function handleCorrect() {
   showResultMsg(true, currentXP);
   gridFX.bumpGridGlow();
   phil.bumpJam();
-  playCorrect();
+  playCorrectSfx();
 
   // (optional) keep your global XP-based cone badge
   checkBadgeUnlock();
@@ -336,7 +339,7 @@ function handleIncorrect() {
   showResultMsg(false, 0);
   gridFX.bumpGridGlow('bad');
   phil.triggerGlitch();
-  playIncorrect();
+  playIncorrectSfx();
 
   // 📳 Wrong-answer haptic
   try {

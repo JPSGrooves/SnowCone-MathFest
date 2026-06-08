@@ -82,7 +82,7 @@ export function setupKeypad() {
     const btn = document.getElementById(id);
     if (btn) {
       btn.addEventListener('pointerdown', e => {
-        e.preventDefault();
+        e?.preventDefault?.();
         handler();
       }, { passive: false });
     }
@@ -120,7 +120,7 @@ export function setupKeypad() {
 
 
   safeBind('muteBtn', (e) => {
-    e.stopPropagation(); // 💥 Block event from bubbling up
+    e?.stopPropagation?.(); // 💥 Block event from bubbling up
     toggleMute();
     updateMuteButtonLabel();
   });

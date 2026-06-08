@@ -1,7 +1,18 @@
 // src/managers/musicManager.js
 import { Howl, Howler } from 'howler';
 import { isIOSNative } from '../utils/platform.js'; // 🔍 single source of truth
-
+import {
+  hasNativeAudioBridge,
+  nativePlayTrack,
+  nativePauseTrack,
+  nativeResumeTrack,
+  nativeStopTrack,
+  nativeSetLooping,
+  nativeSetMuted,
+  nativeSeekPercent,
+  nativeRequestMusicState,
+  subscribeNativeAudioState,
+} from './nativeAudioBridge.js';
 
 let _isBackgrounded = false;
 
@@ -62,6 +73,204 @@ const DEFAULT_MUSIC_VOLUME = 0.7;
 
 function getMusicVolume() {
   return DEFAULT_MUSIC_VOLUME;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 🍎 Native iOS audio lane
+// Swift owns real playback on iOS.
+// JS keeps enough state to update buttons/labels.
+// ─────────────────────────────────────────────────────────────
+let nativePlaying = false;
+let nativeMuted = false;
+let nativeSeekBase = 0;
+let nativeSeekStartedAt = 0;
+
+let nativeCurrentTime = 0;
+let nativeDuration = 0;
+let nativeSeekRatio = 0;
+let nativeSuppressedByExternalAudio = false;
+
+let nativeStateWired = false;
+let nativeStatePollTimer = null;
+
+function useNativeAudio() {
+  return hasNativeAudioBridge();
+}
+
+function nowSeconds() {
+  try {
+    return performance.now() / 1000;
+  } catch {
+    return Date.now() / 1000;
+  }
+}
+
+function nativeEstimatedSeek() {
+  if (!nativePlaying) return nativeSeekBase;
+  return nativeSeekBase + Math.max(0, nowSeconds() - nativeSeekStartedAt);
+}
+
+function setNativePlaybackState({ playing, seek = null } = {}) {
+  if (typeof seek === 'number' && Number.isFinite(seek)) {
+    nativeSeekBase = Math.max(0, seek);
+  } else if (nativePlaying && playing === false) {
+    nativeSeekBase = nativeEstimatedSeek();
+  }
+
+  if (typeof playing === 'boolean') {
+    nativePlaying = playing;
+    if (nativePlaying) {
+      nativeSeekStartedAt = nowSeconds();
+    }
+  }
+
+  emitMusicState();
+}
+
+function wireNativeAudioStateOnce() {
+  if (nativeStateWired) return;
+  nativeStateWired = true;
+
+  subscribeNativeAudioState((state = {}) => {
+    applyNativeAudioState(state);
+  });
+}
+
+function applyNativeAudioState(state = {}) {
+  const trackId = typeof state.trackId === 'string' ? state.trackId : '';
+  const trackName = typeof state.trackName === 'string' ? state.trackName : '';
+
+  nativePlaying = !!state.playing;
+  nativeMuted = !!state.muted;
+  nativeSuppressedByExternalAudio = !!state.suppressedByExternalAudio;
+
+  if (typeof state.looping === 'boolean') {
+    looping = state.looping;
+  }
+
+  nativeCurrentTime = Number.isFinite(Number(state.currentTime))
+    ? Math.max(0, Number(state.currentTime))
+    : 0;
+
+  nativeDuration = Number.isFinite(Number(state.duration))
+    ? Math.max(0, Number(state.duration))
+    : 0;
+
+  if (nativeDuration > 0) {
+    nativeSeekRatio = Math.max(0, Math.min(1, nativeCurrentTime / nativeDuration));
+  } else if (Number.isFinite(Number(state.seekPercent))) {
+    nativeSeekRatio = Math.max(0, Math.min(1, Number(state.seekPercent)));
+  } else {
+    nativeSeekRatio = 0;
+  }
+
+  nativeSeekBase = nativeCurrentTime;
+  nativeSeekStartedAt = nowSeconds();
+
+  if (trackId) {
+    currentTrackMeta =
+      resolveTrackMeta(trackId) ||
+      {
+        id: trackId,
+        name: trackName || trackId,
+        file: '',
+      };
+  }
+
+  emitMusicState();
+}
+
+function shouldPollNativeMusicState() {
+  if (!useNativeAudio()) return false;
+
+  try {
+    if (typeof document !== 'undefined') {
+      if (document.hidden || document.visibilityState === 'hidden') {
+        return false;
+      }
+
+      // Music Tab polling only makes sense while the Music Tab player exists.
+      const hasMusicTabControls =
+        !!document.getElementById('trackProgress') &&
+        !!document.getElementById('trackTimer') &&
+        !!document.getElementById('btnPlayPause');
+
+      if (!hasMusicTabControls) {
+        return false;
+      }
+    }
+  } catch {
+    return false;
+  }
+
+  return true;
+}
+
+export function startNativeMusicStatePolling() {
+  if (!useNativeAudio()) return;
+
+  wireNativeAudioStateOnce();
+
+  if (!shouldPollNativeMusicState()) {
+    return;
+  }
+
+  if (nativeStatePollTimer) return;
+
+  nativeRequestMusicState();
+
+  nativeStatePollTimer = setInterval(() => {
+    if (!shouldPollNativeMusicState()) {
+      stopNativeMusicStatePolling();
+      return;
+    }
+
+    nativeRequestMusicState();
+  }, 500);
+}
+
+
+
+export function stopNativeMusicStatePolling() {
+  if (!nativeStatePollTimer) return;
+
+  clearInterval(nativeStatePollTimer);
+  nativeStatePollTimer = null;
+}
+function playNativeTrackByMeta(meta, opts = {}) {
+  if (!meta?.id) return;
+
+  const {
+    volume = getMusicVolume(),
+    startAt = 0,
+  } = opts;
+
+  currentTrack = null;
+  currentTrackMeta = meta;
+  currentEndOverride = opts.onEnd || null;
+
+  nativePlayTrack(meta.id, {
+    volume,
+    startAt,
+    looping,
+  });
+
+  nativeSeekBase = typeof startAt === 'number' && Number.isFinite(startAt)
+    ? Math.max(0, startAt)
+    : 0;
+
+  // 🍧 Important:
+  // Swift now owns real playback, but JS still needs a practical local state
+  // so the Music Tab can toggle Play → Pause correctly.
+  //
+  // If Apple Music / Spotify is active, Swift may park this request.
+  // That means the UI can be slightly optimistic until we add native state callbacks.
+  // But without this, the button sends resumeTrack forever and never sends pauseTrack.
+  nativePlaying = true;
+  nativeSeekStartedAt = nowSeconds();
+
+  updateTrackLabel(meta.name);
+  emitMusicState();
 }
 
 let currentTrack = null;
@@ -240,10 +449,22 @@ function wireMusicLifecycleGuardsOnce() {
   if (_lifecycleWired) return;
   _lifecycleWired = true;
 
+  // 🍎 Native iOS audio is owned by Swift now.
+  // Do NOT let JS lifecycle handlers pause/resume native music.
+  //
+  // Why:
+  // - Swift already handles app background/foreground.
+  // - JS was sending resumeTrack before Swift could politely detect Apple Music/Spotify.
+  // - That made SCMF music resume over the user's external music.
+  if (useNativeAudio()) {
+    console.log('🍎 [SCMF][Music] Native audio owns lifecycle; JS lifecycle guard disabled.');
+    return;
+  }
+
   try { Howler.autoSuspend = false; } catch {}
 
   // ─────────────────────────────────────────────────────────────
-  // 🧠 iOS lifecycle de-dupe gate
+  // 🧠 Web lifecycle de-dupe gate
   // ─────────────────────────────────────────────────────────────
   let _isBg = false;
   let _lastFlipAt = 0;
@@ -252,10 +473,9 @@ function wireMusicLifecycleGuardsOnce() {
     const now = Date.now();
     if (_isBg && (now - _lastFlipAt) < 150) return;
     if (_isBg) return;
+
     _isBg = true;
     _lastFlipAt = now;
-
-    // ✅ keep module-wide truth in sync
     _isBackgrounded = true;
 
     try { handleMusicBackground(); } catch {}
@@ -265,17 +485,15 @@ function wireMusicLifecycleGuardsOnce() {
     const now = Date.now();
     if (!_isBg && (now - _lastFlipAt) < 150) return;
     if (!_isBg) return;
+
     _isBg = false;
     _lastFlipAt = now;
-
-    // ✅ keep module-wide truth in sync
     _isBackgrounded = false;
 
     try { handleMusicForeground(); } catch {}
   }
 
-
-  // Web lifecycle signals (browser + WKWebView)
+  // Web lifecycle signals only.
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) bgOnce('visibilitychange');
     else fgOnce('visibilitychange');
@@ -284,26 +502,21 @@ function wireMusicLifecycleGuardsOnce() {
   window.addEventListener('pagehide', () => bgOnce('pagehide'));
   window.addEventListener('pageshow', () => fgOnce('pageshow'));
 
-  // ✅ Native WKWebView/Capacitor bridge events (YOUR ViewController)
-  window.addEventListener('scmf:nativeBackground', () => bgOnce('native'));
-  window.addEventListener('scmf:nativeForeground', () => fgOnce('native'));
-
-  // 🚫 IMPORTANT:
-  // Do NOT also wire @capacitor/app appStateChange in native iOS.
-  // It flips during sheets/modals and causes the audio zombie state.
-  // If you ever need it for Android later, gate it like this:
-  const hasNativeBridge = (typeof window !== 'undefined') && window.SC_IOS_NATIVE === true;
-
-  if (!hasNativeBridge) {
-    wireCapacitorAppLifecycle(() => bgOnce('capacitor'), () => fgOnce('capacitor'));
-  }
+  // Capacitor fallback only for non-native-audio environments.
+  wireCapacitorAppLifecycle(() => bgOnce('capacitor'), () => fgOnce('capacitor'));
 }
 
 // Optional exports (handy if you ever want to call directly)
 export function nativeMusicDidBackground() {
+  // Native iOS audio is handled by Swift lifecycle now.
+  if (useNativeAudio()) return;
+
   try { handleMusicBackground(); } catch {}
 }
 export function nativeMusicDidForeground() {
+  // Native iOS audio is handled by Swift lifecycle now.
+  if (useNativeAudio()) return;
+
   try { handleMusicForeground(); } catch {}
 }
 
@@ -673,6 +886,22 @@ function bindHowlHandlers(howl, meta, opts = {}) {
 // 🛑 Stop Track (with Fade) — guarded against race conditions
 // ─────────────────────────────────────────────────────────────
 export function stopTrack(callback, opts = {}) {
+  if (useNativeAudio()) {
+    nativeStopTrack();
+
+    nativePlaying = false;
+    nativeSeekBase = 0;
+    nativeSeekStartedAt = 0;
+
+    currentTrack = null;
+    currentTrackMeta = null;
+    currentEndOverride = null;
+
+    callback?.();
+    emitMusicState();
+    return;
+  }
+
   const { fadeMs = fadeDuration, seq = bumpSeq() } = opts;
 
   if (!currentTrack) {
@@ -732,7 +961,6 @@ export function stopTrack(callback, opts = {}) {
     emitMusicState();
   }, fadeMs + 20);
 }
-
 // ─────────────────────────────────────────────────────────────
 // 🌊 Crossfade transition
 // ─────────────────────────────────────────────────────────────
@@ -820,17 +1048,33 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
     useCache = false,
     volume = getMusicVolume(),
     fadeMs = fadeDuration,
-    startAt = null, // 👈 NEW
+    startAt = null,
   } = opts;
 
-  // ✅ Wire survival guards once, early
+  // ✅ Native iOS path: Swift owns playback.
+  if (useNativeAudio()) {
+    const meta = resolveTrackMeta(id);
+    if (!meta) {
+      console.warn(`⚠️ Native track "${id}" not found.`);
+      return;
+    }
+
+    playNativeTrackByMeta(meta, {
+      volume,
+      startAt: typeof startAt === 'number' && Number.isFinite(startAt) ? startAt : 0,
+      onEnd,
+    });
+
+    return;
+  }
+
+  // ✅ Web fallback path: existing Howler behavior.
   wireMusicLifecycleGuardsOnce();
 
-  // Remember how we played last time (so resume rebuild matches)
   const enforcedHtml5 = forceHtml5ForOptionA(html5);
   _lastPlayOpts = { html5: enforcedHtml5, useCache, volume };
 
-  const seq = bumpSeq();     // ✅ ONE bump for the whole operation
+  const seq = bumpSeq();
   clearStopTimer();
 
   const meta = resolveTrackMeta(id);
@@ -842,7 +1086,7 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
   const nextHowl = getHowlFor(meta, { useCache, html5: enforcedHtml5, volume });
 
   if (crossfadeMs > 0) {
-    crossfadeTo(nextHowl, meta, { crossfadeMs, onEnd, volume, startAt }); // 👈 pass through
+    crossfadeTo(nextHowl, meta, { crossfadeMs, onEnd, volume, startAt });
     return;
   }
 
@@ -857,10 +1101,8 @@ export function playTrack(id = getFirstTrackId(), opts = {}) {
     try { nextHowl.seek(0); } catch {}
     try { nextHowl.volume(volume); } catch {}
 
-    // ✅ Start playback
     try { nextHowl.play(); } catch {}
 
-    // ✅ NEW: restore position after play starts (more reliable in iOS)
     if (typeof startAt === 'number' && isFinite(startAt) && startAt > 0) {
       setTimeout(() => {
         try { nextHowl.seek(startAt); } catch {}
@@ -916,10 +1158,33 @@ export function skipPrev() {
   playTrack(tracks[prev].id, { fadeMs: 0 });
 }
 
+
+
 // ─────────────────────────────────────────────────────────────
 // ⏯️ Play / Pause Toggle
 // ─────────────────────────────────────────────────────────────
-export function togglePlayPause() {
+export function togglePlayPause(opts = {}) {
+  if (useNativeAudio()) {
+    if (!currentTrackMeta) {
+      playTrack();
+      emitMusicState();
+      return;
+    }
+
+    if (nativePlaying) {
+      nativePauseTrack();
+      setNativePlaybackState({ playing: false });
+    } else {
+      // 🍎 v1.2.0 policy:
+      // Resume/request SCMF music, but do NOT override Apple Music / Spotify.
+      // Swift will park it if user soundtrack is active.
+      nativeResumeTrack({ allowExternalAudio: false });
+      setNativePlaybackState({ playing: true });
+    }
+
+    return;
+  }
+
   if (!currentTrack) {
     playTrack();
     emitMusicState();
@@ -941,6 +1206,20 @@ export function togglePlayPause() {
 // 🔇 Mute Controls
 // ─────────────────────────────────────────────────────────────
 export function toggleMute(desired) {
+  if (useNativeAudio()) {
+    nativeMuted = typeof desired === 'boolean'
+      ? desired
+      : !nativeMuted;
+
+    nativeSetMuted(nativeMuted);
+
+    // Keep Howler mute state mirrored for any leftover web fallback sounds.
+    try { Howler.mute(nativeMuted); } catch {}
+
+    emitMusicState();
+    return nativeMuted;
+  }
+
   if (typeof desired === 'boolean') {
     Howler.mute(desired);
     emitMusicState();
@@ -954,6 +1233,7 @@ export function toggleMute(desired) {
 }
 
 export function isMuted() {
+  if (useNativeAudio()) return nativeMuted;
   return Howler._muted;
 }
 
@@ -961,14 +1241,18 @@ export function isMuted() {
 // 🔁 Loop / 🔀 Shuffle (add explicit setters for sanity)
 // ─────────────────────────────────────────────────────────────
 export function toggleLoop() {
-  looping = !looping;
-  if (currentTrack) currentTrack.loop(looping);
-  emitMusicState();
-  return looping;
+  return setLoop(!looping);
 }
 
 export function setLoop(val) {
   looping = !!val;
+
+  if (useNativeAudio()) {
+    nativeSetLooping(looping);
+    emitMusicState();
+    return looping;
+  }
+
   if (currentTrack) currentTrack.loop(looping);
   emitMusicState();
   return looping;
@@ -998,9 +1282,18 @@ export function getShuffling() {
 // 🔢 Current Index (within active pool if set)
 // ─────────────────────────────────────────────────────────────
 function getCurrentTrackIndex() {
+  const list = getActiveList();
+  if (!list.length) return 0;
+
+  const id = currentTrackMeta?.id || '';
+
+  if (id) {
+    const byId = list.findIndex(t => t.id === id);
+    if (byId >= 0) return byId;
+  }
+
   if (!currentTrack) return 0;
 
-  const list = getActiveList();
   const src = currentTrack._src;
   const idx = list.findIndex(t => src && src.includes(t.file));
   return idx >= 0 ? idx : 0;
@@ -1040,16 +1333,15 @@ function startProgressUpdater() {
 // 🎯 Getters (track label uses real meta first)
 // ─────────────────────────────────────────────────────────────
 export function isPlaying() {
+  if (useNativeAudio()) return nativePlaying;
   return currentTrack?.playing() ?? false;
 }
 
 export function currentTrackName() {
-  if (!currentTrack) return '(none)';
-  return currentTrackMeta?.name || '(unknown)';
+  return currentTrackMeta?.name || '(none)';
 }
 
 export function currentTrackId() {
-  if (!currentTrack) return '';
   return currentTrackMeta?.id || '';
 }
 
@@ -1062,7 +1354,13 @@ export function getTrackList() {
 // 🌌 Init
 // ─────────────────────────────────────────────────────────────
 export function initMusicPlayer() {
-  wireMusicLifecycleGuardsOnce(); // ✅ arm lifecycle + gesture safety early
+  wireMusicLifecycleGuardsOnce();
+
+  if (useNativeAudio()) {
+    wireNativeAudioStateOnce();
+    nativeRequestMusicState();
+  }
+
   updateTrackLabel('(none)');
   emitMusicState();
 }
@@ -1084,17 +1382,55 @@ function updateTrackLabel(name = currentTrackName()) {
 }
 
 export function scrubTo(percent) {
+  const p = Number(percent);
+  if (!Number.isFinite(p)) return;
+
+  const clamped = Math.max(0, Math.min(1, p));
+
+  if (useNativeAudio()) {
+    wireNativeAudioStateOnce();
+
+    nativeSeekRatio = clamped;
+
+    if (nativeDuration > 0) {
+      nativeCurrentTime = nativeDuration * clamped;
+      nativeSeekBase = nativeCurrentTime;
+      nativeSeekStartedAt = nowSeconds();
+    }
+
+    nativeSeekPercent(clamped);
+    nativeRequestMusicState();
+    emitMusicState();
+    return;
+  }
+
   if (!currentTrack) return;
+
   const duration = currentTrack.duration();
-  if (duration && percent >= 0 && percent <= 1) {
-    currentTrack.seek(percent * duration);
+  if (duration && clamped >= 0 && clamped <= 1) {
+    currentTrack.seek(clamped * duration);
   }
 }
 
 export function getCurrentSeekPercent() {
+  if (useNativeAudio()) {
+    if (nativeDuration > 0) {
+      const elapsed = nativePlaying
+        ? Math.max(0, nowSeconds() - nativeSeekStartedAt)
+        : 0;
+
+      const estimated = Math.min(nativeDuration, nativeSeekBase + elapsed);
+      return Math.max(0, Math.min(1, estimated / nativeDuration));
+    }
+
+    return nativeSeekRatio;
+  }
+
   if (!currentTrack) return 0;
+
   const duration = currentTrack.duration();
   if (!duration) return 0;
+
   return (currentTrack.seek() || 0) / duration;
 }
 
@@ -1139,6 +1475,21 @@ function isHowlCached(howl) {
 const _listeners = new Set();
 
 export function getMusicState() {
+  let currentTime = 0;
+  let duration = 0;
+
+  if (useNativeAudio()) {
+    const elapsed = nativePlaying
+      ? Math.max(0, nowSeconds() - nativeSeekStartedAt)
+      : 0;
+
+    currentTime = nativeDuration > 0
+      ? Math.min(nativeDuration, nativeSeekBase + elapsed)
+      : nativeCurrentTime;
+
+    duration = nativeDuration;
+  }
+
   return {
     playing: isPlaying(),
     muted: isMuted(),
@@ -1147,6 +1498,11 @@ export function getMusicState() {
     trackId: currentTrackId(),
     trackName: currentTrackName(),
     pool: getMusicPool(),
+
+    seekPercent: getCurrentSeekPercent(),
+    currentTime,
+    duration,
+    suppressedByExternalAudio: nativeSuppressedByExternalAudio,
   };
 }
 

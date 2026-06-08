@@ -23,24 +23,24 @@ export function enableGestureCage() {
 
   // 3) event-level blocks
   let lastTouchTime = 0;
-  S.blockCtx = e => e.preventDefault();                          // no context menu
+  S.blockCtx = e => e?.preventDefault?.();                          // no context menu
   S.blockSelect = e => {
     const t = e.target;
     if (t.closest('.allow-select, input, textarea')) return;
-    e.preventDefault();
+    e?.preventDefault?.();
   };
-  S.blockDrag = e => e.preventDefault();
-  S.blockGesture = e => e.preventDefault();                      // iOS pinch
-  S.blockDblClick = e => e.preventDefault();                     // desktop dbl-click
+  S.blockDrag = e => e?.preventDefault?.();
+  S.blockGesture = e => e?.preventDefault?.();                      // iOS pinch
+  S.blockDblClick = e => e?.preventDefault?.();                     // desktop dbl-click
   S.blockDoubleTap = e => {                                      // iOS dbl-tap
     const now = e.timeStamp;
-    if (now - lastTouchTime < 350) { e.preventDefault(); e.stopPropagation(); }
+    if (now - lastTouchTime < 350) { e?.preventDefault?.(); e?.stopPropagation?.(); }
     lastTouchTime = now;
   };
 
   // ⛔️ stop copying entirely while in kids mode
-  S.blockCopy = e => { e.preventDefault(); };
-  S.blockCut  = e => { e.preventDefault(); };
+  S.blockCopy = e => { e?.preventDefault?.(); };
+  S.blockCut  = e => { e?.preventDefault?.(); };
 
   document.addEventListener('contextmenu', S.blockCtx);
   document.addEventListener('selectstart', S.blockSelect, { passive: false });

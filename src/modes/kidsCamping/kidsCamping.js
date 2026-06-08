@@ -6,7 +6,12 @@ import { appState } from '../../data/appState.js';
 import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { createTentLineGame, initGameLine, cleanupTentLineGame } from './kidsCampingTentLineGame.js';
 import { runInAction, reaction } from 'mobx';
-import { stopTrack, playTrack } from '../../managers/musicManager.js';
+import {
+  stopTrack,
+  playTrack,
+  toggleMute,
+  isMuted,
+} from '../../managers/musicManager.js';
 import { initParkingGame } from './parkingGame.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
 import { initMosquitoGame } from './mosquitoGame.js';
@@ -283,8 +288,8 @@ function wireIntroHandlers() {
   };
 
   HANDLERS.onMuteClickIntro = () => {
-    const H = window.Howler ?? globalThis.Howler;
-    H?.mute?.(!H._muted);
+    const nextMuted = !safeCampingMuted();
+    toggleMute(nextMuted);
     applyMuteVisual(mute);
   };
 
@@ -425,8 +430,8 @@ function wireMainHandlers() {
   const muteBtn = document.getElementById('kcMute');
   if (muteBtn) {
     HANDLERS.onMuteClick = () => {
-      const H = window.Howler ?? globalThis.Howler;
-      H?.mute?.(!H._muted);
+      const nextMuted = !safeCampingMuted();
+      toggleMute(nextMuted);
       applyMuteVisual(muteBtn);
     };
     muteBtn.addEventListener('click', HANDLERS.onMuteClick);
@@ -617,15 +622,31 @@ function animatePopCount() {
 
 function applyMuteVisual(btn) {
   try {
-    const H = window.Howler ?? globalThis.Howler;
-    const muted = !!H?._muted;
+    const muted = safeCampingMuted();
+
     if (btn) {
       btn.textContent = muted ? '🔇' : '🔊';
       btn.classList.toggle('muted', muted);
+      btn.dataset.muted = muted ? '1' : '0';
+      btn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      btn.title = muted ? 'Unmute' : 'Mute';
     }
   } catch {}
 }
 
+function safeCampingMuted() {
+  try {
+    const m = isMuted?.();
+    if (typeof m === 'boolean') return m;
+  } catch {}
+
+  try {
+    const H = window.Howler ?? globalThis.Howler;
+    return !!H?._muted;
+  } catch {}
+
+  return false;
+}
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Navigation

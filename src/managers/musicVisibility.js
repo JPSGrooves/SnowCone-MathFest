@@ -1,27 +1,41 @@
 // /src/managers/musicVisibility.js
 // Global “lock screen” guard for SnowCone MathFest music 🎧
-// Pauses when the tab/app is hidden, resumes if it was playing before.
+//
+// Web only now.
+// Native iOS audio lifecycle is owned by Swift.
 
+import { isIOSNative } from '../utils/platform.js';
 import { isPlaying, togglePlayPause } from './musicManager.js';
 
-// Tracks if we *should* resume when user returns
 let wasPlayingBeforeHide = false;
 let wired = false;
 
+function isNativeIOSAudioRuntime() {
+  try {
+    if (typeof window !== 'undefined' && window.SC_IOS_NATIVE === true) return true;
+  } catch {}
+
+  try {
+    return isIOSNative();
+  } catch {}
+
+  return false;
+}
+
 function onVisibilityChange() {
+  if (isNativeIOSAudioRuntime()) return;
+
   try {
     const hidden = document.hidden;
 
     if (hidden) {
-      // Snapshot current playing state and pause once.
       wasPlayingBeforeHide = !!isPlaying?.();
       if (wasPlayingBeforeHide) {
-        togglePlayPause?.(); // pause
+        togglePlayPause?.();
       }
     } else {
-      // Only auto-resume if we *had* something playing when we left.
       if (wasPlayingBeforeHide) {
-        togglePlayPause?.(); // resume from same position
+        togglePlayPause?.();
       }
       wasPlayingBeforeHide = false;
     }
@@ -30,10 +44,16 @@ function onVisibilityChange() {
   }
 }
 
-// Call this once from your app bootstrap (e.g., main.js)
 export function wireMusicVisibilityGuard() {
   if (wired) return;
   if (typeof document === 'undefined') return;
-  document.addEventListener('visibilitychange', onVisibilityChange);
+
   wired = true;
+
+  if (isNativeIOSAudioRuntime()) {
+    console.log('[musicVisibility] Native iOS detected; visibility guard disabled.');
+    return;
+  }
+
+  document.addEventListener('visibilitychange', onVisibilityChange);
 }

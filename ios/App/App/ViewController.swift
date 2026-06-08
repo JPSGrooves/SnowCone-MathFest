@@ -142,38 +142,90 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
 
     @objc private func onWillResignActive() {
         // ⚠️ DO NOT deactivate here.
-        // willResignActive fires for modals/sheets/control center and causes "audio zombie"
+        // willResignActive fires for modals/sheets/control center and can cause audio zombie states.
         emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
     }
 
     @objc private func onDidEnterBackground() {
-        // ✅ Only deactivate once, and only when actually backgrounded.
+        // Native audio owns its own pause/resume now.
+        SCMFNativeAudioPlayer.shared.handleAppDidEnterBackground()
+
+        // For respectSilentSwitch/.ambient, background audio is not the goal.
         if SCMFAudioSession.shared.policy == .respectSilentSwitch && !scmfDidDeactivateForBg {
             scmfDidDeactivateForBg = true
             SCMFAudioSession.shared.deactivate()
         }
+
         emitBgFg(isForeground: false, eventName: "scmf:nativeBackground")
     }
 
     @objc private func onWillEnterForeground() {
-        // ✅ Foreground pre-wake (ok to call apply)
         SCMFAudioSession.shared.reactivateIfNeeded()
+        SCMFNativeAudioPlayer.shared.handleAppWillEnterForeground()
+
         emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
     }
 
     @objc private func onDidBecomeActive() {
-        // ✅ Clear background-deactivate latch
         scmfDidDeactivateForBg = false
 
-        // ✅ Re-apply policy
         SCMFAudioSession.shared.reactivateIfNeeded()
+        SCMFNativeAudioPlayer.shared.handleAppDidBecomeActive()
+
         emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) { [weak self] in
             self?.scmfFlushPendingEvents()
         }
     }
+    
+    private func emitNativeAudioState() {
+        let payload = SCMFNativeAudioPlayer.shared.musicStatePayload()
 
+        guard
+            let data = try? JSONSerialization.data(withJSONObject: payload, options: []),
+            let json = String(data: data, encoding: .utf8)
+        else {
+            print("🎧⚠️ [SCMF][NativeAudio] failed to serialize music state")
+            return
+        }
+
+        let js = """
+        window.__SCMF_receiveNativeAudioState && window.__SCMF_receiveNativeAudioState(\(json));
+        """
+
+        DispatchQueue.main.async { [weak self] in
+            self?.webView?.evaluateJavaScript(js) { _, error in
+                if let error {
+                    print("🎧⚠️ [SCMF][NativeAudio] emit state JS error:", error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    @objc private func handleSilenceSecondaryAudioHint(_ notification: Notification) {
+        guard
+            let info = notification.userInfo,
+            let typeValue = info[AVAudioSessionSilenceSecondaryAudioHintTypeKey] as? UInt,
+            let type = AVAudioSession.SilenceSecondaryAudioHintType(rawValue: typeValue)
+        else {
+            print("🎧⚠️ [SCMF] silenceSecondaryAudioHint received but could not parse type")
+            return
+        }
+
+        switch type {
+        case .begin:
+            print("🎧 [SCMF] silenceSecondaryAudioHint began")
+            SCMFNativeAudioPlayer.shared.handleExternalAudioBegan()
+
+        case .end:
+            print("🎧 [SCMF] silenceSecondaryAudioHint ended")
+            SCMFNativeAudioPlayer.shared.handleExternalAudioEnded()
+
+        @unknown default:
+            break
+        }
+    }
     
 
     private func emitBgFg(isForeground: Bool, eventName: String) {
@@ -201,6 +253,13 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
             name: AVAudioSession.routeChangeNotification,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSilenceSecondaryAudioHint(_:)),
+            name: AVAudioSession.silenceSecondaryAudioHintNotification,
+            object: nil
+        )
 
         print("✅ [SCMF] Wired AVAudioSession interruption + route change observers")
     }
@@ -215,14 +274,12 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
         switch type {
         case .began:
             print("📵 [SCMF] Audio interruption began")
-            // ✅ Don't fake a background event.
-            // Let JS pause naturally if it receives a playerror.
-            // (Foreground event will come on .ended)
-
+            SCMFNativeAudioPlayer.shared.handleInterruptionBegan()
 
         case .ended:
             print("📳 [SCMF] Audio interruption ended")
             SCMFAudioSession.shared.reactivateIfNeeded()
+            SCMFNativeAudioPlayer.shared.handleInterruptionEnded()
             emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
 
         @unknown default:
@@ -232,7 +289,14 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
 
     @objc private func handleAudioRouteChange(_ notification: Notification) {
         print("🎧 [SCMF] Audio route changed")
+
         SCMFAudioSession.shared.reactivateIfNeeded()
+        SCMFNativeAudioPlayer.shared.handleAppWillEnterForeground()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.20) {
+            SCMFNativeAudioPlayer.shared.tryResumeDeferredMusicIfAllowed(reason: "routeChange")
+        }
+
         emitBgFg(isForeground: true, eventName: "scmf:nativeForeground")
     }
     
@@ -400,7 +464,17 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
     // MARK: - WKScriptMessageHandler
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if debugJSBridge {
-            print("🧃 [SCMF] didReceive name=\(message.name) body=\(message.body)")
+            var shouldPrintMessage = true
+
+            if message.name == audioHandlerName,
+               let dict = message.body as? [String: Any],
+               (dict["type"] as? String) == "requestMusicState" {
+                shouldPrintMessage = false
+            }
+
+            if shouldPrintMessage {
+                print("🧃 [SCMF] didReceive name=\(message.name) body=\(message.body)")
+            }
         }
 
         if message.name == gameCenterHandlerName {
@@ -448,8 +522,16 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
     // MARK: - Audio Payload Router (optional)
     private func handleAudioPayload(_ payload: [String: Any]) {
         let type = (payload["type"] as? String) ?? ""
+        
+        defer {
+            emitNativeAudioState()
+        }
 
         switch type {
+            
+        case "requestMusicState":
+            break
+
         case "setPolicy":
             let raw = (payload["policy"] as? String) ?? ""
             if let policy = SCMFAudioSession.Policy(rawValue: raw) {
@@ -459,11 +541,82 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
                 print("🔊⚠️ [SCMF][Audio] unknown policy:", raw)
             }
 
+        case "playTrack", "playMusic":
+            guard let id = payload["id"] as? String, !id.isEmpty else {
+                print("🔊⚠️ [SCMF][Audio] playTrack missing id:", payload)
+                return
+            }
+
+            let volume = payload.keys.contains("volume")
+                ? Float(coerceDouble(payload["volume"]))
+                : nil
+
+            let startRaw = coerceDouble(payload["startAt"])
+            let startAt: TimeInterval? = startRaw > 0 ? startRaw : nil
+
+            let loop = payload.keys.contains("looping")
+                ? coerceBool(payload["looping"])
+                : nil
+
+            let allowExternalAudio = coerceBool(payload["allowExternalAudio"])
+
+            SCMFNativeAudioPlayer.shared.playMusic(
+                id: id,
+                startAt: startAt,
+                volume: volume,
+                loop: loop,
+                allowExternalAudio: allowExternalAudio
+            )
+
+        case "pauseTrack", "pauseMusic":
+            SCMFNativeAudioPlayer.shared.pauseMusic()
+
+        case "resumeTrack", "resumeMusic":
+            let allowExternalAudio = coerceBool(payload["allowExternalAudio"])
+            SCMFNativeAudioPlayer.shared.resumeMusic(allowExternalAudio: allowExternalAudio)
+
+        case "togglePlayPause":
+            SCMFNativeAudioPlayer.shared.togglePlayPause()
+
+        case "stopTrack", "stopMusic":
+            SCMFNativeAudioPlayer.shared.stopMusic()
+
+        case "seekMusic":
+            let seconds = coerceDouble(payload["seconds"])
+            SCMFNativeAudioPlayer.shared.seekMusic(seconds: seconds)
+
+        case "seekPercent", "seekMusicPercent":
+            let percent = coerceDouble(payload["percent"])
+            SCMFNativeAudioPlayer.shared.seekMusic(percent: percent)
+
+        case "setLooping":
+            SCMFNativeAudioPlayer.shared.setLooping(coerceBool(payload["looping"]))
+
+        case "setMuted":
+            SCMFNativeAudioPlayer.shared.setMuted(coerceBool(payload["muted"]))
+
+        case "setMusicVolume":
+            SCMFNativeAudioPlayer.shared.setMusicVolume(Float(coerceDouble(payload["volume"])))
+
+        case "setSfxVolume":
+            SCMFNativeAudioPlayer.shared.setSfxVolume(Float(coerceDouble(payload["volume"])))
+
+        case "playSfx", "playSFX":
+            guard let id = payload["id"] as? String, !id.isEmpty else {
+                print("🔊⚠️ [SCMF][Audio] playSfx missing id:", payload)
+                return
+            }
+
+            let volume = payload.keys.contains("volume")
+                ? Float(coerceDouble(payload["volume"]))
+                : nil
+
+            SCMFNativeAudioPlayer.shared.playSfx(id: id, volume: volume)
+
         default:
             print("🔊⚠️ [SCMF][Audio] unknown payload type:", type, "payload:", payload)
         }
     }
-
 
     // MARK: - Game Center Payload Router
     private func handleGameCenterPayload(_ payload: [String: Any]) {
@@ -615,5 +768,25 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
         if let n = any as? Float { return Double(n) }
         if let s = any as? String, let n = Double(s) { return n }
         return 0.0
+    }
+    
+    private func coerceBool(_ any: Any?) -> Bool {
+        if let b = any as? Bool { return b }
+
+        if let n = any as? Int { return n != 0 }
+        if let n = any as? Double { return n != 0 }
+        if let n = any as? Float { return n != 0 }
+
+        if let s = any as? String {
+            let lowered = s.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            if lowered == "true" || lowered == "1" || lowered == "yes" || lowered == "y" {
+                return true
+            }
+            if lowered == "false" || lowered == "0" || lowered == "no" || lowered == "n" {
+                return false
+            }
+        }
+
+        return false
     }
 }
