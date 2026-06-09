@@ -8,13 +8,14 @@ import { appState } from '../../data/appState.js';
 // ✅ Use only musicManager (no separate QS Howl player anymore)
 import {
   stopTrack,
-  toggleMute,
   pushMusicScope,
   popMusicScope,
   playRandomTrack,
   setMusicPool,
   setShuffle,
-  setLoop
+  setLoop,
+  isPlaying,
+  isMuted
 } from '../../managers/musicManager.js';
 
 import * as phil from './quickServePhil.js';
@@ -36,6 +37,48 @@ import { hapticSuccess } from '../../utils/haptics.js';
 
 const QS_TRACK_IDS = ['quikserve', 'kktribute', 'softdown'];
 let _qsMusicScopeOn = false;
+
+function activateQuickServeMusicScope() {
+  if (!_qsMusicScopeOn) {
+    pushMusicScope({
+      poolIds: QS_TRACK_IDS,
+      shuffling: true,
+
+      // 🍧 QuickServe fix:
+      // Native iOS does not currently auto-advance the shuffle pool on track end.
+      // So QS loops the active track until the player leaves QS or starts a fresh shift.
+      looping: true
+    });
+
+    _qsMusicScopeOn = true;
+    return;
+  }
+
+  // Safety refresh if QS is already active.
+  // Keep this QS-only so we do not disturb other modes.
+  setMusicPool(QS_TRACK_IDS);
+  setShuffle(true);
+  setLoop(true);
+}
+
+export function ensureQuickServeMusicPlaying() {
+  activateQuickServeMusicScope();
+
+  // Keypad reset uses this path:
+  // if music is already playing, leave it alone.
+  // if the track ended / died / got stopped, restart the QS lane.
+  if (!isPlaying()) {
+    playRandomTrack();
+  }
+}
+
+export function restartQuickServeMusicFresh() {
+  activateQuickServeMusicScope();
+
+  // Result modal Play Again uses this path:
+  // always request a fresh QS track for the new shift.
+  playRandomTrack();
+}
 
 
 //////////////////////////////
@@ -106,20 +149,7 @@ function renderIntroScreen() {
   document.getElementById('startShowBtn')?.addEventListener('click', () => {
     playTransition(() => {
 
-      // 🎧 QS takes over music cleanly (curated pool + shuffle, no loop)
-      if (!_qsMusicScopeOn) {
-        pushMusicScope({ poolIds: QS_TRACK_IDS, shuffling: true, looping: false });
-        _qsMusicScopeOn = true;
-      } else {
-        // safety if re-entering
-        setMusicPool(QS_TRACK_IDS);
-        setShuffle(true);
-        setLoop(false);
-      }
-
-      // Start a random QS track; on end, musicManager sees shuffling=true and picks another.
-      playRandomTrack();
-
+      restartQuickServeMusicFresh();
       renderGameUI();
     });
   });
@@ -239,7 +269,7 @@ export function renderGameUI() {
   gridFX.initGridGlow();
   gridFX.startGridPulse();
   setupKeypad();
-  setupMuteButton();
+  updateMuteButtonLabel();
   startGameLogic();
 
   // 🔗 Wire up result popup buttons once DOM exists
@@ -249,35 +279,14 @@ export function renderGameUI() {
 //////////////////////////////
 // 🔊 Mute Button Logic
 //////////////////////////////
-function setupMuteButton() {
-  const muteBtn = document.getElementById('muteBtn');
-  if (!muteBtn) return;
-
-  const getHowler = () => window.Howler ?? globalThis.Howler;
-
-  const updateLabel = () => {
-    const H = getHowler();
-    const muted = !!H?._muted;
-    muteBtn.textContent = muted ? '🔇 Unmute' : '🔊 Mute';
-  };
-
-  muteBtn.addEventListener('click', () => {
-    // musicManager handles the actual muting
-    toggleMute();
-    updateLabel();
-  });
-
-  updateLabel();
-}
 
 export function updateMuteButtonLabel() {
   const muteBtn = document.getElementById('muteBtn');
   if (!muteBtn) return;
-  const H = window.Howler ?? globalThis.Howler;
-  const muted = !!H?._muted;
+
+  const muted = isMuted();
   muteBtn.textContent = muted ? '🔇 Unmute' : '🔊 Mute';
 }
-
 
 //////////////////////////////
 // 🔙 Return to Menu
@@ -387,9 +396,14 @@ function setupQuickServeResultButtons() {
   playAgainBtn?.addEventListener('click', () => {
     hideQuickServeResultPopup('quickServe');
 
-    // 🧼 Clean the current run and fire up a fresh one
+    // 🧼 Clean the completed run
     stopGameLogic();
     resetCurrentAnswer();
+
+    // 🎧 Completed shift = fresh DJ lane request
+    restartQuickServeMusicFresh();
+
+    // 🍧 New run starts clean
     startGameLogic();
   });
 

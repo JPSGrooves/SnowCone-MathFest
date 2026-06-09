@@ -138,8 +138,7 @@ function handleQuickServeKeys(e, key, shift) {
     if (key === 'm') {
       e.preventDefault();
       toggleMute();
-      updateMuteButtonLabel(); // now always synced
-      updateMuteButtonLabel(); // ✨ this now works every time
+      updateMuteButtonLabel();
       return;
     }
 }

@@ -553,4 +553,5 @@ autorun(() => {
 });
 
 // 🧪 DEV FLAG
-window.devFlags = { build: 'v1.5.0 — iOS Review Ready ✨' };
+window.devFlags = { build: 'v1.5.0 — iOS Review Ready (No More Browser Updates) ✨' };
+window.devFlags = { build: 'v1.2.1 — Startup Doorway Polish ✨' };

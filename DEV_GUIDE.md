@@ -120,6 +120,9 @@ git commit -m "🌈 Locking in current dev state" --no-verify
 git push origin main --no-verify
 ```
 
+npm run build:native
+npx cap open ios
+
 Re-run:
 ```bash
 npm run build:native

@@ -58,24 +58,16 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
       ${model.title}
     </p>
 
-    <p class="startup-streak-line">
-      ${streakLabel}
-    </p>
-
     <p class="startup-progress-line">
       Festival Completion: <strong>${model.percent}%</strong>
     </p>
 
-    <p class="startup-main-line">
-      ${model.line}
+    <p class="startup-streak-line">
+      ${streakLabel}
     </p>
 
-    <p class="startup-suggestion-line">
-      ${model.suggestionText}
-    </p>
-
-    <button type="button" class="startup-play-btn">
-      Play Game
+    <button type="button" class="startup-play-btn" aria-label="Enter SnowCone MathFest">
+      Enter Festival
     </button>
   `;
 

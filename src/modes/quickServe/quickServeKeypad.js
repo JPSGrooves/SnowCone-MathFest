@@ -8,7 +8,10 @@ import {
 } from './quickServeGame.js';
 
 import { stopGameLogic, startGameLogic } from './quickServeGame.js';
-import { returnToMenu } from './quickServe.js'; // 🌟 Full QS exit
+import {
+  returnToMenu,
+  ensureQuickServeMusicPlaying
+} from './quickServe.js'; // 🌟 Full QS exit + QS music guard
 import { setMathMode } from './quickServeGame.js';
 import { setCurrentAnswer } from './quickServeGame.js'; // 💥 you'll add this below
 import { toggleMute } from '../../managers/musicManager.js';
@@ -80,11 +83,17 @@ export function setupKeypad() {
 
   const safeBind = (id, handler) => {
     const btn = document.getElementById(id);
+
     if (btn) {
-      btn.addEventListener('pointerdown', e => {
-        e?.preventDefault?.();
-        handler();
-      }, { passive: false });
+      btn.addEventListener(
+        'pointerdown',
+        (e) => {
+          e?.preventDefault?.();
+          e?.stopPropagation?.();
+          handler(e);
+        },
+        { passive: false }
+      );
     }
   };
 
@@ -95,13 +104,15 @@ export function setupKeypad() {
 
   // 🧼 Control Buttons
   safeBind('reset', () => {
-    console.log('🔁 Resetting QuickServe game only');
+    console.log('🔁 Resetting QuickServe shift only');
 
-    // Music is owned by quickServe.js + musicManager.js.
-    // Reset should restart the shift, not spawn another DJ booth.
+    // Music is still owned by quickServe.js.
+    // This reset does NOT force a new track.
+    // It only restarts music if the QS soundtrack is already dead.
     stopGameLogic();
     setMathMode('addSub');
     startGameLogic();
+    ensureQuickServeMusicPlaying();
   });
 
   safeBind('neg', toggleNegative);
@@ -119,8 +130,7 @@ export function setupKeypad() {
   });
 
 
-  safeBind('muteBtn', (e) => {
-    e?.stopPropagation?.(); // 💥 Block event from bubbling up
+  safeBind('muteBtn', () => {
     toggleMute();
     updateMuteButtonLabel();
   });

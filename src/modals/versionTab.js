@@ -186,11 +186,12 @@ export function renderVersionTab() {
 
   return `
     <div class="settings-block">
-      <h3>🧠 SnowCone MathFest v1.5.0</h3>
+      <h3>🧠 SnowCone MathFest v1.2.1</h3>
       <p><strong>Build:</strong> <code>${build}</code></p>
+      <p><strong>Current pass:</strong> Startup Doorway Polish ✨</p>
       <p>Crafted with cosmic cones 🍧</p>
     </div>
-    <div class="settings-block">
+
     ${
       !isApp
         ? `
@@ -198,8 +199,8 @@ export function renderVersionTab() {
       <h3>🍎 Get the iOS App</h3>
       <p>
         Playing in the browser? On iPhone or iPad you can grab the
-        <strong>SnowCone MathFest</strong> app from the App Store for a more “regular app”
-        feel with Screen Time &amp; parental controls.
+        <strong>SnowCone MathFest</strong> app from the App Store for the main
+        iOS-native experience.
       </p>
       <button class="track-button" id="openIOSAppBtn">🍎 Open App Store</button>
       <p style="font-size: 0.8em; opacity: 0.85; margin-top: 0.4rem;">
@@ -209,8 +210,10 @@ export function renderVersionTab() {
         `
         : ''
     }
+
+    <div class="settings-block">
       <h3>📲 App Info</h3>
-    ${
+      ${
         isApp
           ? `
       <p>You’re running the SnowCone MathFest app on this device.</p>
@@ -228,7 +231,6 @@ export function renderVersionTab() {
       `
       }
     </div>
-
 
     <div class="settings-block">
       <h3>🧰 Tools</h3>
@@ -267,18 +269,53 @@ export function renderVersionTab() {
       <button class="track-button" id="importSaveBtn">📤 Import Save</button>
       <button class="track-button" id="resetProgress">☠️ Reset Progress</button>
     </div>
-    
+
     <div class="settings-block">
-      <h3>v1.5.0 — iOS Review Ready ✨</h3>
+      <h3>v1.2.1 — Startup Doorway Polish ✨</h3>
       <p>
-        – 🚚 <strong>Truck-Tap High Score HUD</strong>: invisible, accessible <code>.menu-highscore-hitbox</code> rides directly on top of the festival truck; scales perfectly inside the 11:16 stage so tapping (or keyboard-focusing) the truck instantly opens stats on phones and desktop — no new mode added<br><br>
-        – 📈 <strong>High Score overlay card</strong>: new <code>#highScoreOverlay</code> reuses the cosmic dimmer to display Camping best score, QuickServe best shift, and Infinity Lake high score + longest streak in a compact neon card that fits even the smallest phones with no scrolling or clipping<br><br>
-        – 🎧 <strong>App-wide music visibility guard</strong>: <code>wireMusicVisibilityGuard()</code> listens for <code>visibilitychange</code> and pauses whatever track was playing when the app backgrounds or locks, then resumes only that track on return for true native-app audio behavior on iOS<br><br>
-        – 🎛️ <strong>QuickServe private booth audio guard</strong>: <code>attachQuickServeVisibilityGuard()</code> in <code>quickServeMusic.js</code> tracks its own playback state so QuickServe music pauses and resumes cleanly without fighting the global guard or resurrecting finished runs after result screens<br><br>
-        – ♾️ <strong>Infinity Lake record-safe scoring pipeline</strong>: end-of-run logic now updates score, streak, longest streak, and solved count deterministically, awards badges based on score + elapsed time, and only bumps High Score or Longest Streak when a true record is beaten — no drift, no false wins<br><br>
-        – 🎬 <strong>Story credits layout + safety net</strong>: credits viewport (<code>.sm-credits-list</code>) now has a guaranteed minimum height, and the blackout hand-off uses <code>animationend</code> with a timed fallback to guarantee <code>showStoryCredits()</code> always fires, even on cranky iOS Safari / WKWebView<br><br>
-        – 🍬 <strong>Celebrations moved under the “movie”</strong>: <code>.pickup-stack</code> and Story XP popups are anchored just above the bottom bar so rewards remain visible without covering the credits; <code>THANK_YOU_TEXT</code> adds a soft, data-only promo outro you can tweak anytime without touching layout code<br><br>
-        – ⭐ <strong>Next</strong>: light visual polish on the High Score card, wire any final Infinity / QuickServe badge tiers off the stabilized score data, and decide whether the credits “thank you” appears on first-clear only or every full loop through the forest
+        – 🚪 <strong>Cleaner startup doorway</strong>: the opening screen now focuses on the SCMF logo, greeting, rank, completion, daily streak, and the new <strong>Enter Festival</strong> button.<br><br>
+
+        – 🍧 <strong>Less front-door reading</strong>: longer narrative/suggestion copy was removed from startup so players can get into the festival faster while still seeing useful progress info.<br><br>
+
+        – 🏆 <strong>Rank stays visible</strong>: rank remains near the top of the startup stack as the player’s arcade-style identity, with completion and daily streak underneath.<br><br>
+
+        – 🌈 <strong>Button polish</strong>: <strong>Play Game</strong> became <strong>Enter Festival</strong>, with cleaner sizing and stronger “step into the world” language.<br><br>
+
+        – 📱 <strong>iOS-native test path</strong>: this pass was checked through the Capacitor iOS lane instead of relying on browser-only confidence.<br><br>
+
+        – 🧊 <strong>Scoped CSS discipline</strong>: startup/button polish stayed targeted. No global stylesheet cleanup was attempted because the current iOS layouts are working and should not be disturbed without cause.<br><br>
+
+        – 🚚 <strong>Next</strong>: evolve the truck popup into the <strong>Festival Office</strong>, with Jehnk saying hello, high scores, rank/completion, daily streak, tiny festival tips, and future room for Daily Challenge, theme hints, and Hard Mode ideas.
+      </p>
+    </div>
+
+    <div class="settings-block">
+      <h3>v1.2.0 — Native Audio & User Soundtrack Update 🔊</h3>
+      <p>
+        – 🔊 <strong>Native iOS audio backbone</strong>: SCMF music and SFX now route through a native Swift audio layer on iPhone/iPad instead of relying fully on WebView audio behavior.<br><br>
+
+        – 🔇 <strong>Silent switch respect</strong>: the iOS build uses a native audio policy that respects the iPhone silent switch.<br><br>
+
+        – 🎧 <strong>User music wins</strong>: Apple Music, Spotify, and other user audio can take priority while SCMF keeps gameplay feedback available.<br><br>
+
+        – 🎛️ <strong>Music Tab upgrade</strong>: play, pause, track switching, mute, and scrubber behavior now feel closer to a real media player.<br><br>
+
+        – 📳 <strong>Native bridge stability</strong>: haptics, Game Center, audio bridge wiring, and native lifecycle events continue to come online in the iOS shell.
+      </p>
+    </div>
+
+    <div class="settings-block">
+      <h3>Next Cone Cart 🛠️</h3>
+      <p>
+        – 🚚 <strong>Festival Office</strong>: turn the truck popup into a home for high scores, rank, completion, streak, tiny tips, and Jehnk.<br><br>
+
+        – 🎯 <strong>Daily Challenge idea</strong>: worth exploring later, especially if the app gets a more unified points/progression system.<br><br>
+
+        – 🎨 <strong>Themes / Hard Modes</strong>: still strong future ideas, but they should not hijack the startup screen.<br><br>
+
+        – 🍎 <strong>Native cleanup watch</strong>: eventually address Apple’s future <code>UIScene</code> lifecycle requirement.<br><br>
+
+        – 🧹 <strong>CSS discipline</strong>: clean only the feature being changed. No global CSS refactor unless a layout is actively broken.
       </p>
     </div>
   `;
