@@ -54,14 +54,6 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
       ${model.greeting}, ${model.username}!
     </p>
 
-    <p class="startup-title-line">
-      ${model.title}
-    </p>
-
-    <p class="startup-progress-line">
-      Festival Completion: <strong>${model.percent}%</strong>
-    </p>
-
     <p class="startup-streak-line">
       ${streakLabel}
     </p>

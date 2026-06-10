@@ -90,6 +90,9 @@ let nativeDuration = 0;
 let nativeSeekRatio = 0;
 let nativeSuppressedByExternalAudio = false;
 
+let nativeEndedHandledTrackId = '';
+let nativeEndedHandledAt = 0;
+
 let nativeStateWired = false;
 let nativeStatePollTimer = null;
 
@@ -136,6 +139,74 @@ function wireNativeAudioStateOnce() {
   });
 }
 
+function nativeStateLooksFinished(state = {}) {
+  if (!useNativeAudio()) return false;
+
+  const trackId = typeof state.trackId === 'string' ? state.trackId : '';
+  if (!trackId) return false;
+
+  // Native Swift is now the only authority for "finished."
+  // Do not guess from currentTime/duration. A paused scrubber near the end
+  // is NOT the same thing as a completed track.
+  if (state.ended !== true) return false;
+
+  if (!!state.playing) return false;
+  if (!!state.looping || looping) return false;
+  if (!!state.suppressedByExternalAudio) return false;
+
+  return true;
+}
+
+function maybeAutoAdvanceNativeEndedTrack(state = {}) {
+  if (!nativeStateLooksFinished(state)) return;
+
+  const trackId = typeof state.trackId === 'string'
+    ? state.trackId
+    : currentTrackMeta?.id || '';
+
+  if (!trackId) return;
+
+  const now = Date.now();
+
+  // Prevent repeated polling from firing skipNext 10 times.
+  if (
+    nativeEndedHandledTrackId === trackId &&
+    now - nativeEndedHandledAt < 1500
+  ) {
+    return;
+  }
+
+  nativeEndedHandledTrackId = trackId;
+  nativeEndedHandledAt = now;
+
+  console.log('🎵 [SCMF][Music] Native track ended; advancing:', trackId);
+
+  setTimeout(() => {
+    handleNativeTrackEnded(trackId);
+  }, 0);
+}
+
+function handleNativeTrackEnded(trackId) {
+  // Story/custom callers still get first claim.
+  if (typeof currentEndOverride === 'function') {
+    try {
+      currentEndOverride(trackId);
+    } catch (err) {
+      console.warn('⚠️ Native onEnd override error:', err);
+    }
+    return;
+  }
+
+  if (looping) return;
+
+  if (shuffling) {
+    playRandomTrack();
+    return;
+  }
+
+  skipNext();
+}
+
 function applyNativeAudioState(state = {}) {
   const trackId = typeof state.trackId === 'string' ? state.trackId : '';
   const trackName = typeof state.trackName === 'string' ? state.trackName : '';
@@ -178,6 +249,7 @@ function applyNativeAudioState(state = {}) {
   }
 
   emitMusicState();
+  maybeAutoAdvanceNativeEndedTrack(state);
 }
 
 function shouldPollNativeMusicState() {
@@ -248,6 +320,8 @@ function playNativeTrackByMeta(meta, opts = {}) {
   currentTrack = null;
   currentTrackMeta = meta;
   currentEndOverride = opts.onEnd || null;
+  nativeEndedHandledTrackId = '';
+  nativeEndedHandledAt = 0;
 
   nativePlayTrack(meta.id, {
     volume,
@@ -1244,12 +1318,34 @@ export function toggleLoop() {
   return setLoop(!looping);
 }
 
+function refreshNativeMusicStateSoon() {
+  if (!useNativeAudio()) return;
+
+  wireNativeAudioStateOnce();
+
+  try {
+    nativeRequestMusicState();
+  } catch {}
+
+  // Ask again one beat later because AVAudioPlayer can update its looped
+  // currentTime just after the button tap / loop toggle.
+  setTimeout(() => {
+    try { nativeRequestMusicState(); } catch {}
+  }, 120);
+}
+
 export function setLoop(val) {
   looping = !!val;
 
   if (useNativeAudio()) {
     nativeSetLooping(looping);
-    emitMusicState();
+
+    // 🍧 Native owns the real playhead.
+    // Do NOT immediately emit JS-estimated time here.
+    // After a loop boundary, JS may still think the scrubber is near 100%,
+    // while AVAudioPlayer has already wrapped back to the start.
+    refreshNativeMusicStateSoon();
+
     return looping;
   }
 
