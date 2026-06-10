@@ -207,6 +207,8 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
     // The live secondaryAudioShouldBeSilencedHint remains the source of truth,
     // but this helps logging and suppression flow stay readable.
     private var externalAudioHintActive: Bool = false
+    
+    private var musicDidFinishNaturally: Bool = false
 
     private override init() {
         super.init()
@@ -292,6 +294,8 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
             musicPlayer = player
             currentTrackId = asset.id
             currentTrackName = asset.name
+            
+            musicDidFinishNaturally = false
 
             player.play()
 
@@ -349,6 +353,7 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
             stopExternalAudioPoll()
             externalAudioSuppressionActive = false
             player.volume = muted ? 0.0 : musicVolume
+            musicDidFinishNaturally = false
             player.play()
             print("▶️ [SCMF][NativeAudio] resumeMusic id=\(currentTrackId ?? "(none)") allowExternalAudio=\(allowExternalAudio)")
         }
@@ -385,6 +390,8 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
         deferredMusicRequest = nil
         externalAudioSuppressionActive = false
         stopExternalAudioPoll()
+        
+        musicDidFinishNaturally = false
 
         print("🛑 [SCMF][NativeAudio] stopMusic")
     }
@@ -394,6 +401,7 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
 
         let safeTime = min(max(0, seconds), player.duration)
         player.currentTime = safeTime
+        musicDidFinishNaturally = false
 
         print("🎚️ [SCMF][NativeAudio] seekMusic \(safeTime)")
     }
@@ -404,6 +412,7 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
         if let player = musicPlayer {
             let target = player.duration * percent
             player.currentTime = min(max(0, target), player.duration)
+            musicDidFinishNaturally = false
 
             print("🎚️ [SCMF][NativeAudio] seekMusic percent=\(percent) seconds=\(player.currentTime)")
             return
@@ -433,6 +442,12 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
 
     func setLooping(_ value: Bool) {
         looping = value
+
+        // Important:
+        // Toggling loop should never leave an old natural-end flag alive.
+        // Otherwise the JS lane can see "ended" later and skip tracks by accident.
+        musicDidFinishNaturally = false
+
         musicPlayer?.numberOfLoops = looping ? -1 : 0
 
         print("🔁 [SCMF][NativeAudio] setLooping \(looping)")
@@ -502,6 +517,10 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
         }()
 
         let currentTime: TimeInterval = {
+            if musicDidFinishNaturally {
+                return duration
+            }
+
             if let player {
                 return player.currentTime
             }
@@ -528,7 +547,8 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
             "muted": muted,
             "looping": looping,
             "suppressedByExternalAudio": externalAudioSuppressionActive || externalAudioHintActive,
-            "hasDeferred": deferredMusicRequest != nil
+            "hasDeferred": deferredMusicRequest != nil,
+            "ended": musicDidFinishNaturally,
         ]
     }
 
@@ -711,7 +731,20 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
         sfxPlayers.removeAll { $0 === player }
 
         if player === musicPlayer {
-            print("🎵 [SCMF][NativeAudio] music finished id=\(currentTrackId ?? "(none)")")
+            // Defensive guard:
+            // A loop boundary should not become a JS "ended" event.
+            // Swift is the turntable; JS only advances when this flag is truly final.
+            if looping {
+                musicDidFinishNaturally = false
+                print("🔁 [SCMF][NativeAudio] loop boundary ignored as track end id=\(currentTrackId ?? "(none)")")
+                return
+            }
+
+            musicDidFinishNaturally = true
+            shouldResumeAfterForeground = false
+            shouldResumeAfterInterruption = false
+
+            print("🎵 [SCMF][NativeAudio] music finished id=\(currentTrackId ?? "(none)") successfully=\(flag)")
         }
     }
 

@@ -7,7 +7,12 @@ export function renderThemesTab() {
   const currentTheme = appState.settings.theme;
   const unlocked = appState.profile?.unlockedThemes || [];
 
-  let html = '<div class="theme-grid">';
+  let html = `
+    <div class="theme-tab-note">
+      🎨 Play the game. Earn cones. Unlock new festival backgrounds! 
+    </div>
+    <div class="theme-grid">
+  `;
 
   Object.keys(themeLabels).forEach(themeId => {
     const label = themeLabels[themeId];

@@ -120,8 +120,19 @@ git commit -m "🌈 Locking in current dev state" --no-verify
 git push origin main --no-verify
 ```
 
+
+cd ~/Documents/SnowCone-MathFest
+
+find public/assets -type f ! -name ".DS_Store" -print0 | \
+xargs -0 -n 1 -P 4 sh -c '
+  echo "🍧 thawing $1"
+  cat "$1" > /dev/null
+' sh
+
 npm run build:native
 npx cap open ios
+
+npm run build:native && npx cap open ios
 
 Re-run:
 ```bash
