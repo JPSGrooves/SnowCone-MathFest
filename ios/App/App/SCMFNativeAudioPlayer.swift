@@ -210,6 +210,11 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
     
     private var musicDidFinishNaturally: Bool = false
 
+    // Manual pause is sacred.
+    // If the player pauses the Radio, native interruption/external-audio logic
+    // must not resurrect the track later.
+    private var userPausedMusic: Bool = false
+    
     private override init() {
         super.init()
     }
@@ -229,6 +234,10 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
             print("🔊⚠️ [SCMF][NativeAudio] Unknown music id:", rawId)
             return
         }
+
+        userPausedMusic = false
+        shouldResumeAfterForeground = false
+        shouldResumeAfterInterruption = false
 
         // Configure category only. Do NOT activate before checking external audio.
         SCMFAudioSession.shared.configure()
@@ -308,17 +317,30 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
     func pauseMusic() {
         guard let player = musicPlayer else { return }
 
+        userPausedMusic = true
+        shouldResumeAfterForeground = false
+        shouldResumeAfterInterruption = false
+
+        deferredMusicRequest = nil
+        externalAudioSuppressionActive = false
+        stopExternalAudioPoll()
+
         if player.isPlaying {
             player.pause()
-            print("⏸️ [SCMF][NativeAudio] pauseMusic id=\(currentTrackId ?? "(none)")")
+            print("⏸️ [SCMF][NativeAudio] pauseMusic id=\(currentTrackId ?? "(none)") userPaused=true")
+        } else {
+            print("⏸️ [SCMF][NativeAudio] pauseMusic ignored; already paused id=\(currentTrackId ?? "(none)") userPaused=true")
         }
     }
 
     func resumeMusic(allowExternalAudio: Bool = false) {
         guard let player = musicPlayer else {
+            userPausedMusic = false
             tryResumeDeferredMusicIfAllowed(reason: "resumeMusic-no-player")
             return
         }
+
+        userPausedMusic = false
 
         SCMFAudioSession.shared.configure()
 
@@ -392,6 +414,7 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
         stopExternalAudioPoll()
         
         musicDidFinishNaturally = false
+        userPausedMusic = false
 
         print("🛑 [SCMF][NativeAudio] stopMusic")
     }
@@ -549,6 +572,7 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
             "suppressedByExternalAudio": externalAudioSuppressionActive || externalAudioHintActive,
             "hasDeferred": deferredMusicRequest != nil,
             "ended": musicDidFinishNaturally,
+            "userPaused": userPausedMusic,
         ]
     }
 
@@ -662,9 +686,11 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
     }
     
     func handleInterruptionBegan() {
-        shouldResumeAfterInterruption = musicPlayer?.isPlaying == true
+        let wasPlaying = musicPlayer?.isPlaying == true
 
-        if let player = musicPlayer {
+        shouldResumeAfterInterruption = wasPlaying && !userPausedMusic
+
+        if let player = musicPlayer, wasPlaying {
             if let id = currentTrackId {
                 deferredMusicRequest = DeferredMusicRequest(
                     id: id,
@@ -675,6 +701,8 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
             }
 
             player.pause()
+        } else if userPausedMusic {
+            deferredMusicRequest = nil
         }
 
         for player in sfxPlayers {
@@ -682,14 +710,29 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
         }
         sfxPlayers.removeAll()
 
-        externalAudioSuppressionActive = true
-        startExternalAudioPollIfNeeded(reason: "interruption began")
+        if shouldResumeAfterInterruption {
+            externalAudioSuppressionActive = true
+            startExternalAudioPollIfNeeded(reason: "interruption began")
+        } else {
+            externalAudioSuppressionActive = false
+            stopExternalAudioPoll()
+        }
 
-        print("📵 [SCMF][NativeAudio] interruption began; shouldResume=\(shouldResumeAfterInterruption)")
+        print("📵 [SCMF][NativeAudio] interruption began; shouldResume=\(shouldResumeAfterInterruption) userPaused=\(userPausedMusic)")
     }
     
     func handleInterruptionEnded() {
         SCMFAudioSession.shared.configure()
+        
+        if userPausedMusic {
+            shouldResumeAfterInterruption = false
+            deferredMusicRequest = nil
+            externalAudioSuppressionActive = false
+            stopExternalAudioPoll()
+
+            print("📳 [SCMF][NativeAudio] interruption ended; not resuming because userPaused=true")
+            return
+        }
 
         if shouldLetExternalAudioWin() {
             shouldResumeAfterInterruption = false
@@ -853,9 +896,19 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
     
     func handleExternalAudioBegan() {
         externalAudioHintActive = true
+
+        if userPausedMusic {
+            deferredMusicRequest = nil
+            externalAudioSuppressionActive = false
+            stopExternalAudioPoll()
+
+            print("🎧 [SCMF][NativeAudio] external audio began; ignored because userPaused=true")
+            return
+        }
+
         externalAudioSuppressionActive = true
 
-        if let player = musicPlayer {
+        if let player = musicPlayer, player.isPlaying {
             if let id = currentTrackId {
                 deferredMusicRequest = DeferredMusicRequest(
                     id: id,
@@ -865,20 +918,25 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
                 )
             }
 
-            if player.isPlaying {
-                player.pause()
-            }
+            player.pause()
+            startExternalAudioPollIfNeeded(reason: "silence hint began")
+
+            print("🎧 [SCMF][NativeAudio] external audio began; SCMF soundtrack suppressed")
+        } else {
+            print("🎧 [SCMF][NativeAudio] external audio began; no active SCMF music to suppress")
         }
-
-        startExternalAudioPollIfNeeded(reason: "silence hint began")
-
-        print("🎧 [SCMF][NativeAudio] external audio began; SCMF soundtrack suppressed")
     }
 
     func handleExternalAudioEnded() {
         externalAudioHintActive = false
         externalAudioSuppressionActive = false
         stopExternalAudioPoll()
+
+        if userPausedMusic {
+            deferredMusicRequest = nil
+            print("🎧 [SCMF][NativeAudio] external audio ended; not resuming because userPaused=true")
+            return
+        }
 
         print("🎧 [SCMF][NativeAudio] external audio ended; SCMF may resume soundtrack")
 
@@ -889,6 +947,15 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
 
     func tryResumeDeferredMusicIfAllowed(reason: String = "unknown") {
         guard let request = deferredMusicRequest else {
+            return
+        }
+
+        if userPausedMusic {
+            deferredMusicRequest = nil
+            externalAudioSuppressionActive = false
+            stopExternalAudioPoll()
+
+            print("🎧 [SCMF][NativeAudio] deferred resume blocked (\(reason)); userPaused=true")
             return
         }
 

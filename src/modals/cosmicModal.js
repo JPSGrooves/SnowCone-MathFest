@@ -3,10 +3,15 @@ import { autorun } from 'mobx';
 import { appState } from '../data/appState.js';
 import { hapticTap } from '../utils/haptics.js'; // 📳 modal tap vibes
 
-import { renderProfileTab, setupProfileTabUI } from './profileTab.js';
+import {
+  renderProfileTab,
+  setupProfileTabUI,
+  syncProfileTabIcon,
+} from './profileTab.js';
 import { renderThemesTab, setupThemesTabUI } from './themesTab.js';
 import { renderMusicTab, setupMusicTabUI } from './musicTab.js';
 import { renderVersionTab, setupVersionTabUI } from './versionTab.js';
+import { renderConesTab, setupConesTabUI } from './conesTab.js';
 
 // 🍧 WKWebView tap-through shield (Capacitor iOS only)
 let COSMIC_BLOCK_UNTIL = 0;
@@ -137,9 +142,10 @@ function renderTab(tabName) {
 
   const tabMap = {
     profile: { render: renderProfileTab, setup: setupProfileTabUI },
+    cones: { render: renderConesTab, setup: setupConesTabUI },
     themes: { render: renderThemesTab, setup: setupThemesTabUI },
-    music: { render: renderMusicTab, setup: setupMusicTabUI },
     version: { render: renderVersionTab, setup: setupVersionTabUI },
+    music: { render: renderMusicTab, setup: setupMusicTabUI },
   };
 
   const tab = tabMap[tabName];
@@ -215,8 +221,9 @@ function setupTabListeners() {
 //////////////////////////////
 document.addEventListener('DOMContentLoaded', () => {
   setupTabListeners();
-  installCosmicTapThroughShield(); // 👈 add this
+  installCosmicTapThroughShield();
   wireOverlayClose();
+  syncProfileTabIcon();
   console.log('🧊 Cosmic modal listeners wired.');
 });
 
@@ -229,9 +236,10 @@ window.openModal = openModal;
 //////////////////////////////
 autorun(() => {
   const badgeFlag = appState.uiState?.triggerBadgeModal;
+
   if (badgeFlag) {
     console.log('🌈 Badge modal trigger received via autorun!');
-    openModal('profile');
+    openModal('cones');
     appState.clearTriggerBadgeModal();
   }
 });

@@ -1,8 +1,84 @@
-// src/tabs/profileTab.js — profile, rank, completion, cones
+// src/tabs/profileTab.js — profile, rank, completion, XP
 
 import { appState } from '../data/appState.js';
-import { renderBadgeGrid, allBadges } from '../managers/badgeManager.js';
-import { INTRO_COPY_HTML } from '../content/introCopy.js';
+
+const DEFAULT_AVATAR_EMOJI = '🧑‍🚀';
+
+const AVATAR_EMOJIS = [
+  '🧑‍🚀',
+  '👩‍🚀',
+  '👨‍🚀',
+  '👩🏻‍🚀',
+  '👨🏻‍🚀',
+  '👩🏽‍🚀',
+  '👨🏽‍🚀',
+  '👩🏿‍🚀',
+  '👨🏿‍🚀',
+
+  '👽',
+  '🤖',
+  '🛸',
+  '🌙',
+  '☄️',
+  '🪐',
+  '⭐',
+  '🌟',
+
+  '🧙',
+  '🧙‍♀️',
+  '🧙‍♂️',
+  '🧝',
+  '🧝‍♀️',
+  '🧝‍♂️',
+  '🧚',
+  '🧚‍♀️',
+  '🧚‍♂️',
+  '🧞',
+  '🧞‍♀️',
+  '🧞‍♂️',
+
+  '🦸',
+  '🦸‍♀️',
+  '🦸‍♂️',
+  '🕵️',
+  '🕵️‍♀️',
+  '🕵️‍♂️',
+  '🥷',
+  '🧜',
+  '🧜‍♀️',
+  '🧜‍♂️',
+];
+
+function escapeAttr(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
+function getSafeAvatarEmoji() {
+  const saved = appState?.profile?.avatarEmoji;
+
+  if (AVATAR_EMOJIS.includes(saved)) {
+    return saved;
+  }
+
+  return DEFAULT_AVATAR_EMOJI;
+}
+
+function getSafeUsername() {
+  return appState?.profile?.username || 'Friend';
+}
 
 function getProfileRankTitle(percent, breakdown) {
   const coreDone = Number(breakdown?.badges?.badgesFrac ?? 0) >= 1;
@@ -29,21 +105,126 @@ function getProfileRankLine(percent, breakdown) {
   const legendDone = !!breakdown?.legendDone;
 
   if (percent >= 100 && legendDone) {
-    return 'Full festival completion. Everything now is style runs, high scores, and cosmic flexing.';
+    return 'You did everything! You are the SnowCone Master!';
   }
 
   if (coreDone && !legendDone) {
-    return 'Core cones are cleared. The Legend badge is the final push.';
+    return '100% of Core Cones! The Legendendary cones await!';
   }
 
-  if (percent >= 80) return 'Late-game cone energy. Target specific badges now.';
-  if (percent >= 50) return 'More done than not. The festival is taking shape.';
-  if (percent >= 20) return 'You are learning the map. Keep scooping.';
-  return 'Fresh festival file. Every cone counts.';
+  if (percent >= 80) {
+    return 'You probably know about the ghosts by now!';
+  }
+
+  if (percent >= 50) {
+    return 'The cone is half full!';
+  }
+
+  if (percent >= 20) {
+    return 'You are learning the shapes of the festival!';
+  }
+
+  if (percent >= 10) {
+    return 'You have officially started your SnowCone trail!';
+  }
+
+  return 'Fresh Festival energy. Find your first cones!';
 }
 
-function getSafeUsername() {
-  return appState?.profile?.username || 'Friend';
+function getProfileXPModel() {
+  const xp = Number(appState?.profile?.xp ?? 0);
+  const level = Number(appState?.profile?.level ?? 1);
+
+  const safeXP = Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;
+  const safeLevel = Number.isFinite(level) ? Math.max(1, Math.floor(level)) : 1;
+
+  const nextLevelXP = safeLevel * 100;
+  const xpToNext = Math.max(0, nextLevelXP - safeXP);
+
+  return {
+    xp: safeXP,
+    level: safeLevel,
+    xpToNext,
+  };
+}
+
+function getAvatarIndex(emoji) {
+  const index = AVATAR_EMOJIS.indexOf(emoji);
+  return index >= 0 ? index : 0;
+}
+
+function getAvatarByIndex(index) {
+  const safeIndex =
+    ((index % AVATAR_EMOJIS.length) + AVATAR_EMOJIS.length) %
+    AVATAR_EMOJIS.length;
+
+  return AVATAR_EMOJIS[safeIndex] || DEFAULT_AVATAR_EMOJI;
+}
+
+function renderAvatarPicker(currentEmoji) {
+  const currentIndex = getAvatarIndex(currentEmoji);
+  const displayNumber = currentIndex + 1;
+  const total = AVATAR_EMOJIS.length;
+
+  return `
+    <div class="profile-avatar-picker" aria-label="Choose your festival avatar">
+      <button
+        type="button"
+        class="profile-avatar-arrow"
+        data-avatar-step="-1"
+        aria-label="Previous avatar"
+      >
+        ‹
+      </button>
+
+      <div class="profile-avatar-display-wrap">
+        <div class="profile-avatar-big" aria-hidden="true">
+          ${escapeHtml(currentEmoji)}
+        </div>
+        <div class="profile-avatar-count" id="profileAvatarCount">
+          ${displayNumber}/${total}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="profile-avatar-arrow"
+        data-avatar-step="1"
+        aria-label="Next astronaut"
+      >
+        ›
+      </button>
+    </div>
+  `;
+}
+
+function showProfileInputMessage(input, text) {
+  const oldMsg = input.nextElementSibling;
+
+  if (oldMsg?.classList.contains('input-message')) {
+    oldMsg.remove();
+  }
+
+  const message = document.createElement('div');
+  message.classList.add('input-message');
+  message.textContent = text;
+
+  Object.assign(message.style, {
+    color: '#00ffee',
+    textAlign: 'center',
+    marginTop: '0.5em',
+    fontSize: '0.85rem',
+  });
+
+  input.insertAdjacentElement('afterend', message);
+  setTimeout(() => message.remove(), 2500);
+}
+
+export function syncProfileTabIcon() {
+  const btn = document.querySelector('.tab-button[data-tab="profile"]');
+  if (!btn) return;
+
+  btn.textContent = `${getSafeAvatarEmoji()}Profile`;
 }
 
 export function renderProfileTab() {
@@ -55,61 +236,60 @@ export function renderProfileTab() {
     ? appState.getCompletionPercent()
     : 0;
 
-  const nonLegendTotal =
-    breakdown?.badges?.nonLegendTotal ??
-    Object.keys(allBadges).filter((id) => {
-      const meta = allBadges[id];
-      return id !== 'legend' && !meta?.legendary;
-    }).length;
-
-  const nonLegendOwned = breakdown?.badges?.nonLegendOwned ?? 0;
   const rankTitle = getProfileRankTitle(percent, breakdown);
   const rankLine = getProfileRankLine(percent, breakdown);
-  const username = getSafeUsername();
+  const username = escapeAttr(getSafeUsername());
+  const avatarEmoji = getSafeAvatarEmoji();
+  const xpModel = getProfileXPModel();
 
   return `
-    <div class="settings-block profile-name-block">
-      <label for="profileNameInput">🧑‍🚀 Your Name:</label>
-      <input
-        id="profileNameInput"
-        type="text"
-        placeholder="Enter name..."
-        value="${username}"
-      />
-    </div>
+    <div class="profile-tab-shell">
+      <div class="settings-block profile-avatar-block">
+        <div class="profile-avatar-label">
+          Choose Your Festival Avatar
+        </div>
 
-    <div class="settings-block">
-      <h3>📈 SnowCone Completion</h3>
-      <div class="xp-bar-wrap">
-        <div class="xp-bar" id="xpBar"></div>
+        ${renderAvatarPicker(avatarEmoji)}
       </div>
-      <span id="xpPercentText">0%</span>
-    </div>
 
-    <div class="settings-block profile-rank-card">
-      <h3 class="profile-rank-title">🍧 ${rankTitle}</h3>
-      <p class="profile-rank-line">${rankLine}</p>
-    </div>
+      <div class="settings-block profile-name-block">
+        <label for="profileNameInput">Profile Name:</label>
+        <input
+          id="profileNameInput"
+          type="text"
+          placeholder="Enter name..."
+          value="${username}"
+        />
+      </div>
 
-    <div class="settings-block">
-      <h3 class="cones-earned-title">
-        🏅 Cones Earned <span class="cones-earned-count">${nonLegendOwned}/${nonLegendTotal}</span>
-      </h3>
-      <div id="badgeGrid" class="badge-wrapper"></div>
-    </div>
+      <div class="settings-block profile-completion-card">
+        <h3>📈 SnowCone Completion</h3>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar" id="xpBar"></div>
+        </div>
+        <span id="xpPercentText">0%</span>
+      </div>
 
-    <div class="settings-block completion-guide-block">
-      <h3>🎯 How to reach 100%</h3>
-      <ul class="completion-brief">
-        <li><strong>Core Cones (95%)</strong> — Unlock all <strong>${nonLegendTotal}</strong> core cones.</li>
-        <li><strong>Legend Cone (5%)</strong> — After that, the <em>Legend</em> cone completes the bar.</li>
-        <li><strong>Bonus Legendary Cones</strong> — Extra flex cones that do not move the % bar.</li>
-      </ul>
+      <div class="settings-block profile-rank-card">
+        <h3 class="profile-rank-title">🍧 ${rankTitle}</h3>
+        <p class="profile-rank-line">${rankLine}</p>
+      </div>
+
+      <div class="settings-block profile-xp-card">
+        <h3 class="profile-xp-title">
+          ✨ XP: <span id="profileXpValue">${xpModel.xp}</span>
+        </h3>
+        <p class="profile-xp-line">
+          Level ${xpModel.level} · ${xpModel.xpToNext} XP to next level
+        </p>
+      </div>
     </div>
   `;
 }
 
 export function setupProfileTabUI() {
+  syncProfileTabIcon();
+
   const input = document.getElementById('profileNameInput');
 
   if (input) {
@@ -118,40 +298,19 @@ export function setupProfileTabUI() {
     if (sessionStorage.getItem('forceWelcomeReload')) {
       sessionStorage.removeItem('forceWelcomeReload');
 
-      const msg = document.createElement('div');
-      msg.classList.add('input-message');
-      msg.textContent = `✅ Save restored: Welcome back, ${appState.profile.username}!`;
-
-      Object.assign(msg.style, {
-        color: '#00ffee',
-        textAlign: 'center',
-        marginTop: '0.5em',
-        fontSize: '0.85rem',
-      });
-
-      input.insertAdjacentElement('afterend', msg);
-      setTimeout(() => msg.remove(), 2500);
+      showProfileInputMessage(
+        input,
+        `✅ Save restored: Welcome back, ${appState.profile.username}!`
+      );
     }
 
     input.onchange = () => {
       appState.profile.username = input.value.trim() || 'Friend';
 
-      const oldMsg = input.nextElementSibling;
-      if (oldMsg?.classList.contains('input-message')) oldMsg.remove();
-
-      const message = document.createElement('div');
-      message.classList.add('input-message');
-      message.textContent = `🧊 Welcome, ${appState.profile.username}!`;
-
-      Object.assign(message.style, {
-        color: '#00ffee',
-        textAlign: 'center',
-        marginTop: '0.5em',
-        fontSize: '0.85rem',
-      });
-
-      input.insertAdjacentElement('afterend', message);
-      setTimeout(() => message.remove(), 2500);
+      showProfileInputMessage(
+        input,
+        `🧊 Welcome, ${appState.profile.username}!`
+      );
 
       try {
         appState.saveToStorage?.();
@@ -159,12 +318,40 @@ export function setupProfileTabUI() {
     };
   }
 
-  const percent = appState.getCompletionPercent();
+  document.querySelectorAll('.profile-avatar-arrow').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const step = Number(btn.dataset.avatarStep || 0);
+      const currentEmoji = getSafeAvatarEmoji();
+      const currentIndex = getAvatarIndex(currentEmoji);
+      const nextEmoji = getAvatarByIndex(currentIndex + step);
+
+      appState.profile.avatarEmoji = nextEmoji;
+
+      const bigAvatar = document.querySelector('.profile-avatar-big');
+      if (bigAvatar) {
+        bigAvatar.textContent = nextEmoji;
+      }
+
+      const count = document.getElementById('profileAvatarCount');
+      if (count) {
+        count.textContent = `${getAvatarIndex(nextEmoji) + 1}/${AVATAR_EMOJIS.length}`;
+      }
+
+      syncProfileTabIcon();
+
+      try {
+        appState.saveToStorage?.();
+      } catch {}
+    });
+  });
+
+  const percent = appState.getCompletionPercent
+    ? appState.getCompletionPercent()
+    : 0;
+
   const bar = document.getElementById('xpBar');
   const text = document.getElementById('xpPercentText');
 
   if (bar) bar.style.width = `${percent}%`;
   if (text) text.textContent = `${percent}%`;
-
-  renderBadgeGrid();
 }

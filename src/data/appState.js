@@ -38,6 +38,7 @@ class AppState {
     infinityHighScore: 0,
     infinityLongestStreak: 0,
     username: 'Friend',
+    avatarEmoji: '🧑‍🚀',
     xp: 0,
     level: 1,
     qsHighScore: 0,
@@ -46,7 +47,7 @@ class AppState {
     lastPlayed: null,
     seenIntro: false,
     streakDays: 0,
-    lastStreakDayKey: null, // 'YYYY-MM-DD' in America/New_York
+    lastStreakDayKey: null,
   };
 
   // Settings (single source of truth for gameMode)

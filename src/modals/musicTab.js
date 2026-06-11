@@ -34,6 +34,14 @@ let _unsubMusic = null;
 let _musicTabAbort = null;
 
 let _scrubbingMusic = false;
+let _ignoreScrubInputUntil = 0;
+let _lastMuteToggleAt = 0;
+
+// Holds the visible clock briefly during Loop toggles.
+// This prevents the first native loop-off refresh from repainting
+// the scrubber to 0/end while iOS is still settling.
+let _heldMusicClock = null;
+let _musicClockHoldUntil = 0;
 
 let _lastGoodTrackLabel = '';
 
@@ -51,6 +59,206 @@ function bindMusicTabEvent(el, type, handler, options = {}) {
     ...options,
     signal: _musicTabAbort.signal,
   });
+}
+
+function musicUiNowMs() {
+  try {
+    return performance.now();
+  } catch {
+    return Date.now();
+  }
+}
+
+function blockScrubGhosts(ms = 850) {
+  _scrubbingMusic = false;
+  _ignoreScrubInputUntil = Math.max(
+    _ignoreScrubInputUntil,
+    musicUiNowMs() + ms
+  );
+}
+
+function shouldBlockScrubInput() {
+  return musicUiNowMs() < _ignoreScrubInputUntil;
+}
+
+function clamp01(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(1, n));
+}
+
+function clearHeldMusicClock() {
+  _heldMusicClock = null;
+  _musicClockHoldUntil = 0;
+}
+
+function getHeldMusicClockIfActive(trackId = '') {
+  if (!_heldMusicClock) return null;
+
+  if (musicUiNowMs() > _musicClockHoldUntil) {
+    clearHeldMusicClock();
+    return null;
+  }
+
+  if (
+    trackId &&
+    _heldMusicClock.trackId &&
+    _heldMusicClock.trackId !== trackId
+  ) {
+    clearHeldMusicClock();
+    return null;
+  }
+
+  return _heldMusicClock;
+}
+
+function holdClockFromBestAvailable(progressBar, timer, ms = 1600) {
+  const state = getMusicState?.() || {};
+  const previous = _lastGoodMusicClock || {};
+
+  const trackId =
+    state.trackId ||
+    currentTrackId?.() ||
+    previous.trackId ||
+    '';
+
+  const duration =
+    Number(state.duration) > 0
+      ? Number(state.duration)
+      : Number(previous.duration || 0);
+
+  if (duration <= 0) return null;
+
+  const visiblePercent = getVisibleProgressPercent(progressBar);
+  const stateCurrentTime = Number(state.currentTime);
+  const stateSeekPercent = Number(state.seekPercent);
+  const previousSeekPercent = Number(previous.seekPercent);
+
+  let seekPercent = null;
+
+  // First trust the visible scrubber, because that is what the player sees.
+  // But do not let a fresh fake 0 erase a known real position.
+  if (
+    visiblePercent !== null &&
+    (
+      visiblePercent > 0 ||
+      !Number.isFinite(previousSeekPercent) ||
+      previousSeekPercent <= 0
+    )
+  ) {
+    seekPercent = visiblePercent;
+  }
+
+  if (
+    seekPercent === null &&
+    Number.isFinite(stateCurrentTime) &&
+    stateCurrentTime > 0
+  ) {
+    seekPercent = stateCurrentTime / duration;
+  }
+
+  if (
+    seekPercent === null &&
+    Number.isFinite(stateSeekPercent) &&
+    stateSeekPercent > 0
+  ) {
+    seekPercent = stateSeekPercent;
+  }
+
+  if (
+    seekPercent === null &&
+    Number.isFinite(previousSeekPercent) &&
+    previousSeekPercent > 0
+  ) {
+    seekPercent = previousSeekPercent;
+  }
+
+  seekPercent = clamp01(seekPercent ?? 0);
+
+  const currentTime = duration * seekPercent;
+
+  const clock = {
+    trackId,
+    currentTime,
+    duration,
+    seekPercent,
+  };
+
+  _lastGoodMusicClock = clock;
+  _heldMusicClock = clock;
+  _musicClockHoldUntil = musicUiNowMs() + ms;
+
+  if (progressBar) {
+    progressBar.value = String(seekPercent * 100);
+  }
+
+  if (timer) {
+    timer.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+  }
+
+  return clock;
+}
+
+function restoreClockFromLastGood(progressBar, timer) {
+  const clock = _lastGoodMusicClock || {};
+  const duration = Number(clock.duration || 0);
+  const currentTime = Number(clock.currentTime || 0);
+  const seekPercent = Number(clock.seekPercent || 0);
+
+  if (progressBar && duration > 0) {
+    progressBar.value = String(Math.max(0, Math.min(100, seekPercent * 100)));
+  }
+
+  if (timer && duration > 0) {
+    timer.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+  }
+}
+
+function sealMusicButtonTouch(btn) {
+  if (!btn) return;
+
+  const seal = (event) => {
+    blockScrubGhosts();
+
+    try { event?.stopPropagation?.(); } catch {}
+  };
+
+  bindMusicTabEvent(btn, 'pointerdown', seal, { passive: false });
+  bindMusicTabEvent(btn, 'touchstart', seal, { passive: false });
+}
+
+function getMusicDeckStatusText(state = getMusicState?.() || {}) {
+  const playing =
+    typeof state?.playing === 'boolean'
+      ? state.playing
+      : isPlaying();
+
+  const loopActive =
+    typeof state?.looping === 'boolean'
+      ? state.looping
+      : getLooping();
+
+  const shuffleActive =
+    typeof state?.shuffling === 'boolean'
+      ? state.shuffling
+      : getShuffling();
+
+  if (!playing) return 'PAUSED';
+
+  if (loopActive && shuffleActive) return 'LOOP + SHUFFLE';
+  if (loopActive) return 'LOOPING';
+  if (shuffleActive) return 'SHUFFLING';
+
+  return 'NOW PLAYING';
+}
+
+function updateMusicDeckStatusLabel(state = getMusicState?.() || {}) {
+  const label = document.getElementById('musicDeckStatusLabel')
+    || document.querySelector('.music-deck-screen-label');
+
+  if (!label) return;
+
+  label.textContent = getMusicDeckStatusText(state);
 }
 
 export function renderMusicTab() {
@@ -82,7 +290,13 @@ export function renderMusicTab() {
       </div>
 
       <div class="music-deck-screen">
-        <div class="music-deck-screen-label">Now Playing</div>
+        <div id="musicDeckStatusLabel" class="music-deck-screen-label">
+          ${getMusicDeckStatusText({
+            playing,
+            looping: loopActive,
+            shuffling: shuffleActive,
+          })}
+        </div>
 
         <div class="track-title-container music-deck-title-wrap">
           <div id="currentTrack" class="track-title music-deck-track-title">
@@ -213,6 +427,15 @@ export function setupMusicTabUI() {
   const progressBar  = document.getElementById('trackProgress');
   const timer        = document.getElementById('trackTimer');
 
+  [
+    playPauseBtn,
+    nextBtn,
+    prevBtn,
+    loopBtn,
+    shuffleBtn,
+    muteBtn,
+  ].forEach(sealMusicButtonTouch);
+
   document.body.classList.add('neon-progress');
 
   // 🔥 Subscribe once: UI becomes reactive instead of guessing with timeouts.
@@ -222,6 +445,8 @@ export function setupMusicTabUI() {
     const playing = !!state.playing;
 
     setPlayButtonUI(playing);
+
+    updateMusicDeckStatusLabel(state);
 
     updateTrackLabelUI(getMusicDisplayLabel(state));
 
@@ -246,10 +471,40 @@ export function setupMusicTabUI() {
   });
 
   // 🔇 / 🔊 Jukebox Mute Button
-  bindMusicTabEvent(muteBtn, 'click', () => {
-    const currentlyMuted = safeIsMuted();
-    setMuted(!currentlyMuted);
+bindMusicTabEvent(muteBtn, 'click', (event) => {
+  try { event?.preventDefault?.(); } catch {}
+  try { event?.stopPropagation?.(); } catch {}
+
+  const now = musicUiNowMs();
+
+  // 🍧 Anti-spam guard:
+  // Mute is a state toggle, not an arcade button.
+  // Prevent rapid taps from forcing repeated native + MobX + UI repaint cycles
+  // that can visually disturb the scrubber.
+  if (now - _lastMuteToggleAt < 420) {
+    blockScrubGhosts(900);
+    holdClockFromBestAvailable(progressBar, timer, 900);
+    return;
+  }
+
+  _lastMuteToggleAt = now;
+
+  blockScrubGhosts(1400);
+  holdClockFromBestAvailable(progressBar, timer, 1400);
+
+  const currentlyMuted = safeIsMuted();
+  setMuted(!currentlyMuted);
+
+  requestAnimationFrame(() => {
+    holdClockFromBestAvailable(progressBar, timer, 1400);
   });
+
+  setTimeout(() => {
+    try {
+      updateMusicClockUI(getMusicState?.() || {}, { progressBar, timer });
+    } catch {}
+  }, 180);
+});
 
   // ✨ Neon Glow Toggle
   bindMusicTabEvent(glowToggle, 'change', () => {
@@ -267,6 +522,11 @@ export function setupMusicTabUI() {
 
   // 🎚️ Scrubbing seek
   bindMusicTabEvent(progressBar, 'input', (e) => {
+    if (!_scrubbingMusic || shouldBlockScrubInput()) {
+      restoreClockFromLastGood(progressBar, timer);
+      return;
+    }
+
     const percent = Math.max(
       0,
       Math.min(1, parseFloat(e.target.value) / 100)
@@ -298,6 +558,8 @@ export function setupMusicTabUI() {
       duration,
       seekPercent: percent,
     };
+
+    clearHeldMusicClock();
 
     if (timer) {
       timer.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
@@ -334,6 +596,8 @@ export function setupMusicTabUI() {
     // Swift parks SCMF music if user soundtrack is active.
     togglePlayPause({ userInitiated: false });
 
+    updateMusicDeckStatusLabel();
+
     const nowPlaying = isPlaying();
 
     if (!_awardedPlayMusic && !wasPlaying && nowPlaying) {
@@ -352,15 +616,62 @@ export function setupMusicTabUI() {
   });
 
   // 🔁 Loop
-  bindMusicTabEvent(loopBtn, 'click', () => {
+  bindMusicTabEvent(loopBtn, 'click', (event) => {
+    try { event?.preventDefault?.(); } catch {}
+    try { event?.stopPropagation?.(); } catch {}
+
+    // Freeze the clock BEFORE toggling native loop.
+    // This is the actual fix for the first Loop-off scrubber jump.
+    blockScrubGhosts(1800);
+    holdClockFromBestAvailable(progressBar, timer, 1800);
+
     const on = toggleLoop();
     loopBtn.classList.toggle('active', on);
+    updateMusicDeckStatusLabel({
+      ...(getMusicState?.() || {}),
+      looping: on,
+    });
+
+    // Freeze again one frame later because iOS may emit a late range/native repaint
+    // after the button click unwinds.
+    requestAnimationFrame(() => {
+      holdClockFromBestAvailable(progressBar, timer, 1800);
+    });
+
+    // Native gets a moment to settle, but updateMusicClockUI will respect the hold.
+    setTimeout(() => {
+      try {
+        updateMusicClockUI(getMusicState?.() || {}, { progressBar, timer });
+      } catch {}
+    }, 220);
+
+    // After the hold expires, let real native state own the display again.
+    setTimeout(() => {
+      try {
+        clearHeldMusicClock();
+        updateMusicClockUI(getMusicState?.() || {}, { progressBar, timer });
+      } catch {}
+    }, 1850);
   });
 
   // 🔀 Shuffle
-  bindMusicTabEvent(shuffleBtn, 'click', () => {
+  bindMusicTabEvent(shuffleBtn, 'click', (event) => {
+    try { event?.preventDefault?.(); } catch {}
+    try { event?.stopPropagation?.(); } catch {}
+
+    blockScrubGhosts(1000);
+    holdClockFromBestAvailable(progressBar, timer, 1000);
+
     const on = toggleShuffle();
     shuffleBtn.classList.toggle('active', on);
+    updateMusicDeckStatusLabel({
+      ...(getMusicState?.() || {}),
+      shuffling: on,
+    });
+
+    requestAnimationFrame(() => {
+      holdClockFromBestAvailable(progressBar, timer, 1000);
+    });
   });
 
   // 🎧 Select Track
@@ -382,6 +693,7 @@ export function setupMusicTabUI() {
 
     if (s) {
       setPlayButtonUI(!!s.playing);
+      updateMusicDeckStatusLabel(s);
 
       updateTrackLabelUI(getMusicDisplayLabel(s));
 
@@ -632,6 +944,11 @@ function getStableMusicClock(state = {}, progressBar = null) {
     _lastGoodMusicClock.trackId ||
     '';
 
+  const heldClock = getHeldMusicClockIfActive(incomingTrackId);
+  if (heldClock) {
+    return heldClock;
+  }
+
   const previous = _lastGoodMusicClock;
 
   const trackChanged =
@@ -679,18 +996,22 @@ function getStableMusicClock(state = {}, progressBar = null) {
   // If paused and we already know the track duration,
   // the visible scrubber owns the timer.
   if (!state?.playing && sameTrackOrUnknown && duration > 0) {
-    const visiblePercent =
-      getVisibleProgressPercent(progressBar) ??
-      previous.seekPercent ??
-      0;
+    const visiblePercent = getVisibleProgressPercent(progressBar);
+    const previousPercent = Number(previous.seekPercent || 0);
 
-    const currentTime = duration * visiblePercent;
+    // Do not let a freshly remounted range at 0 erase the real paused clock.
+    const stablePercent =
+      previousPercent > 0
+        ? previousPercent
+        : visiblePercent ?? 0;
+
+    const currentTime = duration * stablePercent;
 
     _lastGoodMusicClock = {
       trackId: incomingTrackId || previous.trackId,
       currentTime,
       duration,
-      seekPercent: visiblePercent,
+      seekPercent: stablePercent,
     };
 
     return _lastGoodMusicClock;
@@ -741,7 +1062,7 @@ function updateMusicClockUI(state = {}, { progressBar, timer } = {}) {
 
   // Playing: state/clock updates scrubber.
   // Paused: do NOT yank the scrubber around from native/web state.
-  if (progressBar && !_scrubbingMusic && state?.playing) {
+  if (progressBar && !_scrubbingMusic) {
     const nextValue = Math.max(
       0,
       Math.min(100, clock.seekPercent * 100)
