@@ -1945,3 +1945,113 @@ html[data-platform="ios"] .profile-xp-line,
     line-height: 1.2 !important;
   }
 }
+
+/* ──────────────────────────────────────────────────────────
+   Data Tab — Apple-first Save Booth
+   No version notes. No browser/PWA copy. No TLDR.
+   ────────────────────────────────────────────────────────── */
+
+.data-tab-card {
+  width: min(96%, 560px);
+  margin: 1.15rem auto 0 !important;
+  padding: 0.4rem 0.6rem !important;
+
+  text-align: center;
+}
+
+.data-tab-title {
+  margin-bottom: 0.65rem !important;
+
+  color: #00ffee !important;
+  font-size: clamp(1.45rem, 3vh, 2rem) !important;
+  line-height: 1.08 !important;
+
+  text-shadow:
+    0 0 10px rgba(0, 255, 238, 0.68),
+    0 0 22px rgba(0, 255, 238, 0.25) !important;
+}
+
+.data-tab-mainline {
+  width: min(92%, 430px);
+  margin: 0 auto 0.75rem;
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: clamp(1rem, 2vh, 1.28rem);
+  line-height: 1.24;
+}
+
+.data-tab-warning {
+  width: min(92%, 430px);
+  margin: 0 auto 1rem;
+
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(0.82rem, 1.55vh, 1rem);
+  line-height: 1.26;
+}
+
+.data-button-stack {
+  width: min(92%, 390px);
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.58rem;
+}
+
+.data-action-btn {
+  width: 100%;
+  min-height: 48px !important;
+
+  border-radius: 0.75rem !important;
+
+  font-size: clamp(1rem, 2vh, 1.22rem) !important;
+  line-height: 1.1 !important;
+}
+
+.data-danger-btn {
+  border-color: rgba(255, 95, 125, 0.78) !important;
+  color: #ffb8c8 !important;
+  box-shadow:
+    0 0 8px rgba(255, 95, 125, 0.28),
+    inset 0 0 8px rgba(255, 95, 125, 0.06) !important;
+}
+
+.data-tab-footer {
+  width: min(90%, 390px);
+  margin: 0.9rem auto 0;
+
+  color: rgba(255, 255, 255, 0.58);
+  font-size: clamp(0.78rem, 1.42vh, 0.92rem);
+  line-height: 1.22;
+}
+
+/* iPhone squeeze */
+@media (max-width: 600px) {
+  .data-tab-card {
+    margin-top: 0.95rem !important;
+  }
+
+  .data-tab-title {
+    margin-bottom: 0.55rem !important;
+  }
+
+  .data-tab-mainline {
+    margin-bottom: 0.65rem;
+  }
+
+  .data-tab-warning {
+    margin-bottom: 0.9rem;
+  }
+
+  .data-button-stack {
+    gap: 0.5rem;
+  }
+
+  .data-action-btn {
+    min-height: 46px !important;
+  }
+
+  .data-tab-footer {
+    margin-top: 0.75rem;
+  }
+}

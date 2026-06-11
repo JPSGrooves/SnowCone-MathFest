@@ -35,7 +35,7 @@ export function renderConesTab() {
       </h3>
 
       <p class="cones-tab-note">
-        These are your festival cones. Core cones push completion forward.
+        Cones are badges that show your progress.
         Legendary cones prove you were really here!
       </p>
 
