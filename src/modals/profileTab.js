@@ -4,50 +4,211 @@ import { appState } from '../data/appState.js';
 
 const DEFAULT_AVATAR_EMOJI = '🧑‍🚀';
 
-const AVATAR_EMOJIS = [
-  '🧑‍🚀',
-  '👩‍🚀',
-  '👨‍🚀',
-  '👩🏻‍🚀',
-  '👨🏻‍🚀',
-  '👩🏽‍🚀',
-  '👨🏽‍🚀',
-  '👩🏿‍🚀',
-  '👨🏿‍🚀',
+const AVATAR_GROUPS = [
+  {
+    label: 'Cosmic Crew',
+    emojis: [
+      '🧑‍🚀',
+      '👩‍🚀',
+      '👨‍🚀',
+      '👩🏻‍🚀',
+      '👨🏻‍🚀',
+      '👩🏽‍🚀',
+      '👨🏽‍🚀',
+      '👩🏿‍🚀',
+      '👨🏿‍🚀',
+      '👽',
+      '🤖',
+    ],
+  },
 
-  '👽',
-  '🤖',
-  '🛸',
-  '🌙',
-  '☄️',
-  '🪐',
-  '⭐',
-  '🌟',
+  {
+    label: 'Wizard Grove',
+    emojis: [
+      '🧙',
+      '🧙‍♀️',
+      '🧙‍♂️',
+      '🧙🏻‍♀️',
+      '🧙🏽‍♀️',
+      '🧙🏿‍♀️',
+      '🧙🏻‍♂️',
+      '🧙🏽‍♂️',
+    ],
+  },
 
-  '🧙',
-  '🧙‍♀️',
-  '🧙‍♂️',
-  '🧝',
-  '🧝‍♀️',
-  '🧝‍♂️',
-  '🧚',
-  '🧚‍♀️',
-  '🧚‍♂️',
-  '🧞',
-  '🧞‍♀️',
-  '🧞‍♂️',
+  {
+    label: 'Hero Hideout',
+    emojis: [
+      '🦸',
+      '🦸‍♀️',
+      '🦸‍♂️',
+      '🦸🏻‍♀️',
+      '🦸🏽‍♀️',
+      '🦸🏿‍♀️',
+      '🦸🏻‍♂️',
+      '🦸🏽‍♂️',
+      '🥷',
+      '🥷🏽',
+    ],
+  },
 
-  '🦸',
-  '🦸‍♀️',
-  '🦸‍♂️',
-  '🕵️',
-  '🕵️‍♀️',
-  '🕵️‍♂️',
-  '🥷',
-  '🧜',
-  '🧜‍♀️',
-  '🧜‍♂️',
+  {
+    label: 'Groove Grove',
+    emojis: [
+      '🧑‍🎨',
+      '👩‍🎨',
+      '👨‍🎨',
+      '🧑‍🎤',
+      '👩‍🎤',
+      '👨‍🎤',
+    ],
+  },
+
+  {
+    label: 'Camp Critters',
+    emojis: [
+      '🐱',
+      '🐶',
+      '🦊',
+      '🐻',
+      '🐼',
+      '🐸',
+      '🐵',
+      '🐯',
+      '🦁',
+      '🐰',
+    ],
+  },
 ];
+
+const AVATAR_EMOJIS = AVATAR_GROUPS.flatMap((group) => group.emojis);
+
+function getAvatarThemeLabel(emoji) {
+  const group = AVATAR_GROUPS.find((entry) =>
+    entry.emojis.includes(emoji)
+  );
+
+  return group?.label || 'Festival Crew';
+}
+
+let profileSaveTimer = null;
+
+function saveProfileSoon() {
+  if (profileSaveTimer) {
+    clearTimeout(profileSaveTimer);
+  }
+
+  profileSaveTimer = setTimeout(() => {
+    profileSaveTimer = null;
+
+    try {
+      appState.saveToStorage?.();
+    } catch {}
+  }, 220);
+}
+
+const PROFILE_NAME_MAX_CHARS = 15;
+const PROFILE_NAME_FALLBACK = 'Friend';
+
+const BASIC_BLOCKED_NAME_PATTERNS = [
+  // common profanity
+  ['s', 'h', 'i', 't'],
+  ['b', 't', 'c', 'h'],
+  ['a', 's', 's', 'h', 'o', 'l', 'e'],
+  ['n', 'i', 'g', 'g', 'e', 'r'],
+  ['s', 'h', 't'],
+  ['b', 'i', 't', 'c', 'h'],
+  ['n', 'i', 'g', 'g', 'a'],
+  ['f', 'u', 'c', 'k'],
+  ['f', 'c', 'k'],
+  ['f', 'u', 'k'],
+
+  // sexual / explicit basics
+  ['p', 'o', 'r', 'n'],
+  ['s', 'e', 'x'],
+  ['c', 'o', 'c', 'k'],
+  ['p', 'e', 'n', 'i', 's'],
+  ['v', 'a', 'g', 'i', 'n', 'a'],
+  ['p', 'u', 's', 's', 'y'],
+
+  // drug / adult basics
+  ['w', 'e', 'e', 'd'],
+  ['c', 'o', 'c', 'a', 'i', 'n', 'e'],
+  ['m', 'e', 't', 'h'],
+
+  // platform / authority impersonation
+  ['a', 'd', 'm', 'i', 'n'],
+  ['m', 'o', 'd', 'e', 'r', 'a', 't', 'o', 'r'],
+  ['s', 'y', 's', 't', 'e', 'm'],
+  ['d', 'e', 'v', 'e', 'l', 'o', 'p', 'e', 'r'],
+].map((parts) => parts.join(''));
+
+function limitProfileNameLength(value) {
+  return Array.from(String(value ?? '')).slice(0, PROFILE_NAME_MAX_CHARS).join('');
+}
+
+function normalizeProfileNameForFilter(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replaceAll('@', 'a')
+    .replaceAll('4', 'a')
+    .replaceAll('0', 'o')
+    .replaceAll('1', 'i')
+    .replaceAll('!', 'i')
+    .replaceAll('3', 'e')
+    .replaceAll('5', 's')
+    .replaceAll('$', 's')
+    .replace(/[^a-z]/g, '');
+}
+
+function hasBlockedProfileLanguage(value) {
+  const normalized = normalizeProfileNameForFilter(value);
+
+  if (!normalized) return false;
+
+  return BASIC_BLOCKED_NAME_PATTERNS.some((pattern) =>
+    normalized.includes(pattern)
+  );
+}
+
+function stripUnsupportedProfileNameChars(value) {
+  return String(value ?? '')
+    .replace(/[^\p{L}\p{N} _'-]/gu, '')
+    .replace(/\s+/g, ' ');
+}
+
+function sanitizeProfileName(rawValue) {
+  const trimmed = stripUnsupportedProfileNameChars(rawValue).trim();
+  const limited = limitProfileNameLength(trimmed);
+
+  if (!limited) {
+    return {
+      name: PROFILE_NAME_FALLBACK,
+      reason: 'empty',
+    };
+  }
+
+  if (hasBlockedProfileLanguage(limited)) {
+    return {
+      name: PROFILE_NAME_FALLBACK,
+      reason: 'blocked',
+    };
+  }
+
+  if (limited !== trimmed) {
+    return {
+      name: limited,
+      reason: 'length',
+    };
+  }
+
+  return {
+    name: limited,
+    reason: null,
+  };
+}
 
 function escapeAttr(value) {
   return String(value ?? '')
@@ -77,7 +238,7 @@ function getSafeAvatarEmoji() {
 }
 
 function getSafeUsername() {
-  return appState?.profile?.username || 'Friend';
+  return sanitizeProfileName(appState?.profile?.username || PROFILE_NAME_FALLBACK).name;
 }
 
 function getProfileRankTitle(percent, breakdown) {
@@ -165,35 +326,32 @@ function renderAvatarPicker(currentEmoji) {
   const currentIndex = getAvatarIndex(currentEmoji);
   const displayNumber = currentIndex + 1;
   const total = AVATAR_EMOJIS.length;
+  const themeLabel = getAvatarThemeLabel(currentEmoji);
 
   return `
     <div class="profile-avatar-picker" aria-label="Choose your festival avatar">
       <button
         type="button"
-        class="profile-avatar-arrow"
+        class="profile-avatar-arrow profile-avatar-arrow-prev"
         data-avatar-step="-1"
         aria-label="Previous avatar"
-      >
-        ‹
-      </button>
+      ></button>
 
       <div class="profile-avatar-display-wrap">
         <div class="profile-avatar-big" aria-hidden="true">
           ${escapeHtml(currentEmoji)}
         </div>
         <div class="profile-avatar-count" id="profileAvatarCount">
-          ${displayNumber}/${total}
+          ${escapeHtml(themeLabel)} · ${displayNumber}/${total}
         </div>
       </div>
 
       <button
         type="button"
-        class="profile-avatar-arrow"
+        class="profile-avatar-arrow profile-avatar-arrow-next"
         data-avatar-step="1"
-        aria-label="Next astronaut"
-      >
-        ›
-      </button>
+        aria-label="Next avatar"
+      ></button>
     </div>
   `;
 }
@@ -257,6 +415,11 @@ export function renderProfileTab() {
         <input
           id="profileNameInput"
           type="text"
+          maxlength="${PROFILE_NAME_MAX_CHARS}"
+          autocomplete="nickname"
+          autocapitalize="words"
+          autocorrect="off"
+          spellcheck="false"
           placeholder="Enter name..."
           value="${username}"
         />
@@ -287,13 +450,116 @@ export function renderProfileTab() {
   `;
 }
 
+let avatarHoldStartTimer = null;
+let avatarHoldRepeatTimer = null;
+
+function clearAvatarHoldTimers() {
+  if (avatarHoldStartTimer) {
+    clearTimeout(avatarHoldStartTimer);
+    avatarHoldStartTimer = null;
+  }
+
+  if (avatarHoldRepeatTimer) {
+    clearInterval(avatarHoldRepeatTimer);
+    avatarHoldRepeatTimer = null;
+  }
+}
+
+function applyAvatarStep(step) {
+  const safeStep = Number(step || 0);
+  if (!safeStep) return;
+
+  const currentEmoji = getSafeAvatarEmoji();
+  const currentIndex = getAvatarIndex(currentEmoji);
+  const nextEmoji = getAvatarByIndex(currentIndex + safeStep);
+
+  appState.profile.avatarEmoji = nextEmoji;
+
+  const bigAvatar = document.querySelector('.profile-avatar-big');
+  if (bigAvatar) {
+    bigAvatar.textContent = nextEmoji;
+  }
+
+  const count = document.getElementById('profileAvatarCount');
+  if (count) {
+    count.textContent = `${getAvatarThemeLabel(nextEmoji)} · ${getAvatarIndex(nextEmoji) + 1}/${AVATAR_EMOJIS.length}`;
+  }
+
+  syncProfileTabIcon();
+  saveProfileSoon();
+}
+
+function wireAvatarArrowButton(btn) {
+  if (!btn) return;
+
+  const step = Number(btn.dataset.avatarStep || 0);
+  if (!step) return;
+
+  const startHold = (ev) => {
+    ev?.preventDefault?.();
+    ev?.stopPropagation?.();
+
+    clearAvatarHoldTimers();
+
+    try {
+      if (ev?.pointerId !== undefined) {
+        btn.setPointerCapture?.(ev.pointerId);
+      }
+    } catch {}
+
+    // Instant first move.
+    applyAvatarStep(step);
+
+    // Hold briefly, then zip.
+    avatarHoldStartTimer = setTimeout(() => {
+      avatarHoldStartTimer = null;
+
+      avatarHoldRepeatTimer = setInterval(() => {
+        applyAvatarStep(step);
+      }, 85);
+    }, 260);
+  };
+
+  const stopHold = (ev) => {
+    clearAvatarHoldTimers();
+
+    try {
+      if (ev?.pointerId !== undefined) {
+        btn.releasePointerCapture?.(ev.pointerId);
+      }
+    } catch {}
+  };
+
+  btn.addEventListener('pointerdown', startHold);
+  btn.addEventListener('pointerup', stopHold);
+  btn.addEventListener('pointercancel', stopHold);
+  btn.addEventListener('pointerleave', stopHold);
+  btn.addEventListener('lostpointercapture', stopHold);
+
+  // Keep keyboard / external keyboard support.
+  btn.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+
+    ev.preventDefault();
+    applyAvatarStep(step);
+  });
+}
+
 export function setupProfileTabUI() {
   syncProfileTabIcon();
 
   const input = document.getElementById('profileNameInput');
 
   if (input) {
-    input.value = appState.profile.username || 'Guest';
+    const initialName = sanitizeProfileName(appState.profile.username).name;
+
+    input.maxLength = PROFILE_NAME_MAX_CHARS;
+    input.value = initialName;
+    appState.profile.username = initialName;
+
+    try {
+      appState.saveToStorage?.();
+    } catch {}
 
     if (sessionStorage.getItem('forceWelcomeReload')) {
       sessionStorage.removeItem('forceWelcomeReload');
@@ -305,12 +571,22 @@ export function setupProfileTabUI() {
     }
 
     input.onchange = () => {
-      appState.profile.username = input.value.trim() || 'Friend';
+      const result = sanitizeProfileName(input.value);
 
-      showProfileInputMessage(
-        input,
-        `🧊 Welcome, ${appState.profile.username}!`
-      );
+      input.value = result.name;
+      appState.profile.username = result.name;
+
+      let messageText = `🧊 Welcome, ${appState.profile.username}!`;
+
+      if (result.reason === 'blocked') {
+        messageText = '🧊 Keep profile names festival-friendly.';
+      } else if (result.reason === 'empty') {
+        messageText = '🧊 Blank names become Friend.';
+      } else if (result.reason === 'length') {
+        messageText = `🧊 Saved as ${appState.profile.username} — ${PROFILE_NAME_MAX_CHARS} character max.`;
+      }
+
+      showProfileInputMessage(input, messageText);
 
       try {
         appState.saveToStorage?.();
@@ -319,30 +595,7 @@ export function setupProfileTabUI() {
   }
 
   document.querySelectorAll('.profile-avatar-arrow').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const step = Number(btn.dataset.avatarStep || 0);
-      const currentEmoji = getSafeAvatarEmoji();
-      const currentIndex = getAvatarIndex(currentEmoji);
-      const nextEmoji = getAvatarByIndex(currentIndex + step);
-
-      appState.profile.avatarEmoji = nextEmoji;
-
-      const bigAvatar = document.querySelector('.profile-avatar-big');
-      if (bigAvatar) {
-        bigAvatar.textContent = nextEmoji;
-      }
-
-      const count = document.getElementById('profileAvatarCount');
-      if (count) {
-        count.textContent = `${getAvatarIndex(nextEmoji) + 1}/${AVATAR_EMOJIS.length}`;
-      }
-
-      syncProfileTabIcon();
-
-      try {
-        appState.saveToStorage?.();
-      } catch {}
-    });
+    wireAvatarArrowButton(btn);
   });
 
   const percent = appState.getCompletionPercent

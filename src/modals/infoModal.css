@@ -2055,3 +2055,66 @@ html[data-platform="ios"] .profile-xp-line,
     margin-top: 0.75rem;
   }
 }
+
+/* ──────────────────────────────────────────────────────────
+   Profile Avatar Picker — solid triangle arrows
+   Fixes iOS glyph-centering weirdness from ‹ / › text arrows.
+   ────────────────────────────────────────────────────────── */
+
+#cosmicModal .profile-avatar-arrow {
+  position: relative !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  font-size: 0 !important;
+  line-height: 0 !important;
+
+  overflow: hidden !important;
+}
+
+#cosmicModal .profile-avatar-arrow::before {
+  content: "" !important;
+
+  display: block !important;
+  width: 0 !important;
+  height: 0 !important;
+
+  border-top: 7px solid transparent !important;
+  border-bottom: 7px solid transparent !important;
+
+  filter:
+    drop-shadow(0 0 5px rgba(0, 255, 238, 0.85))
+    drop-shadow(0 0 10px rgba(0, 255, 238, 0.35));
+}
+
+#cosmicModal .profile-avatar-arrow[data-avatar-step="-1"]::before {
+  border-right: 10px solid #00ffee !important;
+  transform: translateX(-1px);
+}
+
+#cosmicModal .profile-avatar-arrow[data-avatar-step="1"]::before {
+  border-left: 10px solid #00ffee !important;
+  transform: translateX(1px);
+}
+
+#cosmicModal .profile-avatar-arrow:active::before {
+  filter:
+    drop-shadow(0 0 7px rgba(0, 255, 238, 1))
+    drop-shadow(0 0 14px rgba(255, 128, 240, 0.34));
+}
+
+#cosmicModal .profile-avatar-count {
+  min-height: 1em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Avatar arrows: faster iOS tapping + no long-press weirdness */
+#cosmicModal .profile-avatar-arrow {
+  touch-action: manipulation !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}

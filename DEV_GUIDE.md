@@ -121,18 +121,25 @@ git push origin main --no-verify
 ```
 
 
-cd ~/Documents/SnowCone-MathFest
-
-find public/assets -type f ! -name ".DS_Store" -print0 | \
-xargs -0 -n 1 -P 4 sh -c '
-  echo "🍧 thawing $1"
-  cat "$1" > /dev/null
-' sh
 
 npm run build:native
 npx cap open ios
 
-npm run build:native && npx cap open ios
+
+WHEN YOU NEED MO SPACE!!
+cd ~/Developer/SnowCone-MathFest-clean
+
+rm -rf dist
+rm -rf .vite
+rm -rf ios/App/App/public
+
+rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
+xcrun simctl delete unavailable
+
+npm cache clean --force
+
+df -h ~
 
 Re-run:
 ```bash
