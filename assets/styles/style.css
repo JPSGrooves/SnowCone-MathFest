@@ -1359,3 +1359,153 @@ html[data-platform="ios"] #startup-screen .startup-username {
     0 0 8px rgba(0, 255, 238, 0.7),
     0 0 18px rgba(255, 128, 240, 0.4);
 }
+
+/* ──────────────────────────────────────────────────────────
+   iPad Startup Doorway Balance
+   One-purpose patch:
+   - fixes iPad startup layout
+   - keeps iPhone mostly untouched
+   - forces streak + button into a clean vertical stack
+   ────────────────────────────────────────────────────────── */
+
+@media (min-width: 700px) and (min-height: 900px) {
+  #startup-screen {
+    justify-content: center !important;
+    gap: clamp(10px, 1.4vh, 20px) !important;
+  }
+
+  #startup-screen .startup-cone {
+    width: clamp(420px, 54vw, 540px) !important;
+    max-width: 540px !important;
+    height: auto !important;
+
+    transform: translateY(-1vh) !important;
+    margin-bottom: 0 !important;
+  }
+
+  #startup-screen .startup-festival-card {
+    width: min(78vw, 560px) !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: clamp(8px, 1vh, 14px) !important;
+    text-align: center !important;
+  }
+
+  #startup-screen .startup-welcome-line {
+    margin: 0 !important;
+    line-height: 1.16 !important;
+  }
+
+  #startup-screen .startup-greeting {
+    display: inline-block !important;
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem) !important;
+  }
+
+  #startup-screen .startup-username {
+    display: inline-block !important;
+    margin-top: 0.2rem !important;
+
+    font-size: clamp(1.45rem, 2.4vw, 2rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  #startup-screen .startup-streak-line {
+    display: flex !important;
+    width: 100% !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+
+    margin: 0 !important;
+
+    font-size: clamp(1rem, 1.75vw, 1.35rem) !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+  }
+
+  #startup-screen .startup-avatar-emoji {
+    font-size: 1.18em !important;
+    line-height: 1 !important;
+  }
+
+  #startup-screen .startup-play-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: clamp(280px, 38vw, 380px) !important;
+    max-width: 380px !important;
+    min-width: 0 !important;
+    min-height: 52px !important;
+
+    margin: 0 auto !important;
+    padding: 0.58rem 1.65rem !important;
+
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem) !important;
+    line-height: 1 !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   iPad Startup Doorway Typography Bump
+   Second tiny pass:
+   - keeps the fixed vertical alignment
+   - makes iPad text/button feel intentional
+   - does not touch iPhone
+   ────────────────────────────────────────────────────────── */
+
+@media (min-width: 700px) and (min-height: 900px) {
+  #startup-screen .startup-festival-card {
+    gap: clamp(10px, 1.15vh, 16px) !important;
+  }
+
+  #startup-screen .startup-greeting {
+    font-size: clamp(1.22rem, 2vw, 1.65rem) !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.035em !important;
+  }
+
+  #startup-screen .startup-username {
+    margin-top: 0.24rem !important;
+
+    font-size: clamp(1.85rem, 3vw, 2.45rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.05 !important;
+
+    text-shadow:
+      0 0 8px rgba(0, 255, 238, 0.8),
+      0 0 18px rgba(0, 255, 238, 0.45),
+      0 0 26px rgba(255, 128, 240, 0.28) !important;
+  }
+
+  #startup-screen .startup-streak-line {
+    font-size: clamp(1.18rem, 2vw, 1.55rem) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.015em !important;
+  }
+
+  #startup-screen .startup-avatar-emoji {
+    font-size: 1.22em !important;
+  }
+
+  #startup-screen .startup-play-btn {
+    width: clamp(330px, 42vw, 440px) !important;
+    max-width: 440px !important;
+    min-height: 58px !important;
+
+    font-size: clamp(1.22rem, 2vw, 1.55rem) !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.01em !important;
+
+    box-shadow:
+      0 0 12px rgba(0, 0, 0, 0.9),
+      0 0 22px rgba(128, 255, 241, 0.35) !important;
+  }
+}
