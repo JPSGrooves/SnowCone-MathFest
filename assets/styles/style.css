@@ -1288,3 +1288,74 @@ body.modal-open {
     0 0 6px rgba(0, 0, 0, 1),
     0 0 12px rgba(128, 255, 241, 0.18) !important;
 }
+
+/* 🍧 Rank banner: uses badge toast layout with a rank-specific glow */
+.rank-banner {
+  background: rgba(20, 10, 40, 0.72);
+  border-color: rgba(255, 128, 240, 0.35);
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(255, 128, 240, 0.28);
+}
+
+/* ──────────────────────────────────────────────────────────
+   Startup Welcome Text — iOS doorway polish
+   ────────────────────────────────────────────────────────── */
+
+#startup-screen .startup-welcome-line {
+  margin: 0;
+  text-align: center;
+  line-height: 1.22;
+}
+
+#startup-screen .startup-greeting {
+  font-size: clamp(0.95rem, 2vh, 1.15rem);
+  opacity: 0.92;
+}
+
+#startup-screen .startup-username {
+  display: inline-block;
+  margin-top: 0.18rem;
+
+  font-size: clamp(1.15rem, 2.6vh, 1.55rem);
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow:
+    0 0 8px rgba(0, 255, 238, 0.65),
+    0 0 16px rgba(255, 128, 240, 0.35);
+}
+
+#startup-screen .startup-streak-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+
+  margin: 0.35rem 0 0;
+  text-align: center;
+
+  font-size: clamp(0.82rem, 1.8vh, 1rem);
+  opacity: 0.9;
+}
+
+#startup-screen .startup-avatar-emoji {
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+html[data-platform="ios"] #startup-screen .startup-greeting {
+  font-size: clamp(1.05rem, 2.25vh, 1.28rem);
+  opacity: 0.94;
+}
+
+html[data-platform="ios"] #startup-screen .startup-username {
+  margin-top: 0.22rem;
+
+  font-size: clamp(1.32rem, 3vh, 1.78rem);
+  font-weight: 900;
+  color: #ffffff;
+
+  text-shadow:
+    0 0 8px rgba(0, 255, 238, 0.7),
+    0 0 18px rgba(255, 128, 240, 0.4);
+}
