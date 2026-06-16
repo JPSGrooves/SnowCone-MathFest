@@ -188,15 +188,15 @@ export function renderVersionTab() {
 
       <div class="data-button-stack">
         <button class="track-button data-action-btn" id="downloadSave">
-          ⬇️ Backup Save
+          ⬇️ Save Game
         </button>
 
         <button class="track-button data-action-btn" id="importSaveBtn">
-          📤 Import Save
+          📤 Load Game
         </button>
 
         <button class="track-button data-action-btn data-danger-btn" id="resetProgress">
-          🗑️ Reset Save
+          🗑️ Reset Game
         </button>
       </div>
 

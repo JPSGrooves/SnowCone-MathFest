@@ -2118,3 +2118,95 @@ html[data-platform="ios"] .profile-xp-line,
   user-select: none !important;
   -webkit-touch-callout: none !important;
 }
+
+/* ──────────────────────────────────────────────────────────
+   SnowCone Radio — Center Scrub Bar
+   Tiny safe patch:
+   - centers the progress range inside the Radio faceplate
+   - does not change audio logic
+   - should not disturb iPhone layout
+   ────────────────────────────────────────────────────────── */
+
+.music-deck-progress-wrap {
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.music-deck-card #trackProgress {
+  display: block !important;
+
+  width: min(100%, 315px) !important;
+  max-width: 315px !important;
+
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Keep the timer centered under the scrubber */
+.music-deck-timer {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+/* iPhone keeps its slightly smaller scrubber, but centered */
+@media (max-width: 600px) {
+  .music-deck-card #trackProgress {
+    width: min(100%, 300px) !important;
+    max-width: 300px !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Options Modal Tabs — centered 3-over-2 header
+   Tiny v1.2.6 patch:
+   - fixes uneven right-side header spacing
+   - keeps chunky tab layout
+   - does not touch tab JS or modal content
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  #cosmicModal .modal-header {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 0.8rem !important;
+
+    /* balanced left/right instead of huge right gutter */
+    padding:
+      0.46rem
+      clamp(0.78rem, 3vw, 1.05rem)
+      0.55rem
+      clamp(0.78rem, 3vw, 1.05rem) !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 0.42rem !important;
+
+    align-items: center !important;
+    justify-items: stretch !important;
+  }
+
+  #cosmicModal .tab-button {
+    width: 100% !important;
+    justify-self: stretch !important;
+  }
+
+  /* keep the close button floating independently */
+  #cosmicModal .modal-close {
+    top: 0.52rem !important;
+    right: 0.58rem !important;
+    z-index: 5 !important;
+  }
+}
