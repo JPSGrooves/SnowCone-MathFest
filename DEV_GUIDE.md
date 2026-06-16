@@ -120,7 +120,8 @@ git commit -m "🌈 Locking in current dev state" --no-verify
 git push origin main --no-verify
 ```
 
-
+open folder
+open ~/SCMF_local
 
 npm run build:native
 npx cap open ios

@@ -13,6 +13,15 @@ import AVFoundation
 
 final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKNavigationDelegate {
 
+    // MARK: - Immersive iOS Presentation
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .fade
+    }
+    
     // MARK: - Game Center state
     private var gcAuthInProgress = false
     private var gcQueuedActions: [() -> Void] = []
@@ -42,6 +51,8 @@ final class ViewController: CAPBridgeViewController, WKScriptMessageHandler, WKN
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setNeedsStatusBarAppearanceUpdate()
 
         print("🍧🍧🍧 [SCMF] ViewController.viewDidLoad – native shell is LIVE 🍧🍧🍧")
 

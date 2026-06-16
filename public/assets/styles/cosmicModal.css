@@ -581,3 +581,64 @@ body.neon-progress #trackTimer {
 #cosmicModal:not(.hidden) ~ #game-container {
   pointer-events: none !important;
 }
+.info-compact h3 {
+  margin-top: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.info-compact p {
+  margin-top: 0;
+}
+
+.compact-dot-list {
+  margin-top: 0.25rem;
+  padding-left: 1.1rem;
+}
+
+.compact-dot-list li {
+  margin-bottom: 0.45rem;
+  line-height: 1.35;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Info Modal — simple iOS-readable about card
+   ────────────────────────────────────────────────────────── */
+
+.info-simple {
+  padding-top: 0.25rem;
+}
+
+.info-simple #infoTitle {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.35rem, 2.7vh, 1.8rem);
+  line-height: 1.12;
+  text-align: left;
+}
+
+.info-simple .info-lede {
+  margin: 0 0 1rem;
+  font-size: clamp(0.95rem, 1.85vh, 1.1rem);
+  line-height: 1.35;
+  opacity: 0.95;
+}
+
+.info-simple h3 {
+  margin: 0.9rem 0 0.35rem;
+  font-size: clamp(1.02rem, 2vh, 1.22rem);
+  line-height: 1.15;
+}
+
+.info-simple p,
+.info-simple li {
+  font-size: clamp(0.88rem, 1.75vh, 1rem);
+  line-height: 1.36;
+}
+
+.info-simple .compact-dot-list {
+  margin-top: 0.25rem;
+  padding-left: 1.1rem;
+}
+
+.info-simple .compact-dot-list li {
+  margin-bottom: 0.4rem;
+}

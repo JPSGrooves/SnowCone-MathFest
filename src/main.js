@@ -14,6 +14,8 @@ import { wireMusicVisibilityGuard } from './managers/musicVisibility.js';
 import { renderFestivalWelcomeOnStartup } from './ui/festivalWelcomeView.js'; 
 import { installJsCrashCatcher } from './utils/jsCrashCatcher.js';
 
+import { initRankManager } from './managers/rankManager.js';
+
 
 installJsCrashCatcher();
 
@@ -106,7 +108,8 @@ function attachDevHarness() {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📦 DOM ready. Starting app...');
   initBadgeManager(appState);          // 1) init badge store
-  startAchievementsWatcher(appState);  // 2) wire autoruns AFTER manager
+  initRankManager(appState);           // 2) watch Cone Rank changes
+  startAchievementsWatcher(appState);  // 3) wire autoruns AFTER managers
   if (import.meta.env.DEV) attachDevHarness();
 
   applyBackgroundTheme();

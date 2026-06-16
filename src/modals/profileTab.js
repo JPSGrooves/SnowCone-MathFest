@@ -1,6 +1,7 @@
 // src/tabs/profileTab.js — profile, rank, completion, XP
 
 import { appState } from '../data/appState.js';
+import { getRankModelForAppState } from '../data/rankModel.js';
 
 const DEFAULT_AVATAR_EMOJI = '🧑‍🚀';
 
@@ -241,57 +242,6 @@ function getSafeUsername() {
   return sanitizeProfileName(appState?.profile?.username || PROFILE_NAME_FALLBACK).name;
 }
 
-function getProfileRankTitle(percent, breakdown) {
-  const coreDone = Number(breakdown?.badges?.badgesFrac ?? 0) >= 1;
-  const legendDone = !!breakdown?.legendDone;
-
-  if (percent >= 100 && legendDone) return 'Rank: Festival Legend';
-  if (coreDone && !legendDone) return 'Rank: Legendary Cone Hunter';
-
-  if (percent >= 90) return 'Rank: Cone Commander';
-  if (percent >= 80) return 'Rank: Glow Chaser';
-  if (percent >= 70) return 'Rank: Festival Pilot';
-  if (percent >= 60) return 'Rank: Badge Scout';
-  if (percent >= 50) return 'Rank: Cone Captain';
-  if (percent >= 40) return 'Rank: Half-Cone Hero';
-  if (percent >= 30) return 'Rank: Cone Climber';
-  if (percent >= 20) return 'Rank: Cone Cruiser';
-  if (percent >= 10) return 'Rank: Cone Camper';
-
-  return 'Rank: Baby Cone';
-}
-
-function getProfileRankLine(percent, breakdown) {
-  const coreDone = Number(breakdown?.badges?.badgesFrac ?? 0) >= 1;
-  const legendDone = !!breakdown?.legendDone;
-
-  if (percent >= 100 && legendDone) {
-    return 'You did everything! You are the SnowCone Master!';
-  }
-
-  if (coreDone && !legendDone) {
-    return '100% of Core Cones! The Legendendary cones await!';
-  }
-
-  if (percent >= 80) {
-    return 'You probably know about the ghosts by now!';
-  }
-
-  if (percent >= 50) {
-    return 'The cone is half full!';
-  }
-
-  if (percent >= 20) {
-    return 'You are learning the shapes of the festival!';
-  }
-
-  if (percent >= 10) {
-    return 'You have officially started your SnowCone trail!';
-  }
-
-  return 'Fresh Festival energy. Find your first cones!';
-}
-
 function getProfileXPModel() {
   const xp = Number(appState?.profile?.xp ?? 0);
   const level = Number(appState?.profile?.level ?? 1);
@@ -393,9 +343,9 @@ export function renderProfileTab() {
   const percent = appState.getCompletionPercent
     ? appState.getCompletionPercent()
     : 0;
-
-  const rankTitle = getProfileRankTitle(percent, breakdown);
-  const rankLine = getProfileRankLine(percent, breakdown);
+  const rankModel = getRankModelForAppState(appState);
+  const rankTitle = rankModel.title;
+  const rankLine = rankModel.line;
   const username = escapeAttr(getSafeUsername());
   const avatarEmoji = getSafeAvatarEmoji();
   const xpModel = getProfileXPModel();
@@ -443,12 +393,14 @@ export function renderProfileTab() {
           ✨ XP: <span id="profileXpValue">${xpModel.xp}</span>
         </h3>
         <p class="profile-xp-line">
-          Level ${xpModel.level} · ${xpModel.xpToNext} XP to next level
+          XP Level ${xpModel.level}
         </p>
       </div>
     </div>
   `;
 }
+// Future XP detail, currently hidden for cleaner presentation:
+// ${xpModel.xpToNext} XP more to upgrade!
 
 let avatarHoldStartTimer = null;
 let avatarHoldRepeatTimer = null;
