@@ -266,7 +266,7 @@ html, body {
   position: relative;
 
   font-size: calc(1.25vh + 0.25vw); /* 🎯 Scales with window size smoothly */
-  outline: 2px solid yellow;
+  /* outline removed: old layout debug frame */
 }
 
 /* ✨ Main Menu Layout */
@@ -1507,5 +1507,183 @@ html[data-platform="ios"] #startup-screen .startup-username {
     box-shadow:
       0 0 12px rgba(0, 0, 0, 0.9),
       0 0 22px rgba(128, 255, 241, 0.35) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   iPad Menu Background Matte
+   Purpose:
+   - preserve the sacred 11:16 phone-stage menu layout
+   - fill wider/taller iPad space with themed art
+   - avoid stretching the actual tappable menu PNG
+   - iOS native only
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] {
+  --scmf-menu-backdrop-image: url("/assets/img/branding/menubackgroundPlate_default.png");
+}
+
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] .menu-wrapper {
+    background: #03040f;
+    isolation: isolate;
+  }
+
+  html[data-platform="ios"] .menu-wrapper::before {
+    content: "";
+    position: fixed;
+    inset: -6vmax;
+
+    background-image: var(--scmf-menu-backdrop-image);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    filter:
+      blur(22px)
+      saturate(1.18)
+      brightness(0.52);
+
+    transform: scale(1.08);
+    transform-origin: center center;
+
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  html[data-platform="ios"] .menu-wrapper::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    background:
+      radial-gradient(circle at center,
+        rgba(0, 0, 0, 0.08) 0%,
+        rgba(0, 0, 0, 0.18) 45%,
+        rgba(0, 0, 0, 0.48) 100%
+      );
+
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  html[data-platform="ios"] .menu-layout {
+    position: relative;
+    z-index: 1;
+  }
+
+  html[data-platform="ios"] .aspect-wrap {
+    position: relative;
+    z-index: 2;
+
+    box-shadow:
+      0 0 28px rgba(0, 255, 238, 0.18),
+      0 0 70px rgba(255, 128, 240, 0.12),
+      0 0 120px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Background Plate Era — Real Menu Plate Layer
+   2026-0617
+   - Full-screen menu plate is now the visual background.
+   - Old #menuImage remains as fallback / coordinate relic.
+   - Once the plate loads, iOS hides old #menuImage.
+   - Menu labels, title, hitboxes, Options, and truck tap stay untouched.
+   ────────────────────────────────────────────────────────── */
+
+.menu-backdrop-plate {
+  position: fixed;
+  inset: 0;
+
+  width: 100vw;
+  height: 100svh;
+  min-width: 100vw;
+  min-height: 100svh;
+
+  object-fit: cover;
+  object-position: center center;
+
+  display: block;
+  opacity: 1;
+
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  z-index: 0;
+}
+
+.menu-wrapper {
+  background: #03040f;
+  isolation: isolate;
+}
+
+.menu-wrapper::before {
+  content: none !important;
+}
+
+.menu-layout {
+  position: relative;
+  z-index: 2;
+}
+
+.aspect-wrap {
+  position: relative;
+  z-index: 3;
+}
+
+/* iOS app: once the real plate loads, stop showing the old baked menu PNG. */
+html[data-platform="ios"] .menu-wrapper.plate-ready #menuImage,
+.platform-ios .menu-wrapper.plate-ready #menuImage {
+  opacity: 0 !important;
+}
+
+/* Browser fallback keeps old menu image unless we intentionally change that lane later. */
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Background Plate Era — Tablet Menu Stage
+   2026-0617
+   Purpose:
+   - iPad menu uses the new 3:4 plate as the real stage.
+   - iPhone keeps the older 11:16 phone-safe stage.
+   - Modes are not touched here.
+   ────────────────────────────────────────────────────────── */
+
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] .menu-wrapper.plate-ready .aspect-wrap,
+  .platform-ios .menu-wrapper.plate-ready .aspect-wrap {
+    aspect-ratio: 3 / 4 !important;
+    width: min(100vw, 75svh) !important;
+    height: 100svh !important;
+    max-width: 100vw !important;
+    max-height: 100svh !important;
+  }
+
+  html[data-platform="ios"] .menu-wrapper.plate-ready .menu-frame,
+  .platform-ios .menu-wrapper.plate-ready .menu-frame {
+    aspect-ratio: 3 / 4 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100svh !important;
+  }
+
+  html[data-platform="ios"] .menu-wrapper.plate-ready .background-fill,
+  .platform-ios .menu-wrapper.plate-ready .background-fill {
+    display: none !important;
+  }
+
+  html[data-platform="ios"] .menu-wrapper.plate-ready .menu-title-top,
+  .platform-ios .menu-wrapper.plate-ready .menu-title-top {
+    max-width: 76% !important;
+  }
+
+  html[data-platform="ios"] .menu-wrapper.plate-ready .menu-grid,
+  .platform-ios .menu-wrapper.plate-ready .menu-grid {
+    width: 100% !important;
+    height: 100% !important;
   }
 }
