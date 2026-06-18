@@ -1,5 +1,6 @@
 import { appState } from '../data/appState.js';
 import { getMenuThemePackage } from '../data/menuThemePackages.js';
+import { applyMenuVisualPackage } from './menuVisualManager.js';
 
 export { themeLabels, unlockableThemes } from '../data/menuThemePackages.js';
 
@@ -105,6 +106,7 @@ export function applyBackgroundTheme() {
   // This lets the centered 11:16 stage stay untouched while the wider
   // tablet screen gets intentional themed fill behind it.
   setMenuBackdropImage(resolveMenuBackdropFile(theme));
+  applyMenuVisualPackage(theme);
 
   console.log('🧊 Background set to:', theme, 'file:', bg.src);
 
@@ -162,6 +164,7 @@ export function swapBackground(themeName) {
 
   // Keep the iPad matte/backdrop synced with manual theme swaps.
   setMenuBackdropImage(resolveMenuBackdropFile(themeName));
+  applyMenuVisualPackage(themeName);
 
   console.log(`🌌 Swapped to theme: ${themeName} (file: ${bg.src})`);
 }

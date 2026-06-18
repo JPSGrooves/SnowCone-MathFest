@@ -1642,48 +1642,1012 @@ html[data-platform="ios"] .menu-wrapper.plate-ready #menuImage,
 
 /* Browser fallback keeps old menu image unless we intentionally change that lane later. */
 
-
 /* ──────────────────────────────────────────────────────────
-   SCMF Background Plate Era — Tablet Menu Stage
+   SCMF Background Plate Era — Menu Actor Slots
    2026-0617
    Purpose:
-   - iPad menu uses the new 3:4 plate as the real stage.
-   - iPhone keeps the older 11:16 phone-safe stage.
-   - Modes are not touched here.
+   - Stable visual slots for theme packages.
+   - Package swaps change image src, not DOM structure.
+   - No behavior/sim logic here.
+   - No mode work here.
    ────────────────────────────────────────────────────────── */
 
+.menu-actor-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  z-index: 8;
+}
+
+.menu-actor {
+  position: absolute;
+  display: block;
+
+  object-fit: contain;
+  object-position: center center;
+
+  opacity: 0;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.menu-actor.is-visible {
+  opacity: 1;
+}
+
+.menu-actor.is-empty {
+  display: none;
+}
+
+/* Default package rough stage positions.
+   These are expected to be tuned after seeing the actual PNGs in-app. */
+
+.menu-truck-back {
+  width: 58%;
+  left: 50%;
+  top: 72%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.menu-character {
+  width: 14%;
+  left: 55%;
+  top: 64%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.menu-truck-front {
+  width: 58%;
+  left: 50%;
+  top: 72%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.menu-theme-prop {
+  width: 12%;
+  left: 64%;
+  top: 61%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+}
+
+.menu-center-cone {
+  width: 11%;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+/* Keep labels and hitboxes above visual actors. */
+.menu-frame {
+  position: absolute;
+  z-index: 20;
+}
+
+.menu-highscore-hitbox,
+.mushroom-popper-hitbox {
+  z-index: 30;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Background Plate Era — Menu World Stage 01
+   2026-0617
+   Purpose:
+   - One canonical 3:4 visual coordinate world.
+   - Actor PNGs live in the same stage as the background plate.
+   - iPhone crops this world.
+   - iPad shows more of this world.
+   - No mode work. No sim behavior. No gutter hacks.
+   ────────────────────────────────────────────────────────── */
+
+.menu-wrapper {
+  overflow: hidden !important;
+  isolation: isolate;
+}
+
+/* This is the shared visual world.
+   It matches a 3:4 background plate using object-fit: cover logic. */
+.menu-world-stage {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+
+  width: calc(100svh * 0.75) !important;
+  height: 100svh !important;
+
+  transform: translate(-50%, -50%) !important;
+  transform-origin: center center !important;
+
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+
+  z-index: 5 !important;
+}
+
+/* If a viewport is wider than 3:4, cover by width instead. */
+@media (min-aspect-ratio: 3 / 4) {
+  .menu-world-stage {
+    width: 100vw !important;
+    height: calc(100vw * 1.3333333333) !important;
+  }
+}
+
+.menu-world-stage .menu-actor-layer {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.menu-world-stage .menu-actor {
+  position: absolute !important;
+  display: block !important;
+
+  object-fit: contain !important;
+  object-position: center center !important;
+
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.menu-world-stage .menu-actor.is-visible {
+  opacity: 1 !important;
+}
+
+.menu-world-stage .menu-actor.is-empty {
+  display: none !important;
+}
+
+/* Keep labels/buttons above the shared world. */
+.menu-wrapper .menu-layout {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.menu-wrapper .aspect-wrap {
+  position: relative !important;
+  z-index: 11 !important;
+}
+
+.menu-wrapper .menu-frame {
+  z-index: 20 !important;
+}
+
+/* Living-truck layer hooks. */
+.menu-character.is-in-truck {
+  z-index: 2 !important;
+}
+
+.menu-character.is-front-of-truck {
+  z-index: 6 !important;
+}
+
+/* Shared actor coordinates.
+   These are now one world, not separate phone/iPad guesses. */
+
+.menu-world-stage .menu-truck-back {
+  width: 50% !important;
+  left: 50% !important;
+  top: 76.5% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 1 !important;
+}
+
+.menu-world-stage .menu-character {
+  width: 12.75% !important;
+  left: 55.2% !important;
+  top: 70.8% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 2 !important;
+}
+
+.menu-world-stage .menu-truck-front {
+  width: 50% !important;
+  left: 50% !important;
+  top: 76.5% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 3 !important;
+}
+
+.menu-world-stage .menu-theme-prop {
+  width: 11.75% !important;
+  left: 63.7% !important;
+  top: 70.4% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 4 !important;
+}
+
+.menu-world-stage .menu-center-cone {
+  width: 25% !important;
+  left: 50% !important;
+  top: 53.5% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 5 !important;
+}
+
+/* Keep current tap zones alive for now.
+   Later, we can move these into the same world stage too. */
+.menu-highscore-hitbox,
+.mushroom-popper-hitbox {
+  z-index: 35 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Background Plate Era — Menu Control Valve 01
+   2026-0618
+   Purpose:
+   - Keep actors in canonical 3:4 world stage.
+   - Give Jeremy clean knobs for labels + actors.
+   - Side labels remain screen-safe.
+   - Center labels remain center-aligned.
+   - No mode work. No sim behavior.
+   ────────────────────────────────────────────────────────── */
+
+/* ── PHONE CONTROL VALVES ──────────────────────────────── */
+html[data-platform="ios"] .menu-wrapper.plate-ready,
+.platform-ios .menu-wrapper.plate-ready {
+  /* Title */
+  --scmf-title-y: 8.4%;
+  --scmf-title-width: min(78vw, 680px);
+
+  /* Side label rails */
+  --scmf-side-inset: clamp(10px, 3.6vw, 54px);
+  --scmf-side-label-width: clamp(142px, 38vw, 320px);
+  --scmf-top-row-y: 31.5%;
+  --scmf-mid-row-y: 49.2%;
+
+  /* Center labels */
+  --scmf-infinity-y: 60.2%;
+  --scmf-infinity-width: min(48vw, 340px);
+  --scmf-options-y: 92.2%;
+  --scmf-options-width: min(54vw, 360px);
+
+  /* Actor world controls */
+  --scmf-truck-width: 45%;
+  --scmf-truck-x: 50%;
+  --scmf-truck-y: 78.5%; /* was 76.5% */
+
+  --scmf-jehnk-width: 9.75%;
+  --scmf-jehnk-x: 40.2%;
+  --scmf-jehnk-y: 81.8%; /* was 70.8% */
+
+  --scmf-prop-width: 11.75%;
+  --scmf-prop-x: 63.7%; /* was 63.7% */
+  --scmf-prop-y: 83.4%; /* was 70.8% */
+
+  --scmf-cone-width: 40%; /* was 45% */
+  --scmf-cone-x: 50%;
+  --scmf-cone-y: 40.5%; /* was 52.8% */
+}
+
+/* ── IPAD / TABLET CONTROL VALVES ──────────────────────── */
 @media (min-width: 700px) and (min-height: 700px) {
-  html[data-platform="ios"] .menu-wrapper.plate-ready .aspect-wrap,
-  .platform-ios .menu-wrapper.plate-ready .aspect-wrap {
-    aspect-ratio: 3 / 4 !important;
-    width: min(100vw, 75svh) !important;
-    height: 100svh !important;
-    max-width: 100vw !important;
-    max-height: 100svh !important;
-  }
+  html[data-platform="ios"] .menu-wrapper.plate-ready,
+  .platform-ios .menu-wrapper.plate-ready {
+    /* Title */
+    --scmf-title-y: 8.2%;
+    --scmf-title-width: min(70vw, 680px);
 
-  html[data-platform="ios"] .menu-wrapper.plate-ready .menu-frame,
-  .platform-ios .menu-wrapper.plate-ready .menu-frame {
-    aspect-ratio: 3 / 4 !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100svh !important;
-  }
+    /* Side label rails */
+    --scmf-side-inset: clamp(46px, 6vw, 110px);
+    --scmf-side-label-width: clamp(190px, 25vw, 360px);
+    --scmf-top-row-y: 31.8%;
+    --scmf-mid-row-y: 49.5%;
 
-  html[data-platform="ios"] .menu-wrapper.plate-ready .background-fill,
-  .platform-ios .menu-wrapper.plate-ready .background-fill {
-    display: none !important;
-  }
+    /* Center labels */
+    --scmf-infinity-y: 60.0%;
+    --scmf-infinity-width: min(36vw, 340px);
+    --scmf-options-y: 91.3%;
+    --scmf-options-width: min(38vw, 360px);
 
-  html[data-platform="ios"] .menu-wrapper.plate-ready .menu-title-top,
-  .platform-ios .menu-wrapper.plate-ready .menu-title-top {
-    max-width: 76% !important;
-  }
+    /* Actor world controls */
+    --scmf-truck-width: 48%;
+    --scmf-truck-x: 50%;
+    --scmf-truck-y: 76.5%;
 
-  html[data-platform="ios"] .menu-wrapper.plate-ready .menu-grid,
-  .platform-ios .menu-wrapper.plate-ready .menu-grid {
-    width: 100% !important;
-    height: 100% !important;
+    --scmf-jehnk-width: 12.5%;
+    --scmf-jehnk-x: 55.25%;
+    --scmf-jehnk-y: 71.0%;
+
+    --scmf-prop-width: 11.5%;
+    --scmf-prop-x: 63.8%;
+    --scmf-prop-y: 70.8%;
+
+    /* iPad cone can be larger without breaking phone */
+    --scmf-cone-width: 29%;
+    --scmf-cone-x: 50%;
+    --scmf-cone-y: 52.8%;
   }
+}
+
+/* ── SCREEN-SAFE MENU UI LAYER ─────────────────────────── */
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-layout,
+.platform-ios .menu-wrapper.plate-ready .menu-layout {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100svh !important;
+  max-width: none !important;
+  max-height: none !important;
+  transform: none !important;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+  overflow: visible !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .aspect-wrap,
+.platform-ios .menu-wrapper.plate-ready .aspect-wrap,
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-frame,
+.platform-ios .menu-wrapper.plate-ready .menu-frame,
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-grid,
+.platform-ios .menu-wrapper.plate-ready .menu-grid {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100svh !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  transform: none !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready #menuImage,
+.platform-ios .menu-wrapper.plate-ready #menuImage {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* Title */
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-title-top,
+.platform-ios .menu-wrapper.plate-ready .menu-title-top {
+  position: absolute !important;
+  left: 50% !important;
+  top: var(--scmf-title-y) !important;
+  width: var(--scmf-title-width) !important;
+  max-width: var(--scmf-title-width) !important;
+  transform: translate(-50%, 0) !important;
+  z-index: 26 !important;
+}
+
+/* Labels */
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label,
+.platform-ios .menu-wrapper.plate-ready .menu-label {
+  position: absolute !important;
+  z-index: 28 !important;
+  box-sizing: border-box !important;
+  max-width: none !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  pointer-events: auto !important;
+  text-align: center !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.kids,
+.platform-ios .menu-wrapper.plate-ready .menu-label.kids {
+  left: var(--scmf-side-inset) !important;
+  right: auto !important;
+  top: var(--scmf-top-row-y) !important;
+  width: var(--scmf-side-label-width) !important;
+  transform: translateY(-50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.quick,
+.platform-ios .menu-wrapper.plate-ready .menu-label.quick {
+  left: auto !important;
+  right: var(--scmf-side-inset) !important;
+  top: var(--scmf-top-row-y) !important;
+  width: var(--scmf-side-label-width) !important;
+  transform: translateY(-50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.tips,
+.platform-ios .menu-wrapper.plate-ready .menu-label.tips {
+  left: var(--scmf-side-inset) !important;
+  right: auto !important;
+  top: var(--scmf-mid-row-y) !important;
+  width: var(--scmf-side-label-width) !important;
+  transform: translateY(-50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.story,
+.platform-ios .menu-wrapper.plate-ready .menu-label.story {
+  left: auto !important;
+  right: var(--scmf-side-inset) !important;
+  top: var(--scmf-mid-row-y) !important;
+  width: var(--scmf-side-label-width) !important;
+  transform: translateY(-50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.infinity,
+.platform-ios .menu-wrapper.plate-ready .menu-label.infinity {
+  left: 50% !important;
+  right: auto !important;
+  top: var(--scmf-infinity-y) !important;
+  width: var(--scmf-infinity-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.options,
+html[data-platform="ios"] .menu-wrapper.plate-ready .label-options,
+.platform-ios .menu-wrapper.plate-ready .menu-label.options,
+.platform-ios .menu-wrapper.plate-ready .label-options {
+  left: 50% !important;
+  right: auto !important;
+  top: var(--scmf-options-y) !important;
+  bottom: auto !important;
+  width: var(--scmf-options-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* ── ACTOR WORLD CONTROLS ──────────────────────────────── */
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-truck-back,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-truck-back {
+  width: var(--scmf-truck-width) !important;
+  left: var(--scmf-truck-x) !important;
+  top: var(--scmf-truck-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-truck-front,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-truck-front {
+  width: var(--scmf-truck-width) !important;
+  left: var(--scmf-truck-x) !important;
+  top: var(--scmf-truck-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-character,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-character {
+  width: var(--scmf-jehnk-width) !important;
+  left: var(--scmf-jehnk-x) !important;
+  top: var(--scmf-jehnk-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-theme-prop,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-theme-prop {
+  width: var(--scmf-prop-width) !important;
+  left: var(--scmf-prop-x) !important;
+  top: var(--scmf-prop-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-center-cone,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-center-cone {
+  width: var(--scmf-cone-width) !important;
+  left: var(--scmf-cone-x) !important;
+  top: var(--scmf-cone-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* Hitboxes use the same control valves as the visible objects. */
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-highscore-hitbox,
+.platform-ios .menu-wrapper.plate-ready .menu-highscore-hitbox {
+  left: var(--scmf-truck-x) !important;
+  top: var(--scmf-truck-y) !important;
+  width: min(76vw, 520px) !important;
+  height: 19% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 40 !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .mushroom-popper-hitbox,
+.platform-ios .menu-wrapper.plate-ready .mushroom-popper-hitbox {
+  left: var(--scmf-cone-x) !important;
+  top: var(--scmf-cone-y) !important;
+  width: min(30vw, 250px) !important;
+  height: 16% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 40 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Background Plate Era — Menu Label Control Valve 02
+   2026-0618
+   Purpose:
+   - Individual label position controls.
+   - Phone and iPad can be tuned separately.
+   - Actors keep their existing world-stage controls.
+   - No cropping. No mode work. No sim behavior.
+   ────────────────────────────────────────────────────────── */
+
+/* ── PHONE LABEL KNOBS ──────────────────────────────────── */
+html[data-platform="ios"] .menu-wrapper.plate-ready,
+.platform-ios .menu-wrapper.plate-ready {
+  /* Shared side label sizing */
+  --scmf-side-label-width: clamp(142px, 39vw, 320px);
+
+  /* Top row */
+  --scmf-kids-x: 15%; /* was 20%  good now*/
+  --scmf-kids-y: 25.5%; /* was 49.2% good now*/
+  --scmf-kids-width: var(--scmf-side-label-width);
+
+  --scmf-quick-x: 47%; /* was 80% */
+  --scmf-quick-y: 25.5%; /* was 49.2% good now*/
+  --scmf-quick-width: var(--scmf-side-label-width);
+
+  /* Middle row */
+  --scmf-tips-x: 17%; /* was 20% good now */
+  --scmf-tips-y: 26%; /* was 49.2% good now */
+  --scmf-tips-width: var(--scmf-side-label-width);
+
+  --scmf-story-x: 47%; /* was 80% */
+  --scmf-story-y: 26%; /* was 49.2% good now */
+  --scmf-story-width: var(--scmf-side-label-width);
+
+  /* Center labels */
+  --scmf-infinity-x: 23%; /* was 50% */
+  --scmf-infinity-y: 29%; /* was 60.2% */
+  --scmf-infinity-width: min(50vw, 340px);
+
+  --scmf-options-x: 23%; /* was 50% */
+  --scmf-options-y: 70%; /* was 92.2% */
+  --scmf-options-width: min(56vw, 360px);
+}
+
+/* ── IPAD / TABLET LABEL KNOBS ─────────────────────────── */
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] .menu-wrapper.plate-ready,
+  .platform-ios .menu-wrapper.plate-ready {
+    /* Shared side label sizing */
+    --scmf-side-label-width: clamp(190px, 25vw, 360px);
+
+    /* Top row */
+    --scmf-kids-x: 20.5%;
+    --scmf-kids-y: 31.8%;
+    --scmf-kids-width: var(--scmf-side-label-width);
+
+    --scmf-quick-x: 79.5%;
+    --scmf-quick-y: 31.8%;
+    --scmf-quick-width: var(--scmf-side-label-width);
+
+    /* Middle row */
+    --scmf-tips-x: 20.5%;
+    --scmf-tips-y: 47.8%;
+    --scmf-tips-width: var(--scmf-side-label-width);
+
+    --scmf-story-x: 79.5%;
+    --scmf-story-y: 47.8%;
+    --scmf-story-width: var(--scmf-side-label-width);
+
+    /* Center labels */
+    --scmf-infinity-x: 50%;
+    --scmf-infinity-y: 58.5%;
+    --scmf-infinity-width: min(36vw, 340px);
+
+    --scmf-options-x: 50%;
+    --scmf-options-y: 91.3%;
+    --scmf-options-width: min(38vw, 360px);
+  }
+}
+
+/* ── APPLY INDIVIDUAL LABEL KNOBS ──────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.kids,
+.platform-ios .menu-wrapper.plate-ready .menu-label.kids {
+  left: var(--scmf-kids-x) !important;
+  right: auto !important;
+  top: var(--scmf-kids-y) !important;
+  width: var(--scmf-kids-width) !important;
+  transform: translate(-50%, -50%) !important;
+  text-align: center !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.quick,
+.platform-ios .menu-wrapper.plate-ready .menu-label.quick {
+  left: var(--scmf-quick-x) !important;
+  right: auto !important;
+  top: var(--scmf-quick-y) !important;
+  width: var(--scmf-quick-width) !important;
+  transform: translate(-50%, -50%) !important;
+  text-align: center !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.tips,
+.platform-ios .menu-wrapper.plate-ready .menu-label.tips {
+  left: var(--scmf-tips-x) !important;
+  right: auto !important;
+  top: var(--scmf-tips-y) !important;
+  width: var(--scmf-tips-width) !important;
+  transform: translate(-50%, -50%) !important;
+  text-align: center !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.story,
+.platform-ios .menu-wrapper.plate-ready .menu-label.story {
+  left: var(--scmf-story-x) !important;
+  right: auto !important;
+  top: var(--scmf-story-y) !important;
+  width: var(--scmf-story-width) !important;
+  transform: translate(-50%, -50%) !important;
+  text-align: center !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.infinity,
+.platform-ios .menu-wrapper.plate-ready .menu-label.infinity {
+  left: var(--scmf-infinity-x) !important;
+  right: auto !important;
+  top: var(--scmf-infinity-y) !important;
+  width: var(--scmf-infinity-width) !important;
+  transform: translate(-50%, -50%) !important;
+  text-align: center !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.options,
+html[data-platform="ios"] .menu-wrapper.plate-ready .label-options,
+.platform-ios .menu-wrapper.plate-ready .menu-label.options,
+.platform-ios .menu-wrapper.plate-ready .label-options {
+  left: var(--scmf-options-x) !important;
+  right: auto !important;
+  top: var(--scmf-options-y) !important;
+  bottom: auto !important;
+  width: var(--scmf-options-width) !important;
+  transform: translate(-50%, -50%) !important;
+  text-align: center !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Menu Dial Restore 01 — Jeremy Exact Coordinates
+   2026-0618
+   Purpose:
+   - Restore Jeremy's dialed-in phone values exactly.
+   - Preserve current iPad baseline values exactly.
+   - This block should stay at the END while tuning.
+   ────────────────────────────────────────────────────────── */
+
+/* PHONE — Jeremy dialed values */
+html[data-platform="ios"] .menu-wrapper.plate-ready,
+.platform-ios .menu-wrapper.plate-ready {
+  /* Title */
+  --scmf-title-y: 8.4%;
+  --scmf-title-width: min(78vw, 680px);
+
+  /* Side label rails */
+  --scmf-side-label-width: clamp(142px, 39vw, 320px);
+
+  /* Top row */
+  --scmf-kids-x: 15%;
+  --scmf-kids-y: 25.5%;
+  --scmf-kids-width: var(--scmf-side-label-width);
+
+  --scmf-quick-x: 47%;
+  --scmf-quick-y: 25.5%;
+  --scmf-quick-width: var(--scmf-side-label-width);
+
+  /* Middle row */
+  --scmf-tips-x: 17%;
+  --scmf-tips-y: 26%;
+  --scmf-tips-width: var(--scmf-side-label-width);
+
+  --scmf-story-x: 47%;
+  --scmf-story-y: 26%;
+  --scmf-story-width: var(--scmf-side-label-width);
+
+  /* Center labels */
+  --scmf-infinity-x: 23%;
+  --scmf-infinity-y: 29%;
+  --scmf-infinity-width: min(50vw, 340px);
+
+  --scmf-options-x: 23%;
+  --scmf-options-y: 70%;
+  --scmf-options-width: min(56vw, 360px);
+
+  /* Actor world controls */
+  --scmf-truck-width: 45%;
+  --scmf-truck-x: 50%;
+  --scmf-truck-y: 78.5%;
+
+  --scmf-jehnk-width: 9.75%;
+  --scmf-jehnk-x: 40.2%;
+  --scmf-jehnk-y: 81.8%;
+
+  --scmf-prop-width: 11.75%;
+  --scmf-prop-x: 63.7%;
+  --scmf-prop-y: 83.4%;
+
+  --scmf-cone-width: 40%;
+  --scmf-cone-x: 50%;
+  --scmf-cone-y: 40.5%;
+}
+
+/* IPAD / TABLET — current baseline, not re-guessed */
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] .menu-wrapper.plate-ready,
+  .platform-ios .menu-wrapper.plate-ready {
+    /* Title */
+    --scmf-title-y: 8.2%;
+    --scmf-title-width: min(70vw, 680px);
+
+    /* Side label rails */
+    --scmf-side-label-width: clamp(190px, 25vw, 360px);
+
+    /* Top row */
+    --scmf-kids-x: 20.5%;
+    --scmf-kids-y: 31.8%;
+    --scmf-kids-width: var(--scmf-side-label-width);
+
+    --scmf-quick-x: 79.5%;
+    --scmf-quick-y: 31.8%;
+    --scmf-quick-width: var(--scmf-side-label-width);
+
+    /* Middle row */
+    --scmf-tips-x: 20.5%;
+    --scmf-tips-y: 47.8%;
+    --scmf-tips-width: var(--scmf-side-label-width);
+
+    --scmf-story-x: 79.5%;
+    --scmf-story-y: 47.8%;
+    --scmf-story-width: var(--scmf-side-label-width);
+
+    /* Center labels */
+    --scmf-infinity-x: 50%;
+    --scmf-infinity-y: 58.5%;
+    --scmf-infinity-width: min(36vw, 340px);
+
+    --scmf-options-x: 50%;
+    --scmf-options-y: 91.3%;
+    --scmf-options-width: min(38vw, 360px);
+
+    /* Actor world controls */
+    --scmf-truck-width: 48%;
+    --scmf-truck-x: 50%;
+    --scmf-truck-y: 76.5%;
+
+    --scmf-jehnk-width: 12.5%;
+    --scmf-jehnk-x: 55.25%;
+    --scmf-jehnk-y: 71.0%;
+
+    --scmf-prop-width: 11.5%;
+    --scmf-prop-x: 63.8%;
+    --scmf-prop-y: 70.8%;
+
+    --scmf-cone-width: 29%;
+    --scmf-cone-x: 50%;
+    --scmf-cone-y: 52.8%;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Menu Unified Dial Pad 02 — Jeremy Baseline
+   2026-0618
+   Purpose:
+   - Use Jeremy's dialed-in phone values as the BASE layout.
+   - Let iPad inherit the same geometry naturally.
+   - Only size clamps respond to screen size.
+   - No separate iPad position overrides yet.
+   - Paste at VERY END of style.css.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready,
+.platform-ios .menu-wrapper.plate-ready {
+  /* ── Title — locked for now ───────────────────────────── */
+  --scmf-title-y: 8.4%;
+  --scmf-title-width: min(78vw, 680px);
+
+  /* ── Label scale / box size ───────────────────────────── */
+  --scmf-menu-label-size: clamp(1.2rem, 2.65svh, 2.45rem);
+  --scmf-side-label-width: clamp(142px, 56vw, 360px);
+
+  /* ── Jeremy dialed label positions — BASE ─────────────── */
+
+  --scmf-kids-x: 17%;
+  --scmf-kids-y: 27%;
+  --scmf-kids-width: var(--scmf-side-label-width);
+
+  --scmf-quick-x: 49%;
+  --scmf-quick-y: 27%;
+  --scmf-quick-width: var(--scmf-side-label-width);
+
+  --scmf-tips-x: 17%;
+  --scmf-tips-y: 27%;
+  --scmf-tips-width: var(--scmf-side-label-width);
+
+  --scmf-story-x: 49%;
+  --scmf-story-y: 27%;
+  --scmf-story-width: var(--scmf-side-label-width);
+
+  --scmf-infinity-x: 25%;
+  --scmf-infinity-y: 27%;
+  --scmf-infinity-width: min(56vw, 360px);
+
+  --scmf-options-x: 25%;
+  --scmf-options-y: 67%;
+  --scmf-options-width: min(56vw, 360px);
+
+  /* ── Jeremy dialed actor positions — BASE ─────────────── */
+
+  --scmf-truck-width: 55%;
+  --scmf-truck-x: 50%;
+  --scmf-truck-y: 75%;
+
+  --scmf-jehnk-width: 9.75%;
+  --scmf-jehnk-x: 40.2%;
+  --scmf-jehnk-y: 77%;
+
+  --scmf-prop-width: 8%;
+  --scmf-prop-x: 26%;
+  --scmf-prop-y: 85%;
+
+  --scmf-cone-width: 40%;
+  --scmf-cone-x: 50%;
+  --scmf-cone-y: 41%;
+}
+
+/* ── iPad inherits geometry naturally.
+   Only these size clamps change so text/art do not feel huge.
+   No x/y changes here yet. ─────────────────────────────── */
+
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] .menu-wrapper.plate-ready,
+  .platform-ios .menu-wrapper.plate-ready {
+    --scmf-menu-label-size: clamp(1.2rem, 2.65svh, 2.45rem);
+    --scmf-side-label-width: clamp(190px, 38vw, 360px);
+
+    /* Keep title from becoming too wide on iPad */
+    --scmf-title-width: min(70vw, 680px);
+
+    /* Keep center labels from becoming too wide on iPad */
+    --scmf-infinity-width: min(38vw, 360px);
+    --scmf-options-width: min(38vw, 360px);
+  }
+}
+
+/* ── APPLY TITLE ───────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-title-top,
+.platform-ios .menu-wrapper.plate-ready .menu-title-top {
+  position: absolute !important;
+  left: 50% !important;
+  top: var(--scmf-title-y) !important;
+  width: var(--scmf-title-width) !important;
+  max-width: var(--scmf-title-width) !important;
+  transform: translate(-50%, 0) !important;
+  z-index: 26 !important;
+}
+
+/* ── APPLY LABELS ──────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label,
+.platform-ios .menu-wrapper.plate-ready .menu-label {
+  position: absolute !important;
+  z-index: 28 !important;
+  box-sizing: border-box !important;
+  max-width: none !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  pointer-events: auto !important;
+  text-align: center !important;
+  font-size: var(--scmf-menu-label-size) !important;
+  line-height: 1 !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.kids,
+.platform-ios .menu-wrapper.plate-ready .menu-label.kids {
+  left: var(--scmf-kids-x) !important;
+  top: var(--scmf-kids-y) !important;
+  width: var(--scmf-kids-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.quick,
+.platform-ios .menu-wrapper.plate-ready .menu-label.quick {
+  left: var(--scmf-quick-x) !important;
+  top: var(--scmf-quick-y) !important;
+  width: var(--scmf-quick-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.tips,
+.platform-ios .menu-wrapper.plate-ready .menu-label.tips {
+  left: var(--scmf-tips-x) !important;
+  top: var(--scmf-tips-y) !important;
+  width: var(--scmf-tips-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.story,
+.platform-ios .menu-wrapper.plate-ready .menu-label.story {
+  left: var(--scmf-story-x) !important;
+  top: var(--scmf-story-y) !important;
+  width: var(--scmf-story-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.infinity,
+.platform-ios .menu-wrapper.plate-ready .menu-label.infinity {
+  left: var(--scmf-infinity-x) !important;
+  top: var(--scmf-infinity-y) !important;
+  width: var(--scmf-infinity-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.options,
+html[data-platform="ios"] .menu-wrapper.plate-ready .label-options,
+.platform-ios .menu-wrapper.plate-ready .menu-label.options,
+.platform-ios .menu-wrapper.plate-ready .label-options {
+  left: var(--scmf-options-x) !important;
+  top: var(--scmf-options-y) !important;
+  bottom: auto !important;
+  width: var(--scmf-options-width) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* ── APPLY ACTORS ──────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-truck-back,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-truck-back,
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-truck-front,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-truck-front {
+  width: var(--scmf-truck-width) !important;
+  left: var(--scmf-truck-x) !important;
+  top: var(--scmf-truck-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-character,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-character {
+  width: var(--scmf-jehnk-width) !important;
+  left: var(--scmf-jehnk-x) !important;
+  top: var(--scmf-jehnk-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-theme-prop,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-theme-prop {
+  width: var(--scmf-prop-width) !important;
+  left: var(--scmf-prop-x) !important;
+  top: var(--scmf-prop-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-world-stage .menu-center-cone,
+.platform-ios .menu-wrapper.plate-ready .menu-world-stage .menu-center-cone {
+  width: var(--scmf-cone-width) !important;
+  left: var(--scmf-cone-x) !important;
+  top: var(--scmf-cone-y) !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* ── HITBOXES FOLLOW ACTORS ────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-highscore-hitbox,
+.platform-ios .menu-wrapper.plate-ready .menu-highscore-hitbox {
+  left: var(--scmf-truck-x) !important;
+  top: var(--scmf-truck-y) !important;
+  width: min(76vw, 520px) !important;
+  height: 19% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 40 !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .mushroom-popper-hitbox,
+.platform-ios .menu-wrapper.plate-ready .mushroom-popper-hitbox {
+  left: var(--scmf-cone-x) !important;
+  top: var(--scmf-cone-y) !important;
+  width: min(30vw, 250px) !important;
+  height: 16% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 40 !important;
 }

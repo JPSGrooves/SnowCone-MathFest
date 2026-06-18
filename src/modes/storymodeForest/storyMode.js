@@ -821,7 +821,7 @@ function renderChapterMenu() {
         <img id="modeBackground" class="sm-bg-img" src="${BG_SRC}" alt="Story Mode Background"/>
 
         <section class="sm-chapter-menu">
-          <h2 class="sm-chapter-title">Story Mode Forest</h2>
+          <h2 class="sm-chapter-title">Story Forest</h2>
 
           <div class="sm-chapter-list">
             <button class="sm-btn sm-btn-primary" id="smPrologue">Prologue - Start Here!</button>

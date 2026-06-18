@@ -203,11 +203,11 @@ const DEFAULT_MENU_VISUALS = Object.freeze({
 
   // Future actor slots.
   // These stay null until the PNGs exist.
-  truckBack: null,
-  truckFront: null,
-  centerCone: null,
-  character: null,
-  prop: null,
+  truckBack: 'assets/img/menu/packages/default/truckBack.png',
+  truckFront: 'assets/img/menu/packages/default/truckFront.png',
+  centerCone: 'assets/img/menu/packages/default/centerCone.png',
+  character: 'assets/img/menu/packages/default/character.png',
+  prop: 'assets/img/menu/packages/default/themeProp.png',
 });
 
 const THEME_VIBES = Object.freeze({
