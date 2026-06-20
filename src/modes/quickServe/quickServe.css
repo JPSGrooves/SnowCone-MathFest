@@ -1026,3 +1026,121 @@
     box-shadow: 0 0 26px #00ffeeaa, 0 0 42px #00ffee66;
   }
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   🍧 QuickServe Pavilion — Real Backdrop Plate Layer v1
+   SAFE STRUCTURAL VISUAL PASS:
+   - adds a true full-screen QS plate layer outside the old 11:16 frame
+   - adds one full-screen wash layer for consistent edge darkness
+   - keeps the old QS frame, grid, stage, math, keypad, music, scoring, timer, reset, and result logic intact
+   ───────────────────────────────────────────────────────────── */
+
+body.qs-active #game-container {
+  position: relative !important;
+  overflow: hidden !important;
+  background: #101525 !important;
+}
+
+/* True full-screen QuickServe plate.
+   This is the mode equivalent of the menu backdrop plate. */
+body.qs-active .qs-mode-backdrop-plate {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+
+  object-fit: cover;
+  object-position: center center;
+
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* One full-screen shadow/wash.
+   This replaces the old inner-only wash edge problem. */
+body.qs-active .qs-mode-backdrop-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+
+  background: rgba(0, 0, 0, 0.40);
+}
+
+/* Old QuickServe layout tube stays above the full-screen plate/wash. */
+body.qs-active .aspect-wrap {
+  position: relative;
+  z-index: 2;
+  background: transparent !important;
+}
+
+/* Keep old frame geometry intact, but do not let it paint a background. */
+body.qs-active .game-frame {
+  background: transparent !important;
+}
+
+/* The inner #modeBackground remains in the DOM for repaintBackground(),
+   but the new full-screen plate is now the visible background. */
+body.qs-active .game-frame > .background-fill,
+body.qs-active .game-frame > #modeBackground.background-fill {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Remove only the old inner screen washes that made the 11:16 edge visible.
+   Do NOT touch stage/math/keypad/button panels. */
+body.qs-active .qs-intro,
+body.qs-active .qs-grid {
+  background: transparent !important;
+}
+
+/* The intro blur also only lived inside the 11:16 tube, so it made the edge visible. */
+body.qs-active .qs-intro {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   🍧 QuickServe Pavilion — Frame Stretch Only v1
+   SAFE VISUAL TEST:
+   - stretches only the old QS 11:16 shell to full viewport
+   - keeps existing shader/wash/background behavior
+   - keeps qs-grid, intro, stage, math, keypad, buttons, music, scoring, timer, reset untouched
+   ───────────────────────────────────────────────────────────── */
+
+body.qs-active .aspect-wrap {
+  width: 100vw !important;
+  height: 100svh !important;
+  max-width: 100vw !important;
+  max-height: 100svh !important;
+  aspect-ratio: auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+
+  overflow: hidden !important;
+}
+
+body.qs-active .game-frame {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: auto !important;
+
+  position: relative !important;
+  overflow: hidden !important;
+}

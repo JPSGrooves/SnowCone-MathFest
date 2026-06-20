@@ -111,9 +111,17 @@ function renderIntroScreen() {
   const container = getGameContainer();
 
   container.innerHTML = `
+    <img
+      class="qs-mode-backdrop-plate"
+      src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/plate_quickserveBG.png"
+      alt=""
+      aria-hidden="true"
+    />
+    <div class="qs-mode-backdrop-wash" aria-hidden="true"></div>
+
     <div class="aspect-wrap">
       <div class="game-frame">
-        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
+        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/plate_quickserveBG.png"/>
         <div class="qs-intro">
           <div class="phil-speech">
             <strong>Yo! I’m Cosmic Phil</strong>!<br/>
@@ -171,9 +179,17 @@ export function renderGameUI() {
   const container = getGameContainer();
 
   container.innerHTML = `
+    <img
+      class="qs-mode-backdrop-plate"
+      src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/plate_quickserveBG.png"
+      alt=""
+      aria-hidden="true"
+    />
+    <div class="qs-mode-backdrop-wash" aria-hidden="true"></div>
+
     <div class="aspect-wrap">
       <div class="game-frame">
-        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/quickserveBG.png"/>
+        <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/plate_quickserveBG.png"/>
         
         <div class="qs-grid">
 

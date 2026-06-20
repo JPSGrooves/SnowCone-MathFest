@@ -141,7 +141,7 @@ export function loadKidsMode() {
   }
 
   // Theme + preload
-  setTimeout(() => applyBackgroundTheme('assets/img/modes/kidsCamping/kidsBG.png'), 0);
+  setTimeout(() => applyBackgroundTheme('assets/img/modes/kidsCamping/plate_kidsBG.png'), 0);
   import('./preloadParkingSprites.js').then(m => m.preloadParkingSprites()).catch(() => {});
 
   // Stop prior games/music
@@ -239,7 +239,7 @@ function renderIntroScreen() {
     <div class="kc-aspect-wrap">
       <div class="kc-game-frame">
         <img id="modeBackground" class="background-fill kc-bg-img"
-             src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/kidsBG.png"
+             src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/plate_kidsBG.png"
              alt="Kids Camping Background" />
         <div class="kc-intro">
           <div class="kc-intro-stack">
@@ -355,7 +355,7 @@ function renderMainUI() {
     <div class="kc-aspect-wrap">
       <div class="kc-game-frame">
         <img id="modeBackground" class="background-fill"
-             src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/kidsBG.png"
+             src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/plate_kidsBG.png"
              alt="Kids Camping Background" />
         <div class="kc-grid">
           <div class="kc-title">

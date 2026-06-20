@@ -1812,3 +1812,80 @@
 }
 
 
+
+
+/* ─────────────────────────────────────────────────────────────
+   🌲 Story Mode Forest — Container Plate Backdrop v1
+   SAFE PASS:
+   - #game-container owns the full-screen Story Forest plate
+   - keeps Story's 11:16 reading/chapter layout intact
+   - hides the inner sm-bg-img so there is only one visible background layer
+   - does NOT touch chapters, prologue flow, endings, inventory, cash, music, badges, credits, or Game Center
+   ───────────────────────────────────────────────────────────── */
+
+body.sm-active #game-container {
+  background-image: url("/assets/img/modes/storymodeForest/plate_storyBG.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-color: #07120d !important;
+  overflow: hidden !important;
+}
+
+/* Let the full-screen Story plate show through the old Story frame. */
+body.sm-active .sm-aspect-wrap,
+body.sm-active .sm-game-frame {
+  background: transparent !important;
+}
+
+/* Keep the JS-rendered image in the DOM, but make it invisible.
+   This avoids duplicate/cropped background seams. */
+body.sm-active .sm-game-frame > .sm-bg-img,
+body.sm-active .sm-game-frame > #modeBackground.sm-bg-img {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   🌲 Story Mode Forest — Selected Scene Stretch v1
+   SAFE VISUAL PASS:
+   - keeps intro + chapter selection as-is
+   - stretches only prologue/reader/chapter scenes past the old 11:16 tube
+   - keeps Story text, buttons, bottom bar, inventory, chapter logic, credits, music, badges untouched
+   ───────────────────────────────────────────────────────────── */
+
+/* Prologue / story reader scenes: remove old 11:16 cage */
+body.sm-active .sm-aspect-wrap:has(.sm-prologue),
+body.sm-active .sm-aspect-wrap:has(.sm-ch1),
+body.sm-active .sm-aspect-wrap[data-chapter] {
+  width: 100vw !important;
+  height: 100svh !important;
+  max-width: 100vw !important;
+  max-height: 100svh !important;
+  aspect-ratio: auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+
+  overflow: hidden !important;
+}
+
+/* Match the inner frame to the stretched selected scene only */
+body.sm-active .sm-aspect-wrap:has(.sm-prologue) > .sm-game-frame,
+body.sm-active .sm-aspect-wrap:has(.sm-ch1) > .sm-game-frame,
+body.sm-active .sm-aspect-wrap[data-chapter] > .sm-game-frame {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: auto !important;
+
+  position: relative !important;
+  overflow: hidden !important;
+}

@@ -1198,3 +1198,42 @@ body.il-active .il-stage .il-triplet-img{
 :root[data-platform="ios"] body.il-active .il-intro{
   padding-top: 3.2rem !important; /* 👈 same nudge */
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   ♾️ Infinity Lake — Container Plate Backdrop v1
+   CORRECT SAFE PASS:
+   - one full-screen mode plate on #game-container
+   - keeps old 11:16 gameplay frame intact
+   - hides inner background-fill to prevent duplicate seams
+   - no gameplay, scoring, audio, input, badge, or layout logic touched
+   ───────────────────────────────────────────────────────────── */
+
+body.il-active #game-container {
+  background-image: url("/assets/img/modes/infinityLake/plate_infinityBG.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-color: #061323 !important;
+  overflow: hidden !important;
+}
+
+/* Keep the old safe frame, but let the container plate show through it. */
+body.il-active .il-aspect-wrap,
+body.il-active .il-game-frame {
+  background: transparent !important;
+}
+
+/* Important:
+   The JS still renders this image inside the old 11:16 frame.
+   We hide it so the screen uses ONE plate only, not a second cropped copy. */
+body.il-active .il-game-frame > .background-fill {
+  display: none !important;
+}
+
+/* UI stays above the container plate. */
+body.il-active .il-intro,
+body.il-active .il-grid,
+body.il-active .il-result-overlay {
+  position: relative;
+}

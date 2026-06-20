@@ -176,7 +176,7 @@ export function loadInfinityMode() {
 
 
   // 🎨 Swap IL background (on first load and again later if needed)
-  swapModeBackground('assets/img/modes/infinityLake/infinityBG.png');
+  swapModeBackground('assets/img/modes/infinityLake/plate_infinityBG.png');
 
   // 🌀 Animate intro strobe after #tripletSprite is in DOM
   setTimeout(() => {
@@ -201,7 +201,7 @@ export function loadInfinityMode() {
 
         renderUI(); // 🧠 Build game screen
         updateModeButtonUI(); // 👈 this will now highlight the correct button on load
-        swapModeBackground('assets/img/modes/infinityLake/infinityBG.png');
+        swapModeBackground('assets/img/modes/infinityLake/plate_infinityBG.png');
         setupEventHandlers();
         startGame();
         playInfinityLoop(); // 🎶🍧💫 kick off the infinite jam session
@@ -258,7 +258,7 @@ function renderIntroScreen() {
       <div class="il-game-frame">
         <img 
           class="background-fill"
-          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/infinityBG.png" 
+          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/plate_infinityBG.png" 
           alt="Infinity Lake Background"
         />
 
@@ -312,7 +312,7 @@ function renderUI() {
         <img 
           id="modeBackground" 
           class="background-fill" 
-          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/infinityBG.png" 
+          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/plate_infinityBG.png" 
         />
         <div class="il-grid">
 

@@ -1793,3 +1793,68 @@ html.kc-no-zoom, body.kc-no-zoom { overscroll-behavior: contain; }
 :root[data-platform="ios"] body.kc-active .kc-grid {
   padding-top: 7vh; /* pushes title & zones down under the fake bezel */
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   🏕️ Kids Camping — Container Plate Backdrop v1
+   SAFE PASS:
+   - one full-screen Kids Camping plate on #game-container
+   - keeps old KC gameplay frame intact
+   - hides inner background-fill to prevent duplicate seams
+   - does NOT touch Ant Attack, Tent Line, Parking, Mosquito, score, badges, audio, or cleanup
+   ───────────────────────────────────────────────────────────── */
+
+body.kc-active #game-container {
+  background-image: url("/assets/img/modes/kidsCamping/plate_kidsBG.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-color: #101b2a !important;
+  overflow: hidden !important;
+}
+
+/* Keep the old safe frame, but let the full-screen plate show through. */
+body.kc-active .kc-aspect-wrap,
+body.kc-active .kc-game-frame {
+  background: transparent !important;
+}
+
+/* The JS still renders this image inside the old KC frame.
+   Hide it so the screen uses ONE plate only, not a second cropped copy. */
+body.kc-active .kc-game-frame > .background-fill {
+  display: none !important;
+}
+
+/* Keep actual KC UI above the plate. */
+body.kc-active .kc-intro,
+body.kc-active .kc-grid,
+body.kc-active .kc-bottom-bar {
+  position: relative;
+  z-index: 2;
+}
+
+/* Mosquito / popups / overlays should still sit above the mode plate when needed. */
+body.kc-active .kc-round-msg,
+body.kc-active .kc-all-parked-overlay,
+body.kc-active .score-overlay {
+  z-index: 20;
+}
+
+
+/* 🏕️ KC plate pass — remove only the full-grid dark wash */
+body.kc-active .kc-grid {
+  background: transparent !important;
+}
+
+
+/* 🏕️ KC plate pass — restore child shadow boxes, keep only grid wash removed */
+body.kc-active .kc-grid {
+  background: transparent !important;
+}
+
+body.kc-active .kc-grid > div:not(.kc-title):not(.kc-popper-cell) {
+  border: 1px solid #00ffee88 !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 8px #00ffee44 !important;
+}

@@ -1299,3 +1299,38 @@ body { margin: 0; }
 :root[data-platform="ios"] body.mt-active .mt-footer {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.4rem);
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   🧙‍♂️ MathTips Village — Container Plate Backdrop v2
+   FIXED SAFE PASS:
+   - #game-container owns the full-screen Grampy P plate
+   - keeps MathTips layout positioning intact
+   - does NOT override .mt-grid, .mt-bottom-bar, .mt-content, .chat-window positioning
+   - keeps inner #modeBackground in DOM for JS, but visually hides it to avoid duplicate BG seams
+   ───────────────────────────────────────────────────────────── */
+
+body.mt-active #game-container {
+  background-image: url("/assets/img/modes/mathTips/plate_mathtipsBG.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-color: #22112d !important;
+  overflow: hidden !important;
+}
+
+/* Let the container plate show through the old MathTips frame. */
+body.mt-active .mt-root,
+body.mt-active .mt-aspect-wrap,
+body.mt-active .mt-game-frame {
+  background: transparent !important;
+}
+
+/* Keep the JS-rendered image available for code that looks for #modeBackground,
+   but make it invisible so we do not get duplicate/cropped background layers. */
+body.mt-active .mt-game-frame > .background-fill.mt-bg-img,
+body.mt-active .mt-game-frame > #modeBackground.background-fill {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

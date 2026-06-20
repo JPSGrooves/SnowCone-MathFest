@@ -132,7 +132,7 @@ export function loadMathTips() {
   document.body.classList.add(MT_BODY_CLASS);
 
   try { swapModeBackground('mathTips'); }
-  catch { applyBackgroundTheme(`${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png`); }
+  catch { applyBackgroundTheme(`${import.meta.env.BASE_URL}assets/img/modes/mathTips/plate_mathtipsBG.png`); }
 
   const container = document.querySelector(MT.containerSel);
   const menu = document.querySelector(MT.menuSel);
@@ -190,7 +190,7 @@ function renderIntroScreen() {
       <div class="mt-aspect-wrap">
         <div class="mt-game-frame">
           <img id="modeBackground" class="background-fill mt-bg-img"
-               src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png"
+               src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/plate_mathtipsBG.png"
                alt="MathTips Background"/>
 
           <div class="mt-intro">
@@ -273,7 +273,7 @@ function renderMainUI() {
           <img
             id="modeBackground"
             class="background-fill mt-bg-img"
-            src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/mathtipsBG.png"
+            src="${import.meta.env.BASE_URL}assets/img/modes/mathTips/plate_mathtipsBG.png"
             alt="MathTips Background"
           />
 

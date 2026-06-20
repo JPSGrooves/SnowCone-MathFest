@@ -17,7 +17,7 @@ import { scheduleStoryCredits } from './ui/storyCredits.js';
 
 const SELECTORS = { container: '#game-container' };
 const BASE = import.meta.env.BASE_URL;
-const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
+const BG_SRC = `${BASE}assets/img/modes/storymodeForest/plate_storyBG.png`;
 
 // ─────────────────────────────
 // inline unlock store (no new files)

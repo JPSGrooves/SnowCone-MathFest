@@ -170,7 +170,7 @@ let __smRotateLock = false;
 
 // Assets
 const BASE = import.meta.env.BASE_URL;
-const BG_SRC = `${BASE}assets/img/modes/storymodeForest/storyBG.png`;
+const BG_SRC = `${BASE}assets/img/modes/storymodeForest/plate_storyBG.png`;
 const DIRECTOR_SRC = `${BASE}assets/img/characters/storyMode/jehnk.png`;
 const PRO_IMG = (name) => `${BASE}assets/img/characters/storyMode/${name}`;
 
