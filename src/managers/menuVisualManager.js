@@ -55,9 +55,26 @@ function setActorImage(slotId, src) {
   }
 }
 
+function applyMenuTitleGlow(titleGlow = {}) {
+  if (typeof document === 'undefined') return;
+
+  const root = document.documentElement;
+
+  const glowA = titleGlow.a || '#ffee00';
+  const glowB = titleGlow.b || '#00ffee';
+  const glowC = titleGlow.c || '#ff77ff';
+  const halo = titleGlow.halo || 'rgba(255, 238, 0, 0.65)';
+
+  root.style.setProperty('--scmf-title-glow-a', glowA);
+  root.style.setProperty('--scmf-title-glow-b', glowB);
+  root.style.setProperty('--scmf-title-glow-c', glowC);
+  root.style.setProperty('--scmf-title-glow-halo', halo);
+}
+
 export function applyMenuVisualPackage(themeId = 'menubackground') {
   const pkg = getMenuThemePackage(themeId);
   const visuals = pkg.visual || {};
+  applyMenuTitleGlow(visuals.titleGlow);
 
   Object.entries(ACTOR_SLOTS).forEach(([visualKey, slotId]) => {
     setActorImage(slotId, visuals[visualKey]);

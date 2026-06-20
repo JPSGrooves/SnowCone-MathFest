@@ -2,6 +2,7 @@
 
 import { appState } from '../data/appState.js';
 import { unlockableThemes, themeLabels } from '../managers/backgroundManager.js';
+import { getMenuThemeVisuals } from '../data/menuThemePackages.js';
 
 export function renderThemesTab() {
   const currentTheme = appState.settings.theme;
@@ -21,10 +22,13 @@ export function renderThemesTab() {
       themeId === 'freedom' || 
       unlocked.includes(themeId);
     const active = currentTheme === themeId ? 'active' : '';
+    const previewImage =
+      getMenuThemeVisuals(themeId).backgroundPlate ||
+      'assets/img/menu/packages/default/backgroundPlate.png';
 
     html += `
       <div class="theme-tile ${isUnlocked ? '' : 'locked'} ${active}" data-theme="${themeId}">
-        <div class="theme-preview" style="background-image:url('assets/img/branding/${themeId}.png')"></div>
+        <div class="theme-preview" style="background-image:url('${previewImage}')"></div>
         <div class="theme-label">${label}</div>
         ${!isUnlocked ? '<div class="theme-lock">🔒</div>' : ''}
       </div>

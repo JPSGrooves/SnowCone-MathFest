@@ -5,6 +5,7 @@ import './modals/infoModal.js'; // ⛩️ just runs, no export
 import { Howler } from 'howler';
 import { autorun } from 'mobx';
 import { appState } from './data/appState.js';
+import { titleGlowMap } from './data/menuThemePackages.js';
 import { setupMenu } from './menu/menu.js'; // ⬅️ this wires transitions
 import { playTransition } from './managers/transitionManager.js'; // still available if needed
 import { initBadgeManager } from './managers/badgeManager.js';
@@ -44,10 +45,14 @@ document.addEventListener('gestureend', (e) => {
 });
 
 // 🔐 Optional: Vite env check
+// This is a build charm / sanity check, not a real secret.
+// VITE_* values are bundled into the app, so never put real passwords here.
 if (import.meta.env?.VITE_SECRET_KEY) {
-  console.log('🔐 VITE_SECRET_KEY:', import.meta.env.VITE_SECRET_KEY);
+  if (import.meta.env.DEV) {
+    console.log('🔐 SCMF build charm loaded ✅');
+  }
 } else {
-  console.warn('🚨 No VITE_SECRET_KEY found. Is .env missing?');
+  console.warn('🚨 No SCMF build charm found. Is .env missing?');
 }
 
 // 🧠 Platform flag: 'web' (browser) or 'ios' (Capacitor build)
@@ -63,6 +68,31 @@ if (PLATFORM === 'ios') {
 // tag <html data-platform="web|ios"> so CSS can branch
 document.documentElement.dataset.platform = PLATFORM;
 console.log('🧠 SnowCone platform:', PLATFORM);
+
+function primeStartupTitleGlowVars(themeId = appState.settings?.theme || 'menubackground') {
+  const glow = titleGlowMap?.[themeId] || titleGlowMap?.menubackground;
+
+  if (!glow) {
+    console.warn('⚠️ No startup title glow map found for theme:', themeId);
+    return;
+  }
+
+  const root = document.documentElement;
+
+  root.style.setProperty('--scmf-title-glow-a', glow.a);
+  root.style.setProperty('--scmf-title-glow-b', glow.b);
+  root.style.setProperty('--scmf-title-glow-c', glow.c);
+  root.style.setProperty('--scmf-title-glow-halo', glow.halo);
+
+  root.dataset.scmfTitleGlowPrimed = themeId;
+
+  if (import.meta.env.DEV) {
+    console.log('✨ Startup title glow primed:', themeId);
+  }
+}
+
+// Prime theme glow before DOMContentLoaded/menu animation can flash default colors.
+primeStartupTitleGlowVars();
 
 // 🌍 Inject favicons with proper base path
 const base = import.meta.env.BASE_URL;
@@ -111,6 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initRankManager(appState);           // 2) watch Cone Rank changes
   startAchievementsWatcher(appState);  // 3) wire autoruns AFTER managers
   if (import.meta.env.DEV) attachDevHarness();
+
+  // Re-prime once after app boot state settles, before applying full menu theme.
+  primeStartupTitleGlowVars();
 
   applyBackgroundTheme();
   console.log('🎨 Background applied.');

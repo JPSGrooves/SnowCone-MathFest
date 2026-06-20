@@ -22,17 +22,150 @@ export function restartMenuTitleNeon() {
   const title = document.querySelector('.menu-title-top');
   if (!title) return;
 
-  // Kill current animation (inline)
-  title.style.animation = 'none';
+  const hardKick = () => {
+    // WKWebView/Kids Camping return fix:
+    // CSS owns the themed title glow with !important, so use a CSS reset class
+    // instead of relying on inline style.animation = 'none'.
+    title.classList.remove('menu-title-neon-rekick');
+    title.classList.add('menu-title-neon-hard-reset');
 
-  // Force a reflow so the browser actually commits that change
-  // eslint-disable-next-line no-unused-expressions
-  title.offsetWidth;
+    // Force layout so WebKit commits the no-animation state.
+    void title.offsetWidth;
 
-  // Drop back to stylesheet-defined animation
-  title.style.animation = '';
+    requestAnimationFrame(() => {
+      title.classList.remove('menu-title-neon-hard-reset');
+
+      // Re-add a harmless marker class to force another style recalc.
+      title.classList.add('menu-title-neon-rekick');
+      void title.offsetWidth;
+    });
+  };
+
+  hardKick();
+  requestAnimationFrame(hardKick);
+  setTimeout(hardKick, 120);
+  setTimeout(hardKick, 360);
+  setTimeout(hardKick, 720);
+
+  setTimeout(() => {
+    title.classList.remove('menu-title-neon-rekick');
+    title.classList.remove('menu-title-neon-hard-reset');
+  }, 1200);
 }
 
+
+function prepareMenuTitleGlowGate(menuWrapper) {
+  if (!menuWrapper) return;
+
+  menuWrapper.classList.add('title-glow-gating');
+  menuWrapper.classList.remove('title-glow-ready');
+}
+
+function revealMenuTitleGlowWhenReady(menuWrapper) {
+  if (!menuWrapper) return;
+
+  // Cold launch fix:
+  // Do not restart the neon animation here.
+  // The restart itself is what causes the startup blink.
+  menuWrapper.classList.remove('title-glow-gating');
+  menuWrapper.classList.add('title-glow-ready');
+}
+
+function installMenuNeonVisibilityWatcher(menuWrapper) {
+  if (!menuWrapper || menuWrapper.dataset.neonVisibilityWatcher === '1') return;
+
+  menuWrapper.dataset.neonVisibilityWatcher = '1';
+
+  let pendingKick = 0;
+
+  const kickIfVisible = () => {
+    if (menuWrapper.classList.contains('hidden')) return;
+
+    window.clearTimeout(pendingKick);
+
+    requestAnimationFrame(() => {
+      restartMenuTitleNeon();
+    });
+
+    pendingKick = window.setTimeout(() => {
+      restartMenuTitleNeon();
+    }, 180);
+  };
+
+  const observer = new MutationObserver(kickIfVisible);
+  observer.observe(menuWrapper, {
+    attributes: true,
+    attributeFilter: ['class', 'style']
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) kickIfVisible();
+  });
+
+  window.addEventListener('focus', kickIfVisible);
+
+  kickIfVisible();
+}
+
+
+
+function installMenuNeonReturnWatcher(menuWrapper) {
+  if (!menuWrapper || menuWrapper.dataset.neonReturnWatcher === '1') return;
+
+  menuWrapper.dataset.neonReturnWatcher = '1';
+
+  let wasHidden = menuWrapper.classList.contains('hidden');
+  let armed = false;
+  let pendingKick = 0;
+
+  // Arm after cold menu reveal has settled.
+  window.setTimeout(() => {
+    armed = true;
+    wasHidden = menuWrapper.classList.contains('hidden');
+  }, 900);
+
+  const maybeKickAfterReturn = () => {
+    const isHidden = menuWrapper.classList.contains('hidden');
+
+    if (isHidden) {
+      wasHidden = true;
+      return;
+    }
+
+    // Do not kick on first cold launch.
+    if (!armed) return;
+
+    // Only kick when the menu was actually hidden before.
+    if (!wasHidden) return;
+
+    wasHidden = false;
+    window.clearTimeout(pendingKick);
+
+    pendingKick = window.setTimeout(() => {
+      requestAnimationFrame(() => {
+        restartMenuTitleNeon();
+      });
+    }, 90);
+  };
+
+  const observer = new MutationObserver(maybeKickAfterReturn);
+  observer.observe(menuWrapper, {
+    attributes: true,
+    attributeFilter: ['class', 'style']
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && armed && !menuWrapper.classList.contains('hidden')) {
+      maybeKickAfterReturn();
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    if (armed && !menuWrapper.classList.contains('hidden')) {
+      maybeKickAfterReturn();
+    }
+  });
+}
 
 // 🍄 Secret XP popup helper ("mushroom popper" visual)
 function spawnMushroomPopup(label, anchorRect) {
@@ -146,7 +279,9 @@ function fillHighScoreValues(root) {
 export function setupMenu() {
   const menuWrapper = document.querySelector('.menu-wrapper');
 
-  applyBackgroundTheme();
+  
+  prepareMenuTitleGlowGate(menuWrapper);
+applyBackgroundTheme();
 
   if (!menuWrapper) {
     console.error('❌ .menu-wrapper not found – menu setup aborted.');
@@ -155,6 +290,7 @@ export function setupMenu() {
 
   installMushroomPopper(menuWrapper);
   installHighScoreHitbox(menuWrapper);
+  installMenuNeonReturnWatcher(menuWrapper);
 
   const labelToMode = {
     kids: 'kids',
@@ -209,8 +345,8 @@ export function setupMenu() {
 
   menuWrapper.classList.remove('hidden');
 
-  // 💡 Make sure the neon cycle is active whenever the menu is visible
-  restartMenuTitleNeon();
+  // Cold launch: reveal title without restarting the animation.
+  revealMenuTitleGlowWhenReady(menuWrapper);
 }
 function openHighScoreOverlay() {
   const overlay = document.getElementById('highScoreOverlay');

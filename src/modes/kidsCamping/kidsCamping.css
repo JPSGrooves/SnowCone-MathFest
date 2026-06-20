@@ -1858,3 +1858,1593 @@ body.kc-active .kc-grid > div:not(.kc-title):not(.kc-popper-cell) {
   border-radius: 10px !important;
   box-shadow: 0 0 8px #00ffee44 !important;
 }
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1 — Kids Camping Vertical Recovery + Panel Shaders
+   Purpose:
+   - Recover vertical play space after the full-screen plate pass.
+   - Keep the new plate visible.
+   - Darken only the existing mini-game panels.
+   - No gameplay logic changes.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active #game-container {
+  min-height: 100svh !important;
+  height: 100svh !important;
+  max-height: 100svh !important;
+  overflow: hidden !important;
+
+  background-size: cover !important;
+  background-position: center center !important;
+}
+
+body.kc-active .kc-aspect-wrap,
+body.kc-active .kc-game-frame {
+  min-height: 100svh !important;
+  height: 100svh !important;
+  max-height: 100svh !important;
+}
+
+body.kc-active .kc-grid {
+  min-height: 0 !important;
+  height: calc(100svh - clamp(96px, 13svh, 152px)) !important;
+  max-height: calc(100svh - clamp(96px, 13svh, 152px)) !important;
+
+  align-content: stretch !important;
+  gap: clamp(5px, 1.05svh, 12px) !important;
+}
+
+/* Existing mini-game boxes: darker transparent shade, stronger depth. */
+body.kc-active .kc-grid > div:not(.kc-title):not(.kc-popper-cell) {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 24, 34, 0.76) 0%,
+      rgba(8, 34, 42, 0.62) 100%
+    ) !important;
+
+  border-color: rgba(255, 255, 255, 0.24) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -14px 22px rgba(0, 0, 0, 0.16),
+    0 10px 24px rgba(0, 0, 0, 0.46),
+    0 0 16px rgba(0, 0, 0, 0.28) !important;
+
+  backdrop-filter: blur(2px) saturate(1.04) !important;
+  -webkit-backdrop-filter: blur(2px) saturate(1.04) !important;
+}
+
+/* Smaller-height iPhones get a tighter camping layout. */
+@media (max-height: 740px) {
+  body.kc-active .kc-grid {
+    height: calc(100svh - clamp(82px, 11svh, 124px)) !important;
+    max-height: calc(100svh - clamp(82px, 11svh, 124px)) !important;
+    gap: clamp(4px, 0.85svh, 8px) !important;
+  }
+
+  body.kc-active .kc-grid > div:not(.kc-title):not(.kc-popper-cell) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 7px 16px rgba(0, 0, 0, 0.42),
+      0 0 10px rgba(0, 0, 0, 0.24) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1b — Kids Camping Full-Height Grid Restore
+   Purpose:
+   - Keep the darker transparent mini-game panel shading.
+   - Stop Camping from behaving like a shortened inner slab.
+   - Let the Ant/Tent/Parking zones use the vertical screen again.
+   - Preserve bottom safe area for Back/Mute square buttons.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .kc-grid {
+  min-height: 100svh !important;
+  height: 100svh !important;
+  max-height: 100svh !important;
+
+  /* This replaces the older iOS-only padding-top + later height subtraction. */
+  padding:
+    calc(env(safe-area-inset-top) + clamp(34px, 5.6svh, 62px))
+    clamp(8px, 1.2vw, 14px)
+    calc(env(safe-area-inset-bottom) + clamp(80px, 8.8svh, 112px))
+    clamp(8px, 1.2vw, 14px) !important;
+
+  /*
+    title
+    top game zones span the next two rows
+    parking gets a real row
+    score/popper gets a tiny row
+  */
+  grid-template-rows:
+    auto
+    minmax(0, 1.15fr)
+    minmax(0, 1.15fr)
+    minmax(0, 0.88fr)
+    minmax(0, 0.16fr) !important;
+
+  align-content: stretch !important;
+  gap: clamp(7px, 1svh, 12px) !important;
+  overflow: hidden !important;
+}
+
+body.kc-active .kc-scroller-cell,
+body.kc-active .kc-tent-cell,
+body.kc-active .kc-slider-cell,
+body.kc-active .kc-ant-attack-zone,
+body.kc-active .kc-tent-zone {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+/* Keep the score/popper row from stealing vertical space. */
+body.kc-active .kc-popper-cell {
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: clamp(34px, 5svh, 58px) !important;
+}
+
+/* Let the parking game breathe inside its row without ballooning. */
+body.kc-active .kc-slider-cell {
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+/* Shorter iPhones: still full-height, just tighter reserved button space. */
+@media (max-height: 740px) {
+  body.kc-active .kc-grid {
+    padding:
+      calc(env(safe-area-inset-top) + clamp(28px, 5svh, 50px))
+      clamp(6px, 1vw, 12px)
+      calc(env(safe-area-inset-bottom) + clamp(64px, 8svh, 92px))
+      clamp(6px, 1vw, 12px) !important;
+
+    grid-template-rows:
+      auto
+      minmax(0, 1.12fr)
+      minmax(0, 1.12fr)
+      minmax(0, 0.82fr)
+      minmax(0, 0.12fr) !important;
+
+    gap: clamp(5px, 0.85svh, 9px) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1c — Kids Camping Bottom Dock + Vertical Game Space
+   Purpose:
+   - Back and mute buttons always visible.
+   - Camping Score rests between them.
+   - Game cells use the vertical space above the dock.
+   - Keep the darker transparent panel shading from the previous pass.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .kc-game-frame {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* The game grid should fill the screen, but reserve a real bottom dock. */
+body.kc-active .kc-grid {
+  min-height: 100svh !important;
+  height: 100svh !important;
+  max-height: 100svh !important;
+
+  padding:
+    calc(env(safe-area-inset-top) + clamp(34px, 5.2svh, 64px))
+    clamp(8px, 1.2vw, 14px)
+    calc(env(safe-area-inset-bottom) + clamp(102px, 9.8svh, 136px))
+    clamp(8px, 1.2vw, 14px) !important;
+
+  /*
+    Row map still matches the existing grid-template-areas:
+    title
+    ant/tent upper span
+    ant/tent lower span
+    parking
+    popper/score row collapsed because score becomes docked
+  */
+  grid-template-rows:
+    auto
+    minmax(0, 1.28fr)
+    minmax(0, 1.28fr)
+    minmax(0, 0.78fr)
+    0px !important;
+
+  align-content: stretch !important;
+  gap: clamp(6px, 0.95svh, 12px) !important;
+  overflow: hidden !important;
+}
+
+/* Let the actual game cells fill their assigned rows. */
+body.kc-active .kc-scroller-cell,
+body.kc-active .kc-tent-cell,
+body.kc-active .kc-slider-cell,
+body.kc-active .kc-ant-attack-zone,
+body.kc-active .kc-tent-zone {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+
+/* Parking row should breathe, but not steal the dock area. */
+body.kc-active .kc-slider-cell {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Bottom dock owns Back + Mute. */
+body.kc-active .kc-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: calc(env(safe-area-inset-bottom) + clamp(18px, 2.2svh, 32px)) !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr minmax(110px, 28vw) 1fr !important;
+  align-items: center !important;
+
+  padding: 0 clamp(20px, 3.6vw, 52px) !important;
+  z-index: 70 !important;
+  pointer-events: none !important;
+}
+
+/* Slightly smaller dock buttons so they never get cropped on iPad/iPhone. */
+body.kc-active .kc-square-btn {
+  width: clamp(50px, 5.4svh, 74px) !important;
+  height: clamp(50px, 5.4svh, 74px) !important;
+  font-size: clamp(18px, 2.55svh, 25px) !important;
+  border-radius: 14% !important;
+}
+
+body.kc-active .kc-square-btn.kc-left {
+  justify-self: start !important;
+}
+
+body.kc-active .kc-square-btn.kc-right {
+  justify-self: end !important;
+}
+
+/* Move Camping Score into the visual center of the bottom dock. */
+body.kc-active .kc-popper-cell {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: calc(env(safe-area-inset-bottom) + clamp(18px, 2.2svh, 32px)) !important;
+  transform: translateX(-50%) !important;
+
+  width: clamp(112px, 26vw, 220px) !important;
+  height: clamp(50px, 5.4svh, 74px) !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  z-index: 72 !important;
+  pointer-events: none !important;
+}
+
+/* Keep whatever score markup exists centered and readable. */
+body.kc-active .kc-popper-lineup {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 0 !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+}
+
+body.kc-active .kc-score-wrap,
+body.kc-active .kc-score-box {
+  width: 100% !important;
+  height: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 0.08rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.kc-active .kc-score-label {
+  font-size: clamp(0.62rem, 1.05svh, 0.86rem) !important;
+  line-height: 1 !important;
+  color: #ffee00 !important;
+  text-shadow:
+    0 0 5px rgba(255, 238, 0, 0.7),
+    0 2px 4px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.kc-active #popCount {
+  font-size: clamp(1rem, 2.25svh, 1.55rem) !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  color: #ffee00 !important;
+  text-shadow:
+    0 0 7px rgba(255, 238, 0, 0.75),
+    0 2px 5px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Smaller-height screens: same structure, tighter dock. */
+@media (max-height: 740px) {
+  body.kc-active .kc-grid {
+    padding:
+      calc(env(safe-area-inset-top) + clamp(28px, 4.8svh, 52px))
+      clamp(6px, 1vw, 12px)
+      calc(env(safe-area-inset-bottom) + clamp(86px, 8.8svh, 112px))
+      clamp(6px, 1vw, 12px) !important;
+
+    grid-template-rows:
+      auto
+      minmax(0, 1.24fr)
+      minmax(0, 1.24fr)
+      minmax(0, 0.72fr)
+      0px !important;
+
+    gap: clamp(5px, 0.8svh, 9px) !important;
+  }
+
+  body.kc-active .kc-bottom-bar,
+  body.kc-active .kc-popper-cell {
+    bottom: calc(env(safe-area-inset-bottom) + clamp(14px, 1.8svh, 24px)) !important;
+  }
+
+  body.kc-active .kc-square-btn,
+  body.kc-active .kc-popper-cell {
+    width: clamp(46px, 5svh, 66px) !important;
+    height: clamp(46px, 5svh, 66px) !important;
+  }
+
+  body.kc-active .kc-popper-cell {
+    width: clamp(104px, 25vw, 190px) !important;
+  }
+}
+
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1d — Kids Camping Real Bottom Dock
+   Purpose:
+   - Bottom dock owns Back | Camping Score | Mute.
+   - Mute sits bottom-right.
+   - Score sits bottom-center, not inside the Parking game zone.
+   - Game cells optimize the vertical space above the dock.
+   - Parking intro content centers better before the game starts.
+   ────────────────────────────────────────────────────────── */
+
+/* The old popper grid row is now only a placeholder. */
+body.kc-active .kc-popper-cell {
+  display: none !important;
+}
+
+/* Game grid: reserve dock space but let the three game zones breathe. */
+body.kc-active .kc-grid {
+  min-height: 100svh !important;
+  height: 100svh !important;
+  max-height: 100svh !important;
+
+  padding:
+    calc(env(safe-area-inset-top) + clamp(34px, 5.2svh, 64px))
+    clamp(8px, 1.2vw, 14px)
+    calc(env(safe-area-inset-bottom) + clamp(92px, 8.8svh, 126px))
+    clamp(8px, 1.2vw, 14px) !important;
+
+  grid-template-rows:
+    auto
+    minmax(0, 1.32fr)
+    minmax(0, 1.32fr)
+    minmax(0, 0.76fr)
+    0px !important;
+
+  gap: clamp(6px, 0.95svh, 12px) !important;
+  align-content: stretch !important;
+  overflow: hidden !important;
+}
+
+/* True bottom dock. */
+body.kc-active .kc-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: calc(env(safe-area-inset-bottom) + clamp(18px, 2.2svh, 32px)) !important;
+
+  display: grid !important;
+  grid-template-columns:
+    minmax(72px, 1fr)
+    minmax(112px, 0.9fr)
+    minmax(72px, 1fr) !important;
+
+  align-items: center !important;
+  column-gap: clamp(10px, 2vw, 24px) !important;
+
+  padding: 0 clamp(24px, 4vw, 58px) !important;
+  z-index: 90 !important;
+  pointer-events: none !important;
+}
+
+/* Force exact dock positions. */
+body.kc-active #kcBack,
+body.kc-active #kcBackIntro {
+  grid-column: 1 !important;
+  justify-self: start !important;
+  align-self: center !important;
+}
+
+body.kc-active #kcMute {
+  grid-column: 3 !important;
+  justify-self: end !important;
+  align-self: center !important;
+}
+
+body.kc-active .kc-dock-score {
+  grid-column: 2 !important;
+  justify-self: center !important;
+  align-self: center !important;
+
+  width: clamp(112px, 24vw, 210px) !important;
+  height: clamp(46px, 5.2svh, 72px) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: clamp(4px, 0.6svh, 8px) clamp(8px, 1.2vw, 14px) !important;
+  border-radius: 14px !important;
+
+  background: rgba(5, 18, 24, 0.54) !important;
+  border: 1px solid rgba(255, 238, 0, 0.22) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 6px 16px rgba(0, 0, 0, 0.32),
+    0 0 10px rgba(255, 238, 0, 0.14) !important;
+
+  pointer-events: none !important;
+}
+
+/* Dock button sizing: visible, tucked, not cropped. */
+body.kc-active .kc-square-btn {
+  width: clamp(50px, 5.3svh, 72px) !important;
+  height: clamp(50px, 5.3svh, 72px) !important;
+  font-size: clamp(18px, 2.55svh, 25px) !important;
+  display: grid !important;
+  place-items: center !important;
+  pointer-events: auto !important;
+}
+
+/* Dock score text. */
+body.kc-active .kc-dock-score .kc-score-label {
+  font-size: clamp(0.58rem, 1svh, 0.82rem) !important;
+  line-height: 1 !important;
+  margin: 0 0 0.12rem 0 !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  color: #ffee00 !important;
+  text-shadow:
+    0 0 5px rgba(255, 238, 0, 0.72),
+    0 2px 4px rgba(0, 0, 0, 0.62) !important;
+}
+
+body.kc-active .kc-dock-score #popCount {
+  font-size: clamp(1rem, 2.1svh, 1.5rem) !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #ffee00 !important;
+  text-shadow:
+    0 0 8px rgba(255, 238, 0, 0.78),
+    0 2px 5px rgba(0, 0, 0, 0.62) !important;
+}
+
+/* Parking intro: center the starting prompt inside the bottom game box. */
+body.kc-active .kc-parking-wrap[data-intro="on"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.72fr) minmax(74px, 0.55fr) !important;
+  grid-template-rows: 1fr !important;
+  grid-template-areas: "car intro button" !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  height: 100% !important;
+  width: 100% !important;
+  padding: clamp(6px, 1svh, 12px) clamp(10px, 1.5vw, 18px) !important;
+  gap: clamp(8px, 1.4vw, 18px) !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] #parkingIntro {
+  grid-area: intro !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] .kc-parking-intro {
+  transform: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  font-size: clamp(1.35rem, 3.2svh, 2.4rem) !important;
+  line-height: 1.15 !important;
+  text-align: center !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] #parkingCycleBtn {
+  grid-area: button !important;
+  justify-self: end !important;
+  align-self: center !important;
+  margin: 0 !important;
+}
+
+/* Keep the rolling intro sprites in the same row, not down in the weeds. */
+body.kc-active .kc-parking-wrap[data-intro="on"] #parkingIntroLane {
+  grid-column: 1 / 2 !important;
+  grid-row: 1 / 2 !important;
+  align-self: center !important;
+  justify-self: stretch !important;
+  height: 100% !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] .kc-intro-car-wrap {
+  bottom: 50% !important;
+  transform: translateY(50%) !important;
+}
+
+/* When active gameplay starts, remove old intro offsets. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn,
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone,
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label {
+  margin-top: 0 !important;
+}
+
+/* Short screens: same structure, tighter dock. */
+@media (max-height: 740px) {
+  body.kc-active .kc-grid {
+    padding:
+      calc(env(safe-area-inset-top) + clamp(28px, 4.8svh, 52px))
+      clamp(6px, 1vw, 12px)
+      calc(env(safe-area-inset-bottom) + clamp(78px, 8.2svh, 106px))
+      clamp(6px, 1vw, 12px) !important;
+
+    grid-template-rows:
+      auto
+      minmax(0, 1.28fr)
+      minmax(0, 1.28fr)
+      minmax(0, 0.70fr)
+      0px !important;
+  }
+
+  body.kc-active .kc-bottom-bar {
+    bottom: calc(env(safe-area-inset-bottom) + clamp(14px, 1.8svh, 24px)) !important;
+    padding: 0 clamp(18px, 3.2vw, 42px) !important;
+  }
+
+  body.kc-active .kc-square-btn {
+    width: clamp(46px, 5svh, 66px) !important;
+    height: clamp(46px, 5svh, 66px) !important;
+  }
+
+  body.kc-active .kc-dock-score {
+    height: clamp(46px, 5svh, 66px) !important;
+    width: clamp(104px, 24vw, 188px) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1e — Kids Parking Panel Final Stabilizer
+   Purpose:
+   - Keep the now-good overall Camping layout.
+   - Center "Park the Cars!" in the bottom parking panel.
+   - Prevent active parking game sprites from bottom-clipping.
+   - Keep Back | Camping Score | Mute dock stable.
+   ────────────────────────────────────────────────────────── */
+
+/* Dock remains true bottom row. Score is centered; mute is bottom-right. */
+body.kc-active .kc-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: calc(env(safe-area-inset-bottom) + clamp(18px, 2.15svh, 32px)) !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(78px, 1fr) minmax(112px, 0.8fr) minmax(78px, 1fr) !important;
+  align-items: center !important;
+  column-gap: clamp(10px, 2vw, 24px) !important;
+
+  padding: 0 clamp(24px, 4vw, 58px) !important;
+  z-index: 96 !important;
+  pointer-events: none !important;
+}
+
+body.kc-active #kcBack {
+  grid-column: 1 !important;
+  justify-self: start !important;
+}
+
+body.kc-active .kc-dock-score {
+  grid-column: 2 !important;
+  justify-self: center !important;
+  align-self: center !important;
+}
+
+body.kc-active #kcMute {
+  grid-column: 3 !important;
+  justify-self: end !important;
+  align-self: center !important;
+}
+
+/* The popper cell should never re-enter the grid and push score upward. */
+body.kc-active .kc-popper-cell {
+  display: none !important;
+}
+
+/* Preserve enough bottom air for the dock, but do not over-starve parking. */
+body.kc-active .kc-grid {
+  padding-bottom: calc(env(safe-area-inset-bottom) + clamp(88px, 8.4svh, 120px)) !important;
+
+  grid-template-rows:
+    auto
+    minmax(0, 1.28fr)
+    minmax(0, 1.28fr)
+    minmax(0, 0.82fr)
+    0px !important;
+}
+
+/* Parking panel itself: keep contents inside and give it a little bottom cushion. */
+body.kc-active .kc-slider-cell {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none !important;
+
+  overflow: hidden !important;
+  padding:
+    clamp(8px, 1.05svh, 14px)
+    clamp(10px, 1.4vw, 18px)
+    clamp(12px, 1.55svh, 22px)
+    clamp(10px, 1.4vw, 18px) !important;
+}
+
+/* Intro state: true three-column balance so text is visually centered. */
+body.kc-active .kc-parking-wrap[data-intro="on"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(130px, 0.88fr) minmax(0, 1fr) !important;
+  grid-template-rows: 1fr !important;
+  grid-template-areas: "car intro button" !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  padding:
+    clamp(8px, 1svh, 14px)
+    clamp(12px, 1.6vw, 20px)
+    clamp(12px, 1.5svh, 22px)
+    clamp(12px, 1.6vw, 20px) !important;
+
+  gap: clamp(8px, 1.2vw, 18px) !important;
+  overflow: hidden !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] #parkingIntro {
+  grid-area: intro !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] .kc-parking-intro {
+  transform: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  text-align: center !important;
+  font-size: clamp(1.35rem, 3.1svh, 2.45rem) !important;
+  line-height: 1.12 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+/* JS injects inline gridRow/gridColumn on the rolling intro lane.
+   Force it into the left visual area so it stops disturbing center math. */
+body.kc-active .kc-parking-wrap[data-intro="on"] #parkingIntroLane {
+  grid-column: 1 / 2 !important;
+  grid-row: 1 / 2 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  align-self: center !important;
+  justify-self: stretch !important;
+
+  overflow: hidden !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] .kc-intro-car-wrap {
+  bottom: 50% !important;
+  transform: translateY(50%) !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] #parkingCycleBtn {
+  grid-area: button !important;
+  justify-self: end !important;
+  align-self: center !important;
+  margin: 0 !important;
+}
+
+/* Active parking state: bump innards up slightly and protect from bottom clipping. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(128px, 1.05fr) minmax(76px, 0.72fr) !important;
+  grid-template-rows: 1fr !important;
+  grid-template-areas: "label car button" !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  padding:
+    clamp(6px, 0.75svh, 12px)
+    clamp(10px, 1.45vw, 18px)
+    clamp(14px, 1.75svh, 24px)
+    clamp(10px, 1.45vw, 18px) !important;
+
+  gap: clamp(8px, 1.35vw, 18px) !important;
+  overflow: hidden !important;
+}
+
+/* One stable lift for all active parking innards. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label,
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone,
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+  margin-top: 0 !important;
+  transform: translateY(clamp(-18px, -1.4svh, -8px)) !important;
+}
+
+/* Car zone gets size protection instead of fighting row height. */
+body.kc-active .kc-car-zone {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+body.kc-active .kc-live-car-holder {
+  max-height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.kc-active .kc-car-img,
+body.kc-active .kc-intro-car {
+  max-height: clamp(72px, 14svh, 140px) !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* Park button stays large, but never bleeds into the bottom edge. */
+body.kc-active .kc-park-image-btn {
+  width: clamp(62px, 8.6svh, 108px) !important;
+  height: clamp(62px, 8.6svh, 108px) !important;
+  max-height: clamp(62px, 8.6svh, 108px) !important;
+
+  justify-self: end !important;
+  align-self: center !important;
+
+  margin: 0 !important;
+}
+
+/* Honk label is readable but less likely to collide with bottom edge. */
+body.kc-active .kc-honk-label {
+  align-self: center !important;
+  justify-self: start !important;
+
+  margin: 0 !important;
+  padding-left: 0 !important;
+
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  font-size: clamp(0.78rem, 1.7svh, 1.12rem) !important;
+  line-height: 1.12 !important;
+  overflow: visible !important;
+}
+
+/* Short screens get a little more lift and smaller active vehicle. */
+@media (max-height: 740px) {
+  body.kc-active .kc-grid {
+    padding-bottom: calc(env(safe-area-inset-bottom) + clamp(78px, 7.8svh, 106px)) !important;
+  }
+
+  body.kc-active .kc-car-img,
+  body.kc-active .kc-intro-car {
+    max-height: clamp(62px, 12.2svh, 116px) !important;
+  }
+
+  body.kc-active .kc-park-image-btn {
+    width: clamp(54px, 7.6svh, 92px) !important;
+    height: clamp(54px, 7.6svh, 92px) !important;
+    max-height: clamp(54px, 7.6svh, 92px) !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label,
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone,
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+    transform: translateY(clamp(-16px, -1.35svh, -7px)) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1f — Kids Parking True Center Alignment
+   Purpose:
+   - Keep overall Camping layout exactly where it is.
+   - Vertically center Park 1st/11th honk label.
+   - Dead-center the active car sprite in its cell.
+   - Vertically center Park button in its cell.
+   - Improve iPhone/iPad consistency using svh-based sizing.
+   ────────────────────────────────────────────────────────── */
+
+/* Give the parking row a stable playable slice without moving the whole mode. */
+body.kc-active .kc-grid {
+  grid-template-rows:
+    auto
+    minmax(0, 1.26fr)
+    minmax(0, 1.26fr)
+    minmax(0, 0.88fr)
+    0px !important;
+}
+
+/* Parking panel owns a clean 3-column vertical-center row. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) {
+  display: grid !important;
+  grid-template-columns:
+    minmax(92px, 0.82fr)
+    minmax(150px, 1.22fr)
+    minmax(76px, 0.78fr) !important;
+  grid-template-rows: 1fr !important;
+  grid-template-areas: "label car button" !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  align-items: center !important;
+  justify-items: stretch !important;
+
+  padding:
+    clamp(6px, 0.8svh, 12px)
+    clamp(12px, 1.6vw, 20px)
+    clamp(10px, 1.25svh, 18px)
+    clamp(12px, 1.6vw, 20px) !important;
+
+  gap: clamp(8px, 1.25vw, 18px) !important;
+  overflow: hidden !important;
+}
+
+/* Kill the earlier group-lift. Each parking part now centers itself. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label,
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone,
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+  margin-top: 0 !important;
+  transform: none !important;
+}
+
+/* Left label: vertically centered, readable, consistent. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label {
+  grid-area: label !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  text-align: center !important;
+  font-size: clamp(0.78rem, 1.72svh, 1.16rem) !important;
+  line-height: 1.12 !important;
+  overflow: visible !important;
+}
+
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label > div {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.12 !important;
+}
+
+/* Center car cell: dead center both axes. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone {
+  grid-area: car !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  align-self: stretch !important;
+  justify-self: stretch !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-live-car-holder {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Slightly bigger, but still protected inside the cell. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-img {
+  max-height: min(92%, clamp(88px, 16.4svh, 176px)) !important;
+  max-width: 100% !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* Right button: vertical center, right aligned. */
+body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+  grid-area: button !important;
+
+  align-self: center !important;
+  justify-self: end !important;
+
+  width: clamp(66px, 8.9svh, 114px) !important;
+  height: clamp(66px, 8.9svh, 114px) !important;
+  max-height: clamp(66px, 8.9svh, 114px) !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Intro state: keep Park the Cars centered in the panel too. */
+body.kc-active .kc-parking-wrap[data-intro="on"] {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(142px, 0.9fr)
+    minmax(76px, 1fr) !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+}
+
+body.kc-active .kc-parking-wrap[data-intro="on"] #parkingIntro,
+body.kc-active .kc-parking-wrap[data-intro="on"] .kc-parking-intro {
+  align-self: center !important;
+  justify-self: center !important;
+  text-align: center !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* Shorter iPhones: same composition, slightly smaller assets. */
+@media (max-height: 740px) {
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) {
+    grid-template-columns:
+      minmax(84px, 0.82fr)
+      minmax(132px, 1.16fr)
+      minmax(68px, 0.76fr) !important;
+
+    padding:
+      clamp(4px, 0.65svh, 10px)
+      clamp(9px, 1.35vw, 16px)
+      clamp(8px, 1.1svh, 14px)
+      clamp(9px, 1.35vw, 16px) !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-img {
+    max-height: min(90%, clamp(68px, 14svh, 132px)) !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+    width: clamp(54px, 7.7svh, 92px) !important;
+    height: clamp(54px, 7.7svh, 92px) !important;
+    max-height: clamp(54px, 7.7svh, 92px) !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label {
+    font-size: clamp(0.68rem, 1.55svh, 0.98rem) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1g — Kids Camping iPhone Final Fit
+   Purpose:
+   - Fix phone-only pushed-down Camping title.
+   - Preserve the good iPad layout.
+   - Keep bottom dock stable.
+   - Stop "Cars Parked" label from clipping in Parking.
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  /* Phone only: the old 7vh top push is too much. */
+  :root[data-platform="ios"] body.kc-active .kc-grid,
+  body.kc-active .kc-grid {
+    padding-top: calc(env(safe-area-inset-top) + clamp(14px, 2.4svh, 28px)) !important;
+
+    padding-left: clamp(7px, 2.1vw, 12px) !important;
+    padding-right: clamp(7px, 2.1vw, 12px) !important;
+
+    /* Keep dock protected, but do not steal extra game height. */
+    padding-bottom: calc(env(safe-area-inset-bottom) + clamp(78px, 8.2svh, 106px)) !important;
+
+    grid-template-rows:
+      auto
+      minmax(0, 1.28fr)
+      minmax(0, 1.28fr)
+      minmax(0, 0.84fr)
+      0px !important;
+
+    gap: clamp(5px, 0.82svh, 9px) !important;
+  }
+
+  body.kc-active .kc-title {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: clamp(2px, 0.35svh, 5px) !important;
+    font-size: clamp(1.55rem, 4.7svw, 2.25rem) !important;
+    line-height: 1 !important;
+  }
+
+  body.kc-active .kc-title img.kc-icon {
+    width: clamp(28px, 7.2svw, 42px) !important;
+  }
+
+  /* Keep the parking row a hair taller on phone so text and car breathe. */
+  body.kc-active .kc-slider-cell {
+    padding:
+      clamp(6px, 0.8svh, 10px)
+      clamp(8px, 2.1vw, 14px)
+      clamp(8px, 1svh, 14px)
+      clamp(8px, 2.1vw, 14px) !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) {
+    grid-template-columns:
+      minmax(104px, 0.98fr)
+      minmax(118px, 1.04fr)
+      minmax(58px, 0.62fr) !important;
+
+    gap: clamp(5px, 1.4vw, 10px) !important;
+
+    padding:
+      clamp(4px, 0.55svh, 8px)
+      clamp(6px, 1.8vw, 10px)
+      clamp(4px, 0.55svh, 8px)
+      clamp(6px, 1.8vw, 10px) !important;
+  }
+
+  /* The clipped "Cars Parked" line lives here. Give text room and allow wrapping. */
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label {
+    font-size: clamp(0.72rem, 1.58svh, 0.98rem) !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.02em !important;
+    overflow: visible !important;
+    text-align: center !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label div:first-child,
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-parked-count {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: 100% !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-parked-count {
+    font-size: 0.88em !important;
+    line-height: 1.05 !important;
+    margin-top: 0.12em !important;
+  }
+
+  /* Keep active car centered and slightly protected on phone. */
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-img {
+    max-height: min(88%, clamp(72px, 13.6svh, 122px)) !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+    width: clamp(56px, 7.5svh, 88px) !important;
+    height: clamp(56px, 7.5svh, 88px) !important;
+    max-height: clamp(56px, 7.5svh, 88px) !important;
+  }
+
+  /* Dock stays readable but compact on phone. */
+  body.kc-active .kc-bottom-bar {
+    bottom: calc(env(safe-area-inset-bottom) + clamp(14px, 1.7svh, 24px)) !important;
+    padding: 0 clamp(18px, 5vw, 32px) !important;
+  }
+
+  body.kc-active .kc-dock-score {
+    width: clamp(112px, 34vw, 154px) !important;
+    height: clamp(48px, 5.8svh, 64px) !important;
+  }
+
+  body.kc-active .kc-square-btn {
+    width: clamp(50px, 5.9svh, 64px) !important;
+    height: clamp(50px, 5.9svh, 64px) !important;
+  }
+}
+
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1h — Kids Parking Phone Car Center Lock
+   Purpose:
+   - iPhone-only active Parking polish.
+   - Keep iPad layout untouched.
+   - Dead-center the vehicle PNG inside the bottom Parking panel.
+   - Keep Park 1st/9th label left and Park button right.
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-slider-cell {
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) {
+    position: relative !important;
+
+    display: grid !important;
+    grid-template-columns:
+      minmax(104px, 0.95fr)
+      minmax(112px, 1fr)
+      minmax(58px, 0.62fr) !important;
+    grid-template-rows: 1fr !important;
+    grid-template-areas: "label car button" !important;
+
+    align-items: center !important;
+    justify-items: center !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    padding:
+      clamp(4px, 0.55svh, 8px)
+      clamp(6px, 1.8vw, 10px)
+      clamp(4px, 0.55svh, 8px)
+      clamp(6px, 1.8vw, 10px) !important;
+
+    gap: clamp(5px, 1.4vw, 10px) !important;
+    overflow: hidden !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label {
+    grid-area: label !important;
+    justify-self: start !important;
+    align-self: center !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    z-index: 3 !important;
+  }
+
+  /*
+    Center vehicle independently of the left/right columns.
+    This makes the PNG visually sit in the middle of the Parking panel,
+    while the label and Park button remain in their lanes.
+  */
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone {
+    grid-area: car !important;
+
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+
+    width: clamp(122px, 38vw, 178px) !important;
+    height: clamp(82px, 13.6svh, 132px) !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+    z-index: 2 !important;
+
+    /* Vehicle itself is decorative; Park button remains the action target. */
+    pointer-events: none !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-live-car-holder {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+    grid-area: button !important;
+    justify-self: end !important;
+    align-self: center !important;
+
+    z-index: 4 !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1i — Kids Parking Phone Visual Tune
+   Purpose:
+   - iPhone-only Parking panel cleanup.
+   - Reduce side margin.
+   - Center active vehicle visually.
+   - Slightly shrink vehicle to prevent clipping.
+   - Preserve the good iPad layout.
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-slider-cell {
+    --kc-phone-car-x: 50%;
+    --kc-phone-car-y: 50%;
+    --kc-phone-car-zone-w: clamp(104px, 32vw, 148px);
+    --kc-phone-car-zone-h: clamp(66px, 10.8svh, 104px);
+    --kc-phone-car-img-scale: 0.88;
+    --kc-phone-car-img-nudge-x: 0px;
+    --kc-phone-car-img-nudge-y: 0px;
+
+    padding:
+      clamp(4px, 0.55svh, 8px)
+      clamp(4px, 1.2vw, 8px)
+      clamp(4px, 0.55svh, 8px)
+      clamp(4px, 1.2vw, 8px) !important;
+
+    overflow: hidden !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) {
+    position: relative !important;
+
+    display: grid !important;
+    grid-template-columns:
+      minmax(100px, 0.9fr)
+      minmax(92px, 1fr)
+      minmax(54px, 0.58fr) !important;
+    grid-template-rows: 1fr !important;
+    grid-template-areas: "label car button" !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    padding:
+      clamp(3px, 0.45svh, 7px)
+      clamp(4px, 1.1vw, 8px)
+      clamp(3px, 0.45svh, 7px)
+      clamp(4px, 1.1vw, 8px) !important;
+
+    gap: clamp(3px, 0.9vw, 7px) !important;
+
+    align-items: center !important;
+    justify-items: center !important;
+    overflow: hidden !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label {
+    grid-area: label !important;
+    justify-self: center !important;
+    align-self: center !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    transform: none !important;
+    z-index: 5 !important;
+  }
+
+  /* Phone: vehicle gets its own centered visual layer. */
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone {
+    grid-area: car !important;
+
+    position: absolute !important;
+    left: var(--kc-phone-car-x) !important;
+    top: var(--kc-phone-car-y) !important;
+
+    width: var(--kc-phone-car-zone-w) !important;
+    height: var(--kc-phone-car-zone-h) !important;
+
+    transform: translate(-50%, -50%) !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+    pointer-events: none !important;
+    z-index: 3 !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-live-car-holder {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    object-fit: contain !important;
+    object-position: center center !important;
+
+    display: block !important;
+    margin: 0 auto !important;
+
+    transform:
+      translate(
+        var(--kc-phone-car-img-nudge-x),
+        var(--kc-phone-car-img-nudge-y)
+      )
+      scale(var(--kc-phone-car-img-scale)) !important;
+
+    transform-origin: center center !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+    grid-area: button !important;
+
+    justify-self: center !important;
+    align-self: center !important;
+
+    width: clamp(54px, 7.1svh, 82px) !important;
+    height: clamp(54px, 7.1svh, 82px) !important;
+    max-height: clamp(54px, 7.1svh, 82px) !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    transform: none !important;
+    z-index: 6 !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1j — Kids Parking Phone Touch Repair + Car Center
+   Purpose:
+   - Restore phone touch/click behavior on active Parking vehicle.
+   - Keep the now-good vehicle size.
+   - Center the vehicle layer inside the parking field.
+   - Preserve iPad layout.
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-slider-cell {
+    /*
+      Manual phone Parking knobs.
+      If the PNG still feels off because of transparent canvas padding,
+      tune only these values.
+    */
+    --kc-phone-car-x: 47.5%;
+    --kc-phone-car-y: 46.5%;
+    --kc-phone-car-zone-w: clamp(112px, 34vw, 154px);
+    --kc-phone-car-zone-h: clamp(70px, 11.2svh, 110px);
+    --kc-phone-car-img-scale: 0.88;
+    --kc-phone-car-img-nudge-x: -2px;
+    --kc-phone-car-img-nudge-y: -4px;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) {
+    position: relative !important;
+
+    grid-template-columns:
+      minmax(96px, 0.86fr)
+      minmax(116px, 1fr)
+      minmax(54px, 0.58fr) !important;
+
+    gap: clamp(3px, 0.8vw, 7px) !important;
+
+    padding:
+      clamp(3px, 0.45svh, 7px)
+      clamp(3px, 0.9vw, 7px)
+      clamp(3px, 0.45svh, 7px)
+      clamp(3px, 0.9vw, 7px) !important;
+
+    overflow: hidden !important;
+  }
+
+  /*
+    Label is visual only. Let it never steal taps from nearby gameplay.
+  */
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-honk-label {
+    pointer-events: none !important;
+    z-index: 4 !important;
+  }
+
+  /*
+    Active vehicle layer:
+    previous phone pass made this pointer-events:none, which broke phone parking.
+    Put the touch target back online.
+  */
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-zone {
+    grid-area: car !important;
+
+    position: absolute !important;
+    left: var(--kc-phone-car-x) !important;
+    top: var(--kc-phone-car-y) !important;
+
+    width: var(--kc-phone-car-zone-w) !important;
+    height: var(--kc-phone-car-zone-h) !important;
+
+    transform: translate(-50%, -50%) !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+
+    z-index: 7 !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-live-car-holder,
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-img {
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-live-car-holder {
+    width: 100% !important;
+    height: 100% !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-car-img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    object-fit: contain !important;
+    object-position: center center !important;
+
+    display: block !important;
+    margin: 0 auto !important;
+
+    transform:
+      translate(
+        var(--kc-phone-car-img-nudge-x),
+        var(--kc-phone-car-img-nudge-y)
+      )
+      scale(var(--kc-phone-car-img-scale)) !important;
+
+    transform-origin: center center !important;
+  }
+
+  /*
+    Park button stays touchable and above the car layer if overlap ever happens.
+  */
+  body.kc-active .kc-parking-wrap:not([data-intro="on"]) .kc-park-image-btn {
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    z-index: 9 !important;
+  }
+}
+

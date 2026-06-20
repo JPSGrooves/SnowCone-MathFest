@@ -15,12 +15,12 @@ export const labelColorMap = {
     options:  '#cccccc'
   },
   spring: {
-    kids:     '#ebc2ff',
-    quick:    '#ffebc2',
-    tips:     '#c2f1ff',
-    story:    '#c2f1ff',
-    infinity: '#d4d4ed',
-    options:  '#ffc2dd'
+    kids:     '#ffb039', // brighter golden-brown, less dead/dark
+    quick:    '#ff9760', // orange sherbet, readable and alive
+    tips:     '#36dff5', // stronger aqua-teal
+    story:    '#4e92ff', // vivid story blue
+    infinity: '#917cfd', // bright violet lake glow
+    options:  '#f97ac2'  // blossom pink with enough weight
   },
   summer: {
     kids:     '#ffdd00',  // same
@@ -48,16 +48,16 @@ export const labelColorMap = {
     options:  '#66ccff'
   },
   freedom: {
-    kids:     '#ff4444',
+    kids:     '#ff3f3f',
     quick:    '#ffffff',
-    tips:     '#3366ff',
-    story:    '#ffcc00',
-    infinity: '#bbbbbb',
-    options:  '#ff4444'
+    tips:     '#f2f6ff',
+    story:    '#ffd21f',
+    infinity: '#2f9bff', // still blue, but much more readable than #0062ff
+    options:  '#ff4a4a'
   },
   halloween: {
     kids:     '#ff9933',
-    quick:    '#6600cc',
+    quick:    '#8620ec',
     tips:     '#00cc66',
     story:    '#cc0000',
     infinity: '#dddddd',
@@ -72,20 +72,20 @@ export const labelColorMap = {
     options:  '#FFD8B0'  // ← true near-black for real contrast
   },
   christmas: {
-    kids:     '#00dd00',
-    quick:    '#dd0000',
+    kids:     '#4dff62',
+    quick:    '#ff4747',
     tips:     '#ffffff',
-    story:    '#ff66cc',
-    infinity: '#aaaaaa',
-    options:  '#ccccff'
+    story:    '#ff75df',
+    infinity: '#4eeaff',
+    options:  '#ffd84a' // gold reads better at the bottom than blue
   },
   newyear: {
-    kids:     '#A98BEF', // good
-    quick:    '#ffcc00', // good
-    tips:     '#ffcc00', // was #999999 → lighter, closer to white
-    story:    '#A98BEF', // was #330066 → much lighter purple
-    infinity: '#ff00ff', // good
-    options:  '#E0E0E0'  // was #111111 → light gray for dark bg
+    kids:     '#ffffff', // you said Camping is already the cleanest
+    quick:    '#ffe600', // yellow works on blue sky
+    tips:     '#39ff14', // slime green, but stronger
+    story:    '#996dff', // purple instead of cyan; cyan dies on sky/clouds
+    infinity: '#ff4fe3', // hot pink reads against blue/white
+    options:  '#7ac5ff'
   },
   valentine: {
     kids:     '#ffe6f0',
@@ -143,28 +143,156 @@ export const labelColorMap = {
     infinity: '#ff99ff',
     options:  '#C47AE6'  // lighter purple than #9900cc
   },
-cosmic_07: {
-  kids:     '#F2F8FF', // near-white, whisper of blue
-  quick:    '#F2F8FF',
-  tips:     '#F2F8FF',
-  story:    '#EDF5FF', // hair darker for readability
-  infinity: '#F7FBFF', // almost pure white
-  options:  '#EDF6FF'
-}
+  cosmic_07: {
+    kids:     '#F2F8FF',
+    quick:    '#D9F4FF',
+    tips:     '#FFF3B8',
+    story:    '#F6D6FF',
+    infinity: '#F7FBFF',
+    options:  '#CDE7FF'
+  }
 
 };
 
+export const titleGlowMap = {
+  menubackground: {
+    a: '#ffee00',
+    b: '#00ffee',
+    c: '#ff77ff',
+    halo: 'rgba(255, 238, 0, 0.65)'
+  },
+
+  spring: {
+    a: '#ff8ac8',
+    b: '#ffe66d',
+    c: '#49d6c9',
+    halo: 'rgba(255, 138, 200, 0.6)'
+  },
+
+  summer: {
+    a: '#ffdd00',
+    b: '#ff7a1a',
+    c: '#00ddff',
+    halo: 'rgba(255, 221, 0, 0.65)'
+  },
+
+  fall: {
+    a: '#ffb000',
+    b: '#8a4b16',
+    c: '#ffe066',
+    halo: 'rgba(255, 176, 0, 0.7)'
+  },
+
+  winter: {
+    a: '#ffffff',
+    b: '#aaddff',
+    c: '#66ccff',
+    halo: 'rgba(170, 221, 255, 0.7)'
+  },
+
+  freedom: {
+    a: '#ff3333',
+    b: '#ffffff',
+    c: '#0062ff',
+    halo: 'rgba(255, 255, 255, 0.7)'
+  },
+
+  halloween: {
+    a: '#ff8c22',
+    b: '#7a2cff',
+    c: '#00cc66',
+    halo: 'rgba(255, 140, 34, 0.7)'
+  },
+
+  christmas: {
+    a: '#55de55',
+    b: '#ffffff',
+    c: '#fa3f3f',
+    halo: 'rgba(255, 255, 255, 0.7)'
+  },
+
+  valentine: {
+    a: '#ffe6f0',
+    b: '#ff6699',
+    c: '#ff2f6d',
+    halo: 'rgba(255, 102, 153, 0.7)'
+  },
+
+  cosmic_01: {
+    a: '#cc66ff',
+    b: '#00ffff',
+    c: '#ffcc00',
+    halo: 'rgba(204, 102, 255, 0.75)'
+  },
+
+  cosmic_02: {
+    a: '#ff99cc',
+    b: '#33ccff',
+    c: '#ccff66',
+    halo: 'rgba(51, 204, 255, 0.72)'
+  },
+
+  cosmic_03: {
+    a: '#ffffff',
+    b: '#88ffcc',
+    c: '#00cc99',
+    halo: 'rgba(136, 255, 204, 0.7)'
+  },
+
+  cosmic_04: {
+    a: '#aaffff',
+    b: '#ffffff',
+    c: '#33ccff',
+    halo: 'rgba(170, 255, 255, 0.7)'
+  },
+
+  cosmic_05: {
+    a: '#ffcc00',
+    b: '#00ffff',
+    c: '#ff33cc',
+    halo: 'rgba(255, 51, 204, 0.75)'
+  },
+
+  cosmic_06: {
+    a: '#7BAFD4',
+    b: '#ffccff',
+    c: '#C47AE6',
+    halo: 'rgba(196, 122, 230, 0.7)'
+  },
+
+  cosmic_07: {
+    a: '#F2F8FF',
+    b: '#CDE7FF',
+    c: '#FFF3B8',
+    halo: 'rgba(242, 248, 255, 0.72)'
+  },
+
+  harvest: {
+    a: '#ff4fd8',
+    b: '#ffd84f',
+    c: '#38f7ff',
+    halo: 'rgba(255, 79, 216, 0.72)'
+  },
+
+  newyear: {
+    a: '#ffffff',
+    b: '#7cff00',
+    c: '#ff4fb8',
+    halo: 'rgba(124, 255, 0, 0.7)'
+  }
+};
+
 export const themeLabels = {
-  menubackground: '🌌 Default',
+  menubackground: '🍧 Default',
   fall: '🍂 Fall',
   winter: '❄️ Winter',
   spring: '🌸 Spring',
   summer: '☀️ Summer',
   halloween: '🎃 Halloween',
-  harvest: '🌽 Harvest',
+  harvest: '🎸 Concert',
   christmas: '🎄 Christmas',
-  freedom: '🎆 Freedom',
-  newyear: '🎊 New Year',
+  freedom: '🇺🇸 Freedom',
+  newyear: '☁️ Clouds',
   valentine: '💘 Valentine',
   cosmic_01: '🌀 Cosmic 01',
   cosmic_02: '🌀 Cosmic 02',
@@ -195,7 +323,7 @@ export const unlockableThemes = [
 ];
 
 const DEFAULT_MENU_VISUALS = Object.freeze({
-  backgroundPlate: 'assets/img/branding/menubackgroundPlate_default.png',
+  backgroundPlate: 'assets/img/menu/packages/default/backgroundPlate.png',
 
   // Legacy fallback: old baked menu map image.
   // Kept for browser fallback and safety while the 2027 plate system grows.
@@ -324,6 +452,15 @@ const THEME_VIBES = Object.freeze({
   },
 });
 
+function resolveMenuPackageId(themeId) {
+  return themeId === 'menubackground' ? 'default' : themeId;
+}
+
+function getMenuPackageAsset(themeId, filename) {
+  const packageId = resolveMenuPackageId(themeId);
+  return `assets/img/menu/packages/${packageId}/${filename}`;
+}
+
 function buildMenuThemePackage(themeId) {
   const cleanId = typeof themeId === 'string' && themeId.trim()
     ? themeId.trim()
@@ -336,15 +473,18 @@ function buildMenuThemePackage(themeId) {
     visual: Object.freeze({
       ...DEFAULT_MENU_VISUALS,
 
-      // For now, every theme keeps the default plate until its own plate exists.
-      // Later: replace per package, not with scattered CSS.
-      backgroundPlate: DEFAULT_MENU_VISUALS.backgroundPlate,
+      // 2027 theme package layer:
+      // backgrounds + center cones can vary per theme now.
+      // Truck / character / prop stay default for this test pass.
+      backgroundPlate: getMenuPackageAsset(cleanId, 'backgroundPlate.png'),
+      centerCone: getMenuPackageAsset(cleanId, 'centerCone.png'),
 
       // Old #menuImage fallback can still match selected theme.
       legacyBackgroundTheme: cleanId,
 
       // Existing font colors are now part of the package.
       labelColors: Object.freeze(labelColorMap[cleanId] || labelColorMap.menubackground || {}),
+      titleGlow: Object.freeze(titleGlowMap[cleanId] || titleGlowMap.menubackground),
     }),
 
     vibe: Object.freeze(THEME_VIBES[cleanId] || THEME_VIBES.menubackground),

@@ -2486,7 +2486,7 @@ html[data-platform="ios"] .menu-wrapper.plate-ready,
   --scmf-jehnk-x: 40.2%;
   --scmf-jehnk-y: 77%;
 
-  --scmf-prop-width: 8%;
+  --scmf-prop-width: 12%;
   --scmf-prop-x: 26%;
   --scmf-prop-y: 85%;
 
@@ -2651,3 +2651,159 @@ html[data-platform="ios"] .menu-wrapper.plate-ready .mushroom-popper-hitbox,
   transform: translate(-50%, -50%) !important;
   z-index: 40 !important;
 }
+
+/* Theme labels need shadow armor.
+   Color alone is not enough on painted plates. */
+/* ──────────────────────────────────────────────────────────
+   SCMF Theme-Reactive Title Glow
+   2026-0619
+   Purpose:
+   - Title glow now follows the active menu theme package.
+   - Theme data owns the colors.
+   - CSS owns the animation.
+   ────────────────────────────────────────────────────────── */
+
+:root {
+  --scmf-title-glow-a: #ffee00;
+  --scmf-title-glow-b: #00ffee;
+  --scmf-title-glow-c: #ff77ff;
+  --scmf-title-glow-halo: rgba(255, 238, 0, 0.65);
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-title-top,
+.platform-ios .menu-wrapper.plate-ready .menu-title-top {
+  animation: scmfThemeTitleGlow 4.8s ease-in-out infinite !important;
+  will-change: filter, transform;
+}
+
+@keyframes scmfThemeTitleGlow {
+  0%,
+  100% {
+    filter:
+      drop-shadow(0 0 2px rgba(0, 0, 0, 0.95))
+      drop-shadow(0 0 5px var(--scmf-title-glow-a))
+      drop-shadow(0 0 14px var(--scmf-title-glow-a))
+      drop-shadow(0 0 24px var(--scmf-title-glow-halo));
+  }
+
+  33% {
+    filter:
+      drop-shadow(0 0 2px rgba(0, 0, 0, 0.95))
+      drop-shadow(0 0 5px var(--scmf-title-glow-b))
+      drop-shadow(0 0 14px var(--scmf-title-glow-b))
+      drop-shadow(0 0 24px var(--scmf-title-glow-halo));
+  }
+
+  66% {
+    filter:
+      drop-shadow(0 0 2px rgba(0, 0, 0, 0.95))
+      drop-shadow(0 0 5px var(--scmf-title-glow-c))
+      drop-shadow(0 0 14px var(--scmf-title-glow-c))
+      drop-shadow(0 0 24px var(--scmf-title-glow-halo));
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1 — Main Menu Label Readability Assist
+   Purpose:
+   - Keep theme colors from menuThemePackages.js.
+   - Give labels a stronger readable edge over bright plates.
+   - Preserve neon/festival personality.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label,
+.platform-ios .menu-wrapper.plate-ready .menu-label {
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.92),
+    0 2px 4px rgba(0, 0, 0, 0.72),
+    0 0 8px currentColor,
+    0 0 16px rgba(0, 0, 0, 0.42) !important;
+
+  filter:
+    drop-shadow(0 2px 3px rgba(0, 0, 0, 0.72))
+    drop-shadow(0 0 5px currentColor) !important;
+}
+
+/* Bottom/center labels need a hair more grounding because plates get busiest there. */
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.infinity,
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-label.options,
+.platform-ios .menu-wrapper.plate-ready .menu-label.infinity,
+.platform-ios .menu-wrapper.plate-ready .menu-label.options {
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 1),
+    0 3px 5px rgba(0, 0, 0, 0.82),
+    0 0 8px currentColor,
+    0 0 18px rgba(0, 0, 0, 0.55) !important;
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1h — Menu Title Hard Glow Reset
+   Purpose:
+   - Fix title glow freezing after returning from Kids Camping.
+   - Current theme title animation uses !important, so the reset must too.
+   - No layout changes.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-title-top.menu-title-neon-hard-reset,
+.platform-ios .menu-wrapper.plate-ready .menu-title-top.menu-title-neon-hard-reset {
+  animation: none !important;
+  -webkit-animation: none !important;
+
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* Harmless style-recalc marker class. The real animation comes from scmfThemeTitleGlow. */
+html[data-platform="ios"] .menu-wrapper.plate-ready .menu-title-top.menu-title-neon-rekick,
+.platform-ios .menu-wrapper.plate-ready .menu-title-top.menu-title-neon-rekick {
+  transform: translate(-50%, 0) translateZ(0) !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1k — Startup Menu Title Stutter Gate
+   Purpose:
+   - Prevent default title glow colors from flashing on cold launch.
+   - Menu title becomes visible only after theme package/glow vars settle.
+   - iOS-native menu only.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.plate-ready:not(.title-glow-ready) .menu-title-top,
+.platform-ios .menu-wrapper.plate-ready:not(.title-glow-ready) .menu-title-top {
+  opacity: 0 !important;
+  animation: none !important;
+  -webkit-animation: none !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.plate-ready.title-glow-ready .menu-title-top,
+.platform-ios .menu-wrapper.plate-ready.title-glow-ready .menu-title-top {
+  opacity: 1 !important;
+  transition: opacity 140ms ease-out !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1l — Final Menu Title Glow Startup Gate
+   Purpose:
+   - Stop cold-launch title color stutter.
+   - Hide title only while JS is intentionally settling theme glow.
+   - Does not affect mode returns after title is ready.
+   - iOS-native Capacitor target.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] .menu-wrapper.title-glow-gating:not(.title-glow-ready) .menu-title-top,
+.platform-ios .menu-wrapper.title-glow-gating:not(.title-glow-ready) .menu-title-top {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  animation: none !important;
+  -webkit-animation: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+html[data-platform="ios"] .menu-wrapper.title-glow-gating.title-glow-ready .menu-title-top,
+.platform-ios .menu-wrapper.title-glow-gating.title-glow-ready .menu-title-top {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: opacity 140ms ease-out !important;
+}
+

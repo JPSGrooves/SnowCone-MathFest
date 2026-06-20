@@ -11,6 +11,8 @@ import {
   playTrack,
   toggleMute,
   isMuted,
+  pushMusicScope,
+  popMusicScope,
 } from '../../managers/musicManager.js';
 import { initParkingGame } from './parkingGame.js';
 import { preventDoubleTapZoom } from '../../utils/preventDoubleTapZoom.js';
@@ -18,7 +20,6 @@ import { initMosquitoGame } from './mosquitoGame.js';
 import { enableGestureCage, disableGestureCage } from '../../utils/gestureCage.js';
 import { enableIosLoupeKiller, disableIosLoupeKiller } from '../../utils/iosLoupeKiller.js';
 import { awardBadge } from '../../managers/badgeManager.js';
-import { restartMenuTitleNeon } from '../../menu/menu.js'; // 🆕 neon kick
 
 
 
@@ -38,6 +39,68 @@ const _awarded = {
 };
 
 const PARKING_FAST_MS = 60_000; // 60s target
+
+
+const KC_FIRST_TRACK_ID = 'sc90';
+
+// After SnowCone 90 plays once, Kids Camping enters the full festival rotation.
+// setMusicPool() filters iOS-exclusive tracks automatically when not visible.
+const KC_ROTATION_TRACK_IDS = [
+  'quikserve',
+  'kktribute',
+  'softdown',
+  'infadd',
+  'sc90',
+  'nothingorg',
+  'secrets',
+  'stoopidelectro',
+  'prologue',
+  'kittyPaws',
+  'patchrelaxes',
+  'bonusTime',
+  'lastRun'
+];
+let _kcMusicScopeOn = false;
+
+function activateKidsCampingMusicScope() {
+  if (_kcMusicScopeOn) return;
+
+  pushMusicScope({
+    // 🏕️ Kids Camping music lane:
+    // Start on SnowCone 90, then native ended handler advances into this pool.
+    poolIds: KC_ROTATION_TRACK_IDS,
+
+    // Once sc90 ends, musicManager.handleNativeTrackEnded()
+    // sees shuffling=true and calls playRandomTrack().
+    shuffling: false,
+
+    // Important: false here.
+    // If true, native ended handler returns early and sc90 loops forever.
+    looping: true
+  });
+
+  _kcMusicScopeOn = true;
+}
+
+function startKidsCampingMusic() {
+  activateKidsCampingMusicScope();
+
+  // First Camping song is always SnowCone 90.
+  // After it ends, the active shuffled pool takes over.
+  playTrack(KC_FIRST_TRACK_ID);
+}
+
+function stopKidsCampingMusic() {
+  try { stopTrack(); } catch {}
+
+  if (_kcMusicScopeOn) {
+    try { popMusicScope(); } catch (err) {
+      console.warn('[kc] popMusicScope failed', err);
+    }
+    _kcMusicScopeOn = false;
+  }
+}
+
 
 
 
@@ -170,7 +233,7 @@ export async function stopKidsMode() {
   // 🔹 NEW: turn off the no-select guard when we leave Kids Mode
   disableNoSelectForKids();
 
-  try { stopTrack(); } catch {}
+  stopKidsCampingMusic();
   try { cleanupTentLineGame(); } catch {}
 
   // 🔴 HARD KILL Ant Attack
@@ -270,7 +333,7 @@ function wireIntroHandlers() {
   const mute  = document.querySelector('#kcMuteIntro');
 
   HANDLERS.onBackToMenuIntro = () => {
-    stopTrack();
+    stopKidsCampingMusic();
     returnToMenu();
   };
   HANDLERS.onStartCamping = async () => {
@@ -346,7 +409,7 @@ function unwireAudioUnlock() {
 // Main UI + handlers
 // ────────────────────────────────────────────────────────────────────────────────
 function renderMainUI() {
-  playTrack('sc90');
+  startKidsCampingMusic();
 
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
@@ -368,29 +431,21 @@ function renderMainUI() {
           <div class="kc-tent-zone"></div>
           <div class="kc-slider-cell" id="parkingZone"></div>
 
-          <div class="kc-popper-cell">
-            <div class="kc-popper-lineup">
-              <!-- left slot now empty (buttons moved to fixed bottom bar) -->
-              <div class="kc-popper-slot"></div>
-
-              <!-- center: score stays exactly as before -->
-              <div class="kc-score-wrap">
-                <div class="kc-score-box">
-                  <div class="kc-score-label">Camping Score</div>
-                  <span id="popCount">0</span>
-                </div>
-              </div>
-
-              <!-- right slot now empty (buttons moved to fixed bottom bar) -->
-              <div class="kc-popper-slot"></div>
-            </div>
-          </div>
+          <!-- Score moved to the real bottom dock in 1.3.1d.
+               Keep this cell as a harmless grid-area placeholder only. -->
+          <div class="kc-popper-cell" aria-hidden="true"></div>
         </div>
 
-        <!-- 🍧 KC bottom bar (Story-style) -->
+        <!-- 🍧 KC bottom dock: Back | Camping Score | Mute -->
         <div class="kc-bottom-bar">
-          <button id="kcBack" class="kc-square-btn kc-left">🔙</button>
-          <button id="kcMute" class="kc-square-btn kc-right">🔊</button>
+          <button id="kcBack" class="kc-square-btn kc-left" aria-label="Back to Menu">🔙</button>
+
+          <div class="kc-dock-score" aria-live="polite">
+            <div class="kc-score-label">Camping Score</div>
+            <span id="popCount">0</span>
+          </div>
+
+          <button id="kcMute" class="kc-square-btn kc-right" aria-label="Mute">🔊</button>
         </div>
       </div>
     </div>
@@ -420,7 +475,7 @@ function wireMainHandlers() {
   const backBtn = document.getElementById('kcBack');
   if (backBtn) {
     HANDLERS.onBackFromMain = () => {
-      try { stopTrack(); } catch {}
+      stopKidsCampingMusic();
       returnToMenu();              // 👈 this already awaits stopKidsMode + forceKillAntAttack
     };
     backBtn.addEventListener('click', HANDLERS.onBackFromMain);
@@ -654,6 +709,13 @@ function safeCampingMuted() {
 // ────────────────────────────────────────────────────────────────────────────────
 // Navigation
 // ────────────────────────────────────────────────────────────────────────────────
+
+function restartMenuTitleNeonAfterKidsReturn() {
+  // No-op now.
+  // Menu owns title animation behavior.
+  // The old Kids-only repeated restart caused the return blink/stutter.
+}
+
 function returnToMenu() {
   playTransition(async () => {
     try {
@@ -674,10 +736,9 @@ function returnToMenu() {
 
     applyBackgroundTheme();
 
-    // ✨ SAFARI FIX:
-    // after a heavy mode like Kids Camping, force the main
-    // title's neon animation to restart so it keeps glowing.
-    restartMenuTitleNeon();
+    // Title glow is handled by menu.js now.
+    // Do not restart it from Kids Camping; repeated kicks cause return blink.
+    restartMenuTitleNeonAfterKidsReturn();
   });
 }
 

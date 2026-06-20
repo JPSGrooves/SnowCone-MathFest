@@ -5,7 +5,7 @@ import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgro
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { startTripletLoop, stopTripletLoop, startTripletSequence } from './tripletAnimator.js';
-import { stopTrack, toggleMute } from '../../managers/musicManager.js';
+import { stopTrack, toggleMute, isMuted } from '../../managers/musicManager.js';
 import { activateInputHandler } from '../../managers/inputManager.js';
 import { launchConfetti } from '../../utils/confetti.js';
 import { runInAction } from 'mobx';
@@ -355,7 +355,7 @@ function renderUI() {
             <div class="utility-buttons">
               <button id="backToMenu">Main<br>Menu</button>
               <button id="endGame">Results<br>♾️</button>
-              <button id="muteToggle">🔇<br>Mute</button>
+              <button id="muteToggle">🔊<br>Mute</button>
             </div>
           </div>
 
@@ -419,9 +419,17 @@ function setupEventHandlers() {
     onMuteClick = () => {
       toggleMute();
       updateMuteButtonLabel();
+      requestAnimationFrame(updateMuteButtonLabel);
+      setTimeout(updateMuteButtonLabel, 80);
       flashMuteIcon();
     };
     muteBtn.addEventListener('click', onMuteClick);
+
+    // SCMF 1.3.1e initial mute visual sync
+    // Sync visual button state from the real global/native mute state.
+    updateMuteButtonLabel();
+    requestAnimationFrame(updateMuteButtonLabel);
+    setTimeout(updateMuteButtonLabel, 80);
   }
 
   // ✅ Answer buttons (store handler per button)
@@ -998,9 +1006,11 @@ function flashMuteIcon() {
 
 export function updateMuteButtonLabel() {
   const icon = document.getElementById('muteToggle');
-  const muted = Howler._muted;
+  const muted = isMuted();
   if (icon) {
     icon.innerHTML = muted ? '🔇<br>Unmute' : '🔊<br>Mute';
+    icon.classList.toggle('muted', muted);
+    icon.setAttribute('aria-pressed', String(muted));
   }
 }
 
@@ -1119,7 +1129,7 @@ function endInfinityGame() {
 function playStreakBurst() {
   // 🔇 Respect global mute via Howler
   try {
-    if (Howler?._muted) {
+    if (isMuted()) {
       return;
     }
   } catch {
