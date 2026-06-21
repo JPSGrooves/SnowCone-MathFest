@@ -121,7 +121,7 @@ function resolveMenuBackdropFile(theme) {
 
   return pkg.visual?.backgroundPlate
     || fallback.visual?.backgroundPlate
-    || 'assets/img/branding/menubackgroundPlate_default.png';
+    || 'assets/img/menu/packages/default/backgroundPlate.png';
 }
 
 

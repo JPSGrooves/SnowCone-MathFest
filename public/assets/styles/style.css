@@ -1520,7 +1520,7 @@ html[data-platform="ios"] #startup-screen .startup-username {
    ────────────────────────────────────────────────────────── */
 
 html[data-platform="ios"] {
-  --scmf-menu-backdrop-image: url("/assets/img/branding/menubackgroundPlate_default.png");
+  --scmf-menu-backdrop-image: url("/assets/img/menu/packages/default/backgroundPlate.png");
 }
 
 @media (min-width: 700px) and (min-height: 700px) {
