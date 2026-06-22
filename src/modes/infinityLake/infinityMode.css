@@ -1255,3 +1255,905 @@ body.il-active .il-result-overlay {
     inset 0 0 12px rgba(0, 0, 0, 0.42),
     0 0 14px rgba(255, 80, 160, 0.38) !important;
 }
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Scenic HUD Preflight
+   Purpose:
+   - No giant card.
+   - No speech bubble.
+   - Keep the lake plate visible.
+   - Use floating HUD islands over a soft dark gradient.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-intro.il-preflight-scene {
+  position: absolute !important;
+  inset: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+  gap: clamp(10px, 1.5svh, 18px) !important;
+
+  padding:
+    calc(env(safe-area-inset-top, 0px) + clamp(20px, 4svh, 42px))
+    clamp(18px, 4vw, 46px)
+    calc(env(safe-area-inset-bottom, 0px) + clamp(14px, 2.4svh, 28px)) !important;
+
+  overflow: hidden !important;
+  pointer-events: auto !important;
+
+  background:
+    radial-gradient(circle at 50% 34%,
+      rgba(0, 255, 238, 0.10) 0%,
+      rgba(0, 0, 0, 0.10) 32%,
+      rgba(0, 0, 0, 0.36) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.32) 0%,
+      rgba(0, 0, 0, 0.12) 34%,
+      rgba(0, 0, 0, 0.36) 72%,
+      rgba(0, 0, 0, 0.64) 100%
+    ) !important;
+}
+
+body.il-active .il-preflight-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background:
+    radial-gradient(circle at 50% 30%, transparent 0%, rgba(0, 0, 0, 0.16) 52%, rgba(0, 0, 0, 0.58) 100%),
+    linear-gradient(90deg, rgba(0,0,0,0.35), transparent 22%, transparent 78%, rgba(0,0,0,0.35));
+  pointer-events: none;
+}
+
+body.il-active .il-preflight-header,
+body.il-active .il-preflight-stage,
+body.il-active .il-preflight-hud,
+body.il-active .il-preflight-footer {
+  position: relative;
+  z-index: 1;
+}
+
+body.il-active .il-preflight-header {
+  text-align: center;
+  align-self: start;
+}
+
+body.il-active .il-preflight-header h1 {
+  margin: 0;
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(2.05rem, 5.3vw, 4.4rem);
+  line-height: 0.95;
+  letter-spacing: 0.035em;
+  font-weight: 700;
+
+  background:
+    linear-gradient(90deg, #00ffee 0%, #8ffff8 35%, #ffffff 50%, #8ffff8 65%, #00ccff 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  text-shadow:
+    0 0 12px rgba(0, 255, 238, 0.35),
+    0 0 26px rgba(0, 204, 255, 0.18);
+
+  animation: il-title-ink 6s linear infinite;
+}
+
+body.il-active .il-preflight-header p {
+  margin: clamp(8px, 1.1svh, 14px) auto 0;
+  max-width: min(86vw, 560px);
+
+  color: rgba(240, 255, 255, 0.96);
+  font-size: clamp(1rem, 2.5vw, 1.45rem);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.95),
+    0 0 16px rgba(0, 255, 238, 0.22);
+}
+
+body.il-active .il-preflight-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+body.il-active .il-preflight-triplets {
+  width: clamp(250px, 55vw, 540px);
+  max-height: min(42svh, 430px);
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 0 16px rgba(0, 255, 238, 0.28))
+    drop-shadow(0 18px 26px rgba(0, 0, 0, 0.72));
+
+  transform-origin: center bottom;
+  animation: il-preflight-float 4.6s ease-in-out infinite;
+}
+
+@keyframes il-preflight-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.012);
+  }
+}
+
+body.il-active .il-preflight-hud {
+  display: grid;
+  gap: clamp(10px, 1.45svh, 16px);
+  align-self: end;
+}
+
+body.il-active .il-preflight-stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 3vw, 22px);
+  flex-wrap: wrap;
+}
+
+body.il-active .il-preflight-chip {
+  min-width: clamp(128px, 32vw, 210px);
+  padding: clamp(8px, 1.35svh, 13px) clamp(12px, 2.8vw, 20px);
+
+  border-radius: 18px;
+  border: 2px solid rgba(0, 255, 238, 0.66);
+  background: rgba(0, 0, 0, 0.58);
+
+  box-shadow:
+    0 0 12px rgba(0, 255, 238, 0.28),
+    inset 0 0 16px rgba(0, 255, 238, 0.09);
+
+  text-align: center;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+body.il-active .il-preflight-chip span {
+  display: block;
+  margin-bottom: 0.18rem;
+
+  color: rgba(220, 255, 255, 0.9);
+  font-size: clamp(0.74rem, 1.9vw, 1rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body.il-active .il-preflight-chip strong {
+  display: block;
+
+  color: #ffffff;
+  font-size: clamp(1.35rem, 4.2vw, 2.25rem);
+  line-height: 1;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.55),
+    0 0 18px rgba(0, 255, 238, 0.35);
+}
+
+body.il-active .il-preflight-difficulty {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(8px, 2.2vw, 16px);
+  width: min(92vw, 720px);
+  margin: 0 auto;
+}
+
+body.il-active .il-preflight-diff-btn,
+body.il-active .il-preflight-nav-btn,
+body.il-active .il-preflight-play {
+  appearance: none;
+  -webkit-appearance: none;
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  border-radius: 18px;
+  border: 2px solid rgba(0, 255, 238, 0.52);
+  background: rgba(0, 0, 0, 0.68);
+  color: #f7ffff;
+
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+
+  box-shadow:
+    0 0 10px rgba(0, 255, 238, 0.25),
+    inset 0 0 14px rgba(0, 255, 238, 0.08);
+
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+}
+
+body.il-active .il-preflight-diff-btn {
+  min-height: clamp(62px, 8.5svh, 92px);
+  padding: clamp(8px, 1.3svh, 14px) clamp(8px, 2vw, 16px);
+  transition:
+    transform 120ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+body.il-active .il-preflight-diff-btn span,
+body.il-active .il-preflight-diff-btn strong {
+  display: block;
+}
+
+body.il-active .il-preflight-diff-btn span {
+  margin-bottom: 0.2rem;
+  font-size: clamp(0.78rem, 2.1vw, 1.06rem);
+  letter-spacing: 0.04em;
+}
+
+body.il-active .il-preflight-diff-btn strong {
+  font-size: clamp(1.2rem, 3.8vw, 2rem);
+  line-height: 1;
+}
+
+body.il-active .il-preflight-diff-btn:active,
+body.il-active .il-preflight-nav-btn:active,
+body.il-active .il-preflight-play:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+body.il-active .il-diff-easy {
+  --il-diff-color: #ffee00;
+}
+
+body.il-active .il-diff-medium {
+  --il-diff-color: #00ccff;
+}
+
+body.il-active .il-diff-hard {
+  --il-diff-color: #ff44ff;
+}
+
+body.il-active .il-preflight-diff-btn.selected {
+  border-color: var(--il-diff-color);
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--il-diff-color) 28%, transparent), transparent 70%),
+    rgba(0, 0, 0, 0.72);
+
+  box-shadow:
+    0 0 13px color-mix(in srgb, var(--il-diff-color) 72%, transparent),
+    0 0 28px color-mix(in srgb, var(--il-diff-color) 36%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--il-diff-color) 18%, transparent);
+}
+
+body.il-active .il-preflight-footer {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.8fr) minmax(150px, 1.1fr) minmax(20px, 0.8fr);
+  align-items: center;
+  gap: clamp(10px, 2.2vw, 18px);
+  width: min(92vw, 720px);
+  margin: 0 auto;
+}
+
+body.il-active .il-preflight-nav-btn {
+  min-height: clamp(48px, 6.8svh, 68px);
+  padding: 0.7rem 1rem;
+  border-color: rgba(255, 102, 255, 0.74);
+  box-shadow:
+    0 0 12px rgba(255, 102, 255, 0.34),
+    inset 0 0 16px rgba(255, 102, 255, 0.10);
+}
+
+body.il-active .il-preflight-play {
+  min-height: clamp(52px, 7.4svh, 74px);
+  padding: 0.75rem 1.2rem;
+
+  font-size: clamp(1.05rem, 2.8vw, 1.45rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+
+  border-color: rgba(0, 255, 238, 0.9);
+  color: #07151a;
+  background:
+    linear-gradient(135deg, #fff475 0%, #80fff1 46%, #ff80f0 100%);
+
+  text-shadow: none;
+  box-shadow:
+    0 0 14px rgba(0, 255, 238, 0.52),
+    0 0 28px rgba(255, 128, 240, 0.26);
+}
+
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active .il-intro.il-preflight-scene {
+    grid-template-rows: auto minmax(0, 0.88fr) auto auto !important;
+    gap: clamp(7px, 1.05svh, 12px) !important;
+  }
+
+  body.il-active .il-preflight-header h1 {
+    font-size: clamp(1.72rem, 9vw, 2.75rem);
+  }
+
+  body.il-active .il-preflight-header p {
+    font-size: clamp(0.86rem, 4vw, 1.1rem);
+  }
+
+  body.il-active .il-preflight-triplets {
+    width: clamp(218px, 66vw, 360px);
+    max-height: 34svh;
+  }
+
+  body.il-active .il-preflight-chip {
+    min-width: clamp(116px, 38vw, 170px);
+  }
+
+  body.il-active .il-preflight-diff-btn {
+    min-height: clamp(54px, 7.6svh, 76px);
+    border-radius: 15px;
+  }
+
+  body.il-active .il-preflight-footer {
+    grid-template-columns: 1fr 1.1fr;
+  }
+
+  body.il-active .il-preflight-footer::after {
+    content: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active .il-preflight-triplets,
+  body.il-active .il-preflight-header h1 {
+    animation: none !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Scenic HUD Tighten Pass 01
+   Purpose:
+   - Keep scenic preflight.
+   - Restore old bottom-left back button.
+   - Move Play Game up above bottom bar.
+   - Make difficulty/stat rows less fat across iPhone/iPad.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-intro.il-preflight-scene {
+  grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+  gap: clamp(6px, 1.05svh, 12px) !important;
+
+  padding:
+    calc(env(safe-area-inset-top, 0px) + clamp(14px, 2.2svh, 28px))
+    clamp(18px, 4vw, 42px)
+    calc(env(safe-area-inset-bottom, 0px) + clamp(66px, 8.2svh, 92px)) !important;
+}
+
+/* Title/copy: a hair smaller and tighter, especially on iPad */
+body.il-active .il-preflight-header h1 {
+  font-size: clamp(2rem, 4.4svh, 3.35rem) !important;
+}
+
+body.il-active .il-preflight-header p {
+  margin-top: clamp(4px, 0.65svh, 9px) !important;
+  font-size: clamp(0.95rem, 2.05svh, 1.25rem) !important;
+  line-height: 1.15 !important;
+}
+
+/* Triplets: keep the cool placement, but make them less huge on iPad */
+body.il-active .il-preflight-triplets {
+  width: clamp(225px, 42svh, 430px) !important;
+  max-height: min(34svh, 380px) !important;
+}
+
+/* HUD sits higher and tighter */
+body.il-active .il-preflight-hud {
+  gap: clamp(7px, 1svh, 12px) !important;
+}
+
+/* Stats less chunky */
+body.il-active .il-preflight-chip {
+  min-width: clamp(118px, 26vw, 185px) !important;
+  padding: clamp(6px, 0.95svh, 10px) clamp(10px, 2vw, 16px) !important;
+  border-radius: 15px !important;
+}
+
+body.il-active .il-preflight-chip span {
+  font-size: clamp(0.66rem, 1.45svh, 0.86rem) !important;
+}
+
+body.il-active .il-preflight-chip strong {
+  font-size: clamp(1.2rem, 3.25svh, 1.85rem) !important;
+}
+
+/* Difficulty row smaller and more controlled */
+body.il-active .il-preflight-difficulty {
+  width: min(90vw, 640px) !important;
+  gap: clamp(7px, 1.65vw, 13px) !important;
+}
+
+body.il-active .il-preflight-diff-btn {
+  min-height: clamp(50px, 6.4svh, 72px) !important;
+  padding: clamp(6px, 0.85svh, 10px) clamp(8px, 1.5vw, 14px) !important;
+  border-radius: 15px !important;
+}
+
+body.il-active .il-preflight-diff-btn span {
+  font-size: clamp(0.72rem, 1.55svh, 0.94rem) !important;
+}
+
+body.il-active .il-preflight-diff-btn strong {
+  font-size: clamp(1.05rem, 2.85svh, 1.55rem) !important;
+}
+
+/* Play button gets its own row above the old BTM button */
+body.il-active .il-preflight-footer {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+
+  width: min(90vw, 640px) !important;
+  margin: 0 auto !important;
+}
+
+body.il-active .il-preflight-play {
+  width: min(58vw, 320px) !important;
+  min-height: clamp(48px, 6.1svh, 66px) !important;
+  padding: 0.58rem 1rem !important;
+
+  font-size: clamp(1rem, 2.35svh, 1.32rem) !important;
+  border-radius: 16px !important;
+}
+
+/* Restore old intro bottom bar behavior */
+body.il-active .il-preflight-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: max(1.2vh, env(safe-area-inset-bottom, 0px)) !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: end !important;
+
+  pointer-events: none !important;
+  padding: 0 1.2vh !important;
+  z-index: 9 !important;
+}
+
+body.il-active .il-preflight-bottom-bar .il-square-btn {
+  pointer-events: auto !important;
+}
+
+/* iPad: stop the preflight from becoming giant/fat */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.il-active .il-intro.il-preflight-scene {
+    padding:
+      calc(env(safe-area-inset-top, 0px) + clamp(18px, 2.3svh, 34px))
+      clamp(42px, 6vw, 76px)
+      calc(env(safe-area-inset-bottom, 0px) + clamp(76px, 8svh, 104px)) !important;
+  }
+
+  body.il-active .il-preflight-header h1 {
+    font-size: clamp(2.6rem, 4.3svh, 3.85rem) !important;
+  }
+
+  body.il-active .il-preflight-triplets {
+    width: clamp(290px, 36svh, 430px) !important;
+    max-height: 34svh !important;
+  }
+
+  body.il-active .il-preflight-difficulty,
+  body.il-active .il-preflight-footer {
+    width: min(72vw, 620px) !important;
+  }
+
+  body.il-active .il-preflight-play {
+    width: min(38vw, 330px) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Result Popup Recenter Fix
+   Purpose:
+   - Undo old absolute/translate popup drift.
+   - Let overlay center the popup cleanly.
+   - Prevent bottom cut-off near home indicator.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active #ilResultOverlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 900 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 12px)
+    16px
+    calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+
+  background:
+    radial-gradient(circle at 50% 30%, rgba(0, 255, 238, 0.18), transparent 55%),
+    rgba(0, 0, 0, 0.74) !important;
+}
+
+body.il-active #ilResultOverlay.hidden {
+  display: none !important;
+}
+
+body.il-active #ilResultPopup {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+
+  width: min(86vw, 420px) !important;
+  max-width: 420px !important;
+  max-height: min(78svh, 620px) !important;
+
+  margin: 0 auto !important;
+  padding: clamp(0.85rem, 2svh, 1.45rem) !important;
+  gap: clamp(0.55rem, 1.35svh, 1rem) !important;
+
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+
+  animation:
+    il-popup-soft-in 0.32s ease-out forwards,
+    popupGlow 2.5s ease-in-out infinite !important;
+}
+
+body.il-active #ilResultPopup h2 {
+  font-size: clamp(1.45rem, 3.1svh, 2.1rem) !important;
+  margin: 0 0 0.25rem !important;
+}
+
+body.il-active #ilResultPopup p {
+  font-size: clamp(0.92rem, 2svh, 1.18rem) !important;
+  margin: 0.16rem 0 !important;
+}
+
+body.il-active #ilResultPopup .il-tip-line {
+  font-size: clamp(0.78rem, 1.65svh, 0.95rem) !important;
+  line-height: 1.28 !important;
+}
+
+@keyframes il-popup-soft-in {
+  from {
+    opacity: 0;
+    transform: scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Scenic HUD polish v2
+   iOS-first presentation polish
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-intro.il-preflight-scene {
+  --il-pref-accent: #00ffee;
+  --il-pref-glow: rgba(0,255,238,0.30);
+}
+
+/* kill those side edge shadow borders */
+body.il-active .il-preflight-vignette {
+  inset: -2% !important;
+  background:
+    radial-gradient(circle at 50% 28%,
+      transparent 0%,
+      rgba(0, 0, 0, 0.08) 54%,
+      rgba(0, 0, 0, 0.34) 100%) !important;
+}
+
+/* give title zone more breathing room */
+body.il-active .il-preflight-header {
+  padding-top: clamp(2px, 0.5svh, 8px);
+  padding-bottom: clamp(8px, 1.2svh, 16px);
+}
+
+body.il-active .il-preflight-header h1 {
+  font-size: clamp(2.35rem, 5.2svh, 4.15rem) !important;
+  letter-spacing: 0.03em;
+}
+
+body.il-active .il-preflight-header p {
+  margin-top: clamp(8px, 1svh, 14px) !important;
+  padding: 0.15rem 0.65rem 0.35rem !important;
+  line-height: 1.18 !important;
+  font-size: clamp(1rem, 2.1svh, 1.32rem) !important;
+}
+
+/* merged theme-reactive stats box */
+body.il-active .il-preflight-stats-merged {
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(10px, 1.8vw, 16px);
+
+  width: min(90vw, 560px);
+  margin: 0 auto;
+  padding: clamp(8px, 1svh, 12px) clamp(14px, 2.2vw, 18px);
+
+  border-radius: 18px;
+  border: 2px solid var(--il-pref-accent);
+  background: rgba(0, 0, 0, 0.58);
+
+  box-shadow:
+    0 0 12px var(--il-pref-glow),
+    inset 0 0 16px color-mix(in srgb, var(--il-pref-accent) 12%, transparent);
+
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+body.il-active .il-preflight-stat-col {
+  text-align: center;
+}
+
+body.il-active .il-preflight-stat-col span {
+  display: block;
+  margin-bottom: 0.12rem;
+  color: rgba(230,255,255,0.92);
+  font-size: clamp(0.7rem, 1.45svh, 0.88rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body.il-active .il-preflight-stat-col strong {
+  display: block;
+  color: #ffffff;
+  font-size: clamp(1.15rem, 3.1svh, 1.85rem);
+  line-height: 1;
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.55),
+    0 0 18px var(--il-pref-glow);
+}
+
+body.il-active .il-preflight-stat-divider {
+  width: 1px;
+  height: clamp(34px, 5svh, 52px);
+  background: color-mix(in srgb, var(--il-pref-accent) 70%, white 10%);
+  box-shadow: 0 0 10px var(--il-pref-glow);
+  opacity: 0.9;
+}
+
+/* difficulty colors always visible */
+body.il-active .il-diff-easy {
+  --il-diff-color: #ffee00;
+  color: #ffee00 !important;
+  border-color: rgba(255, 238, 0, 0.88) !important;
+  box-shadow:
+    0 0 10px rgba(255, 238, 0, 0.18),
+    inset 0 0 10px rgba(255, 238, 0, 0.05) !important;
+}
+
+body.il-active .il-diff-medium {
+  --il-diff-color: #00ccff;
+  color: #00ccff !important;
+  border-color: rgba(0, 204, 255, 0.88) !important;
+  box-shadow:
+    0 0 10px rgba(0, 204, 255, 0.18),
+    inset 0 0 10px rgba(0, 204, 255, 0.05) !important;
+}
+
+body.il-active .il-diff-hard {
+  --il-diff-color: #ff44ff;
+  color: #ff44ff !important;
+  border-color: rgba(255, 68, 255, 0.88) !important;
+  box-shadow:
+    0 0 10px rgba(255, 68, 255, 0.18),
+    inset 0 0 10px rgba(255, 68, 255, 0.05) !important;
+}
+
+body.il-active .il-preflight-diff-btn.selected {
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--il-diff-color) 28%, transparent), transparent 70%),
+    rgba(0, 0, 0, 0.74) !important;
+
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--il-diff-color) 80%, transparent),
+    0 0 30px color-mix(in srgb, var(--il-diff-color) 36%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--il-diff-color) 18%, transparent) !important;
+}
+
+/* play button theme-reactive */
+body.il-active .il-preflight-play {
+  border-color: var(--il-pref-accent) !important;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--il-pref-accent) 22%, #ffffff 78%) 0%,
+      color-mix(in srgb, var(--il-pref-accent) 42%, #ffffff 58%) 52%,
+      color-mix(in srgb, var(--il-pref-accent) 22%, #ffd8ff 78%) 100%
+    ) !important;
+
+  color: #07151a !important;
+
+  box-shadow:
+    0 0 14px var(--il-pref-glow),
+    0 0 28px color-mix(in srgb, var(--il-pref-accent) 28%, transparent) !important;
+}
+
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active .il-preflight-stats-merged {
+    width: min(92vw, 500px);
+    gap: 10px;
+    padding: 8px 12px;
+  }
+
+  body.il-active .il-preflight-stat-col strong {
+    font-size: clamp(1.05rem, 2.8svh, 1.55rem);
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Theme-Reactive Title Polish
+   Purpose:
+   - Keep the existing shimmer/ink effect.
+   - Make title tint follow active theme accent.
+   - Give descenders like the "y" in Infinity room to breathe.
+   - No gameplay/layout logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-preflight-header {
+  overflow: visible !important;
+
+  /* Gives the title/copy stack breathing room without moving the whole scene much. */
+  padding-top: clamp(2px, 0.45svh, 8px) !important;
+  padding-bottom: clamp(10px, 1.45svh, 18px) !important;
+}
+
+body.il-active .il-preflight-header h1 {
+  display: inline-block !important;
+  overflow: visible !important;
+
+  /*
+    The old shimmer stays.
+    The ink now follows --il-pref-accent from the theme-aware preflight vars.
+  */
+  background:
+    linear-gradient(
+      90deg,
+      var(--il-pref-accent, #00ffee) 0%,
+      color-mix(in srgb, var(--il-pref-accent, #00ffee) 62%, #ffffff 38%) 28%,
+      #ffffff 50%,
+      color-mix(in srgb, var(--il-pref-accent, #00ffee) 62%, #ffffff 38%) 72%,
+      var(--il-pref-accent, #00ffee) 100%
+    ) !important;
+
+  background-size: 240% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  /*
+    This is the clipping fix:
+    the title needed more line box + padding for descenders.
+  */
+  line-height: 1.14 !important;
+  padding: 0.02em 0 0.16em !important;
+  margin-bottom: -0.04em !important;
+
+  text-shadow:
+    0 0 10px var(--il-pref-glow, rgba(0, 255, 238, 0.30)),
+    0 0 22px color-mix(in srgb, var(--il-pref-accent, #00ffee) 34%, transparent),
+    0 0 34px rgba(0, 0, 0, 0.36) !important;
+
+  filter:
+    drop-shadow(0 0 8px color-mix(in srgb, var(--il-pref-accent, #00ffee) 42%, transparent))
+    drop-shadow(0 3px 5px rgba(0, 0, 0, 0.42)) !important;
+
+  animation: il-title-ink 6s linear infinite !important;
+}
+
+body.il-active .il-preflight-header p {
+  /*
+    Keeps copy from crowding the title descender.
+    This should fix the "y" feeling clipped by the line below.
+  */
+  margin-top: clamp(6px, 0.9svh, 13px) !important;
+}
+
+/* iPad: a little more title air because the type is visually heavier there. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.il-active .il-preflight-header {
+    padding-bottom: clamp(12px, 1.55svh, 22px) !important;
+  }
+
+  body.il-active .il-preflight-header h1 {
+    line-height: 1.16 !important;
+    padding-bottom: 0.18em !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Full Viewport Preflight Shadow Fix
+   Purpose:
+   - Fix side-edge shadow/border artifacts.
+   - Let the preflight overlay own the whole viewport.
+   - Keep gameplay/result layout untouched.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-intro.il-preflight-scene {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100vw !important;
+  height: 100svh !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  z-index: 20 !important;
+  isolation: isolate !important;
+
+  /*
+    Keep the scenic HUD grid, but make the overlay screen-sized instead of
+    trapped inside the old 11:16 Infinity shell.
+  */
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+  overflow: hidden !important;
+
+  /*
+    The scene itself should not create dark side rails.
+    The shadow is handled by .il-preflight-vignette below.
+  */
+  background: transparent !important;
+}
+
+/* Full-screen shadow wash, not an 11:16-frame wash */
+body.il-active .il-preflight-vignette {
+  position: fixed !important;
+  inset: -12vmax !important;
+
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  z-index: -1 !important;
+  pointer-events: none !important;
+
+  /*
+    No left/right rail gradient.
+    Big soft vertical/circular wash only.
+  */
+  background:
+    radial-gradient(
+      ellipse 115% 86% at 50% 34%,
+      rgba(0, 255, 238, 0.05) 0%,
+      rgba(0, 0, 0, 0.03) 38%,
+      rgba(0, 0, 0, 0.22) 72%,
+      rgba(0, 0, 0, 0.44) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.16) 0%,
+      rgba(0, 0, 0, 0.04) 34%,
+      rgba(0, 0, 0, 0.28) 72%,
+      rgba(0, 0, 0, 0.58) 100%
+    ) !important;
+}
+
+/*
+  Belt + suspenders:
+  while preflight is visible, make sure old frame pieces do not create
+  their own background edge illusion.
+*/
+body.il-active .il-preflight-scene ~ *,
+body.il-active .il-preflight-scene::before,
+body.il-active .il-preflight-scene::after {
+  box-shadow: none !important;
+}
+
+/* Keep the old back button above the full-screen vignette. */
+body.il-active .il-preflight-bottom-bar {
+  z-index: 30 !important;
+}

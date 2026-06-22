@@ -158,6 +158,7 @@ export function loadInfinityMode() {
   activateInputHandler('infinity');
   document.body.classList.add('il-active');
   appState.setMode('infinity');
+  currentMode = 'addsub';
   appState.setGameMode('addsub'); // 🌊 Default to +/- combo mode
   stopTrack(); // 🔇 stop jukebox track cold on entry
 
@@ -169,6 +170,7 @@ export function loadInfinityMode() {
   gameContainer.style.display = 'flex';
 
   renderIntroScreen();
+  setupIntroDifficultyHandlers();
   document.getElementById('ilBackIntro')?.addEventListener('click', returnToMenu);
   setTimeout(() => {
     startTripletLoop('intro', 'tripletSpriteIntro', 500);
@@ -250,50 +252,186 @@ export function stopInfinityMode() {
 }
 
 
+
+function getInfinityPreflightStats() {
+  const profile = appState.profile || {};
+
+  const bestScore = Number(profile.infinityHighScore || 0);
+  const bestStreak = Number(profile.infinityLongestStreak || 0);
+
+  return {
+    bestScore: Number.isFinite(bestScore) ? bestScore : 0,
+    bestStreak: Number.isFinite(bestStreak) ? bestStreak : 0,
+  };
+}
+
+function getInfinityPreflightThemeAccent() {
+  const themeId = appState?.settings?.theme || 'menubackground';
+
+  const map = {
+    menubackground: { accent: '#00ffee', glow: 'rgba(0,255,238,0.30)' },
+    spring:         { accent: '#ff8fd1', glow: 'rgba(255,143,209,0.30)' },
+    summer:         { accent: '#ffe95a', glow: 'rgba(255,233,90,0.30)' },
+    fall:           { accent: '#ff9f43', glow: 'rgba(255,159,67,0.30)' },
+    winter:         { accent: '#9fe8ff', glow: 'rgba(159,232,255,0.30)' },
+    halloween:      { accent: '#ff7a1a', glow: 'rgba(255,122,26,0.30)' },
+    harvest:        { accent: '#f0b24c', glow: 'rgba(240,178,76,0.30)' },
+    christmas:      { accent: '#46d98a', glow: 'rgba(70,217,138,0.30)' },
+    freedom:        { accent: '#7fb3ff', glow: 'rgba(127,179,255,0.30)' },
+    newyear:        { accent: '#d7ecff', glow: 'rgba(215,236,255,0.30)' },
+    valentine:      { accent: '#ff82c8', glow: 'rgba(255,130,200,0.30)' },
+  };
+
+  if (themeId.startsWith('cosmic')) {
+    return {
+      accent: '#9a7cff',
+      glow: 'rgba(154,124,255,0.30)',
+    };
+  }
+
+  return map[themeId] || map.menubackground;
+}
+
+function applyInfinityPreflightThemeVars(scopeEl) {
+  if (!scopeEl) return;
+
+  const { accent, glow } = getInfinityPreflightThemeAccent();
+  scopeEl.style.setProperty('--il-pref-accent', accent);
+  scopeEl.style.setProperty('--il-pref-glow', glow);
+}
+
+function setIntroDifficultyMode(mode) {
+  const safeMode = ['addsub', 'multdiv', 'alg'].includes(mode)
+    ? mode
+    : 'addsub';
+
+  currentMode = safeMode;
+
+  try {
+    appState.setGameMode(safeMode);
+  } catch (err) {
+    console.warn('[Infinity] Could not set intro game mode:', err);
+  }
+
+  document.querySelectorAll('.il-preflight-diff-btn').forEach((btn) => {
+    const selected = btn.dataset.mode === safeMode;
+    btn.classList.toggle('selected', selected);
+    btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+}
+
+function setupIntroDifficultyHandlers() {
+  const buttons = document.querySelectorAll('.il-preflight-diff-btn');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      setIntroDifficultyMode(btn.dataset.mode);
+    });
+  });
+
+  setIntroDifficultyMode(currentMode || 'addsub');
+}
+
 function renderIntroScreen() {
   const container = document.getElementById('game-container');
+  const { bestScore, bestStreak } = getInfinityPreflightStats();
 
   container.innerHTML = `
     <div class="il-aspect-wrap">
       <div class="il-game-frame">
-        <img 
+        <img
           class="background-fill"
-          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/plate_infinityBG.png" 
+          src="${import.meta.env.BASE_URL}assets/img/modes/infinityLake/plate_infinityBG.png"
           alt="Infinity Lake Background"
+          draggable="false"
         />
 
-        <!-- 🧊 INFINITY INTRO STACK -->
-        <div class="il-intro">
-          <div class="il-intro-stack">
-            <div class="il-speech">
-              Hi! We're the <strong>Infinity Triplets</strong>!<br>
-              <span class="il-howto">
-                No timer! Jam out and tap the correct answers to build a record streak! Harder problems score more points!
-              </span>
+        <div class="il-intro il-preflight-scene">
+          <div class="il-preflight-vignette" aria-hidden="true"></div>
+
+          <header class="il-preflight-header">
+            <h1>Infinity Lake</h1>
+            <p>
+              Pick the right answer.<br />
+              Keep the streak alive.
+            </p>
+          </header>
+
+          <section class="il-preflight-stage" aria-label="Infinity Triplets">
+            <img
+              id="tripletSpriteIntro"
+              class="triplet-img il-preflight-triplets"
+              src="${import.meta.env.BASE_URL}assets/img/characters/infinityLake/il_intro.png"
+              alt="The Infinity Triplets"
+              draggable="false"
+            />
+          </section>
+
+          <section class="il-preflight-hud" aria-label="Infinity Lake setup">
+            <div class="il-preflight-stats il-preflight-stats-merged">
+              <div class="il-preflight-stat-col">
+                <span>Best Score</span>
+                <strong>${bestScore}</strong>
+              </div>
+
+              <div class="il-preflight-stat-divider" aria-hidden="true"></div>
+
+              <div class="il-preflight-stat-col">
+                <span>Best Streak</span>
+                <strong>${bestStreak}</strong>
+              </div>
             </div>
 
-            <div class="triplet-wrapper">
-              <img 
-                id="tripletSpriteIntro" 
-                class="triplet-img" 
-                src="${import.meta.env.BASE_URL}assets/img/characters/infinityLake/il_intro.png"
-              />
-            </div>
+            <div class="il-preflight-difficulty" aria-label="Choose difficulty">
+              <button
+                type="button"
+                class="il-preflight-diff-btn il-diff-easy selected"
+                data-mode="addsub"
+                aria-pressed="true"
+              >
+                <span>Easy</span>
+                <strong>+/−</strong>
+              </button>
 
-            <!-- ✅ Keep Start button in the stack -->
-            <button id="startInfinitySet" class="il-intro-btn start-show-btn">
-              🎶 Start the Set 🎶
+              <button
+                type="button"
+                class="il-preflight-diff-btn il-diff-medium"
+                data-mode="multdiv"
+                aria-pressed="false"
+              >
+                <span>Medium</span>
+                <strong>×÷</strong>
+              </button>
+
+              <button
+                type="button"
+                class="il-preflight-diff-btn il-diff-hard"
+                data-mode="alg"
+                aria-pressed="false"
+              >
+                <span>Hard</span>
+                <strong>𝒙</strong>
+              </button>
+            </div>
+          </section>
+
+          <footer class="il-preflight-footer">
+            <button id="startInfinitySet" type="button" class="il-preflight-play start-show-btn">
+              Play Game
             </button>
-          </div>
+          </footer>
 
-          <!-- ✅ QS/Story-style bottom bar (intro only) -->
-          <div class="il-bottom-bar">
-            <button id="ilBackIntro" class="il-square-btn il-left">🔙</button> <!-- ✅ no global class -->
+          <div class="il-bottom-bar il-preflight-bottom-bar">
+            <button id="ilBackIntro" type="button" class="il-square-btn il-left" aria-label="Back to Main Menu">
+              🔙
+            </button>
           </div>
         </div>
       </div>
     </div>
   `;
+
+  applyInfinityPreflightThemeVars(container.querySelector('.il-preflight-scene'));
 }
 
 
