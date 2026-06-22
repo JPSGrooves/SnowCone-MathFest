@@ -2,7 +2,7 @@
 
 import './infinityMode.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
-import { playTransition } from '../../managers/transitionManager.js';
+import { playModeReturnTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { startTripletLoop, stopTripletLoop, startTripletSequence } from './tripletAnimator.js';
 import { stopTrack, toggleMute, isMuted } from '../../managers/musicManager.js';
@@ -667,8 +667,11 @@ function returnToMenu() {
   // ✅ Commit run even if player leaves early (no popup)
   commitInfinityRun({ reason: 'exit_menu', showPopup: false });
 
+  console.log('🌌 [Infinity] Back-to-menu using playModeReturnTransition');
+
   stopTrack(); // 💥 nukes the Howl
-  playTransition(() => {
+  playModeReturnTransition(() => {
+    console.log('🌌 [Infinity] return transition callback: restoring menu');
     stopInfinityMode();
     document.querySelector('.menu-wrapper')?.classList.remove('hidden');
     applyBackgroundTheme();

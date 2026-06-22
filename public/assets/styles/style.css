@@ -3198,3 +3198,222 @@ html[data-platform="ios"] .menu-wrapper.title-glow-gating.title-glow-ready .menu
   opacity: 0 !important;
   transition-duration: 540ms !important;
 }
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Mode → Menu Return Transition — Infinity Pilot
+   Purpose:
+   - Reverse/complement the Ghost Portal without touching Menu → Mode.
+   - Avoid the old colored OG transition wash.
+   - Restore menu behind transitionStars, then fade portal away.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition.returning {
+  background: #02030a !important;
+  transition: opacity 260ms ease !important;
+}
+
+#menu-mode-transition.returning .menu-mode-transition-bg {
+  opacity: 0 !important;
+  transform: scale(1.035) !important;
+
+  transition:
+    opacity 320ms ease,
+    transform 1700ms ease-out !important;
+}
+
+#menu-mode-transition.returning.active .menu-mode-transition-bg {
+  opacity: 1 !important;
+  transform: scale(1.055) !important;
+}
+
+#menu-mode-transition.returning .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(0.94) !important;
+
+  /* Neutral return glow: no cyan/theme color wash on the return path yet. */
+  filter:
+    drop-shadow(0 0 12px rgba(255, 255, 255, 0.26))
+    drop-shadow(0 8px 20px rgba(0, 0, 0, 0.72)) !important;
+
+  transition:
+    opacity 360ms ease,
+    transform 980ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 980ms ease !important;
+}
+
+#menu-mode-transition.returning.active .menu-mode-transition-cone {
+  opacity: 0.92 !important;
+  transform: translate(-50%, -50%) scale(1.035) !important;
+}
+
+#menu-mode-transition.returning.to-black .menu-mode-transition-cone {
+  opacity: 0.82 !important;
+  transform: translate(-50%, -50%) scale(1.01) !important;
+}
+
+#menu-mode-transition.returning .menu-mode-transition-black {
+  background: #000 !important;
+  opacity: 0 !important;
+  transition: opacity 360ms ease !important;
+}
+
+/* Tiny neutral veil only. This is intentionally NOT the old color wash. */
+#menu-mode-transition.returning.to-black .menu-mode-transition-black {
+  opacity: 0.08 !important;
+}
+
+#menu-mode-transition.returning.return-menu-ready .menu-mode-transition-bg {
+  opacity: 0 !important;
+  transform: scale(1.015) !important;
+  transition-duration: 620ms !important;
+}
+
+#menu-mode-transition.returning.return-menu-ready .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(0.985) !important;
+  transition-duration: 420ms !important;
+}
+
+#menu-mode-transition.returning.return-menu-ready .menu-mode-transition-black {
+  opacity: 0 !important;
+}
+
+#menu-mode-transition.returning.leaving {
+  opacity: 0 !important;
+  transition-duration: 620ms !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Mode → Menu Return Transition — Smooth Cone Alignment
+   Purpose:
+   - transitionStars fades in first.
+   - return cone appears only after a beat.
+   - cone is already measured to the real menu cone position/size.
+   - no center fallback snap unless measurement fully fails.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition.returning {
+  background: #02030a !important;
+  opacity: 0 !important;
+  transition: opacity 260ms ease !important;
+}
+
+#menu-mode-transition.returning.active {
+  opacity: 1 !important;
+}
+
+#menu-mode-transition.returning.leaving {
+  opacity: 0 !important;
+  transition-duration: 620ms !important;
+}
+
+#menu-mode-transition.returning .menu-mode-transition-bg {
+  opacity: 0 !important;
+  transform: scale(1.02) !important;
+
+  transition:
+    opacity 260ms ease,
+    transform 1500ms ease-out !important;
+}
+
+#menu-mode-transition.returning.active .menu-mode-transition-bg {
+  opacity: 1 !important;
+  transform: scale(1.045) !important;
+}
+
+/* Important:
+   active alone does NOT show the cone on return.
+   JS waits a split second, then adds .return-cone-ready. */
+#menu-mode-transition.returning.active .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+#menu-mode-transition.returning.return-cone-ready .menu-mode-transition-cone {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+
+  filter:
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.22))
+    drop-shadow(0 8px 20px rgba(0, 0, 0, 0.65)) !important;
+
+  transition:
+    opacity 340ms ease,
+    transform 620ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 620ms ease !important;
+}
+
+/* No black/color wash on this return path. */
+#menu-mode-transition.returning .menu-mode-transition-black,
+#menu-mode-transition.returning.to-black .menu-mode-transition-black {
+  opacity: 0 !important;
+  background: transparent !important;
+}
+
+/* During the blend out, the overlay cone fades away exactly over the real menu cone. */
+#menu-mode-transition.returning.return-menu-ready .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+  transition-duration: 420ms !important;
+}
+
+#menu-mode-transition.returning.return-menu-ready .menu-mode-transition-bg {
+  opacity: 0 !important;
+  transform: scale(1.01) !important;
+  transition-duration: 620ms !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Mode → Menu Return Transition — 2.5s Exit Tempo
+   Purpose:
+   - Match Menu → Mode Ghost Portal pacing.
+   - Keep corrected cone alignment.
+   - Slow the star fade, cone arrival, and final menu blend.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition.returning {
+  transition: opacity 420ms ease !important;
+}
+
+#menu-mode-transition.returning.leaving {
+  opacity: 0 !important;
+  transition-duration: 720ms !important;
+}
+
+#menu-mode-transition.returning .menu-mode-transition-bg {
+  transform: scale(1.015) !important;
+
+  transition:
+    opacity 520ms ease,
+    transform 2500ms ease-out !important;
+}
+
+#menu-mode-transition.returning.active .menu-mode-transition-bg {
+  opacity: 1 !important;
+  transform: scale(1.065) !important;
+}
+
+/* Return cone waits longer, then fades in with the slow portal rhythm. */
+#menu-mode-transition.returning.return-cone-ready .menu-mode-transition-cone {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+
+  transition:
+    opacity 720ms ease,
+    transform 1450ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 1450ms ease !important;
+}
+
+/* Final handoff: overlay cone fades away over the real menu cone. */
+#menu-mode-transition.returning.return-menu-ready .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+  transition-duration: 720ms !important;
+}
+
+#menu-mode-transition.returning.return-menu-ready .menu-mode-transition-bg {
+  opacity: 0 !important;
+  transform: scale(1.015) !important;
+  transition-duration: 720ms !important;
+}
+

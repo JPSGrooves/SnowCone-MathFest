@@ -270,3 +270,180 @@ export function playMenuModeTransition(callback) {
     appState.uiState.transitioning = false;
   }, 2500);
 }
+
+let isModeReturnTransitioning = false;
+
+function ensureMenuModeTransitionLayer() {
+  let layer = document.getElementById('menu-mode-transition');
+
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'menu-mode-transition';
+
+    layer.innerHTML = `
+      <div class="menu-mode-transition-bg" aria-hidden="true"></div>
+      <img class="menu-mode-transition-cone" alt="" aria-hidden="true" />
+      <div class="menu-mode-transition-black" aria-hidden="true"></div>
+    `;
+
+    document.body.appendChild(layer);
+  }
+
+  return layer;
+}
+
+function applyModeReturnConeMetrics(cone, metrics) {
+  if (!cone || !metrics) return;
+
+  cone.src = metrics.src;
+  cone.style.left = `${metrics.left}px`;
+  cone.style.top = `${metrics.top}px`;
+  cone.style.width = `${metrics.width}px`;
+}
+
+function getFallbackReturnConeMetrics(base) {
+  return {
+    src: `${base}assets/img/transitions/snowCone.png`,
+    left: window.innerWidth * 0.5,
+    top: window.innerHeight * 0.54,
+    width: Math.min(Math.max(window.innerWidth * 0.34, 130), 280),
+  };
+}
+
+function measureMenuConeForReturn(base) {
+  const fallback = getFallbackReturnConeMetrics(base);
+
+  const menuWrapper = document.querySelector('.menu-wrapper');
+  const liveCone =
+    document.getElementById('menuCenterCone') ||
+    document.querySelector('.menu-center-cone');
+
+  if (!menuWrapper || !liveCone) {
+    console.warn('🌌 [Transition] Menu cone measurement fallback: missing menu/cone');
+    return fallback;
+  }
+
+  const wasHidden = menuWrapper.classList.contains('hidden');
+
+  const previousInline = {
+    visibility: menuWrapper.style.visibility,
+    pointerEvents: menuWrapper.style.pointerEvents,
+    opacity: menuWrapper.style.opacity,
+  };
+
+  try {
+    // The menu is usually display:none via .hidden during modes.
+    // We briefly reveal it invisibly so WebKit can calculate the real cone rect.
+    if (wasHidden) {
+      menuWrapper.style.visibility = 'hidden';
+      menuWrapper.style.pointerEvents = 'none';
+      menuWrapper.style.opacity = '0';
+      menuWrapper.classList.remove('hidden');
+
+      // Force layout while invisible.
+      void menuWrapper.offsetWidth;
+      void liveCone.offsetWidth;
+    }
+
+    const rect = liveCone.getBoundingClientRect?.();
+    const src =
+      liveCone.getAttribute?.('src') ||
+      liveCone.src ||
+      fallback.src;
+
+    if (rect && rect.width > 10 && rect.height > 10) {
+      return {
+        src,
+        left: rect.left + rect.width / 2,
+        top: rect.top + rect.height / 2,
+        width: rect.width,
+      };
+    }
+
+    console.warn('🌌 [Transition] Menu cone measurement fallback: bad rect', rect);
+    return {
+      ...fallback,
+      src,
+    };
+  } finally {
+    if (wasHidden) {
+      menuWrapper.classList.add('hidden');
+    }
+
+    menuWrapper.style.visibility = previousInline.visibility;
+    menuWrapper.style.pointerEvents = previousInline.pointerEvents;
+    menuWrapper.style.opacity = previousInline.opacity;
+  }
+}
+
+export function playModeReturnTransition(callback) {
+  if (isModeReturnTransitioning || isMenuModeTransitioning || isTransitioning) return;
+
+  console.log('🌌 [Transition] playModeReturnTransition fired');
+
+  isModeReturnTransitioning = true;
+  appState.uiState.transitioning = true;
+
+  const base = import.meta.env.BASE_URL;
+  const layer = ensureMenuModeTransitionLayer();
+  const cone = layer.querySelector('.menu-mode-transition-cone');
+
+  // Critical: measure the real menu cone BEFORE the visual transition begins.
+  // That prevents the center-position cone snap.
+  const coneMetrics = measureMenuConeForReturn(base);
+  applyModeReturnConeMetrics(cone, coneMetrics);
+
+  layer.classList.remove(
+    'active',
+    'to-black',
+    'leaving',
+    'returning',
+    'return-cone-ready',
+    'return-menu-ready'
+  );
+
+  // Force reflow so WKWebView restarts the classes cleanly.
+  void layer.offsetWidth;
+
+  // 0.00s — transitionStars fades in alone.
+  layer.classList.add('returning', 'active');
+
+  // 0.62s — cone fades in already at the exact menu cone position/size.
+  window.setTimeout(() => {
+    layer.classList.add('return-cone-ready');
+  }, 620);
+
+  // 1.38s — restore menu behind the opaque starfield.
+  window.setTimeout(() => {
+    try {
+      callback?.();
+    } catch (err) {
+      console.error('🚨 Mode return transition callback failed:', err);
+    }
+
+    console.log('🌌 [Transition] menu restored behind return portal');
+  }, 1380);
+
+  // 1.78s — begin the blend into the restored menu.
+  window.setTimeout(() => {
+    layer.classList.add('return-menu-ready', 'leaving');
+  }, 1780);
+
+  // 2.50s — cleanup.
+  window.setTimeout(() => {
+    layer.classList.remove(
+      'active',
+      'to-black',
+      'leaving',
+      'returning',
+      'return-cone-ready',
+      'return-menu-ready'
+    );
+
+    isModeReturnTransitioning = false;
+    appState.uiState.transitioning = false;
+
+    console.log('🌌 [Transition] playModeReturnTransition cleaned up');
+  }, 2500);
+}
+
