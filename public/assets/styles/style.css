@@ -2807,3 +2807,394 @@ html[data-platform="ios"] .menu-wrapper.title-glow-gating.title-glow-ready .menu
   transition: opacity 140ms ease-out !important;
 }
 
+/* ──────────────────────────────────────────────────────────
+   SCMF Transition BG — hard PNG background override
+   Purpose:
+   - Force transitionStars.png to be the actual transition background.
+   - Do not depend on the injected .starfield image layer.
+   - Keep OG truck/cone animation intact.
+   ────────────────────────────────────────────────────────── */
+
+#scene-transition {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+
+  background-color: #02030a !important;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.10),
+      rgba(0, 0, 0, 0.22)
+    ),
+    url("../img/transitions/transitionStars.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+
+  opacity: 0;
+  transition: opacity 280ms ease !important;
+}
+
+#scene-transition.active {
+  opacity: 1 !important;
+}
+
+/* The JS still injects this image, but the container background now owns the scene. */
+#scene-transition .starfield {
+  display: none !important;
+}
+
+#scene-transition .transition-truck,
+#scene-transition .transition-cone {
+  z-index: 3 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Menu → Mode Soft Transition
+   Purpose:
+   - Subtle transitionStars.png fade.
+   - Theme cone lingers briefly.
+   - Fade to black before mode intro appears.
+   - No racing truck/cone.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+#menu-mode-transition.active {
+  opacity: 1;
+}
+
+#menu-mode-transition.leaving {
+  opacity: 0;
+  transition-duration: 280ms;
+}
+
+.menu-mode-transition-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.08),
+      rgba(0, 0, 0, 0.20)
+    ),
+    url("../img/transitions/transitionStars.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  opacity: 0;
+  transform: scale(1.01);
+  transition:
+    opacity 220ms ease,
+    transform 900ms ease-out;
+}
+
+#menu-mode-transition.active .menu-mode-transition-bg {
+  opacity: 1;
+  transform: scale(1.035);
+}
+
+.menu-mode-transition-cone {
+  position: fixed;
+  z-index: 3;
+
+  height: auto;
+  object-fit: contain;
+  object-position: center center;
+
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+
+  filter:
+    drop-shadow(0 0 14px rgba(0, 255, 238, 0.42))
+    drop-shadow(0 8px 20px rgba(0, 0, 0, 0.65));
+
+  transition:
+    opacity 220ms ease,
+    transform 620ms ease,
+    filter 620ms ease;
+}
+
+#menu-mode-transition.active .menu-mode-transition-cone {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.045);
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-cone {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+.menu-mode-transition-black {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  background: #000;
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-black {
+  opacity: 1;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Menu → Mode Soft Transition — Slow Ghost Pass
+   Purpose:
+   - Let the transitionStars + theme cone moment breathe.
+   - Fade to black.
+   - Crossfade out into the mode intro.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition {
+  transition: opacity 260ms ease !important;
+}
+
+#menu-mode-transition.leaving {
+  opacity: 0 !important;
+  transition-duration: 700ms !important;
+}
+
+.menu-mode-transition-bg {
+  transition:
+    opacity 360ms ease,
+    transform 1900ms ease-out !important;
+}
+
+#menu-mode-transition.active .menu-mode-transition-bg {
+  opacity: 0.96 !important;
+  transform: scale(1.055) !important;
+}
+
+.menu-mode-transition-cone {
+  transition:
+    opacity 360ms ease,
+    transform 1500ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 1500ms ease !important;
+}
+
+#menu-mode-transition.active .menu-mode-transition-cone {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1.085) !important;
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(0.96) !important;
+}
+
+.menu-mode-transition-black {
+  transition: opacity 430ms ease !important;
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-black {
+  opacity: 1 !important;
+}
+/* ──────────────────────────────────────────────────────────
+   SCMF Menu → Mode Soft Transition — 3 Second Ghost Blend
+   Purpose:
+   - Slower theme-cone / transitionStars moment.
+   - No hard blackout.
+   - Crossfade into mode intro like startup → menu.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition {
+  transition: opacity 320ms ease !important;
+}
+
+#menu-mode-transition.leaving {
+  opacity: 0 !important;
+  transition-duration: 760ms !important;
+}
+
+.menu-mode-transition-bg {
+  transition:
+    opacity 500ms ease,
+    transform 2600ms ease-out !important;
+}
+
+#menu-mode-transition.active .menu-mode-transition-bg {
+  opacity: 0.96 !important;
+  transform: scale(1.075) !important;
+}
+
+.menu-mode-transition-cone {
+  transition:
+    opacity 500ms ease,
+    transform 2300ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 2300ms ease !important;
+}
+
+#menu-mode-transition.active .menu-mode-transition-cone {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1.11) !important;
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-cone {
+  opacity: 0.18 !important;
+  transform: translate(-50%, -50%) scale(0.98) !important;
+}
+
+.menu-mode-transition-black {
+  transition: opacity 520ms ease !important;
+}
+
+/* Soft veil only — not full black */
+#menu-mode-transition.to-black .menu-mode-transition-black {
+  opacity: 0.42 !important;
+}/* ──────────────────────────────────────────────────────────
+   SCMF Menu → Mode Soft Transition — 2.5s Ghost Blend
+   Purpose:
+   - Final timing candidate after visual test.
+   - Keeps the startup-style crossfade feeling.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition {
+  transition: opacity 280ms ease !important;
+}
+
+#menu-mode-transition.leaving {
+  opacity: 0 !important;
+  transition-duration: 560ms !important;
+}
+
+.menu-mode-transition-bg {
+  transition:
+    opacity 430ms ease,
+    transform 2200ms ease-out !important;
+}
+
+#menu-mode-transition.active .menu-mode-transition-bg {
+  opacity: 0.96 !important;
+  transform: scale(1.065) !important;
+}
+
+.menu-mode-transition-cone {
+  transition:
+    opacity 430ms ease,
+    transform 2100ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 2100ms ease !important;
+}
+
+#menu-mode-transition.active .menu-mode-transition-cone {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1.095) !important;
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-cone {
+  opacity: 0.18 !important;
+  transform: translate(-50%, -50%) scale(0.98) !important;
+}
+
+.menu-mode-transition-black {
+  transition: opacity 460ms ease !important;
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-black {
+  opacity: 0.38 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF Menu → Mode Soft Transition — Cone Fully Clears
+   Purpose:
+   - Cone fades all the way out before mode swap.
+   - Keeps the 2.5s ghost blend.
+   - Reduces the snappy mid-fade screen switch.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition.leaving {
+  opacity: 0 !important;
+  transition-duration: 540ms !important;
+}
+
+.menu-mode-transition-cone {
+  transition:
+    opacity 520ms ease,
+    transform 2100ms cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 2100ms ease !important;
+}
+
+#menu-mode-transition.to-black .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(0.975) !important;
+}
+
+/* Soft veil, not blackout. Just enough cover for the swap. */
+#menu-mode-transition.to-black .menu-mode-transition-black {
+  opacity: 0.30 !important;
+  transition: opacity 520ms ease !important;
+}
+/* ──────────────────────────────────────────────────────────
+   SCMF Menu → Mode Soft Transition — Opaque Starfield Cover
+   Purpose:
+   - transitionStars.png fully owns the screen.
+   - Menu title/truck/labels should NOT show through.
+   - The blend happens from transition → mode intro, not menu → transition.
+   ────────────────────────────────────────────────────────── */
+
+#menu-mode-transition {
+  background: #02030a !important;
+}
+
+#menu-mode-transition.active {
+  opacity: 1 !important;
+}
+
+.menu-mode-transition-bg {
+  background-color: #02030a !important;
+
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.14)
+    ),
+    url("../img/transitions/transitionStars.png") !important;
+
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+
+  opacity: 0 !important;
+
+  transition:
+    opacity 360ms ease,
+    transform 2200ms ease-out !important;
+}
+
+#menu-mode-transition.active .menu-mode-transition-bg {
+  opacity: 1 !important;
+  transform: scale(1.065) !important;
+}
+
+/* Cone fully clears before the mode swap. */
+#menu-mode-transition.to-black .menu-mode-transition-cone {
+  opacity: 0 !important;
+  transform: translate(-50%, -50%) scale(0.975) !important;
+}
+
+/* This is now just a soft veil over an opaque starfield, not the main cover. */
+#menu-mode-transition.to-black .menu-mode-transition-black {
+  opacity: 0.22 !important;
+  transition: opacity 520ms ease !important;
+}
+
+#menu-mode-transition.leaving {
+  opacity: 0 !important;
+  transition-duration: 540ms !important;
+}

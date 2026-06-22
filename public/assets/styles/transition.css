@@ -1,4 +1,4 @@
-/* 🌌 Starfield Transition Layer */
+/* 🌌 SnowCone scene transition — smoothed OG pass */
 #scene-transition {
   position: fixed;
   inset: 0;
@@ -8,19 +8,70 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
+
+  opacity: 0;
+  background:
+    radial-gradient(circle at 50% 42%, var(--scmf-transition-glow, rgba(0, 255, 238, 0.28)), transparent 34%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08), transparent 18%),
+    #02030a;
+
+  transition: opacity 0.28s ease;
 }
 
-.starfield {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
+#scene-transition.active {
+  opacity: 1;
+}
+
+#scene-transition.leaving {
   opacity: 0;
-  transition: opacity 0.25s ease-in;
+  transition-duration: 0.32s;
+}
+
+/* Softer, farther-away macro starfield */
+#scene-transition .starfield {
+  position: absolute;
+  inset: -3%;
+  width: 106%;
+  height: 106%;
+  object-fit: cover;
+  z-index: 1;
+
+  opacity: 0;
+  filter: blur(0.55px) brightness(0.48) saturate(0.72);
+  transform: scale(1.035);
+  transition:
+    opacity 0.32s ease,
+    transform 1.45s ease-out;
 }
 
 #scene-transition.active .starfield {
+  opacity: 0.52;
+  transform: scale(1.075);
+}
+
+#scene-transition.leaving .starfield {
+  opacity: 0;
+}
+
+/* Theme tint / distant Milky Way wash */
+.transition-cosmic-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 28% 32%, var(--scmf-transition-tint, rgba(0, 255, 238, 0.12)), transparent 34%),
+    radial-gradient(circle at 72% 68%, var(--scmf-transition-glow, rgba(255, 255, 255, 0.12)), transparent 38%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.52));
+  opacity: 0;
+  transition: opacity 0.34s ease;
+}
+
+#scene-transition.active .transition-cosmic-wash {
   opacity: 1;
+}
+
+#scene-transition.leaving .transition-cosmic-wash {
+  opacity: 0;
 }
 
 .transition-truck {
@@ -29,9 +80,13 @@
   left: -25vw;
   width: clamp(120px, 30vw, 300px);
   height: auto;
-  will-change: transform;
+  will-change: transform, opacity;
   z-index: 2;
-  transform: translateX(-150%);
+  transform: translateX(-155vw);
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 10px var(--scmf-transition-glow, rgba(0, 255, 238, 0.34)))
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
 }
 
 .transition-cone {
@@ -40,25 +95,32 @@
   right: -20vw;
   width: clamp(100px, 20vw, 250px);
   height: auto;
-  will-change: transform;
+  will-change: transform, opacity;
   z-index: 2;
-  transform: translateX(150%);
+  transform: translateX(155vw);
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 10px var(--scmf-transition-glow, rgba(0, 255, 238, 0.34)))
+    drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
 }
 
 @media (max-width: 768px) and (orientation: portrait) {
-  .transition-truck,
+  .transition-truck {
+    width: clamp(150px, 42vw, 320px);
+  }
+
   .transition-cone {
-    transform: scale(2.0);
-    max-width: 300px; /* or something sane */
+    width: clamp(120px, 32vw, 260px);
   }
 }
 
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+@media (prefers-reduced-motion: reduce) {
+  #scene-transition,
+  #scene-transition .starfield,
+  .transition-cosmic-wash,
+  .transition-truck,
+  .transition-cone {
+    transition-duration: 0.01ms !important;
+    animation: none !important;
   }
 }

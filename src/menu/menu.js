@@ -5,7 +5,7 @@ import { autorun } from 'mobx';
 import { appState } from '../data/appState.js';
 import { applyBackgroundTheme } from '../managers/backgroundManager.js';
 import '../modals/infoModal.js';
-import { playTransition } from '../managers/transitionManager.js';
+import { playTransition, playMenuModeTransition } from '../managers/transitionManager.js';
 import { startMode } from '../managers/sceneManager.js';
 import { awardBadge } from '../managers/badgeManager.js'; 
 import { hapticTap } from '../utils/haptics.js'; // 📳 tiny cone tap vibes
@@ -305,9 +305,9 @@ applyBackgroundTheme();
     if (!label) return;
 
     label.addEventListener('click', () => {
-      menuWrapper.classList.add('hidden');
+      playMenuModeTransition(() => {
+        menuWrapper.classList.add('hidden');
 
-      playTransition(() => {
         console.log(`🚀 Launching mode: ${modeName}`);
         appState.setLastPlayed(Date.now());
         appState.setMode(modeName);
