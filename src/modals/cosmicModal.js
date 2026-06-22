@@ -2,6 +2,7 @@
 import { autorun } from 'mobx';
 import { appState } from '../data/appState.js';
 import { hapticTap } from '../utils/haptics.js'; // 📳 modal tap vibes
+import { getThemeAccent } from '../data/themeAccentLaw.js';
 
 import {
   renderProfileTab,
@@ -15,6 +16,70 @@ import { renderConesTab, setupConesTabUI } from './conesTab.js';
 
 // 🍧 WKWebView tap-through shield (Capacitor iOS only)
 let COSMIC_BLOCK_UNTIL = 0;
+
+// 🎨 Options modal theme accent law
+// Scope: Options/Cosmic popup only.
+// This does NOT change layout, sizing, modal behavior, or tabs.
+const OPTIONS_THEME_ACCENTS = Object.freeze({
+  menubackground: '#00ffee',
+  default: '#00ffee',
+
+  fall: '#c98243',
+  harvest: '#c98243',
+
+  winter: '#9fe8ff',
+
+  spring: '#ff9fcd',
+
+  summer: '#ffe66d',
+
+  halloween: '#ff8a1f',
+
+  concert: '#67d85a',
+
+  christmas: '#8fffd1',
+
+  freedom: '#9fd7ff',
+
+  clouds: '#f7fbff',
+  cloud: '#f7fbff',
+  newyear: '#f7fbff',
+
+  valentine: '#ff82c8',
+
+  cosmic_01: '#9a7cff',
+  cosmic_02: '#9a7cff',
+  cosmic_03: '#9a7cff',
+  cosmic_04: '#9a7cff',
+  cosmic_05: '#9a7cff',
+  cosmic_06: '#9a7cff',
+  cosmic_07: '#ff82c8',
+});
+
+function getOptionsThemeAccent(themeId = appState.settings?.theme || 'menubackground') {
+  const cleanId = String(themeId || 'menubackground').toLowerCase();
+
+  if (OPTIONS_THEME_ACCENTS[cleanId]) {
+    return OPTIONS_THEME_ACCENTS[cleanId];
+  }
+
+  if (cleanId.startsWith('cosmic')) {
+    return '#9a7cff';
+  }
+
+  return OPTIONS_THEME_ACCENTS.menubackground;
+}
+
+function applyOptionsThemeAccent() {
+  const modal = document.getElementById('cosmicModal');
+  if (!modal) return;
+
+  const { accent, glow, faint } = getThemeAccent(appState.settings?.theme);
+
+  modal.style.setProperty('--scmf-options-accent', accent);
+  modal.style.setProperty('--scmf-options-accent-soft', glow);
+  modal.style.setProperty('--scmf-options-accent-faint', faint);
+}
 
 function isIOSNativeShell() {
   // You already log: "Running inside iOS shell (platform-ios)"
@@ -69,6 +134,8 @@ export function openModal(tab = 'profile') {
   modal.classList.remove('hidden');
   overlay?.classList.remove('hidden');
   overlay?.classList.add('show');
+
+  applyOptionsThemeAccent();
 
   requestAnimationFrame(() => {
     renderTab(tab);
@@ -155,6 +222,8 @@ function renderTab(tabName) {
   }
 
   content.innerHTML = tab.render();
+
+  applyOptionsThemeAccent();
 
   // 🔥 DOM Paint before setup
   requestAnimationFrame(() => {

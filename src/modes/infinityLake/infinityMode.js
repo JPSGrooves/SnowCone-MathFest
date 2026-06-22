@@ -13,6 +13,7 @@ import { playInfinityLoop } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
 import { Howl, Howler } from 'howler';
 import { hapticSuccess, hapticError, hapticSoftPulse } from '../../utils/haptics.js';
+import { getThemeAccent } from '../../data/themeAccentLaw.js';
 
 
 
@@ -266,38 +267,27 @@ function getInfinityPreflightStats() {
 }
 
 function getInfinityPreflightThemeAccent() {
-  const themeId = appState?.settings?.theme || 'menubackground';
+  const { accent, glow, faint } = getThemeAccent(appState?.settings?.theme);
 
-  const map = {
-    menubackground: { accent: '#00ffee', glow: 'rgba(0,255,238,0.30)' },
-    spring:         { accent: '#ff8fd1', glow: 'rgba(255,143,209,0.30)' },
-    summer:         { accent: '#ffe95a', glow: 'rgba(255,233,90,0.30)' },
-    fall:           { accent: '#ff9f43', glow: 'rgba(255,159,67,0.30)' },
-    winter:         { accent: '#9fe8ff', glow: 'rgba(159,232,255,0.30)' },
-    halloween:      { accent: '#ff7a1a', glow: 'rgba(255,122,26,0.30)' },
-    harvest:        { accent: '#f0b24c', glow: 'rgba(240,178,76,0.30)' },
-    christmas:      { accent: '#46d98a', glow: 'rgba(70,217,138,0.30)' },
-    freedom:        { accent: '#7fb3ff', glow: 'rgba(127,179,255,0.30)' },
-    newyear:        { accent: '#d7ecff', glow: 'rgba(215,236,255,0.30)' },
-    valentine:      { accent: '#ff82c8', glow: 'rgba(255,130,200,0.30)' },
+  return {
+    accent,
+    glow,
+    faint,
   };
-
-  if (themeId.startsWith('cosmic')) {
-    return {
-      accent: '#9a7cff',
-      glow: 'rgba(154,124,255,0.30)',
-    };
-  }
-
-  return map[themeId] || map.menubackground;
 }
-
 function applyInfinityPreflightThemeVars(scopeEl) {
-  if (!scopeEl) return;
+  const { accent, glow, faint } = getInfinityPreflightThemeAccent();
 
-  const { accent, glow } = getInfinityPreflightThemeAccent();
-  scopeEl.style.setProperty('--il-pref-accent', accent);
-  scopeEl.style.setProperty('--il-pref-glow', glow);
+  const targets = [
+    document.body,
+    scopeEl,
+  ].filter(Boolean);
+
+  targets.forEach((target) => {
+    target.style.setProperty('--il-pref-accent', accent);
+    target.style.setProperty('--il-pref-glow', glow);
+    target.style.setProperty('--il-pref-faint', faint);
+  });
 }
 
 function setIntroDifficultyMode(mode) {
@@ -523,6 +513,8 @@ function renderUI() {
       </div>
     </div>
   `;
+
+  applyInfinityPreflightThemeVars(container.querySelector('.il-grid'));
 
   problemEl = document.getElementById('mathProblem');
   answerBtns = Array.from(document.querySelectorAll('.ans-btn'));

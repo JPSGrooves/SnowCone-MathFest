@@ -2157,3 +2157,239 @@ body.il-active .il-preflight-scene::after {
 body.il-active .il-preflight-bottom-bar {
   z-index: 30 !important;
 }
+
+/* ──────────────────────────────────────────────────────────
+   SCMF — Infinity Lake Theme Accent Law
+   Scope:
+   - IL preflight already consumes --il-pref-accent.
+   - This catches gameplay/result cyan accents.
+   - Difficulty/answer colors stay fixed.
+   - No layout / sizing / spacing changes.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active {
+  --il-pref-accent: #00ffee;
+  --il-pref-glow: #00ffee55;
+  --il-pref-faint: #00ffee22;
+}
+
+/* Main gameplay title */
+body.il-active .il-title {
+  background:
+    linear-gradient(
+      90deg,
+      var(--il-pref-accent) 0%,
+      color-mix(in srgb, var(--il-pref-accent) 68%, #ffffff 32%) 30%,
+      #ffffff 50%,
+      color-mix(in srgb, var(--il-pref-accent) 68%, #ffffff 32%) 70%,
+      var(--il-pref-accent) 100%
+    ) !important;
+
+  background-size: 200% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  text-shadow:
+    0 0 8px var(--il-pref-glow),
+    0 0 16px var(--il-pref-faint) !important;
+}
+
+/* Main gameplay frame accents */
+body.il-active .il-stage,
+body.il-active .il-math,
+body.il-active .il-controls {
+  border-color: var(--il-pref-glow) !important;
+
+  box-shadow:
+    0 0 10px var(--il-pref-glow),
+    inset 0 0 10px var(--il-pref-faint) !important;
+}
+
+/* Problem header + score accents */
+body.il-active .il-math #mathProblem .il-problem-head,
+body.il-active .il-score-box {
+  color: var(--il-pref-accent) !important;
+
+  border-color: var(--il-pref-glow) !important;
+
+  text-shadow:
+    0 0 6px var(--il-pref-glow),
+    0 0 12px var(--il-pref-faint) !important;
+
+  box-shadow:
+    0 0 8px var(--il-pref-glow),
+    inset 0 0 8px var(--il-pref-faint) !important;
+}
+
+/* Main mode buttons keep their current layout but use theme accent */
+body.il-active .il-controls .mode-buttons button,
+body.il-active .il-controls .utility-buttons #muteToggle,
+body.il-active .il-controls .utility-buttons #endGame {
+  border-color: var(--il-pref-glow) !important;
+  color: var(--il-pref-accent) !important;
+
+  box-shadow:
+    0 0 8px var(--il-pref-faint),
+    inset 0 0 8px var(--il-pref-faint) !important;
+}
+
+body.il-active .il-controls .mode-buttons button.active-mode {
+  background-color: var(--il-pref-faint) !important;
+  border-color: var(--il-pref-accent) !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 12px var(--il-pref-glow),
+    0 0 20px var(--il-pref-faint),
+    inset 0 0 10px var(--il-pref-faint) !important;
+}
+
+/* Mode flash */
+body.il-active .mode-flash {
+  color: var(--il-pref-accent) !important;
+  border-color: var(--il-pref-glow) !important;
+
+  box-shadow:
+    0 0 12px var(--il-pref-glow),
+    0 0 20px var(--il-pref-faint) !important;
+}
+
+/* Results overlay and popup */
+body.il-active #ilResultOverlay {
+  background:
+    radial-gradient(circle at 50% 30%, var(--il-pref-faint), transparent 55%),
+    rgba(0, 0, 0, 0.74) !important;
+}
+
+body.il-active #ilResultPopup {
+  border-color: var(--il-pref-glow) !important;
+
+  box-shadow:
+    0 0 18px var(--il-pref-glow),
+    0 0 30px var(--il-pref-faint) !important;
+}
+
+body.il-active #ilResultPopup h2 {
+  color: var(--il-pref-accent) !important;
+
+  text-shadow:
+    0 0 8px var(--il-pref-glow),
+    0 0 16px var(--il-pref-faint) !important;
+}
+
+/* Play Again button inside result popup */
+body.il-active #ilResultPopup .start-show-btn {
+  border-color: var(--il-pref-accent) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--il-pref-accent) 26%, #ffffff 74%) 0%,
+      color-mix(in srgb, var(--il-pref-accent) 48%, #ffffff 52%) 52%,
+      color-mix(in srgb, var(--il-pref-accent) 26%, #ffffff 74%) 100%
+    ) !important;
+
+  color: #07151a !important;
+
+  box-shadow:
+    0 0 10px var(--il-pref-glow),
+    0 0 18px var(--il-pref-faint) !important;
+}
+
+/* Result popup pulse follows theme accent */
+@keyframes popupGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 18px var(--il-pref-glow),
+      0 0 30px var(--il-pref-faint);
+  }
+
+  50% {
+    box-shadow:
+      0 0 28px var(--il-pref-glow),
+      0 0 44px var(--il-pref-faint);
+  }
+}
+
+/* Keep answer buttons fixed. These are gameplay-choice colors, not theme colors. */
+body.il-active .ans-yellow {
+  color: black !important;
+  border-color: #ffee00 !important;
+}
+
+body.il-active .ans-blue {
+  color: black !important;
+  border-color: #00ccff !important;
+}
+
+body.il-active .ans-violet {
+  color: black !important;
+  border-color: #cc33ff !important;
+}
+
+/* Keep preflight difficulty buttons fixed by difficulty. */
+body.il-active .il-diff-easy {
+  --il-diff-color: #ffee00 !important;
+}
+
+body.il-active .il-diff-medium {
+  --il-diff-color: #00ccff !important;
+}
+
+body.il-active .il-diff-hard {
+  --il-diff-color: #ff44ff !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   IL — Answer Choice Colors Stay Triplet-Matched
+   Scope:
+   - Left answer = yellow text/border/glow
+   - Middle answer = blue text/border/glow
+   - Right answer = magenta/violet text/border/glow
+   - Not theme-reactive
+   - No layout changes
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-math .answer-options .ans-yellow {
+  color: #ffee00 !important;
+  border-color: #ffee00 !important;
+  background: rgba(0, 0, 0, 0.58) !important;
+
+  text-shadow:
+    0 0 6px rgba(255, 238, 0, 0.72),
+    0 0 12px rgba(255, 238, 0, 0.32) !important;
+
+  box-shadow:
+    0 0 10px rgba(255, 238, 0, 0.72),
+    inset 0 0 10px rgba(255, 238, 0, 0.10) !important;
+}
+
+body.il-active .il-math .answer-options .ans-blue {
+  color: #00ccff !important;
+  border-color: #00ccff !important;
+  background: rgba(0, 0, 0, 0.58) !important;
+
+  text-shadow:
+    0 0 6px rgba(0, 204, 255, 0.72),
+    0 0 12px rgba(0, 204, 255, 0.32) !important;
+
+  box-shadow:
+    0 0 10px rgba(0, 204, 255, 0.72),
+    inset 0 0 10px rgba(0, 204, 255, 0.10) !important;
+}
+
+body.il-active .il-math .answer-options .ans-violet {
+  color: #ff44ff !important;
+  border-color: #ff44ff !important;
+  background: rgba(0, 0, 0, 0.58) !important;
+
+  text-shadow:
+    0 0 6px rgba(255, 68, 255, 0.72),
+    0 0 12px rgba(255, 68, 255, 0.32) !important;
+
+  box-shadow:
+    0 0 10px rgba(255, 68, 255, 0.72),
+    inset 0 0 10px rgba(255, 68, 255, 0.10) !important;
+}

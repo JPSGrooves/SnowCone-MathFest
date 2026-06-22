@@ -2210,3 +2210,92 @@ html[data-platform="ios"] .profile-xp-line,
     z-index: 5 !important;
   }
 }
+
+/* ──────────────────────────────────────────────────────────
+   SCMF — Info Modal Theme Accent Law
+   Scope:
+   - Info/About popup only
+   - color / border-color / glow-color only
+   - no sizing, no layout, no padding, no positioning
+   ────────────────────────────────────────────────────────── */
+
+#infoModal {
+  --scmf-info-accent: #00ffee;
+  --scmf-info-accent-soft: #00ffee55;
+  --scmf-info-accent-faint: #00ffee22;
+}
+
+/* Main info window shell */
+#infoModal .cosmic-modal-inner {
+  border-color: var(--scmf-info-accent) !important;
+
+  box-shadow:
+    0 0 14px var(--scmf-info-accent-soft),
+    0 0 28px var(--scmf-info-accent-faint) !important;
+}
+
+/* Close button */
+#infoModal .close-modal {
+  color: var(--scmf-info-accent) !important;
+
+  box-shadow:
+    0 0 7px var(--scmf-info-accent-soft),
+    0 0 14px var(--scmf-info-accent-faint) !important;
+}
+
+#infoModal .close-modal:hover {
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 8px var(--scmf-info-accent-soft),
+    0 0 16px var(--scmf-info-accent-faint) !important;
+}
+
+/* Main title + headings */
+#infoModal #infoTitle,
+#infoModal .tab-content h2,
+#infoModal .info-simple h3 {
+  color: var(--scmf-info-accent) !important;
+
+  text-shadow:
+    0 0 6px var(--scmf-info-accent-soft),
+    0 0 12px var(--scmf-info-accent-faint) !important;
+}
+
+/* Lede gets a soft theme kiss, but body copy stays readable */
+#infoModal .info-lede {
+  color: color-mix(in srgb, var(--scmf-info-accent) 38%, #ffffff 62%) !important;
+}
+
+/* Links / CTA */
+#infoModal .cta {
+  border-color: var(--scmf-info-accent) !important;
+  color: var(--scmf-info-accent) !important;
+
+  box-shadow:
+    0 0 8px var(--scmf-info-accent-soft),
+    inset 0 0 8px var(--scmf-info-accent-faint) !important;
+}
+
+#infoModal .cta-primary {
+  background:
+    linear-gradient(
+      135deg,
+      var(--scmf-info-accent) 0%,
+      color-mix(in srgb, var(--scmf-info-accent) 70%, #ffffff 30%) 52%,
+      var(--scmf-info-accent) 100%
+    ) !important;
+
+  color: #07151a !important;
+  border-color: transparent !important;
+
+  box-shadow:
+    0 0 10px var(--scmf-info-accent-soft),
+    0 0 18px var(--scmf-info-accent-faint) !important;
+}
+
+/* Support/footer accent */
+#infoModal .support-note strong,
+#infoModal .support-note a {
+  color: var(--scmf-info-accent) !important;
+}

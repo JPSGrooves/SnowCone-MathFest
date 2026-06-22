@@ -642,3 +642,1305 @@ body.neon-progress #trackTimer {
 .info-simple .compact-dot-list li {
   margin-bottom: 0.4rem;
 }
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1 — Cosmic Modal Responsive Shell Valves
+   Purpose:
+   - Better iPhone/iPad proportions.
+   - Softer borders/glow.
+   - Controlled font scaling.
+   - Keep existing tab logic/content untouched.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] #cosmicModal.modal,
+.platform-ios #cosmicModal.modal {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  width: min(92vw, 520px) !important;
+  max-width: min(92vw, 520px) !important;
+
+  height: min(
+    82svh,
+    calc(
+      100svh
+      - env(safe-area-inset-top, 0px)
+      - env(safe-area-inset-bottom, 0px)
+      - 34px
+    )
+  ) !important;
+
+  max-height: min(
+    82svh,
+    calc(
+      100svh
+      - env(safe-area-inset-top, 0px)
+      - env(safe-area-inset-bottom, 0px)
+      - 34px
+    )
+  ) !important;
+
+  aspect-ratio: auto !important;
+
+  padding:
+    clamp(0.62rem, 1.45svh, 1rem)
+    clamp(0.62rem, 2.5vw, 1rem)
+    clamp(0.7rem, 1.65svh, 1.1rem) !important;
+
+  border-width: clamp(1px, 0.22svh, 2px) !important;
+  border-radius: clamp(14px, 2.2svh, 22px) !important;
+
+  box-shadow:
+    0 0 clamp(12px, 2svh, 22px) rgba(0, 255, 238, 0.52),
+    0 0 clamp(28px, 5svh, 56px) rgba(255, 128, 240, 0.14),
+    inset 0 0 clamp(8px, 1.5svh, 18px) rgba(0, 255, 238, 0.06) !important;
+
+  overflow: hidden !important;
+  font-size: clamp(0.86rem, 1.65svh, 1.05rem) !important;
+  line-height: 1.35 !important;
+}
+
+/* Header stays tappable but stops getting chunky */
+html[data-platform="ios"] #cosmicModal .modal-header,
+.platform-ios #cosmicModal .modal-header {
+  flex: 0 0 auto !important;
+
+  gap: clamp(0.32rem, 0.85svh, 0.5rem) !important;
+  margin-bottom: clamp(0.46rem, 1.1svh, 0.75rem) !important;
+  padding:
+    clamp(0.34rem, 0.9svh, 0.52rem)
+    clamp(2rem, 5vw, 2.45rem)
+    clamp(0.42rem, 1svh, 0.6rem)
+    clamp(0.18rem, 1vw, 0.35rem) !important;
+}
+
+/* Tabs: readable, thumb-safe, not huge */
+html[data-platform="ios"] #cosmicModal .tab-button,
+.platform-ios #cosmicModal .tab-button {
+  min-height: clamp(34px, 4.7svh, 44px) !important;
+  padding:
+    clamp(0.34rem, 0.9svh, 0.52rem)
+    clamp(0.28rem, 1.3vw, 0.48rem) !important;
+
+  border-radius: clamp(9px, 1.35svh, 13px) !important;
+
+  font-size: clamp(0.72rem, 1.42svh, 0.92rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.005em !important;
+}
+
+/* Close button: smaller hit jewel, still reachable */
+html[data-platform="ios"] #cosmicModal .modal-close,
+.platform-ios #cosmicModal .modal-close {
+  top: clamp(0.48rem, 1svh, 0.7rem) !important;
+  right: clamp(0.48rem, 1.5vw, 0.72rem) !important;
+
+  width: clamp(28px, 4.2svh, 36px) !important;
+  height: clamp(28px, 4.2svh, 36px) !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  font-size: clamp(0.95rem, 1.9svh, 1.18rem) !important;
+  line-height: 1 !important;
+}
+
+/* Content scrolls; shell does not stretch weirdly */
+html[data-platform="ios"] #cosmicModal #modalContent,
+html[data-platform="ios"] #cosmicModal .modal-content,
+.platform-ios #cosmicModal #modalContent,
+.platform-ios #cosmicModal .modal-content {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+
+  padding:
+    clamp(0.42rem, 1svh, 0.72rem)
+    clamp(0.42rem, 1.4vw, 0.8rem)
+    clamp(0.62rem, 1.35svh, 0.95rem) !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+
+  font-size: clamp(0.86rem, 1.58svh, 1.02rem) !important;
+  line-height: 1.33 !important;
+}
+
+html[data-platform="ios"] #cosmicModal h3,
+.platform-ios #cosmicModal h3 {
+  font-size: clamp(1.08rem, 2.15svh, 1.42rem) !important;
+  line-height: 1.12 !important;
+  margin-bottom: clamp(0.28rem, 0.8svh, 0.5rem) !important;
+}
+
+/* iPad: wider but still panel-like, not fullscreen */
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] #cosmicModal.modal,
+  .platform-ios #cosmicModal.modal {
+    width: min(70vw, 600px) !important;
+    max-width: min(70vw, 600px) !important;
+    height: min(78svh, 760px) !important;
+    max-height: min(78svh, 760px) !important;
+
+    font-size: clamp(0.92rem, 1.25svh, 1.08rem) !important;
+  }
+
+  html[data-platform="ios"] #cosmicModal .tab-button,
+  .platform-ios #cosmicModal .tab-button {
+    font-size: clamp(0.78rem, 1.12svh, 0.96rem) !important;
+    min-height: clamp(38px, 4.2svh, 48px) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.3.1 — Cosmic Modal Responsive Shell Valves
+   Purpose:
+   - Better iPhone/iPad proportions.
+   - Softer borders/glow.
+   - Controlled font scaling.
+   - Keep existing tab logic/content untouched.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] #cosmicModal.modal,
+.platform-ios #cosmicModal.modal {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  width: min(92vw, 520px) !important;
+  max-width: min(92vw, 520px) !important;
+
+  height: min(
+    82svh,
+    calc(
+      100svh
+      - env(safe-area-inset-top, 0px)
+      - env(safe-area-inset-bottom, 0px)
+      - 34px
+    )
+  ) !important;
+
+  max-height: min(
+    82svh,
+    calc(
+      100svh
+      - env(safe-area-inset-top, 0px)
+      - env(safe-area-inset-bottom, 0px)
+      - 34px
+    )
+  ) !important;
+
+  aspect-ratio: auto !important;
+
+  padding:
+    clamp(0.62rem, 1.45svh, 1rem)
+    clamp(0.62rem, 2.5vw, 1rem)
+    clamp(0.7rem, 1.65svh, 1.1rem) !important;
+
+  border-width: clamp(1px, 0.22svh, 2px) !important;
+  border-radius: clamp(14px, 2.2svh, 22px) !important;
+
+  box-shadow:
+    0 0 clamp(12px, 2svh, 22px) rgba(0, 255, 238, 0.52),
+    0 0 clamp(28px, 5svh, 56px) rgba(255, 128, 240, 0.14),
+    inset 0 0 clamp(8px, 1.5svh, 18px) rgba(0, 255, 238, 0.06) !important;
+
+  overflow: hidden !important;
+  font-size: clamp(0.86rem, 1.65svh, 1.05rem) !important;
+  line-height: 1.35 !important;
+}
+
+html[data-platform="ios"] #cosmicModal .modal-header,
+.platform-ios #cosmicModal .modal-header {
+  flex: 0 0 auto !important;
+
+  gap: clamp(0.32rem, 0.85svh, 0.5rem) !important;
+  margin-bottom: clamp(0.46rem, 1.1svh, 0.75rem) !important;
+  padding:
+    clamp(0.34rem, 0.9svh, 0.52rem)
+    clamp(2rem, 5vw, 2.45rem)
+    clamp(0.42rem, 1svh, 0.6rem)
+    clamp(0.18rem, 1vw, 0.35rem) !important;
+}
+
+html[data-platform="ios"] #cosmicModal .tab-button,
+.platform-ios #cosmicModal .tab-button {
+  min-height: clamp(34px, 4.7svh, 44px) !important;
+  padding:
+    clamp(0.34rem, 0.9svh, 0.52rem)
+    clamp(0.28rem, 1.3vw, 0.48rem) !important;
+
+  border-radius: clamp(9px, 1.35svh, 13px) !important;
+
+  font-size: clamp(0.72rem, 1.42svh, 0.92rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.005em !important;
+}
+
+html[data-platform="ios"] #cosmicModal .modal-close,
+.platform-ios #cosmicModal .modal-close {
+  top: clamp(0.48rem, 1svh, 0.7rem) !important;
+  right: clamp(0.48rem, 1.5vw, 0.72rem) !important;
+
+  width: clamp(28px, 4.2svh, 36px) !important;
+  height: clamp(28px, 4.2svh, 36px) !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  font-size: clamp(0.95rem, 1.9svh, 1.18rem) !important;
+  line-height: 1 !important;
+}
+
+html[data-platform="ios"] #cosmicModal #modalContent,
+html[data-platform="ios"] #cosmicModal .modal-content,
+.platform-ios #cosmicModal #modalContent,
+.platform-ios #cosmicModal .modal-content {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+
+  padding:
+    clamp(0.42rem, 1svh, 0.72rem)
+    clamp(0.42rem, 1.4vw, 0.8rem)
+    clamp(0.62rem, 1.35svh, 0.95rem) !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+
+  font-size: clamp(0.86rem, 1.58svh, 1.02rem) !important;
+  line-height: 1.33 !important;
+}
+
+html[data-platform="ios"] #cosmicModal h3,
+.platform-ios #cosmicModal h3 {
+  font-size: clamp(1.08rem, 2.15svh, 1.42rem) !important;
+  line-height: 1.12 !important;
+  margin-bottom: clamp(0.28rem, 0.8svh, 0.5rem) !important;
+}
+
+/* iPad: wider but still panel-like, not fullscreen */
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] #cosmicModal.modal,
+  .platform-ios #cosmicModal.modal {
+    width: min(70vw, 600px) !important;
+    max-width: min(70vw, 600px) !important;
+    height: min(78svh, 760px) !important;
+    max-height: min(78svh, 760px) !important;
+
+    font-size: clamp(0.92rem, 1.25svh, 1.08rem) !important;
+  }
+
+  html[data-platform="ios"] #cosmicModal .tab-button,
+  .platform-ios #cosmicModal .tab-button {
+    font-size: clamp(0.78rem, 1.12svh, 0.96rem) !important;
+    min-height: clamp(38px, 4.2svh, 48px) !important;
+  }
+}/* 🌌 Cosmic Modal Shell */
+/* 🌌 Cosmic Modal Shell (Unified with cosmic-modal-inner style) */
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(17, 17, 17, 0.95);
+  color: white;
+  padding: 1.5em;
+  border: 2px solid #00ffee;
+  border-radius: 1em;
+  z-index: 9999;
+
+  width: 95vw;
+  max-width: calc(100vh * (10 / 16)); /* matches info modal aspect ratio */
+  aspect-ratio: 10 / 12;
+  max-height: 95vh;
+
+  box-shadow: 0 0 20px #00ffeeaa;
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden; /* 🧊 Freeze outer modal */
+  scrollbar-gutter: stable;
+  padding-right: calc(1em + 6px);
+  scrollbar-width: none;
+}
+
+.modal::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 1.5rem; /* a lil' bigger for mobile vibe */
+  background: none;
+  border: none;
+  color: #fff;
+  z-index: 9999;
+  cursor: pointer;
+}
+
+
+/* 🔘 Modal Header – Wrap Tab Buttons */
+.modal-header {
+  display: flex;
+  flex-wrap: wrap; /* 💪 ALLOW WRAPPING */
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 1em;
+  padding: 0.5em;
+  width: 100%;
+}
+
+
+/* 🧊 Actually hide the modal */
+.modal.hidden {
+  display: none !important;
+}
+
+
+.tab-button {
+  background: #222;
+  border: none;
+  color: #fff;
+
+  padding: 0.6em 0.9em; /* 🔥 slimmed but tappable */
+  border-radius: 0.5em;
+  cursor: pointer;
+
+  font-size: clamp(0.45rem, 0.9vw, 0.8rem); /* 🎯 tighter scale */
+  line-height: 1.1;
+
+
+  max-width: none;
+
+
+  flex: 1 1 auto; /* 🔄 shrink and grow as needed */
+  min-width: clamp(60px, 18vw, 100px); /* 📱 lower min-width on tiny screens */
+  font-size: clamp(0.6rem, 1.5vmin, 0.85rem); /* 🌀 scales tighter */
+
+
+  display: flex;                 /* 🧊 enables centering */
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;          /* 🚫 no wrapping */
+  overflow: hidden;             /* ✅ contain overflow visually, no scroll */
+  letter-spacing: 0.03em;
+
+  transition: all 0.2s ease;
+}
+
+
+.tab-button.active,
+.tab-button:hover {
+  background: #00ffee;
+  color: black;
+  box-shadow: 0 0 8px #00ffeeaa;
+  transform: scale(1.03);
+  transition: transform 0.15s ease, box-shadow 0.3s ease;
+}
+
+/* 🧑‍🚀 Input + Completion */
+.settings-block {
+  margin: 1em 0;
+  text-align: center;
+}
+
+#profileNameInput {
+  background: #111;
+  color: #fff;
+  border: 2px solid #00ffee;
+  padding: 0.5em;
+  font-size: 1rem;
+  border-radius: 0.5em;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* 📈 XP Bar */
+.xp-bar-wrap {
+  width: 100%;
+  height: 10px;
+  background: #222;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.5em;
+}
+.xp-bar {
+  height: 100%;
+  background: linear-gradient(to right, #00ffee, #ff33ff);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* 🏅 Badge Grid */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 0.5em;
+  justify-items: center;
+  width: 100%;
+}
+.badge-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3em;            /* 📏 bigger space between groupings */
+  padding-bottom: 2em; /* ⬇️ prevent last group clipping */
+}
+
+
+.badge-tile {
+  width: 72px;               
+  height: auto;              /* 🔥 this lets the cone grow naturally */
+  min-height: 96px; /* 🚧 optional: locks grid if you want 3-line breathing room */
+  aspect-ratio: 1 / 1.2;
+  padding-bottom: 0.4em;     /* 🌬️ adds space for the short label */
+  padding: 0.5em 0.2em;
+  background: #333;
+  border: 2px solid #888;
+  border-radius: 0.5em;
+  color: white;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  flex-direction: column;
+  text-align: center;
+  box-shadow: 0 0 8px #00000055;
+}
+
+.badge-tile.unlocked {
+  border-color: #00ffee;
+  background: #111;
+  color: #00ffee;
+  box-shadow: 0 0 12px #00ffeeaa;
+}
+.badge-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 0.2em;
+}
+
+.badge-label {
+  font-size: 0.7rem;
+  color: white;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.badge-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 0.2em;
+}
+
+.badge-label {
+  font-size: 0.7rem;
+  color: white;
+  text-align: center;
+}
+.badge-short {
+  font-size: 0.6rem;
+  color: #aaa;
+  text-align: center;
+  margin-top: 0.25em;
+  line-height: 1;
+}
+.badge-group {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+
+.badge-section {
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #00ffee;
+  margin-bottom: 0.5em;
+  padding-left: 0;
+  border-left: none;
+}
+
+.badge-section:first-child {
+  margin-top: 0;
+}
+
+/* 🎨 Theme Grid */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5em;
+  justify-items: center;
+}
+.theme-tile {
+  border: 2px solid #444;
+  border-radius: 0.5em;
+  overflow: hidden;
+  width: 100%; /* 🔥 Changed from 100px */
+  max-width: 140px; /* 🔥 add a cap for consistency */
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 0 6px #000000aa;
+  transition: transform 0.2s ease;
+}
+.theme-tile.active {
+  border-color: #00ffee;
+  box-shadow: 0 0 12px #00ffeeaa;
+}
+.theme-tile:hover {
+  transform: scale(1.05);
+}
+.theme-tile.locked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.theme-preview {
+  width: 100%;
+  height: clamp(60px, 10vmin, 80px); /* 🔥 Stretchy preview */
+  background-size: cover;
+  background-position: center;
+}
+.theme-label {
+  text-align: center;
+  font-size: clamp(0.85rem, 1.8vmin, 1.1rem); /* 🔥 Responsive font! */
+  padding: 0.25em;
+}
+.theme-lock {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 1.2rem;
+  color: #ff4444;
+}
+
+/* 🎧 Audio Track Buttons */
+.track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  align-items: center;
+}
+.track-button {
+  padding: 0.5em 1em;
+  background: #222;
+  border: 2px solid #00ffee;
+  color: white;
+  border-radius: 0.5em;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.track-button:hover {
+  background: #00ffee;
+  color: black;
+}
+
+/* 🔍 Scrollbars hidden */
+.modal-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1em;
+  scrollbar-gutter: stable;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  flex: 1;
+  min-height: 0; /* prevents flex bugs in production */
+}
+.modal-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* 🌠 Responsive Typography Inside Modal */
+.modal {
+  font-size: clamp(1rem, 2.2vmin, 1.3rem);
+  line-height: 1.6;
+}
+
+.modal h3 {
+  font-size: clamp(1.3rem, 3vmin, 1.8rem);
+  color: #00ffee;
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+.modal p,
+.modal label,
+.modal span,
+.modal input,
+.modal button {
+  font-size: inherit;
+}
+
+/* 🌀 Optional tweak to help buttons feel tappable on mobile */
+.tab-button,
+.track-button,
+.modal-close {
+  font-size: clamp(1rem, 2vmin, 1.2rem);
+}
+/* 🌌 Cosmic Modal Background Dimmer */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85); /* 🕶️ Dim level */
+  z-index: 9998; /* Just under the modal (which is 9999) */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* === 🎛️ Cosmic Jukebox Player === */
+.jukebox {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #00ffee;
+  border-radius: 1em;
+  padding: 1.25em;
+  box-shadow: 0 0 12px #00ffee88, 0 0 24px #00ffee44;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  margin-top: 1em;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+}
+
+.jukebox h3 {
+  color: #00ffee;
+  font-size: 1.25rem;
+  margin-bottom: 0.25em;
+}
+
+#currentTrack {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #00ffee;
+  margin-top: 0.25em;
+}
+
+/* === 🎧 Progress Bar Neon Glow === */
+/* === 🎧 Progress Bar Neon Glow === */
+#trackProgress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #00ffee33, #00ffee11);
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  box-shadow: inset 0 0 5px #00ffee66;
+}
+
+/* 🔥 The track trail line */
+#trackProgress::-webkit-slider-runnable-track {
+  height: 8px;
+  background: linear-gradient(to right, #00ffee, #00ffee33);
+  border-radius: 999px;
+  box-shadow: 0 0 8px #00ffee99;
+}
+
+#trackProgress::-moz-range-track {
+  height: 8px;
+  background: linear-gradient(to right, #00ffee, #00ffee33);
+  border-radius: 999px;
+  box-shadow: 0 0 8px #00ffee99;
+}
+
+/* 🔥 The draggable thumb */
+#trackProgress::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00ffee;
+  box-shadow: 0 0 10px #00ffeeaa, 0 0 20px #00ffee99;
+  margin-top: -4px;
+}
+
+#trackProgress::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00ffee;
+  box-shadow: 0 0 10px #00ffeeaa, 0 0 20px #00ffee99;
+  border: none;
+}
+#trackTimer {
+  font-size: 0.85rem;
+  color: #ccffff;
+  margin-top: 0.25em;
+}
+
+.jukebox-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  justify-content: center;
+}
+
+.jukebox-controls button {
+  background: #111;
+  border: 2px solid #00ffee;
+  color: #00ffee;
+  padding: 0.5em 1em;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 0 6px #00ffee55;
+  transition: background 0.2s ease, transform 0.2s ease;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.jukebox-controls button:hover {
+  background: #00ffee22;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* 🟢 Active button glow */
+.icon-btn.active {
+  background-color: rgba(0, 255, 255, 0.15);
+  box-shadow: 0 0 6px #00ffff, inset 0 0 4px #00ffff;
+  color: white;
+}
+/* === 🎧 Styled Dropdown (Jukebox Select) === */
+select#trackSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-color: #111;
+  color: #00ffee;
+  border: 2px solid #00ffee;
+  border-radius: 8px;
+  padding: 0.4em 1.2em 0.4em 0.6em;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 0 8px #00ffee55;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg fill="%2300ffee" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.6em center;
+  background-size: 1em;
+}
+
+select#trackSelect:hover {
+  background-color: #222;
+}
+
+select#trackSelect:focus {
+  outline: none;
+  background-color: #000;
+  box-shadow: 0 0 10px #00ffeeaa;
+}
+.track-title-container {
+  position: relative;
+  min-height: 1.8em;
+  height: auto;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.track-title {
+  position: static; /* 🔥 kill the absolute */
+  text-align: center;
+  color: #00ffee;
+  font-weight: bold;
+  font-size: 1.2rem;
+  opacity: 1;
+  pointer-events: none;
+}
+
+#currentTrack {
+  display: block;
+  color: #00ffee;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+}
+#trackProgress.glow {
+  accent-color: #00ffee;
+  background: linear-gradient(to right, #00ffee 0%, #ff33ff 100%);
+  height: 8px;
+  border-radius: 999px;
+  box-shadow: 0 0 10px #00ffeeaa;
+}
+body.neon-progress #trackProgress {
+  background: linear-gradient(90deg, #00ffee, #ff33ff);
+  box-shadow: 0 0 10px #00ffeeaa, 0 0 20px #ff33ffaa;
+  border-radius: 10px;
+  height: 8px;
+  accent-color: #00ffee;
+}
+
+body.neon-progress #trackProgress::-webkit-slider-thumb {
+  background: white;
+  border: 2px solid #00ffee;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 10px #00ffeeaa, 0 0 20px #ff33ffaa;
+}
+
+body.neon-progress #trackTimer {
+  color: #00ffee;
+}
+.modal .badge-grid .badge-tile{
+  height: auto;            /* let content decide */
+  min-height: 96px;        /* tiny floor for consistency */
+  aspect-ratio: auto;      /* stop forcing short cards */
+}
+/* 🛡️ Cosmic Modal: enforce solid event shield (match infoModal behavior) */
+#cosmicModal {
+  pointer-events: auto !important; /* the overlay RECEIVES all taps */
+}
+
+#cosmicModal * {
+  pointer-events: auto; /* inner content still works normally */
+}
+
+/* 🧱 MENU BEHIND MUST NOT RECEIVE EVENTS WHEN COSMIC MODAL IS OPEN */
+#cosmicModal:not(.hidden) ~ .menu-wrapper,
+#cosmicModal:not(.hidden) ~ .menu-layout,
+#cosmicModal:not(.hidden) ~ .menu-frame,
+#cosmicModal:not(.hidden) ~ #game-container {
+  pointer-events: none !important;
+}
+.info-compact h3 {
+  margin-top: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.info-compact p {
+  margin-top: 0;
+}
+
+.compact-dot-list {
+  margin-top: 0.25rem;
+  padding-left: 1.1rem;
+}
+
+.compact-dot-list li {
+  margin-bottom: 0.45rem;
+  line-height: 1.35;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Info Modal — simple iOS-readable about card
+   ────────────────────────────────────────────────────────── */
+
+.info-simple {
+  padding-top: 0.25rem;
+}
+
+.info-simple #infoTitle {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.35rem, 2.7vh, 1.8rem);
+  line-height: 1.12;
+  text-align: left;
+}
+
+.info-simple .info-lede {
+  margin: 0 0 1rem;
+  font-size: clamp(0.95rem, 1.85vh, 1.1rem);
+  line-height: 1.35;
+  opacity: 0.95;
+}
+
+.info-simple h3 {
+  margin: 0.9rem 0 0.35rem;
+  font-size: clamp(1.02rem, 2vh, 1.22rem);
+  line-height: 1.15;
+}
+
+.info-simple p,
+.info-simple li {
+  font-size: clamp(0.88rem, 1.75vh, 1rem);
+  line-height: 1.36;
+}
+
+.info-simple .compact-dot-list {
+  margin-top: 0.25rem;
+  padding-left: 1.1rem;
+}
+
+.info-simple .compact-dot-list li {
+  margin-bottom: 0.4rem;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF — Options Popup Theme-Reactive Accent Colors
+   Scope:
+   - Options/Cosmic popup only
+   - color / border-color / glow color only
+   - no sizing, no layout, no padding, no positioning
+   ────────────────────────────────────────────────────────── */
+
+#cosmicModal {
+  --scmf-options-accent-a: var(--scmf-title-glow-a, #00ffee);
+  --scmf-options-accent-b: var(--scmf-title-glow-b, #ff77ff);
+  --scmf-options-accent-c: var(--scmf-title-glow-c, #ffee00);
+  --scmf-options-halo: var(--scmf-title-glow-halo, rgba(0, 255, 238, 0.65));
+}
+
+/* Main popup shell */
+#cosmicModal.modal {
+  border-color: var(--scmf-options-accent-a) !important;
+  color: #f7ffff !important;
+
+  box-shadow:
+    0 0 20px var(--scmf-options-halo),
+    0 0 34px color-mix(in srgb, var(--scmf-options-accent-b) 34%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--scmf-options-accent-a) 16%, transparent) !important;
+}
+
+/* Close button */
+#cosmicModal .modal-close {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px var(--scmf-options-accent-a),
+    0 0 14px var(--scmf-options-halo) !important;
+}
+
+/* Tabs */
+#cosmicModal .tab-button {
+  color: #f7ffff !important;
+
+  box-shadow:
+    inset 0 0 8px color-mix(in srgb, var(--scmf-options-accent-a) 10%, transparent) !important;
+}
+
+#cosmicModal .tab-button.active,
+#cosmicModal .tab-button:hover {
+  background: var(--scmf-options-accent-a) !important;
+  color: #07151a !important;
+
+  box-shadow:
+    0 0 8px var(--scmf-options-accent-a),
+    0 0 16px var(--scmf-options-halo) !important;
+}
+
+/* Main modal text accents */
+#cosmicModal h2,
+#cosmicModal h3,
+#cosmicModal .badge-section,
+#cosmicModal .cones-earned-title,
+#cosmicModal .cones-earned-count,
+#cosmicModal .data-tab-title,
+#cosmicModal .music-deck-brand,
+#cosmicModal .music-deck-timer,
+#cosmicModal #currentTrack,
+#cosmicModal .track-title,
+#cosmicModal .track-button,
+#cosmicModal .theme-label,
+#cosmicModal .profile-xp-title,
+#cosmicModal .profile-rank-title {
+  color: var(--scmf-options-accent-a) !important;
+
+  text-shadow:
+    0 0 8px var(--scmf-options-halo),
+    0 0 16px color-mix(in srgb, var(--scmf-options-accent-a) 32%, transparent) !important;
+}
+
+/* Softer normal copy stays readable, not rainbow */
+#cosmicModal p,
+#cosmicModal li,
+#cosmicModal label,
+#cosmicModal span {
+  border-color: currentColor;
+}
+
+/* Inputs / selects / buttons that used cyan borders */
+#cosmicModal input,
+#cosmicModal select,
+#cosmicModal .track-button,
+#cosmicModal .jukebox,
+#cosmicModal .theme-tile.active,
+#cosmicModal .badge-tile.unlocked,
+#cosmicModal .music-deck-picker select,
+#cosmicModal .profile-avatar-arrow,
+#cosmicModal #profileNameInput {
+  border-color: var(--scmf-options-accent-a) !important;
+}
+
+/* Unlocked / active glow accents */
+#cosmicModal .badge-tile.unlocked,
+#cosmicModal .theme-tile.active,
+#cosmicModal .track-button:hover,
+#cosmicModal .profile-avatar-big,
+#cosmicModal .profile-avatar-arrow,
+#cosmicModal #profileNameInput:focus {
+  box-shadow:
+    0 0 10px var(--scmf-options-halo),
+    0 0 18px color-mix(in srgb, var(--scmf-options-accent-a) 28%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--scmf-options-accent-a) 10%, transparent) !important;
+}
+
+/* XP/progress bars */
+#cosmicModal .xp-bar {
+  background:
+    linear-gradient(
+      to right,
+      var(--scmf-options-accent-a),
+      var(--scmf-options-accent-b)
+    ) !important;
+}
+
+#cosmicModal #trackProgress,
+#cosmicModal #trackProgress.glow {
+  accent-color: var(--scmf-options-accent-a) !important;
+  box-shadow:
+    inset 0 0 5px var(--scmf-options-halo),
+    0 0 10px color-mix(in srgb, var(--scmf-options-accent-a) 28%, transparent) !important;
+}
+
+/* Radio buttons / active controls */
+#cosmicModal .jukebox-controls button,
+#cosmicModal .music-deck-card button.music-btn,
+#cosmicModal .music-deck-card .icon-btn.music-btn {
+  color: var(--scmf-options-accent-a) !important;
+
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--scmf-options-accent-a) 34%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--scmf-options-accent-a) 10%, transparent) !important;
+}
+
+#cosmicModal .icon-btn.active,
+#cosmicModal .music-deck-card button.music-btn.active {
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 14px var(--scmf-options-halo),
+    0 0 24px color-mix(in srgb, var(--scmf-options-accent-b) 24%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--scmf-options-accent-a) 14%, transparent) !important;
+}
+
+/* Profile name typing underline */
+#cosmicModal #profileNameInput {
+  caret-color: var(--scmf-options-accent-a) !important;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--scmf-options-accent-a) 45%,
+      var(--scmf-options-accent-b) 55%,
+      transparent 100%
+    ) !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF — Options Popup Theme Accent Law
+   Scope:
+   - Options/Cosmic popup only
+   - color / border-color / glow-color only
+   - no sizing, no layout, no padding, no positioning
+   ────────────────────────────────────────────────────────── */
+
+#cosmicModal {
+  --scmf-options-accent: #00ffee;
+  --scmf-options-accent-soft: #00ffee55;
+  --scmf-options-accent-faint: #00ffee22;
+}
+
+/* Main shell */
+#cosmicModal.modal {
+  border-color: var(--scmf-options-accent) !important;
+
+  box-shadow:
+    0 0 14px var(--scmf-options-accent-soft),
+    0 0 28px var(--scmf-options-accent-faint) !important;
+}
+
+/* Tabs */
+#cosmicModal .tab-button {
+  color: #f7ffff !important;
+}
+
+#cosmicModal .tab-button.active,
+#cosmicModal .tab-button:hover {
+  background: var(--scmf-options-accent) !important;
+  color: #07151a !important;
+
+  box-shadow:
+    0 0 8px var(--scmf-options-accent-soft),
+    0 0 14px var(--scmf-options-accent-faint) !important;
+}
+
+/* Main cyan text accents */
+#cosmicModal h2,
+#cosmicModal h3,
+#cosmicModal .badge-section,
+#cosmicModal .cones-earned-title,
+#cosmicModal .cones-earned-count,
+#cosmicModal .data-tab-title,
+#cosmicModal .music-deck-brand,
+#cosmicModal .music-deck-timer,
+#cosmicModal #currentTrack,
+#cosmicModal .track-title,
+#cosmicModal .track-button,
+#cosmicModal .profile-xp-title,
+#cosmicModal .profile-rank-title {
+  color: var(--scmf-options-accent) !important;
+
+  text-shadow:
+    0 0 6px var(--scmf-options-accent-soft),
+    0 0 12px var(--scmf-options-accent-faint) !important;
+}
+
+/* Borders that were cyan */
+#cosmicModal input,
+#cosmicModal select,
+#cosmicModal .track-button,
+#cosmicModal .jukebox,
+#cosmicModal .theme-tile.active,
+#cosmicModal .badge-tile.unlocked,
+#cosmicModal .music-deck-picker select,
+#cosmicModal select#trackSelect,
+#cosmicModal .profile-avatar-arrow,
+#cosmicModal #profileNameInput {
+  border-color: var(--scmf-options-accent) !important;
+}
+
+/* Song selection box — SnowCone Radio missed piece */
+#cosmicModal .music-deck-picker select,
+#cosmicModal select#trackSelect {
+  color: var(--scmf-options-accent) !important;
+
+  background-image:
+    linear-gradient(
+      180deg,
+      var(--scmf-options-accent-faint),
+      rgba(0, 0, 0, 0.34)
+    ) !important;
+
+  box-shadow:
+    0 0 8px var(--scmf-options-accent-soft),
+    inset 0 0 8px var(--scmf-options-accent-faint) !important;
+}
+
+/* Active / unlocked glows: calmer than last pass */
+#cosmicModal .badge-tile.unlocked,
+#cosmicModal .theme-tile.active,
+#cosmicModal .profile-avatar-big,
+#cosmicModal .profile-avatar-arrow,
+#cosmicModal #profileNameInput:focus {
+  box-shadow:
+    0 0 8px var(--scmf-options-accent-soft),
+    inset 0 0 8px var(--scmf-options-accent-faint) !important;
+}
+
+/* XP/progress bars */
+#cosmicModal .xp-bar {
+  background:
+    linear-gradient(
+      to right,
+      var(--scmf-options-accent),
+      rgba(255, 255, 255, 0.72)
+    ) !important;
+}
+
+#cosmicModal #trackProgress,
+#cosmicModal #trackProgress.glow {
+  accent-color: var(--scmf-options-accent) !important;
+  box-shadow:
+    inset 0 0 5px var(--scmf-options-accent-soft),
+    0 0 8px var(--scmf-options-accent-faint) !important;
+}
+
+/* Radio buttons / active controls */
+#cosmicModal .jukebox-controls button,
+#cosmicModal .music-deck-card button.music-btn,
+#cosmicModal .music-deck-card .icon-btn.music-btn {
+  color: var(--scmf-options-accent) !important;
+
+  box-shadow:
+    0 0 8px var(--scmf-options-accent-faint),
+    inset 0 0 8px var(--scmf-options-accent-faint) !important;
+}
+
+#cosmicModal .icon-btn.active,
+#cosmicModal .music-deck-card button.music-btn.active {
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 10px var(--scmf-options-accent-soft),
+    inset 0 0 10px var(--scmf-options-accent-faint) !important;
+}
+
+/* Profile name typing underline */
+#cosmicModal #profileNameInput {
+  caret-color: var(--scmf-options-accent) !important;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--scmf-options-accent) 48%,
+      rgba(255, 255, 255, 0.72) 54%,
+      transparent 100%
+    ) !important;
+}
+
+/* Avatar arrow triangles */
+#cosmicModal .profile-avatar-arrow[data-avatar-step="-1"]::before {
+  border-right-color: var(--scmf-options-accent) !important;
+}
+
+#cosmicModal .profile-avatar-arrow[data-avatar-step="1"]::before {
+  border-left-color: var(--scmf-options-accent) !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF — Options Theme Accent Final Color Catch
+   Scope:
+   - Close X color
+   - Theme/cone label text color
+   - No layout / sizing / spacing changes
+   ────────────────────────────────────────────────────────── */
+
+/* X close button follows the active theme accent */
+#cosmicModal .modal-close {
+  color: var(--scmf-options-accent) !important;
+
+  text-shadow:
+    0 0 6px var(--scmf-options-accent-soft),
+    0 0 12px var(--scmf-options-accent-faint) !important;
+}
+
+#cosmicModal .modal-close:hover,
+#cosmicModal .modal-close:active {
+  color: var(--scmf-options-accent) !important;
+
+  text-shadow:
+    0 0 8px var(--scmf-options-accent-soft),
+    0 0 16px var(--scmf-options-accent-faint) !important;
+}
+
+/* Theme tile labels / cone labels follow the same accent law */
+#cosmicModal .theme-label,
+#cosmicModal .badge-label,
+#cosmicModal .badge-short,
+#cosmicModal .cone-label,
+#cosmicModal .cones-label {
+  color: var(--scmf-options-accent) !important;
+
+  text-shadow:
+    0 0 5px var(--scmf-options-accent-soft),
+    0 0 10px var(--scmf-options-accent-faint) !important;
+}
