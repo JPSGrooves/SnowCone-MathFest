@@ -1,3 +1,317 @@
+# 🍧 SnowCone MathFest — Changelog Reopened for the 1.4.0 → 2.0.0 Era
+
+## Current Development Era — 2026-06-22
+
+SnowCone MathFest has officially moved into its next major development arc.
+
+The original launch-era changelog below is preserved as history, but development is now being tracked again from the current iOS-first production roadmap.
+
+The app is now treated as a real iPhone / iPad product, not a browser-first experiment.
+
+Primary production target:
+
+**Capacitor iOS app → Xcode → real iPhone/iPad testing**
+
+Use the native lane for serious testing:
+
+```bash
+cd ~/Developer/SnowCone-MathFest-clean
+git status --short
+npm run build:native
+npx cap open ios
+```
+
+Browser preview is still useful, but App Store confidence comes from the native iOS build.
+
+---
+
+# [1.4.0] — Infinity Lake Flagship Pass — In Development ♾️
+
+## Current Focus
+
+Version **1.4.0** is now dedicated to finishing **Infinity Lake** as the first truly polished SnowCone MathFest attraction.
+
+The goal is not simply to “fix” Infinity Lake.
+
+The goal is to make Infinity Lake feel like a finished arcade-concert math attraction inside the SnowCone MathFest festival.
+
+The intro/preflight screen is now close to final. It has a stronger visual identity, clearer difficulty entry, better stats presentation, and a much cleaner Back-to-Menu experience.
+
+Next focus:
+
+**Make the gameplay screen feel as intentional as the intro.**
+
+---
+
+## Recently Added / Improved
+
+### Infinity Lake Preflight Screen
+
+* Rebuilt Infinity Lake intro into a real preflight screen.
+* Added clear mode identity:
+
+  * title
+  * short how-to line
+  * Triplets stage art
+  * Best Score
+  * Best Streak
+  * difficulty selection
+  * Play Game button
+  * Back button
+* Added difficulty entry:
+
+  * **Easy** — addition/subtraction
+  * **Medium** — multiplication/division
+  * **Hard** — algebra
+* Difficulty choice now correctly sets the starting gameplay mode.
+* Label finalized as: **Choose Difficulty**
+* Back button redesigned into a cleaner HUD-style button.
+
+### Infinity Lake Return Portal
+
+* Added a dedicated Infinity Lake → Main Menu return transition.
+* Replaced the old truck/cone transition for Infinity Lake exits.
+* Return transition now uses the same Ghost Portal language as Menu → Mode.
+* Return timing matched to the 2.5-second portal feel.
+* Cone now aligns with the real main-menu cone before the menu fades back in.
+* Result: returning to the menu feels like the festival world is pulling the player back home instead of abruptly reloading.
+
+### Theme Accent Direction
+
+* Central theme-accent law is now active.
+* Infinity Lake, modal UI, and future mode polish should follow shared theme-responsive accent rules.
+* Difficulty/answer colors remain fixed by gameplay meaning:
+
+  * yellow
+  * cyan/blue
+  * magenta
+
+### iOS-First Presentation
+
+* Infinity Lake work is now judged through the native iOS build.
+* iPhone and iPad layout are the priority.
+* Browser parity is secondary unless specifically needed.
+* WKWebView / Capacitor behavior is treated as the real production environment.
+
+---
+
+## Immediate 1.4.0 Goals
+
+### Gameplay State Polish
+
+* Make in-game mode buttons match the intro difficulty language.
+* Use:
+
+  * Easy / +/- = yellow
+  * Medium / ×÷ = cyan
+  * Hard / x = magenta
+* Selected mode should glow clearly.
+* Unselected modes should dim but remain readable.
+* Do not over-animate mode buttons if dimming communicates selection clearly.
+
+### Answer Button Feedback
+
+* Add subtle life to the three answer buttons under the equation.
+* The answer buttons are the best place for pulse/pop feedback.
+* Goal:
+
+  * subtle breathing/pulse while waiting
+  * clean pop on correct answer
+  * possible shake/flicker on wrong answer later
+* Keep the answer colors fixed and readable.
+
+### Bottom Control Pad Polish
+
+* Main Menu button needs to be iPad-safe.
+* Visible label may become shorter, likely **Menu**, while accessibility can still say “Main Menu.”
+* Main Menu button should visually match the cleaner intro Back button language.
+* Mute can remain simple.
+* Results button can remain special.
+* Control pad should feel less like a static button grid and more like a small arcade console.
+
+### Results / Exit Flow
+
+Future improvement after the visual pass:
+
+When tapping Main Menu during a run, consider showing a popup:
+
+**See results before you go?**
+
+Buttons:
+
+* **See Results**
+* **Exit to Menu**
+
+Purpose:
+
+* prevent accidental exits
+* let players see score/streak before leaving
+* keep Results button available
+* preserve score commitment safety
+
+This should wait until the core gameplay presentation is stable.
+
+---
+
+## Infinity Lake Animation Vision
+
+Infinity Lake should eventually feel like a pinball machine, arcade cabinet, and concert stage combined.
+
+The Triplets remain the stars of the lake.
+
+Future animation should be tied to gameplay events, not random decoration.
+
+Potential animation triggers:
+
+* correct answer
+* wrong answer
+* streak trigger
+* mode switch
+* score milestone
+* high score
+* result screen
+* badge moment
+
+The current streak/SFX rhythm already has an important pattern and should guide the animation system. Future visual rewards should build from that system instead of inventing unrelated numbers.
+
+Long-term dream:
+
+* moving cartoon-style Triplet moments
+* stage lighting reactions
+* score bursts
+* streak escalation
+* lake spotlight moments
+* animated PNG/sprite sequences
+* Fibonacci / geometry / math-inspired rhythm language
+* a performance feeling where the Triplets react to the player’s flow
+
+This is a major future piece of 1.4.0, but first the gameplay UI needs to be clean.
+
+---
+
+# Road to 2.0.0
+
+## 1.4.0 — Infinity Lake
+
+Finish Infinity Lake as the first flagship attraction.
+
+## 1.5.0 — QuickServe Pavilion
+
+Redo QuickServe preflight, difficulty entry, gameplay presentation, and shell polish.
+
+## 1.6.0 — Kids Camping
+
+Rebuild Kids Camping presentation and clarify Parking, Tent Line, and Ant Attack as stronger camp activities.
+
+## 1.7.0 — Story Mode
+
+Simplify Story Mode flow and improve chapter presentation.
+
+## 1.8.0 — MathTips / Grampy P
+
+Complete MathTips Village redo into the Grampy P Cards era.
+
+## 1.9.0 — Truck Era
+
+Add truck-era popups, connective tissue, hub flavor, and mode connections.
+
+## 2.0.0 — Festival Complete Again
+
+Revisit badges, achievements, Game Center, progression, final polish, and all-mode cohesion.
+
+---
+
+## Development Law
+
+No new mode yet.
+
+No Truck Office yet.
+
+No Daily Tasks yet.
+
+No shop/economy system yet.
+
+No badge rewrite yet.
+
+No global CSS cave purge unless absolutely necessary.
+
+No five-mode mega-commit.
+
+Work one version lane at a time.
+
+Current law:
+
+**1.4.0 = Infinity Lake.**
+
+Finish the lake first.
+
+Then move to QuickServe.
+
+---
+
+## Dev Notes
+
+> *SnowCone MathFest is entering the attraction era.*
+>
+> The game already exists.
+> Now each mode needs to feel like it belongs inside one polished, strange, musical, iOS-native festival.
+>
+> Infinity Lake goes first.
+>
+> Make the lake glow.
+> Make the Triplets perform.
+> Make the math feel like an arcade concert.
+>
+> Then keep walking the road to 2.0.0. 🍧♾️✨
+
+
+Concise list of adds since v1.2.1:
+	•	iPad startup layout polish.
+	•	SnowCone Radio scrubber centering.
+	•	Options tab header centering.
+	•	iPad presentation audit / wide-screen notes.
+	•	Main menu full-screen background plate system.
+	•	menubackgroundPlate_default.png.
+	•	Old starfield floater removed from menu.
+	•	menuBackdropPlate DOM image layer.
+	•	plate-ready fallback behavior.
+	•	Menu actor slots:
+	◦	truckBack
+	◦	character
+	◦	truckFront
+	◦	themeProp
+	◦	centerCone
+	•	Default actor asset package folder.
+	•	menuVisualManager.js.
+	•	menuThemePackages.js.
+	•	Theme package data model.
+	•	Label colors moved into theme package data.
+	•	Theme vibe metadata added.
+	•	Theme package path/folder plan.
+	•	Screen-safe menu label layer.
+	•	CSS variable “dial pad” for menu positioning.
+	•	Shared iPhone/iPad menu composition direction.
+	•	Theme cone/background packet plan.
+	•	New theme art/cone concepts:
+	◦	Spring
+	◦	RVA
+	◦	Party/New Year/disco
+	◦	Cosmic
+	◦	fancy pink cone
+	◦	Cloud/Nick-style
+	◦	menu sign prop
+	•	Theme emoji picks:
+	◦	🍧 Default
+	◦	🌉 RVA
+	◦	🎸 Concert
+	◦	🇺🇸 Freedom
+	◦	☁️ Clouds
+	•	Spring label color fix.
+	•	Label shadow/glow strategy.
+	•	Theme-reactive title glow plan / patch design.
+	•	titleGlowMap concept.
+	•	Future Living Truck / Festival Office direction clarified.
+
 * ✅ **v0.5.0 – QuickServe Mode Almost Complete (Jukebox Miracle Included)**
 * ✅ **v0.5.6 – QuickServe Keyboard Ascension**
 * ✅ **v0.6.0 – Infinity Mode Complete**

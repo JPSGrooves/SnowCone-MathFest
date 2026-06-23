@@ -348,6 +348,7 @@ function renderIntroScreen() {
           </header>
 
           <section class="il-preflight-stage" aria-label="Infinity Triplets">
+            <div class="il-preflight-stage-glow" aria-hidden="true"></div>
             <img
               id="tripletSpriteIntro"
               class="triplet-img il-preflight-triplets"
@@ -372,6 +373,8 @@ function renderIntroScreen() {
               </div>
             </div>
 
+            <div class="il-preflight-flow-label" aria-hidden="true">Choose Difficulty</div>
+
             <div class="il-preflight-difficulty" aria-label="Choose difficulty">
               <button
                 type="button"
@@ -379,7 +382,7 @@ function renderIntroScreen() {
                 data-mode="addsub"
                 aria-pressed="true"
               >
-                <span>Easy</span>
+                <span>EASY</span>
                 <strong>+/−</strong>
               </button>
 
@@ -389,7 +392,7 @@ function renderIntroScreen() {
                 data-mode="multdiv"
                 aria-pressed="false"
               >
-                <span>Medium</span>
+                <span>MEDIUM</span>
                 <strong>×÷</strong>
               </button>
 
@@ -399,7 +402,7 @@ function renderIntroScreen() {
                 data-mode="alg"
                 aria-pressed="false"
               >
-                <span>Hard</span>
+                <span>HARD</span>
                 <strong>𝒙</strong>
               </button>
             </div>
@@ -412,8 +415,14 @@ function renderIntroScreen() {
           </footer>
 
           <div class="il-bottom-bar il-preflight-bottom-bar">
-            <button id="ilBackIntro" type="button" class="il-square-btn il-left" aria-label="Back to Main Menu">
-              🔙
+            <button
+              id="ilBackIntro"
+              type="button"
+              class="il-square-btn il-left il-preflight-back-btn"
+              aria-label="Back to Main Menu"
+            >
+              <span class="il-preflight-back-arrow" aria-hidden="true">←</span>
+              <span class="il-preflight-back-text">Back</span>
             </button>
           </div>
         </div>
@@ -447,13 +456,18 @@ function renderUI() {
           <!-- 🌊 Title -->
           <div class="il-title">Infinity Lake</div>
 
-          <!-- 🎶 Stage Row (Triplets + Score) -->
+          <!-- 🎶 Stage Row (Triplets + Score HUD) -->
           <div class="il-stage">
             <img 
               id="tripletSpriteGame" 
               class="il-triplet-img fade-in" 
               src="${import.meta.env.BASE_URL}assets/img/characters/infinityLake/il_openSet.png"
             />
+
+            <div class="il-metric-row il-stage-metrics" aria-label="Infinity Lake score and streak">
+              <div class="il-score-box">Score: <span id="infScore">0</span></div>
+              <div class="il-streak-box">Streak: <span id="infStreak">0</span></div>
+            </div>
           </div>
 
           <!-- 🧠 Math & Answer UI -->
@@ -466,24 +480,37 @@ function renderUI() {
             </div>
             <div id="coneResultMsg" class="result-msg"></div>
 
-            <!-- 🌟 Wrap the score + streak in a horizontal row -->
-            <div class="il-metric-row">
-              <div class="il-score-box">Score: <span id="infScore">0</span></div>
-              <div class="il-streak-box">Streak: <span id="infStreak">0</span></div>
-            </div>
           </div>
 
           <!-- 🎛️ Controls Grid -->
           <div class="il-controls">
-            <div class="mode-buttons">
-              <button data-mode="addsub">+/−<br>Mode</button>
-              <button data-mode="multdiv">×÷<br>Mode</button>
-              <button data-mode="alg">𝒙<br>Mode</button>
+            <div class="mode-buttons" aria-label="Choose difficulty while playing">
+              <button data-mode="addsub" aria-label="Easy mode, addition and subtraction">
+                <span class="il-mode-label">EASY</span>
+                <strong>+/−</strong>
+              </button>
+              <button data-mode="multdiv" aria-label="Medium mode, multiplication and division">
+                <span class="il-mode-label">MEDIUM</span>
+                <strong>×÷</strong>
+              </button>
+              <button data-mode="alg" aria-label="Hard mode, algebra">
+                <span class="il-mode-label">HARD</span>
+                <strong>𝒙</strong>
+              </button>
             </div>
             <div class="utility-buttons">
-              <button id="backToMenu">Main<br>Menu</button>
-              <button id="endGame">Results<br>♾️</button>
-              <button id="muteToggle">🔊<br>Mute</button>
+              <button id="backToMenu" aria-label="Main Menu">
+                <span class="il-util-arrow" aria-hidden="true">←</span>
+                <span class="il-util-label">Menu</span>
+              </button>
+              <button id="endGame" aria-label="Show Results">
+                <span class="il-results-symbol" aria-hidden="true">∞</span>
+                <span class="il-results-label">RESULTS</span>
+              </button>
+              <button id="muteToggle" aria-label="Mute" aria-pressed="false">
+                <span class="il-mute-symbol" aria-hidden="true">🔊</span>
+                <span class="il-mute-label">MUTE</span>
+              </button>
             </div>
           </div>
 
@@ -740,40 +767,40 @@ function newProblem() {
 
   switch (mode) {
     case 'addsub': {
-      const head = `<span class="il-problem-head">Add. and Sub.</span>`;
+      const head = `<span class="il-problem-head il-problem-head-easy">ADD & SUB</span>`;
       if (addsubToggle) {
         op = '+';
         correctAnswer = a + b;
-        question = `${head}<br>${a} + ${b} = ?`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} + ${b} = ?`;
       } else {
         op = '−';
         correctAnswer = a - b;
-        question = `${head}<br>${a} − ${b} = ?`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} − ${b} = ?`;
       }
       addsubToggle = !addsubToggle;
       break;
     }
 
     case 'multdiv': {
-      const head = `<span class="il-problem-head">Mult. and Div.</span>`;
+      const head = `<span class="il-problem-head il-problem-head-medium">MULT & DIV</span>`;
       if (multdivToggle) {
         op = '×';
         correctAnswer = a * b;
-        question = `${head}<br>${a} × ${b} = ?`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} × ${b} = ?`;
       } else {
         // clean division
         op = '÷';
         b = Math.floor(Math.random() * 9) + 1;                // 1–9
         correctAnswer = Math.floor(Math.random() * 10) + 1;   // 1–10
         a = b * correctAnswer;
-        question = `${head}<br>${a} ÷ ${b} = ?`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} ÷ ${b} = ?`;
       }
       multdivToggle = !multdivToggle;
       break;
     }
 
     case 'alg': {
-      const head = `<span class="il-problem-head">Solve for 𝒙</span>`;
+      const head = `<span class="il-problem-head il-problem-head-hard">ALGEBRA</span>`;
       // 🔧 use the SAME glyphs we check for later
       const ops = ['+', '−', '×', '÷'];
       op = ops[Math.floor(Math.random() * ops.length)];
@@ -785,23 +812,23 @@ function newProblem() {
         // 𝒙 + b = result  (x is a)
         result = a + b;
         correctAnswer = a;
-        question = `${head}<br>𝒙 + ${b} = ${result}`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>𝒙 + ${b} = ${result}`;
       } else if (op === '−') {
         // 𝒙 − b = result (x is a)
         result = a - b;
         correctAnswer = a;
-        question = `${head}<br>𝒙 − ${b} = ${result}`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>𝒙 − ${b} = ${result}`;
       } else if (op === '×') {
         // 𝒙 × b = result (x is a)
         result = a * b;
         correctAnswer = a;
-        question = `${head}<br>𝒙 × ${b} = ${result}`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>𝒙 × ${b} = ${result}`;
       } else if (op === '÷') {
         // a ÷ 𝒙 = b, where a = b * x
         correctAnswer = Math.floor(Math.random() * 10) + 1; // 1–10
         b = Math.floor(Math.random() * 9) + 1;              // 1–9
         a = b * correctAnswer;
-        question = `${head}<br>${a} ÷ 𝒙 = ${b}`;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} ÷ 𝒙 = ${b}`;
       }
 
       break;
@@ -1140,10 +1167,15 @@ function flashMuteIcon() {
 export function updateMuteButtonLabel() {
   const icon = document.getElementById('muteToggle');
   const muted = isMuted();
+
   if (icon) {
-    icon.innerHTML = muted ? '🔇<br>Unmute' : '🔊<br>Mute';
+    icon.innerHTML = `
+      <span class="il-mute-symbol" aria-hidden="true">${muted ? '🔇' : '🔊'}</span>
+      <span class="il-mute-label">${muted ? 'UNMUTE' : 'MUTE'}</span>
+    `;
     icon.classList.toggle('muted', muted);
     icon.setAttribute('aria-pressed', String(muted));
+    icon.setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
   }
 }
 
