@@ -63,13 +63,13 @@ function nextSequenceStep(el, speed) {
   fadeClone.style.width = el.offsetWidth + 'px';
   fadeClone.style.height = el.offsetHeight + 'px';
   fadeClone.style.transition = 'opacity 0.4s ease';
-  fadeClone.style.opacity = '1';
+  fadeClone.style.opacity = '0';
   fadeClone.style.pointerEvents = 'none';
-  fadeClone.style.zIndex = '5';
+  fadeClone.style.zIndex = '2';
 
   el.style.opacity = '0';
   el.src = frameList[0];
-  el.style.zIndex = '10';
+  el.style.zIndex = '3';
 
   el.parentElement.appendChild(fadeClone);
 

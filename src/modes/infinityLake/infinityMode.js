@@ -14,6 +14,7 @@ import { awardBadge } from '../../managers/badgeManager.js';
 import { Howl, Howler } from 'howler';
 import { hapticSuccess, hapticError, hapticSoftPulse } from '../../utils/haptics.js';
 import { getThemeAccent } from '../../data/themeAccentLaw.js';
+import { initLakeVision, resetLakeVision, advanceLakeVision, collapseLakeVision } from './infinityVision.js';
 
 
 
@@ -59,7 +60,7 @@ let addsubToggle = true;
 let multdivToggle = true;
 let startTime = 0;
 let streakFlipFlop = true; // Alternates SFX: true = milestone, false = points100
-const sfxIntervals = [3, 6, 9, 6, 3, 6, 9]; // Your exact pattern: 3 6 9 6 3 6 9 etc
+const sfxIntervals = [3]; // Lake Vision v1.1: fire every 3 correct answers.
 let patternIndex = 0;
 let nextTrigger = sfxIntervals[0];
 // state near the other lets
@@ -159,8 +160,9 @@ export function loadInfinityMode() {
   activateInputHandler('infinity');
   document.body.classList.add('il-active');
   appState.setMode('infinity');
-  currentMode = 'addsub';
-  appState.setGameMode('addsub'); // 🌊 Default to +/- combo mode
+  const savedInfinityMode = readInfinityDifficultyMode();
+  currentMode = savedInfinityMode;
+  appState.setGameMode(savedInfinityMode); // 🌊 Restore last IL lane instead of forcing Easy
   stopTrack(); // 🔇 stop jukebox track cold on entry
 
   const menuWrapper = document.querySelector('.menu-wrapper');
@@ -290,18 +292,84 @@ function applyInfinityPreflightThemeVars(scopeEl) {
   });
 }
 
-function setIntroDifficultyMode(mode) {
-  const safeMode = ['addsub', 'multdiv', 'alg'].includes(mode)
-    ? mode
-    : 'addsub';
+
+const INFINITY_DIFFICULTY_MODES = Object.freeze(['addsub', 'multdiv', 'alg']);
+const INFINITY_LAST_DIFFICULTY_FLAG = 'infinityLastMode';
+const INFINITY_LAST_DIFFICULTY_STORAGE_KEY = 'scmf.infinity.lastMode';
+
+function normalizeInfinityDifficultyMode(mode, fallback = 'addsub') {
+  return INFINITY_DIFFICULTY_MODES.includes(mode) ? mode : fallback;
+}
+
+function readInfinityDifficultyMode() {
+  let saved = null;
+
+  try {
+    if (typeof appState.getFlag === 'function') {
+      saved = appState.getFlag(INFINITY_LAST_DIFFICULTY_FLAG, null);
+    } else {
+      saved = appState.flags?.[INFINITY_LAST_DIFFICULTY_FLAG];
+    }
+  } catch (err) {
+    console.warn('[Infinity] Could not read saved difficulty flag:', err);
+  }
+
+  if (!INFINITY_DIFFICULTY_MODES.includes(saved)) {
+    try {
+      saved = window.localStorage?.getItem(INFINITY_LAST_DIFFICULTY_STORAGE_KEY);
+    } catch (err) {
+      console.warn('[Infinity] Could not read saved difficulty localStorage:', err);
+    }
+  }
+
+  if (!INFINITY_DIFFICULTY_MODES.includes(saved)) {
+    try {
+      saved = appState.getGameMode?.();
+    } catch {}
+  }
+
+  return normalizeInfinityDifficultyMode(saved || currentMode || 'addsub');
+}
+
+function saveInfinityDifficultyMode(mode) {
+  const safeMode = normalizeInfinityDifficultyMode(mode);
 
   currentMode = safeMode;
 
   try {
     appState.setGameMode(safeMode);
   } catch (err) {
-    console.warn('[Infinity] Could not set intro game mode:', err);
+    console.warn('[Infinity] Could not set game mode:', err);
   }
+
+  try {
+    if (typeof appState.setFlag === 'function') {
+      appState.setFlag(INFINITY_LAST_DIFFICULTY_FLAG, safeMode);
+    } else {
+      appState.flags = appState.flags || {};
+      appState.flags[INFINITY_LAST_DIFFICULTY_FLAG] = safeMode;
+    }
+  } catch (err) {
+    console.warn('[Infinity] Could not save difficulty flag:', err);
+  }
+
+  try {
+    appState.saveToStorage?.();
+  } catch (err) {
+    console.warn('[Infinity] Could not persist saved difficulty:', err);
+  }
+
+  try {
+    window.localStorage?.setItem(INFINITY_LAST_DIFFICULTY_STORAGE_KEY, safeMode);
+  } catch (err) {
+    console.warn('[Infinity] Could not save difficulty localStorage:', err);
+  }
+
+  return safeMode;
+}
+
+function setIntroDifficultyMode(mode) {
+  const safeMode = saveInfinityDifficultyMode(mode);
 
   document.querySelectorAll('.il-preflight-diff-btn').forEach((btn) => {
     const selected = btn.dataset.mode === safeMode;
@@ -309,6 +377,7 @@ function setIntroDifficultyMode(mode) {
     btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
   });
 }
+
 
 function setupIntroDifficultyHandlers() {
   const buttons = document.querySelectorAll('.il-preflight-diff-btn');
@@ -319,7 +388,7 @@ function setupIntroDifficultyHandlers() {
     });
   });
 
-  setIntroDifficultyMode(currentMode || 'addsub');
+  setIntroDifficultyMode(readInfinityDifficultyMode());
 }
 
 function renderIntroScreen() {
@@ -435,7 +504,7 @@ function renderIntroScreen() {
 
 
 function switchMode(mode) {
-  currentMode = mode;
+  saveInfinityDifficultyMode(mode);
   updateModeButtonUI();
   newProblem();               // ⬅️ was generateNewProblem(); fix the name
 }
@@ -463,6 +532,13 @@ function renderUI() {
               class="il-triplet-img fade-in" 
               src="${import.meta.env.BASE_URL}assets/img/characters/infinityLake/il_openSet.png"
             />
+
+            <div id="lakeVisionStage" class="lake-vision-stage phase-cyan" aria-hidden="true">
+              <img class="lake-vision-layer lake-vision-layer-01" data-vision-layer="1" alt="" />
+              <img class="lake-vision-layer lake-vision-layer-02" data-vision-layer="2" alt="" />
+              <img class="lake-vision-layer lake-vision-layer-03" data-vision-layer="3" alt="" />
+              <img class="lake-vision-layer lake-vision-layer-full" data-vision-layer="4" alt="" />
+            </div>
 
             <div class="il-metric-row il-stage-metrics" aria-label="Infinity Lake score and streak">
               <div class="il-score-box">Score: <span id="infScore">0</span></div>
@@ -547,6 +623,8 @@ function renderUI() {
   answerBtns = Array.from(document.querySelectorAll('.ans-btn'));
   scoreDisplay = document.getElementById('infScore');
   resultMsg = document.getElementById('coneResultMsg');
+  initLakeVision();
+  resetLakeVision({ rotateShape: false });
 }
 
 function setupEventHandlers() {
@@ -605,7 +683,7 @@ function setupEventHandlers() {
     const fn = () => {
       const mode = btn.dataset.mode;
       if (!mode) return;
-      appState.setGameMode(mode);
+      saveInfinityDifficultyMode(mode);
       updateModeButtonUI();
       newProblem();
       flashModeName();
@@ -708,6 +786,11 @@ function returnToMenu() {
 
 
 function startGame() {
+  // ♾️ Lake Vision v1 resets with each fresh run.
+  patternIndex = 0;
+  nextTrigger = sfxIntervals[0];
+  resetLakeVision({ rotateShape: false });
+
   // re-arm keyboard for a fresh set
   activateInputHandler('infinity');
 
@@ -912,6 +995,7 @@ function handleCorrect() {
   if (streak === nextTrigger) {
     console.log('💥 Triggering SFX burst!');
     playStreakBurst();
+    advanceLakeVision(streak);
     patternIndex = (patternIndex + 1) % sfxIntervals.length;
     nextTrigger += sfxIntervals[patternIndex];
   }
@@ -923,6 +1007,30 @@ function handleCorrect() {
   updateStreak();
   showResult(`✅ +${points} pt, +${xp} XP`, '#00ffee');
   newProblem();
+}
+
+
+async function playLakeVisionCrashSound() {
+  try {
+    const sfx = await import('../../managers/sfxManager.js');
+    const play = sfx.playSfx || sfx.playSFX || sfx.playSoundEffect;
+
+    if (typeof play !== 'function') return;
+
+    // Try common wrong-answer ids without making this patch depend on one exact name.
+    // If none exist, sfxManager should safely warn/fallback and the vision still works.
+    for (const id of ['wrong', 'incorrect', 'qs_wrong', 'quickserve_wrong', 'error']) {
+      try {
+        const result = play(id);
+        if (result && typeof result.then === 'function') await result;
+        return;
+      } catch (err) {
+        // Try the next likely id.
+      }
+    }
+  } catch (err) {
+    console.warn('[Infinity] Lake Vision crash sound unavailable:', err);
+  }
 }
 
 function handleIncorrect(guess) {
@@ -941,8 +1049,13 @@ function handleIncorrect(guess) {
   }
 
   streak = 0;
+  patternIndex = 0;
+  nextTrigger = sfxIntervals[0];
+
   updateStreak();
   showResult('❌ Nope. Try again!', '#ff5555');
+  collapseLakeVision();
+  playLakeVisionCrashSound();
 
   // 📳 Wrong-answer haptic
   try {
