@@ -3417,3 +3417,71 @@ html[data-platform="ios"] .menu-wrapper.title-glow-gating.title-glow-ready .menu
   transition-duration: 720ms !important;
 }
 
+
+/* ───────────────── SCMF Startup Theme Glass Button — START ─────────────────
+   Purpose:
+   - Welcome screen Enter Festival button follows active theme accent.
+   - Button only. No new boxes. No welcome card redesign.
+   - Uses getThemeAccent() variables injected by festivalWelcomeView.js.
+   ─────────────────────────────────────────────────────────────────────── */
+
+#startup-screen {
+  --scmf-startup-accent: #00ffee;
+  --scmf-startup-accent-soft: rgba(0, 255, 238, 0.42);
+  --scmf-startup-accent-faint: rgba(0, 255, 238, 0.16);
+
+  --scmf-startup-button-border:
+    color-mix(
+      in srgb,
+      var(--scmf-startup-accent) 58%,
+      rgba(255, 255, 255, 0.22)
+    );
+
+  --scmf-startup-button-bg:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--scmf-startup-accent) 82%, white 10%),
+      color-mix(in srgb, var(--scmf-startup-accent) 62%, black 18%)
+    );
+
+  --scmf-startup-button-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 0 16px var(--scmf-startup-accent-soft),
+    0 10px 22px rgba(0, 0, 0, 0.34);
+}
+
+/* Tiny first application: Enter Festival only. */
+#startup-screen .startup-play-btn {
+  border: 1px solid var(--scmf-startup-button-border) !important;
+  border-radius: 16px !important;
+
+  background: var(--scmf-startup-button-bg) !important;
+  color: #061014 !important;
+
+  box-shadow: var(--scmf-startup-button-shadow) !important;
+
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.24) !important;
+
+  -webkit-backdrop-filter: blur(6px) saturate(1.10);
+  backdrop-filter: blur(6px) saturate(1.10);
+}
+
+#startup-screen .startup-play-btn:active {
+  transform: translateY(1px) scale(0.99);
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.10) inset,
+    0 0 11px var(--scmf-startup-accent-soft),
+    0 7px 16px rgba(0, 0, 0, 0.34) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #startup-screen .startup-play-btn {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ───────────────── SCMF Startup Theme Glass Button — END ───────────────── */
+

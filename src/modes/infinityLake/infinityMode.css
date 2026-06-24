@@ -6599,3 +6599,266 @@ body.il-active #ilResultPopup button {
 
 /* ───────────────── SCMF Subtractive HUD Glass — END ───────────────── */
 
+
+/* ───────────────── SCMF IL Unified CTA Buttons — START ─────────────────
+   Purpose:
+   - Unify Infinity Lake intro Play Game and results buttons.
+   - Intro Play Game and Results Again share the same primary CTA language.
+   - Results Menu uses the same system as a dark secondary CTA.
+   - CSS-only: no JS, gameplay, scoring, audio, layout, or results logic changed.
+   ───────────────────────────────────────────────────────────────────── */
+
+body.il-active {
+  --il-cta-accent:
+    var(--il-glass-accent, var(--il-pref-accent, #00ffee));
+
+  --il-cta-glow:
+    var(--il-glass-glow, var(--il-pref-glow, rgba(0, 255, 238, 0.42)));
+
+  --il-cta-faint:
+    var(--il-glass-faint, var(--il-pref-faint, rgba(0, 255, 238, 0.16)));
+
+  --il-cta-border:
+    color-mix(
+      in srgb,
+      var(--il-cta-accent) 62%,
+      rgba(255, 255, 255, 0.24)
+    );
+
+  --il-cta-border-soft:
+    color-mix(
+      in srgb,
+      var(--il-cta-accent) 42%,
+      rgba(255, 255, 255, 0.18)
+    );
+}
+
+/* Shared CTA base:
+   This is the button protocol, not a new container. */
+body.il-active .il-preflight-play,
+body.il-active .il-intro .start-show-btn,
+body.il-active #ilResultPopup .il-results-primary,
+body.il-active #ilResultPopup .il-results-secondary,
+body.il-active #ilResultPopup #ilPlayAgainBtn,
+body.il-active #ilResultPopup #ilBackBtn {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  min-height: clamp(48px, 5.6svh, 62px) !important;
+  min-width: clamp(132px, 28vw, 210px) !important;
+
+  padding:
+    clamp(0.48rem, 1.1svh, 0.7rem)
+    clamp(0.95rem, 2.1svh, 1.35rem) !important;
+
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-radius: 16px !important;
+
+  font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 800 !important;
+  font-synthesis: none !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  line-height: 1.05 !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.48rem !important;
+
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    filter 0.16s ease !important;
+
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Primary CTA:
+   Intro Play Game and Results Again now match. */
+body.il-active .il-preflight-play,
+body.il-active .il-intro .start-show-btn,
+body.il-active #ilResultPopup .il-results-primary,
+body.il-active #ilResultPopup #ilPlayAgainBtn {
+  border-color: var(--il-cta-border) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.24),
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--il-cta-accent) 82%, white 10%),
+      color-mix(in srgb, var(--il-cta-accent) 58%, black 20%)
+    ) !important;
+
+  color: #061014 !important;
+
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.24) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset,
+    0 0 16px var(--il-cta-glow),
+    0 10px 22px rgba(0, 0, 0, 0.34) !important;
+
+  -webkit-backdrop-filter: blur(6px) saturate(1.10);
+  backdrop-filter: blur(6px) saturate(1.10);
+}
+
+/* Secondary CTA:
+   Results Menu stays calmer, but belongs to the same family. */
+body.il-active #ilResultPopup .il-results-secondary,
+body.il-active #ilResultPopup #ilBackBtn {
+  border-color: var(--il-cta-border-soft) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.07),
+      rgba(0, 0, 0, 0.44)
+    ) !important;
+
+  color: rgba(245, 255, 255, 0.94) !important;
+
+  text-shadow:
+    0 0 7px rgba(0, 0, 0, 0.96),
+    0 0 10px var(--il-cta-faint) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 8px 18px rgba(0, 0, 0, 0.28),
+    0 0 10px var(--il-cta-faint) !important;
+
+  -webkit-backdrop-filter: blur(5px) saturate(1.08);
+  backdrop-filter: blur(5px) saturate(1.08);
+}
+
+/* Label/symbol alignment inside both intro/results CTAs. */
+body.il-active #ilResultPopup .il-util-arrow,
+body.il-active #ilResultPopup .il-util-label,
+body.il-active .il-preflight-play span,
+body.il-active .il-intro .start-show-btn span {
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  line-height: 1 !important;
+}
+
+body.il-active #ilResultPopup .il-util-arrow {
+  font-size: 1.1em !important;
+  transform: translateY(-0.02em);
+}
+
+body.il-active #ilResultPopup .il-util-label {
+  font-size: 0.92em !important;
+}
+
+/* Press state: same tactile feel across intro + results. */
+body.il-active .il-preflight-play:active,
+body.il-active .il-intro .start-show-btn:active,
+body.il-active #ilResultPopup .il-results-primary:active,
+body.il-active #ilResultPopup .il-results-secondary:active,
+body.il-active #ilResultPopup #ilPlayAgainBtn:active,
+body.il-active #ilResultPopup #ilBackBtn:active {
+  transform: translateY(1px) scale(0.985) !important;
+  filter: brightness(0.96) saturate(0.98) !important;
+}
+
+/* Primary hover/active glow. */
+body.il-active .il-preflight-play:hover,
+body.il-active .il-intro .start-show-btn:hover,
+body.il-active #ilResultPopup .il-results-primary:hover,
+body.il-active #ilResultPopup #ilPlayAgainBtn:hover {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.16) inset,
+    0 0 20px var(--il-cta-glow),
+    0 12px 24px rgba(0, 0, 0, 0.36) !important;
+}
+
+/* Secondary hover/active glow. */
+body.il-active #ilResultPopup .il-results-secondary:hover,
+body.il-active #ilResultPopup #ilBackBtn:hover {
+  border-color: var(--il-cta-border) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.07) inset,
+    0 0 14px var(--il-cta-glow),
+    0 8px 18px rgba(0, 0, 0, 0.30) !important;
+}
+
+/* Keep result row clean and consistent. */
+body.il-active #ilResultPopup .il-result-buttons {
+  gap: clamp(0.65rem, 1.4svh, 0.95rem) !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active .il-preflight-play,
+  body.il-active .il-intro .start-show-btn,
+  body.il-active #ilResultPopup .il-results-primary,
+  body.il-active #ilResultPopup .il-results-secondary,
+  body.il-active #ilResultPopup #ilPlayAgainBtn,
+  body.il-active #ilResultPopup #ilBackBtn {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ───────────────── SCMF IL Unified CTA Buttons — END ───────────────── */
+
+
+/* ───────────────── SCMF IL Preflight Stat Labels — START ─────────────────
+   Purpose:
+   - Make Top Score / Top Streak / Visions labels theme-responsive.
+   - Keep numbers bright white.
+   - CSS-only: no layout, JS, scoring, buttons, or results logic touched.
+   ───────────────────────────────────────────────────────────────────── */
+
+body.il-active {
+  --il-stat-label-accent:
+    var(--il-cta-accent, var(--il-glass-accent, var(--il-pref-accent, #00ffee)));
+
+  --il-stat-label-glow:
+    var(--il-cta-glow, var(--il-glass-glow, var(--il-pref-glow, rgba(0, 255, 238, 0.42))));
+
+  --il-stat-label-faint:
+    var(--il-cta-faint, var(--il-glass-faint, var(--il-pref-faint, rgba(0, 255, 238, 0.16))));
+}
+
+/* Stat headers only: Top Score / Top Streak / Visions */
+body.il-active .il-preflight-stats-merged .il-preflight-stat-col > span {
+  color: var(--il-stat-label-accent) !important;
+
+  text-shadow:
+    0 0 7px var(--il-stat-label-glow),
+    0 0 14px var(--il-stat-label-faint),
+    0 0 18px rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Numbers stay white and readable. */
+body.il-active .il-preflight-stats-merged .il-preflight-stat-col > strong {
+  color: #ffffff !important;
+
+  text-shadow:
+    0 0 7px rgba(255, 255, 255, 0.42),
+    0 0 14px rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Footnote stays quieter so it does not compete with the numbers. */
+body.il-active .il-preflight-stats-merged .il-preflight-stat-col > small,
+body.il-active .il-preflight-vision-footnote {
+  color: rgba(235, 248, 255, 0.82) !important;
+
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.76),
+    0 0 10px var(--il-stat-label-faint) !important;
+}
+
+/* ───────────────── SCMF IL Preflight Stat Labels — END ───────────────── */
+

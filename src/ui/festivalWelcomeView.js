@@ -3,6 +3,7 @@
 
 import { appState } from '../data/appState.js';
 import { getFestivalWelcomeModel } from '../data/festivalWelcome.js';
+import { getThemeAccent } from '../data/themeAccentLaw.js';
 
 const DEFAULT_STARTUP_AVATAR = '🧑‍🚀';
 
@@ -23,6 +24,17 @@ function getStartupAvatarEmoji() {
   }
 
   return DEFAULT_STARTUP_AVATAR;
+}
+
+function applyStartupThemeAccent() {
+  const screen = document.getElementById('startup-screen');
+  if (!screen) return;
+
+  const { accent, glow, faint } = getThemeAccent(appState.settings?.theme);
+
+  screen.style.setProperty('--scmf-startup-accent', accent);
+  screen.style.setProperty('--scmf-startup-accent-soft', glow);
+  screen.style.setProperty('--scmf-startup-accent-faint', faint);
 }
 
 function hideStartupScreen(onDone) {
@@ -53,6 +65,8 @@ export function renderFestivalWelcomeOnStartup(onPlay) {
   if (!screen) return;
 
   screen.style.pointerEvents = 'auto';
+
+  applyStartupThemeAccent();
 
   const inner = screen.querySelector('.startup-inner') || screen;
 
