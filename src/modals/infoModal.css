@@ -2299,3 +2299,304 @@ html[data-platform="ios"] .profile-xp-line,
 #infoModal .support-note a {
   color: var(--scmf-info-accent) !important;
 }
+
+
+/* ───────────────── SCMF Info Modal Dropdown HUD — START ─────────────────
+   Purpose:
+   - Title-press Info modal gets HUD Glass standards.
+   - Static text sections become native details/summary dropdowns.
+   - JPS Grooves CTA becomes a quieter credit link.
+   - CSS-only after index markup change. No modal JS or behavior changes.
+   ───────────────────────────────────────────────────────────────────── */
+
+#infoModal {
+  --scmf-info-glass-accent:
+    var(--scmf-info-accent, #00ffee);
+
+  --scmf-info-glass-soft:
+    var(--scmf-info-accent-soft, rgba(0, 255, 238, 0.42));
+
+  --scmf-info-glass-faint:
+    var(--scmf-info-accent-faint, rgba(0, 255, 238, 0.16));
+
+  --scmf-info-glass-border:
+    color-mix(
+      in srgb,
+      var(--scmf-info-glass-accent) 54%,
+      rgba(255, 255, 255, 0.22)
+    );
+
+  --scmf-info-glass-border-soft:
+    color-mix(
+      in srgb,
+      var(--scmf-info-glass-accent) 34%,
+      rgba(255, 255, 255, 0.14)
+    );
+}
+
+/* Shell material: dark glass, no new inner card. */
+#infoModal .cosmic-modal-inner {
+  border-width: 1px !important;
+  border-color: var(--scmf-info-glass-border) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      color-mix(in srgb, var(--scmf-info-glass-accent) 10%, transparent) 0%,
+      transparent 34%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 18, 32, 0.92),
+      rgba(1, 5, 14, 0.98)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 18px 46px rgba(0, 0, 0, 0.52),
+    0 0 16px var(--scmf-info-glass-soft),
+    0 0 28px var(--scmf-info-glass-faint) !important;
+
+  -webkit-backdrop-filter: blur(8px) saturate(1.10);
+  backdrop-filter: blur(8px) saturate(1.10);
+}
+
+/* Match the Options close-button philosophy: no loud circle. */
+#infoModal .close-modal {
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+
+  color: rgba(255, 255, 255, 0.78) !important;
+
+  box-shadow: none !important;
+
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.95),
+    0 0 12px var(--scmf-info-glass-faint) !important;
+
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+#infoModal .close-modal:hover,
+#infoModal .close-modal:active {
+  color: var(--scmf-info-glass-accent) !important;
+
+  text-shadow:
+    0 0 8px var(--scmf-info-glass-soft),
+    0 0 16px var(--scmf-info-glass-faint) !important;
+}
+
+/* Top question and one-sentence answer. */
+#infoModal .info-hud-sheet {
+  padding-top: 0.2rem;
+}
+
+#infoModal .info-hud-sheet #infoTitle {
+  margin: 0 2rem 0.45rem 0;
+
+  color: var(--scmf-info-glass-accent) !important;
+
+  font-size: clamp(1.22rem, 2.45vh, 1.68rem);
+  line-height: 1.1;
+  text-align: left;
+
+  text-shadow:
+    0 0 7px var(--scmf-info-glass-soft),
+    0 0 14px var(--scmf-info-glass-faint) !important;
+}
+
+#infoModal .info-hud-sheet .info-lede {
+  margin: 0 0 0.85rem;
+
+  color: rgba(245, 255, 255, 0.92) !important;
+
+  font-size: clamp(0.9rem, 1.65vh, 1.02rem);
+  line-height: 1.35;
+
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.82) !important;
+}
+
+/* Dropdown stack. */
+#infoModal .info-drop-stack {
+  display: grid;
+  gap: clamp(0.5rem, 1.05vh, 0.72rem);
+}
+
+/* Dropdown shell: existing content surface, not a new modal box. */
+#infoModal .info-drop {
+  border: 1px solid var(--scmf-info-glass-border-soft);
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(0, 0, 0, 0.40)
+    );
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.035) inset,
+    0 6px 14px rgba(0, 0, 0, 0.20),
+    0 0 8px var(--scmf-info-glass-faint);
+
+  overflow: hidden;
+}
+
+/* Tap row. */
+#infoModal .info-drop > summary {
+  min-height: clamp(42px, 5svh, 52px);
+  padding:
+    clamp(0.55rem, 1.1vh, 0.72rem)
+    clamp(0.75rem, 2.1vw, 1rem);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  cursor: pointer;
+  list-style: none;
+
+  color: rgba(245, 255, 255, 0.94);
+
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.86rem, 1.65vh, 1.04rem);
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+
+  text-shadow:
+    0 0 7px rgba(0, 0, 0, 0.95),
+    0 0 9px var(--scmf-info-glass-faint);
+}
+
+#infoModal .info-drop > summary::-webkit-details-marker {
+  display: none;
+}
+
+#infoModal .info-drop > summary::after {
+  content: "▾";
+
+  color: var(--scmf-info-glass-accent);
+
+  font-size: 0.95em;
+  line-height: 1;
+
+  text-shadow:
+    0 0 8px var(--scmf-info-glass-soft),
+    0 0 14px var(--scmf-info-glass-faint);
+
+  transform: rotate(0deg);
+  transition: transform 0.16s ease;
+}
+
+#infoModal .info-drop[open] > summary {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+
+  color: var(--scmf-info-glass-accent);
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--scmf-info-glass-accent) 12%, transparent),
+      rgba(0, 0, 0, 0.12)
+    );
+}
+
+#infoModal .info-drop[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+/* Revealed body. */
+#infoModal .info-drop-body {
+  padding:
+    clamp(0.45rem, 1vh, 0.64rem)
+    clamp(0.75rem, 2.1vw, 1rem)
+    clamp(0.66rem, 1.25vh, 0.88rem);
+
+  color: rgba(240, 250, 255, 0.92);
+
+  text-shadow:
+    0 0 7px rgba(0, 0, 0, 0.86);
+}
+
+#infoModal .info-drop-body .compact-dot-list {
+  margin: 0;
+  padding: 0;
+}
+
+#infoModal .info-drop-body .compact-dot-list li {
+  margin: 0 0 0.48rem;
+  font-size: clamp(0.82rem, 1.52vh, 0.96rem);
+  line-height: 1.35;
+}
+
+#infoModal .info-drop-body .compact-dot-list li:last-child {
+  margin-bottom: 0;
+}
+
+#infoModal .info-drop-body strong {
+  color: color-mix(
+    in srgb,
+    var(--scmf-info-glass-accent) 46%,
+    #ffffff 54%
+  );
+
+  font-weight: 900;
+}
+
+/* Quiet credit, not a big CTA button. */
+#infoModal .info-credit-line {
+  margin: 0.85rem 0 0;
+  text-align: center;
+
+  color: rgba(230, 248, 255, 0.72) !important;
+
+  font-size: clamp(0.68rem, 1.28vh, 0.82rem);
+  line-height: 1.3;
+
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.86);
+}
+
+#infoModal .info-credit-link {
+  color: var(--scmf-info-glass-accent) !important;
+  text-decoration: none;
+
+  border-bottom: 1px solid color-mix(
+    in srgb,
+    var(--scmf-info-glass-accent) 54%,
+    transparent
+  );
+
+  text-shadow:
+    0 0 7px var(--scmf-info-glass-faint);
+}
+
+#infoModal .info-credit-link:hover,
+#infoModal .info-credit-link:active {
+  color: #ffffff !important;
+  border-bottom-color: var(--scmf-info-glass-accent);
+}
+
+/* Old CTA row becomes harmless if any stale markup survives somewhere. */
+#infoModal .cta-row {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #infoModal .cosmic-modal-inner {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  #infoModal .info-drop > summary::after {
+    transition: none !important;
+  }
+}
+
+/* ───────────────── SCMF Info Modal Dropdown HUD — END ───────────────── */
+

@@ -1,3 +1,111 @@
+<!-- SCMF 1.4.0 TOP CHANGELOG ENTRY START -->
+# [1.4.0] — 2026-06-24 — Infinity Lake Flagship + HUD Glass Release Candidate ♾️🍧
+
+## Release Focus
+
+Version **1.4.0** turns Infinity Lake into the first true flagship attraction inside SnowCone MathFest.
+
+This release also establishes the new app-wide visual direction:
+
+**theme-responsive HUD Glass, iOS-first polish, native audio confidence, and cleaner modal presentation.**
+
+The build is now considered a publishable iOS candidate pending final smoke testing.
+
+---
+
+## Added / Improved
+
+### ♾️ Infinity Lake Flagship Pass
+
+- Rebuilt Infinity Lake into a more complete arcade-concert math attraction.
+- Added a polished preflight screen with:
+  - theme-responsive title treatment
+  - Triplets stage presentation
+  - Top Score / Top Streak / Visions board
+  - difficulty selector
+  - unified Play Game button
+  - clean Back-to-Menu control
+- Unified intro and results buttons into one consistent CTA system.
+- Made preflight stat labels theme-responsive while keeping numbers bright white.
+- Improved result popup presentation and button consistency.
+- Preserved the dedicated Infinity Lake → Main Menu portal return transition.
+- Last selected Infinity Lake difficulty now persists between visits.
+
+### 🔊 Infinity Lake Native SFX Fixes
+
+- Routed Infinity Lake SFX through the native iOS audio bridge first.
+- Restored streak burst SFX on native iOS.
+- Improved wrong-answer SFX timing and volume so misses cut through the lake music.
+- Kept browser/Howler fallback behavior for preview testing.
+
+### 🧊 HUD Glass UI Standard
+
+- Established the restrained SCMF HUD Glass design rule:
+  - existing surfaces only
+  - thin borders
+  - dark glass
+  - subtle glow
+  - theme-responsive accents
+  - no extra boxes
+- Applied the new visual standard to:
+  - Infinity Lake
+  - Startup welcome button
+  - Options modal
+  - Info / title-press modal
+
+### ⚙️ Options Modal Polish
+
+- Cleaned up the Options modal shell.
+- Removed the unwanted tab-header box, grid texture, and circular X button.
+- Made tabs stretch evenly and match the active theme.
+- Gave the profile name input HUD Glass styling.
+- Updated Data tab buttons with correct festival font styling.
+- Made the SnowCone Radio scrubber theme-responsive.
+
+### 🎯 Title Press / Info Modal Redesign
+
+- Redesigned the title-press modal into a compact HUD Glass info panel.
+- Replaced long static text with clean dropdown sections:
+  - Quick Start
+  - Play Zones
+  - What’s New in 1.4.0
+- Reduced the JPS Grooves link from a large CTA into a quieter credit link.
+- Kept the modal JS behavior simple and stable.
+
+### 🚀 Startup Polish
+
+- Updated the Enter Festival button with theme-responsive HUD Glass styling.
+- Connected startup button accent styling to the shared theme accent law.
+
+---
+
+## Fixed
+
+- Fixed Infinity Lake SFX not firing correctly in the native iOS lane.
+- Fixed wrong-answer SFX being too quiet or visually buried after streak moments.
+- Fixed inconsistent button styling between Infinity Lake intro and results screens.
+- Fixed Info modal feeling disconnected from the new HUD Glass standard.
+- Fixed Options modal over-glass issues from earlier visual passes.
+
+---
+
+## Dev Notes
+
+> *1.4.0 is the first attraction-era release.*
+>
+> Infinity Lake now feels like a real SnowCone MathFest destination instead of an older mode with polish layered on top.
+>
+> The visual language is clearer now:
+>
+> **dark glass, theme glow, thin borders, existing surfaces, no clutter.**
+>
+> This is the build where the lake starts to glow like the future of the whole festival. 🍧♾️✨
+
+---
+
+<!-- SCMF 1.4.0 TOP CHANGELOG ENTRY END -->
+
+
 # 🍧 SnowCone MathFest — Changelog Reopened for the 1.4.0 → 2.0.0 Era
 
 ## Current Development Era — 2026-06-22

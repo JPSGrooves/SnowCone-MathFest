@@ -1328,28 +1328,14 @@ function handleCorrect() {
 
 
 function playLakeVisionCrashSound() {
-  // ♾️ Lake Vision crash SFX
-  // Direct file route: stable, local, and respects the global mute state.
-  try {
-    if (isMuted()) {
-      return;
-    }
-  } catch {
-    // If mute state is temporarily unavailable, fail quiet rather than breaking gameplay.
-    return;
-  }
-
-  try {
-    const crash = new Howl({
-      src: [`${import.meta.env.BASE_URL}assets/audio/SFX/incorrect.mp3`],
-      volume: 0.55,
-    });
-
-    crash.play();
-  } catch (err) {
-    console.warn('[Infinity] Lake Vision crash SFX failed:', err);
-  }
+  playInfinitySfxNativeFirst({
+    id: 'incorrect',
+    file: 'incorrect.mp3',
+    // Wrong answers need to cut through lake music + streak honks.
+    volume: 0.55,
+  });
 }
+
 
 
 function handleIncorrect(guess) {
@@ -1372,9 +1358,12 @@ function handleIncorrect(guess) {
   nextTrigger = sfxIntervals[0];
 
   updateStreak();
+
+  // 🔊 Fire wrong-answer SFX before the visual collapse so it feels instant.
+  playLakeVisionCrashSound();
+
   showResult('❌ Nope. Try again!', '#ff5555');
   collapseLakeVision();
-  playLakeVisionCrashSound();
 
   // 📳 Wrong-answer haptic
   try {
@@ -2073,30 +2062,71 @@ function endInfinityGame() {
 }
 
 
-function playStreakBurst() {
-  // 🔇 Respect global mute via Howler
+function playInfinitySfxNativeFirst({
+  id,
+  file = `${id}.mp3`,
+  volume = 0.35,
+} = {}) {
+  if (!id) return false;
+
   try {
     if (isMuted()) {
-      return;
+      return false;
     }
   } catch {
-    // if Howler isn't ready for some reason, just fail silently
+    // If mute state is unavailable, let the SFX attempt continue.
   }
 
-  const file = streakFlipFlop ? 'honk1.mp3' : 'honk2.mp3';
+  const nativeBridge =
+    typeof window !== 'undefined'
+      ? window.webkit?.messageHandlers?.scmfAudioBridge
+      : null;
+
+  if (nativeBridge?.postMessage) {
+    try {
+      nativeBridge.postMessage({
+        type: 'playSfx',
+        id,
+        file,
+        volume,
+      });
+
+      console.log(`[Infinity] native SFX requested: ${id}`);
+      return true;
+    } catch (err) {
+      console.warn('[Infinity] native SFX bridge failed, falling back to Howl:', err);
+    }
+  }
 
   try {
     const sfx = new Howl({
       src: [`${import.meta.env.BASE_URL}assets/audio/SFX/${file}`],
-      volume: 0.4, // softer, still punchy for streak hype
+      volume,
     });
 
     sfx.play();
-    streakFlipFlop = !streakFlipFlop;
+    return true;
   } catch (err) {
-    console.warn('[Infinity] streak SFX failed:', err);
+    console.warn('[Infinity] Howl SFX fallback failed:', id, file, err);
+    return false;
   }
 }
+
+function playStreakBurst() {
+  const sfxId = streakFlipFlop ? 'honk1' : 'honk2';
+  const file = `${sfxId}.mp3`;
+
+  const played = playInfinitySfxNativeFirst({
+    id: sfxId,
+    file,
+    volume: 0.4,
+  });
+
+  if (played) {
+    streakFlipFlop = !streakFlipFlop;
+  }
+}
+
 
 
 
