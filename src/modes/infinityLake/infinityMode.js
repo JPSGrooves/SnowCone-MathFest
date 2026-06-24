@@ -5,22 +5,23 @@ import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgro
 import { playModeReturnTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { startTripletLoop, stopTripletLoop, startTripletSequence } from './tripletAnimator.js';
-import { stopTrack, toggleMute, isMuted } from '../../managers/musicManager.js';
+import { stopTrack, toggleMute, isMuted, playInfinityLoop, stopInfinityLoop } from '../../managers/musicManager.js';
 import { activateInputHandler } from '../../managers/inputManager.js';
 import { launchConfetti } from '../../utils/confetti.js';
 import { runInAction } from 'mobx';
-import { playInfinityLoop } from '../../managers/musicManager.js';
 import { awardBadge } from '../../managers/badgeManager.js';
-import { Howl, Howler } from 'howler';
+import { Howl } from 'howler';
 import { hapticSuccess, hapticError, hapticSoftPulse } from '../../utils/haptics.js';
 import { getThemeAccent } from '../../data/themeAccentLaw.js';
-import { initLakeVision, resetLakeVision, advanceLakeVision, collapseLakeVision } from './infinityVision.js';
-
-
-
-
-
-
+import {
+  initLakeVision,
+  resetLakeVision,
+  advanceLakeVision,
+  collapseLakeVision,
+  getLakeVisionTotalCount,
+  getLakeVisionShapeIds,
+  getCurrentLakeVisionShapeId
+} from './infinityVision.js';
 
 
 
@@ -65,6 +66,8 @@ let patternIndex = 0;
 let nextTrigger = sfxIntervals[0];
 // state near the other lets
 let solvedCount = 0;     // how many problems the player solved this run
+let runVisionsCompleted = 0; // completed full visions this run; can exceed available designs
+let visionDisplay = null;
 let currentMode = 'addsub'; // you use this but never declared it
 
 // 🧮 NEW: mistake tracking so we can teach something
@@ -218,12 +221,9 @@ export function loadInfinityMode() {
 
         // Start sprite sequence
         startTripletSequence([
-          { pose: 'openSet', time: 3000 },
-          { pose: 'jam1', time: 6000 },
-          { pose: 'jam2', time: 9000 },
-          { pose: 'change', time: 3000 },
-          { pose: 'other', time: 6000 },
-          { pose: 'other2', time: 9000 }
+          { pose: 'openSet', time: 4200, once: true },
+          { pose: 'jam1', time: 5200 },
+          { pose: 'jam2', time: 5200 }
         ], 'tripletSpriteGame');
 
 
@@ -430,15 +430,23 @@ function renderIntroScreen() {
           <section class="il-preflight-hud" aria-label="Infinity Lake setup">
             <div class="il-preflight-stats il-preflight-stats-merged">
               <div class="il-preflight-stat-col">
-                <span>Best Score</span>
+                <span>Top Score</span>
                 <strong>${bestScore}</strong>
               </div>
 
               <div class="il-preflight-stat-divider" aria-hidden="true"></div>
 
               <div class="il-preflight-stat-col">
-                <span>Best Streak</span>
+                <span>Top Streak</span>
                 <strong>${bestStreak}</strong>
+              </div>
+
+              <div class="il-preflight-stat-divider" aria-hidden="true"></div>
+
+              <div class="il-preflight-stat-col il-preflight-stat-visions">
+                <span>Visions</span>
+                <strong id="ilIntroVisionsSeen">${readInfinityVisionSeenIds().length} of ${getInfinityVisionTotal()}</strong>
+                <small class="il-preflight-vision-footnote">Top Vision Run: ${readInfinityTopVisionRun()}</small>
               </div>
             </div>
 
@@ -540,9 +548,10 @@ function renderUI() {
               <img class="lake-vision-layer lake-vision-layer-full" data-vision-layer="4" alt="" />
             </div>
 
-            <div class="il-metric-row il-stage-metrics" aria-label="Infinity Lake score and streak">
+            <div class="il-metric-row il-stage-metrics" aria-label="Infinity Lake score, streak, and visions">
               <div class="il-score-box">Score: <span id="infScore">0</span></div>
               <div class="il-streak-box">Streak: <span id="infStreak">0</span></div>
+              <div class="il-vision-box">Visions: <span id="infVisions">0</span></div>
             </div>
           </div>
 
@@ -592,24 +601,46 @@ function renderUI() {
 
         </div>
 
-        <!-- 🎉 Result overlay + popup -->
+        <!-- ♾️ Infinity Results overlay + popup -->
         <div class="il-result-overlay hidden" id="ilResultOverlay">
-          <div class="il-result-popup" id="ilResultPopup">
-            <h2>🎉 Set Complete!</h2>
+          <div class="il-result-popup il-results-card" id="ilResultPopup">
+            <div class="il-results-kicker">Infinity Lake</div>
+            <h2>Results</h2>
 
-            <p><strong>Score:</strong> <span id="ilScoreFinal">0</span></p>
-            <p><strong>Streak:</strong> <span id="ilStreakRun">0</span></p>
-            <p><strong>High Score:</strong> <span id="ilHighScore">0</span></p>
-            <p><strong>Longest Streak:</strong> <span id="ilStreak">0</span></p>
+            <div class="il-results-grid" aria-label="Infinity Lake results">
+              <section class="il-results-panel il-results-panel-score">
+                <span class="il-results-label">Score</span>
+                <strong id="ilScoreFinal">0</strong>
+                <small>Top Score: <span id="ilHighScore">0</span></small>
+              </section>
 
-            <!-- 🧠 Teaching tip line -->
-            <p class="il-tip-line">
-              <strong>Feedback:</strong>
-              <span id="ilTipText"></span>
+              <section class="il-results-panel il-results-panel-streak">
+                <span class="il-results-label">Top Streak</span>
+                <strong id="ilStreakRun">0</strong>
+                <small>Top Streak: <span id="ilStreak">0</span></small>
+              </section>
+            </div>
+
+            <section class="il-vision-result-panel" aria-label="Visions reached">
+              <span class="il-results-label">Visions Reached:</span>
+              <strong id="ilVisionReached">0 of 3</strong>
+              <small>This Run: <span id="ilVisionRunCount">0</span></small>
+              <small>Top Vision Run: <span id="ilTopVisionRun">0</span></small>
+            </section>
+
+            <p class="il-result-flavor" id="ilResultFlavor">
+              The lake is warming up.
             </p>
 
             <div class="il-result-buttons">
-              <button id="ilPlayAgainBtn" class="start-show-btn">🔁 Play Again</button>
+              <button id="ilPlayAgainBtn" class="start-show-btn il-results-primary" aria-label="Play Again">
+                <span class="il-util-arrow" aria-hidden="true">↻</span>
+                <span class="il-util-label">Again</span>
+              </button>
+              <button id="ilBackBtn" class="il-results-secondary" aria-label="Main Menu">
+                <span class="il-util-arrow" aria-hidden="true">←</span>
+                <span class="il-util-label">Menu</span>
+              </button>
             </div>
           </div>
         </div>
@@ -622,6 +653,7 @@ function renderUI() {
   problemEl = document.getElementById('mathProblem');
   answerBtns = Array.from(document.querySelectorAll('.ans-btn'));
   scoreDisplay = document.getElementById('infScore');
+  visionDisplay = document.getElementById('infVisions');
   resultMsg = document.getElementById('coneResultMsg');
   initLakeVision();
   resetLakeVision({ rotateShape: false });
@@ -774,7 +806,7 @@ function returnToMenu() {
 
   console.log('🌌 [Infinity] Back-to-menu using playModeReturnTransition');
 
-  stopTrack(); // 💥 nukes the Howl
+  stopInfinityLoop(); // ♾️ stop IL music + restore previous music scope
   playModeReturnTransition(() => {
     console.log('🌌 [Infinity] return transition callback: restoring menu');
     stopInfinityMode();
@@ -802,6 +834,7 @@ function startGame() {
   streak = 0;
   maxStreak = 0;
   solvedCount = 0;
+  runVisionsCompleted = 0;
   streakFlipFlop = true;
   patternIndex = 0;
   nextTrigger = sfxIntervals[0];
@@ -822,12 +855,19 @@ function startGame() {
 
   updateScore();
   updateStreak();
+  updateVisionCounter();
   newProblem();
 }
 
 function updateStreak() {
   const el = document.getElementById('infStreak');
   if (el) el.textContent = streak;
+}
+
+
+function updateVisionCounter() {
+  const el = visionDisplay || document.getElementById('infVisions');
+  if (el) el.textContent = runVisionsCompleted;
 }
 
 function compute(a, b, op) {
@@ -840,118 +880,369 @@ function compute(a, b, op) {
 }
 
 
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Difficulty Problem Variety Helpers v1
+   Purpose:
+   - Easy: random +/− without long repeats.
+   - Medium: cleaner 2–12 facts with occasional 13–15 stretch.
+   - Hard: more varied one-step algebra forms.
+   - All modes: stronger nearby answer choices.
+   - Scoring stays exactly the same.
+   ────────────────────────────────────────────────────────── */
+
+function randomInt(min, max) {
+  const low = Math.ceil(min);
+  const high = Math.floor(max);
+  return Math.floor(Math.random() * (high - low + 1)) + low;
+}
+
+function shuffleInfinityOptions(values) {
+  const copy = [...values];
+
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+function chooseInfinityOperation(mode, operations) {
+  if (!chooseInfinityOperation.history) {
+    chooseInfinityOperation.history = {
+      addsub: [],
+      multdiv: [],
+      alg: [],
+    };
+  }
+
+  const history = chooseInfinityOperation.history[mode] || [];
+  const last = history[history.length - 1];
+  const previous = history[history.length - 2];
+
+  let pool = [...operations];
+
+  // No long repeats: if the last two were the same, force a different op.
+  if (last && previous && last === previous && pool.length > 1) {
+    pool = pool.filter((op) => op !== last);
+  }
+
+  const picked = pool[Math.floor(Math.random() * pool.length)] || operations[0];
+
+  chooseInfinityOperation.history[mode] = [...history, picked].slice(-2);
+
+  return picked;
+}
+
+function getInfinityFactFactor({ allowStretch = true } = {}) {
+  // Mostly 2–12, with a small 13–15 stretch lane.
+  if (allowStretch && Math.random() < 0.14) {
+    return randomInt(13, 15);
+  }
+
+  return randomInt(2, 12);
+}
+
+function addInfinityCandidate(candidates, value) {
+  const n = Number(value);
+
+  if (!Number.isFinite(n)) return;
+  if (!Number.isInteger(n)) return;
+  if (!candidates.includes(n)) {
+    candidates.push(n);
+  }
+}
+
+function buildInfinityDistractors(correct, mode, meta = {}) {
+  const candidates = [];
+
+  const addNearMisses = (radius = 5) => {
+    for (let distance = 1; distance <= radius; distance += 1) {
+      addInfinityCandidate(candidates, correct + distance);
+      addInfinityCandidate(candidates, correct - distance);
+    }
+  };
+
+  if (mode === 'addsub') {
+    addNearMisses(5);
+
+    // Place-value-ish slips for bigger easy answers.
+    if (Math.abs(correct) >= 10) {
+      addInfinityCandidate(candidates, correct + 10);
+      addInfinityCandidate(candidates, correct - 10);
+    }
+  } else if (mode === 'multdiv') {
+    addNearMisses(5);
+
+    const a = Number(meta.a);
+    const b = Number(meta.b);
+
+    if (meta.op === '×') {
+      // Common fact-family slips.
+      addInfinityCandidate(candidates, (a + 1) * b);
+      addInfinityCandidate(candidates, a * (b + 1));
+      addInfinityCandidate(candidates, Math.max(0, (a - 1) * b));
+      addInfinityCandidate(candidates, Math.max(0, a * (b - 1)));
+
+      // Addition mistake / near-product mistake.
+      addInfinityCandidate(candidates, a + b);
+      addInfinityCandidate(candidates, correct + a);
+      addInfinityCandidate(candidates, correct - b);
+    } else if (meta.op === '÷') {
+      // For a ÷ b = correct, kids often grab a nearby quotient or a factor.
+      addInfinityCandidate(candidates, correct + 1);
+      addInfinityCandidate(candidates, correct - 1);
+      addInfinityCandidate(candidates, correct + 2);
+      addInfinityCandidate(candidates, correct - 2);
+      addInfinityCandidate(candidates, b);
+      addInfinityCandidate(candidates, correct * b);
+      addInfinityCandidate(candidates, Math.round((a + b) / b));
+      addInfinityCandidate(candidates, Math.round((a - b) / b));
+    }
+  } else if (mode === 'alg') {
+    addNearMisses(4);
+
+    const b = Number(meta.b);
+    const result = Number(meta.result);
+    const coefficient = Number(meta.coefficient || 1);
+
+    if (meta.form === 'xPlusB' || meta.form === 'bPlusX') {
+      // Mistake: add b instead of subtracting b.
+      addInfinityCandidate(candidates, result + b);
+      addInfinityCandidate(candidates, result);
+    }
+
+    if (meta.form === 'xMinusB') {
+      // Mistake: subtract b again instead of adding it back.
+      addInfinityCandidate(candidates, result - b);
+      addInfinityCandidate(candidates, result);
+    }
+
+    if (meta.form === 'xTimesB' || meta.form === 'bTimesX') {
+      // Mistake: add/subtract instead of divide.
+      addInfinityCandidate(candidates, result + b);
+      addInfinityCandidate(candidates, result - b);
+      addInfinityCandidate(candidates, b);
+      addInfinityCandidate(candidates, Math.round(result / Math.max(1, b)) + 1);
+      addInfinityCandidate(candidates, Math.round(result / Math.max(1, b)) - 1);
+    }
+
+    if (meta.form === 'xDivB') {
+      // Mistake: divide the result instead of multiplying back.
+      addInfinityCandidate(candidates, Math.round(result / Math.max(1, b)));
+      addInfinityCandidate(candidates, result + b);
+      addInfinityCandidate(candidates, result - b);
+      addInfinityCandidate(candidates, result);
+    }
+
+    if (meta.form === 'twoXPlusB') {
+      // Mistake: forget to divide by 2, or divide before subtracting.
+      addInfinityCandidate(candidates, result - b);
+      addInfinityCandidate(candidates, Math.round((result + b) / coefficient));
+      addInfinityCandidate(candidates, Math.round(result / coefficient));
+      addInfinityCandidate(candidates, correct + b);
+      addInfinityCandidate(candidates, correct - b);
+    }
+  }
+
+  // Fallback safety: always fill near the correct answer.
+  let spread = 1;
+  while (candidates.length < 8 && spread <= 16) {
+    addInfinityCandidate(candidates, correct + spread);
+    addInfinityCandidate(candidates, correct - spread);
+    spread += 1;
+  }
+
+  return candidates.filter((value) => value !== correct);
+}
+
+function generateAnswerOptions(correctAnswer, mode, meta = {}) {
+  const correct = Number(correctAnswer);
+  const candidates = buildInfinityDistractors(correct, mode, meta);
+  const options = [correct];
+
+  const shuffledCandidates = shuffleInfinityOptions(candidates);
+
+  for (const candidate of shuffledCandidates) {
+    if (options.length >= 3) break;
+    if (!options.includes(candidate)) {
+      options.push(candidate);
+    }
+  }
+
+  // Extra emergency fallback, should almost never be needed.
+  let guard = 0;
+  while (options.length < 3 && guard < 40) {
+    const fake = correct + randomInt(-9, 9);
+    if (fake !== correct && !options.includes(fake)) {
+      options.push(fake);
+    }
+    guard += 1;
+  }
+
+  return shuffleInfinityOptions(options.slice(0, 3));
+}
+
 function newProblem() {
   const mode = appState.getGameMode();
-  let a = Math.floor(Math.random() * 20) + 1;
-  let b = Math.floor(Math.random() * 20) + 1;
-  let correctAnswer;
-  let question;
-  let op = null; // 🧮 track what kind of problem this is
+  let a = randomInt(1, 20);
+  let b = randomInt(1, 20);
+  let correctAnswer = 0;
+  let question = '';
+  let op = null;
+  let problemMeta = null;
 
   switch (mode) {
     case 'addsub': {
       const head = `<span class="il-problem-head il-problem-head-easy">ADD & SUB</span>`;
-      if (addsubToggle) {
-        op = '+';
+      op = chooseInfinityOperation('addsub', ['+', '−']);
+
+      if (op === '+') {
         correctAnswer = a + b;
         question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} + ${b} = ?`;
       } else {
-        op = '−';
+        // Jeremy likes the possibility of negatives here. Keep it.
         correctAnswer = a - b;
         question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} − ${b} = ?`;
       }
-      addsubToggle = !addsubToggle;
+
+      problemMeta = {
+        mode,
+        op,
+        a,
+        b,
+        correct: correctAnswer,
+      };
+
       break;
     }
 
     case 'multdiv': {
       const head = `<span class="il-problem-head il-problem-head-medium">MULT & DIV</span>`;
-      if (multdivToggle) {
-        op = '×';
+      op = chooseInfinityOperation('multdiv', ['×', '÷']);
+
+      if (op === '×') {
+        a = getInfinityFactFactor({ allowStretch: true });
+        b = getInfinityFactFactor({ allowStretch: true });
         correctAnswer = a * b;
         question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} × ${b} = ?`;
       } else {
-        // clean division
-        op = '÷';
-        b = Math.floor(Math.random() * 9) + 1;                // 1–9
-        correctAnswer = Math.floor(Math.random() * 10) + 1;   // 1–10
+        b = getInfinityFactFactor({ allowStretch: false });
+        correctAnswer = getInfinityFactFactor({ allowStretch: true });
         a = b * correctAnswer;
         question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} ÷ ${b} = ?`;
       }
-      multdivToggle = !multdivToggle;
+
+      problemMeta = {
+        mode,
+        op,
+        a,
+        b,
+        correct: correctAnswer,
+      };
+
       break;
     }
 
     case 'alg': {
       const head = `<span class="il-problem-head il-problem-head-hard">ALGEBRA</span>`;
-      // 🔧 use the SAME glyphs we check for later
-      const ops = ['+', '−', '×', '÷'];
-      op = ops[Math.floor(Math.random() * ops.length)];
-      let result;
 
-      correctAnswer = a; // default
+      const form = chooseInfinityOperation('alg', [
+        'xPlusB',
+        'bPlusX',
+        'xMinusB',
+        'xTimesB',
+        'bTimesX',
+        'xDivB',
+        'twoXPlusB',
+      ]);
 
-      if (op === '+') {
-        // 𝒙 + b = result  (x is a)
-        result = a + b;
-        correctAnswer = a;
+      const x = randomInt(1, 15);
+      b = randomInt(2, 12);
+
+      if (form === 'xPlusB') {
+        op = '+';
+        const result = x + b;
+        correctAnswer = x;
         question = `${head}<span class="il-problem-break" aria-hidden="true"></span>𝒙 + ${b} = ${result}`;
-      } else if (op === '−') {
-        // 𝒙 − b = result (x is a)
-        result = a - b;
-        correctAnswer = a;
+        problemMeta = { mode, op, form, a: x, b, result, correct: correctAnswer };
+      } else if (form === 'bPlusX') {
+        op = '+';
+        const result = b + x;
+        correctAnswer = x;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${b} + 𝒙 = ${result}`;
+        problemMeta = { mode, op, form, a: x, b, result, correct: correctAnswer };
+      } else if (form === 'xMinusB') {
+        op = '−';
+        const result = x - b;
+        correctAnswer = x;
         question = `${head}<span class="il-problem-break" aria-hidden="true"></span>𝒙 − ${b} = ${result}`;
-      } else if (op === '×') {
-        // 𝒙 × b = result (x is a)
-        result = a * b;
-        correctAnswer = a;
+        problemMeta = { mode, op, form, a: x, b, result, correct: correctAnswer };
+      } else if (form === 'xTimesB') {
+        op = '×';
+        const result = x * b;
+        correctAnswer = x;
         question = `${head}<span class="il-problem-break" aria-hidden="true"></span>𝒙 × ${b} = ${result}`;
-      } else if (op === '÷') {
-        // a ÷ 𝒙 = b, where a = b * x
-        correctAnswer = Math.floor(Math.random() * 10) + 1; // 1–10
-        b = Math.floor(Math.random() * 9) + 1;              // 1–9
-        a = b * correctAnswer;
-        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} ÷ 𝒙 = ${b}`;
+        problemMeta = { mode, op, form, a: x, b, result, correct: correctAnswer };
+      } else if (form === 'bTimesX') {
+        op = '×';
+        const result = b * x;
+        correctAnswer = x;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${b} × 𝒙 = ${result}`;
+        problemMeta = { mode, op, form, a: x, b, result, correct: correctAnswer };
+      } else if (form === 'xDivB') {
+        op = '÷';
+        const result = randomInt(2, 12);
+        correctAnswer = result * b;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>𝒙 ÷ ${b} = ${result}`;
+        problemMeta = { mode, op, form, a: correctAnswer, b, result, correct: correctAnswer };
+      } else {
+        op = '+';
+        const coefficient = 2;
+        const result = coefficient * x + b;
+        correctAnswer = x;
+        question = `${head}<span class="il-problem-break" aria-hidden="true"></span>2𝒙 + ${b} = ${result}`;
+        problemMeta = { mode, op, form: 'twoXPlusB', coefficient, a: x, b, result, correct: correctAnswer };
       }
 
       break;
+    }
+
+    default: {
+      const head = `<span class="il-problem-head il-problem-head-easy">ADD & SUB</span>`;
+      op = '+';
+      correctAnswer = a + b;
+      question = `${head}<span class="il-problem-break" aria-hidden="true"></span>${a} + ${b} = ?`;
+      problemMeta = {
+        mode: 'addsub',
+        op,
+        a,
+        b,
+        correct: correctAnswer,
+      };
     }
   }
 
   currentCorrect = correctAnswer;
 
-  // 📝 remember this problem so we can talk about it later
   lastProblemMeta = {
-    mode,
+    ...(problemMeta || {}),
+    mode: problemMeta?.mode || mode,
     op,
-    a,
-    b,
+    a: problemMeta?.a ?? a,
+    b: problemMeta?.b ?? b,
     correct: correctAnswer,
   };
 
-  // 🎲 Generate 2 fake options that aren’t the correct answer
-  let options = [correctAnswer];
-  let tries = 0;
-  while (options.length < 3) {
-    const fake = correctAnswer + Math.floor(Math.random() * 11) - 5;
-    if (!options.includes(fake) && fake >= 0) {
-      options.push(fake);
-    } else {
-      options.push(Math.floor(Math.random() * 50)); // 💥 backup junk answer
-    }
-    if (++tries > 10) break;
-  }
+  const options = generateAnswerOptions(correctAnswer, mode, lastProblemMeta);
 
-  options = options.slice(0, 3);
-  options.sort(() => Math.random() - 0.5);
-
-  // ✍️ Inject into DOM
   problemEl.innerHTML = question;
   answerBtns.forEach((btn, i) => {
     btn.textContent = options[i];
     btn.dataset.value = options[i];
   });
 }
+
 
 function handleAnswer(btn) {
   const guess = Number(btn.dataset.value);
@@ -996,6 +1287,12 @@ function handleCorrect() {
     console.log('💥 Triggering SFX burst!');
     playStreakBurst();
     advanceLakeVision(streak);
+
+    if (isInfinityVisionFullCompletionHit(streak)) {
+      completeInfinityVisionForCurrentShape();
+    }
+
+    pulseInfinityVisionLevelHaptic(streak);
     patternIndex = (patternIndex + 1) % sfxIntervals.length;
     nextTrigger += sfxIntervals[patternIndex];
   }
@@ -1010,28 +1307,30 @@ function handleCorrect() {
 }
 
 
-async function playLakeVisionCrashSound() {
+function playLakeVisionCrashSound() {
+  // ♾️ Lake Vision crash SFX
+  // Direct file route: stable, local, and respects the global mute state.
   try {
-    const sfx = await import('../../managers/sfxManager.js');
-    const play = sfx.playSfx || sfx.playSFX || sfx.playSoundEffect;
-
-    if (typeof play !== 'function') return;
-
-    // Try common wrong-answer ids without making this patch depend on one exact name.
-    // If none exist, sfxManager should safely warn/fallback and the vision still works.
-    for (const id of ['wrong', 'incorrect', 'qs_wrong', 'quickserve_wrong', 'error']) {
-      try {
-        const result = play(id);
-        if (result && typeof result.then === 'function') await result;
-        return;
-      } catch (err) {
-        // Try the next likely id.
-      }
+    if (isMuted()) {
+      return;
     }
+  } catch {
+    // If mute state is temporarily unavailable, fail quiet rather than breaking gameplay.
+    return;
+  }
+
+  try {
+    const crash = new Howl({
+      src: [`${import.meta.env.BASE_URL}assets/audio/SFX/incorrect.mp3`],
+      volume: 0.55,
+    });
+
+    crash.play();
   } catch (err) {
-    console.warn('[Infinity] Lake Vision crash sound unavailable:', err);
+    console.warn('[Infinity] Lake Vision crash SFX failed:', err);
   }
 }
+
 
 function handleIncorrect(guess) {
   const mode = appState.getGameMode();
@@ -1075,34 +1374,319 @@ function showResult(msg, color) {
   setTimeout(() => resultMsg.textContent = '', 1500);
 }
 
+
+
+
+
+const INFINITY_VISIONS_SEEN_STORAGE_KEY = 'scmf.infinity.visionSeenIds';
+const INFINITY_TOP_VISION_RUN_STORAGE_KEY = 'scmf.infinity.topVisionRun';
+
+function getInfinityVisionTotal() {
+  try {
+    return Math.max(1, Number(getLakeVisionTotalCount()) || 3);
+  } catch {
+    return 3;
+  }
+}
+
+function getInfinityVisionIds() {
+  try {
+    const ids = getLakeVisionShapeIds();
+    return Array.isArray(ids) && ids.length ? ids : ['lake_01', 'squares_01', 'flower_01'];
+  } catch {
+    return ['lake_01', 'squares_01', 'flower_01'];
+  }
+}
+
+function normalizeInfinityVisionSeenIds(value) {
+  const validIds = getInfinityVisionIds();
+  const validSet = new Set(validIds);
+
+  let raw = [];
+
+  if (Array.isArray(value)) {
+    raw = value;
+  } else if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      raw = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      raw = value.split(',').map((item) => item.trim()).filter(Boolean);
+    }
+  }
+
+  const clean = [];
+
+  raw.forEach((id) => {
+    if (validSet.has(id) && !clean.includes(id)) {
+      clean.push(id);
+    }
+  });
+
+  return clean;
+}
+
+function readInfinityVisionSeenIds() {
+  try {
+    const profileIds = normalizeInfinityVisionSeenIds(appState?.profile?.infinityVisionSeenIds);
+    if (profileIds.length) {
+      return profileIds;
+    }
+  } catch {}
+
+  try {
+    const storedIds = normalizeInfinityVisionSeenIds(localStorage.getItem(INFINITY_VISIONS_SEEN_STORAGE_KEY));
+    if (storedIds.length) {
+      return storedIds;
+    }
+  } catch {}
+
+  // Legacy fallback from the old numeric field.
+  // This keeps prior progress from vanishing, but future tracking becomes exact by ID.
+  try {
+    const legacyCount = Math.max(0, Number(appState?.profile?.infinityVisionsSeen) || 0);
+    if (legacyCount > 0) {
+      return getInfinityVisionIds().slice(0, legacyCount);
+    }
+  } catch {}
+
+  return [];
+}
+
+function saveInfinityVisionSeenIds(ids = []) {
+  const clean = normalizeInfinityVisionSeenIds(ids);
+
+  try {
+    if (appState?.profile) {
+      appState.profile.infinityVisionSeenIds = clean;
+      appState.profile.infinityVisionsSeen = clean.length; // legacy mirror
+      appState.saveToStorage?.();
+    }
+  } catch {}
+
+  try {
+    localStorage.setItem(INFINITY_VISIONS_SEEN_STORAGE_KEY, JSON.stringify(clean));
+  } catch {}
+
+  return clean;
+}
+
+function markInfinityVisionSeen(shapeId) {
+  if (!shapeId) {
+    return readInfinityVisionSeenIds();
+  }
+
+  const ids = readInfinityVisionSeenIds();
+
+  if (!ids.includes(shapeId)) {
+    ids.push(shapeId);
+  }
+
+  return saveInfinityVisionSeenIds(ids);
+}
+
+function readInfinityVisionsSeen() {
+  return readInfinityVisionSeenIds().length;
+}
+
+function readInfinityTopVisionRun() {
+  const candidates = [];
+
+  try {
+    const profileValue = Number(appState?.profile?.infinityTopVisionRun);
+    if (Number.isFinite(profileValue)) {
+      candidates.push(Math.max(0, profileValue));
+    }
+  } catch {}
+
+  try {
+    const storedValue = Number(localStorage.getItem(INFINITY_TOP_VISION_RUN_STORAGE_KEY));
+    if (Number.isFinite(storedValue)) {
+      candidates.push(Math.max(0, storedValue));
+    }
+  } catch {}
+
+  // Future/legacy safety: if we ever named this differently during testing,
+  // preserve the best real number instead of letting the stat fall backward.
+  try {
+    const legacyValue = Number(appState?.profile?.infinityBestVisionRun);
+    if (Number.isFinite(legacyValue)) {
+      candidates.push(Math.max(0, legacyValue));
+    }
+  } catch {}
+
+  return candidates.length ? Math.max(...candidates) : 0;
+}
+
+
+function saveInfinityTopVisionRun(count = 0) {
+  const safeCount = Math.max(0, Number(count) || 0);
+  const currentBest = readInfinityTopVisionRun();
+  const nextBest = Math.max(currentBest, safeCount);
+
+  try {
+    if (appState?.profile) {
+      appState.profile.infinityTopVisionRun = nextBest;
+      appState.profile.infinityBestVisionRun = nextBest; // harmless legacy mirror
+      appState.saveToStorage?.();
+    }
+  } catch {}
+
+  try {
+    localStorage.setItem(INFINITY_TOP_VISION_RUN_STORAGE_KEY, String(nextBest));
+  } catch {}
+
+  return nextBest;
+}
+
+
+function isInfinityVisionFullCompletionHit(runStreak = 0) {
+  const s = Math.max(0, Number(runStreak) || 0);
+  return s >= 12 && (s - 12) % 21 === 0;
+}
+
+function completeInfinityVisionForCurrentShape() {
+  runVisionsCompleted += 1;
+
+  const shapeId = getCurrentLakeVisionShapeId();
+  markInfinityVisionSeen(shapeId);
+
+  // This is the active run tracker:
+  // 1, 2, 3... and yes, 6/7/8+ if the player keeps cooking.
+  const topVisionRun = saveInfinityTopVisionRun(runVisionsCompleted);
+
+  updateVisionCounter();
+
+  return {
+    shapeId,
+    runVisionsCompleted,
+    seenCount: readInfinityVisionsSeen(),
+    total: getInfinityVisionTotal(),
+    topVisionRun,
+  };
+}
+
+
+function pulseInfinityVisionLevelHaptic(runStreak = 0) {
+  try {
+    if (isInfinityVisionFullCompletionHit(runStreak)) {
+      hapticSuccess();
+      return;
+    }
+
+    hapticSoftPulse();
+  } catch (err) {
+    console.warn('[Infinity] vision level haptic failed:', err);
+  }
+}
+
+function buildInfinityResultFlavor({
+  score = 0,
+  runStreak = 0,
+  runVisions = 0,
+  isNewHighScore = false,
+  isNewStreak = false,
+} = {}) {
+  if (isNewHighScore && isNewStreak) {
+    return 'New bests across the board. The lake absolutely noticed.';
+  }
+
+  if (isNewHighScore) {
+    return 'New top score. That one goes on the board.';
+  }
+
+  if (isNewStreak) {
+    return 'New top streak. You found the rhythm.';
+  }
+
+  if (runVisions >= 3) {
+    return 'The lake kept opening.';
+  }
+
+  if (runVisions === 2) {
+    return 'Two visions broke through.';
+  }
+
+  if (runVisions === 1) {
+    return 'The vision came through.';
+  }
+
+  if (runStreak >= 9) {
+    return 'The shape was almost complete.';
+  }
+
+  if (runStreak >= 3) {
+    return 'First light on the water.';
+  }
+
+  if (score > 0 || runStreak > 0) {
+    return 'The lake is warming up.';
+  }
+
+  return 'The next vision is waiting.';
+}
+
+
 /*popup*/
-function showResultPopup({ score, highScore, streak, longest, time }) {
+function showResultPopup({
+  score,
+  highScore,
+  streak,
+  longest,
+  time,
+  isNewHighScore = false,
+  isNewStreak = false,
+} = {}) {
   const overlay = document.getElementById('ilResultOverlay');
   const popup   = document.getElementById('ilResultPopup');
   if (!overlay || !popup) return;
 
-  // 🌊 This run
-  const scoreEl     = document.getElementById('ilScoreFinal');
+  const safeScore = Math.max(0, Number(score) || 0);
+  const safeHighScore = Math.max(0, Number(highScore) || 0);
+  const safeRunStreak = Math.max(0, Number(streak) || 0);
+  const safeBestStreak = Math.max(0, Number(longest) || 0);
+
+  const visionTotal = getInfinityVisionTotal();
+  const seenCount = readInfinityVisionSeenIds().length;
+  const topVisionRun = saveInfinityTopVisionRun(runVisionsCompleted);
+
+  const scoreEl = document.getElementById('ilScoreFinal');
+  const highScoreEl = document.getElementById('ilHighScore');
   const streakRunEl = document.getElementById('ilStreakRun');
+  const longestEl = document.getElementById('ilStreak');
+  const visionEl = document.getElementById('ilVisionReached');
+  const visionRunEl = document.getElementById('ilVisionRunCount');
+  const topVisionRunEl = document.getElementById('ilTopVisionRun');
+  const flavorEl = document.getElementById('ilResultFlavor');
 
-  if (scoreEl)     scoreEl.textContent     = score;
-  if (streakRunEl) streakRunEl.textContent = streak;
+  if (scoreEl) scoreEl.textContent = safeScore;
+  if (highScoreEl) highScoreEl.textContent = safeHighScore;
+  if (streakRunEl) streakRunEl.textContent = safeRunStreak;
+  if (longestEl) longestEl.textContent = safeBestStreak;
 
-  // 🏅 Lifetime records
-  const highScoreEl   = document.getElementById('ilHighScore');
-  const longestEl     = document.getElementById('ilStreak');
-
-  if (highScoreEl) highScoreEl.textContent = highScore;
-  if (longestEl)   longestEl.textContent   = longest;
-
-  // (time is still available if you ever want to log/use it,
-  // but we don't show it in the popup anymore)
-
-  // 🧠 Teaching tip
-  const tipEl = document.getElementById('ilTipText');
-  if (tipEl) {
-    tipEl.textContent = buildInfinityTip();
+  if (visionEl) {
+    visionEl.textContent = `${seenCount} of ${visionTotal}`;
+    visionEl.dataset.seenCount = String(seenCount);
+    visionEl.dataset.visionTotal = String(visionTotal);
   }
+
+  if (visionRunEl) visionRunEl.textContent = runVisionsCompleted;
+  if (topVisionRunEl) topVisionRunEl.textContent = topVisionRun;
+
+  if (flavorEl) {
+    flavorEl.textContent = buildInfinityResultFlavor({
+      score: safeScore,
+      runStreak: safeRunStreak,
+      runVisions: runVisionsCompleted,
+      isNewHighScore,
+      isNewStreak,
+    });
+  }
+
+  popup.dataset.seenCount = String(seenCount);
+  popup.dataset.visionTotal = String(visionTotal);
+  popup.dataset.runVisions = String(runVisionsCompleted);
+  popup.classList.toggle('has-new-record', Boolean(isNewHighScore || isNewStreak));
 
   // 🔒 freeze hotkeys while modal is up
   activateInputHandler(null);
@@ -1117,6 +1701,10 @@ function showResultPopup({ score, highScore, streak, longest, time }) {
     console.warn('[Infinity] hapticSuccess failed:', e);
   }
 }
+
+
+
+
 
 function closeResultPopup() {
   const overlay = document.getElementById('ilResultOverlay');
@@ -1358,6 +1946,18 @@ function commitInfinityRun({ reason = 'unknown', showPopup = false } = {}) {
     console.warn('[Infinity] finalizeInfinityRun failed during commit:', e);
   }
 
+  saveInfinityTopVisionRun(runVisionsCompleted);
+
+
+  // 3.5) Persist Top Vision Run from the active run.
+  // This is the best completed-full-vision count in one run,
+  // not lifetime unique designs seen.
+  try {
+    saveInfinityTopVisionRun(runVisionsCompleted);
+  } catch (e) {
+    console.warn('[Infinity] saveInfinityTopVisionRun failed during commit:', e);
+  }
+
   // 4) Force persistence immediately (important on iOS if user bounces / app suspends)
   try {
     appState?.saveToStorage?.();
@@ -1380,7 +1980,9 @@ function commitInfinityRun({ reason = 'unknown', showPopup = false } = {}) {
         streak: runStreak,
         highScore: appState.profile.infinityHighScore || 0,
         longest: lifetimeStreak,
-        time: timeLabel
+        time: timeLabel,
+        isNewHighScore,
+        isNewStreak
       });
 
       // Confetti only when breaking records (matches your current behavior)

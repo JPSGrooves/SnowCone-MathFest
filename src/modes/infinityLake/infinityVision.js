@@ -1,22 +1,14 @@
 // src/modes/infinityLake/infinityVision.js
-// 🍧 Infinity Lake Vision System v1.3
-//
-// Purpose:
-// - Every 3-correct streak milestone reveals or energizes a lake vision.
-// - Wrong answers crash the current vision apart.
-// - Completed visions now transcend smoothly into the next shape instead of
-//   flying away like broken pieces.
-// - Triplets remain the performers; the vision is the streak-made light show.
+// ♾️ Infinity Lake Vision — Tier Color + Breathing v2
 //
 // Rhythm:
-// 3  → layer_01
-// 6  → layer_02
-// 9  → layer_03
-// 12 → full + big ring burst
-// 15 → ring pulse
-// 18 → color shift + ring pulse
-// 21 → transcend / dissolve
-// 24 → next shape layer_01
+// Tier 1: layer 1 appears yellow
+// Tier 2: layer 2 adds yellow
+// Tier 3: layer 3 adds and turns blue
+// Tier 4: full vision completes, stays blue
+// Tier 5: ring pulse, turns magenta
+// Tier 6: magenta stays, full image starts breathing
+// Tier 7: transcend into next design
 
 const VISION_SHAPES = Object.freeze([
   'lake_01',
@@ -31,366 +23,448 @@ const VISION_LAYER_FILES = Object.freeze([
   'full.png',
 ]);
 
-const COLOR_PHASES = Object.freeze([
-  'cyan',
-  'gold',
-  'pink',
-  'green',
-  'violet',
-]);
-
+let stageEl = null;
+let layerEls = [];
 let shapeIndex = 0;
 let currentLayer = 0;
 let overdriveCount = 0;
-let colorPhaseIndex = 0;
-let collapseTimer = null;
-let pulseTimer = null;
-let transitionTimer = null;
-let burstTimer = null;
+let resetTimer = null;
+let transcendTimer = null;
 
-function assetUrl(shapeId, fileName) {
+function visionBaseUrl() {
   const base = import.meta.env.BASE_URL || '/';
   const cleanBase = base.endsWith('/') ? base : `${base}/`;
-  return `${cleanBase}assets/img/modes/infinityLake/visions/${shapeId}/${fileName}`;
+  return `${cleanBase}assets/img/modes/infinityLake/visions`;
 }
 
-function getStage() {
-  return document.getElementById('lakeVisionStage');
+function getShapeId(index = shapeIndex) {
+  return VISION_SHAPES[((index % VISION_SHAPES.length) + VISION_SHAPES.length) % VISION_SHAPES.length];
 }
 
-function getLayerEls() {
-  return Array.from(document.querySelectorAll('.lake-vision-layer'));
-}
-
-function getCurrentShapeId() {
-  return VISION_SHAPES[shapeIndex] || VISION_SHAPES[0];
-}
-
-function getCurrentColorPhase() {
-  return COLOR_PHASES[colorPhaseIndex] || COLOR_PHASES[0];
+function srcFor(shapeId, fileName) {
+  return `${visionBaseUrl()}/${shapeId}/${fileName}`;
 }
 
 function clearTimers() {
-  for (const timer of [collapseTimer, pulseTimer, transitionTimer, burstTimer]) {
-    if (timer) clearTimeout(timer);
-  }
-
-  collapseTimer = null;
-  pulseTimer = null;
-  transitionTimer = null;
-  burstTimer = null;
+  clearTimeout(resetTimer);
+  clearTimeout(transcendTimer);
+  resetTimer = null;
+  transcendTimer = null;
 }
 
-function applyStageState() {
-  const stage = getStage();
-  if (!stage) return;
+function getLayerEls() {
+  if (!stageEl) return [];
 
-  stage.dataset.visionShape = getCurrentShapeId();
-  stage.dataset.visionLayer = String(currentLayer);
-  stage.dataset.visionPhase = getCurrentColorPhase();
+  return [1, 2, 3, 4]
+    .map((layerNumber) => stageEl.querySelector(`[data-vision-layer="${layerNumber}"]`))
+    .filter(Boolean);
+}
 
-  stage.classList.remove(
+function preloadCurrentShape() {
+  const shapeId = getShapeId();
+
+  VISION_LAYER_FILES.forEach((fileName) => {
+    const img = new Image();
+    img.src = srcFor(shapeId, fileName);
+  });
+}
+
+function loadShapeIntoLayers() {
+  const shapeId = getShapeId();
+
+  if (stageEl) {
+    stageEl.dataset.visionShape = shapeId;
+  }
+
+  layerEls.forEach((layer, index) => {
+    const fileName = VISION_LAYER_FILES[index];
+    if (!fileName) return;
+    layer.src = srcFor(shapeId, fileName);
+  });
+
+  preloadCurrentShape();
+}
+
+function removeTierClasses() {
+  if (!stageEl) return;
+
+  stageEl.classList.remove(
     'phase-cyan',
     'phase-gold',
     'phase-pink',
     'phase-green',
-    'phase-violet'
+    'phase-violet',
+    'phase-yellow',
+    'phase-blue',
+    'phase-magenta',
+    'vision-breathing',
+    'vision-next-arrive',
+    'vision-overdrive',
+    'vision-transcending',
+    'vision-crashing',
+    'vision-pulse',
+    'vision-full-pulse',
+    'vision-ring-pulse',
+    'vision-color-pulse',
+    'vision-handoff-pop',
+    'vision-next-born',
+    'vision-wrong-burst'
   );
-  stage.classList.add(`phase-${getCurrentColorPhase()}`);
-
-  stage.classList.toggle('vision-active', currentLayer > 0);
-  stage.classList.toggle('vision-full', currentLayer >= 4);
 }
 
-function loadShapeImages() {
-  const shapeId = getCurrentShapeId();
-  const layers = getLayerEls();
+function setTierPhase(tier) {
+  if (!stageEl) return;
 
-  layers.forEach((el, index) => {
-    const fileName = VISION_LAYER_FILES[index];
-    if (!fileName) return;
+  stageEl.classList.remove('phase-yellow', 'phase-blue', 'phase-magenta');
 
-    const src = assetUrl(shapeId, fileName);
+  if (tier <= 2) {
+    stageEl.classList.add('phase-yellow');
+    return;
+  }
 
-    if (el.getAttribute('src') !== src) {
-      el.setAttribute('src', src);
-    }
+  if (tier <= 4) {
+    stageEl.classList.add('phase-blue');
+    return;
+  }
 
-    el.dataset.visionAsset = `${shapeId}/${fileName}`;
-  });
-
-  applyStageState();
-}
-
-function resetLayerMotionClasses() {
-  getLayerEls().forEach((el) => {
-    el.classList.remove(
-      'current',
-      'vision-crash-piece',
-      'vision-blast-piece'
-    );
-
-    el.style.removeProperty('--vision-fly-x');
-    el.style.removeProperty('--vision-fly-y');
-    el.style.removeProperty('--vision-fly-rot');
-    el.style.removeProperty('--vision-fly-delay');
-  });
+  stageEl.classList.add('phase-magenta');
 }
 
 function showLayer(layerNumber) {
-  const layers = getLayerEls();
+  const safeLayerNumber = Math.max(0, Math.min(4, Number(layerNumber) || 0));
 
-  layers.forEach((el, index) => {
-    const shouldShow = index < layerNumber;
-    el.classList.toggle('visible', shouldShow);
-    el.classList.toggle('current', index === layerNumber - 1);
+  if (stageEl) {
+    stageEl.classList.toggle('vision-active', safeLayerNumber > 0);
+    stageEl.classList.toggle('vision-full', safeLayerNumber >= 4);
+  }
+
+  layerEls.forEach((layer, index) => {
+    const shouldShow = index < safeLayerNumber;
+    const isCurrent = shouldShow && index === safeLayerNumber - 1;
+
+    // New class from the latest pass.
+    layer.classList.toggle('is-visible', shouldShow);
+
+    // Compatibility with the existing working CSS stack.
+    layer.classList.toggle('visible', shouldShow);
+    layer.classList.toggle('current', isCurrent);
   });
-
-  applyStageState();
-}
-
-function clearMomentClasses(stage) {
-  if (!stage) return;
-
-  stage.classList.remove(
-    'vision-pulse',
-    'vision-overdrive-hit',
-    'vision-full-burst',
-    'vision-ring-burst',
-    'vision-color-shift',
-    'vision-transcending',
-    'vision-next-arrive'
-  );
 }
 
 function pulseVision(kind = 'pulse') {
-  const stage = getStage();
-  if (!stage) return;
+  if (!stageEl) return;
 
-  clearMomentClasses(stage);
+  stageEl.classList.remove(
+    'vision-pulse',
+    'vision-full-pulse',
+    'vision-ring-pulse',
+    'vision-color-pulse'
+  );
 
   // Force animation restart.
   // eslint-disable-next-line no-unused-expressions
-  stage.offsetWidth;
+  stageEl.offsetWidth;
 
   if (kind === 'full') {
-    stage.classList.add('vision-full-burst');
-  } else if (kind === 'color') {
-    stage.classList.add('vision-color-shift', 'vision-ring-burst');
+    stageEl.classList.add('vision-full-pulse');
   } else if (kind === 'ring') {
-    stage.classList.add('vision-ring-burst');
-  } else if (kind === 'overdrive') {
-    stage.classList.add('vision-overdrive-hit', 'vision-ring-burst');
+    stageEl.classList.add('vision-ring-pulse');
+  } else if (kind === 'color') {
+    stageEl.classList.add('vision-color-pulse');
   } else {
-    stage.classList.add('vision-pulse');
+    stageEl.classList.add('vision-pulse');
   }
 
-  if (pulseTimer) clearTimeout(pulseTimer);
-
-  pulseTimer = setTimeout(() => {
-    stage.classList.remove(
+  window.setTimeout(() => {
+    stageEl?.classList.remove(
       'vision-pulse',
-      'vision-overdrive-hit',
-      'vision-ring-burst',
-      'vision-color-shift'
+      'vision-full-pulse',
+      'vision-ring-pulse',
+      'vision-color-pulse'
     );
-  }, kind === 'overdrive' ? 980 : 760);
-
-  if (kind === 'full') {
-    if (burstTimer) clearTimeout(burstTimer);
-    burstTimer = setTimeout(() => {
-      stage.classList.remove('vision-full-burst');
-    }, 1050);
-  }
+  }, 900);
 }
 
-function rotateToNextShape({ startAtLayer = 0 } = {}) {
-  shapeIndex = (shapeIndex + 1) % VISION_SHAPES.length;
-  currentLayer = startAtLayer;
-  overdriveCount = 0;
-  loadShapeImages();
-  showLayer(currentLayer);
-}
+function resetVisibleLayers() {
+  layerEls.forEach((layer) => {
+    layer.classList.remove(
+      'is-visible',
+      'visible',
+      'current',
+      'vision-crash-piece',
+      'vision-crash-hide-full',
+      'vision-crash-piece-1',
+      'vision-crash-piece-2',
+      'vision-crash-piece-3',
+      'vision-crash-piece-4',
+      'vision-flyoff-piece',
+      'vision-next-piece'
+    );
 
-function setFlyVars(el, index) {
-  const crashMap = [
-    ['-58vw', '18vh', '-22deg', '0ms'],
-    ['48vw', '24vh', '18deg', '44ms'],
-    ['-36vw', '54vh', '-34deg', '88ms'],
-    ['42vw', '-20vh', '26deg', '122ms'],
-  ];
+    layer.style.removeProperty('--vision-crash-x');
+    layer.style.removeProperty('--vision-crash-y');
+    layer.style.removeProperty('--vision-crash-r');
+    layer.style.removeProperty('--vision-crash-scale');
+    layer.style.removeProperty('--vision-crash-delay');
 
-  const [x, y, rot, delay] = crashMap[index % crashMap.length];
-
-  el.style.setProperty('--vision-fly-x', x);
-  el.style.setProperty('--vision-fly-y', y);
-  el.style.setProperty('--vision-fly-rot', rot);
-  el.style.setProperty('--vision-fly-delay', delay);
-}
-
-function crashVisiblePieces() {
-  getLayerEls().forEach((el, index) => {
-    if (!el.classList.contains('visible')) return;
-
-    setFlyVars(el, index);
-
-    el.classList.remove('current');
-
-    // Force each piece animation to restart cleanly.
-    el.classList.remove('vision-crash-piece');
-    // eslint-disable-next-line no-unused-expressions
-    el.offsetWidth;
-    el.classList.add('vision-crash-piece');
+    layer.style.removeProperty('--vision-fly-x');
+    layer.style.removeProperty('--vision-fly-y');
+    layer.style.removeProperty('--vision-fly-rot');
+    layer.style.removeProperty('--vision-fly-delay');
   });
 }
 
-function transcendToNextShape(streakValue = 0) {
-  const stage = getStage();
-  if (!stage) return;
 
-  clearTimers();
-  resetLayerMotionClasses();
 
-  stage.classList.remove(
-    'vision-collapsing',
-    'vision-overdrive-hit',
-    'vision-full-burst',
-    'vision-ring-burst',
-    'vision-color-shift',
-    'vision-next-arrive'
-  );
+export function getLakeVisionTotalCount() {
+  return VISION_SHAPES.length;
+}
 
-  stage.classList.add('vision-overdrive', 'vision-transcending');
 
-  transitionTimer = setTimeout(() => {
-    stage.classList.remove('vision-transcending', 'vision-overdrive');
+export function getLakeVisionShapeIds() {
+  return [...VISION_SHAPES];
+}
 
-    resetLayerMotionClasses();
-    rotateToNextShape({ startAtLayer: 1 });
-
-    stage.classList.add('vision-next-arrive');
-    pulseVision('ring');
-
-    transitionTimer = setTimeout(() => {
-      stage.classList.remove('vision-next-arrive');
-    }, 760);
-  }, 820);
-
-  console.log(`♾️ Lake Vision transcend at streak ${streakValue}`);
+export function getCurrentLakeVisionShapeId() {
+  return getShapeId();
 }
 
 export function initLakeVision() {
-  clearTimers();
-  const stage = getStage();
-  if (!stage) return;
+  stageEl = document.getElementById('lakeVisionStage');
+  if (!stageEl) return;
 
-  resetLayerMotionClasses();
-  loadShapeImages();
-  showLayer(currentLayer);
+  layerEls = getLayerEls();
+  loadShapeIntoLayers();
+  resetLakeVision({ rotateShape: false });
 }
 
-export function resetLakeVision({ rotateShape = false } = {}) {
-  clearTimers();
+export function resetLakeVision({ rotateShape = false, startAtLayer = 0 } = {}) {
+  if (!stageEl) return;
 
-  const stage = getStage();
+  clearTimers();
 
   if (rotateShape) {
     shapeIndex = (shapeIndex + 1) % VISION_SHAPES.length;
   }
 
-  currentLayer = 0;
+  removeTierClasses();
+  resetVisibleLayers();
+
+  loadShapeIntoLayers();
+
+  currentLayer = Math.max(0, Math.min(4, Number(startAtLayer) || 0));
   overdriveCount = 0;
 
-  if (stage) {
-    stage.classList.remove(
-      'vision-active',
-      'vision-full',
-      'vision-collapsing',
-      'vision-pulse',
-      'vision-overdrive',
-      'vision-overdrive-hit',
-      'vision-full-burst',
-      'vision-ring-burst',
-      'vision-color-shift',
-      'vision-transcending',
-      'vision-next-arrive',
-      'vision-blasting'
-    );
+  if (currentLayer > 0) {
+    setTierPhase(currentLayer);
+    showLayer(currentLayer);
+  } else {
+    stageEl.classList.add('phase-yellow');
+    stageEl.classList.remove('vision-active', 'vision-full');
+    showLayer(0);
   }
-
-  resetLayerMotionClasses();
-  loadShapeImages();
-  showLayer(0);
 }
 
 export function advanceLakeVision(streakValue = 0) {
-  const stage = getStage();
-  if (!stage) return;
+  if (!stageEl) return;
 
-  clearTimers();
-  resetLayerMotionClasses();
+  if (!layerEls.length) {
+    layerEls = getLayerEls();
+  }
 
-  stage.classList.remove(
-    'vision-collapsing',
-    'vision-transcending',
-    'vision-next-arrive'
-  );
-
-  // First four 3-streak hits build the image:
-  // 3 → layer 1, 6 → layer 2, 9 → layer 3, 12 → full.
   if (currentLayer < 4) {
     currentLayer += 1;
+
+    setTierPhase(currentLayer);
     showLayer(currentLayer);
-    pulseVision(currentLayer >= 4 ? 'full' : 'pulse');
+
+    pulseVision(currentLayer === 4 ? 'full' : 'pulse');
     return;
   }
 
-  // After full reveal:
-  // 15 → ring pulse
-  // 18 → color shift + ring pulse
-  // 21 → smooth transcend into next shape.
   overdriveCount += 1;
 
+  // Tier 5: magenta ring pulse.
   if (overdriveCount === 1) {
+    setTierPhase(5);
+    stageEl.classList.add('vision-overdrive');
     pulseVision('ring');
     return;
   }
 
+  // Tier 6: magenta breathing.
   if (overdriveCount === 2) {
-    colorPhaseIndex = (colorPhaseIndex + 1) % COLOR_PHASES.length;
-    applyStageState();
+    setTierPhase(6);
+    stageEl.classList.add('vision-overdrive', 'vision-breathing');
     pulseVision('color');
     return;
   }
 
+  // Tier 7: transcend into next design.
   transcendToNextShape(streakValue);
 }
 
-export function collapseLakeVision() {
-  const stage = getStage();
+function transcendToNextShape(streakValue = 0) {
+  if (!stageEl) return;
 
-  if (!stage || currentLayer <= 0) {
+  clearTimeout(transcendTimer);
+
+  // Tier 7 handoff:
+  // Keep the charged magenta vision alive, then make it burst into the next design.
+  // The shape swap happens while hidden, so the player sees transformation, not reset.
+  setTierPhase(7);
+
+  stageEl.classList.remove(
+    'vision-next-born',
+    'vision-swap-hidden',
+    'vision-transcending'
+  );
+
+  stageEl.classList.add(
+    'vision-overdrive',
+    'vision-breathing',
+    'vision-handoff-pop'
+  );
+
+  transcendTimer = window.setTimeout(() => {
+    if (!stageEl) return;
+
+    // Hide the swap frame so the old full glyph never visibly snaps back.
+    stageEl.classList.add('vision-swap-hidden');
+
+    resetLakeVision({ rotateShape: true, startAtLayer: 1 });
+
+    window.requestAnimationFrame(() => {
+      if (!stageEl) return;
+
+      stageEl.classList.add('vision-next-born');
+      stageEl.classList.remove('vision-swap-hidden');
+
+      window.setTimeout(() => {
+        stageEl?.classList.remove('vision-next-born');
+      }, 1050);
+    });
+  }, 1180);
+}
+
+
+export function collapseLakeVision() {
+  if (!stageEl) return;
+
+  clearTimers();
+
+  if (!layerEls.length) {
+    layerEls = getLayerEls();
+  }
+
+  const visibleLayers = layerEls.filter((layer) =>
+    layer.classList.contains('is-visible') || layer.classList.contains('visible')
+  );
+
+  if (!visibleLayers.length) {
     resetLakeVision({ rotateShape: false });
     return;
   }
 
-  clearTimers();
-
-  stage.classList.remove(
+  // Wrong-answer crash only.
+  // Full.png is a complete alpha image, not a fragment.
+  // In late blue / magenta states, hide that full layer first so it does not
+  // ghost underneath the flying fragment pieces.
+  stageEl.classList.remove(
+    'vision-breathing',
+    'vision-overdrive',
     'vision-pulse',
-    'vision-overdrive-hit',
+    'vision-full-pulse',
+    'vision-ring-pulse',
+    'vision-color-pulse',
     'vision-full-burst',
     'vision-ring-burst',
     'vision-color-shift',
+    'vision-handoff-pop',
+    'vision-next-born',
+    'vision-swap-hidden',
     'vision-transcending',
-    'vision-next-arrive'
+    'vision-next-arrive',
+    'vision-wrong-burst',
+    'vision-wrong-flyoff'
   );
 
-  stage.classList.add('vision-collapsing');
-  crashVisiblePieces();
+  stageEl.classList.add('vision-crashing', 'vision-collapsing', 'vision-no-ghost-crash');
 
-  collapseTimer = setTimeout(() => {
-    stage.classList.remove('vision-collapsing', 'vision-overdrive');
+  const hasFullLayer = visibleLayers.some((layer) => layer.dataset.visionLayer === '4');
+
+  const crashLayers = hasFullLayer
+    ? visibleLayers.filter((layer) => layer.dataset.visionLayer !== '4')
+    : visibleLayers;
+
+  visibleLayers.forEach((layer) => {
+    layer.classList.remove(
+      'current',
+      'vision-crash-piece',
+      'vision-flyoff-piece',
+      'vision-crash-hide-full',
+      'vision-crash-piece-1',
+      'vision-crash-piece-2',
+      'vision-crash-piece-3',
+      'vision-crash-piece-4'
+    );
+
+    layer.style.removeProperty('--vision-crash-x');
+    layer.style.removeProperty('--vision-crash-y');
+    layer.style.removeProperty('--vision-crash-r');
+    layer.style.removeProperty('--vision-crash-scale');
+    layer.style.removeProperty('--vision-crash-delay');
+    layer.style.removeProperty('--vision-fly-x');
+    layer.style.removeProperty('--vision-fly-y');
+    layer.style.removeProperty('--vision-fly-rot');
+    layer.style.removeProperty('--vision-fly-delay');
+  });
+
+  if (hasFullLayer) {
+    visibleLayers
+      .filter((layer) => layer.dataset.visionLayer === '4')
+      .forEach((layer) => {
+        layer.classList.add('vision-crash-hide-full');
+      });
+  }
+
+  const crashMap = [
+    ['-58vw', '18vh', '-22deg', '0ms'],
+    ['48vw', '24vh', '18deg', '44ms'],
+    ['-36vw', '54vh', '-34deg', '88ms'],
+    ['42vw', '-20vh', '26deg', '132ms'],
+  ];
+
+  const activeCrashLayers = crashLayers.length ? crashLayers : visibleLayers;
+
+  activeCrashLayers.forEach((layer, index) => {
+    const [x, y, rot, delay] = crashMap[index % crashMap.length];
+
+    layer.style.setProperty('--vision-fly-x', x);
+    layer.style.setProperty('--vision-fly-y', y);
+    layer.style.setProperty('--vision-fly-rot', rot);
+    layer.style.setProperty('--vision-fly-delay', delay);
+
+    // Force animation restart cleanly.
+    // eslint-disable-next-line no-unused-expressions
+    layer.offsetWidth;
+
+    layer.classList.add('vision-crash-piece');
+  });
+
+  resetTimer = window.setTimeout(() => {
+    stageEl?.classList.remove(
+      'vision-crashing',
+      'vision-collapsing',
+      'vision-no-ghost-crash',
+      'vision-wrong-burst',
+      'vision-wrong-flyoff'
+    );
+
     resetLakeVision({ rotateShape: true });
-  }, 900);
+  }, 1260);
 }
+
+
+
+

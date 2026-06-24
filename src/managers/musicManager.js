@@ -96,6 +96,12 @@ let nativeEndedHandledAt = 0;
 let nativeStateWired = false;
 let nativeStatePollTimer = null;
 
+// Engine polling is NOT the Music Tab scrubber.
+// This keeps Swift-owned native audio advancing in games/modes even when
+// the Radio/Music Tab UI is closed.
+let nativeEngineStatePollTimer = null;
+let nativeEngineStatePollingWanted = false;
+
 function useNativeAudio() {
   return hasNativeAudioBridge();
 }
@@ -252,6 +258,63 @@ function applyNativeAudioState(state = {}) {
   maybeAutoAdvanceNativeEndedTrack(state);
 }
 
+function shouldPollNativeMusicEngineState() {
+  if (!useNativeAudio()) return false;
+  if (!nativeEngineStatePollingWanted) return false;
+
+  try {
+    if (typeof document !== 'undefined') {
+      if (document.hidden || document.visibilityState === 'hidden') {
+        return false;
+      }
+    }
+  } catch {
+    return false;
+  }
+
+  // If Swift has parked SCMF for Apple Music / Spotify, don't poke it.
+  if (nativeSuppressedByExternalAudio) return false;
+
+  // If JS has no active track identity, there is nothing to advance.
+  if (!currentTrackMeta?.id) return false;
+
+  return true;
+}
+
+export function startNativeMusicEnginePolling() {
+  if (!useNativeAudio()) return;
+
+  nativeEngineStatePollingWanted = true;
+  wireNativeAudioStateOnce();
+
+  if (nativeEngineStatePollTimer) return;
+
+  try {
+    nativeRequestMusicState();
+  } catch {}
+
+  nativeEngineStatePollTimer = setInterval(() => {
+    if (!shouldPollNativeMusicEngineState()) {
+      return;
+    }
+
+    try {
+      nativeRequestMusicState();
+    } catch (err) {
+      console.warn('⚠️ Native music engine state request failed:', err);
+    }
+  }, 650);
+}
+
+export function stopNativeMusicEnginePolling() {
+  nativeEngineStatePollingWanted = false;
+
+  if (!nativeEngineStatePollTimer) return;
+
+  clearInterval(nativeEngineStatePollTimer);
+  nativeEngineStatePollTimer = null;
+}
+
 function shouldPollNativeMusicState() {
   if (!useNativeAudio()) return false;
 
@@ -328,6 +391,17 @@ function playNativeTrackByMeta(meta, opts = {}) {
     startAt,
     looping,
   });
+
+  // THE native auto-advance fix:
+  // Swift owns playback, but JS owns shuffle/skip/onEnd logic.
+  // Therefore JS must keep asking Swift for ended state even when the
+  // Radio/Music Tab is closed.
+  startNativeMusicEnginePolling();
+
+  // Prime one state request shortly after play so JS and Swift agree.
+  window.setTimeout(() => {
+    try { nativeRequestMusicState(); } catch {}
+  }, 180);
 
   nativeSeekBase = typeof startAt === 'number' && Number.isFinite(startAt)
     ? Math.max(0, startAt)
@@ -961,6 +1035,7 @@ function bindHowlHandlers(howl, meta, opts = {}) {
 // ─────────────────────────────────────────────────────────────
 export function stopTrack(callback, opts = {}) {
   if (useNativeAudio()) {
+    stopNativeMusicEnginePolling();
     nativeStopTrack();
 
     nativePlaying = false;

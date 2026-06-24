@@ -4122,3 +4122,1993 @@ body.il-active .lake-vision-stage.vision-transcending .lake-vision-layer.vision-
   }
 }
 
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Triplet Smooth Placeholder Pass
+   Purpose:
+   - Smooth current placeholder Triplet PNG swaps.
+   - Do not move Triplets.
+   - Do not affect Lake Vision stack.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active #tripletSpriteIntro,
+body.il-active #tripletSpriteGame {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  transform-style: preserve-3d;
+  will-change: opacity, filter;
+
+  transition:
+    opacity 180ms ease,
+    filter 220ms ease;
+}
+
+/* Pose change: a tiny light dip, not a position shift. */
+body.il-active #tripletSpriteIntro.triplet-pose-swap,
+body.il-active #tripletSpriteGame.triplet-pose-swap {
+  opacity: 0.72 !important;
+  filter:
+    drop-shadow(0 0 12px rgba(0, 255, 238, 0.22))
+    brightness(0.92)
+    blur(0.35px) !important;
+}
+
+/* Pose arrival: soft settle after the new PNG lands. */
+body.il-active #tripletSpriteIntro.triplet-pose-arrive,
+body.il-active #tripletSpriteGame.triplet-pose-arrive {
+  animation: il-triplet-soft-arrive 360ms ease both;
+}
+
+/* Lit strobe: make the lit frame feel intentionally glowy. */
+body.il-active #tripletSpriteIntro.triplet-strobe-lit,
+body.il-active #tripletSpriteGame.triplet-strobe-lit {
+  filter:
+    drop-shadow(0 0 12px rgba(0, 255, 238, 0.18))
+    drop-shadow(0 0 20px rgba(255, 80, 255, 0.10))
+    brightness(1.04);
+}
+
+@keyframes il-triplet-soft-arrive {
+  0% {
+    opacity: 0.78;
+    filter:
+      drop-shadow(0 0 10px rgba(0, 255, 238, 0.18))
+      brightness(0.96)
+      blur(0.3px);
+  }
+
+  100% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 12px rgba(0, 255, 238, 0.12))
+      brightness(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active #tripletSpriteIntro,
+  body.il-active #tripletSpriteGame {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Triplet Quick Crossfade Pass
+   Purpose:
+   - Undo the blurry/glitchy pose dip.
+   - Pose changes now use a clean old-image → new-image crossfade.
+   - Lit/unlit strobe remains direct and snappy.
+   - No position changes. No Lake Vision changes.
+   ────────────────────────────────────────────────────────── */
+
+/* Kill the previous soft-dip/blur behavior if it exists. */
+body.il-active #tripletSpriteIntro.triplet-pose-swap,
+body.il-active #tripletSpriteGame.triplet-pose-swap,
+body.il-active #tripletSpriteIntro.triplet-pose-arrive,
+body.il-active #tripletSpriteGame.triplet-pose-arrive {
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* The live sprite only fades opacity during pose crossfade. */
+body.il-active #tripletSpriteIntro.triplet-crossfade-live,
+body.il-active #tripletSpriteGame.triplet-crossfade-live {
+  transition: opacity 240ms ease !important;
+  filter: none !important;
+}
+
+/* Old pose overlay: exact measured bounds, same parent, same z stack. */
+body.il-active .triplet-crossfade-layer {
+  position: absolute !important;
+  display: block !important;
+
+  object-fit: contain !important;
+  object-position: center center !important;
+
+  opacity: 1;
+  z-index: 3 !important;
+
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+
+  filter: none !important;
+  transform: translateZ(0);
+  transition: opacity 240ms ease !important;
+}
+
+/* Fade the old pose away while the new pose fades in. */
+body.il-active .triplet-crossfade-layer.is-fading-out {
+  opacity: 0;
+}
+
+/* Lit frame may still glow if prior CSS applies, but never blur it. */
+body.il-active #tripletSpriteIntro.triplet-strobe-lit,
+body.il-active #tripletSpriteGame.triplet-strobe-lit {
+  filter:
+    drop-shadow(0 0 10px rgba(0, 255, 238, 0.14))
+    brightness(1.025) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active #tripletSpriteIntro.triplet-crossfade-live,
+  body.il-active #tripletSpriteGame.triplet-crossfade-live,
+  body.il-active .triplet-crossfade-layer {
+    transition: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Triplet Double Buffer Crossfade
+   Purpose:
+   - True two-layer opacity blend between pose PNGs.
+   - Old pose fades 100→0 while new pose fades 0→100.
+   - No blur, no brightness dip, no position move.
+   - Lit/unlit strobe remains direct on the active layer.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-stage {
+  position: relative !important;
+}
+
+/* Base and standby layers share the same CSS positioning rules. */
+body.il-active #tripletSpriteGame.triplet-buffer-base,
+body.il-active .triplet-buffer-layer {
+  position: absolute !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+
+  object-fit: contain !important;
+  object-position: center center !important;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  transform: translateZ(0);
+  will-change: opacity;
+}
+
+/* Important: kill the failed blur/dip experiments. */
+body.il-active #tripletSpriteGame.triplet-pose-swap,
+body.il-active #tripletSpriteGame.triplet-pose-arrive,
+body.il-active .triplet-buffer-layer.triplet-pose-swap,
+body.il-active .triplet-buffer-layer.triplet-pose-arrive {
+  opacity: inherit !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* Crossfade should only animate opacity. */
+body.il-active #tripletSpriteGame.triplet-buffer-base,
+body.il-active .triplet-buffer-layer {
+  transition: opacity 320ms ease !important;
+  filter: none !important;
+}
+
+/* Lit frame: keep the good concert flash, but do not blur or move it. */
+body.il-active #tripletSpriteGame.triplet-strobe-lit,
+body.il-active .triplet-buffer-layer.triplet-strobe-lit {
+  filter:
+    drop-shadow(0 0 10px rgba(0, 255, 238, 0.14))
+    drop-shadow(0 0 16px rgba(255, 80, 255, 0.08))
+    brightness(1.035) !important;
+}
+
+/* Keep Triplets behind the Lake Vision, same as current accepted stack. */
+body.il-active #tripletSpriteGame.triplet-buffer-base,
+body.il-active .triplet-buffer-layer {
+  z-index: 3 !important;
+}
+
+/* The JS temporarily raises the incoming layer during crossfade. */
+body.il-active .triplet-buffer-layer[style*="z-index: 5"],
+body.il-active #tripletSpriteGame[style*="z-index: 5"] {
+  z-index: 4 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active #tripletSpriteGame.triplet-buffer-base,
+  body.il-active .triplet-buffer-layer {
+    transition: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Triplet Constant Theme Glow v2
+   Purpose:
+   - Intro and gameplay Triplets keep one steady theme-responsive CSS glow.
+   - Lit PNGs may change visually, but CSS filter does NOT flash.
+   - No transition/fade/blur/glitch classes affect Triplets anymore.
+   - Lake Vision untouched.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active {
+  --il-triplet-glow-a: color-mix(in srgb, var(--il-pref-accent, #00ffee) 22%, transparent);
+  --il-triplet-glow-b: color-mix(in srgb, var(--il-pref-accent, #00ffee) 12%, transparent);
+}
+
+/* Remove old helper layers entirely. */
+body.il-active .triplet-crossfade-layer,
+body.il-active .triplet-buffer-layer {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* One stable glow for intro and gameplay, regardless of Lit frame. */
+body.il-active #tripletSpriteIntro,
+body.il-active #tripletSpriteGame,
+body.il-active #tripletSpriteIntro.triplet-strobe-lit,
+body.il-active #tripletSpriteGame.triplet-strobe-lit,
+body.il-active #tripletSpriteIntro.triplet-pose-swap,
+body.il-active #tripletSpriteGame.triplet-pose-swap,
+body.il-active #tripletSpriteIntro.triplet-pose-arrive,
+body.il-active #tripletSpriteGame.triplet-pose-arrive,
+body.il-active #tripletSpriteIntro.triplet-crossfade-live,
+body.il-active #tripletSpriteGame.triplet-crossfade-live,
+body.il-active #tripletSpriteIntro.triplet-buffer-base,
+body.il-active #tripletSpriteGame.triplet-buffer-base,
+body.il-active #tripletSpriteIntro.triplet-buffer-active,
+body.il-active #tripletSpriteGame.triplet-buffer-active {
+  opacity: 1 !important;
+  transition: none !important;
+  animation: none !important;
+
+  filter:
+    drop-shadow(0 0 10px var(--il-triplet-glow-a))
+    drop-shadow(0 0 18px var(--il-triplet-glow-b))
+    drop-shadow(0 12px 18px rgba(0, 0, 0, 0.34)) !important;
+}
+
+/* Preserve accepted gameplay stack. */
+body.il-active #tripletSpriteGame {
+  position: absolute !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Intro image: theme glow, but keep its existing layout sizing/placement. */
+body.il-active #tripletSpriteIntro {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Results Popup Arcade Card
+   Purpose:
+   - Results popup becomes an arcade afterglow card.
+   - No teaching/advice tone.
+   - Match intro terminology: Best Score / Best Streak.
+   - Small reactive lake dialogue only.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-result-popup.il-results-card {
+  width: min(88vw, 420px) !important;
+  max-height: min(82svh, 620px) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+
+  padding:
+    clamp(1rem, 2.3svh, 1.35rem)
+    clamp(1rem, 4vw, 1.45rem)
+    clamp(1rem, 2.4svh, 1.5rem) !important;
+
+  border: 1px solid color-mix(in srgb, var(--il-pref-accent, #00ffee) 68%, rgba(255,255,255,0.2)) !important;
+  border-radius: 24px !important;
+
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--il-pref-accent, #00ffee) 18%, transparent), transparent 42%),
+    linear-gradient(180deg, rgba(4, 10, 30, 0.96), rgba(1, 4, 16, 0.985)) !important;
+
+  box-shadow:
+    0 0 26px color-mix(in srgb, var(--il-pref-accent, #00ffee) 28%, transparent),
+    0 24px 60px rgba(0, 0, 0, 0.54) !important;
+
+  text-align: center !important;
+}
+
+body.il-active .il-results-kicker {
+  margin-bottom: 0.2rem !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.68rem, 1.8vw, 0.78rem) !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+
+  color: color-mix(in srgb, var(--il-pref-accent, #00ffee) 78%, white) !important;
+  opacity: 0.9 !important;
+}
+
+body.il-active .il-results-card h2 {
+  margin: 0 0 clamp(0.7rem, 2svh, 0.95rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.18rem, 4.8vw, 1.65rem) !important;
+  letter-spacing: 0.04em !important;
+
+  color: #f7fbff !important;
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--il-pref-accent, #00ffee) 50%, transparent) !important;
+}
+
+body.il-active .il-record-badges {
+  display: flex !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.4rem !important;
+
+  min-height: 1.55rem !important;
+  margin-bottom: clamp(0.45rem, 1.4svh, 0.75rem) !important;
+}
+
+body.il-active .il-record-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0.32rem 0.62rem !important;
+  border-radius: 999px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.8vw, 0.7rem) !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+
+  color: #031020 !important;
+  background: color-mix(in srgb, var(--il-pref-accent, #00ffee) 78%, white) !important;
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--il-pref-accent, #00ffee) 54%, transparent) !important;
+}
+
+body.il-active .il-results-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: clamp(0.55rem, 2vw, 0.75rem) !important;
+  margin-bottom: clamp(0.65rem, 1.8svh, 0.9rem) !important;
+}
+
+body.il-active .il-results-panel,
+body.il-active .il-vision-result-panel {
+  border: 1px solid color-mix(in srgb, var(--il-pref-accent, #00ffee) 36%, rgba(255,255,255,0.16)) !important;
+  border-radius: 18px !important;
+
+  background:
+    linear-gradient(180deg, rgba(7, 18, 48, 0.74), rgba(1, 5, 18, 0.86)) !important;
+
+  box-shadow:
+    inset 0 0 16px rgba(255,255,255,0.035),
+    0 0 14px color-mix(in srgb, var(--il-pref-accent, #00ffee) 10%, transparent) !important;
+}
+
+body.il-active .il-results-panel {
+  padding: clamp(0.72rem, 2svh, 0.95rem) 0.58rem !important;
+}
+
+body.il-active .il-vision-result-panel {
+  padding: clamp(0.7rem, 1.8svh, 0.9rem) 0.7rem !important;
+  margin-bottom: clamp(0.7rem, 1.8svh, 0.95rem) !important;
+}
+
+body.il-active .il-results-label {
+  display: block !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.9vw, 0.72rem) !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+
+  color: color-mix(in srgb, var(--il-pref-accent, #00ffee) 70%, white) !important;
+  opacity: 0.9 !important;
+}
+
+body.il-active .il-results-panel strong,
+body.il-active .il-vision-result-panel strong {
+  display: block !important;
+
+  margin: 0.18rem 0 0.14rem !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.38rem, 6.8vw, 2.2rem) !important;
+  line-height: 1 !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 14px color-mix(in srgb, var(--il-pref-accent, #00ffee) 42%, transparent) !important;
+}
+
+body.il-active .il-vision-result-panel strong {
+  font-size: clamp(1rem, 4vw, 1.35rem) !important;
+  letter-spacing: 0.03em !important;
+}
+
+body.il-active .il-results-panel small {
+  display: block !important;
+
+  font-size: clamp(0.66rem, 2.2vw, 0.78rem) !important;
+  color: rgba(235, 247, 255, 0.78) !important;
+}
+
+body.il-active .il-result-flavor {
+  margin:
+    0
+    auto
+    clamp(0.9rem, 2.2svh, 1.1rem) !important;
+
+  max-width: 30ch !important;
+
+  font-size: clamp(0.86rem, 2.9vw, 1rem) !important;
+  line-height: 1.28 !important;
+  color: rgba(244, 250, 255, 0.92) !important;
+}
+
+body.il-active .il-result-buttons {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.65rem !important;
+  margin-top: 0 !important;
+}
+
+body.il-active .il-result-buttons button {
+  min-height: 3rem !important;
+  border-radius: 16px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  font-size: clamp(0.72rem, 2.3vw, 0.84rem) !important;
+}
+
+body.il-active .il-results-primary {
+  color: #031020 !important;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--il-pref-accent, #00ffee) 78%, white), var(--il-pref-accent, #00ffee)) !important;
+  border: 1px solid rgba(255,255,255,0.36) !important;
+}
+
+body.il-active .il-results-secondary {
+  color: rgba(244, 250, 255, 0.92) !important;
+  background: rgba(2, 8, 24, 0.76) !important;
+  border: 1px solid color-mix(in srgb, var(--il-pref-accent, #00ffee) 34%, rgba(255,255,255,0.16)) !important;
+}
+
+@media (max-height: 740px) {
+  body.il-active .il-result-popup.il-results-card {
+    max-height: 84svh !important;
+    padding: 0.82rem !important;
+  }
+
+  body.il-active .il-results-grid {
+    gap: 0.48rem !important;
+    margin-bottom: 0.52rem !important;
+  }
+
+  body.il-active .il-result-flavor {
+    margin-bottom: 0.68rem !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Results Popup Copy Polish v2
+   Purpose:
+   - Title is simply Results.
+   - Remove new-best bubbles.
+   - Top Score / Top Streak language.
+   - Visions Reached is a number counter.
+   - Back button matches mode stacked arrow/Menu language.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-record-badges,
+body.il-active .il-record-badge {
+  display: none !important;
+}
+
+body.il-active .il-results-card h2 {
+  margin-bottom: clamp(0.86rem, 2.2svh, 1.1rem) !important;
+}
+
+body.il-active .il-results-panel-score .il-results-label,
+body.il-active .il-results-panel-streak .il-results-label {
+  font-size: clamp(0.68rem, 2.12vw, 0.84rem) !important;
+  letter-spacing: 0.115em !important;
+}
+
+body.il-active .il-results-panel strong {
+  font-size: clamp(1.38rem, 6.8vw, 2.2rem) !important;
+}
+
+body.il-active .il-results-panel small {
+  font-size: clamp(0.66rem, 2.2vw, 0.78rem) !important;
+}
+
+body.il-active .il-vision-result-panel .il-results-label {
+  font-size: clamp(0.66rem, 2.05vw, 0.8rem) !important;
+  letter-spacing: 0.11em !important;
+}
+
+body.il-active .il-vision-result-panel strong#ilVisionReached {
+  font-size: clamp(1.55rem, 6.5vw, 2.15rem) !important;
+  line-height: 1 !important;
+}
+
+/* Back to Menu in results: match the in-mode stacked arrow/Menu language. */
+body.il-active #ilResultPopup #ilBackBtn {
+  order: -1 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+
+  min-height: 3rem !important;
+  padding: clamp(0.3rem, 0.85svh, 0.5rem) clamp(0.25rem, 1vw, 0.55rem) !important;
+
+  border-radius: 16px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 14, 38, 0.78),
+      rgba(2, 7, 20, 0.92)
+    ) !important;
+
+  border: 1.5px solid var(--il-pref-glow, rgba(0, 255, 238, 0.5)) !important;
+  color: rgba(225, 245, 255, 0.96) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+    0 8px 18px rgba(0, 0, 0, 0.30),
+    0 0 14px var(--il-pref-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.il-active #ilResultPopup #ilBackBtn .il-util-arrow {
+  display: block !important;
+  font-size: clamp(0.92rem, 1.9svh, 1.12rem) !important;
+  line-height: 0.92 !important;
+  margin-bottom: 2px !important;
+  color: inherit !important;
+}
+
+body.il-active #ilResultPopup #ilBackBtn .il-util-label {
+  display: block !important;
+  max-width: 100% !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.25svh, 0.75rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  color: inherit !important;
+}
+
+body.il-active #ilResultPopup #ilBackBtn:active {
+  transform: translateY(1px) scale(0.985) !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Vision Tier Colors and Final Results Polish
+   - Vision tiers: yellow → blue → magenta → breathing → next design.
+   - Results: stacked Again/Menu buttons.
+   - Intro: 3-column Top Score / Top Streak / Visions.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .lake-vision-stage.phase-yellow {
+  --lake-vision-accent: #ffe86a;
+  --lake-vision-glow: rgba(255, 232, 106, 0.72);
+  --lake-vision-soft: rgba(255, 232, 106, 0.24);
+}
+
+body.il-active .lake-vision-stage.phase-blue {
+  --lake-vision-accent: #62d7ff;
+  --lake-vision-glow: rgba(98, 215, 255, 0.72);
+  --lake-vision-soft: rgba(98, 215, 255, 0.24);
+}
+
+body.il-active .lake-vision-stage.phase-magenta {
+  --lake-vision-accent: #ff4dff;
+  --lake-vision-glow: rgba(255, 77, 255, 0.74);
+  --lake-vision-soft: rgba(255, 77, 255, 0.26);
+}
+
+/* Recolor white transparent PNG vision art through CSS glow/filters. */
+body.il-active .lake-vision-stage.phase-yellow .lake-vision-layer.is-visible {
+  filter:
+    sepia(1)
+    saturate(2.2)
+    hue-rotate(345deg)
+    brightness(1.28)
+    drop-shadow(0 0 10px var(--lake-vision-glow))
+    drop-shadow(0 0 22px var(--lake-vision-soft)) !important;
+}
+
+body.il-active .lake-vision-stage.phase-blue .lake-vision-layer.is-visible {
+  filter:
+    saturate(1.8)
+    hue-rotate(165deg)
+    brightness(1.22)
+    drop-shadow(0 0 10px var(--lake-vision-glow))
+    drop-shadow(0 0 22px var(--lake-vision-soft)) !important;
+}
+
+body.il-active .lake-vision-stage.phase-magenta .lake-vision-layer.is-visible {
+  filter:
+    saturate(2.4)
+    hue-rotate(255deg)
+    brightness(1.24)
+    drop-shadow(0 0 12px var(--lake-vision-glow))
+    drop-shadow(0 0 26px var(--lake-vision-soft)) !important;
+}
+
+/* Tier 6: the complete vision breathes while waiting for transcend. */
+body.il-active .lake-vision-stage.vision-breathing:not(.vision-crashing):not(.vision-transcending) .lake-vision-layer.is-visible {
+  animation: lakeVisionBreath 1.55s ease-in-out infinite !important;
+  transform-origin: center center !important;
+}
+
+@keyframes lakeVisionBreath {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: scale(1.045);
+    opacity: 1;
+  }
+}
+
+/* Intro stat row becomes Top Score / Top Streak / Visions. */
+body.il-active .il-preflight-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+body.il-active .il-preflight-stat-visions strong {
+  white-space: nowrap !important;
+}
+
+/* Results vision counter should read like “0 of 3”. */
+body.il-active .il-vision-result-panel .il-results-label {
+  font-size: clamp(0.66rem, 2.05vw, 0.8rem) !important;
+  letter-spacing: 0.11em !important;
+}
+
+body.il-active .il-vision-result-panel strong#ilVisionReached {
+  font-size: clamp(1.3rem, 5.4vw, 1.9rem) !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1 !important;
+}
+
+/* Stack both result buttons. */
+body.il-active #ilResultPopup #ilPlayAgainBtn,
+body.il-active #ilResultPopup #ilBackBtn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+
+  min-height: 3rem !important;
+  padding: clamp(0.3rem, 0.85svh, 0.5rem) clamp(0.25rem, 1vw, 0.55rem) !important;
+  border-radius: 16px !important;
+}
+
+body.il-active #ilResultPopup #ilPlayAgainBtn .il-util-arrow,
+body.il-active #ilResultPopup #ilBackBtn .il-util-arrow {
+  display: block !important;
+  font-size: clamp(0.92rem, 1.9svh, 1.12rem) !important;
+  line-height: 0.92 !important;
+  margin-bottom: 2px !important;
+  color: inherit !important;
+}
+
+body.il-active #ilResultPopup #ilPlayAgainBtn .il-util-label,
+body.il-active #ilResultPopup #ilBackBtn .il-util-label {
+  display: block !important;
+  max-width: 100% !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.25svh, 0.75rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  color: inherit !important;
+}
+
+body.il-active #ilResultPopup #ilBackBtn {
+  order: -1 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Fix Vision Visibility and Intro Stats
+   Purpose:
+   - Intro stats row is now Top Score | Top Streak | Visions.
+   - Lake Vision v2 JS restores compatibility with old working CSS classes.
+   - Yellow / Blue / Magenta phases feed both old and new vision variables.
+   ────────────────────────────────────────────────────────── */
+
+/* Intro stat box: three real columns, two dividers. */
+body.il-active .il-preflight-stats-merged {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: clamp(7px, 1.6vw, 14px) !important;
+
+  width: min(92vw, 650px) !important;
+  padding: clamp(8px, 1.05svh, 12px) clamp(10px, 2vw, 18px) !important;
+}
+
+body.il-active .il-preflight-stats-merged .il-preflight-stat-col {
+  min-width: 0 !important;
+  text-align: center !important;
+}
+
+body.il-active .il-preflight-stats-merged .il-preflight-stat-col span {
+  display: block !important;
+  margin-bottom: 0.12rem !important;
+
+  color: rgba(230, 255, 255, 0.92) !important;
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.62rem, 1.35svh, 0.84rem) !important;
+  letter-spacing: 0.075em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+}
+
+body.il-active .il-preflight-stats-merged .il-preflight-stat-col strong {
+  display: block !important;
+
+  color: #ffffff !important;
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.18rem, 3.05svh, 1.8rem) !important;
+  line-height: 1 !important;
+
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.52),
+    0 0 18px var(--il-pref-glow, rgba(0,255,238,0.3)) !important;
+}
+
+/* Visions is textier than the numbers, so keep it from blowing the row. */
+body.il-active .il-preflight-stats-merged .il-preflight-stat-visions strong {
+  font-size: clamp(0.86rem, 2.35svh, 1.36rem) !important;
+  white-space: nowrap !important;
+}
+
+body.il-active .il-preflight-stats-merged .il-preflight-stat-divider {
+  width: 1px !important;
+  height: clamp(34px, 5svh, 52px) !important;
+  opacity: 0.85 !important;
+}
+
+/* Small phone guard: still three columns, just tighter. */
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active .il-preflight-stats-merged {
+    width: min(92vw, 520px) !important;
+    gap: 7px !important;
+    padding: 8px 10px !important;
+  }
+
+  body.il-active .il-preflight-stats-merged .il-preflight-stat-col span {
+    font-size: clamp(0.56rem, 1.18svh, 0.72rem) !important;
+    letter-spacing: 0.055em !important;
+  }
+
+  body.il-active .il-preflight-stats-merged .il-preflight-stat-col strong {
+    font-size: clamp(1rem, 2.55svh, 1.48rem) !important;
+  }
+
+  body.il-active .il-preflight-stats-merged .il-preflight-stat-visions strong {
+    font-size: clamp(0.74rem, 2.05svh, 1.08rem) !important;
+  }
+}
+
+/* Vision phases must feed BOTH systems:
+   older working CSS uses --lake-vision-color,
+   newer tier pass used --lake-vision-glow/accent. */
+body.il-active .lake-vision-stage.phase-yellow {
+  --lake-vision-color: #ffe86a !important;
+  --lake-vision-accent: #ffe86a !important;
+  --lake-vision-glow: rgba(255, 232, 106, 0.76) !important;
+  --lake-vision-soft: rgba(255, 232, 106, 0.28) !important;
+}
+
+body.il-active .lake-vision-stage.phase-blue {
+  --lake-vision-color: #62d7ff !important;
+  --lake-vision-accent: #62d7ff !important;
+  --lake-vision-glow: rgba(98, 215, 255, 0.76) !important;
+  --lake-vision-soft: rgba(98, 215, 255, 0.28) !important;
+}
+
+body.il-active .lake-vision-stage.phase-magenta {
+  --lake-vision-color: #ff4dff !important;
+  --lake-vision-accent: #ff4dff !important;
+  --lake-vision-glow: rgba(255, 77, 255, 0.78) !important;
+  --lake-vision-soft: rgba(255, 77, 255, 0.30) !important;
+}
+
+/* Compatibility: either .visible or .is-visible should render. */
+body.il-active .lake-vision-stage.vision-active {
+  opacity: 0.82 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+body.il-active .lake-vision-stage.vision-full {
+  opacity: 0.96 !important;
+}
+
+body.il-active .lake-vision-layer.visible,
+body.il-active .lake-vision-layer.is-visible {
+  opacity: 0.88 !important;
+  transform: scale(1) !important;
+}
+
+body.il-active .lake-vision-layer.current {
+  opacity: 1 !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Magenta Overdrive Tune
+   Purpose:
+   - Tier 5 magenta ring pulse should feel special, not nuclear.
+   - Tier 6 magenta breathing should feel like “about to pop.”
+   - CSS-only. No vision logic changes.
+   ────────────────────────────────────────────────────────── */
+
+/* Tier 5:
+   After the blue full vision, the first magenta overdrive should be a clean
+   ring pulse, not a giant blown-out glow cloud. */
+body.il-active .lake-vision-stage.phase-magenta.vision-overdrive:not(.vision-breathing):not(.vision-transcending) {
+  opacity: 0.94 !important;
+
+  filter:
+    drop-shadow(0 0 10px rgba(255, 77, 255, 0.58))
+    drop-shadow(0 0 22px rgba(255, 77, 255, 0.22))
+    brightness(1.04) !important;
+}
+
+body.il-active .lake-vision-stage.phase-magenta.vision-overdrive:not(.vision-breathing):not(.vision-transcending) .lake-vision-layer.visible,
+body.il-active .lake-vision-stage.phase-magenta.vision-overdrive:not(.vision-breathing):not(.vision-transcending) .lake-vision-layer.is-visible {
+  opacity: 0.9 !important;
+
+  filter:
+    saturate(2.1)
+    hue-rotate(255deg)
+    brightness(1.08)
+    drop-shadow(0 0 9px rgba(255, 77, 255, 0.62))
+    drop-shadow(0 0 20px rgba(255, 77, 255, 0.22)) !important;
+}
+
+/* Make the tier-5 ring itself readable but not screen-washing. */
+body.il-active .lake-vision-stage.phase-magenta.vision-ring-pulse::after,
+body.il-active .lake-vision-stage.phase-magenta.vision-ring-burst::after {
+  border-color: rgba(255, 92, 255, 0.82) !important;
+
+  box-shadow:
+    0 0 10px rgba(255, 92, 255, 0.66),
+    0 0 22px rgba(255, 92, 255, 0.24) !important;
+
+  animation: lakeVisionMagentaCleanRing 820ms ease-out both !important;
+}
+
+body.il-active .lake-vision-stage.phase-magenta.vision-ring-pulse::before,
+body.il-active .lake-vision-stage.phase-magenta.vision-ring-burst::before {
+  opacity: 0.72 !important;
+  animation: lakeVisionMagentaTinySparks 820ms ease-out both !important;
+}
+
+/* Tier 6:
+   This is the “about to pop” state.
+   It should charge upward, not dim down. */
+body.il-active .lake-vision-stage.phase-magenta.vision-breathing:not(.vision-crashing):not(.vision-transcending) {
+  opacity: 1 !important;
+
+  filter:
+    drop-shadow(0 0 16px rgba(255, 77, 255, 0.76))
+    drop-shadow(0 0 34px rgba(255, 77, 255, 0.30))
+    brightness(1.12) !important;
+}
+
+/* Override the previous breathing animation that could read like dimming. */
+body.il-active .lake-vision-stage.phase-magenta.vision-breathing:not(.vision-crashing):not(.vision-transcending) .lake-vision-layer.visible,
+body.il-active .lake-vision-stage.phase-magenta.vision-breathing:not(.vision-crashing):not(.vision-transcending) .lake-vision-layer.is-visible {
+  opacity: 1 !important;
+  transform-origin: center center !important;
+
+  animation: lakeVisionMagentaChargeBreath 1.22s ease-in-out infinite !important;
+
+  filter:
+    saturate(2.45)
+    hue-rotate(255deg)
+    brightness(1.16)
+    drop-shadow(0 0 13px rgba(255, 77, 255, 0.82))
+    drop-shadow(0 0 30px rgba(255, 77, 255, 0.34)) !important;
+}
+
+/* A subtle charging halo while tier 6 waits for tier 7. */
+body.il-active .lake-vision-stage.phase-magenta.vision-breathing:not(.vision-crashing):not(.vision-transcending)::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -9% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  border: 2px solid rgba(255, 92, 255, 0.58) !important;
+
+  box-shadow:
+    0 0 12px rgba(255, 92, 255, 0.58),
+    0 0 28px rgba(255, 92, 255, 0.24),
+    inset 0 0 18px rgba(255, 92, 255, 0.12) !important;
+
+  animation: lakeVisionMagentaChargeRing 1.22s ease-in-out infinite !important;
+}
+
+body.il-active .lake-vision-stage.phase-magenta.vision-breathing:not(.vision-crashing):not(.vision-transcending)::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -12% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  background:
+    radial-gradient(circle at 50% 10%, rgba(255,255,255,0.34) 0 2px, transparent 4px),
+    radial-gradient(circle at 84% 42%, rgba(255,92,255,0.42) 0 3px, transparent 6px),
+    radial-gradient(circle at 58% 88%, rgba(255,92,255,0.38) 0 3px, transparent 6px),
+    radial-gradient(circle at 18% 46%, rgba(255,92,255,0.34) 0 2px, transparent 5px) !important;
+
+  opacity: 0.72 !important;
+  animation: lakeVisionMagentaChargeSparks 1.22s ease-in-out infinite !important;
+}
+
+@keyframes lakeVisionMagentaCleanRing {
+  0% {
+    opacity: 0;
+    transform: scale(0.74);
+  }
+
+  34% {
+    opacity: 0.72;
+    transform: scale(0.96);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes lakeVisionMagentaTinySparks {
+  0% {
+    opacity: 0;
+    transform: scale(0.78) rotate(0deg);
+    filter: blur(0.4px);
+  }
+
+  34% {
+    opacity: 0.7;
+    transform: scale(1) rotate(7deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.2) rotate(16deg);
+    filter: blur(1.2px);
+  }
+}
+
+@keyframes lakeVisionMagentaChargeBreath {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter:
+      saturate(2.35)
+      hue-rotate(255deg)
+      brightness(1.14)
+      drop-shadow(0 0 12px rgba(255, 77, 255, 0.78))
+      drop-shadow(0 0 28px rgba(255, 77, 255, 0.30));
+  }
+
+  48% {
+    opacity: 1;
+    transform: scale(1.058);
+    filter:
+      saturate(2.65)
+      hue-rotate(255deg)
+      brightness(1.32)
+      drop-shadow(0 0 19px rgba(255, 95, 255, 0.96))
+      drop-shadow(0 0 42px rgba(255, 95, 255, 0.44));
+  }
+}
+
+@keyframes lakeVisionMagentaChargeRing {
+  0%,
+  100% {
+    opacity: 0.36;
+    transform: scale(0.98);
+  }
+
+  48% {
+    opacity: 0.82;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes lakeVisionMagentaChargeSparks {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.96) rotate(0deg);
+    filter: blur(0.2px);
+  }
+
+  48% {
+    opacity: 0.88;
+    transform: scale(1.16) rotate(12deg);
+    filter: blur(0.7px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active .lake-vision-stage.phase-magenta.vision-breathing .lake-vision-layer.visible,
+  body.il-active .lake-vision-stage.phase-magenta.vision-breathing .lake-vision-layer.is-visible,
+  body.il-active .lake-vision-stage.phase-magenta.vision-breathing::before,
+  body.il-active .lake-vision-stage.phase-magenta.vision-breathing::after {
+    animation: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Vision HUD and Discovery Result Polish
+   Purpose:
+   - In-game HUD: Score | Streak | Visions.
+   - Visions can count beyond 3 during a run.
+   - Result panel shows exact lifetime discovery: 0 of 3.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-stage-metrics {
+  width: min(94%, 520px) !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  display: grid !important;
+}
+
+body.il-active .il-stage-metrics .il-score-box,
+body.il-active .il-stage-metrics .il-streak-box,
+body.il-active .il-stage-metrics .il-vision-box {
+  min-width: 0 !important;
+  width: auto !important;
+
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 0.28rem !important;
+
+  margin: 0 !important;
+  padding: clamp(0.3rem, 0.78svh, 0.52rem) clamp(0.34rem, 1.1vw, 0.62rem) !important;
+
+  border-radius: 13px !important;
+  border-width: 1.5px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.68rem, 1.5svh, 0.95rem) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 10, 28, 0.78),
+      rgba(1, 5, 18, 0.92)
+    ) !important;
+}
+
+body.il-active .il-stage-metrics .il-vision-box {
+  color: var(--il-pref-accent, #00ffee) !important;
+  border: 1.5px solid var(--il-pref-glow, rgba(0,255,238,0.5)) !important;
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.26),
+    0 0 12px var(--il-pref-faint, rgba(0,255,238,0.22)) !important;
+}
+
+body.il-active .il-stage-metrics .il-vision-box span {
+  font-size: clamp(1rem, 2.2svh, 1.38rem) !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.34),
+    0 0 12px currentColor !important;
+}
+
+body.il-active .il-vision-result-panel small {
+  display: block !important;
+  margin-top: 0.18rem !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.62rem, 1.75vw, 0.76rem) !important;
+  letter-spacing: 0.045em !important;
+  color: rgba(235, 247, 255, 0.78) !important;
+}
+
+body.il-active .il-vision-result-panel strong#ilVisionReached {
+  margin-bottom: 0.1rem !important;
+}
+
+@media (max-height: 740px) {
+  body.il-active .il-stage-metrics {
+    width: min(96%, 460px) !important;
+    gap: 0.34rem !important;
+  }
+
+  body.il-active .il-stage-metrics .il-score-box,
+  body.il-active .il-stage-metrics .il-streak-box,
+  body.il-active .il-stage-metrics .il-vision-box {
+    font-size: clamp(0.58rem, 1.25svh, 0.78rem) !important;
+    padding: clamp(0.25rem, 0.62svh, 0.42rem) clamp(0.25rem, 0.85vw, 0.5rem) !important;
+  }
+
+  body.il-active .il-stage-metrics .il-score-box span,
+  body.il-active .il-stage-metrics .il-streak-box span,
+  body.il-active .il-stage-metrics .il-vision-box span {
+    font-size: clamp(0.86rem, 1.85svh, 1.12rem) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Exact HUD Visions Match + Theme Streak
+   Purpose:
+   - Keep Jeremy's existing Score/Streak HUD boxes.
+   - Make Visions use the same shape/glow sizing rules.
+   - Make Streak theme-responsive instead of hardcoded magenta.
+   - Do not alter layout, vision logic, audio, Triplets, answers, or controls.
+   ────────────────────────────────────────────────────────── */
+
+/* The current good chip styling existed for Score/Streak only.
+   Add Visions to that same exact family. */
+body.il-active .il-stage-metrics .il-vision-box {
+  min-width: 0 !important;
+  width: auto !important;
+
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 0.32rem !important;
+
+  margin: 0 !important;
+  padding: clamp(0.34rem, 0.9svh, 0.58rem) clamp(0.58rem, 1.8vw, 0.95rem) !important;
+
+  border-radius: 13px !important;
+  border-width: 1.5px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 10, 28, 0.74),
+      rgba(1, 5, 18, 0.90)
+    ) !important;
+
+  font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: clamp(0.86rem, 1.85svh, 1.08rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+
+  color: var(--il-pref-accent) !important;
+  border-color: var(--il-pref-glow) !important;
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.26),
+    0 0 12px var(--il-pref-glow),
+    inset 0 0 8px var(--il-pref-faint) !important;
+}
+
+/* Visions number matches Score/Streak number treatment. */
+body.il-active .il-stage-metrics .il-vision-box span {
+  font-size: clamp(1.1rem, 2.45svh, 1.52rem) !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.34),
+    0 0 12px var(--il-pref-glow) !important;
+}
+
+/* Replace the hardcoded magenta Streak chip with the active theme accent.
+   This keeps the same box, just changes its color law. */
+body.il-active .il-stage-metrics .il-streak-box {
+  color: var(--il-pref-accent) !important;
+  border-color: var(--il-pref-glow) !important;
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.26),
+    0 0 12px var(--il-pref-glow),
+    inset 0 0 8px var(--il-pref-faint) !important;
+}
+
+/* Streak number glow should follow the same theme glow instead of currentColor magenta. */
+body.il-active .il-stage-metrics .il-streak-box span {
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.34),
+    0 0 12px var(--il-pref-glow) !important;
+}
+
+@media (max-height: 740px) {
+  body.il-active .il-stage-metrics .il-vision-box {
+    min-height: clamp(36px, 4.85svh, 48px) !important;
+    font-size: clamp(0.78rem, 1.62svh, 0.98rem) !important;
+  }
+
+  body.il-active .il-stage-metrics .il-vision-box span {
+    font-size: clamp(1rem, 2.12svh, 1.34rem) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Final Equal Stage HUD Chips
+   Purpose:
+   - Keep the existing chunky chip look.
+   - Force Score / Streak / Visions to be identical boxes.
+   - Make all three theme-responsive.
+   - Fix Visions label size by using one smaller shared chip font.
+   - CSS only.
+   ────────────────────────────────────────────────────────── */
+
+/* The row itself must stop sizing chips by text length. */
+body.il-active .il-stage .il-stage-metrics,
+body.il-active .il-stage-metrics {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: clamp(0.42rem, 1.18svh, 0.82rem) !important;
+  transform: translateX(-50%) !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: min(86%, 520px) !important;
+  gap: clamp(0.52rem, 1.45vw, 0.82rem) !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  z-index: 8 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+/* One exact visual law for all three boxes. */
+body.il-active .il-stage .il-stage-metrics .il-score-box,
+body.il-active .il-stage .il-stage-metrics .il-streak-box,
+body.il-active .il-stage .il-stage-metrics .il-vision-box,
+body.il-active .il-stage-metrics .il-score-box,
+body.il-active .il-stage-metrics .il-streak-box,
+body.il-active .il-stage-metrics .il-vision-box {
+  box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 9 !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: clamp(2.82rem, 5.35svh, 3.58rem) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(0.18rem, 0.55vw, 0.32rem) !important;
+
+  margin: 0 !important;
+  padding: clamp(0.3rem, 0.78svh, 0.48rem) clamp(0.34rem, 0.92vw, 0.58rem) !important;
+
+  border-radius: clamp(13px, 2.2vw, 18px) !important;
+  border: 1.5px solid var(--il-pref-glow, rgba(140, 255, 102, 0.58)) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 10, 28, 0.82),
+      rgba(1, 5, 18, 0.94)
+    ) !important;
+
+  color: var(--il-pref-accent, #8cff66) !important;
+
+  font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: clamp(0.68rem, 1.42svh, 0.88rem) !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+
+  text-shadow:
+    0 0 7px var(--il-pref-glow, rgba(140, 255, 102, 0.42)) !important;
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.26),
+    0 0 12px var(--il-pref-glow, rgba(140, 255, 102, 0.42)),
+    inset 0 0 8px var(--il-pref-faint, rgba(140, 255, 102, 0.18)) !important;
+
+  outline: none !important;
+  filter: none !important;
+}
+
+/* One exact number law for all three values. */
+body.il-active .il-stage .il-stage-metrics .il-score-box span,
+body.il-active .il-stage .il-stage-metrics .il-streak-box span,
+body.il-active .il-stage .il-stage-metrics .il-vision-box span,
+body.il-active .il-stage-metrics .il-score-box span,
+body.il-active .il-stage-metrics .il-streak-box span,
+body.il-active .il-stage-metrics .il-vision-box span {
+  display: inline-block !important;
+
+  min-width: 1ch !important;
+
+  color: #ffffff !important;
+  font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: clamp(1.15rem, 2.48svh, 1.58rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+  line-height: 0.95 !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.34),
+    0 0 12px var(--il-pref-glow, rgba(140, 255, 102, 0.42)) !important;
+}
+
+/* Short iPhone guard: same boxes, just smaller. */
+@media (max-height: 740px) {
+  body.il-active .il-stage .il-stage-metrics,
+  body.il-active .il-stage-metrics {
+    width: min(88%, 470px) !important;
+    gap: clamp(0.42rem, 1.15vw, 0.62rem) !important;
+  }
+
+  body.il-active .il-stage .il-stage-metrics .il-score-box,
+  body.il-active .il-stage .il-stage-metrics .il-streak-box,
+  body.il-active .il-stage .il-stage-metrics .il-vision-box,
+  body.il-active .il-stage-metrics .il-score-box,
+  body.il-active .il-stage-metrics .il-streak-box,
+  body.il-active .il-stage-metrics .il-vision-box {
+    height: clamp(2.42rem, 4.85svh, 3.1rem) !important;
+    padding-inline: clamp(0.22rem, 0.7vw, 0.42rem) !important;
+    font-size: clamp(0.58rem, 1.24svh, 0.76rem) !important;
+    gap: clamp(0.12rem, 0.38vw, 0.24rem) !important;
+  }
+
+  body.il-active .il-stage .il-stage-metrics .il-score-box span,
+  body.il-active .il-stage .il-stage-metrics .il-streak-box span,
+  body.il-active .il-stage .il-stage-metrics .il-vision-box span,
+  body.il-active .il-stage-metrics .il-score-box span,
+  body.il-active .il-stage-metrics .il-streak-box span,
+  body.il-active .il-stage-metrics .il-vision-box span {
+    font-size: clamp(0.98rem, 2.08svh, 1.32rem) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Intro Vision Footnote
+   Purpose:
+   - Adds Top Vision Run under intro Visions stat.
+   - No layout/system changes.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-preflight-stat-visions .il-preflight-vision-footnote {
+  display: block !important;
+  margin-top: clamp(0.18rem, 0.45svh, 0.32rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.52rem, 1.08svh, 0.68rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.055em !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+
+  color: rgba(230, 255, 245, 0.78) !important;
+  text-shadow:
+    0 0 7px var(--il-pref-faint, rgba(120, 255, 120, 0.18)) !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Handoff Pop Transformation v1
+   Purpose:
+   - Tier 7 uses the charged magenta pulse as the actual transition.
+   - Old glyph blooms/flares out.
+   - Source swap happens while hidden.
+   - New glyph is born from the same energy.
+   - No HUD/audio/results changes.
+   ────────────────────────────────────────────────────────── */
+
+/* Hard-hide the single frame where the image source changes. */
+body.il-active .lake-vision-stage.vision-swap-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Old charged vision: bloom into the handoff. */
+body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop {
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  animation: ilVisionHandoffStagePop 1180ms cubic-bezier(.14,.82,.18,1) both !important;
+
+  filter:
+    drop-shadow(0 0 18px rgba(255, 77, 255, 0.92))
+    drop-shadow(0 0 44px rgba(255, 77, 255, 0.42))
+    brightness(1.22) !important;
+}
+
+/* Old glyph itself: go white-hot, expand, dissolve. */
+body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop .lake-vision-layer.visible,
+body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop .lake-vision-layer.is-visible {
+  opacity: 1 !important;
+  transform-origin: center center !important;
+
+  animation: ilVisionHandoffGlyphPop 1180ms cubic-bezier(.14,.82,.18,1) both !important;
+
+  filter:
+    saturate(2.8)
+    hue-rotate(255deg)
+    brightness(1.3)
+    drop-shadow(0 0 18px rgba(255, 96, 255, 1))
+    drop-shadow(0 0 46px rgba(255, 96, 255, 0.48)) !important;
+}
+
+/* The big expanding circle: this is the “lake transformed” beat. */
+body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -17% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  border: 2.5px solid rgba(255, 120, 255, 0.9) !important;
+
+  box-shadow:
+    0 0 18px rgba(255, 120, 255, 0.82),
+    0 0 46px rgba(255, 120, 255, 0.42),
+    0 0 82px rgba(255, 120, 255, 0.20),
+    inset 0 0 28px rgba(255, 120, 255, 0.18) !important;
+
+  animation: ilVisionHandoffRingPop 1180ms ease-out both !important;
+}
+
+/* Spark shell rides the ring outward. */
+body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -20% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  background:
+    radial-gradient(circle at 50% 4%, rgba(255,255,255,0.68) 0 2px, transparent 5px),
+    radial-gradient(circle at 73% 14%, rgba(255,120,255,0.58) 0 3px, transparent 7px),
+    radial-gradient(circle at 94% 48%, rgba(255,120,255,0.52) 0 3px, transparent 8px),
+    radial-gradient(circle at 73% 88%, rgba(255,120,255,0.48) 0 3px, transparent 7px),
+    radial-gradient(circle at 27% 88%, rgba(255,120,255,0.48) 0 3px, transparent 7px),
+    radial-gradient(circle at 6% 48%, rgba(255,120,255,0.52) 0 3px, transparent 8px),
+    radial-gradient(circle at 27% 14%, rgba(255,120,255,0.58) 0 3px, transparent 7px) !important;
+
+  animation: ilVisionHandoffSparkPop 1180ms ease-out both !important;
+}
+
+/* New glyph arrival: born from the same energy, not just swapped in. */
+body.il-active .lake-vision-stage.vision-next-born {
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  animation: ilVisionNextBornStage 1020ms cubic-bezier(.16,.88,.24,1.02) both !important;
+}
+
+/* First layer of next shape pops in cleanly. */
+body.il-active .lake-vision-stage.vision-next-born .lake-vision-layer.visible,
+body.il-active .lake-vision-stage.vision-next-born .lake-vision-layer.is-visible {
+  animation: ilVisionNextBornGlyph 1020ms cubic-bezier(.16,.88,.24,1.02) both !important;
+}
+
+/* Arrival echo ring. */
+body.il-active .lake-vision-stage.vision-next-born::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -12% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  border: 2px solid var(--lake-vision-glow, rgba(255, 232, 106, 0.74)) !important;
+
+  box-shadow:
+    0 0 12px var(--lake-vision-glow, rgba(255, 232, 106, 0.62)),
+    0 0 32px var(--lake-vision-soft, rgba(255, 232, 106, 0.26)) !important;
+
+  animation: ilVisionNextBornRing 1020ms ease-out both !important;
+}
+
+@keyframes ilVisionHandoffStagePop {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  28% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.075);
+  }
+
+  58% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.18);
+  }
+
+  82% {
+    opacity: 0.86;
+    transform: translate(-50%, -50%) scale(1.32);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.52);
+  }
+}
+
+@keyframes ilVisionHandoffGlyphPop {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  28% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  58% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+
+  82% {
+    opacity: 0.62;
+    transform: scale(1.42) rotate(2deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.72) rotate(5deg);
+  }
+}
+
+@keyframes ilVisionHandoffRingPop {
+  0% {
+    opacity: 0.26;
+    transform: scale(0.86);
+  }
+
+  34% {
+    opacity: 0.92;
+    transform: scale(1.08);
+  }
+
+  68% {
+    opacity: 0.62;
+    transform: scale(1.55);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.12);
+  }
+}
+
+@keyframes ilVisionHandoffSparkPop {
+  0% {
+    opacity: 0.34;
+    transform: scale(0.9) rotate(0deg);
+    filter: blur(0.2px);
+  }
+
+  42% {
+    opacity: 1;
+    transform: scale(1.26) rotate(16deg);
+    filter: blur(0.6px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.05) rotate(42deg);
+    filter: blur(2px);
+  }
+}
+
+@keyframes ilVisionNextBornStage {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.68);
+    filter:
+      blur(2.8px)
+      brightness(1.22);
+  }
+
+  42% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.09);
+    filter:
+      blur(0.2px)
+      brightness(1.22)
+      drop-shadow(0 0 16px var(--lake-vision-glow, rgba(255, 232, 106, 0.72)));
+  }
+
+  100% {
+    opacity: 0.82;
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes ilVisionNextBornGlyph {
+  0% {
+    opacity: 0;
+    transform: scale(0.76);
+  }
+
+  42% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ilVisionNextBornRing {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+
+  42% {
+    opacity: 0.82;
+    transform: scale(1.04);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.48);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop,
+  body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop .lake-vision-layer.visible,
+  body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop .lake-vision-layer.is-visible,
+  body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop::before,
+  body.il-active .lake-vision-stage.phase-magenta.vision-handoff-pop::after,
+  body.il-active .lake-vision-stage.vision-next-born,
+  body.il-active .lake-vision-stage.vision-next-born .lake-vision-layer.visible,
+  body.il-active .lake-vision-stage.vision-next-born .lake-vision-layer.is-visible,
+  body.il-active .lake-vision-stage.vision-next-born::after {
+    animation: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Perfect Wrong Answer Flyoff v1
+   Purpose:
+   - Preserve current v2 vision tiers and perfect handoff.
+   - Wrong answers restore the old "aaa damn" fly-off crash.
+   - Uses old --vision-fly-* vectors, not the newer contained burst.
+   - No HUD/audio/results/Triplets/scoring changes.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .lake-vision-stage.vision-collapsing {
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  animation: ilPerfectWrongStageShock 940ms ease both !important;
+}
+
+/* Current visible layers fly away individually. */
+body.il-active .lake-vision-stage.vision-collapsing .lake-vision-layer.vision-crash-piece,
+body.il-active .lake-vision-stage.vision-collapsing .lake-vision-layer.visible.vision-crash-piece,
+body.il-active .lake-vision-stage.vision-collapsing .lake-vision-layer.is-visible.vision-crash-piece,
+body.il-active .lake-vision-layer.vision-crash-piece {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform-origin: center center !important;
+
+  animation: ilPerfectWrongPieceFlyoff 920ms cubic-bezier(.18,.88,.34,1) both !important;
+  animation-delay: var(--vision-fly-delay, 0ms) !important;
+
+  filter:
+    drop-shadow(0 0 9px var(--lake-vision-color, #ffffff))
+    drop-shadow(0 0 18px var(--lake-vision-soft, rgba(255,255,255,0.34))) !important;
+}
+
+/* A quick red shock, but the pieces are the star. */
+body.il-active .lake-vision-stage.vision-collapsing::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -12% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  border: 2px solid rgba(255, 85, 85, 0.82) !important;
+  box-shadow:
+    0 0 16px rgba(255, 85, 85, 0.64),
+    0 0 34px rgba(255, 85, 85, 0.28) !important;
+
+  animation: ilPerfectWrongCrackRing 640ms ease-out both !important;
+}
+
+@keyframes ilPerfectWrongStageShock {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter:
+      drop-shadow(0 0 12px var(--lake-vision-color, #ffffff))
+      brightness(1.08);
+  }
+
+  22% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.055) rotate(-1.2deg);
+    filter:
+      drop-shadow(0 0 18px #ff5555)
+      drop-shadow(0 0 34px rgba(255, 85, 85, 0.34))
+      brightness(1.28)
+      blur(0.35px);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.98) rotate(0.8deg);
+    filter:
+      drop-shadow(0 0 8px #ff5555)
+      brightness(0.98);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+    filter:
+      drop-shadow(0 0 4px #ff5555)
+      blur(2px)
+      brightness(0.8);
+  }
+}
+
+@keyframes ilPerfectWrongPieceFlyoff {
+  0% {
+    opacity: 1;
+    transform:
+      scale(1)
+      translate(0, 0)
+      rotate(0deg);
+    filter:
+      drop-shadow(0 0 7px var(--lake-vision-color, #ffffff))
+      drop-shadow(0 0 16px var(--lake-vision-soft, rgba(255,255,255,0.34)));
+  }
+
+  22% {
+    opacity: 1;
+    transform:
+      scale(1.06)
+      translate(0, -2vh)
+      rotate(-2deg);
+    filter:
+      drop-shadow(0 0 14px #ff5555)
+      drop-shadow(0 0 26px rgba(255,85,85,0.34))
+      brightness(1.22);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(var(--vision-fly-x, 40vw), var(--vision-fly-y, 40vh))
+      rotate(var(--vision-fly-rot, 24deg))
+      scale(0.72);
+    filter:
+      drop-shadow(0 0 5px #ff5555)
+      blur(4px)
+      brightness(0.86);
+  }
+}
+
+@keyframes ilPerfectWrongCrackRing {
+  0% {
+    opacity: 0;
+    transform: scale(0.68);
+  }
+
+  26% {
+    opacity: 0.92;
+    transform: scale(0.98);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.62);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active .lake-vision-stage.vision-collapsing,
+  body.il-active .lake-vision-stage.vision-collapsing::after,
+  body.il-active .lake-vision-stage.vision-collapsing .lake-vision-layer.vision-crash-piece,
+  body.il-active .lake-vision-layer.vision-crash-piece {
+    animation: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Full Layer Wrong Crash Ghost Fix v1
+   Purpose:
+   - Fix late-blue / magenta wrong-answer crash.
+   - Hide full.png during crash because it is a full alpha image.
+   - Explode only fragment layers so no ghost image remains.
+   - Good-answer tier-7 handoff untouched.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .lake-vision-stage.vision-no-ghost-crash::before,
+body.il-active .lake-vision-stage.vision-no-ghost-crash::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+}
+
+/* Full.png must disappear during wrong-answer crash.
+   It is not a separate shard; it is the complete overlay. */
+body.il-active .lake-vision-stage.vision-no-ghost-crash .lake-vision-layer.vision-crash-hide-full,
+body.il-active .lake-vision-stage.vision-no-ghost-crash .lake-vision-layer-full.vision-crash-hide-full {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  transform: scale(0.96) !important;
+}
+
+/* Kill any leftover full-layer visibility while crash is running. */
+body.il-active .lake-vision-stage.vision-no-ghost-crash .lake-vision-layer-full:not(.vision-crash-piece) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+body.il-active .lake-vision-stage.vision-no-ghost-crash.vision-collapsing {
+  opacity: 1 !important;
+  visibility: visible !important;
+  animation: ilWrongCrashStageNoGhost 1180ms ease both !important;
+}
+
+body.il-active .lake-vision-stage.vision-no-ghost-crash .lake-vision-layer.vision-crash-piece {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform-origin: center center !important;
+
+  animation: ilWrongCrashPieceNoGhost 1040ms cubic-bezier(.18,.88,.34,1) both !important;
+  animation-delay: var(--vision-fly-delay, 0ms) !important;
+
+  filter:
+    drop-shadow(0 0 9px var(--lake-vision-color, #ffffff))
+    drop-shadow(0 0 18px var(--lake-vision-soft, rgba(255,255,255,0.34))) !important;
+}
+
+@keyframes ilWrongCrashStageNoGhost {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter:
+      drop-shadow(0 0 12px var(--lake-vision-color, #ffffff))
+      brightness(1.08);
+  }
+
+  22% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04) rotate(-0.8deg);
+    filter:
+      drop-shadow(0 0 14px #ff5555)
+      drop-shadow(0 0 28px rgba(255, 85, 85, 0.28))
+      brightness(1.2);
+  }
+
+  74% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.98) rotate(0.5deg);
+    filter:
+      drop-shadow(0 0 6px #ff5555)
+      brightness(0.95);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.94);
+    filter:
+      blur(2px)
+      brightness(0.72);
+  }
+}
+
+@keyframes ilWrongCrashPieceNoGhost {
+  0% {
+    opacity: 1;
+    transform:
+      scale(1)
+      translate(0, 0)
+      rotate(0deg);
+    filter:
+      drop-shadow(0 0 7px var(--lake-vision-color, #ffffff))
+      drop-shadow(0 0 16px var(--lake-vision-soft, rgba(255,255,255,0.34)));
+  }
+
+  22% {
+    opacity: 1;
+    transform:
+      scale(1.055)
+      translate(0, -2vh)
+      rotate(-2deg);
+    filter:
+      drop-shadow(0 0 13px #ff5555)
+      drop-shadow(0 0 24px rgba(255,85,85,0.30))
+      brightness(1.18);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(var(--vision-fly-x, 40vw), var(--vision-fly-y, 40vh))
+      rotate(var(--vision-fly-rot, 24deg))
+      scale(0.68);
+    filter:
+      drop-shadow(0 0 4px #ff5555)
+      blur(4px)
+      brightness(0.78);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active .lake-vision-stage.vision-no-ghost-crash,
+  body.il-active .lake-vision-stage.vision-no-ghost-crash .lake-vision-layer.vision-crash-piece {
+    animation: none !important;
+  }
+}
+
