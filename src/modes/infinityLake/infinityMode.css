@@ -6112,3 +6112,140 @@ body.il-active .lake-vision-stage.vision-no-ghost-crash .lake-vision-layer.visio
   }
 }
 
+
+/* ───────────── IL Body-Level Result Dimmer Fix — START ─────────────
+   Purpose:
+   - Darken the full iPhone/iPad viewport behind Infinity results.
+   - Do not fight the old 11:16 #ilResultOverlay frame.
+   - Keep existing popup layout untouched.
+   - CSS + tiny JS hook only.
+   ───────────────────────────────────────────────────────────────── */
+
+#ilViewportResultDimmer {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100svh !important;
+
+  z-index: 850 !important;
+
+  display: block !important;
+  pointer-events: none !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      var(--il-pref-faint, rgba(0, 255, 238, 0.20)),
+      transparent 56%
+    ),
+    rgba(0, 0, 0, 0.78) !important;
+
+  opacity: 1 !important;
+}
+
+#ilViewportResultDimmer.hidden,
+body:not(.il-active) #ilViewportResultDimmer {
+  display: none !important;
+}
+
+/* Existing frame-local result overlay/card stays above the full-screen dimmer. */
+body.il-active #ilResultOverlay {
+  z-index: 900 !important;
+}
+
+body.il-active #ilResultPopup {
+  z-index: 999 !important;
+}
+
+/* Prevent stale dimmer from interacting with any other modal/body state. */
+body.il-result-open {
+  overflow: hidden;
+}
+
+/* ───────────── IL Body-Level Result Dimmer Fix — END ───────────── */
+
+
+/* ───────────── IL FINAL Body-Portaled Results Overlay — START ─────────────
+   Purpose:
+   - #ilResultOverlay is moved to document.body by renderUI().
+   - The overlay itself now owns the full iPhone/iPad viewport.
+   - This bypasses the old 11:16 frame, #game-container stacking, and WKWebView quirks.
+   - No gameplay, score, audio, vision, or transition logic touched.
+   ─────────────────────────────────────────────────────────────────────── */
+
+body.il-active > #ilResultOverlay {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100vw !important;
+  min-width: 100vw !important;
+  max-width: none !important;
+
+  height: 100vh !important;
+  height: 100svh !important;
+  min-height: 100svh !important;
+  max-height: none !important;
+
+  z-index: 2147483000 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  box-sizing: border-box !important;
+
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 12px)
+    16px
+    calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+
+  pointer-events: auto !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      var(--il-pref-faint, rgba(0, 255, 238, 0.20)),
+      transparent 56%
+    ),
+    rgba(0, 0, 0, 0.82) !important;
+}
+
+body.il-active > #ilResultOverlay.hidden {
+  display: none !important;
+}
+
+/* The popup now centers inside the body-level full-screen overlay. */
+body.il-active > #ilResultOverlay #ilResultPopup {
+  position: relative !important;
+
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  transform: none !important;
+
+  z-index: 2147483001 !important;
+
+  margin: 0 auto !important;
+
+  max-height: min(82svh, 620px) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* The failed helper dimmer is disabled. The overlay owns dimming now. */
+#ilViewportResultDimmer {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Prevent background body scroll while result modal is up. */
+body.il-result-open {
+  overflow: hidden !important;
+}
+
+/* ───────────── IL FINAL Body-Portaled Results Overlay — END ───────────── */

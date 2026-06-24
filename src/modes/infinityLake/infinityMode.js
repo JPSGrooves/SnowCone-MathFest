@@ -238,8 +238,13 @@ export function loadInfinityMode() {
 }
 
 export function stopInfinityMode() {
-  // 🧼 Always clear the body flag so iOS CSS stops applying
-  document.body.classList.remove('il-active');
+  // 🧼 Always clear the body flags so iOS CSS stops applying
+  document.body.classList.remove('il-active', 'il-result-open');
+  hideInfinityViewportResultDimmer({ remove: true });
+
+  // 🧼 The results modal is portaled to <body>, so container.innerHTML will not remove it.
+  document.body.querySelector('#ilResultOverlay')?.remove();
+  document.body.querySelector('#ilViewportResultDimmer')?.remove();
 
   // ✅ hard reset run state so intro is truly "no run"
   startTime = 0;
@@ -647,6 +652,21 @@ function renderUI() {
       </div>
     </div>
   `;
+
+  // Infinity Lake — BODY PORTAL for result overlay
+  // The old 11:16 frame and #game-container can trap fixed/absolute overlays on iOS.
+  // Move the actual overlay + popup to document.body so the dimmer owns the whole viewport.
+  const resultOverlay = container.querySelector('#ilResultOverlay');
+
+  const staleBodyOverlay = Array
+    .from(document.querySelectorAll('#ilResultOverlay'))
+    .find((el) => el.parentElement === document.body && el !== resultOverlay);
+
+  staleBodyOverlay?.remove();
+
+  if (resultOverlay && resultOverlay.parentElement !== document.body) {
+    document.body.appendChild(resultOverlay);
+  }
 
   applyInfinityPreflightThemeVars(container.querySelector('.il-grid'));
 
@@ -1627,6 +1647,48 @@ function buildInfinityResultFlavor({
 }
 
 
+
+// Infinity Lake — body-level viewport result dimmer
+// The normal #ilResultOverlay is still inside the old IL frame.
+// This body-level dimmer darkens the entire iPhone/iPad viewport behind it.
+function ensureInfinityViewportResultDimmer() {
+  if (typeof document === 'undefined') return null;
+
+  let dimmer = document.getElementById('ilViewportResultDimmer');
+
+  if (!dimmer) {
+    dimmer = document.createElement('div');
+    dimmer.id = 'ilViewportResultDimmer';
+    dimmer.className = 'il-viewport-result-dimmer hidden';
+    dimmer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(dimmer);
+  }
+
+  return dimmer;
+}
+
+function showInfinityViewportResultDimmer() {
+  const dimmer = ensureInfinityViewportResultDimmer();
+  document.body.classList.add('il-result-open');
+  dimmer?.classList.remove('hidden');
+}
+
+function hideInfinityViewportResultDimmer({ remove = false } = {}) {
+  const dimmer = document.getElementById('ilViewportResultDimmer');
+
+  document.body.classList.remove('il-result-open');
+
+  if (!dimmer) return;
+
+  dimmer.classList.add('hidden');
+
+  if (remove) {
+    dimmer.remove();
+  }
+}
+
+
+
 /*popup*/
 function showResultPopup({
   score,
@@ -1691,7 +1753,8 @@ function showResultPopup({
   // 🔒 freeze hotkeys while modal is up
   activateInputHandler(null);
 
-  // 📺 Show overlay
+  // 📺 Show body-level overlay
+  document.body.classList.add('il-result-open');
   overlay.classList.remove('hidden');
 
   // 📳 Soft “set complete” buzz
@@ -1708,6 +1771,10 @@ function showResultPopup({
 
 function closeResultPopup() {
   const overlay = document.getElementById('ilResultOverlay');
+
+  document.body.classList.remove('il-result-open');
+  document.body.querySelector('#ilViewportResultDimmer')?.remove();
+
   if (overlay) overlay.classList.add('hidden');
 }
 
