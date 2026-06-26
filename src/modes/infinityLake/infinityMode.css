@@ -6862,3 +6862,386 @@ body.il-active .il-preflight-vision-footnote {
 
 /* ───────────────── SCMF IL Preflight Stat Labels — END ───────────────── */
 
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Results Button Clip Fix
+   Purpose:
+   - Keep the HUD Glass result buttons.
+   - Stop MENU / AGAIN from feeling oversized inside the results card.
+   - Prevent bottom clipping on iPhone/iPad.
+   - CSS-only: no gameplay, scoring, audio, vision, Game Center, or JS touched.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active > #ilResultOverlay #ilResultPopup,
+body.il-active #ilResultPopup.il-results-card {
+  box-sizing: border-box !important;
+  justify-content: flex-start !important;
+
+  gap: clamp(0.48rem, 1.05svh, 0.78rem) !important;
+
+  padding:
+    clamp(0.85rem, 1.9svh, 1.2rem)
+    clamp(0.95rem, 3.8vw, 1.35rem)
+    clamp(0.82rem, 1.8svh, 1.05rem) !important;
+
+  overflow: hidden !important;
+}
+
+body.il-active #ilResultPopup .il-result-buttons {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+
+  width: 100% !important;
+  gap: clamp(0.5rem, 1.1svh, 0.72rem) !important;
+
+  margin-top: clamp(0.15rem, 0.55svh, 0.35rem) !important;
+  align-items: stretch !important;
+}
+
+body.il-active #ilResultPopup .il-results-primary,
+body.il-active #ilResultPopup .il-results-secondary,
+body.il-active #ilResultPopup #ilPlayAgainBtn,
+body.il-active #ilResultPopup #ilBackBtn {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  min-height: 0 !important;
+  height: clamp(2.65rem, 5.25svh, 3.25rem) !important;
+
+  padding:
+    clamp(0.25rem, 0.65svh, 0.42rem)
+    clamp(0.28rem, 1vw, 0.55rem) !important;
+
+  border-radius: 14px !important;
+  gap: 1px !important;
+}
+
+body.il-active #ilResultPopup .il-util-arrow {
+  font-size: clamp(0.88rem, 1.65svh, 1.02rem) !important;
+  line-height: 0.9 !important;
+  margin-bottom: 0 !important;
+}
+
+body.il-active #ilResultPopup .il-util-label {
+  font-size: clamp(0.52rem, 1.04svh, 0.66rem) !important;
+  line-height: 1 !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* Shorter iPhones get the emergency snowcone squeeze. */
+@media (max-height: 740px) {
+  body.il-active > #ilResultOverlay #ilResultPopup,
+  body.il-active #ilResultPopup.il-results-card {
+    gap: 0.42rem !important;
+    padding: 0.78rem 0.82rem 0.72rem !important;
+  }
+
+  body.il-active #ilResultPopup .il-results-primary,
+  body.il-active #ilResultPopup .il-results-secondary,
+  body.il-active #ilResultPopup #ilPlayAgainBtn,
+  body.il-active #ilResultPopup #ilBackBtn {
+    height: 2.45rem !important;
+    border-radius: 12px !important;
+  }
+
+  body.il-active #ilResultPopup .il-util-arrow {
+    font-size: 0.86rem !important;
+  }
+
+  body.il-active #ilResultPopup .il-util-label {
+    font-size: 0.5rem !important;
+    letter-spacing: 0.085em !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Vision Symbol Tracker
+   Purpose:
+   - Intro/results only.
+   - Shows vision slots in unlock order.
+   - Uses locked cone icon for unseen visions.
+   - Does not touch gameplay HUD or scoring.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-vision-intro-tracker,
+body.il-active .il-vision-result-tracker,
+body.il-active .il-vision-symbol-row {
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  align-items: center !important;
+  justify-items: center !important;
+
+  width: min(100%, 12.5rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  gap: clamp(0.08rem, 0.55vw, 0.22rem) !important;
+  white-space: nowrap !important;
+}
+
+body.il-active .il-vision-intro-tracker {
+  margin-top: clamp(0.22rem, 0.7svh, 0.42rem) !important;
+  margin-bottom: clamp(0.18rem, 0.55svh, 0.34rem) !important;
+}
+
+body.il-active .il-vision-result-tracker {
+  width: min(100%, 13.5rem) !important;
+  margin-top: clamp(0.35rem, 0.9svh, 0.58rem) !important;
+  margin-bottom: clamp(0.25rem, 0.75svh, 0.45rem) !important;
+}
+
+body.il-active .il-vision-symbol {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: clamp(0.82rem, 1.95svh, 1.08rem) !important;
+  height: clamp(0.82rem, 1.95svh, 1.08rem) !important;
+
+  font-size: clamp(0.7rem, 1.7svh, 0.98rem) !important;
+  line-height: 1 !important;
+
+  color: rgba(235, 250, 255, 0.96) !important;
+  text-shadow:
+    0 0 5px rgba(255, 255, 255, 0.35),
+    0 0 10px var(--il-hud-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  overflow: visible !important;
+}
+
+body.il-active .il-vision-symbol.is-unlocked {
+  opacity: 1 !important;
+  filter:
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.3))
+    drop-shadow(0 0 8px var(--il-hud-faint, rgba(0, 255, 238, 0.2))) !important;
+}
+
+body.il-active .il-vision-symbol.is-locked {
+  opacity: 0.72 !important;
+}
+
+body.il-active .il-vision-locked-cone {
+  width: clamp(0.68rem, 1.55svh, 0.88rem) !important;
+  height: clamp(0.68rem, 1.55svh, 0.88rem) !important;
+  object-fit: contain !important;
+  display: block !important;
+
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+
+  filter:
+    brightness(1.65)
+    contrast(0.96)
+    drop-shadow(0 0 4px rgba(190, 230, 255, 0.32))
+    drop-shadow(0 0 8px rgba(120, 190, 255, 0.18)) !important;
+}
+
+body.il-active #ilIntroVisionsSeen {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* The Visions stat column needs enough room for a 10-slot tracker. */
+body.il-active .il-preflight-stat-visions {
+  min-width: min(100%, 13rem) !important;
+}
+
+/* iPad/tablet: let the tracker breathe a tiny bit more. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.il-active .il-vision-intro-tracker {
+    width: min(100%, 14rem) !important;
+  }
+
+  body.il-active .il-vision-result-tracker {
+    width: min(100%, 15rem) !important;
+  }
+
+  body.il-active .il-vision-symbol {
+    width: clamp(0.92rem, 1.65svh, 1.18rem) !important;
+    height: clamp(0.92rem, 1.65svh, 1.18rem) !important;
+    font-size: clamp(0.8rem, 1.42svh, 1.05rem) !important;
+  }
+
+  body.il-active .il-vision-locked-cone {
+    width: clamp(0.75rem, 1.35svh, 0.96rem) !important;
+    height: clamp(0.75rem, 1.35svh, 0.96rem) !important;
+  }
+}
+
+/* Small phones: preserve the row, just shrink the slots. */
+@media (max-width: 390px), (max-height: 720px) {
+  body.il-active .il-vision-intro-tracker,
+  body.il-active .il-vision-result-tracker,
+  body.il-active .il-vision-symbol-row {
+    width: min(100%, 10.6rem) !important;
+    gap: 0.04rem !important;
+  }
+
+  body.il-active .il-vision-symbol {
+    width: 0.62rem !important;
+    height: 0.62rem !important;
+    font-size: 0.54rem !important;
+  }
+
+  body.il-active .il-vision-locked-cone {
+    width: 0.52rem !important;
+    height: 0.52rem !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Wrong Crash Settled Guard
+   Purpose:
+   - Prevent final wrong-answer crash popback flash.
+   - When JS marks the crash as settled, all vision layers stay hidden
+     while the next vision reset/rotation is prepared.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .lake-vision-stage.vision-crash-settled .lake-vision-layer,
+body.il-active .lake-vision-stage.vision-crash-settled .lake-vision-layer.visible,
+body.il-active .lake-vision-stage.vision-crash-settled .lake-vision-layer.is-visible,
+body.il-active .lake-vision-stage.vision-crash-settled .lake-vision-layer.vision-crash-piece,
+body.il-active .lake-vision-stage.vision-crash-settled .lake-vision-layer-full {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  transform: scale(0.96) !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — No Alpha Wrong Crash
+   Purpose:
+   - Stop wrong-answer crash from trusting transparent PNG alpha layers.
+   - Hide real vision art immediately.
+   - Use stage-level burst/shock VFX instead of flying PNG shards.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .lake-vision-stage.vision-no-alpha-crash .lake-vision-layer,
+body.il-active .lake-vision-stage.vision-no-alpha-crash .lake-vision-layer.visible,
+body.il-active .lake-vision-stage.vision-no-alpha-crash .lake-vision-layer.is-visible,
+body.il-active .lake-vision-stage.vision-no-alpha-crash .lake-vision-layer-full,
+body.il-active .lake-vision-stage.vision-no-alpha-crash .lake-vision-layer.vision-crash-piece {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  transform: scale(0.96) !important;
+}
+
+body.il-active .lake-vision-stage.vision-no-alpha-crash {
+  opacity: 1 !important;
+  visibility: visible !important;
+  animation: ilNoAlphaWrongStageShock 760ms ease-out both !important;
+}
+
+body.il-active .lake-vision-stage.vision-no-alpha-crash::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -14% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  border: 2px solid rgba(255, 72, 92, 0.72) !important;
+
+  box-shadow:
+    0 0 16px rgba(255, 72, 92, 0.72),
+    0 0 34px rgba(255, 72, 92, 0.34),
+    inset 0 0 24px rgba(255, 72, 92, 0.18) !important;
+
+  animation: ilNoAlphaWrongRingBurst 760ms ease-out both !important;
+}
+
+body.il-active .lake-vision-stage.vision-no-alpha-crash::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -18% !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.92) 0 2px, transparent 4px),
+    radial-gradient(circle at 18% 36%, rgba(255,80,110,0.92) 0 2px, transparent 4px),
+    radial-gradient(circle at 78% 32%, rgba(0,255,238,0.82) 0 2px, transparent 4px),
+    radial-gradient(circle at 28% 76%, rgba(255,80,110,0.72) 0 2px, transparent 4px),
+    radial-gradient(circle at 72% 72%, rgba(0,255,238,0.62) 0 2px, transparent 4px) !important;
+
+  filter:
+    drop-shadow(0 0 8px rgba(255, 90, 120, 0.72))
+    drop-shadow(0 0 12px rgba(0, 255, 238, 0.24)) !important;
+
+  animation: ilNoAlphaWrongSparkBurst 760ms ease-out both !important;
+}
+
+@keyframes ilNoAlphaWrongStageShock {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter:
+      drop-shadow(0 0 18px rgba(255, 70, 95, 0.55))
+      brightness(1.18);
+  }
+
+  16% {
+    transform: translate3d(-2px, 1px, 0) scale(1.018);
+    filter:
+      drop-shadow(0 0 24px rgba(255, 70, 95, 0.72))
+      brightness(1.32);
+  }
+
+  34% {
+    transform: translate3d(2px, -1px, 0) scale(0.994);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: none;
+  }
+}
+
+@keyframes ilNoAlphaWrongRingBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.64);
+  }
+
+  14% {
+    opacity: 1;
+    transform: scale(0.84);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.74);
+  }
+}
+
+@keyframes ilNoAlphaWrongSparkBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.62) rotate(0deg);
+  }
+
+  18% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-4deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.82) rotate(12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.il-active .lake-vision-stage.vision-no-alpha-crash,
+  body.il-active .lake-vision-stage.vision-no-alpha-crash::before,
+  body.il-active .lake-vision-stage.vision-no-alpha-crash::after {
+    animation: none !important;
+  }
+}
+

@@ -12,9 +12,29 @@
 
 const VISION_SHAPES = Object.freeze([
   'lake_01',
-  'squares_01',
+  'seed_01',
+  'leaf_01',
   'flower_01',
+  'fish_01',
+  'duck_01',
+  'dino_01',
+  'squares_01',
+  'triangle_01',
+  'diamond_01',
 ]);
+
+const VISION_SYMBOLS = Object.freeze({
+  lake_01: '≋',
+  seed_01: '◉',
+  leaf_01: '🍃',
+  flower_01: '✿',
+  fish_01: '🐟',
+  duck_01: '🦆',
+  dino_01: '🦕',
+  squares_01: '□',
+  triangle_01: '△',
+  diamond_01: '◇',
+});
 
 const VISION_LAYER_FILES = Object.freeze([
   'layer_01.png',
@@ -225,6 +245,13 @@ export function getLakeVisionShapeIds() {
   return [...VISION_SHAPES];
 }
 
+export function getLakeVisionDisplayItems() {
+  return VISION_SHAPES.map((id) => ({
+    id,
+    symbol: VISION_SYMBOLS[id] || '?',
+  }));
+}
+
 export function getCurrentLakeVisionShapeId() {
   return getShapeId();
 }
@@ -357,19 +384,24 @@ export function collapseLakeVision() {
     layerEls = getLayerEls();
   }
 
-  const visibleLayers = layerEls.filter((layer) =>
+  const hadVisibleVision = layerEls.some((layer) =>
     layer.classList.contains('is-visible') || layer.classList.contains('visible')
   );
 
-  if (!visibleLayers.length) {
+  if (!hadVisibleVision) {
     resetLakeVision({ rotateShape: false });
     return;
   }
 
-  // Wrong-answer crash only.
-  // Full.png is a complete alpha image, not a fragment.
-  // In late blue / magenta states, hide that full layer first so it does not
-  // ghost underneath the flying fragment pieces.
+  // Wrong-answer crash v2:
+  // Do NOT animate the real transparent PNG vision layers.
+  // The vision art is a 1000x1000 alpha canvas, and moving those real layers
+  // can cause ghosting/popback/compositing weirdness on iOS.
+  //
+  // Instead:
+  // 1. hide all real vision layers immediately,
+  // 2. play a stage-level burst/shock animation,
+  // 3. reset/rotate after the burst.
   stageEl.classList.remove(
     'vision-breathing',
     'vision-overdrive',
@@ -386,18 +418,17 @@ export function collapseLakeVision() {
     'vision-transcending',
     'vision-next-arrive',
     'vision-wrong-burst',
-    'vision-wrong-flyoff'
+    'vision-wrong-flyoff',
+    'vision-crashing',
+    'vision-collapsing',
+    'vision-no-ghost-crash',
+    'vision-crash-settled',
+    'vision-no-alpha-crash'
   );
 
-  stageEl.classList.add('vision-crashing', 'vision-collapsing', 'vision-no-ghost-crash');
+  resetVisibleLayers();
 
-  const hasFullLayer = visibleLayers.some((layer) => layer.dataset.visionLayer === '4');
-
-  const crashLayers = hasFullLayer
-    ? visibleLayers.filter((layer) => layer.dataset.visionLayer !== '4')
-    : visibleLayers;
-
-  visibleLayers.forEach((layer) => {
+  layerEls.forEach((layer) => {
     layer.classList.remove(
       'current',
       'vision-crash-piece',
@@ -420,50 +451,24 @@ export function collapseLakeVision() {
     layer.style.removeProperty('--vision-fly-delay');
   });
 
-  if (hasFullLayer) {
-    visibleLayers
-      .filter((layer) => layer.dataset.visionLayer === '4')
-      .forEach((layer) => {
-        layer.classList.add('vision-crash-hide-full');
-      });
-  }
+  // Force class restart so repeated wrong answers still show the burst.
+  // eslint-disable-next-line no-unused-expressions
+  stageEl.offsetWidth;
 
-  const crashMap = [
-    ['-58vw', '18vh', '-22deg', '0ms'],
-    ['48vw', '24vh', '18deg', '44ms'],
-    ['-36vw', '54vh', '-34deg', '88ms'],
-    ['42vw', '-20vh', '26deg', '132ms'],
-  ];
-
-  const activeCrashLayers = crashLayers.length ? crashLayers : visibleLayers;
-
-  activeCrashLayers.forEach((layer, index) => {
-    const [x, y, rot, delay] = crashMap[index % crashMap.length];
-
-    layer.style.setProperty('--vision-fly-x', x);
-    layer.style.setProperty('--vision-fly-y', y);
-    layer.style.setProperty('--vision-fly-rot', rot);
-    layer.style.setProperty('--vision-fly-delay', delay);
-
-    // Force animation restart cleanly.
-    // eslint-disable-next-line no-unused-expressions
-    layer.offsetWidth;
-
-    layer.classList.add('vision-crash-piece');
-  });
+  stageEl.classList.add('vision-no-alpha-crash', 'vision-collapsing');
 
   resetTimer = window.setTimeout(() => {
-    stageEl?.classList.remove(
-      'vision-crashing',
-      'vision-collapsing',
-      'vision-no-ghost-crash',
-      'vision-wrong-burst',
-      'vision-wrong-flyoff'
-    );
+    if (!stageEl) return;
 
+    resetVisibleLayers();
     resetLakeVision({ rotateShape: true });
-  }, 1260);
+
+    window.requestAnimationFrame(() => {
+      stageEl?.classList.remove('vision-no-alpha-crash', 'vision-collapsing');
+    });
+  }, 860);
 }
+
 
 
 

@@ -1,7 +1,8 @@
 // /src/modes/infinity/infinityMode.js
 
 import './infinityMode.css';
-import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
+import {
+swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playModeReturnTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { startTripletLoop, stopTripletLoop, startTripletSequence } from './tripletAnimator.js';
@@ -20,7 +21,8 @@ import {
   collapseLakeVision,
   getLakeVisionTotalCount,
   getLakeVisionShapeIds,
-  getCurrentLakeVisionShapeId
+  getCurrentLakeVisionShapeId,
+  getLakeVisionDisplayItems
 } from './infinityVision.js';
 
 
@@ -220,10 +222,38 @@ export function loadInfinityMode() {
         if (grid) grid.classList.add('fade-in');
 
         // Start sprite sequence
+        // 🍧 Triplet Concert Loop v3
+        // Open set plays once, then the full jam pattern repeats.
+        // The animator keeps using each pose's normal/Lit pair:
+        // il_jam4.png ↔ il_jam4Lit.png, etc.
         startTripletSequence([
-          { pose: 'openSet', time: 4200, once: true },
+          { pose: 'openSet', time: 4500, once: true },
+
+          { pose: 'jam4', time: 3000 },
+          { pose: 'jam3', time: 3000 },
+          { pose: 'jam4', time: 3000 },
+          { pose: 'jam3', time: 3000 },
+          { pose: 'jam5', time: 4500 },
+          { pose: 'jam6', time: 4500 },
+          { pose: 'jam5', time: 4500 },
+          { pose: 'jam6', time: 4500 },
+          { pose: 'jam5', time: 4500 },
+          { pose: 'jam4', time: 1500 },
+          { pose: 'jam3', time: 1500 },
+          { pose: 'jam4', time: 1500 },
+          { pose: 'jam3', time: 1500 },
+
+          { pose: 'jam2', time: 5200 },
           { pose: 'jam1', time: 5200 },
-          { pose: 'jam2', time: 5200 }
+          { pose: 'jam2', time: 5200 },
+          { pose: 'jam1', time: 5200 },
+          { pose: 'jam2', time: 5200 },
+          { pose: 'jam1', time: 5200 },
+
+          { pose: 'jam5', time: 4000 },
+          { pose: 'jam6', time: 4000 },
+          { pose: 'jam5', time: 4000 },
+          { pose: 'jam6', time: 4000 }
         ], 'tripletSpriteGame');
 
 
@@ -450,7 +480,8 @@ function renderIntroScreen() {
 
               <div class="il-preflight-stat-col il-preflight-stat-visions">
                 <span>Visions</span>
-                <strong id="ilIntroVisionsSeen">${readInfinityVisionSeenIds().length} of ${getInfinityVisionTotal()}</strong>
+                <strong id="ilIntroVisionsSeen">${renderInfinityVisionIntroSummary()}</strong>
+                <div id="ilIntroVisionTracker" class="il-vision-intro-tracker" aria-label="Infinity Lake vision tracker">${renderInfinityVisionSymbolSlots()}</div>
                 <small class="il-preflight-vision-footnote">Top Vision Run: ${readInfinityTopVisionRun()}</small>
               </div>
             </div>
@@ -628,7 +659,8 @@ function renderUI() {
 
             <section class="il-vision-result-panel" aria-label="Visions reached">
               <span class="il-results-label">Visions Reached:</span>
-              <strong id="ilVisionReached">0 of 3</strong>
+              <strong id="ilVisionReached">${readInfinityVisionSeenIds().length} of ${getInfinityVisionTotal()}</strong>
+              <div id="ilVisionResultTracker" class="il-vision-result-tracker" aria-label="Infinity Lake vision tracker">${renderInfinityVisionSymbolSlots()}</div>
               <small>This Run: <span id="ilVisionRunCount">0</span></small>
               <small>Top Vision Run: <span id="ilTopVisionRun">0</span></small>
             </section>
@@ -1390,6 +1422,44 @@ function showResult(msg, color) {
 const INFINITY_VISIONS_SEEN_STORAGE_KEY = 'scmf.infinity.visionSeenIds';
 const INFINITY_TOP_VISION_RUN_STORAGE_KEY = 'scmf.infinity.topVisionRun';
 
+
+function getInfinityVisionLockedConeSrc() {
+  const base = import.meta.env.BASE_URL || '/';
+  const cleanBase = base.endsWith('/') ? base : `${base}/`;
+  return `${cleanBase}assets/img/icons/cone_locked.png`;
+}
+
+function renderInfinityVisionSymbolSlots() {
+  const seenSet = new Set(readInfinityVisionSeenIds());
+  const lockedConeSrc = getInfinityVisionLockedConeSrc();
+
+  return getLakeVisionDisplayItems()
+    .map((item, index) => {
+      const isUnlocked = seenSet.has(item.id);
+      const slotNumber = index + 1;
+      const label = `Vision ${slotNumber}: ${item.id}`;
+
+      if (isUnlocked) {
+        return `<span class="il-vision-symbol is-unlocked" title="${label}" aria-label="${label} unlocked">${item.symbol}</span>`;
+      }
+
+      return `<span class="il-vision-symbol is-locked" title="${label} locked" aria-label="${label} locked"><img class="il-vision-locked-cone" src="${lockedConeSrc}" alt="" /></span>`;
+    })
+    .join('');
+}
+
+function renderInfinityVisionSymbolRow(extraClass = '') {
+  const className = extraClass
+    ? `il-vision-symbol-row ${extraClass}`
+    : 'il-vision-symbol-row';
+
+  return `<span class="${className}" aria-label="Infinity Lake vision tracker">${renderInfinityVisionSymbolSlots()}</span>`;
+}
+
+function renderInfinityVisionIntroSummary() {
+  return `${readInfinityVisionSeenIds().length} of ${getInfinityVisionTotal()}`;
+}
+
 function getInfinityVisionTotal() {
   try {
     return Math.max(1, Number(getLakeVisionTotalCount()) || 3);
@@ -1551,7 +1621,11 @@ function saveInfinityTopVisionRun(count = 0) {
 
 function isInfinityVisionFullCompletionHit(runStreak = 0) {
   const s = Math.max(0, Number(runStreak) || 0);
-  return s >= 12 && (s - 12) % 21 === 0;
+
+  // Bank a Vision only when the completed full vision hands off/transcends.
+  // 12 = full.png appears, but the Vision is not banked yet.
+  // 21 / 42 / 63... = transition into the next Vision, so the run earns +1.
+  return s >= 21 && s % 21 === 0;
 }
 
 function completeInfinityVisionForCurrentShape() {
@@ -1706,6 +1780,7 @@ function showResultPopup({
   const streakRunEl = document.getElementById('ilStreakRun');
   const longestEl = document.getElementById('ilStreak');
   const visionEl = document.getElementById('ilVisionReached');
+  const visionTrackerEl = document.getElementById('ilVisionResultTracker');
   const visionRunEl = document.getElementById('ilVisionRunCount');
   const topVisionRunEl = document.getElementById('ilTopVisionRun');
   const flavorEl = document.getElementById('ilResultFlavor');
@@ -1721,6 +1796,7 @@ function showResultPopup({
     visionEl.dataset.visionTotal = String(visionTotal);
   }
 
+  if (visionTrackerEl) visionTrackerEl.innerHTML = renderInfinityVisionSymbolSlots();
   if (visionRunEl) visionRunEl.textContent = runVisionsCompleted;
   if (topVisionRunEl) topVisionRunEl.textContent = topVisionRun;
 
