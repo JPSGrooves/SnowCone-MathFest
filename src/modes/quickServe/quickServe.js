@@ -25,7 +25,8 @@ import { setupKeypad, generateKeypadHTML } from './quickServeKeypad.js';
 import {
   startGameLogic,
   stopGameLogic,
-  resetCurrentAnswer
+  resetCurrentAnswer,
+  setMathMode
 } from './quickServeGame.js';
 
 import { activateInputHandler } from '../../managers/inputManager.js';
@@ -39,6 +40,269 @@ import { hapticSuccess } from '../../utils/haptics.js';
 const QS_TRACK_IDS = ['quikserve', 'kktribute', 'softdown'];
 let _qsMusicScopeOn = false;
 let qsIntroStartInFlight = false;
+let qsPreflightDifficulty = 'easy';
+let qsSelectedCharacterId = 'cosmicPhil';
+
+const QS_CHARACTER_PHIL_SRC =
+  `${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_intro.png`;
+
+const QS_LOCKED_CHARACTER_PLACEHOLDER_SRC =
+  `${import.meta.env.BASE_URL}assets/img/icons/cone_locked.png`;
+
+const QS_CHARACTER_ROSTER = [
+  {
+    id: 'cosmicPhil',
+    name: 'Cosmic Phil',
+    shortName: 'Phil',
+    unlockLabel: 'Default',
+    unlockScore: 0,
+    boostLabel: 'Boost: None',
+    boostKind: 'none',
+    introSrc: QS_CHARACTER_PHIL_SRC,
+    artClass: 'cosmic-phil',
+  },
+  {
+    id: 'koolKatGirl',
+    name: 'Kool Kat Girl',
+    shortName: 'Kat',
+    unlockLabel: '100',
+    unlockScore: 100,
+    boostLabel: 'Boost: +1 per solve',
+    boostKind: 'plusOne',
+    // Scaffold art until the real PNG is dropped in.
+    introSrc: QS_CHARACTER_PHIL_SRC,
+    artClass: 'kool-kat-girl',
+  },
+  {
+    id: 'doctorSax',
+    name: 'Doctor Sax',
+    shortName: 'Sax',
+    unlockLabel: '200',
+    unlockScore: 200,
+    boostLabel: 'Boost: +2 per solve',
+    boostKind: 'plusTwo',
+    introSrc: QS_CHARACTER_PHIL_SRC,
+    artClass: 'doctor-sax',
+  },
+  {
+    id: 'hoodedDinoDj',
+    name: 'Hooded Dino DJ',
+    shortName: 'Dino DJ',
+    unlockLabel: '400',
+    unlockScore: 400,
+    boostLabel: 'Boost: +5 per solve',
+    boostKind: 'plusFive',
+    introSrc: QS_CHARACTER_PHIL_SRC,
+    artClass: 'hooded-dino-dj',
+  },
+  {
+    id: 'familyBand',
+    name: 'Family Band',
+    shortName: 'Band',
+    unlockLabel: '800',
+    unlockScore: 800,
+    boostLabel: 'Boost: +7 on harder solves',
+    boostKind: 'hardBonusSeven',
+    introSrc: QS_CHARACTER_PHIL_SRC,
+    artClass: 'family-band',
+  },
+];
+
+function isQuickServeCharacterUnlocked(character) {
+  if (!character) return false;
+  return getQuickServeBestScore() >= Number(character.unlockScore || 0);
+}
+
+function getQuickServeUnlockedCharacterCount() {
+  return QS_CHARACTER_ROSTER.filter(isQuickServeCharacterUnlocked).length;
+}
+
+function getQuickServeSelectedCharacter() {
+  const selected =
+    QS_CHARACTER_ROSTER.find((character) => character.id === qsSelectedCharacterId)
+    || QS_CHARACTER_ROSTER[0];
+
+  if (!isQuickServeCharacterUnlocked(selected)) {
+    qsSelectedCharacterId = QS_CHARACTER_ROSTER[0].id;
+    return QS_CHARACTER_ROSTER[0];
+  }
+
+  return selected;
+}
+
+function getQuickServeCharacterBestScore(character) {
+  // QS 1.5 scaffold:
+  // Existing data only has one QS high score.
+  // Phil shows the real score. Other unlocked characters show '--'
+  // until per-character stats are added.
+  if (character?.id === 'cosmicPhil') {
+    return getQuickServeBestScore();
+  }
+
+  return null;
+}
+
+function getQuickServeMathModeFromPreflight(mode = qsPreflightDifficulty) {
+  const map = {
+    easy: 'addSub',
+    medium: 'multiDiv',
+    hard: 'algebra',
+  };
+
+  return map[mode] || 'addSub';
+}
+
+function applyQuickServePreflightMathMode() {
+  const mathMode = getQuickServeMathModeFromPreflight();
+  setMathMode(mathMode);
+
+  console.log(
+    `[QuickServe] Starting difficulty wired directly: ${qsPreflightDifficulty} → ${mathMode}`
+  );
+
+  return mathMode;
+}
+
+function selectQuickServeCharacter(characterId) {
+  const character = QS_CHARACTER_ROSTER.find((item) => item.id === characterId);
+
+  if (!character) {
+    console.warn(`[QuickServe] Unknown character requested: ${characterId}`);
+    return;
+  }
+
+  if (!isQuickServeCharacterUnlocked(character)) {
+    console.log(
+      `[QuickServe] Character locked: ${character.id}; requires score ${character.unlockScore}`
+    );
+
+    document
+      .querySelector(`[data-qs-character-slot="${character.id}"]`)
+      ?.classList.add('qs-locked-bump');
+
+    window.setTimeout(() => {
+      document
+        .querySelector(`[data-qs-character-slot="${character.id}"]`)
+        ?.classList.remove('qs-locked-bump');
+    }, 320);
+
+    return;
+  }
+
+  qsSelectedCharacterId = character.id;
+
+  console.log(
+    `[QuickServe] Character selected: ${character.id}; ${character.boostLabel}`
+  );
+
+  renderIntroScreen();
+  applyQuickServeThemeVars(document.querySelector('.qs-intro'));
+}
+
+function renderQuickServeCharacterRosterRow(selectedCharacter) {
+  return QS_CHARACTER_ROSTER.map((character) => {
+    const unlocked = isQuickServeCharacterUnlocked(character);
+    const selected = selectedCharacter?.id === character.id;
+    const characterBest = getQuickServeCharacterBestScore(character);
+    const bestLabel = characterBest == null ? 'Best --' : `Best ${characterBest}`;
+
+    const slotClasses = [
+      'qs-roster-slot',
+      `qs-roster-${character.id}`,
+      unlocked ? 'is-unlocked' : 'is-locked',
+      selected ? 'is-selected' : '',
+    ].filter(Boolean).join(' ');
+
+    if (!unlocked) {
+      return `
+        <button
+          type="button"
+          class="${slotClasses}"
+          data-qs-character-slot="${character.id}"
+          aria-label="${character.name} locked until score ${character.unlockLabel}"
+        >
+          <span class="qs-roster-lock-mark" aria-hidden="true">🔒</span>
+
+          <div class="qs-locked-message" aria-hidden="true">
+            <span>${character.unlockLabel}+</span>
+            <span>points</span>
+            <span>to Unlock</span>
+          </div>
+        </button>
+      `;
+    }
+
+    return `
+      <button
+        type="button"
+        class="${slotClasses}"
+        data-qs-character-slot="${character.id}"
+        aria-label="${character.name} unlocked"
+      >
+        <span class="qs-roster-check" aria-hidden="true">✓</span>
+        <span class="qs-roster-name">${character.shortName || character.name}</span>
+        <img
+          class="qs-roster-img qs-character-art qs-character-art-${character.artClass}"
+          src="${character.introSrc}"
+          alt=""
+          aria-hidden="true"
+        />
+        <span class="qs-roster-best-word">Best</span>
+        <span class="qs-roster-score-label">Score:</span>
+        <span class="qs-roster-score-value">${characterBest == null ? '--' : characterBest}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function wireQuickServeCharacterPreviewButtons() {
+  document.querySelectorAll('[data-qs-character-slot]').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectQuickServeCharacter(button.dataset.qsCharacterSlot);
+    });
+  });
+}
+
+function getQuickServeBestScore() {
+  const profileScore =
+    typeof appState?.profile?.qsHighScore === 'number'
+      ? appState.profile.qsHighScore
+      : 0;
+
+  const statsScore =
+    typeof appState?.stats?.quickServe?.topScore === 'number'
+      ? appState.stats.quickServe.topScore
+      : 0;
+
+  return Math.max(profileScore, statsScore, 0);
+}
+
+function setQuickServePreflightDifficulty(mode = 'easy') {
+  const safeMode = ['easy', 'medium', 'hard'].includes(mode) ? mode : 'easy';
+  qsPreflightDifficulty = safeMode;
+
+  document.querySelectorAll('[data-qs-preflight-mode]').forEach((button) => {
+    const isActive = button.dataset.qsPreflightMode === safeMode;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+function wireQuickServePreflightDifficultyButtons() {
+  document.querySelectorAll('[data-qs-preflight-mode]').forEach((button) => {
+    button.addEventListener('click', () => {
+      setQuickServePreflightDifficulty(button.dataset.qsPreflightMode);
+    });
+  });
+
+  setQuickServePreflightDifficulty(qsPreflightDifficulty || 'easy');
+}
+
+function syncQuickServeStartingModeFromPreflight() {
+  // Deprecated QS 1.5 path:
+  // direct preflight mode wiring now happens before renderGameUI().
+  return applyQuickServePreflightMathMode();
+}
 
 function getQuickServeThemeAccent() {
   const { accent, glow, faint } = getThemeAccent(appState?.settings?.theme);
@@ -142,6 +406,8 @@ export function loadQuickServe() {
 //////////////////////////////
 function renderIntroScreen() {
   const container = getGameContainer();
+  const bestScore = getQuickServeBestScore();
+  const selectedCharacter = getQuickServeSelectedCharacter();
 
   container.innerHTML = `
     <img
@@ -155,29 +421,91 @@ function renderIntroScreen() {
     <div class="aspect-wrap">
       <div class="game-frame">
         <img id="modeBackground" class="background-fill" src="${import.meta.env.BASE_URL}assets/img/modes/quickServe/plate_quickserveBG.png"/>
-        <div class="qs-intro">
-          <div class="phil-speech">
-            <strong>Yo! I’m Cosmic Phil</strong>!<br/>
-              Solve as many problems as you can in <strong>1:45</strong>.
-              Harder problems score more points and XP.<br/>
-            🎸 Rock on to your next high score!
-          </div>
+        <div class="qs-intro qs-preflight qs-character-preflight qs-character-v3">
+          <section class="qs-preflight-scene qs-character-v3-scene" aria-label="QuickServe character select preflight">
+            <header class="qs-preflight-header qs-character-header">
+              <h1>QuickServe Pavilion</h1>
+              <p class="qs-character-subtitle">Choose your character boost! Solve equations fast!</p>
+            </header>
 
-          <div class="phil-wrapper">
-            <img 
-              id="philSpriteIntro" 
-              class="phil-img" 
-              src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_intro.png"
-            />
-          </div>
+            <section
+              class="qs-character-main-card qs-selected-${selectedCharacter.id}"
+              aria-label="QuickServe character card"
+            >
+              <div class="qs-character-label">Character</div>
 
-          <!-- keep Start button exactly as-is -->
-          <button id="startShowBtn" class="start-show-btn">✨ Start the Show ✨</button>
+              <div class="qs-character-portrait-wrap">
+                <img
+                  id="philSpriteIntro"
+                  class="phil-img qs-character-portrait qs-character-art qs-character-art-${selectedCharacter.artClass}"
+                  src="${selectedCharacter.introSrc}"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+
+              <div class="qs-character-name" id="qsSelectedCharacterName">
+                ${selectedCharacter.name}
+              </div>
+
+              <div class="qs-character-boost" id="qsSelectedCharacterBoost">
+                ${selectedCharacter.boostLabel}
+              </div>
+
+              <div class="qs-unlocked-header">
+                Characters Unlocked: ${getQuickServeUnlockedCharacterCount()} of ${QS_CHARACTER_ROSTER.length}
+              </div>
+
+              <div class="qs-unlocked-row" aria-label="Characters unlocked">
+                ${renderQuickServeCharacterRosterRow(selectedCharacter)}
+              </div>
+            </section>
+
+            <section class="qs-difficulty-panel" aria-label="Choose QuickServe difficulty">
+              <div class="qs-difficulty-label">Choose Difficulty</div>
+
+              <div class="qs-difficulty-row">
+                <button
+                  type="button"
+                  class="qs-difficulty-btn is-active"
+                  data-qs-preflight-mode="easy"
+                  aria-pressed="true"
+                >
+                  <strong>Easy</strong>
+                  <span>+ / −</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="qs-difficulty-btn"
+                  data-qs-preflight-mode="medium"
+                  aria-pressed="false"
+                >
+                  <strong>Medium</strong>
+                  <span>× / ÷</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="qs-difficulty-btn"
+                  data-qs-preflight-mode="hard"
+                  aria-pressed="false"
+                >
+                  <strong>Hard</strong>
+                  <span>𝒙</span>
+                </button>
+              </div>
+            </section>
+
+            <button id="startShowBtn" class="start-show-btn qs-preflight-start">
+              PLAY GAME
+            </button>
+          </section>
         </div>
 
         <!-- ✅ Story-style bottom bar just for QS intro -->
         <div class="qs-bottom-bar">
-          <button id="qsBackIntro" class="qs-square-btn qs-left">🔙</button>
+          <button id="qsBackIntro" class="qs-preflight-back-btn" aria-label="Back to menu"><span class="qs-preflight-back-arrow">←</span><span class="qs-preflight-back-text">BACK</span></button>
         </div>
       </div>
     </div>
@@ -193,6 +521,8 @@ function renderIntroScreen() {
 
   // New square Back/Mute for intro
   document.getElementById('qsBackIntro')?.addEventListener('click', returnToMenu);
+  wireQuickServePreflightDifficultyButtons();
+  wireQuickServeCharacterPreviewButtons();
 
 
 
@@ -213,6 +543,12 @@ export function startQuickServeShiftFromIntro() {
   const frameEl = document.querySelector('.game-frame');
 
   const launchGameplay = () => {
+    console.log(
+      `[QuickServe] Starting game with character scaffold: ${getQuickServeSelectedCharacter().id}`
+    );
+
+    applyQuickServePreflightMathMode();
+
     // Preserve the current QS music ownership rule:
     // intro start / completed-run replay may request a fresh QS track.
     restartQuickServeMusicFresh();

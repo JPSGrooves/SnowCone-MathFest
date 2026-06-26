@@ -1533,3 +1533,3187 @@ body.qs-active #qsResultMsg:not(.error) {
 }
 
 /* ───────────────── QuickServe — Theme Responsive Shell END ───────────────── */
+
+/* ───────────────── QuickServe — Intro IL Style Glass START ─────────────────
+   Purpose:
+   - QS 1.5 intro/preflight layout using the Infinity Lake-style pattern.
+   - Title, subtitle, Cosmic Phil, Best Score, difficulty row, Start Shift, IL-style Back.
+   - Apply restrained theme-responsive glass to existing QS mode surfaces.
+   - No scoring, timer, audio, Game Center, result logic, or Phil behavior changed.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Mode-wide glass law: existing surfaces only, no new outer wrapper boxes. */
+body.qs-active .qs-intro,
+body.qs-active .qs-stage,
+body.qs-active .qs-math,
+body.qs-active .qs-keypad,
+body.qs-active .qs-result-popup {
+  border: 1px solid var(--qs-glow, rgba(0, 255, 238, 0.55)) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 16, 30, 0.74),
+      rgba(1, 5, 13, 0.86)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.055) inset,
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    0 0 20px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(8px) saturate(1.12);
+  backdrop-filter: blur(8px) saturate(1.12);
+}
+
+/* Full intro stage */
+body.qs-active .qs-intro.qs-il-style-preflight {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  padding:
+    clamp(0.62rem, 1.35svh, 0.96rem)
+    clamp(0.64rem, 3vw, 1rem)
+    clamp(0.82rem, 1.8svh, 1.18rem) !important;
+
+  border-radius: 18px !important;
+  overflow: hidden !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 16%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)) 0%,
+      rgba(0, 0, 0, 0.22) 42%,
+      rgba(0, 0, 0, 0.72) 100%
+    ) !important;
+}
+
+body.qs-active .qs-preflight-shell {
+  width: min(92%, 410px) !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  gap: clamp(0.42rem, 1.08svh, 0.72rem) !important;
+
+  padding: clamp(0.68rem, 1.42svh, 0.98rem) !important;
+
+  border: 1px solid var(--qs-glow, rgba(0, 255, 238, 0.55)) !important;
+  border-radius: 22px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 24, 42, 0.76),
+      rgba(1, 5, 13, 0.9)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 14px 30px rgba(0, 0, 0, 0.38),
+    0 0 26px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(10px) saturate(1.14);
+  backdrop-filter: blur(10px) saturate(1.14);
+}
+
+body.qs-active .qs-preflight-header {
+  text-align: center !important;
+}
+
+body.qs-active .qs-preflight-kicker {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.54rem, 1.32svh, 0.72rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 14px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-preflight-header h1 {
+  margin: 0.06rem 0 0 !important;
+
+  font-family: 'Luckiest Guy', 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(1.55rem, 4.45svh, 2.34rem) !important;
+  line-height: 0.94 !important;
+  letter-spacing: 0.012em !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--qs-accent, #00ffee),
+      #ffffff,
+      var(--qs-accent, #00ffee)
+    ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-preflight-header p {
+  margin: clamp(0.12rem, 0.46svh, 0.24rem) 0 0 !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.75rem, 1.78svh, 0.98rem) !important;
+  font-weight: 750 !important;
+  line-height: 1.08 !important;
+
+  color: rgba(238, 252, 255, 0.9) !important;
+}
+
+/* Phil + Best Score */
+body.qs-active .qs-preflight-hero {
+  display: grid !important;
+  grid-template-columns: minmax(5.6rem, 0.92fr) minmax(0, 1.08fr) !important;
+  align-items: stretch !important;
+  gap: clamp(0.42rem, 1.45vw, 0.68rem) !important;
+}
+
+body.qs-active .qs-phil-card,
+body.qs-active .qs-best-score-card {
+  min-height: clamp(5.35rem, 14svh, 7.8rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid color-mix(in srgb, var(--qs-accent, #00ffee) 42%, rgba(255,255,255,0.15)) !important;
+  border-radius: 17px !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 8%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)),
+      rgba(0, 0, 0, 0.36) 64%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.045) inset,
+    0 0 14px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-phil-label,
+body.qs-active .qs-best-score-card span {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.52rem, 1.25svh, 0.68rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 66%, #ffffff 34%) !important;
+  text-shadow: 0 0 8px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-preflight-phil {
+  max-height: none !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: end !important;
+  justify-content: center !important;
+
+  margin-top: clamp(0.08rem, 0.32svh, 0.18rem) !important;
+}
+
+body.qs-active .qs-preflight-phil .phil-img {
+  width: auto !important;
+  max-width: 100% !important;
+  height: clamp(4.9rem, 12.8svh, 7.05rem) !important;
+  object-fit: contain !important;
+
+  filter:
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 8px 10px rgba(0,0,0,0.38)) !important;
+}
+
+body.qs-active .qs-best-score-card strong {
+  margin-top: clamp(0.16rem, 0.48svh, 0.28rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.45rem, 4.1svh, 2.25rem) !important;
+  line-height: 0.92 !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 9px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* IL-style difficulty row */
+body.qs-active .qs-difficulty-panel {
+  padding: clamp(0.42rem, 1svh, 0.62rem) !important;
+
+  border: 1px solid color-mix(in srgb, var(--qs-accent, #00ffee) 34%, rgba(255,255,255,0.13)) !important;
+  border-radius: 17px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,0.28),
+      rgba(0,0,0,0.48)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.035) inset,
+    0 0 14px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-difficulty-label {
+  margin-bottom: clamp(0.3rem, 0.72svh, 0.46rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.54rem, 1.3svh, 0.72rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.1em !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+
+  color: rgba(238, 252, 255, 0.88) !important;
+}
+
+body.qs-active .qs-difficulty-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(0.3rem, 1vw, 0.46rem) !important;
+}
+
+body.qs-active .qs-difficulty-btn {
+  min-width: 0 !important;
+  min-height: clamp(2.45rem, 5.6svh, 3.15rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.08rem !important;
+
+  padding: clamp(0.32rem, 0.9svh, 0.52rem) clamp(0.22rem, 1.2vw, 0.42rem) !important;
+
+  border: 1px solid color-mix(in srgb, var(--qs-accent, #00ffee) 38%, rgba(255,255,255,0.15)) !important;
+  border-radius: 14px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.075),
+      rgba(0,0,0,0.46)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.92) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.035) inset,
+    0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  cursor: pointer !important;
+}
+
+body.qs-active .qs-difficulty-btn strong {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.36svh, 0.76rem) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+}
+
+body.qs-active .qs-difficulty-btn span {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.6rem, 1.42svh, 0.8rem) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  opacity: 0.82 !important;
+}
+
+body.qs-active .qs-difficulty-btn.is-active {
+  border-color: var(--qs-accent, #00ffee) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)),
+      rgba(0,0,0,0.42) 70%
+    ) !important;
+
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.09) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 24px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Start Shift */
+body.qs-active .qs-preflight-start {
+  align-self: center !important;
+
+  width: min(86%, 15.5rem) !important;
+  min-width: 0 !important;
+
+  margin-top: clamp(0.06rem, 0.34svh, 0.22rem) !important;
+  padding: clamp(0.52rem, 1.3svh, 0.72rem) clamp(0.9rem, 4vw, 1.3rem) !important;
+
+  border: 1px solid var(--qs-accent, #00ffee) !important;
+  border-radius: 999px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.78rem, 1.8svh, 1rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.035em !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 86%, #ffffff 14%),
+      var(--qs-accent, #00ffee)
+    ) !important;
+
+  color: rgba(0, 10, 16, 0.95) !important;
+}
+
+/* IL-style intro back button */
+body.qs-active .qs-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: max(0.42rem, calc(env(safe-area-inset-bottom, 0px) + 0.18rem)) !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr !important;
+  align-items: center !important;
+
+  padding: 0 clamp(0.58rem, 2.2vw, 0.9rem) !important;
+  pointer-events: none !important;
+  z-index: 8 !important;
+}
+
+body.qs-active .qs-il-back-btn {
+  grid-column: 1 !important;
+  justify-self: start !important;
+  pointer-events: auto !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  padding: clamp(0.36rem, 0.95svh, 0.52rem) clamp(0.58rem, 2.4vw, 0.82rem) !important;
+
+  border: 1px solid color-mix(in srgb, var(--qs-accent, #00ffee) 52%, rgba(255,255,255,0.18)) !important;
+  border-radius: 999px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 24, 42, 0.82),
+      rgba(0, 0, 0, 0.74)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.94) !important;
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.62rem, 1.42svh, 0.78rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.035em !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.045) inset,
+    0 0 12px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Existing gameplay surfaces get the same restrained glass language. */
+body.qs-active .qs-stage .score-box,
+body.qs-active .qs-stage .timer-box,
+body.qs-active .qs-stage .info-box,
+body.qs-active .info-box {
+  border-color: color-mix(in srgb, var(--qs-accent, #00ffee) 44%, rgba(255,255,255,0.16)) !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.08),
+      rgba(0,0,0,0.42)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 0 12px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-keypad button {
+  border-color: color-mix(in srgb, var(--qs-accent, #00ffee) 44%, rgba(255,255,255,0.16)) !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.078),
+      rgba(0,0,0,0.42)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.035) inset,
+    0 0 9px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-keypad button.active-mode,
+body.qs-active .qs-keypad .active-mode {
+  border-color: var(--qs-accent, #00ffee) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 22px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Tight phones: preserve Start Shift and Back button. */
+@media (max-height: 740px) {
+  body.qs-active .qs-preflight-shell {
+    gap: clamp(0.32rem, 0.78svh, 0.52rem) !important;
+    padding: clamp(0.54rem, 1.05svh, 0.76rem) !important;
+  }
+
+  body.qs-active .qs-preflight-header h1 {
+    font-size: clamp(1.34rem, 4svh, 2rem) !important;
+  }
+
+  body.qs-active .qs-preflight-hero {
+    grid-template-columns: minmax(5.2rem, 0.9fr) minmax(0, 1.1fr) !important;
+  }
+
+  body.qs-active .qs-phil-card,
+  body.qs-active .qs-best-score-card {
+    min-height: clamp(4.65rem, 12.6svh, 6.25rem) !important;
+  }
+
+  body.qs-active .qs-preflight-phil .phil-img {
+    height: clamp(4.25rem, 11.5svh, 5.7rem) !important;
+  }
+
+  body.qs-active .qs-difficulty-btn {
+    min-height: clamp(2.18rem, 5svh, 2.72rem) !important;
+  }
+}
+
+/* iPad: same structure, more breathing room. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-preflight-shell {
+    width: min(78%, 500px) !important;
+  }
+
+  body.qs-active .qs-preflight-phil .phil-img {
+    height: clamp(6.3rem, 14svh, 8.9rem) !important;
+  }
+
+  body.qs-active .qs-phil-card,
+  body.qs-active .qs-best-score-card {
+    min-height: clamp(6.6rem, 14svh, 9rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-preflight-shell,
+  body.qs-active .qs-intro,
+  body.qs-active .qs-stage,
+  body.qs-active .qs-math,
+  body.qs-active .qs-keypad {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Intro IL Style Glass END ───────────────── */
+
+/* ───────────────── QuickServe — Character Select Intro START ─────────────────
+   Purpose:
+   - QS 1.5 character-select intro scaffold.
+   - Full-screen / Infinity Lake-style preflight.
+   - Visual character system only: Cosmic Phil selected, locked placeholders visible.
+   - Preserve theme vars, intro→game fade, music, scoring, results, and gameplay.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Remove the giant modal-card feeling from the intro layer. */
+body.qs-active .qs-intro.qs-character-preflight {
+  position: absolute !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding:
+    calc(env(safe-area-inset-top, 0px) + clamp(0.82rem, 2.2svh, 1.45rem))
+    clamp(0.76rem, 4vw, 2.2rem)
+    calc(env(safe-area-inset-bottom, 0px) + clamp(4.7rem, 8.2svh, 6.4rem)) !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+
+  overflow: hidden !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* The actual content stack: not a big card, just floating HUD islands. */
+body.qs-active .qs-preflight-scene {
+  width: min(92vw, 720px) !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto !important;
+
+  align-items: center !important;
+  gap: clamp(0.42rem, 1.15svh, 0.82rem) !important;
+
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Header */
+body.qs-active .qs-character-header {
+  text-align: center !important;
+  align-self: end !important;
+  overflow: visible !important;
+}
+
+body.qs-active .qs-character-header h1 {
+  margin: 0 !important;
+  display: inline-block !important;
+
+  font-family: 'Luckiest Guy', 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(1.92rem, 5.25svh, 3.65rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.015em !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--qs-accent, #00ffee) 0%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 60%, #ffffff 40%) 30%,
+      #ffffff 50%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 60%, #ffffff 40%) 70%,
+      var(--qs-accent, #00ffee) 100%
+    ) !important;
+
+  background-size: 240% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  padding-bottom: 0.08em !important;
+
+  text-shadow:
+    0 0 10px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 22px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 3px 8px rgba(0, 0, 0, 0.50) !important;
+}
+
+body.qs-active .qs-character-header p {
+  width: min(92vw, 640px) !important;
+  margin: clamp(0.25rem, 0.75svh, 0.48rem) auto 0 !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.84rem, 2svh, 1.18rem) !important;
+  font-weight: 760 !important;
+  line-height: 1.16 !important;
+
+  color: rgba(238, 252, 255, 0.94) !important;
+  text-shadow:
+    0 2px 7px rgba(0, 0, 0, 0.92),
+    0 0 14px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Character + Best Score row */
+body.qs-active .qs-character-score-row {
+  min-height: 0 !important;
+  align-self: center !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr) !important;
+  gap: clamp(0.48rem, 1.8vw, 0.9rem) !important;
+}
+
+body.qs-active .qs-character-card,
+body.qs-active .qs-best-score-card,
+body.qs-active .qs-unlocked-panel,
+body.qs-active .qs-difficulty-panel {
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 46%, rgba(255,255,255,0.16)) !important;
+  border-radius: 22px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 16, 30, 0.70),
+      rgba(1, 5, 13, 0.82)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.052) inset,
+    0 14px 32px rgba(0, 0, 0, 0.30),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(12px) saturate(1.12);
+  backdrop-filter: blur(12px) saturate(1.12);
+}
+
+body.qs-active .qs-character-card {
+  min-height: clamp(8.8rem, 25svh, 14rem) !important;
+  padding: clamp(0.54rem, 1.15svh, 0.82rem) !important;
+
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: clamp(0.26rem, 0.7svh, 0.48rem) !important;
+}
+
+body.qs-active .qs-character-label,
+body.qs-active .qs-best-score-card span,
+body.qs-active .qs-unlocked-label,
+body.qs-active .qs-difficulty-label {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.6rem, 1.5svh, 0.82rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 13px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-selector {
+  min-height: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(1.65rem, 0.28fr) minmax(0, 1fr) minmax(1.65rem, 0.28fr) !important;
+  align-items: center !important;
+  gap: clamp(0.22rem, 1vw, 0.5rem) !important;
+}
+
+body.qs-active .qs-character-portrait-wrap {
+  min-height: 0 !important;
+  height: 100% !important;
+
+  display: flex !important;
+  align-items: end !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-character-portrait {
+  width: auto !important;
+  max-width: 100% !important;
+  height: clamp(5.8rem, 17svh, 9rem) !important;
+  object-fit: contain !important;
+
+  filter:
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+body.qs-active .qs-character-nodes {
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(0.18rem, 0.6svh, 0.34rem) !important;
+}
+
+body.qs-active .qs-character-node {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  width: clamp(1.35rem, 3.6svh, 2rem) !important;
+  height: clamp(1.35rem, 3.6svh, 2rem) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 0 !important;
+  border: 1px solid color-mix(in srgb, var(--qs-accent, #00ffee) 52%, rgba(255,255,255,0.16)) !important;
+  border-radius: 999px !important;
+
+  background: rgba(0, 0, 0, 0.44) !important;
+  color: rgba(246, 255, 255, 0.96) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1rem, 2.8svh, 1.55rem) !important;
+  line-height: 1 !important;
+
+  box-shadow:
+    0 0 8px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    inset 0 0 8px rgba(255,255,255,0.035) !important;
+}
+
+body.qs-active .qs-character-dot {
+  width: clamp(0.34rem, 0.95svh, 0.48rem) !important;
+  height: clamp(0.34rem, 0.95svh, 0.48rem) !important;
+  border-radius: 999px !important;
+
+  background: rgba(255,255,255,0.22) !important;
+  box-shadow: 0 0 7px rgba(255,255,255,0.16) !important;
+}
+
+body.qs-active .qs-character-dot.is-active {
+  background: var(--qs-accent, #00ffee) !important;
+  box-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 14px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-dot.is-locked {
+  opacity: 0.36 !important;
+}
+
+body.qs-active .qs-character-name {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.82rem, 1.9svh, 1.08rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1.05 !important;
+  text-align: center !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-card.qs-character-nudge {
+  animation: qs-character-nudge 260ms ease-out both;
+}
+
+@keyframes qs-character-nudge {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(-2px); }
+  70% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Best Score */
+body.qs-active .qs-best-score-card {
+  min-height: clamp(8.8rem, 25svh, 14rem) !important;
+  padding: clamp(0.54rem, 1.15svh, 0.82rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-best-score-card span {
+  font-size: clamp(0.7rem, 1.7svh, 0.94rem) !important;
+}
+
+body.qs-active .qs-best-score-card strong {
+  margin-top: clamp(0.22rem, 0.7svh, 0.42rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(2.05rem, 7.2svh, 4.25rem) !important;
+  line-height: 0.9 !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 22px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 4px 8px rgba(0,0,0,0.45) !important;
+}
+
+/* Characters Unlocked */
+body.qs-active .qs-unlocked-panel {
+  padding: clamp(0.46rem, 1svh, 0.7rem) clamp(0.54rem, 1.8vw, 0.86rem) !important;
+}
+
+body.qs-active .qs-unlocked-label {
+  margin-bottom: clamp(0.32rem, 0.75svh, 0.48rem) !important;
+}
+
+body.qs-active .qs-unlocked-row {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.3rem, 1.25vw, 0.54rem) !important;
+}
+
+body.qs-active .qs-roster-slot {
+  min-height: clamp(2.8rem, 6.4svh, 4rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 14px !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 12%,
+      rgba(255,255,255,0.08),
+      rgba(0,0,0,0.40) 70%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px rgba(0,0,0,0.24) !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  border-color: var(--qs-accent, #00ffee) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 0 12px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-roster-img {
+  height: clamp(1.72rem, 4.2svh, 2.55rem) !important;
+  width: auto !important;
+  object-fit: contain !important;
+  margin-bottom: 0.1rem !important;
+}
+
+body.qs-active .qs-roster-slot span {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.5rem, 1.18svh, 0.66rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  color: rgba(245, 253, 255, 0.9) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked {
+  opacity: 0.62 !important;
+  filter: saturate(0.78) brightness(0.82) !important;
+}
+
+body.qs-active .qs-locked-cone {
+  width: clamp(1.55rem, 3.9svh, 2.3rem) !important;
+  height: clamp(1.85rem, 4.55svh, 2.72rem) !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  border-radius: 50% 50% 44% 44% / 54% 54% 46% 46% !important;
+  border: 1px solid rgba(255,255,255,0.20) !important;
+
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.18), rgba(0,0,0,0.22) 58%),
+    linear-gradient(180deg, var(--qs-faint, rgba(0,255,238,0.18)), rgba(0,0,0,0.36)) !important;
+
+  color: rgba(255,255,255,0.82) !important;
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.95rem, 2.4svh, 1.35rem) !important;
+  font-weight: 950 !important;
+
+  text-shadow: 0 0 9px rgba(255,255,255,0.28) !important;
+}
+
+/* Difficulty: IL-like selected/dimmed states */
+body.qs-active .qs-difficulty-panel {
+  padding: clamp(0.5rem, 1.1svh, 0.76rem) !important;
+}
+
+body.qs-active .qs-difficulty-label {
+  margin-bottom: clamp(0.34rem, 0.8svh, 0.5rem) !important;
+}
+
+body.qs-active .qs-difficulty-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(0.34rem, 1.35vw, 0.62rem) !important;
+}
+
+body.qs-active .qs-difficulty-btn {
+  min-height: clamp(2.65rem, 6.2svh, 3.7rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.08rem !important;
+
+  padding: clamp(0.36rem, 0.9svh, 0.56rem) clamp(0.22rem, 1.2vw, 0.44rem) !important;
+
+  border-radius: 16px !important;
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 42%, rgba(255,255,255,0.14)) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.065),
+      rgba(0,0,0,0.50)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.9) !important;
+
+  opacity: 0.54 !important;
+  filter: saturate(0.76) brightness(0.82) !important;
+  transform: translateY(0) scale(0.985) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  cursor: pointer !important;
+}
+
+body.qs-active .qs-difficulty-btn.is-active {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1) !important;
+
+  border-color: var(--qs-accent, #00ffee) !important;
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)),
+      rgba(0,0,0,0.48) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.09) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 24px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-difficulty-btn strong {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.58svh, 0.88rem) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+}
+
+body.qs-active .qs-difficulty-btn span {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.55svh, 0.86rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  opacity: 0.86 !important;
+}
+
+/* Play Game */
+body.qs-active .qs-preflight-start {
+  justify-self: center !important;
+  align-self: start !important;
+
+  width: min(72vw, 18.5rem) !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+  padding: clamp(0.58rem, 1.45svh, 0.82rem) clamp(1rem, 4vw, 1.55rem) !important;
+
+  border: 1.5px solid var(--qs-accent, #00ffee) !important;
+  border-radius: 999px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.92rem, 2.15svh, 1.2rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.035em !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%),
+      color-mix(in srgb, var(--qs-accent, #00ffee) 92%, #000000 8%)
+    ) !important;
+
+  color: rgba(0, 10, 16, 0.96) !important;
+  text-shadow: none !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.12) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 10px 24px rgba(0,0,0,0.34) !important;
+}
+
+/* IL-like bottom-left Back button */
+body.qs-active .qs-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: max(1.2vh, env(safe-area-inset-bottom, 0px)) !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: end !important;
+
+  pointer-events: none !important;
+  padding: 0 1.2vh !important;
+  z-index: 30 !important;
+}
+
+body.qs-active .qs-preflight-back-btn {
+  pointer-events: auto !important;
+  justify-self: start !important;
+
+  width: clamp(64px, 9vw, 78px) !important;
+  height: clamp(64px, 9vw, 78px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  padding: 0 !important;
+  border-radius: 18px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 14, 38, 0.78),
+      rgba(2, 7, 20, 0.92)
+    ) !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 28%, rgba(160,220,255,0.22)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    0 0 16px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+body.qs-active .qs-preflight-back-arrow {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem) !important;
+  line-height: 1 !important;
+  color: rgba(215, 240, 255, 0.95) !important;
+}
+
+body.qs-active .qs-preflight-back-text {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.55rem, 1.1vw, 0.68rem) !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  color: rgba(200, 228, 245, 0.82) !important;
+}
+
+/* Keep gameplay glass from the prior accepted direction. */
+body.qs-active .qs-stage,
+body.qs-active .qs-math,
+body.qs-active .qs-keypad,
+body.qs-active .qs-result-popup {
+  border-color: var(--qs-glow, rgba(0, 255, 238, 0.55)) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+    0 10px 24px rgba(0, 0, 0, 0.32),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Short phones: keep everything visible above the bottom-left menu button. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-preflight {
+    padding-top: calc(env(safe-area-inset-top, 0px) + clamp(0.58rem, 1.25svh, 0.82rem)) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(4.35rem, 7.8svh, 5.6rem)) !important;
+  }
+
+  body.qs-active .qs-preflight-scene {
+    gap: clamp(0.3rem, 0.78svh, 0.52rem) !important;
+  }
+
+  body.qs-active .qs-character-header h1 {
+    font-size: clamp(1.55rem, 4.25svh, 2.3rem) !important;
+  }
+
+  body.qs-active .qs-character-header p {
+    font-size: clamp(0.72rem, 1.7svh, 0.92rem) !important;
+    line-height: 1.1 !important;
+  }
+
+  body.qs-active .qs-character-card,
+  body.qs-active .qs-best-score-card {
+    min-height: clamp(7.1rem, 21svh, 10.4rem) !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(4.6rem, 13.4svh, 6.4rem) !important;
+  }
+
+  body.qs-active .qs-unlocked-row {
+    gap: clamp(0.22rem, 1vw, 0.38rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(2.35rem, 5.6svh, 3.2rem) !important;
+  }
+
+  body.qs-active .qs-difficulty-btn {
+    min-height: clamp(2.22rem, 5.1svh, 2.85rem) !important;
+  }
+
+  body.qs-active .qs-preflight-start {
+    padding-top: clamp(0.48rem, 1.1svh, 0.62rem) !important;
+    padding-bottom: clamp(0.48rem, 1.1svh, 0.62rem) !important;
+  }
+}
+
+/* iPad: wider scenic HUD, not a tiny phone card. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-preflight-scene {
+    width: min(78vw, 760px) !important;
+  }
+
+  body.qs-active .qs-character-score-row {
+    gap: clamp(0.75rem, 1.6vw, 1.15rem) !important;
+  }
+
+  body.qs-active .qs-character-card,
+  body.qs-active .qs-best-score-card {
+    min-height: clamp(11rem, 23svh, 16rem) !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(7.2rem, 15.5svh, 10.5rem) !important;
+  }
+
+  body.qs-active .qs-best-score-card strong {
+    font-size: clamp(3rem, 7svh, 5rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-character-card.qs-character-nudge {
+    animation: none !important;
+  }
+
+  body.qs-active .qs-intro,
+  body.qs-active .qs-stage,
+  body.qs-active .qs-math,
+  body.qs-active .qs-keypad,
+  body.qs-active .qs-result-popup {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Character Select Intro END ───────────────── */
+
+/* ───────────────── QuickServe — Character Select Intro V2 START ─────────────────
+   Purpose:
+   - Merge Character, Boost, Best Score, and Characters Unlocked into one primary card.
+   - Preserve loved difficulty row.
+   - Match SCMF/Infinity Lake title/button language more closely.
+   - Direct difficulty wiring happens in JS before gameplay starts.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v2 {
+  position: absolute !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding:
+    calc(env(safe-area-inset-top, 0px) + clamp(0.66rem, 1.65svh, 1.12rem))
+    clamp(0.72rem, 3.4vw, 2.15rem)
+    calc(env(safe-area-inset-bottom, 0px) + clamp(4.65rem, 7.8svh, 6.2rem)) !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  overflow: hidden !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body.qs-active .qs-character-v2-scene {
+  width: min(92vw, 760px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  display: grid !important;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto !important;
+
+  align-items: stretch !important;
+  gap: clamp(0.48rem, 1.15svh, 0.88rem) !important;
+
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Title/subtitle: SCMF/IL-style, single-line title on iPhone. */
+body.qs-active .qs-character-header {
+  text-align: center !important;
+  overflow: visible !important;
+}
+
+body.qs-active .qs-character-header h1 {
+  max-width: 96vw !important;
+  margin: 0 auto !important;
+  padding: 0 0 0.06em !important;
+
+  display: block !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.48rem, 7.25vw, 4.45rem) !important;
+  line-height: 0.98 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--qs-accent, #00ffee) 0%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 58%, #ffffff 42%) 34%,
+      #ffffff 50%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 58%, #ffffff 42%) 66%,
+      var(--qs-accent, #00ffee) 100%
+    ) !important;
+
+  background-size: 240% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  text-shadow:
+    0 0 10px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 22px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 3px 8px rgba(0, 0, 0, 0.52) !important;
+}
+
+body.qs-active .qs-character-header p {
+  width: min(93vw, 660px) !important;
+  margin: clamp(0.28rem, 0.78svh, 0.56rem) auto 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 2.8vw, 1.22rem) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.16 !important;
+
+  color: rgba(238, 252, 255, 0.94) !important;
+  text-shadow:
+    0 2px 7px rgba(0, 0, 0, 0.94),
+    0 0 14px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* One big character card. */
+body.qs-active .qs-character-main-card,
+body.qs-active .qs-difficulty-panel {
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 46%, rgba(255,255,255,0.16)) !important;
+  border-radius: 24px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 16, 30, 0.70),
+      rgba(1, 5, 13, 0.82)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.052) inset,
+    0 14px 32px rgba(0, 0, 0, 0.30),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(12px) saturate(1.12);
+  backdrop-filter: blur(12px) saturate(1.12);
+}
+
+body.qs-active .qs-character-main-card {
+  min-height: 0 !important;
+  height: 100% !important;
+
+  display: grid !important;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto
+    auto
+    auto !important;
+
+  align-items: center !important;
+  gap: clamp(0.22rem, 0.7svh, 0.48rem) !important;
+
+  padding: clamp(0.62rem, 1.32svh, 0.98rem) !important;
+}
+
+body.qs-active .qs-character-label,
+body.qs-active .qs-unlocked-header,
+body.qs-active .qs-difficulty-label {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.64rem, 1.55svh, 0.88rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 13px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-selector {
+  min-height: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+  gap: clamp(0.34rem, 2vw, 0.82rem) !important;
+}
+
+body.qs-active .qs-character-portrait-wrap {
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: end !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-character-portrait {
+  width: auto !important;
+  max-width: 100% !important;
+  height: clamp(6.4rem, 18svh, 10.2rem) !important;
+  object-fit: contain !important;
+
+  filter:
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+/* Cleaner selector arrows. */
+body.qs-active .qs-character-arrow {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+
+  width: clamp(2.2rem, 5.2svh, 3.1rem) !important;
+  height: clamp(2.2rem, 5.2svh, 3.1rem) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: 0 !important;
+  border-radius: 999px !important;
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 58%, rgba(255,255,255,0.18)) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 20, 34, 0.78),
+      rgba(0, 0, 0, 0.72)
+    ) !important;
+
+  color: rgba(246, 255, 255, 0.96) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.42rem, 3.7svh, 2.2rem) !important;
+  line-height: 1 !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 0 12px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-name {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1rem, 2.35svh, 1.45rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.025em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-boost,
+body.qs-active .qs-character-best-line {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.58svh, 0.88rem) !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.08 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.92) !important;
+  text-shadow: 0 0 10px rgba(0,0,0,0.72) !important;
+}
+
+body.qs-active .qs-character-best-line strong {
+  color: #ffffff !important;
+  font-weight: 950 !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-unlocked-header {
+  margin-top: clamp(0.12rem, 0.4svh, 0.24rem) !important;
+}
+
+/* Character slots with per-character best/threshold text. */
+body.qs-active .qs-unlocked-row {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.26rem, 1.1vw, 0.54rem) !important;
+}
+
+body.qs-active .qs-roster-slot {
+  position: relative !important;
+
+  min-width: 0 !important;
+  min-height: clamp(3.35rem, 7.2svh, 4.75rem) !important;
+
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto auto !important;
+  place-items: center !important;
+
+  padding: clamp(0.24rem, 0.58svh, 0.38rem) clamp(0.12rem, 0.7vw, 0.28rem) !important;
+
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 15px !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 12%,
+      rgba(255,255,255,0.08),
+      rgba(0,0,0,0.42) 70%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px rgba(0,0,0,0.24) !important;
+
+  color: rgba(245,253,255,0.9) !important;
+  overflow: hidden !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  border-color: var(--qs-accent, #00ffee) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 0 12px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-roster-check,
+body.qs-active .qs-roster-lock-mark {
+  position: absolute !important;
+  top: 0.18rem !important;
+  right: 0.22rem !important;
+
+  font-size: clamp(0.48rem, 1.12svh, 0.66rem) !important;
+  line-height: 1 !important;
+}
+
+body.qs-active .qs-roster-check {
+  color: var(--qs-accent, #00ffee) !important;
+  text-shadow: 0 0 7px var(--qs-glow, rgba(0,255,238,0.55)) !important;
+}
+
+body.qs-active .qs-roster-img,
+body.qs-active .qs-roster-locked-img {
+  height: clamp(1.55rem, 3.7svh, 2.35rem) !important;
+  width: auto !important;
+  max-width: 92% !important;
+  object-fit: contain !important;
+}
+
+body.qs-active .qs-roster-locked-img {
+  opacity: 0.48 !important;
+  filter: saturate(0.65) brightness(0.76) !important;
+}
+
+body.qs-active .qs-roster-name {
+  margin-top: 0.05rem !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.46rem, 1.08svh, 0.64rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+body.qs-active .qs-roster-best {
+  margin-top: 0.05rem !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.42rem, 0.94svh, 0.58rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.74) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked {
+  opacity: 0.62 !important;
+  filter: saturate(0.78) brightness(0.84) !important;
+}
+
+/* Loved difficulty row: keep structure, enforce selected/dimmed state. */
+body.qs-active .qs-difficulty-panel {
+  padding: clamp(0.5rem, 1.1svh, 0.76rem) !important;
+}
+
+body.qs-active .qs-difficulty-label {
+  margin-bottom: clamp(0.34rem, 0.8svh, 0.5rem) !important;
+}
+
+body.qs-active .qs-difficulty-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(0.34rem, 1.35vw, 0.62rem) !important;
+}
+
+body.qs-active .qs-difficulty-btn {
+  min-height: clamp(2.65rem, 6.2svh, 3.7rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.08rem !important;
+
+  padding: clamp(0.36rem, 0.9svh, 0.56rem) clamp(0.22rem, 1.2vw, 0.44rem) !important;
+
+  border-radius: 16px !important;
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 42%, rgba(255,255,255,0.14)) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.065),
+      rgba(0,0,0,0.50)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.9) !important;
+
+  opacity: 0.54 !important;
+  filter: saturate(0.76) brightness(0.82) !important;
+  transform: translateY(0) scale(0.985) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  cursor: pointer !important;
+}
+
+body.qs-active .qs-difficulty-btn.is-active {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1) !important;
+
+  border-color: var(--qs-accent, #00ffee) !important;
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)),
+      rgba(0,0,0,0.48) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.09) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 24px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-difficulty-btn strong {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.58svh, 0.88rem) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+}
+
+body.qs-active .qs-difficulty-btn span {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.55svh, 0.86rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  opacity: 0.86 !important;
+}
+
+/* IL-like PLAY GAME button. */
+body.qs-active .qs-preflight-start {
+  justify-self: center !important;
+  align-self: start !important;
+
+  width: min(72vw, 22rem) !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+  padding: clamp(0.72rem, 1.72svh, 0.98rem) clamp(1rem, 4vw, 1.8rem) !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 48%, #ffffff 16%) !important;
+  border-radius: 18px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.05rem, 2.45svh, 1.42rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 64%, #ffffff 36%),
+      color-mix(in srgb, var(--qs-accent, #00ffee) 92%, #000000 8%)
+    ) !important;
+
+  color: rgba(0, 10, 16, 0.96) !important;
+  text-shadow: none !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.12) inset,
+    0 0 16px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 12px 25px rgba(0,0,0,0.34) !important;
+}
+
+/* IL-like bottom-left Back button. */
+body.qs-active .qs-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: max(1.2vh, env(safe-area-inset-bottom, 0px)) !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: end !important;
+
+  pointer-events: none !important;
+  padding: 0 1.2vh !important;
+  z-index: 30 !important;
+}
+
+body.qs-active .qs-preflight-back-btn {
+  pointer-events: auto !important;
+  justify-self: start !important;
+
+  width: clamp(64px, 9vw, 78px) !important;
+  height: clamp(64px, 9vw, 78px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  padding: 0 !important;
+  border-radius: 18px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 14, 38, 0.78),
+      rgba(2, 7, 20, 0.92)
+    ) !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 28%, rgba(160,220,255,0.22)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    0 0 16px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+body.qs-active .qs-preflight-back-arrow {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem) !important;
+  line-height: 1 !important;
+  color: rgba(215, 240, 255, 0.95) !important;
+}
+
+body.qs-active .qs-preflight-back-text {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.55rem, 1.1vw, 0.68rem) !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  color: rgba(200, 228, 245, 0.82) !important;
+}
+
+/* Keep gameplay glass from the prior accepted direction. */
+body.qs-active .qs-stage,
+body.qs-active .qs-math,
+body.qs-active .qs-keypad,
+body.qs-active .qs-result-popup {
+  border-color: var(--qs-glow, rgba(0, 255, 238, 0.55)) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+    0 10px 24px rgba(0, 0, 0, 0.32),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-main-card.qs-character-nudge {
+  animation: qs-character-v2-nudge 260ms ease-out both;
+}
+
+@keyframes qs-character-v2-nudge {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(-2px); }
+  70% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Short phones: preserve the whole stack. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v2 {
+    padding-top: calc(env(safe-area-inset-top, 0px) + clamp(0.48rem, 1.15svh, 0.74rem)) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(4.22rem, 7.4svh, 5.4rem)) !important;
+  }
+
+  body.qs-active .qs-character-v2-scene {
+    gap: clamp(0.28rem, 0.75svh, 0.52rem) !important;
+  }
+
+  body.qs-active .qs-character-header h1 {
+    font-size: clamp(1.32rem, 6.8vw, 2.45rem) !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  body.qs-active .qs-character-header p {
+    font-size: clamp(0.63rem, 2.55vw, 0.9rem) !important;
+    line-height: 1.08 !important;
+    margin-top: clamp(0.16rem, 0.48svh, 0.32rem) !important;
+  }
+
+  body.qs-active .qs-character-main-card {
+    gap: clamp(0.14rem, 0.45svh, 0.3rem) !important;
+    padding: clamp(0.48rem, 1svh, 0.72rem) !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(4.65rem, 13.4svh, 6.7rem) !important;
+  }
+
+  body.qs-active .qs-character-arrow {
+    width: clamp(1.95rem, 4.7svh, 2.55rem) !important;
+    height: clamp(1.95rem, 4.7svh, 2.55rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(2.82rem, 6.25svh, 3.65rem) !important;
+  }
+
+  body.qs-active .qs-roster-img,
+  body.qs-active .qs-roster-locked-img {
+    height: clamp(1.28rem, 3.15svh, 1.85rem) !important;
+  }
+
+  body.qs-active .qs-difficulty-btn {
+    min-height: clamp(2.22rem, 5.1svh, 2.85rem) !important;
+  }
+
+  body.qs-active .qs-preflight-start {
+    padding-top: clamp(0.56rem, 1.25svh, 0.72rem) !important;
+    padding-bottom: clamp(0.56rem, 1.25svh, 0.72rem) !important;
+  }
+}
+
+/* iPad: bigger scenic stack, not a tiny phone strip. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-v2-scene {
+    width: min(74vw, 780px) !important;
+  }
+
+  body.qs-active .qs-character-header h1 {
+    font-size: clamp(3.2rem, 6.4vw, 5.2rem) !important;
+  }
+
+  body.qs-active .qs-character-header p {
+    font-size: clamp(1rem, 1.75vw, 1.35rem) !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(7.2rem, 15.5svh, 10.8rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(4.35rem, 7.4svh, 5.65rem) !important;
+  }
+
+  body.qs-active .qs-roster-img,
+  body.qs-active .qs-roster-locked-img {
+    height: clamp(2.15rem, 3.8svh, 3rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-character-main-card.qs-character-nudge {
+    animation: none !important;
+  }
+
+  body.qs-active .qs-intro,
+  body.qs-active .qs-stage,
+  body.qs-active .qs-math,
+  body.qs-active .qs-keypad,
+  body.qs-active .qs-result-popup {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Character Select Intro V2 END ───────────────── */
+
+/* ───────────────── QuickServe — Character Select Intro V3 START ─────────────────
+   Purpose:
+   - No arrow buttons. Character selection happens from unlocked character boxes.
+   - Unlocks now derive from existing QuickServe best score.
+   - Keep loved difficulty row.
+   - Tighten iPhone Play Game sizing and improve IL-style edge highlight.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding:
+    calc(env(safe-area-inset-top, 0px) + clamp(0.6rem, 1.55svh, 1.05rem))
+    clamp(0.72rem, 3.4vw, 2.15rem)
+    calc(env(safe-area-inset-bottom, 0px) + clamp(4.5rem, 7.6svh, 6rem)) !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  overflow: hidden !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+body.qs-active .qs-character-v3-scene {
+  width: min(92vw, 740px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+
+  display: grid !important;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto !important;
+
+  align-items: stretch !important;
+  gap: clamp(0.42rem, 1.05svh, 0.78rem) !important;
+
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Title/subtitle */
+body.qs-active .qs-character-header {
+  text-align: center !important;
+  overflow: visible !important;
+}
+
+body.qs-active .qs-character-header h1 {
+  max-width: 96vw !important;
+  margin: 0 auto !important;
+  padding: 0 0 0.04em !important;
+
+  display: block !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.44rem, 7.05vw, 4.35rem) !important;
+  line-height: 0.98 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--qs-accent, #00ffee),
+      color-mix(in srgb, var(--qs-accent, #00ffee) 56%, #ffffff 44%),
+      #ffffff,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 56%, #ffffff 44%),
+      var(--qs-accent, #00ffee)
+    ) !important;
+
+  background-size: 240% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  text-shadow:
+    0 0 10px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 22px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 3px 8px rgba(0, 0, 0, 0.52) !important;
+}
+
+body.qs-active .qs-character-subtitle {
+  width: min(92vw, 620px) !important;
+  margin: clamp(0.22rem, 0.64svh, 0.44rem) auto 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.02em !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 2.55vw, 1.16rem) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.08 !important;
+
+  color: rgba(238, 252, 255, 0.94) !important;
+  text-shadow:
+    0 2px 7px rgba(0, 0, 0, 0.94),
+    0 0 14px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* One big character card */
+body.qs-active .qs-character-main-card,
+body.qs-active .qs-difficulty-panel {
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 46%, rgba(255,255,255,0.16)) !important;
+  border-radius: 24px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 16, 30, 0.68),
+      rgba(1, 5, 13, 0.80)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.052) inset,
+    0 14px 32px rgba(0, 0, 0, 0.30),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(12px) saturate(1.12);
+  backdrop-filter: blur(12px) saturate(1.12);
+}
+
+body.qs-active .qs-character-main-card {
+  min-height: 0 !important;
+  height: 100% !important;
+
+  display: grid !important;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto
+    auto !important;
+
+  align-items: center !important;
+  gap: clamp(0.18rem, 0.58svh, 0.42rem) !important;
+
+  padding: clamp(0.56rem, 1.18svh, 0.92rem) !important;
+}
+
+body.qs-active .qs-character-label,
+body.qs-active .qs-unlocked-header,
+body.qs-active .qs-difficulty-label {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.64rem, 1.55svh, 0.88rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 13px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-portrait-wrap {
+  min-height: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-character-portrait {
+  width: auto !important;
+  max-width: 100% !important;
+  height: clamp(6.8rem, 19svh, 11rem) !important;
+  object-fit: contain !important;
+
+  filter:
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+/* Temporary art differences until real character PNGs land. */
+body.qs-active .qs-character-art-kool-kat-girl {
+  filter:
+    hue-rotate(36deg)
+    saturate(1.24)
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+body.qs-active .qs-character-art-doctor-sax {
+  filter:
+    hue-rotate(92deg)
+    saturate(1.15)
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+body.qs-active .qs-character-art-hooded-dino-dj {
+  filter:
+    hue-rotate(168deg)
+    saturate(1.18)
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+body.qs-active .qs-character-art-family-band {
+  filter:
+    hue-rotate(245deg)
+    saturate(1.26)
+    brightness(1.08)
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+body.qs-active .qs-character-name {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1rem, 2.35svh, 1.45rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.025em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-boost {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.58svh, 0.88rem) !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.08 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.92) !important;
+  text-shadow: 0 0 10px rgba(0,0,0,0.72) !important;
+}
+
+/* Character slots */
+body.qs-active .qs-unlocked-row {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.24rem, 1vw, 0.5rem) !important;
+}
+
+body.qs-active .qs-roster-slot {
+  position: relative !important;
+
+  min-width: 0 !important;
+  min-height: clamp(4rem, 8.4svh, 5.65rem) !important;
+
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto auto !important;
+  place-items: center !important;
+
+  padding: clamp(0.28rem, 0.62svh, 0.42rem) clamp(0.12rem, 0.7vw, 0.28rem) !important;
+
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 15px !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 12%,
+      rgba(255,255,255,0.08),
+      rgba(0,0,0,0.42) 70%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px rgba(0,0,0,0.24) !important;
+
+  color: rgba(245,253,255,0.9) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  border-color: var(--qs-accent, #00ffee) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 0 12px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-roster-check,
+body.qs-active .qs-roster-lock-mark {
+  position: absolute !important;
+  top: 0.18rem !important;
+  right: 0.22rem !important;
+
+  font-size: clamp(0.48rem, 1.12svh, 0.66rem) !important;
+  line-height: 1 !important;
+}
+
+body.qs-active .qs-roster-check {
+  color: var(--qs-accent, #00ffee) !important;
+  text-shadow: 0 0 7px var(--qs-glow, rgba(0,255,238,0.55)) !important;
+}
+
+body.qs-active .qs-roster-img,
+body.qs-active .qs-roster-locked-img {
+  height: clamp(1.85rem, 4.2svh, 2.75rem) !important;
+  width: auto !important;
+  max-width: 92% !important;
+  object-fit: contain !important;
+}
+
+body.qs-active .qs-roster-locked-img {
+  opacity: 0.48 !important;
+  filter: saturate(0.65) brightness(0.76) !important;
+}
+
+body.qs-active .qs-lock-fallback {
+  width: clamp(1.45rem, 3.2svh, 2rem) !important;
+  height: clamp(1.45rem, 3.2svh, 2rem) !important;
+  display: none;
+  place-items: center !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  color: rgba(255,255,255,0.72) !important;
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-weight: 950 !important;
+}
+
+body.qs-active .qs-roster-name {
+  margin-top: 0.05rem !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.48rem, 1.08svh, 0.66rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.02 !important;
+  text-align: center !important;
+}
+
+body.qs-active .qs-roster-best {
+  margin-top: 0.05rem !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.42rem, 0.94svh, 0.58rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.74) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked {
+  opacity: 0.62 !important;
+  filter: saturate(0.78) brightness(0.84) !important;
+}
+
+body.qs-active .qs-roster-slot.qs-locked-bump {
+  animation: qs-locked-bump 320ms ease-out both;
+}
+
+@keyframes qs-locked-bump {
+  0% { transform: translateY(0); }
+  35% { transform: translateY(-2px); }
+  70% { transform: translateY(1px); }
+  100% { transform: translateY(0); }
+}
+
+/* Difficulty row stays as accepted. */
+body.qs-active .qs-difficulty-panel {
+  padding: clamp(0.5rem, 1.1svh, 0.76rem) !important;
+}
+
+body.qs-active .qs-difficulty-label {
+  margin-bottom: clamp(0.34rem, 0.8svh, 0.5rem) !important;
+}
+
+body.qs-active .qs-difficulty-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(0.34rem, 1.35vw, 0.62rem) !important;
+}
+
+body.qs-active .qs-difficulty-btn {
+  min-height: clamp(2.65rem, 6.2svh, 3.7rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.08rem !important;
+
+  padding: clamp(0.36rem, 0.9svh, 0.56rem) clamp(0.22rem, 1.2vw, 0.44rem) !important;
+
+  border-radius: 16px !important;
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 42%, rgba(255,255,255,0.14)) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.065),
+      rgba(0,0,0,0.50)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.9) !important;
+
+  opacity: 0.54 !important;
+  filter: saturate(0.76) brightness(0.82) !important;
+  transform: translateY(0) scale(0.985) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  cursor: pointer !important;
+}
+
+body.qs-active .qs-difficulty-btn.is-active {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1) !important;
+
+  border-color: var(--qs-accent, #00ffee) !important;
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)),
+      rgba(0,0,0,0.48) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.09) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 24px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-difficulty-btn strong {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.58svh, 0.88rem) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+}
+
+body.qs-active .qs-difficulty-btn span {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.66rem, 1.55svh, 0.86rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  opacity: 0.86 !important;
+}
+
+/* IL-ish PLAY GAME: smaller on iPhone, prettier edge. */
+body.qs-active .qs-preflight-start {
+  position: relative !important;
+  justify-self: center !important;
+  align-self: start !important;
+
+  width: min(64vw, 20rem) !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+  padding: clamp(0.62rem, 1.42svh, 0.86rem) clamp(1rem, 4vw, 1.6rem) !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 42%, #ffffff 22%) !important;
+  border-radius: 18px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.9rem, 2.12svh, 1.24rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 52%, #ffffff 48%) 0%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 82%, #ffffff 18%) 46%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 92%, #000000 8%) 100%
+    ) !important;
+
+  color: rgba(0, 10, 16, 0.96) !important;
+  text-shadow: none !important;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.30),
+    inset 0 -2px 0 rgba(0,0,0,0.18),
+    0 0 0 1px rgba(255,255,255,0.10),
+    0 0 16px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 12px 25px rgba(0,0,0,0.34) !important;
+}
+
+/* Back button stays IL-like. */
+body.qs-active .qs-bottom-bar {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: max(1.2vh, env(safe-area-inset-bottom, 0px)) !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: end !important;
+
+  pointer-events: none !important;
+  padding: 0 1.2vh !important;
+  z-index: 30 !important;
+}
+
+body.qs-active .qs-preflight-back-btn {
+  pointer-events: auto !important;
+  justify-self: start !important;
+
+  width: clamp(64px, 9vw, 78px) !important;
+  height: clamp(64px, 9vw, 78px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  padding: 0 !important;
+  border-radius: 18px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 14, 38, 0.78),
+      rgba(2, 7, 20, 0.92)
+    ) !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 28%, rgba(160,220,255,0.22)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    0 0 16px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+body.qs-active .qs-preflight-back-arrow {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem) !important;
+  line-height: 1 !important;
+  color: rgba(215, 240, 255, 0.95) !important;
+}
+
+body.qs-active .qs-preflight-back-text {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.55rem, 1.1vw, 0.68rem) !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  color: rgba(200, 228, 245, 0.82) !important;
+}
+
+/* Keep gameplay glass from the prior accepted direction. */
+body.qs-active .qs-stage,
+body.qs-active .qs-math,
+body.qs-active .qs-keypad,
+body.qs-active .qs-result-popup {
+  border-color: var(--qs-glow, rgba(0, 255, 238, 0.55)) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+    0 10px 24px rgba(0, 0, 0, 0.32),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Short phones: preserve stack. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 {
+    padding-top: calc(env(safe-area-inset-top, 0px) + clamp(0.42rem, 1.05svh, 0.68rem)) !important;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(4.15rem, 7.1svh, 5.2rem)) !important;
+  }
+
+  body.qs-active .qs-character-v3-scene {
+    gap: clamp(0.24rem, 0.7svh, 0.48rem) !important;
+  }
+
+  body.qs-active .qs-character-header h1 {
+    font-size: clamp(1.28rem, 6.65vw, 2.35rem) !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  body.qs-active .qs-character-subtitle {
+    font-size: clamp(0.62rem, 2.42vw, 0.86rem) !important;
+    line-height: 1.04 !important;
+    margin-top: clamp(0.14rem, 0.44svh, 0.28rem) !important;
+  }
+
+  body.qs-active .qs-character-main-card {
+    gap: clamp(0.12rem, 0.38svh, 0.28rem) !important;
+    padding: clamp(0.44rem, 0.9svh, 0.66rem) !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(4.9rem, 14.2svh, 6.85rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(3.08rem, 6.65svh, 3.95rem) !important;
+  }
+
+  body.qs-active .qs-roster-img,
+  body.qs-active .qs-roster-locked-img {
+    height: clamp(1.35rem, 3.2svh, 1.95rem) !important;
+  }
+
+  body.qs-active .qs-difficulty-btn {
+    min-height: clamp(2.22rem, 5.1svh, 2.85rem) !important;
+  }
+
+  body.qs-active .qs-preflight-start {
+    width: min(60vw, 17rem) !important;
+    padding-top: clamp(0.52rem, 1.15svh, 0.68rem) !important;
+    padding-bottom: clamp(0.52rem, 1.15svh, 0.68rem) !important;
+    font-size: clamp(0.82rem, 1.95svh, 1.05rem) !important;
+  }
+}
+
+/* iPad: keep card centered and wider without wasting the whole stage. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-v3-scene {
+    width: min(70vw, 720px) !important;
+  }
+
+  body.qs-active .qs-character-header h1 {
+    font-size: clamp(3rem, 6vw, 5rem) !important;
+  }
+
+  body.qs-active .qs-character-subtitle {
+    font-size: clamp(0.98rem, 1.65vw, 1.3rem) !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(7.7rem, 16.5svh, 11.6rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(4.85rem, 8.1svh, 6.25rem) !important;
+  }
+
+  body.qs-active .qs-roster-img,
+  body.qs-active .qs-roster-locked-img {
+    height: clamp(2.28rem, 4svh, 3.18rem) !important;
+  }
+
+  body.qs-active .qs-preflight-start {
+    width: min(42vw, 20rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-roster-slot.qs-locked-bump {
+    animation: none !important;
+  }
+
+  body.qs-active .qs-intro,
+  body.qs-active .qs-stage,
+  body.qs-active .qs-math,
+  body.qs-active .qs-keypad,
+  body.qs-active .qs-result-popup {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Character Select Intro V3 END ───────────────── */
+
+/* ───────────────── QuickServe — Character Layout Correction START ─────────────────
+   Purpose:
+   - Correct QS intro V3 layout after iPhone/iPad test.
+   - Center and widen iPad presentation.
+   - Make character art scale better.
+   - Character selection happens by roster boxes only.
+   - Preserve difficulty row, unlock/select logic, theme vars, fade, music, scoring.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Hard-center the whole preflight stack and prevent the iPad left-heavy drift. */
+body.qs-active .qs-intro.qs-character-v3 {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding-left: clamp(0.72rem, 3vw, 2.2rem) !important;
+  padding-right: clamp(0.72rem, 3vw, 2.2rem) !important;
+}
+
+body.qs-active .qs-character-v3-scene {
+  justify-self: center !important;
+  align-self: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  width: min(94vw, 860px) !important;
+  max-width: 94vw !important;
+}
+
+/* Subtitle: keep stacked, give iPhone a tiny readability bump. */
+body.qs-active .qs-character-subtitle {
+  font-size: clamp(0.78rem, 2.78vw, 1.2rem) !important;
+  line-height: 1.09 !important;
+}
+
+/* Character card should feel like the main stage panel, not a left-biased rectangle. */
+body.qs-active .qs-character-main-card {
+  width: 100% !important;
+  justify-self: center !important;
+
+  grid-template-rows:
+    auto
+    minmax(7rem, 1fr)
+    auto
+    auto
+    auto !important;
+
+  gap: clamp(0.22rem, 0.62svh, 0.46rem) !important;
+}
+
+/* Remove dead arrow styles from layout if any old DOM/classes survived. */
+body.qs-active .qs-character-arrow,
+body.qs-active .qs-character-node,
+body.qs-active .qs-character-dot,
+body.qs-active .qs-character-nodes {
+  display: none !important;
+}
+
+/* Character art gets more authority, especially on iPad. */
+body.qs-active .qs-character-portrait-wrap {
+  width: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-character-portrait {
+  height: clamp(7.35rem, 20.5svh, 12.6rem) !important;
+  max-height: 100% !important;
+}
+
+/* Selected character slot: small glow. Unselected unlocked: half-dim. Locked stays dim. */
+body.qs-active .qs-roster-slot.is-unlocked:not(.is-selected) {
+  opacity: 0.58 !important;
+  filter: saturate(0.78) brightness(0.78) !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1.012) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.07) inset,
+    0 0 10px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 18px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked {
+  opacity: 0.42 !important;
+  filter: saturate(0.62) brightness(0.68) !important;
+}
+
+/* Roster slots: requested stack.
+   Phil
+   png
+   Best
+   Score: 120
+*/
+body.qs-active .qs-roster-slot {
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto !important;
+
+  min-height: clamp(4.45rem, 9svh, 6.1rem) !important;
+  padding: clamp(0.26rem, 0.62svh, 0.44rem) clamp(0.12rem, 0.7vw, 0.3rem) !important;
+}
+
+body.qs-active .qs-roster-name {
+  order: 1 !important;
+  margin: 0 !important;
+
+  font-size: clamp(0.52rem, 1.14svh, 0.7rem) !important;
+  line-height: 1.02 !important;
+}
+
+body.qs-active .qs-roster-img,
+body.qs-active .qs-roster-locked-img,
+body.qs-active .qs-lock-fallback {
+  order: 2 !important;
+}
+
+body.qs-active .qs-roster-best-word {
+  order: 3 !important;
+  margin-top: 0.04rem !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.42rem, 0.95svh, 0.58rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.78) !important;
+}
+
+body.qs-active .qs-roster-score-line {
+  order: 4 !important;
+  margin-top: 0.02rem !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.42rem, 0.95svh, 0.58rem) !important;
+  font-weight: 850 !important;
+  line-height: 1.02 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.76) !important;
+}
+
+/* Play Game: slightly smaller on iPhone, same general IL/welcome highlight. */
+body.qs-active .qs-preflight-start {
+  width: min(58vw, 19rem) !important;
+  padding-top: clamp(0.52rem, 1.22svh, 0.76rem) !important;
+  padding-bottom: clamp(0.52rem, 1.22svh, 0.76rem) !important;
+  font-size: clamp(0.84rem, 1.96svh, 1.16rem) !important;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.36),
+    inset 0 -2px 0 rgba(0,0,0,0.16),
+    0 0 0 1px color-mix(in srgb, var(--qs-accent, #00ffee) 24%, #ffffff 20%),
+    0 0 16px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 12px 25px rgba(0,0,0,0.34) !important;
+}
+
+/* iPad: spread horizontally, center hard, scale character art up. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 {
+    padding-left: clamp(1rem, 4vw, 3.2rem) !important;
+    padding-right: clamp(1rem, 4vw, 3.2rem) !important;
+  }
+
+  body.qs-active .qs-character-v3-scene {
+    width: min(88vw, 920px) !important;
+    max-width: 88vw !important;
+  }
+
+  body.qs-active .qs-character-main-card {
+    min-height: clamp(30rem, 58svh, 41rem) !important;
+    grid-template-rows:
+      auto
+      minmax(11rem, 1fr)
+      auto
+      auto
+      auto !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(10rem, 23svh, 16rem) !important;
+  }
+
+  body.qs-active .qs-character-subtitle {
+    font-size: clamp(1.05rem, 1.85vw, 1.42rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(5.4rem, 9.2svh, 7rem) !important;
+  }
+
+  body.qs-active .qs-roster-img,
+  body.qs-active .qs-roster-locked-img {
+    height: clamp(2.4rem, 4.4svh, 3.55rem) !important;
+  }
+
+  body.qs-active .qs-preflight-start {
+    width: min(38vw, 20rem) !important;
+    font-size: clamp(1rem, 1.8vw, 1.28rem) !important;
+  }
+}
+
+/* Short phones: preserve stack and keep button from getting chunky. */
+@media (max-height: 740px) {
+  body.qs-active .qs-character-subtitle {
+    font-size: clamp(0.68rem, 2.55vw, 0.92rem) !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(5.2rem, 15svh, 7.4rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(3.4rem, 7.1svh, 4.35rem) !important;
+  }
+
+  body.qs-active .qs-preflight-start {
+    width: min(56vw, 16rem) !important;
+    font-size: clamp(0.78rem, 1.82svh, 1rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Character Layout Correction END ───────────────── */
+
+/* ───────────────── QuickServe — Roster PNG Polish START ─────────────────
+   Purpose:
+   - Small QS intro polish after V3 test.
+   - Bigger readable iPhone subtitle.
+   - Cleaner roster text stacks.
+   - Simplified locked boxes.
+   - Better main character PNG scaling, especially iPad.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* iPhone readability bump, still stacked. */
+body.qs-active .qs-character-subtitle {
+  font-size: clamp(0.84rem, 2.95vw, 1.22rem) !important;
+  line-height: 1.1 !important;
+}
+
+/* Let the character art breathe more inside the big card. */
+body.qs-active .qs-character-main-card {
+  grid-template-rows:
+    auto
+    minmax(8.6rem, 1.2fr)
+    auto
+    auto
+    auto
+    auto !important;
+}
+
+body.qs-active .qs-character-portrait {
+  height: clamp(7.9rem, 22svh, 13.8rem) !important;
+  max-height: 100% !important;
+}
+
+/* Roster slots: Name / PNG / Best / Score: / value. */
+body.qs-active .qs-roster-slot.is-unlocked {
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto !important;
+}
+
+body.qs-active .qs-roster-name {
+  font-size: clamp(0.52rem, 1.14svh, 0.7rem) !important;
+  line-height: 1.02 !important;
+}
+
+body.qs-active .qs-roster-best-word,
+body.qs-active .qs-roster-score-label,
+body.qs-active .qs-roster-score-value {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.42rem, 0.95svh, 0.58rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.02 !important;
+  text-align: center !important;
+  color: rgba(238, 252, 255, 0.78) !important;
+}
+
+body.qs-active .qs-roster-score-value {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow:
+    0 0 5px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Remove old combined score line if any survived. */
+body.qs-active .qs-roster-score-line {
+  display: none !important;
+}
+
+/* Locked boxes: only lock + cone + Unlock threshold. */
+body.qs-active .qs-roster-slot.is-locked {
+  grid-template-rows:
+    minmax(0, 1fr)
+    auto !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-name {
+  font-size: clamp(0.48rem, 1.05svh, 0.64rem) !important;
+  line-height: 1.02 !important;
+  color: rgba(238, 252, 255, 0.76) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-best-word,
+body.qs-active .qs-roster-slot.is-locked .qs-roster-score-label,
+body.qs-active .qs-roster-slot.is-locked .qs-roster-score-value,
+body.qs-active .qs-roster-slot.is-locked .qs-roster-score-line {
+  display: none !important;
+}
+
+/* Slightly bigger locked cone so the lock boxes feel intentional, not text-heavy. */
+body.qs-active .qs-roster-locked-img,
+body.qs-active .qs-lock-fallback {
+  height: clamp(1.72rem, 3.95svh, 2.55rem) !important;
+}
+
+/* Keep unlocked-but-not-selected dimmed, selected glowing lightly. */
+body.qs-active .qs-roster-slot.is-unlocked:not(.is-selected) {
+  opacity: 0.52 !important;
+  filter: saturate(0.72) brightness(0.74) !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1.012) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.07) inset,
+    0 0 9px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* iPad: main character PNG should not feel tiny. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-main-card {
+    grid-template-rows:
+      auto
+      minmax(13.5rem, 1.35fr)
+      auto
+      auto
+      auto
+      auto !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(12rem, 27svh, 18.5rem) !important;
+  }
+
+  body.qs-active .qs-character-subtitle {
+    font-size: clamp(1.08rem, 1.9vw, 1.48rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(5.7rem, 9.6svh, 7.35rem) !important;
+  }
+
+  body.qs-active .qs-roster-img {
+    height: clamp(2.55rem, 4.7svh, 3.75rem) !important;
+  }
+}
+
+/* Short phones: readable subtitle without stealing too much vertical stage. */
+@media (max-height: 740px) {
+  body.qs-active .qs-character-subtitle {
+    font-size: clamp(0.72rem, 2.72vw, 0.96rem) !important;
+    line-height: 1.06 !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(5.45rem, 15.7svh, 7.65rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot {
+    min-height: clamp(3.45rem, 7.25svh, 4.5rem) !important;
+  }
+
+  body.qs-active .qs-roster-best-word,
+  body.qs-active .qs-roster-score-label,
+  body.qs-active .qs-roster-score-value {
+    font-size: clamp(0.38rem, 0.88svh, 0.52rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Roster PNG Polish END ───────────────── */
+
+/* ───────────────── QuickServe — Roster Slot Text Cleanup START ─────────────────
+   Purpose:
+   - Clean QS character roster slots after V3 test.
+   - Subtitle returns to one line and scales.
+   - Unlocked cards stack Name / PNG / Best / Score: / value.
+   - Locked cards show only threshold message.
+   - Bigger main character PNG on iPad.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* One-line subtitle: scale, do not wrap or clip. */
+body.qs-active .qs-character-subtitle {
+  width: min(94vw, 680px) !important;
+  max-width: 94vw !important;
+
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+
+  font-size: clamp(0.56rem, 2.28vw, 1.08rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.035em !important;
+}
+
+/* Give the main art more authority, especially on iPad. */
+body.qs-active .qs-character-main-card {
+  grid-template-rows:
+    auto
+    minmax(9.4rem, 1.32fr)
+    auto
+    auto
+    auto
+    auto !important;
+}
+
+body.qs-active .qs-character-portrait {
+  height: clamp(8.3rem, 23svh, 14.8rem) !important;
+  max-height: 100% !important;
+}
+
+/* Roster unlocked cards: exact stack requested. */
+body.qs-active .qs-roster-slot.is-unlocked {
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto !important;
+
+  align-content: center !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-roster-slot.is-unlocked .qs-roster-name {
+  order: 1 !important;
+  margin: 0 !important;
+}
+
+body.qs-active .qs-roster-slot.is-unlocked .qs-roster-img {
+  order: 2 !important;
+}
+
+body.qs-active .qs-roster-slot.is-unlocked .qs-roster-best-word {
+  order: 3 !important;
+}
+
+body.qs-active .qs-roster-slot.is-unlocked .qs-roster-score-label {
+  order: 4 !important;
+}
+
+body.qs-active .qs-roster-slot.is-unlocked .qs-roster-score-value {
+  order: 5 !important;
+}
+
+/* Keep all roster text centered and readable. */
+body.qs-active .qs-roster-name,
+body.qs-active .qs-roster-best-word,
+body.qs-active .qs-roster-score-label,
+body.qs-active .qs-roster-score-value {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+body.qs-active .qs-roster-name {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.5rem, 1.08svh, 0.68rem) !important;
+  font-weight: 950 !important;
+  line-height: 1.02 !important;
+}
+
+body.qs-active .qs-roster-best-word,
+body.qs-active .qs-roster-score-label,
+body.qs-active .qs-roster-score-value {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.4rem, 0.9svh, 0.55rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  color: rgba(238, 252, 255, 0.82) !important;
+}
+
+body.qs-active .qs-roster-score-value {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* Locked cards: center threshold message only. */
+body.qs-active .qs-roster-slot.is-locked {
+  display: grid !important;
+  grid-template-rows: 1fr !important;
+  place-items: center !important;
+  text-align: center !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-lock-mark {
+  position: absolute !important;
+  top: 0.18rem !important;
+  right: 0.22rem !important;
+}
+
+body.qs-active .qs-locked-message {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-weight: 900 !important;
+  line-height: 1.02 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.74) !important;
+}
+
+body.qs-active .qs-locked-message span:first-child {
+  font-size: clamp(0.62rem, 1.24svh, 0.82rem) !important;
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+body.qs-active .qs-locked-message span:nth-child(2),
+body.qs-active .qs-locked-message span:nth-child(3) {
+  font-size: clamp(0.46rem, 0.98svh, 0.62rem) !important;
+}
+
+/* Hide old locked cone/fallback styles if older markup somehow survives. */
+body.qs-active .qs-roster-slot.is-locked .qs-roster-locked-img,
+body.qs-active .qs-roster-slot.is-locked .qs-lock-fallback,
+body.qs-active .qs-roster-slot.is-locked .qs-roster-best-word,
+body.qs-active .qs-roster-slot.is-locked .qs-roster-score-label,
+body.qs-active .qs-roster-slot.is-locked .qs-roster-score-value,
+body.qs-active .qs-roster-slot.is-locked .qs-roster-score-line {
+  display: none !important;
+}
+
+/* Selected / unselected states. */
+body.qs-active .qs-roster-slot.is-unlocked:not(.is-selected) {
+  opacity: 0.52 !important;
+  filter: saturate(0.72) brightness(0.74) !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1.012) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.07) inset,
+    0 0 9px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* iPad: larger main character art without wrecking the accepted layout. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-main-card {
+    grid-template-rows:
+      auto
+      minmax(14.75rem, 1.48fr)
+      auto
+      auto
+      auto
+      auto !important;
+  }
+
+  body.qs-active .qs-character-portrait {
+    height: clamp(13.2rem, 29svh, 20rem) !important;
+  }
+
+  body.qs-active .qs-character-subtitle {
+    width: min(88vw, 760px) !important;
+    font-size: clamp(0.96rem, 1.55vw, 1.32rem) !important;
+    letter-spacing: -0.03em !important;
+  }
+}
+
+/* Phone: keep the one-line subtitle readable but safe. */
+@media (max-width: 430px) {
+  body.qs-active .qs-character-subtitle {
+    font-size: clamp(0.58rem, 2.48vw, 0.82rem) !important;
+    width: 96vw !important;
+    max-width: 96vw !important;
+  }
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-character-portrait {
+    height: clamp(5.6rem, 16svh, 7.9rem) !important;
+  }
+
+  body.qs-active .qs-roster-name {
+    font-size: clamp(0.44rem, 0.98svh, 0.58rem) !important;
+  }
+
+  body.qs-active .qs-roster-best-word,
+  body.qs-active .qs-roster-score-label,
+  body.qs-active .qs-roster-score-value {
+    font-size: clamp(0.34rem, 0.8svh, 0.48rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Roster Slot Text Cleanup END ───────────────── */
