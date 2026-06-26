@@ -4,6 +4,7 @@ import './quickServe.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
 import { playTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
+import { getThemeAccent } from '../../data/themeAccentLaw.js';
 
 // ✅ Use only musicManager (no separate QS Howl player anymore)
 import {
@@ -37,6 +38,36 @@ import { hapticSuccess } from '../../utils/haptics.js';
 
 const QS_TRACK_IDS = ['quikserve', 'kktribute', 'softdown'];
 let _qsMusicScopeOn = false;
+let qsIntroStartInFlight = false;
+
+function getQuickServeThemeAccent() {
+  const { accent, glow, faint } = getThemeAccent(appState?.settings?.theme);
+
+  return {
+    accent,
+    glow,
+    faint,
+  };
+}
+
+function applyQuickServeThemeVars(scopeEl) {
+  const { accent, glow, faint } = getQuickServeThemeAccent();
+
+  const targets = [
+    document.body,
+    document.getElementById('game-container'),
+    document.querySelector('.game-frame'),
+    document.querySelector('.qs-intro'),
+    document.querySelector('.qs-grid'),
+    scopeEl,
+  ].filter(Boolean);
+
+  targets.forEach((target) => {
+    target.style.setProperty('--qs-accent', accent);
+    target.style.setProperty('--qs-glow', glow);
+    target.style.setProperty('--qs-faint', faint);
+  });
+}
 
 function activateQuickServeMusicScope() {
   if (!_qsMusicScopeOn) {
@@ -86,6 +117,7 @@ export function restartQuickServeMusicFresh() {
 //////////////////////////////
 export function loadQuickServe() {
   console.log('🍧 Loading QuickServe Mode');
+  qsIntroStartInFlight = false;
   // 💫 Activate QS mode keys
   activateInputHandler('quickServe');
   document.body.classList.add('qs-active');
@@ -98,6 +130,7 @@ export function loadQuickServe() {
   hideMenu();
   showGameContainer();
   renderIntroScreen();
+  applyQuickServeThemeVars(document.querySelector('.qs-intro'));
 }
 
 
@@ -153,14 +186,10 @@ function renderIntroScreen() {
   phil.initPhil();
   repaintBackground();
 
-  // Start the show
-  document.getElementById('startShowBtn')?.addEventListener('click', () => {
-    playTransition(() => {
-
-      restartQuickServeMusicFresh();
-      renderGameUI();
-    });
-  });
+  // Start the show — QS 1.5:
+  // In-place intro → gameplay fade.
+  // No old global portal between QS intro and QS gameplay.
+  document.getElementById('startShowBtn')?.addEventListener('click', startQuickServeShiftFromIntro);
 
   // New square Back/Mute for intro
   document.getElementById('qsBackIntro')?.addEventListener('click', returnToMenu);
@@ -175,7 +204,46 @@ function renderIntroScreen() {
 // 🎮 Main Game Screen
 /////////////////////////////
 //          removed for pay loop    <button id="qsBackBtn" class="back-to-menu-btn">🔙 Back to Menu</button>)
-export function renderGameUI() {
+export function startQuickServeShiftFromIntro() {
+  if (qsIntroStartInFlight) return;
+  qsIntroStartInFlight = true;
+
+  const introEl = document.querySelector('.qs-intro');
+  const bottomBarEl = document.querySelector('.qs-bottom-bar');
+  const frameEl = document.querySelector('.game-frame');
+
+  const launchGameplay = () => {
+    // Preserve the current QS music ownership rule:
+    // intro start / completed-run replay may request a fresh QS track.
+    restartQuickServeMusicFresh();
+
+    renderGameUI();
+    applyQuickServeThemeVars(document.querySelector('.qs-grid'));
+
+    requestAnimationFrame(() => {
+      const gridEl = document.querySelector('.qs-grid');
+      gridEl?.classList.add('qs-game-fade-in');
+
+      window.setTimeout(() => {
+        gridEl?.classList.remove('qs-game-fade-in');
+        qsIntroStartInFlight = false;
+      }, 720);
+    });
+  };
+
+  if (!introEl) {
+    launchGameplay();
+    return;
+  }
+
+  frameEl?.classList.add('qs-intro-to-game-active');
+  introEl.classList.add('qs-intro-fade-out');
+  bottomBarEl?.classList.add('qs-intro-fade-out');
+
+  window.setTimeout(launchGameplay, 360);
+}
+
+function renderGameUI() {
   const container = getGameContainer();
 
   container.innerHTML = `

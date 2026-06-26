@@ -1229,3 +1229,307 @@ body.qs-active .phil-speech {
     0 0 18px rgba(0, 255, 238, 0.42),
     0 10px 30px rgba(0, 0, 0, 0.42) !important;
 }
+
+/* ───────────────── QuickServe — iPhone Edge Safety START ─────────────────
+   Purpose:
+   - Pull the bottom keypad away from iPhone rounded corners.
+   - Protect Main Menu / Reset Game from feeling clipped.
+   - CSS-only. No gameplay, music, scoring, Phil, or results logic touched.
+   ──────────────────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] .qs-grid,
+.platform-ios .qs-grid {
+  box-sizing: border-box !important;
+
+  /* QS was living a little too close to the iPhone glass edge. */
+  padding-left: max(0.82rem, calc(env(safe-area-inset-left, 0px) + 0.58rem)) !important;
+  padding-right: max(0.82rem, calc(env(safe-area-inset-right, 0px) + 0.58rem)) !important;
+
+  /* Keep the bottom row above the rounded corner / home indicator danger zone. */
+  padding-bottom: max(0.64rem, calc(env(safe-area-inset-bottom, 0px) + 0.22rem)) !important;
+}
+
+html[data-platform="ios"] .qs-keypad,
+.platform-ios .qs-keypad {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Tiny phones: preserve the edge buffer without making the keypad feel cramped. */
+@media (max-width: 390px), (max-height: 720px) {
+  html[data-platform="ios"] .qs-grid,
+  .platform-ios .qs-grid {
+    padding-left: max(0.66rem, calc(env(safe-area-inset-left, 0px) + 0.42rem)) !important;
+    padding-right: max(0.66rem, calc(env(safe-area-inset-right, 0px) + 0.42rem)) !important;
+    padding-bottom: max(0.6rem, calc(env(safe-area-inset-bottom, 0px) + 0.18rem)) !important;
+  }
+}
+
+/* ───────────────── QuickServe — iPhone Edge Safety END ───────────────── */
+
+/* ───────────────── QuickServe — Intro To Game Fade START ─────────────────
+   Purpose:
+   - Replace old global transition between QS intro and QS gameplay.
+   - Keep the QuickServe plate/background feeling continuous.
+   - Intro elements fade out; gameplay elements fade in.
+   - No scoring, music, keypad, Phil, or result logic changes.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro,
+body.qs-active .qs-bottom-bar {
+  transition:
+    opacity 340ms ease,
+    transform 340ms ease,
+    filter 340ms ease !important;
+  will-change: opacity, transform, filter;
+}
+
+body.qs-active .qs-intro.qs-intro-fade-out {
+  opacity: 0 !important;
+  transform: translate3d(0, -0.35rem, 0) scale(0.992) !important;
+  filter: blur(5px) saturate(0.92) !important;
+  pointer-events: none !important;
+}
+
+body.qs-active .qs-bottom-bar.qs-intro-fade-out {
+  opacity: 0 !important;
+  transform: translate3d(0, 0.35rem, 0) scale(0.992) !important;
+  filter: blur(4px) saturate(0.92) !important;
+  pointer-events: none !important;
+}
+
+body.qs-active .qs-grid.qs-game-fade-in {
+  animation: qsGameFadeInFromIntro 560ms ease-out both !important;
+}
+
+@keyframes qsGameFadeInFromIntro {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.42rem, 0) scale(0.992);
+    filter: blur(5px) saturate(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-intro,
+  body.qs-active .qs-bottom-bar {
+    transition: opacity 180ms ease !important;
+  }
+
+  body.qs-active .qs-intro.qs-intro-fade-out,
+  body.qs-active .qs-bottom-bar.qs-intro-fade-out {
+    transform: none !important;
+    filter: none !important;
+  }
+
+  body.qs-active .qs-grid.qs-game-fade-in {
+    animation: qsGameFadeInFromIntroReduced 180ms ease-out both !important;
+  }
+
+  @keyframes qsGameFadeInFromIntroReduced {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+/* ───────────────── QuickServe — Intro To Game Fade END ───────────────── */
+
+/* ───────────────── QuickServe — Theme Responsive Shell START ─────────────────
+   Purpose:
+   - First QS 1.5 theme-responsive pass.
+   - Make the current SCMF theme accent feed QuickServe intro/game shell.
+   - No scoring, audio, keypad logic, Phil logic, results rebuild, or mode options touched.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active {
+  --qs-accent: #00ffee;
+  --qs-glow: rgba(0, 255, 238, 0.55);
+  --qs-faint: rgba(0, 255, 238, 0.18);
+
+  --qs-glass-bg:
+    linear-gradient(
+      180deg,
+      rgba(8, 18, 32, 0.70) 0%,
+      rgba(2, 8, 18, 0.82) 100%
+    );
+
+  --qs-glass-bg-strong:
+    linear-gradient(
+      180deg,
+      rgba(8, 18, 32, 0.82) 0%,
+      rgba(1, 5, 13, 0.92) 100%
+    );
+}
+
+/* Title / mode identity */
+body.qs-active .qs-header h1,
+body.qs-active .qs-intro h1 {
+  background:
+    linear-gradient(
+      90deg,
+      var(--qs-accent) 0%,
+      color-mix(in srgb, var(--qs-accent) 62%, #ffffff 38%) 32%,
+      #ffffff 50%,
+      color-mix(in srgb, var(--qs-accent) 62%, #ffffff 38%) 68%,
+      var(--qs-accent) 100%
+    ) !important;
+
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  text-shadow:
+    0 0 8px var(--qs-glow),
+    0 0 18px var(--qs-faint) !important;
+}
+
+/* Core glass surfaces */
+body.qs-active .qs-intro,
+body.qs-active .qs-stage,
+body.qs-active .qs-math,
+body.qs-active .qs-keypad {
+  border-color: var(--qs-glow) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045) inset,
+    0 10px 26px rgba(0, 0, 0, 0.32),
+    0 0 18px var(--qs-faint) !important;
+}
+
+/* Intro/preflight card: theme-aware but not redesigned yet */
+body.qs-active .qs-intro {
+  background:
+    radial-gradient(
+      circle at 50% 15%,
+      var(--qs-faint) 0%,
+      rgba(0, 0, 0, 0.30) 48%,
+      rgba(0, 0, 0, 0.72) 100%
+    ) !important;
+}
+
+/* Stage aura */
+body.qs-active .qs-stage {
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      var(--qs-faint) 0%,
+      rgba(0, 0, 0, 0.24) 45%,
+      rgba(0, 0, 0, 0.58) 100%
+    ) !important;
+}
+
+/* Score/timer/info chips */
+body.qs-active .qs-stage .score-box,
+body.qs-active .qs-stage .timer-box,
+body.qs-active .qs-stage .info-box,
+body.qs-active .info-box {
+  border-color: var(--qs-glow) !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 0 12px var(--qs-faint) !important;
+
+  text-shadow:
+    0 0 6px var(--qs-glow),
+    0 0 12px var(--qs-faint) !important;
+}
+
+/* Math/readout panel */
+body.qs-active .qs-math {
+  background: var(--qs-glass-bg-strong) !important;
+}
+
+body.qs-active #mathProblem,
+body.qs-active #answerDisplay {
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 0 16px var(--qs-faint) !important;
+}
+
+/* Keypad shell */
+body.qs-active .qs-keypad {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 12, 24, 0.66),
+      rgba(0, 0, 0, 0.80)
+    ) !important;
+}
+
+/* Keypad buttons: theme glow without changing button jobs */
+body.qs-active .qs-keypad button {
+  border-color: color-mix(in srgb, var(--qs-accent) 48%, rgba(255,255,255,0.22)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 0 9px var(--qs-faint) !important;
+}
+
+body.qs-active .qs-keypad button:hover {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 0 14px var(--qs-glow) !important;
+}
+
+/* Start / major action buttons */
+body.qs-active .qs-intro button,
+body.qs-active .start-show-btn,
+body.qs-active .play-again-btn {
+  border-color: var(--qs-accent) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.10) inset,
+    0 0 15px var(--qs-glow),
+    0 8px 18px rgba(0, 0, 0, 0.34) !important;
+}
+
+/* Active mode / current keypad mode */
+body.qs-active .qs-keypad .active-mode,
+body.qs-active .qs-keypad button.active-mode {
+  border-color: var(--qs-accent) !important;
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      var(--qs-faint),
+      rgba(0, 0, 0, 0.58) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.10) inset,
+    0 0 16px var(--qs-glow),
+    0 0 26px var(--qs-faint) !important;
+}
+
+/* Feedback text follows theme unless the existing JS marks error/zero states. */
+body.qs-active #qsXPMsg:not(.zero),
+body.qs-active #qsResultMsg:not(.error) {
+  color: var(--qs-accent) !important;
+  text-shadow:
+    0 0 6px var(--qs-glow),
+    0 0 12px var(--qs-faint) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-intro,
+  body.qs-active .qs-stage,
+  body.qs-active .qs-math,
+  body.qs-active .qs-keypad {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Theme Responsive Shell END ───────────────── */
