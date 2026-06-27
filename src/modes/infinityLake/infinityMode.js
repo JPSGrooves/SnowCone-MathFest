@@ -447,7 +447,8 @@ function renderIntroScreen() {
             <h1>Infinity Lake</h1>
             <p>
               Pick the right answer.<br />
-              Keep the streak alive.
+              Keep the streak alive.<br />
+              See the Visions.
             </p>
           </header>
 

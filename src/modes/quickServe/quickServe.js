@@ -54,6 +54,7 @@ const QS_CHARACTER_ROSTER = [
     id: 'cosmicPhil',
     name: 'Cosmic Phil',
     shortName: 'Phil',
+    displayNameLines: ['Cosmic', 'Phil'],
     unlockLabel: 'Default',
     unlockScore: 0,
     boostLabel: 'Boost: None',
@@ -65,6 +66,7 @@ const QS_CHARACTER_ROSTER = [
     id: 'koolKatGirl',
     name: 'Kool Kat Girl',
     shortName: 'Kat',
+    displayNameLines: ['Kool', 'Kat'],
     unlockLabel: '100',
     unlockScore: 100,
     boostLabel: 'Boost: +1 per solve',
@@ -77,6 +79,7 @@ const QS_CHARACTER_ROSTER = [
     id: 'doctorSax',
     name: 'Doctor Sax',
     shortName: 'Sax',
+    displayNameLines: ['Doctor', 'Sax'],
     unlockLabel: '200',
     unlockScore: 200,
     boostLabel: 'Boost: +2 per solve',
@@ -88,6 +91,7 @@ const QS_CHARACTER_ROSTER = [
     id: 'hoodedDinoDj',
     name: 'Hooded Dino DJ',
     shortName: 'Dino DJ',
+    displayNameLines: ['Dino', 'DJ'],
     unlockLabel: '400',
     unlockScore: 400,
     boostLabel: 'Boost: +5 per solve',
@@ -99,6 +103,7 @@ const QS_CHARACTER_ROSTER = [
     id: 'familyBand',
     name: 'Family Band',
     shortName: 'Band',
+    displayNameLines: ['Family', 'Band'],
     unlockLabel: '800',
     unlockScore: 800,
     boostLabel: 'Boost: +7 on harder solves',
@@ -240,16 +245,17 @@ function renderQuickServeCharacterRosterRow(selectedCharacter) {
         aria-label="${character.name} unlocked"
       >
         <span class="qs-roster-check" aria-hidden="true">✓</span>
-        <span class="qs-roster-name">${character.shortName || character.name}</span>
+        <span class="qs-roster-name">
+          ${(character.displayNameLines || [character.shortName || character.name])
+            .map((line) => `<span>${line}</span>`)
+            .join('')}
+        </span>
         <img
           class="qs-roster-img qs-character-art qs-character-art-${character.artClass}"
           src="${character.introSrc}"
           alt=""
           aria-hidden="true"
         />
-        <span class="qs-roster-best-word">Best</span>
-        <span class="qs-roster-score-label">Score:</span>
-        <span class="qs-roster-score-value">${characterBest == null ? '--' : characterBest}</span>
       </button>
     `;
   }).join('');
@@ -425,14 +431,17 @@ function renderIntroScreen() {
           <section class="qs-preflight-scene qs-character-v3-scene" aria-label="QuickServe character select preflight">
             <header class="qs-preflight-header qs-character-header">
               <h1>QuickServe Pavilion</h1>
-              <p class="qs-character-subtitle">Choose your character boost! Solve equations fast!</p>
+              <p class="qs-character-subtitle">
+                <span>Choose your character!</span>
+                <span>Solve equations fast!</span>
+              </p>
             </header>
 
             <section
               class="qs-character-main-card qs-selected-${selectedCharacter.id}"
               aria-label="QuickServe character card"
             >
-              <div class="qs-character-label">Character</div>
+              <div class="qs-character-label">${selectedCharacter.name}</div>
 
               <div class="qs-character-portrait-wrap">
                 <img
@@ -450,6 +459,10 @@ function renderIntroScreen() {
 
               <div class="qs-character-boost" id="qsSelectedCharacterBoost">
                 ${selectedCharacter.boostLabel}
+              </div>
+
+              <div class="qs-character-best-main" id="qsSelectedCharacterBest">
+                Best Score: <strong>${getQuickServeCharacterBestScore(selectedCharacter) ?? '--'}</strong>
               </div>
 
               <div class="qs-unlocked-header">
