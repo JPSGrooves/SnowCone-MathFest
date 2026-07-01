@@ -46,6 +46,7 @@ export function initGridGlow() {
   }
 
   container = nextContainer;
+  resetGridVisualState();
 
   // Hide old straight lines (fallback stays in markup)
   container.querySelectorAll('.glow-line').forEach(el => (el.style.display = 'none'));
@@ -71,6 +72,8 @@ export function initGridGlow() {
 
 export function startGridPulse() {
   if (pulseActive || !canvas) return;
+  resetGridVisualState();
+  clear();
   pulseActive = true;
   lastTs = null;
   rafId = requestAnimationFrame(frame);
@@ -81,6 +84,7 @@ export function stopGridPulse() {
   if (rafId) cancelAnimationFrame(rafId);
   rafId = null;
   lastTs = null;
+  resetGridVisualState();
   clear();
 }
 
@@ -116,6 +120,12 @@ function resize() {
 function clear() {
   if (!ctx) return;
   ctx.clearRect(0, 0, W, H);
+}
+
+function resetGridVisualState() {
+  tint = 'good';
+  bumpAmt = 0;
+  bumpEnd = 0;
 }
 
 // ── animation ─────────────────────────────────────────────────
