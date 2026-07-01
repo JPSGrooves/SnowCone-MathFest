@@ -1,11 +1,25 @@
-// 🍧 quickServePhil.js — Cosmic Pose Engine Refactor 💀✨
+// 🍧 quickServePhil.js — QS Act Pose Engine 💀✨
 
 let philEl = null;
 let currentPose = 'idle';
+let currentTimedPose = 'idle';
 let poseTimer = null;
 let reactionTimeout = null;
+let poseSerial = 0;
+let activePerformer = null;
 
-const poseMap = {
+const QS_SHIFT_DURATION_MS = 105000;
+
+const timedPoseProgression = [
+  'idle',
+  'focus',
+  'groove',
+  'lockin',
+  'crank',
+  'hype',
+];
+
+const legacyPoseMap = {
   idle: 'phil_intro',
   focus: 'phil_01_idle',
   groove: 'phil_02_focus',
@@ -14,83 +28,145 @@ const poseMap = {
   hype: 'phil_06_hype',
   cosmic: 'phil_07_cosmic',
   glitch: 'phil_glitch',
-  jams: 'phil_jams', // 🎸 Celebration pose
+  jams: 'phil_jams',
 };
+
+const poseFrameKeyMap = {
+  idle: 'idle',
+  focus: 'buildYellow1',
+  groove: 'buildYellow2',
+  lockin: 'buildGreen1',
+  crank: 'buildGreen2',
+  hype: 'buildGreen3',
+  cosmic: 'correct',
+  glitch: 'incorrect',
+  jams: 'correct',
+};
+
+function getLegacyPoseSrc(poseName) {
+  const file = legacyPoseMap[poseName] || legacyPoseMap.idle;
+  return `${import.meta.env.BASE_URL}assets/img/characters/quickServe/${file}.png`;
+}
+
+function getPerformerPoseSrc(poseName) {
+  const frameKey = poseFrameKeyMap[poseName] || poseFrameKeyMap.idle;
+  const src = activePerformer?.frames?.[frameKey];
+
+  if (src && typeof src === 'string') {
+    return src;
+  }
+
+  return getLegacyPoseSrc(poseName);
+}
+
+function getPoseStepMs() {
+  return QS_SHIFT_DURATION_MS / timedPoseProgression.length;
+}
+
+export function setQuickServePerformer(performer) {
+  activePerformer = performer || null;
+
+  if (philEl) {
+    setPose(currentPose || currentTimedPose || 'idle', { force: true });
+  }
+}
 
 //////////////////////////////
 // 🚀 Init
 //////////////////////////////
 export function initPhil() {
   philEl = document.getElementById('philSpriteInGame');
+
   if (!philEl) {
-    console.warn('⚠️ Cosmic Phil not found in DOM!');
     return;
   }
+
   philEl.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-  setPose('idle');
+  currentTimedPose = 'idle';
+  setPose('idle', { force: true });
 }
 
 //////////////////////////////
 // 🔥 Set Pose
 //////////////////////////////
-export function setPose(poseName) {
+export function setPose(poseName, options = {}) {
   if (!philEl) return;
-  if (!poseMap[poseName]) {
-    console.warn(`⚠️ Unknown pose: "${poseName}"`);
+
+  const { force = false } = options;
+  const nextSrc = getPerformerPoseSrc(poseName);
+
+  if (!nextSrc) {
+    console.warn(`⚠️ Unknown QuickServe pose: "${poseName}"`);
     return;
   }
-  if (poseName === currentPose) return;
+
+  if (!force && poseName === currentPose && philEl.getAttribute('src') === nextSrc) {
+    return;
+  }
 
   currentPose = poseName;
+  poseSerial += 1;
+
+  const thisPoseSerial = poseSerial;
+
   philEl.style.opacity = '0';
 
-  setTimeout(() => {
-    philEl.src = `${import.meta.env.BASE_URL}assets/img/characters/quickServe/${poseMap[poseName]}.png`;
+  window.setTimeout(() => {
+    if (!philEl || thisPoseSerial !== poseSerial) return;
+
+    philEl.src = nextSrc;
     philEl.style.opacity = '1';
   }, 250);
 }
 
 //////////////////////////////
-// ⏳ Pose Timelines
+// ⏳ Pose Timeline
 //////////////////////////////
 export function startPhilPoseTimer() {
   clearPhilTimer();
-  setPose('focus');
 
-  const timeline = ['groove', 'lockin', 'crank', 'hype', 'cosmic'];
-  let index = 0;
+  currentTimedPose = 'idle';
+  setPose(currentTimedPose, { force: true });
 
-  poseTimer = setInterval(() => {
-    if (index < timeline.length) {
-      setPose(timeline[index]);
-      index++;
-    } else {
-      clearPhilTimer();
+  let index = 1;
+  const stepMs = getPoseStepMs();
+
+  poseTimer = window.setInterval(() => {
+    if (index >= timedPoseProgression.length) {
+      clearInterval(poseTimer);
+      poseTimer = null;
+      return;
     }
-  }, 15000);
 
-  console.log('💀 Phil timeline started');
+    currentTimedPose = timedPoseProgression[index];
+    setPose(currentTimedPose, { force: true });
+    index += 1;
+  }, stepMs);
+
+  console.log(
+    `[QuickServe] Performer timeline started: ${activePerformer?.id || 'legacyPhil'}; step=${Math.round(stepMs)}ms`
+  );
 }
 
 export function clearPhilTimer() {
   clearInterval(poseTimer);
   poseTimer = null;
+
   clearTimeout(reactionTimeout);
   reactionTimeout = null;
 }
 
 //////////////////////////////
-// 💥 Reactions (Glitch & Jam)
+// 💥 Reactions
 //////////////////////////////
 function temporaryPose(newPose, duration = 500) {
   if (!philEl) return;
-  const cached = currentPose;
 
-  setPose(newPose);
+  setPose(newPose, { force: true });
   clearTimeout(reactionTimeout);
 
-  reactionTimeout = setTimeout(() => {
-    setPose(cached);
+  reactionTimeout = window.setTimeout(() => {
+    setPose(currentTimedPose || 'idle', { force: true });
   }, duration);
 }
 
@@ -107,16 +183,19 @@ export function bumpJam() {
 //////////////////////////////
 export function philIntro() {
   clearPhilTimer();
-  setPose('focus');
+  currentTimedPose = 'focus';
+  setPose('focus', { force: true });
 
-  setTimeout(() => {
-    setPose('groove');
+  window.setTimeout(() => {
+    currentTimedPose = 'groove';
+    setPose('groove', { force: true });
   }, 1000);
 }
 
 export function philCelebrate() {
   clearPhilTimer();
-  setPose('jams');
+  currentTimedPose = 'jams';
+  setPose('jams', { force: true });
 }
 
 //////////////////////////////
@@ -124,5 +203,6 @@ export function philCelebrate() {
 //////////////////////////////
 export function resetPhil() {
   clearPhilTimer();
-  setPose('idle');
+  currentTimedPose = 'idle';
+  setPose('idle', { force: true });
 }

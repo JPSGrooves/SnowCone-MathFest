@@ -9,7 +9,13 @@ import {
   playCorrectSfx,
   playIncorrectSfx,
 } from '../../managers/sfxManager.js';
-import { renderGameUI, showQuickServeResults } from './quickServe.js';
+import {
+  renderGameUI,
+  showQuickServeResults,
+  getQuickServeSelectedCharacterScoreBonus,
+  getQuickServeSelectedCharacterSummary,
+  recordQuickServeSelectedCharacterScore,
+} from './quickServe.js';
 import { generateProblem } from '../../logic/mathBrain.js';
 import { launchConfetti } from '../../utils/confetti.js';
 import { maybeAwardQuickServeBadges, finalizeQuickServeRun, resetQuickServeRunMilestones } from './quickServeBadges.js';
@@ -212,6 +218,11 @@ function endGame(didBeatHighScore = false) {
   // 🌟 New: detect a "perfect shift"
   const perfectRun = totalServed > 0 && totalMissed === 0;
 
+  // 🎸 Track selected-character high score separately from the existing
+  // global QuickServe/Game Center high score lane.
+  const selectedCharacter = getQuickServeSelectedCharacterSummary();
+  const characterResult = recordQuickServeSelectedCharacterScore(score);
+
   // 🎉 Confetti if high score OR perfect run
   if (didBeatHighScore || perfectRun) {
     launchConfetti();
@@ -235,6 +246,11 @@ function endGame(didBeatHighScore = false) {
       : null,
     // 🌟 pass this through for the popup to show a little line
     perfectRun,
+
+    // 🎸 Character-result metadata for the QS results rebuild.
+    character: selectedCharacter,
+    characterHighScore: characterResult.bestScore,
+    didBeatCharacterHighScore: characterResult.didBeatCharacterHighScore,
   });
 }
 
@@ -281,8 +297,13 @@ function handleCorrect() {
   // 📊 one more cone successfully served
   totalServed++;
 
-  // 🎯 score exactly by mode points (no double bump)
-  score += currentPoints;
+  // 🎯 Score by mode points plus the selected character's unlock boost.
+  // This makes unlockable performers actually matter without touching
+  // Game Center IDs, badge IDs, the timer, keypad, or math generation.
+  const characterBonus = getQuickServeSelectedCharacterScoreBonus();
+  const earnedPoints = currentPoints + characterBonus;
+
+  score += earnedPoints;
   updateScore();
 
   // 🏅 award QS milestone badges at live score

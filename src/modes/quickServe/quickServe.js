@@ -2,7 +2,7 @@
 // quickServe.js
 import './quickServe.css';
 import { swapModeBackground, applyBackgroundTheme } from '../../managers/backgroundManager.js';
-import { playTransition } from '../../managers/transitionManager.js';
+import { playModeReturnTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { getThemeAccent } from '../../data/themeAccentLaw.js';
 
@@ -43,8 +43,25 @@ let qsIntroStartInFlight = false;
 let qsPreflightDifficulty = 'easy';
 let qsSelectedCharacterId = 'cosmicPhil';
 
-const QS_CHARACTER_PHIL_SRC =
-  `${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_intro.png`;
+const QS_ACT_ART_BASE =
+  `${import.meta.env.BASE_URL}assets/img/characters/quickServe/acts/`;
+
+function qsActImage(actSlug, frameName) {
+  return `${QS_ACT_ART_BASE}${actSlug}_${frameName}.png`;
+}
+
+function qsActFrames(actSlug) {
+  return {
+    idle: qsActImage(actSlug, 'idle_white'),
+    buildYellow1: qsActImage(actSlug, 'build_yellow_01'),
+    buildYellow2: qsActImage(actSlug, 'build_yellow_02'),
+    buildGreen1: qsActImage(actSlug, 'build_green_01'),
+    buildGreen2: qsActImage(actSlug, 'build_green_02'),
+    buildGreen3: qsActImage(actSlug, 'build_green_03'),
+    correct: qsActImage(actSlug, 'correct_blue'),
+    incorrect: qsActImage(actSlug, 'incorrect_magenta'),
+  };
+}
 
 const QS_LOCKED_CHARACTER_PLACEHOLDER_SRC =
   `${import.meta.env.BASE_URL}assets/img/icons/cone_locked.png`;
@@ -59,57 +76,66 @@ const QS_CHARACTER_ROSTER = [
     unlockScore: 0,
     boostLabel: 'Boost: None',
     boostKind: 'none',
-    introSrc: QS_CHARACTER_PHIL_SRC,
+    scoreBonus: 0,
+    introSrc: qsActImage('cosmic_phil', 'card'),
+    frames: qsActFrames('cosmic_phil'),
     artClass: 'cosmic-phil',
   },
   {
-    id: 'koolKatGirl',
-    name: 'Kool Kat Girl',
+    id: 'koolKat',
+    name: 'Kool Kat',
     shortName: 'Kat',
     displayNameLines: ['Kool', 'Kat'],
     unlockLabel: '100',
     unlockScore: 100,
     boostLabel: 'Boost: +1 per solve',
     boostKind: 'plusOne',
-    // Scaffold art until the real PNG is dropped in.
-    introSrc: QS_CHARACTER_PHIL_SRC,
-    artClass: 'kool-kat-girl',
+    scoreBonus: 1,
+    introSrc: qsActImage('kool_kat', 'card'),
+    frames: qsActFrames('kool_kat'),
+    artClass: 'kool-kat',
   },
   {
-    id: 'doctorSax',
-    name: 'Doctor Sax',
-    shortName: 'Sax',
-    displayNameLines: ['Doctor', 'Sax'],
+    id: 'drKennyFields',
+    name: 'Kenny Fields',
+    shortName: 'Kenny',
+    displayNameLines: ['Kenny', 'Fields'],
     unlockLabel: '200',
     unlockScore: 200,
     boostLabel: 'Boost: +2 per solve',
     boostKind: 'plusTwo',
-    introSrc: QS_CHARACTER_PHIL_SRC,
-    artClass: 'doctor-sax',
+    scoreBonus: 2,
+    introSrc: qsActImage('dr_kenny_fields', 'card'),
+    frames: qsActFrames('dr_kenny_fields'),
+    artClass: 'dr-kenny-fields',
   },
   {
-    id: 'hoodedDinoDj',
-    name: 'Hooded Dino DJ',
-    shortName: 'Dino DJ',
-    displayNameLines: ['Dino', 'DJ'],
+    id: 'dinoKid',
+    name: 'Dino Kid',
+    shortName: 'Dino',
+    displayNameLines: ['Dino', 'Kid'],
     unlockLabel: '400',
     unlockScore: 400,
     boostLabel: 'Boost: +5 per solve',
     boostKind: 'plusFive',
-    introSrc: QS_CHARACTER_PHIL_SRC,
-    artClass: 'hooded-dino-dj',
+    scoreBonus: 5,
+    introSrc: qsActImage('dino_kid', 'card'),
+    frames: qsActFrames('dino_kid'),
+    artClass: 'dino-kid',
   },
   {
-    id: 'familyBand',
-    name: 'Family Band',
-    shortName: 'Band',
-    displayNameLines: ['Family', 'Band'],
+    id: 'grampyP',
+    name: 'Grampy P',
+    shortName: 'Grampy',
+    displayNameLines: ['Grampy', 'P'],
     unlockLabel: '800',
     unlockScore: 800,
-    boostLabel: 'Boost: +7 on harder solves',
-    boostKind: 'hardBonusSeven',
-    introSrc: QS_CHARACTER_PHIL_SRC,
-    artClass: 'family-band',
+    boostLabel: 'Boost: +7 per solve',
+    boostKind: 'plusSeven',
+    scoreBonus: 7,
+    introSrc: qsActImage('grampy_p', 'card'),
+    frames: qsActFrames('grampy_p'),
+    artClass: 'grampy-p',
   },
 ];
 
@@ -135,16 +161,144 @@ function getQuickServeSelectedCharacter() {
   return selected;
 }
 
-function getQuickServeCharacterBestScore(character) {
-  // QS 1.5 scaffold:
-  // Existing data only has one QS high score.
-  // Phil shows the real score. Other unlocked characters show '--'
-  // until per-character stats are added.
-  if (character?.id === 'cosmicPhil') {
-    return getQuickServeBestScore();
+const QS_CHARACTER_SCORE_STORAGE_KEY = 'scmf.qs.characterHighScores.v1';
+
+const QS_CHARACTER_ID_ALIASES = {
+  koolKatGirl: 'koolKat',
+  doctorSax: 'drKennyFields',
+  hoodedDinoDj: 'dinoKid',
+  familyBand: 'grampyP',
+};
+
+function normalizeQuickServeCharacterId(characterOrId) {
+  const rawId =
+    typeof characterOrId === 'string'
+      ? characterOrId
+      : characterOrId?.id;
+
+  if (!rawId) return 'cosmicPhil';
+
+  return QS_CHARACTER_ID_ALIASES[rawId] || rawId;
+}
+
+function normalizeQuickServeCharacterScoreMap(rawMap = {}) {
+  return Object.entries(rawMap || {}).reduce((acc, [rawId, rawValue]) => {
+    const id = normalizeQuickServeCharacterId(rawId);
+    const value = Number(rawValue);
+
+    if (!Number.isFinite(value)) return acc;
+
+    acc[id] = Math.max(Number(acc[id] || 0), Math.max(0, Math.floor(value)));
+    return acc;
+  }, {});
+}
+
+function readQuickServeCharacterScoreMap() {
+  let localScores = {};
+
+  try {
+    localScores = JSON.parse(
+      window.localStorage.getItem(QS_CHARACTER_SCORE_STORAGE_KEY) || '{}'
+    );
+  } catch {
+    localScores = {};
   }
 
-  return null;
+  const profileScores = appState?.profile?.qsCharacterHighScores || {};
+
+  return normalizeQuickServeCharacterScoreMap({
+    ...localScores,
+    ...profileScores,
+  });
+}
+
+function writeQuickServeCharacterScoreMap(nextScores = {}) {
+  const normalized = normalizeQuickServeCharacterScoreMap(nextScores);
+
+  try {
+    if (!appState.profile) {
+      appState.profile = {};
+    }
+
+    appState.profile.qsCharacterHighScores = {
+      ...(appState.profile.qsCharacterHighScores || {}),
+      ...normalized,
+    };
+  } catch (err) {
+    console.warn('[QuickServe] Could not write character scores to appState profile:', err);
+  }
+
+  try {
+    window.localStorage.setItem(
+      QS_CHARACTER_SCORE_STORAGE_KEY,
+      JSON.stringify(normalized)
+    );
+  } catch (err) {
+    console.warn('[QuickServe] Could not write character scores to localStorage:', err);
+  }
+
+  return normalized;
+}
+
+function getQuickServeCharacterBestScore(characterOrId) {
+  const id = normalizeQuickServeCharacterId(characterOrId);
+  const scores = readQuickServeCharacterScoreMap();
+  const storedScore = Number(scores[id] || 0);
+
+  // Existing QS history belonged to the original default performer.
+  // Seed Cosmic Phil visually from the global QS high score until a
+  // character-specific score beats it.
+  if (id === 'cosmicPhil') {
+    return Math.max(storedScore, getQuickServeBestScore());
+  }
+
+  return storedScore;
+}
+
+export function recordQuickServeSelectedCharacterScore(scoreValue = 0) {
+  const selectedCharacter = getQuickServeSelectedCharacter();
+  const id = normalizeQuickServeCharacterId(selectedCharacter);
+  const score = Math.max(0, Math.floor(Number(scoreValue) || 0));
+  const previousBest = getQuickServeCharacterBestScore(id);
+
+  if (score <= previousBest) {
+    return {
+      characterId: id,
+      characterName: selectedCharacter.name,
+      previousBest,
+      bestScore: previousBest,
+      didBeatCharacterHighScore: false,
+    };
+  }
+
+  const scores = readQuickServeCharacterScoreMap();
+  scores[id] = score;
+  writeQuickServeCharacterScoreMap(scores);
+
+  return {
+    characterId: id,
+    characterName: selectedCharacter.name,
+    previousBest,
+    bestScore: score,
+    didBeatCharacterHighScore: true,
+  };
+}
+
+export function getQuickServeSelectedCharacterScoreBonus() {
+  const selectedCharacter = getQuickServeSelectedCharacter();
+  return Math.max(0, Number(selectedCharacter?.scoreBonus || 0));
+}
+
+export function getQuickServeSelectedCharacterSummary() {
+  const selectedCharacter = getQuickServeSelectedCharacter();
+
+  return {
+    id: selectedCharacter.id,
+    name: selectedCharacter.name,
+    shortName: selectedCharacter.shortName,
+    scoreBonus: Math.max(0, Number(selectedCharacter.scoreBonus || 0)),
+    bestScore: getQuickServeCharacterBestScore(selectedCharacter),
+  };
 }
 
 function getQuickServeMathModeFromPreflight(mode = qsPreflightDifficulty) {
@@ -209,7 +363,6 @@ function renderQuickServeCharacterRosterRow(selectedCharacter) {
     const unlocked = isQuickServeCharacterUnlocked(character);
     const selected = selectedCharacter?.id === character.id;
     const characterBest = getQuickServeCharacterBestScore(character);
-    const bestLabel = characterBest == null ? 'Best --' : `Best ${characterBest}`;
 
     const slotClasses = [
       'qs-roster-slot',
@@ -229,9 +382,8 @@ function renderQuickServeCharacterRosterRow(selectedCharacter) {
           <span class="qs-roster-lock-mark" aria-hidden="true">🔒</span>
 
           <div class="qs-locked-message" aria-hidden="true">
-            <span>${character.unlockLabel}+</span>
-            <span>points</span>
-            <span>to Unlock</span>
+            <span class="qs-locked-word">Unlock</span>
+            <span class="qs-locked-threshold">${character.unlockScore}</span>
           </div>
         </button>
       `;
@@ -245,17 +397,22 @@ function renderQuickServeCharacterRosterRow(selectedCharacter) {
         aria-label="${character.name} unlocked"
       >
         <span class="qs-roster-check" aria-hidden="true">✓</span>
+
         <span class="qs-roster-name">
           ${(character.displayNameLines || [character.shortName || character.name])
             .map((line) => `<span>${line}</span>`)
             .join('')}
         </span>
+
         <img
           class="qs-roster-img qs-character-art qs-character-art-${character.artClass}"
           src="${character.introSrc}"
           alt=""
           aria-hidden="true"
         />
+
+        <span class="qs-roster-best-word">Best</span>
+        <span class="qs-roster-score-line">Score: ${characterBest}</span>
       </button>
     `;
   }).join('');
@@ -414,6 +571,8 @@ function renderIntroScreen() {
   const container = getGameContainer();
   const bestScore = getQuickServeBestScore();
   const selectedCharacter = getQuickServeSelectedCharacter();
+
+  phil.setQuickServePerformer(selectedCharacter);
 
   container.innerHTML = `
     <img
@@ -592,8 +751,14 @@ export function startQuickServeShiftFromIntro() {
   window.setTimeout(launchGameplay, 360);
 }
 
-function renderGameUI() {
+export function renderGameUI() {
   const container = getGameContainer();
+  const selectedCharacter = getQuickServeSelectedCharacter();
+  const gameSpriteSrc =
+    selectedCharacter?.frames?.idle
+    || `${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_01_idle.png`;
+
+  phil.setQuickServePerformer(selectedCharacter);
 
   container.innerHTML = `
     <img
@@ -627,8 +792,10 @@ function renderGameUI() {
             <div class="phil-wrapper in-game">
               <img 
                 id="philSpriteInGame" 
-                class="phil-img in-game"
-                src="${import.meta.env.BASE_URL}assets/img/characters/quickServe/phil_01_idle.png"
+                class="phil-img in-game qs-character-art qs-character-art-${selectedCharacter.artClass}"
+                src="${gameSpriteSrc}"
+                alt=""
+                aria-hidden="true"
               />
             </div>
 
@@ -709,9 +876,36 @@ function renderGameUI() {
   setupQuickServeResultButtons();
 }
 
+
+//////////////////////////////
+// ↩️ Return Active Shift To QS Intro
+//////////////////////////////
+export function returnQuickServeGameToIntro() {
+  console.log('[QuickServe] Returning active shift to intro/preflight');
+
+  qsIntroStartInFlight = false;
+
+  // Stop the active shift without leaving QuickServe.
+  stopGameLogic();
+  resetCurrentAnswer();
+  gridFX.stopGridPulse();
+  phil.resetPhil();
+
+  // QS intro/preflight should be quiet until the next PLAY GAME.
+  // Keep the QS music scope alive; do not pop back to menu ownership here.
+  stopTrack();
+
+  renderIntroScreen();
+  applyQuickServeThemeVars(document.querySelector('.qs-intro'));
+
+  // Keep keyboard/input ownership inside QuickServe.
+  activateInputHandler('quickServe');
+}
+
 //////////////////////////////
 // 🔊 Mute Button Logic
 //////////////////////////////
+
 
 export function updateMuteButtonLabel() {
   const muteBtn = document.getElementById('muteBtn');
@@ -728,13 +922,14 @@ export function returnToMenu() {
   // 🔇 Kill QS music (global player)
   stopTrack();
 
-  // Restore whatever music state existed before QS took over
+  // Restore whatever music state existed before QS took over.
   if (_qsMusicScopeOn) {
     popMusicScope();
     _qsMusicScopeOn = false;
   }
 
-  playTransition(() => {
+  // QS intro Back → Main Menu uses the same return portal language as IL.
+  playModeReturnTransition(() => {
     cleanUpQuickServe();
     showMenu();
     applyBackgroundTheme();

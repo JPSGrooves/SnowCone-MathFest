@@ -9,7 +9,7 @@ import {
 
 import { stopGameLogic, startGameLogic } from './quickServeGame.js';
 import {
-  returnToMenu,
+  returnQuickServeGameToIntro,
   ensureQuickServeMusicPlaying
 } from './quickServe.js'; // 🌟 Full QS exit + QS music guard
 import { setMathMode } from './quickServeGame.js';
@@ -45,7 +45,7 @@ export function generateKeypadHTML() {
       { id: 'muteBtn', label: '🔊 Mute', class: 'btn-mode' },
     ],
     [
-      { id: 'menu', label: 'Main<br>Menu', class: 'btn-menu' },
+      { id: 'menu', label: 'Back<br>Intro', class: 'btn-menu' },
       { id: 'decimal', label: '.', class: 'btn-num' },
       { id: 'zero', label: '0', class: 'btn-num' },
       { id: 'neg', label: '±', class: 'btn-num' },
@@ -109,8 +109,10 @@ export function setupKeypad() {
     // Music is still owned by quickServe.js.
     // This reset does NOT force a new track.
     // It only restarts music if the QS soundtrack is already dead.
+    //
+    // Important QS 1.5 rule:
+    // Reset preserves the current in-game difficulty instead of forcing Easy.
     stopGameLogic();
-    setMathMode('addSub');
     startGameLogic();
     ensureQuickServeMusicPlaying();
   });
@@ -137,8 +139,8 @@ export function setupKeypad() {
 
 
 
-  // 🌀 Return to Main Menu (Full cleanup)
-  safeBind('menu', returnToMenu);
+  // ↩️ Return to QS intro/preflight, so the player can change character or difficulty.
+  safeBind('menu', returnQuickServeGameToIntro);
 }
 
 

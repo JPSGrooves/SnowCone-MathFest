@@ -3606,39 +3606,7 @@ body.qs-active .qs-character-portrait {
     drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
 }
 
-/* Temporary art differences until real character PNGs land. */
-body.qs-active .qs-character-art-kool-kat-girl {
-  filter:
-    hue-rotate(36deg)
-    saturate(1.24)
-    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
-    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
-}
-
-body.qs-active .qs-character-art-doctor-sax {
-  filter:
-    hue-rotate(92deg)
-    saturate(1.15)
-    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
-    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
-}
-
-body.qs-active .qs-character-art-hooded-dino-dj {
-  filter:
-    hue-rotate(168deg)
-    saturate(1.18)
-    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
-    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
-}
-
-body.qs-active .qs-character-art-family-band {
-  filter:
-    hue-rotate(245deg)
-    saturate(1.26)
-    brightness(1.08)
-    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
-    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
-}
+/* Real QuickServe act PNGs are now active; placeholder hue-shift rules removed. */
 
 body.qs-active .qs-character-name {
   font-family: 'Orbitron', system-ui, sans-serif !important;
@@ -5113,3 +5081,131 @@ html body.qs-active .qs-intro.qs-character-v3 .qs-character-best-main strong {
 }
 
 /* ───────────────── QuickServe — Text Size Lock END ───────────────── */
+
+/* ───────────────── QuickServe — Real Act PNG Wiring START ─────────────────
+   Purpose:
+   - Real QS 1–46 artwork is active.
+   - QS4 is intentionally skipped.
+   - Old placeholder hue-shift Phil behavior removed.
+   - No trophies, badges, Game Center, scoring, timer, or audio touched.
+   ──────────────────────────────────────────────────────────────────────── */
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-character-art,
+html body.qs-active #philSpriteInGame.qs-character-art,
+html body.qs-active .qs-intro.qs-character-v3 .qs-character-art-grampy-p,
+html body.qs-active .qs-intro.qs-character-v3 .qs-character-art-dino-kid,
+html body.qs-active .qs-intro.qs-character-v3 .qs-character-art-dr-kenny-fields,
+html body.qs-active .qs-intro.qs-character-v3 .qs-character-art-kool-kat,
+html body.qs-active .qs-intro.qs-character-v3 .qs-character-art-cosmic-phil,
+html body.qs-active #philSpriteInGame.qs-character-art-grampy-p,
+html body.qs-active #philSpriteInGame.qs-character-art-dino-kid,
+html body.qs-active #philSpriteInGame.qs-character-art-dr-kenny-fields,
+html body.qs-active #philSpriteInGame.qs-character-art-kool-kat,
+html body.qs-active #philSpriteInGame.qs-character-art-cosmic-phil {
+  filter:
+    drop-shadow(0 0 10px var(--qs-faint, rgba(0, 255, 238, 0.18)))
+    drop-shadow(0 9px 12px rgba(0, 0, 0, 0.44)) !important;
+}
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+  height: clamp(7.4rem, 20svh, 11.8rem) !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-roster-img {
+  height: clamp(1.95rem, 4.35svh, 3.1rem) !important;
+  max-width: 96% !important;
+  object-fit: contain !important;
+}
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-roster-slot.is-locked {
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto !important;
+
+  align-content: center !important;
+  justify-content: center !important;
+  place-items: center !important;
+}
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-roster-slot.is-locked .qs-roster-lock-mark {
+  position: absolute !important;
+  top: 0.18rem !important;
+  right: 0.22rem !important;
+  display: block !important;
+}
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-roster-slot.is-locked .qs-roster-locked-img {
+  display: block !important;
+  order: 2 !important;
+
+  width: auto !important;
+  height: clamp(1.7rem, 3.95svh, 2.55rem) !important;
+  max-width: 86% !important;
+
+  object-fit: contain !important;
+  opacity: 0.58 !important;
+
+  filter:
+    saturate(0.72)
+    brightness(0.82)
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.12)) !important;
+}
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-locked-message {
+  order: 3 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 100% !important;
+  height: auto !important;
+  margin-top: clamp(0.08rem, 0.3svh, 0.18rem) !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.46rem, 0.98svh, 0.64rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.78) !important;
+}
+
+html body.qs-active .qs-intro.qs-character-v3 .qs-locked-threshold {
+  display: block !important;
+  white-space: nowrap !important;
+}
+
+html body.qs-active #philSpriteInGame.qs-character-art {
+  max-height: clamp(145px, 46.2vh, 242px) !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+@media (min-width: 700px) and (min-height: 700px) {
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+    height: clamp(10.5rem, 24svh, 18rem) !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-roster-img {
+    height: clamp(2.7rem, 4.9svh, 3.95rem) !important;
+  }
+}
+
+@media (max-height: 740px) {
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+    height: clamp(5.3rem, 15svh, 7.2rem) !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-roster-img,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-roster-locked-img {
+    height: clamp(1.35rem, 3.25svh, 1.95rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Real Act PNG Wiring END ───────────────── */
+
