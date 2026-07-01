@@ -41,6 +41,7 @@ const QS_TRACK_IDS = ['quikserve', 'kktribute', 'softdown'];
 let _qsMusicScopeOn = false;
 let qsIntroStartInFlight = false;
 let qsPreflightDifficulty = 'easy';
+let qsSelectedModeId = 'addSub';
 let qsSelectedCharacterId = 'cosmicPhil';
 
 const QS_ACT_ART_BASE =
@@ -74,7 +75,7 @@ const QS_CHARACTER_ROSTER = [
     displayNameLines: ['Cosmic', 'Phil'],
     unlockLabel: 'Default',
     unlockScore: 0,
-    boostLabel: 'Boost: None',
+    boostLabel: '',
     boostKind: 'none',
     scoreBonus: 0,
     introSrc: qsActImage('cosmic_phil', 'card'),
@@ -87,24 +88,24 @@ const QS_CHARACTER_ROSTER = [
     shortName: 'Kat',
     displayNameLines: ['Kool', 'Kat'],
     unlockLabel: '100',
-    unlockScore: 100,
-    boostLabel: 'Boost: +1 per solve',
-    boostKind: 'plusOne',
-    scoreBonus: 1,
+    unlockScore: 0,
+    boostLabel: '',
+    boostKind: 'none',
+    scoreBonus: 0,
     introSrc: qsActImage('kool_kat', 'card'),
     frames: qsActFrames('kool_kat'),
     artClass: 'kool-kat',
   },
   {
     id: 'drKennyFields',
-    name: 'Kenny Fields',
+    name: 'Dr. Kenny Fields',
     shortName: 'Kenny',
     displayNameLines: ['Kenny', 'Fields'],
     unlockLabel: '200',
-    unlockScore: 200,
-    boostLabel: 'Boost: +2 per solve',
-    boostKind: 'plusTwo',
-    scoreBonus: 2,
+    unlockScore: 0,
+    boostLabel: '',
+    boostKind: 'none',
+    scoreBonus: 0,
     introSrc: qsActImage('dr_kenny_fields', 'card'),
     frames: qsActFrames('dr_kenny_fields'),
     artClass: 'dr-kenny-fields',
@@ -115,10 +116,10 @@ const QS_CHARACTER_ROSTER = [
     shortName: 'Dino',
     displayNameLines: ['Dino', 'Kid'],
     unlockLabel: '400',
-    unlockScore: 400,
-    boostLabel: 'Boost: +5 per solve',
-    boostKind: 'plusFive',
-    scoreBonus: 5,
+    unlockScore: 0,
+    boostLabel: '',
+    boostKind: 'none',
+    scoreBonus: 0,
     introSrc: qsActImage('dino_kid', 'card'),
     frames: qsActFrames('dino_kid'),
     artClass: 'dino-kid',
@@ -129,19 +130,306 @@ const QS_CHARACTER_ROSTER = [
     shortName: 'Grampy',
     displayNameLines: ['Grampy', 'P'],
     unlockLabel: '800',
-    unlockScore: 800,
-    boostLabel: 'Boost: +7 per solve',
-    boostKind: 'plusSeven',
-    scoreBonus: 7,
+    unlockScore: 0,
+    boostLabel: '',
+    boostKind: 'none',
+    scoreBonus: 0,
     introSrc: qsActImage('grampy_p', 'card'),
     frames: qsActFrames('grampy_p'),
     artClass: 'grampy-p',
   },
 ];
 
+const QS_MODE_ROSTER = [
+  {
+    id: 'addSub',
+    label: 'Add/Sub',
+    mathMode: 'addSub',
+  },
+  {
+    id: 'multiDiv',
+    label: 'Mult/Div',
+    mathMode: 'multiDiv',
+  },
+  {
+    id: 'decimals',
+    label: 'Dec/Perc',
+    mathMode: 'algebra',
+    previewNote: 'temporary algebra lane',
+  },
+  {
+    id: 'fractions',
+    label: 'Frac/Word',
+    mathMode: 'algebra',
+    previewNote: 'temporary algebra lane',
+  },
+  {
+    id: 'mixed',
+    label: 'Mixed Bag',
+    mathMode: 'mixedReview',
+  },
+];
+
+
+const QS_DIFFICULTY_ROSTER = [
+  {
+    id: 'easy',
+    label: 'Easy',
+  },
+  {
+    id: 'medium',
+    label: 'Med',
+  },
+  {
+    id: 'hard',
+    label: 'Hard',
+  },
+];
+
+function renderQuickServeDifficultyButtons() {
+  return QS_DIFFICULTY_ROSTER.map((difficulty) => {
+    const selected = qsPreflightDifficulty === difficulty.id;
+    const classes = [
+      'qs-difficulty-select-btn',
+      `qs-difficulty-${difficulty.id}`,
+      selected ? 'is-active' : '',
+    ].filter(Boolean).join(' ');
+
+    return `
+      <button
+        type="button"
+        class="${classes}"
+        data-qs-preflight-mode="${difficulty.id}"
+        aria-pressed="${selected ? 'true' : 'false'}"
+      >
+        <strong>${difficulty.label}</strong>
+      </button>
+    `;
+  }).join('');
+}
+
+const QS_MODE_SCORE_STORAGE_KEY = 'scmf.qs.modeHighScores.v1';
+
+function normalizeQuickServeModeId(modeId = qsSelectedModeId) {
+  const id = String(modeId || '').trim();
+
+  const legacyMap = {
+    easy: 'addSub',
+    medium: 'multiDiv',
+    hard: 'mixed',
+    algebra: 'mixed',
+  };
+
+  if (legacyMap[id]) return legacyMap[id];
+
+  return QS_MODE_ROSTER.some((mode) => mode.id === id) ? id : 'addSub';
+}
+
+function getQuickServeSelectedMode(modeId = qsSelectedModeId) {
+  const normalizedId = normalizeQuickServeModeId(modeId);
+  return QS_MODE_ROSTER.find((mode) => mode.id === normalizedId) || QS_MODE_ROSTER[0];
+}
+
+function getLegacyPreflightDifficultyFromMode(modeId = qsSelectedModeId) {
+  const normalizedId = normalizeQuickServeModeId(modeId);
+
+  if (normalizedId === 'addSub') return 'easy';
+  if (normalizedId === 'multiDiv') return 'medium';
+
+  return 'hard';
+}
+
+function readQuickServeModeScoreMap() {
+  let localScores = {};
+
+  try {
+    localScores = JSON.parse(
+      window.localStorage.getItem(QS_MODE_SCORE_STORAGE_KEY) || '{}'
+    );
+  } catch {
+    localScores = {};
+  }
+
+  const profileScores = appState?.profile?.qsModeHighScores || {};
+
+  return Object.entries({
+    ...localScores,
+    ...profileScores,
+  }).reduce((acc, [rawId, rawValue]) => {
+    const id = normalizeQuickServeModeId(rawId);
+    const value = Number(rawValue);
+
+    if (!Number.isFinite(value)) return acc;
+
+    acc[id] = Math.max(Number(acc[id] || 0), Math.max(0, Math.floor(value)));
+    return acc;
+  }, {});
+}
+
+function writeQuickServeModeScoreMap(nextScores = {}) {
+  const normalized = Object.entries(nextScores || {}).reduce((acc, [rawId, rawValue]) => {
+    const id = normalizeQuickServeModeId(rawId);
+    const value = Number(rawValue);
+
+    if (!Number.isFinite(value)) return acc;
+
+    acc[id] = Math.max(Number(acc[id] || 0), Math.max(0, Math.floor(value)));
+    return acc;
+  }, {});
+
+  try {
+    if (!appState.profile) {
+      appState.profile = {};
+    }
+
+    appState.profile.qsModeHighScores = {
+      ...(appState.profile.qsModeHighScores || {}),
+      ...normalized,
+    };
+  } catch (err) {
+    console.warn('[QuickServe] Could not write mode scores to appState profile:', err);
+  }
+
+  try {
+    window.localStorage.setItem(
+      QS_MODE_SCORE_STORAGE_KEY,
+      JSON.stringify(normalized)
+    );
+  } catch (err) {
+    console.warn('[QuickServe] Could not write mode scores to localStorage:', err);
+  }
+
+  return normalized;
+}
+
+function getQuickServeModeBestScore(modeId = qsSelectedModeId) {
+  const id = normalizeQuickServeModeId(modeId);
+  const scores = readQuickServeModeScoreMap();
+  const storedScore = Number(scores[id] || 0);
+
+  // Seed the original Add/Sub-ish lane from the old global QS high score.
+  // The new lanes start honest at 0 until they get real runs.
+  if (id === 'addSub') {
+    return Math.max(storedScore, getQuickServeBestScore());
+  }
+
+  return Math.max(storedScore, 0);
+}
+
+function recordQuickServeSelectedModeScore(scoreValue = 0) {
+  const id = normalizeQuickServeModeId(qsSelectedModeId);
+  const score = Math.max(0, Math.floor(Number(scoreValue) || 0));
+  const previousBest = getQuickServeModeBestScore(id);
+
+  if (score <= previousBest) {
+    return {
+      modeId: id,
+      previousBest,
+      bestScore: previousBest,
+      didBeatModeHighScore: false,
+    };
+  }
+
+  const scores = readQuickServeModeScoreMap();
+  scores[id] = score;
+  writeQuickServeModeScoreMap(scores);
+
+  return {
+    modeId: id,
+    previousBest,
+    bestScore: score,
+    didBeatModeHighScore: true,
+  };
+}
+
+function resolveQuickServeMathMode(modeId = qsSelectedModeId) {
+  const selectedMode = getQuickServeSelectedMode(modeId);
+
+  if (selectedMode.mathMode === 'mixedReview') {
+    const existingModes = ['addSub', 'multiDiv', 'algebra'];
+    return existingModes[Math.floor(Math.random() * existingModes.length)];
+  }
+
+  return selectedMode.mathMode || 'addSub';
+}
+
+function renderQuickServeModeButtons() {
+  return QS_MODE_ROSTER.map((mode) => {
+    const selected = normalizeQuickServeModeId(qsSelectedModeId) === mode.id;
+    const classes = [
+      'qs-mode-select-btn',
+      `qs-mode-${mode.id}`,
+      selected ? 'is-active' : '',
+    ].filter(Boolean).join(' ');
+
+    return `
+      <button
+        type="button"
+        class="${classes}"
+        data-qs-mode="${mode.id}"
+        aria-pressed="${selected ? 'true' : 'false'}"
+      >
+        <strong>${mode.label}</strong>
+      </button>
+    `;
+  }).join('');
+}
+
+function setQuickServeSelectedMode(modeId = 'addSub', options = {}) {
+  const { rerender = false } = options;
+  const safeModeId = normalizeQuickServeModeId(modeId);
+
+  qsSelectedModeId = safeModeId;
+  qsPreflightDifficulty = getLegacyPreflightDifficultyFromMode(safeModeId);
+
+  document.querySelectorAll('[data-qs-mode]').forEach((button) => {
+    const isActive = button.dataset.qsMode === safeModeId;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+
+  const selectedMode = getQuickServeSelectedMode(safeModeId);
+
+  const modeBestLabelEl = document.getElementById('qsSelectedModeBestLabel');
+  if (modeBestLabelEl) {
+    modeBestLabelEl.textContent = `${selectedMode.label} High Score:`;
+  }
+
+  const modeBestEl = document.getElementById('qsSelectedModeBestValue');
+  if (modeBestEl) {
+    const bestScore = getQuickServeModeBestScore(safeModeId);
+    modeBestEl.textContent = bestScore || '--';
+  }
+
+  if (rerender) {
+    renderIntroScreen();
+    applyQuickServeThemeVars(document.querySelector('.qs-intro'));
+  }
+}
+
+function wireQuickServeModeButtons() {
+  document.querySelectorAll('[data-qs-mode]').forEach((button) => {
+    button.addEventListener('click', () => {
+      setQuickServeSelectedMode(button.dataset.qsMode);
+    });
+  });
+
+  setQuickServeSelectedMode(qsSelectedModeId || 'addSub');
+}
+
+export function setQuickServeModeFromInGameMathMode(mathMode = 'addSub') {
+  const map = {
+    addSub: 'addSub',
+    multiDiv: 'multiDiv',
+    algebra: 'mixed',
+  };
+
+  const nextModeId = map[mathMode] || normalizeQuickServeModeId(qsSelectedModeId);
+  setQuickServeSelectedMode(nextModeId);
+}
+
 function isQuickServeCharacterUnlocked(character) {
-  if (!character) return false;
-  return getQuickServeBestScore() >= Number(character.unlockScore || 0);
+  return Boolean(character);
 }
 
 function getQuickServeUnlockedCharacterCount() {
@@ -153,8 +441,8 @@ function getQuickServeSelectedCharacter() {
     QS_CHARACTER_ROSTER.find((character) => character.id === qsSelectedCharacterId)
     || QS_CHARACTER_ROSTER[0];
 
-  if (!isQuickServeCharacterUnlocked(selected)) {
-    qsSelectedCharacterId = QS_CHARACTER_ROSTER[0].id;
+  if (!selected) {
+    qsSelectedCharacterId = 'cosmicPhil';
     return QS_CHARACTER_ROSTER[0];
   }
 
@@ -256,6 +544,8 @@ function getQuickServeCharacterBestScore(characterOrId) {
 }
 
 export function recordQuickServeSelectedCharacterScore(scoreValue = 0) {
+  recordQuickServeSelectedModeScore(scoreValue);
+
   const selectedCharacter = getQuickServeSelectedCharacter();
   const id = normalizeQuickServeCharacterId(selectedCharacter);
   const score = Math.max(0, Math.floor(Number(scoreValue) || 0));
@@ -285,8 +575,7 @@ export function recordQuickServeSelectedCharacterScore(scoreValue = 0) {
 }
 
 export function getQuickServeSelectedCharacterScoreBonus() {
-  const selectedCharacter = getQuickServeSelectedCharacter();
-  return Math.max(0, Number(selectedCharacter?.scoreBonus || 0));
+  return 0;
 }
 
 export function getQuickServeSelectedCharacterSummary() {
@@ -301,26 +590,23 @@ export function getQuickServeSelectedCharacterSummary() {
   };
 }
 
-function getQuickServeMathModeFromPreflight(mode = qsPreflightDifficulty) {
-  const map = {
-    easy: 'addSub',
-    medium: 'multiDiv',
-    hard: 'algebra',
-  };
-
-  return map[mode] || 'addSub';
+function getQuickServeMathModeFromPreflight(mode = qsSelectedModeId) {
+  return resolveQuickServeMathMode(mode);
 }
 
 function applyQuickServePreflightMathMode() {
+  const selectedMode = getQuickServeSelectedMode();
   const mathMode = getQuickServeMathModeFromPreflight();
+
   setMathMode(mathMode);
 
   console.log(
-    `[QuickServe] Starting difficulty wired directly: ${qsPreflightDifficulty} → ${mathMode}`
+    `[QuickServe] Starting mode wired directly: ${selectedMode.id}/${qsPreflightDifficulty} → ${mathMode}`
   );
 
   return mathMode;
 }
+
 
 function selectQuickServeCharacter(characterId) {
   const character = QS_CHARACTER_ROSTER.find((item) => item.id === characterId);
@@ -330,78 +616,34 @@ function selectQuickServeCharacter(characterId) {
     return;
   }
 
-  if (!isQuickServeCharacterUnlocked(character)) {
-    console.log(
-      `[QuickServe] Character locked: ${character.id}; requires score ${character.unlockScore}`
-    );
-
-    document
-      .querySelector(`[data-qs-character-slot="${character.id}"]`)
-      ?.classList.add('qs-locked-bump');
-
-    window.setTimeout(() => {
-      document
-        .querySelector(`[data-qs-character-slot="${character.id}"]`)
-        ?.classList.remove('qs-locked-bump');
-    }, 320);
-
-    return;
-  }
-
   qsSelectedCharacterId = character.id;
 
-  console.log(
-    `[QuickServe] Character selected: ${character.id}; ${character.boostLabel}`
-  );
+  console.log(`[QuickServe] Character selected: ${character.id}`);
 
   renderIntroScreen();
   applyQuickServeThemeVars(document.querySelector('.qs-intro'));
 }
 
 function renderQuickServeCharacterRosterRow(selectedCharacter) {
-  return QS_CHARACTER_ROSTER.map((character) => {
-    const unlocked = isQuickServeCharacterUnlocked(character);
+  return QS_CHARACTER_ROSTER.map((character, index) => {
     const selected = selectedCharacter?.id === character.id;
-    const characterBest = getQuickServeCharacterBestScore(character);
 
     const slotClasses = [
       'qs-roster-slot',
       `qs-roster-${character.id}`,
-      unlocked ? 'is-unlocked' : 'is-locked',
+      'is-unlocked',
       selected ? 'is-selected' : '',
     ].filter(Boolean).join(' ');
-
-    if (!unlocked) {
-      return `
-        <button
-          type="button"
-          class="${slotClasses}"
-          data-qs-character-slot="${character.id}"
-          aria-label="${character.name} locked until score ${character.unlockLabel}"
-        >
-          <span class="qs-roster-lock-mark" aria-hidden="true">🔒</span>
-
-          <div class="qs-locked-message" aria-hidden="true">
-            <span class="qs-locked-word">Unlock</span>
-            <span class="qs-locked-threshold">${character.unlockScore}</span>
-          </div>
-        </button>
-      `;
-    }
 
     return `
       <button
         type="button"
         class="${slotClasses}"
         data-qs-character-slot="${character.id}"
-        aria-label="${character.name} unlocked"
+        aria-label="Select ${character.name}"
       >
-        <span class="qs-roster-check" aria-hidden="true">✓</span>
-
         <span class="qs-roster-name">
-          ${(character.displayNameLines || [character.shortName || character.name])
-            .map((line) => `<span>${line}</span>`)
-            .join('')}
+          <span>${character.shortName || character.name}</span>
         </span>
 
         <img
@@ -410,9 +652,6 @@ function renderQuickServeCharacterRosterRow(selectedCharacter) {
           alt=""
           aria-hidden="true"
         />
-
-        <span class="qs-roster-best-word">Best</span>
-        <span class="qs-roster-score-line">Score: ${characterBest}</span>
       </button>
     `;
   }).join('');
@@ -460,6 +699,8 @@ function wireQuickServePreflightDifficultyButtons() {
 
   setQuickServePreflightDifficulty(qsPreflightDifficulty || 'easy');
 }
+
+
 
 function syncQuickServeStartingModeFromPreflight() {
   // Deprecated QS 1.5 path:
@@ -569,8 +810,9 @@ export function loadQuickServe() {
 //////////////////////////////
 function renderIntroScreen() {
   const container = getGameContainer();
-  const bestScore = getQuickServeBestScore();
   const selectedCharacter = getQuickServeSelectedCharacter();
+  const selectedMode = getQuickServeSelectedMode();
+  const modeBestScore = getQuickServeModeBestScore(selectedMode.id);
 
   phil.setQuickServePerformer(selectedCharacter);
 
@@ -598,75 +840,54 @@ function renderIntroScreen() {
 
             <section
               class="qs-character-main-card qs-selected-${selectedCharacter.id}"
-              aria-label="QuickServe character card"
+              aria-label="QuickServe character, mode, and difficulty select"
             >
-              <div class="qs-character-label">${selectedCharacter.name}</div>
+              <div class="qs-setup-layout" aria-label="QuickServe setup controls">
+                <section class="qs-mode-select-panel" aria-label="Mode Select">
+                  <div class="qs-mode-select-label">Mode Select</div>
+                  <div class="qs-mode-select-row">
+                    ${renderQuickServeModeButtons()}
+                  </div>
+                </section>
 
-              <div class="qs-character-portrait-wrap">
-                <img
-                  id="philSpriteIntro"
-                  class="phil-img qs-character-portrait qs-character-art qs-character-art-${selectedCharacter.artClass}"
-                  src="${selectedCharacter.introSrc}"
-                  alt=""
-                  aria-hidden="true"
-                />
+                <section class="qs-difficulty-select-panel" aria-label="Difficulty">
+                  <div class="qs-difficulty-select-label">Difficulty</div>
+                  <div class="qs-difficulty-select-row">
+                    ${renderQuickServeDifficultyButtons()}
+                  </div>
+                </section>
               </div>
 
-              <div class="qs-character-name" id="qsSelectedCharacterName">
-                ${selectedCharacter.name}
+              <div class="qs-mode-high-score" id="qsSelectedModeBest">
+                <span id="qsSelectedModeBestLabel">${selectedMode.label} High Score:</span>
+                <strong id="qsSelectedModeBestValue">${modeBestScore || '--'}</strong>
               </div>
 
-              <div class="qs-character-boost" id="qsSelectedCharacterBoost">
-                ${selectedCharacter.boostLabel}
-              </div>
+              <section class="qs-character-showcase" aria-label="Selected character">
+                <div class="qs-character-portrait-wrap qs-character-stage-wrap">
+                  <img
+                    id="philSpriteIntro"
+                    class="phil-img qs-character-portrait qs-character-art qs-character-art-${selectedCharacter.artClass}"
+                    src="${selectedCharacter.introSrc}"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </div>
 
-              <div class="qs-character-best-main" id="qsSelectedCharacterBest">
-                Best Score: <strong>${getQuickServeCharacterBestScore(selectedCharacter) ?? '--'}</strong>
-              </div>
+                <div class="qs-character-name qs-character-name-stage" id="qsSelectedCharacterName">
+                  ${selectedCharacter.name}
+                </div>
+              </section>
 
-              <div class="qs-unlocked-header">
-                Characters Unlocked: ${getQuickServeUnlockedCharacterCount()} of ${QS_CHARACTER_ROSTER.length}
-              </div>
+              <section class="qs-character-selection-panel" aria-label="Character Selection">
+                <div class="qs-unlocked-header">
+                  Character Selection:
+                </div>
 
-              <div class="qs-unlocked-row" aria-label="Characters unlocked">
-                ${renderQuickServeCharacterRosterRow(selectedCharacter)}
-              </div>
-            </section>
-
-            <section class="qs-difficulty-panel" aria-label="Choose QuickServe difficulty">
-              <div class="qs-difficulty-label">Choose Difficulty</div>
-
-              <div class="qs-difficulty-row">
-                <button
-                  type="button"
-                  class="qs-difficulty-btn is-active"
-                  data-qs-preflight-mode="easy"
-                  aria-pressed="true"
-                >
-                  <strong>Easy</strong>
-                  <span>+ / −</span>
-                </button>
-
-                <button
-                  type="button"
-                  class="qs-difficulty-btn"
-                  data-qs-preflight-mode="medium"
-                  aria-pressed="false"
-                >
-                  <strong>Medium</strong>
-                  <span>× / ÷</span>
-                </button>
-
-                <button
-                  type="button"
-                  class="qs-difficulty-btn"
-                  data-qs-preflight-mode="hard"
-                  aria-pressed="false"
-                >
-                  <strong>Hard</strong>
-                  <span>𝒙</span>
-                </button>
-              </div>
+                <div class="qs-unlocked-row" aria-label="Character Selection">
+                  ${renderQuickServeCharacterRosterRow(selectedCharacter)}
+                </div>
+              </section>
             </section>
 
             <button id="startShowBtn" class="start-show-btn qs-preflight-start">
@@ -693,6 +914,7 @@ function renderIntroScreen() {
 
   // New square Back/Mute for intro
   document.getElementById('qsBackIntro')?.addEventListener('click', returnToMenu);
+  wireQuickServeModeButtons();
   wireQuickServePreflightDifficultyButtons();
   wireQuickServeCharacterPreviewButtons();
 

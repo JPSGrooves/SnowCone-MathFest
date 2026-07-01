@@ -10,7 +10,8 @@ import {
 import { stopGameLogic, startGameLogic } from './quickServeGame.js';
 import {
   returnQuickServeGameToIntro,
-  ensureQuickServeMusicPlaying
+  ensureQuickServeMusicPlaying,
+  setQuickServeModeFromInGameMathMode
 } from './quickServe.js'; // 🌟 Full QS exit + QS music guard
 import { setMathMode } from './quickServeGame.js';
 import { setCurrentAnswer } from './quickServeGame.js'; // 💥 you'll add this below
@@ -123,12 +124,15 @@ export function setupKeypad() {
 
   safeBind('plusMinus', () => {
     setMathMode('addSub');
+    setQuickServeModeFromInGameMathMode('addSub');
   });
   safeBind('multiplyDivide', () => {
     setMathMode('multiDiv');
+    setQuickServeModeFromInGameMathMode('multiDiv');
   });
   safeBind('algMode', () => {
     setMathMode('algebra');
+    setQuickServeModeFromInGameMathMode('algebra');
   });
 
 

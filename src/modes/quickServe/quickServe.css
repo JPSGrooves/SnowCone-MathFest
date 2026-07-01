@@ -5209,3 +5209,1335 @@ html body.qs-active #philSpriteInGame.qs-character-art {
 
 /* ───────────────── QuickServe — Real Act PNG Wiring END ───────────────── */
 
+
+/* ───────────────── QuickServe — Character Mode Pivot START ─────────────────
+   Purpose:
+   - Character = performer/personality.
+   - Mode Select = math lane.
+   - No character power ladder, no boosts, no locked boxes.
+   - Intro only. Actual new decimal/fraction generators come in the next pass.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-character-main-card {
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto !important;
+
+  gap: clamp(0.26rem, 0.72svh, 0.52rem) !important;
+}
+
+body.qs-active .qs-character-name-top {
+  align-self: center !important;
+  justify-self: center !important;
+
+  width: 100% !important;
+  margin: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.06rem, 2.55svh, 1.62rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.025em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-mode-layout {
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
+  align-items: center !important;
+  gap: clamp(0.42rem, 2vw, 0.9rem) !important;
+}
+
+body.qs-active .qs-character-mode-layout .qs-character-portrait-wrap {
+  min-height: 0 !important;
+  height: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-character-mode-layout .qs-character-portrait {
+  height: clamp(6.35rem, 18.5svh, 11.35rem) !important;
+  max-height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}
+
+body.qs-active .qs-mode-select-panel {
+  min-width: 0 !important;
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: clamp(0.26rem, 0.72svh, 0.46rem) !important;
+}
+
+body.qs-active .qs-mode-select-label {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.56rem, 1.38svh, 0.76rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 13px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-mode-select-row {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: clamp(0.2rem, 0.56svh, 0.36rem) !important;
+}
+
+body.qs-active .qs-mode-select-btn {
+  min-width: 0 !important;
+  min-height: clamp(1.82rem, 4.15svh, 2.56rem) !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: clamp(0.16rem, 0.8vw, 0.34rem) !important;
+
+  padding: clamp(0.26rem, 0.72svh, 0.42rem) clamp(0.36rem, 1.5vw, 0.62rem) !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 38%, rgba(255,255,255,0.14)) !important;
+  border-radius: 13px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.065),
+      rgba(0,0,0,0.50)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.9) !important;
+
+  opacity: 0.62 !important;
+  filter: saturate(0.82) brightness(0.86) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  cursor: pointer !important;
+}
+
+body.qs-active .qs-mode-select-btn strong {
+  min-width: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.32svh, 0.78rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  text-align: left !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.qs-active .qs-mode-select-btn span {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.54rem, 1.22svh, 0.72rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  text-align: right !important;
+  opacity: 0.86 !important;
+}
+
+body.qs-active .qs-mode-select-btn.is-active {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1.006) !important;
+
+  border-color: var(--qs-accent, #00ffee) !important;
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)),
+      rgba(0,0,0,0.48) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.09) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 24px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-mode-high-score {
+  width: 100% !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.76rem, 1.75svh, 1rem) !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.05 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.94) !important;
+  text-shadow: 0 0 10px rgba(0,0,0,0.72) !important;
+}
+
+body.qs-active .qs-mode-high-score strong {
+  color: #ffffff !important;
+  font-weight: 950 !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-unlocked-header {
+  margin: clamp(0.02rem, 0.22svh, 0.12rem) 0 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.62rem, 1.48svh, 0.82rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+}
+
+body.qs-active .qs-unlocked-row {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.24rem, 1vw, 0.5rem) !important;
+}
+
+body.qs-active .qs-roster-slot,
+body.qs-active .qs-roster-slot.is-unlocked,
+body.qs-active .qs-roster-slot.is-locked {
+  opacity: 0.66 !important;
+  filter: saturate(0.84) brightness(0.84) !important;
+
+  min-height: clamp(3.5rem, 7.25svh, 4.95rem) !important;
+
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  place-items: center !important;
+
+  padding: clamp(0.26rem, 0.62svh, 0.42rem) clamp(0.12rem, 0.7vw, 0.28rem) !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1.012) !important;
+}
+
+body.qs-active .qs-roster-check,
+body.qs-active .qs-roster-lock-mark,
+body.qs-active .qs-locked-message,
+body.qs-active .qs-locked-word,
+body.qs-active .qs-locked-threshold,
+body.qs-active .qs-roster-best,
+body.qs-active .qs-roster-best-word,
+body.qs-active .qs-roster-score-line,
+body.qs-active .qs-roster-locked-img,
+body.qs-active .qs-lock-fallback {
+  display: none !important;
+}
+
+body.qs-active .qs-roster-name {
+  order: 1 !important;
+  margin: 0 0 clamp(0.12rem, 0.32svh, 0.2rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.5rem, 1.08svh, 0.66rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: rgba(245, 253, 255, 0.92) !important;
+}
+
+body.qs-active .qs-roster-img {
+  order: 2 !important;
+
+  height: clamp(1.85rem, 4.2svh, 2.75rem) !important;
+  width: auto !important;
+  max-width: 94% !important;
+  object-fit: contain !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-character-mode-layout {
+    gap: clamp(0.3rem, 1.4vw, 0.64rem) !important;
+  }
+
+  body.qs-active .qs-character-mode-layout .qs-character-portrait {
+    height: clamp(5.15rem, 14.8svh, 7.2rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn {
+    min-height: clamp(1.55rem, 3.58svh, 2.1rem) !important;
+    border-radius: 11px !important;
+  }
+
+  body.qs-active .qs-mode-select-btn strong {
+    font-size: clamp(0.5rem, 1.16svh, 0.68rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn span {
+    font-size: clamp(0.48rem, 1.05svh, 0.62rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot,
+  body.qs-active .qs-roster-slot.is-unlocked,
+  body.qs-active .qs-roster-slot.is-locked {
+    min-height: clamp(2.98rem, 6.3svh, 3.82rem) !important;
+  }
+
+  body.qs-active .qs-roster-img {
+    height: clamp(1.34rem, 3.12svh, 1.88rem) !important;
+  }
+}
+
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-mode-layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr) !important;
+    gap: clamp(0.8rem, 2vw, 1.4rem) !important;
+  }
+
+  body.qs-active .qs-character-mode-layout .qs-character-portrait {
+    height: clamp(8rem, 17svh, 12.4rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn {
+    min-height: clamp(2.1rem, 4.3svh, 2.9rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot,
+  body.qs-active .qs-roster-slot.is-unlocked,
+  body.qs-active .qs-roster-slot.is-locked {
+    min-height: clamp(4.1rem, 7.2svh, 5.6rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Character Mode Pivot END ───────────────── */
+
+
+/* ───────────────── QuickServe — Mode Difficulty Stage Layout START ─────────────────
+   Purpose:
+   - Left side = Mode Select.
+   - Right side = Difficulty.
+   - Score line names selected mode: Add/Sub High Score: --
+   - Character becomes stage performer below setup controls.
+   - Character Selection stays bottom of card.
+   - Intro layout only. Math generator expansion comes later.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-character-main-card {
+  grid-template-rows:
+    minmax(0, 1.18fr)
+    auto
+    auto
+    minmax(0, 0.82fr)
+    auto
+    auto !important;
+
+  gap: clamp(0.22rem, 0.62svh, 0.46rem) !important;
+  padding: clamp(0.56rem, 1.12svh, 0.88rem) !important;
+}
+
+/* Top two-column control board */
+body.qs-active .qs-setup-layout {
+  min-height: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) !important;
+  align-items: stretch !important;
+  gap: clamp(0.42rem, 2vw, 0.9rem) !important;
+}
+
+body.qs-active .qs-mode-select-panel,
+body.qs-active .qs-difficulty-select-panel {
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: clamp(0.24rem, 0.66svh, 0.42rem) !important;
+}
+
+body.qs-active .qs-mode-select-label,
+body.qs-active .qs-difficulty-select-label {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.56rem, 1.38svh, 0.78rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 13px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-mode-select-row,
+body.qs-active .qs-difficulty-select-row {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: clamp(0.2rem, 0.54svh, 0.34rem) !important;
+}
+
+body.qs-active .qs-mode-select-btn,
+body.qs-active .qs-difficulty-select-btn {
+  min-width: 0 !important;
+  min-height: clamp(1.58rem, 3.55svh, 2.24rem) !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: clamp(0.16rem, 0.8vw, 0.34rem) !important;
+
+  padding: clamp(0.22rem, 0.58svh, 0.36rem) clamp(0.34rem, 1.35vw, 0.58rem) !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 38%, rgba(255,255,255,0.14)) !important;
+  border-radius: 13px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.065),
+      rgba(0,0,0,0.50)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.9) !important;
+
+  opacity: 0.62 !important;
+  filter: saturate(0.82) brightness(0.86) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 0 9px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  cursor: pointer !important;
+}
+
+body.qs-active .qs-mode-select-btn strong,
+body.qs-active .qs-difficulty-select-btn strong {
+  min-width: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.5rem, 1.18svh, 0.72rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  text-align: left !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.qs-active .qs-mode-select-btn span,
+body.qs-active .qs-difficulty-select-btn span {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.47rem, 1.04svh, 0.62rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  text-align: right !important;
+  opacity: 0.86 !important;
+}
+
+body.qs-active .qs-mode-select-btn.is-active,
+body.qs-active .qs-difficulty-select-btn.is-active {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1.006) !important;
+
+  border-color: var(--qs-accent, #00ffee) !important;
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      var(--qs-faint, rgba(0, 255, 238, 0.18)),
+      rgba(0,0,0,0.48) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.09) inset,
+    0 0 15px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 24px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Score row: explicitly mode-based. */
+body.qs-active .qs-mode-high-score {
+  width: 100% !important;
+
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 0.35em !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 1.68svh, 0.98rem) !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.05 !important;
+  text-align: center !important;
+
+  color: rgba(238, 252, 255, 0.94) !important;
+  text-shadow: 0 0 10px rgba(0,0,0,0.72) !important;
+}
+
+body.qs-active .qs-mode-high-score strong {
+  color: #ffffff !important;
+  font-weight: 950 !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Performer stage section */
+body.qs-active .qs-character-name-stage {
+  align-self: center !important;
+  justify-self: center !important;
+
+  width: 100% !important;
+  margin: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.96rem, 2.25svh, 1.38rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.025em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .qs-character-stage-wrap {
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+body.qs-active .qs-character-stage-wrap .qs-character-portrait {
+  height: clamp(4.95rem, 13.8svh, 8.7rem) !important;
+  max-height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Character Selection bottom row */
+body.qs-active .qs-unlocked-header {
+  margin: clamp(0.02rem, 0.22svh, 0.12rem) 0 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.34svh, 0.78rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+}
+
+body.qs-active .qs-unlocked-row {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.22rem, 0.9vw, 0.42rem) !important;
+}
+
+body.qs-active .qs-roster-slot,
+body.qs-active .qs-roster-slot.is-unlocked,
+body.qs-active .qs-roster-slot.is-locked {
+  opacity: 0.66 !important;
+  filter: saturate(0.84) brightness(0.84) !important;
+
+  min-height: clamp(3.12rem, 6.45svh, 4.34rem) !important;
+
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  place-items: center !important;
+
+  padding: clamp(0.22rem, 0.52svh, 0.36rem) clamp(0.1rem, 0.6vw, 0.24rem) !important;
+}
+
+body.qs-active .qs-roster-slot.is-selected {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(-1px) scale(1.012) !important;
+}
+
+body.qs-active .qs-roster-check,
+body.qs-active .qs-roster-lock-mark,
+body.qs-active .qs-locked-message,
+body.qs-active .qs-locked-word,
+body.qs-active .qs-locked-threshold,
+body.qs-active .qs-roster-best,
+body.qs-active .qs-roster-best-word,
+body.qs-active .qs-roster-score-line,
+body.qs-active .qs-roster-locked-img,
+body.qs-active .qs-lock-fallback {
+  display: none !important;
+}
+
+body.qs-active .qs-roster-name {
+  order: 1 !important;
+  margin: 0 0 clamp(0.1rem, 0.28svh, 0.18rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.48rem, 1.02svh, 0.62rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: rgba(245, 253, 255, 0.92) !important;
+}
+
+body.qs-active .qs-roster-img {
+  order: 2 !important;
+
+  height: clamp(1.62rem, 3.62svh, 2.36rem) !important;
+  width: auto !important;
+  max-width: 94% !important;
+  object-fit: contain !important;
+}
+
+/* Short iPhones: keep the orchestra inside the glass. */
+@media (max-height: 740px) {
+  body.qs-active .qs-character-main-card {
+    grid-template-rows:
+      minmax(0, 1.22fr)
+      auto
+      auto
+      minmax(0, 0.72fr)
+      auto
+      auto !important;
+
+    gap: clamp(0.12rem, 0.36svh, 0.28rem) !important;
+    padding: clamp(0.42rem, 0.86svh, 0.62rem) !important;
+  }
+
+  body.qs-active .qs-setup-layout {
+    gap: clamp(0.28rem, 1.22vw, 0.58rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn,
+  body.qs-active .qs-difficulty-select-btn {
+    min-height: clamp(1.34rem, 3.06svh, 1.78rem) !important;
+    border-radius: 11px !important;
+    padding-top: clamp(0.18rem, 0.45svh, 0.3rem) !important;
+    padding-bottom: clamp(0.18rem, 0.45svh, 0.3rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn strong,
+  body.qs-active .qs-difficulty-select-btn strong {
+    font-size: clamp(0.45rem, 1.02svh, 0.6rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn span,
+  body.qs-active .qs-difficulty-select-btn span {
+    font-size: clamp(0.42rem, 0.92svh, 0.54rem) !important;
+  }
+
+  body.qs-active .qs-mode-high-score {
+    font-size: clamp(0.62rem, 1.45svh, 0.82rem) !important;
+  }
+
+  body.qs-active .qs-character-name-stage {
+    font-size: clamp(0.84rem, 1.96svh, 1.12rem) !important;
+  }
+
+  body.qs-active .qs-character-stage-wrap .qs-character-portrait {
+    height: clamp(3.9rem, 11.1svh, 5.65rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot,
+  body.qs-active .qs-roster-slot.is-unlocked,
+  body.qs-active .qs-roster-slot.is-locked {
+    min-height: clamp(2.58rem, 5.56svh, 3.36rem) !important;
+  }
+
+  body.qs-active .qs-roster-img {
+    height: clamp(1.16rem, 2.65svh, 1.58rem) !important;
+  }
+}
+
+/* iPad: give the setup board more authority. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-main-card {
+    grid-template-rows:
+      minmax(0, 1.12fr)
+      auto
+      auto
+      minmax(0, 0.88fr)
+      auto
+      auto !important;
+  }
+
+  body.qs-active .qs-setup-layout {
+    gap: clamp(0.8rem, 2vw, 1.4rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn,
+  body.qs-active .qs-difficulty-select-btn {
+    min-height: clamp(1.95rem, 3.95svh, 2.72rem) !important;
+  }
+
+  body.qs-active .qs-character-stage-wrap .qs-character-portrait {
+    height: clamp(6.35rem, 13.4svh, 9.9rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot,
+  body.qs-active .qs-roster-slot.is-unlocked,
+  body.qs-active .qs-roster-slot.is-locked {
+    min-height: clamp(3.8rem, 6.7svh, 5.2rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Mode Difficulty Stage Layout END ───────────────── */
+
+
+/* ───────────────── QuickServe — Intro Spacing + Showcase Fix START ─────────────────
+   Purpose:
+   - Give Mode Select breathing room inside the glass.
+   - Keep Difficulty aligned without over-moving it.
+   - Buffer the selected-mode high score so it does not collide visually.
+   - Put character name under the PNG.
+   - Group Character Selection label + tiles tightly on iPhone/iPad.
+   - CSS-only visual rhythm after one safe JS reorder.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-character-main-card {
+  grid-template-rows:
+    minmax(0, 1.1fr)
+    auto
+    minmax(0, 0.86fr)
+    auto !important;
+
+  gap: clamp(0.26rem, 0.72svh, 0.54rem) !important;
+  padding:
+    clamp(0.68rem, 1.28svh, 1rem)
+    clamp(0.66rem, 2.2vw, 1.08rem)
+    clamp(0.62rem, 1.16svh, 0.92rem) !important;
+}
+
+/* Top control board: let Mode Select stand inside the window instead of kissing the edge. */
+body.qs-active .qs-setup-layout {
+  min-height: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) !important;
+  align-items: center !important;
+  gap: clamp(0.58rem, 2.4vw, 1.1rem) !important;
+
+  padding:
+    clamp(0.28rem, 0.82svh, 0.56rem)
+    clamp(0.32rem, 1.45vw, 0.72rem)
+    clamp(0.1rem, 0.35svh, 0.22rem) !important;
+
+  box-sizing: border-box !important;
+}
+
+/* A little extra comfort on the left list only. */
+body.qs-active .qs-mode-select-panel {
+  padding-left: clamp(0.12rem, 0.8vw, 0.38rem) !important;
+}
+
+body.qs-active .qs-difficulty-select-panel {
+  padding-right: clamp(0.08rem, 0.55vw, 0.28rem) !important;
+}
+
+/* Labels should sit below the top border, not on it. */
+body.qs-active .qs-mode-select-label,
+body.qs-active .qs-difficulty-select-label {
+  margin-bottom: clamp(0.06rem, 0.24svh, 0.16rem) !important;
+}
+
+/* Mode buttons: slightly narrower visual punch so they breathe inside the card. */
+body.qs-active .qs-mode-select-row,
+body.qs-active .qs-difficulty-select-row {
+  padding-inline: clamp(0.02rem, 0.3vw, 0.14rem) !important;
+}
+
+body.qs-active .qs-mode-select-btn,
+body.qs-active .qs-difficulty-select-btn {
+  min-height: clamp(1.48rem, 3.35svh, 2.12rem) !important;
+}
+
+/* High score gets its own breathing band without becoming another box. */
+body.qs-active .qs-mode-high-score {
+  position: relative !important;
+  z-index: 3 !important;
+
+  width: 100% !important;
+  margin:
+    clamp(0.08rem, 0.34svh, 0.22rem)
+    0
+    clamp(0.16rem, 0.54svh, 0.34rem) !important;
+
+  padding:
+    clamp(0.14rem, 0.42svh, 0.28rem)
+    clamp(0.22rem, 1.2vw, 0.46rem) !important;
+
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: 0.35em !important;
+
+  line-height: 1.06 !important;
+  text-align: center !important;
+
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.92),
+    0 0 12px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Character showcase = PNG then name. */
+body.qs-active .qs-character-showcase {
+  min-height: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+  gap: clamp(0.06rem, 0.25svh, 0.18rem) !important;
+
+  overflow: visible !important;
+}
+
+body.qs-active .qs-character-stage-wrap {
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+
+  display: flex !important;
+  align-items: end !important;
+  justify-content: center !important;
+
+  overflow: visible !important;
+}
+
+body.qs-active .qs-character-stage-wrap .qs-character-portrait {
+  height: clamp(4.7rem, 12.8svh, 8.2rem) !important;
+  max-height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+}
+
+body.qs-active .qs-character-name-stage {
+  width: 100% !important;
+  margin: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.86rem, 2.05svh, 1.24rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.025em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.9),
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* Selection label and row should travel together, not float apart. */
+body.qs-active .qs-character-selection-panel {
+  width: 100% !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  align-items: start !important;
+  gap: clamp(0.26rem, 0.72svh, 0.48rem) !important;
+}
+
+body.qs-active .qs-character-selection-panel .qs-unlocked-header {
+  margin: 0 !important;
+  align-self: end !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.56rem, 1.28svh, 0.74rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%) !important;
+}
+
+body.qs-active .qs-character-selection-panel .qs-unlocked-row {
+  align-self: start !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.22rem, 0.9vw, 0.42rem) !important;
+}
+
+body.qs-active .qs-character-selection-panel .qs-roster-slot,
+body.qs-active .qs-character-selection-panel .qs-roster-slot.is-unlocked,
+body.qs-active .qs-character-selection-panel .qs-roster-slot.is-locked {
+  min-height: clamp(3rem, 6.2svh, 4.18rem) !important;
+}
+
+body.qs-active .qs-character-selection-panel .qs-roster-img {
+  height: clamp(1.48rem, 3.35svh, 2.22rem) !important;
+}
+
+/* Short phones: tighter, but still buffered. */
+@media (max-height: 740px) {
+  body.qs-active .qs-character-main-card {
+    grid-template-rows:
+      minmax(0, 1.12fr)
+      auto
+      minmax(0, 0.72fr)
+      auto !important;
+
+    gap: clamp(0.12rem, 0.36svh, 0.28rem) !important;
+    padding:
+      clamp(0.48rem, 0.92svh, 0.68rem)
+      clamp(0.48rem, 1.8vw, 0.78rem)
+      clamp(0.44rem, 0.84svh, 0.62rem) !important;
+  }
+
+  body.qs-active .qs-setup-layout {
+    gap: clamp(0.38rem, 1.5vw, 0.72rem) !important;
+    padding-top: clamp(0.2rem, 0.55svh, 0.34rem) !important;
+    padding-inline: clamp(0.2rem, 1vw, 0.46rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn,
+  body.qs-active .qs-difficulty-select-btn {
+    min-height: clamp(1.28rem, 2.9svh, 1.68rem) !important;
+    padding-top: clamp(0.16rem, 0.4svh, 0.26rem) !important;
+    padding-bottom: clamp(0.16rem, 0.4svh, 0.26rem) !important;
+  }
+
+  body.qs-active .qs-mode-high-score {
+    margin-top: clamp(0.04rem, 0.18svh, 0.12rem) !important;
+    margin-bottom: clamp(0.08rem, 0.32svh, 0.18rem) !important;
+    padding-top: clamp(0.08rem, 0.24svh, 0.16rem) !important;
+    padding-bottom: clamp(0.08rem, 0.24svh, 0.16rem) !important;
+    font-size: clamp(0.58rem, 1.34svh, 0.78rem) !important;
+  }
+
+  body.qs-active .qs-character-stage-wrap .qs-character-portrait {
+    height: clamp(3.55rem, 10svh, 5.25rem) !important;
+  }
+
+  body.qs-active .qs-character-name-stage {
+    font-size: clamp(0.72rem, 1.72svh, 0.96rem) !important;
+  }
+
+  body.qs-active .qs-character-selection-panel {
+    gap: clamp(0.14rem, 0.42svh, 0.26rem) !important;
+  }
+
+  body.qs-active .qs-character-selection-panel .qs-roster-slot,
+  body.qs-active .qs-character-selection-panel .qs-roster-slot.is-unlocked,
+  body.qs-active .qs-character-selection-panel .qs-roster-slot.is-locked {
+    min-height: clamp(2.42rem, 5.25svh, 3.18rem) !important;
+  }
+
+  body.qs-active .qs-character-selection-panel .qs-roster-img {
+    height: clamp(1.08rem, 2.45svh, 1.48rem) !important;
+  }
+}
+
+/* iPad: same critique, same medicine — less floaty lower section. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-main-card {
+    grid-template-rows:
+      minmax(0, 1.02fr)
+      auto
+      minmax(0, 0.82fr)
+      auto !important;
+
+    padding-inline: clamp(0.9rem, 1.8vw, 1.35rem) !important;
+  }
+
+  body.qs-active .qs-setup-layout {
+    gap: clamp(0.9rem, 2.1vw, 1.55rem) !important;
+    padding-inline: clamp(0.48rem, 1.1vw, 0.92rem) !important;
+  }
+
+  body.qs-active .qs-character-stage-wrap .qs-character-portrait {
+    height: clamp(5.6rem, 11.8svh, 8.7rem) !important;
+  }
+
+  body.qs-active .qs-character-selection-panel {
+    gap: clamp(0.28rem, 0.58svh, 0.44rem) !important;
+  }
+
+  body.qs-active .qs-character-selection-panel .qs-roster-slot,
+  body.qs-active .qs-character-selection-panel .qs-roster-slot.is-unlocked,
+  body.qs-active .qs-character-selection-panel .qs-roster-slot.is-locked {
+    min-height: clamp(3.5rem, 6.1svh, 4.85rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Intro Spacing + Showcase Fix END ───────────────── */
+
+
+/* ───────────────── QuickServe — Selected Character Name Lock START ─────────────────
+   Purpose:
+   - Full selected character name lives below the PNG.
+   - White, readable, centered.
+   - Sits directly above Character Selection.
+   - No JS, gameplay, scoring, mode, difficulty, music, or roster logic changed.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-character-showcase {
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+  gap: clamp(0.14rem, 0.42svh, 0.28rem) !important;
+
+  overflow: visible !important;
+}
+
+body.qs-active .qs-character-stage-wrap {
+  align-items: end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+body.qs-active .qs-character-name-stage,
+body.qs-active #qsSelectedCharacterName.qs-character-name-stage {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  width: 100% !important;
+  margin:
+    clamp(0.04rem, 0.16svh, 0.1rem)
+    0
+    clamp(0.18rem, 0.48svh, 0.32rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.94rem, 2.18svh, 1.36rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.035em !important;
+  line-height: 1.04 !important;
+  text-align: center !important;
+  text-transform: none !important;
+
+  color: #ffffff !important;
+
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.95),
+    0 0 8px rgba(255, 255, 255, 0.35),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+
+  z-index: 4 !important;
+}
+
+body.qs-active .qs-character-selection-panel {
+  margin-top: 0 !important;
+}
+
+/* Tight phones: keep name visible without stealing too much character art. */
+@media (max-height: 740px) {
+  body.qs-active .qs-character-name-stage,
+  body.qs-active #qsSelectedCharacterName.qs-character-name-stage {
+    font-size: clamp(0.78rem, 1.82svh, 1rem) !important;
+    margin-bottom: clamp(0.12rem, 0.32svh, 0.22rem) !important;
+  }
+}
+
+/* iPad: same label, slightly more confident. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-character-name-stage,
+  body.qs-active #qsSelectedCharacterName.qs-character-name-stage {
+    font-size: clamp(1.08rem, 1.9vw, 1.58rem) !important;
+    margin-bottom: clamp(0.22rem, 0.44svh, 0.38rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Selected Character Name Lock END ───────────────── */
+
+
+/* ───────────────── QuickServe — Setup Button Polish START ─────────────────
+   Purpose:
+   - Mode/Difficulty buttons become arcade menu buttons, not two-column data rows.
+   - Labels are centered and concise.
+   - Buttons are slightly vertically fatter.
+   - Top buffer is trimmed a little while keeping accepted relative layout.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-setup-layout {
+  padding-top: clamp(0.12rem, 0.42svh, 0.32rem) !important;
+  padding-bottom: clamp(0.08rem, 0.28svh, 0.2rem) !important;
+
+  gap: clamp(0.54rem, 2.25vw, 1.05rem) !important;
+  align-items: start !important;
+}
+
+body.qs-active .qs-mode-select-panel,
+body.qs-active .qs-difficulty-select-panel {
+  justify-content: start !important;
+  gap: clamp(0.16rem, 0.48svh, 0.32rem) !important;
+}
+
+body.qs-active .qs-mode-select-label,
+body.qs-active .qs-difficulty-select-label {
+  margin-bottom: clamp(0.02rem, 0.16svh, 0.1rem) !important;
+}
+
+body.qs-active .qs-mode-select-btn,
+body.qs-active .qs-difficulty-select-btn {
+  min-height: clamp(1.72rem, 3.82svh, 2.42rem) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding:
+    clamp(0.28rem, 0.72svh, 0.46rem)
+    clamp(0.42rem, 1.55vw, 0.72rem) !important;
+
+  text-align: center !important;
+}
+
+body.qs-active .qs-mode-select-btn strong,
+body.qs-active .qs-difficulty-select-btn strong {
+  width: 100% !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.62rem, 1.42svh, 0.86rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+body.qs-active .qs-mode-select-btn span,
+body.qs-active .qs-difficulty-select-btn span {
+  display: none !important;
+}
+
+/* Short iPhones: still centered, just compressed enough to fit. */
+@media (max-height: 740px) {
+  body.qs-active .qs-setup-layout {
+    padding-top: clamp(0.06rem, 0.28svh, 0.18rem) !important;
+    gap: clamp(0.34rem, 1.35vw, 0.66rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-panel,
+  body.qs-active .qs-difficulty-select-panel {
+    gap: clamp(0.12rem, 0.34svh, 0.22rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn,
+  body.qs-active .qs-difficulty-select-btn {
+    min-height: clamp(1.48rem, 3.24svh, 1.9rem) !important;
+    padding-top: clamp(0.2rem, 0.5svh, 0.32rem) !important;
+    padding-bottom: clamp(0.2rem, 0.5svh, 0.32rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn strong,
+  body.qs-active .qs-difficulty-select-btn strong {
+    font-size: clamp(0.52rem, 1.16svh, 0.68rem) !important;
+  }
+}
+
+/* iPad: same language, a little more confident. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-setup-layout {
+    padding-top: clamp(0.18rem, 0.36svh, 0.34rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn,
+  body.qs-active .qs-difficulty-select-btn {
+    min-height: clamp(1.98rem, 4.08svh, 2.78rem) !important;
+  }
+
+  body.qs-active .qs-mode-select-btn strong,
+  body.qs-active .qs-difficulty-select-btn strong {
+    font-size: clamp(0.72rem, 1.35vw, 0.98rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Setup Button Polish END ───────────────── */
+
+
+/* ───────────────── QuickServe — High Score Hug Fix START ─────────────────
+   Purpose:
+   - Make the selected-mode high score feel connected to Mode Select / Difficulty.
+   - Reduce the feeling that it belongs to the character PNG.
+   - CSS-only polish pass.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-mode-high-score {
+  align-self: start !important;
+
+  margin-top: clamp(-0.18rem, -0.28svh, -0.06rem) !important;
+  margin-bottom: clamp(0.28rem, 0.82svh, 0.48rem) !important;
+
+  padding-top: 0 !important;
+  padding-bottom: clamp(0.02rem, 0.12svh, 0.08rem) !important;
+}
+
+body.qs-active .qs-character-showcase {
+  margin-top: clamp(0.04rem, 0.18svh, 0.12rem) !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-mode-high-score {
+    margin-top: clamp(-0.12rem, -0.22svh, -0.04rem) !important;
+    margin-bottom: clamp(0.18rem, 0.54svh, 0.3rem) !important;
+  }
+
+  body.qs-active .qs-character-showcase {
+    margin-top: clamp(0.02rem, 0.1svh, 0.08rem) !important;
+  }
+}
+
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-mode-high-score {
+    margin-top: clamp(-0.14rem, -0.18svh, -0.04rem) !important;
+    margin-bottom: clamp(0.24rem, 0.62svh, 0.42rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — High Score Hug Fix END ───────────────── */
+
+
+/* ───────────────── QuickServe — High Score Real Cluster Fix START ─────────────────
+   Purpose:
+   - Previous high-score margin nudge was too weak because the setup row still owned a big flex/grid band.
+   - Collapse Mode/Difficulty setup to content height.
+   - Let the character showcase absorb the extra vertical space.
+   - Result: score visually belongs to Mode/Difficulty, not the performer PNG.
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Current direct children are:
+   1. qs-setup-layout
+   2. qs-mode-high-score
+   3. qs-character-showcase
+   4. qs-character-selection-panel
+*/
+body.qs-active .qs-character-main-card {
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: stretch !important;
+
+  gap: clamp(0.24rem, 0.66svh, 0.48rem) !important;
+}
+
+/* Kill the fake full-height top row. This is the actual fix. */
+body.qs-active .qs-setup-layout {
+  height: auto !important;
+  min-height: 0 !important;
+  align-self: start !important;
+
+  padding-top: clamp(0.1rem, 0.32svh, 0.24rem) !important;
+  padding-bottom: clamp(0.06rem, 0.2svh, 0.14rem) !important;
+}
+
+/* Score now hugs setup because setup no longer owns empty height. */
+body.qs-active .qs-mode-high-score {
+  align-self: start !important;
+
+  margin-top: clamp(0.02rem, 0.12svh, 0.08rem) !important;
+  margin-bottom: clamp(0.46rem, 1.18svh, 0.82rem) !important;
+
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  line-height: 1.04 !important;
+}
+
+/* Character showcase gets the slack now. */
+body.qs-active .qs-character-showcase {
+  align-self: stretch !important;
+
+  min-height: 0 !important;
+  height: 100% !important;
+
+  margin-top: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+}
+
+/* Keep the PNG centered in its newly expanded performer band. */
+body.qs-active .qs-character-stage-wrap {
+  height: 100% !important;
+  align-items: center !important;
+}
+
+/* Short phones: same structural fix, just less breathing room. */
+@media (max-height: 740px) {
+  body.qs-active .qs-character-main-card {
+    grid-template-rows:
+      auto
+      auto
+      minmax(0, 1fr)
+      auto !important;
+
+    gap: clamp(0.12rem, 0.34svh, 0.28rem) !important;
+  }
+
+  body.qs-active .qs-setup-layout {
+    padding-top: clamp(0.04rem, 0.16svh, 0.12rem) !important;
+    padding-bottom: 0 !important;
+  }
+
+  body.qs-active .qs-mode-high-score {
+    margin-top: 0 !important;
+    margin-bottom: clamp(0.26rem, 0.72svh, 0.46rem) !important;
+  }
+}
+
+/* iPad: same correction. Slightly more separation before performer. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-mode-high-score {
+    margin-bottom: clamp(0.56rem, 0.95svh, 0.9rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — High Score Real Cluster Fix END ───────────────── */
