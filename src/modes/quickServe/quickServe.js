@@ -154,19 +154,17 @@ const QS_MODE_ROSTER = [
   {
     id: 'decimals',
     label: 'Dec/Perc',
-    mathMode: 'algebra',
-    previewNote: 'temporary algebra lane',
+    mathMode: 'decimals',
   },
   {
     id: 'fractions',
     label: 'Frac/Word',
-    mathMode: 'algebra',
-    previewNote: 'temporary algebra lane',
+    mathMode: 'fractions',
   },
   {
     id: 'mixed',
     label: 'Mixed Bag',
-    mathMode: 'mixedReview',
+    mathMode: 'mixed',
   },
 ];
 
@@ -344,12 +342,6 @@ function recordQuickServeSelectedModeScore(scoreValue = 0) {
 
 function resolveQuickServeMathMode(modeId = qsSelectedModeId) {
   const selectedMode = getQuickServeSelectedMode(modeId);
-
-  if (selectedMode.mathMode === 'mixedReview') {
-    const existingModes = ['addSub', 'multiDiv', 'algebra'];
-    return existingModes[Math.floor(Math.random() * existingModes.length)];
-  }
-
   return selectedMode.mathMode || 'addSub';
 }
 
@@ -380,7 +372,6 @@ function setQuickServeSelectedMode(modeId = 'addSub', options = {}) {
   const safeModeId = normalizeQuickServeModeId(modeId);
 
   qsSelectedModeId = safeModeId;
-  qsPreflightDifficulty = getLegacyPreflightDifficultyFromMode(safeModeId);
 
   document.querySelectorAll('[data-qs-mode]').forEach((button) => {
     const isActive = button.dataset.qsMode === safeModeId;
@@ -598,7 +589,7 @@ function applyQuickServePreflightMathMode() {
   const selectedMode = getQuickServeSelectedMode();
   const mathMode = getQuickServeMathModeFromPreflight();
 
-  setMathMode(mathMode);
+  setMathMode(mathMode, qsPreflightDifficulty);
 
   console.log(
     `[QuickServe] Starting mode wired directly: ${selectedMode.id}/${qsPreflightDifficulty} → ${mathMode}`
@@ -688,6 +679,10 @@ function setQuickServePreflightDifficulty(mode = 'easy') {
     button.classList.toggle('is-active', isActive);
     button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
+}
+
+export function setQuickServeDifficultyFromInGameDifficulty(difficulty = 'easy') {
+  setQuickServePreflightDifficulty(difficulty);
 }
 
 function wireQuickServePreflightDifficultyButtons() {
@@ -1134,7 +1129,15 @@ export function updateMuteButtonLabel() {
   if (!muteBtn) return;
 
   const muted = isMuted();
-  muteBtn.textContent = muted ? '🔇 Unmute' : '🔊 Mute';
+  const icon = muted ? '🔇' : '🔊';
+  const text = muted ? 'Unmute' : 'Mute';
+
+  muteBtn.innerHTML = `
+    <span class="qs-keypad-mute-icon" aria-hidden="true">${icon}</span>
+    <span class="qs-keypad-mute-text">${text}</span>
+  `.trim();
+
+  muteBtn.setAttribute('aria-label', text);
 }
 
 //////////////////////////////

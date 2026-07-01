@@ -28,6 +28,7 @@ import { hapticError } from '../../utils/haptics.js';
 // 🔥 Game State
 //////////////////////////////
 let score = 0;
+  updateQuickServeStageEnergy(0);
 let timeRemaining = 105;
 let timerInterval = null;
 let currentAnswer = '';
@@ -35,6 +36,7 @@ let gameRunning = false;
 
 // 🌈 NEW STUFF
 let currentMathMode = 'addSub';
+let currentMathDifficulty = 'easy';
 let currentCorrectAnswer = 0;
 let currentXP = 3;
 let currentPoints = 1;
@@ -85,39 +87,84 @@ export function appendToAnswer(val) {
   updateAnswerDisplay();
 }
 
-export function setMathMode(mode) {
-  currentMathMode = mode;
+export function setMathMode(mode, difficulty = currentMathDifficulty) {
+  currentMathMode = normalizeQuickServeMathMode(mode);
+  currentMathDifficulty = normalizeQuickServeMathDifficulty(difficulty);
 
-  // 🎯 Set XP and point rewards based on mode
-  switch (mode) {
-    case 'addSub':
-      currentXP = 3;
-      currentPoints = 1;
-      break;
-    case 'multiDiv':
-      currentXP = 5;
-      currentPoints = 3;
-      break;
-    case 'algebra':
-      currentXP = 8;
-      currentPoints = 5;
-      break;
-    default:
-      currentXP = 3;
-      currentPoints = 1;
-      break;
-  }
+  const reward = getModeDifficultyRewards(currentMathMode, currentMathDifficulty);
+  currentXP = reward.xp;
+  currentPoints = reward.points;
 
   resetCurrentAnswer();
   renderProblem();
-  highlightModeButton(mode);
+  highlightDifficultyButton(currentMathDifficulty);
 
-  console.log(`🌈 Mode set to: ${mode}`);
+  console.log(`🌈 Mode set to: ${currentMathMode}/${currentMathDifficulty}`);
+}
+
+export function setMathDifficulty(difficulty = currentMathDifficulty) {
+  currentMathDifficulty = normalizeQuickServeMathDifficulty(difficulty);
+
+  const reward = getModeDifficultyRewards(currentMathMode, currentMathDifficulty);
+  currentXP = reward.xp;
+  currentPoints = reward.points;
+
+  resetCurrentAnswer();
+  renderProblem();
+  highlightDifficultyButton(currentMathDifficulty);
+
+  console.log(`🌶️ Difficulty set to: ${currentMathMode}/${currentMathDifficulty}`);
 }
 
 export function setCurrentAnswer(val) {
   currentAnswer = val;
 }
+
+
+/* ───────────────── QuickServe Stage Energy Helpers START ─────────────────
+   Visual-only bridge:
+   - CSS reads data-qs-energy on .qs-grid.
+   - Score makes the stage gradually glow harder.
+   - Correct/wrong reactions are brief class pulses.
+   ──────────────────────────────────────────────────────────────────────── */
+function getQuickServeStageEnergy(scoreValue = score) {
+  const n = Math.max(0, Number(scoreValue) || 0);
+
+  if (n >= 75) return 5;
+  if (n >= 50) return 4;
+  if (n >= 25) return 3;
+  if (n >= 10) return 2;
+  if (n > 0) return 1;
+
+  return 0;
+}
+
+function updateQuickServeStageEnergy(scoreValue = score) {
+  const gridEl = document.querySelector('.qs-grid');
+  if (!gridEl) return;
+
+  const level = String(getQuickServeStageEnergy(scoreValue));
+  gridEl.dataset.qsEnergy = level;
+  document.body?.setAttribute('data-qs-energy', level);
+}
+
+function triggerQuickServeStageReaction(type = 'good') {
+  const gridEl = document.querySelector('.qs-grid');
+  if (!gridEl) return;
+
+  const className = type === 'bad'
+    ? 'qs-stage-react-bad'
+    : 'qs-stage-react-good';
+
+  gridEl.classList.remove('qs-stage-react-good', 'qs-stage-react-bad');
+  void gridEl.offsetWidth;
+  gridEl.classList.add(className);
+
+  window.setTimeout(() => {
+    gridEl?.classList.remove(className);
+  }, type === 'bad' ? 360 : 420);
+}
+/* ───────────────── QuickServe Stage Energy Helpers END ───────────────── */
 
 //////////////////////////////
 // 🎮 Runtime Logic
@@ -152,7 +199,7 @@ function resetGameState() {
 }
 
 function startGame() {
-  highlightModeButton(currentMathMode); // 🌟 Apply glow to current mode
+  highlightDifficultyButton(currentMathDifficulty); // 🌟 Apply glow to current mode
   gameRunning = true;
   updateScore();
   updateAnswerDisplay();
@@ -163,26 +210,113 @@ function startGame() {
   renderProblem();
 }
 
-function highlightModeButton(mode) {
+function highlightDifficultyButton(difficulty = currentMathDifficulty) {
   const map = {
-    addSub: 'plusMinus',
-    multiDiv: 'multiplyDivide',
-    algebra: 'algMode'
+    easy: 'plusMinus',
+    medium: 'multiplyDivide',
+    hard: 'algMode',
   };
 
-  const activeId = map[mode];
-  document.querySelectorAll('.btn-mode').forEach(btn => {
+  const activeId = map[normalizeQuickServeMathDifficulty(difficulty)] || 'plusMinus';
+
+  document.querySelectorAll('.btn-mode').forEach((btn) => {
+    // Mute is also styled as btn-mode, but it is not a difficulty selector.
+    if (btn.id === 'muteBtn') {
+      btn.classList.remove('active-mode');
+      return;
+    }
+
     btn.classList.toggle('active-mode', btn.id === activeId);
   });
 }
 
-function modeToButtonId(mode) {
-  switch (mode) {
-    case 'addSub': return 'plusMinus';
-    case 'multiDiv': return 'multiplyDivide';
-    case 'algebra': return 'algMode';
-    default: return '';
-  }
+// Legacy shim: old calls now mean "refresh current difficulty highlight."
+function highlightModeButton(mode) {
+  highlightDifficultyButton(currentMathDifficulty);
+}
+
+function modeToButtonId(modeOrDifficulty) {
+  const map = {
+    easy: 'plusMinus',
+    medium: 'multiplyDivide',
+    hard: 'algMode',
+
+    // Legacy math-mode fallbacks.
+    addSub: 'plusMinus',
+    multiDiv: 'multiplyDivide',
+    algebra: 'algMode',
+    mixed: 'algMode',
+  };
+
+  return map[modeOrDifficulty] || '';
+}
+
+
+function normalizeQuickServeMathMode(mode = 'addSub') {
+  const raw = String(mode || '').trim();
+
+  const aliases = {
+    algebra: 'mixed',
+    mixedReview: 'mixed',
+    decimal: 'decimals',
+    fraction: 'fractions',
+  };
+
+  const normalized = aliases[raw] || raw;
+
+  return ['addSub', 'multiDiv', 'decimals', 'fractions', 'mixed'].includes(normalized)
+    ? normalized
+    : 'addSub';
+}
+
+function normalizeQuickServeMathDifficulty(difficulty = 'easy') {
+  const raw = String(difficulty || '').trim();
+
+  const aliases = {
+    med: 'medium',
+    normal: 'medium',
+  };
+
+  const normalized = aliases[raw] || raw;
+
+  return ['easy', 'medium', 'hard'].includes(normalized)
+    ? normalized
+    : 'easy';
+}
+
+function getModeDifficultyRewards(mode = 'addSub', difficulty = 'easy') {
+  const safeMode = normalizeQuickServeMathMode(mode);
+  const safeDifficulty = normalizeQuickServeMathDifficulty(difficulty);
+
+  const table = {
+    addSub: {
+      easy:   { xp: 3, points: 1 },
+      medium: { xp: 4, points: 2 },
+      hard:   { xp: 5, points: 3 },
+    },
+    multiDiv: {
+      easy:   { xp: 5, points: 3 },
+      medium: { xp: 6, points: 4 },
+      hard:   { xp: 7, points: 5 },
+    },
+    decimals: {
+      easy:   { xp: 5, points: 3 },
+      medium: { xp: 7, points: 5 },
+      hard:   { xp: 9, points: 7 },
+    },
+    fractions: {
+      easy:   { xp: 5, points: 3 },
+      medium: { xp: 7, points: 5 },
+      hard:   { xp: 9, points: 7 },
+    },
+    mixed: {
+      easy:   { xp: 6, points: 4 },
+      medium: { xp: 8, points: 6 },
+      hard:   { xp: 10, points: 8 },
+    },
+  };
+
+  return table[safeMode]?.[safeDifficulty] || table.addSub.easy;
 }
 
 function startTimer() {
@@ -277,16 +411,20 @@ function submitAnswer() {
   const problemEl = document.getElementById('mathProblem');
   if (!problemEl) return;
 
-  const correct = parseInt(problemEl.dataset.answer, 10);
+  const correct = Number(problemEl.dataset.answer);
 
-  // 🧠 Treat empty answer as "0" ONLY if correct answer is zero
+  // 🧠 Treat empty answer as "0" ONLY if correct answer is zero.
   const guessStr = currentAnswer.trim() === '' && correct === 0
     ? '0'
     : currentAnswer.trim();
 
-  const guess = parseInt(guessStr, 10);
+  const guess = Number(guessStr);
+  const isCorrect =
+    Number.isFinite(guess)
+    && Number.isFinite(correct)
+    && Math.abs(guess - correct) < 0.001;
 
-  if (guess === correct) {
+  if (isCorrect) {
     handleCorrect();
   } else {
     handleIncorrect();
@@ -294,6 +432,7 @@ function submitAnswer() {
 }
 
 function handleCorrect() {
+  triggerQuickServeStageReaction('good');
   // 📊 one more cone successfully served
   totalServed++;
 
@@ -304,6 +443,7 @@ function handleCorrect() {
   const earnedPoints = currentPoints + characterBonus;
 
   score += earnedPoints;
+  updateQuickServeStageEnergy(score);
   updateScore();
 
   // 🏅 award QS milestone badges at live score
@@ -329,17 +469,18 @@ function handleCorrect() {
 }
 
 function handleIncorrect() {
+  triggerQuickServeStageReaction('bad');
   // 📊 track a miss + which lane it came from
   totalMissed++;
 
-  switch (currentMathMode) {
-    case 'addSub':
+  switch (currentMathDifficulty) {
+    case 'easy':
       easyMisses++;
       break;
-    case 'multiDiv':
+    case 'medium':
       mediumMisses++;
       break;
-    case 'algebra':
+    case 'hard':
       hardMisses++;
       break;
   }
@@ -381,9 +522,9 @@ function renderProblem() {
     xp = 3,
     points = 1,
     meta = null,
-  } = generateProblem(currentMathMode);
+  } = generateProblem(currentMathMode, currentMathDifficulty);
 
-  currentCorrectAnswer = answer;
+  currentCorrectAnswer = Number(answer);
   currentXP = xp;
   currentPoints = points;
   currentProblemMeta = meta;
@@ -391,7 +532,7 @@ function renderProblem() {
   const problemEl = document.getElementById('mathProblem');
   if (problemEl) {
     problemEl.textContent = `${equation} = ?`;
-    problemEl.dataset.answer = answer.toString();
+    problemEl.dataset.answer = String(answer);
   }
 }
 

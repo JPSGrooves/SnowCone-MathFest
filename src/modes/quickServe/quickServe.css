@@ -6541,3 +6541,1024 @@ body.qs-active .qs-character-stage-wrap {
 }
 
 /* ───────────────── QuickServe — High Score Real Cluster Fix END ───────────────── */
+
+
+/* ───────────────── QuickServe — In-Game Stock Back Button START ─────────────────
+   Purpose:
+   - Make the in-game Back button visually match the stock QS intro back button.
+   - Preserve the existing function by keeping id="menu" and its current handler.
+   - Scope only to the keypad button so the intro bottom-bar button stays untouched.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-keypad #menu.qs-keypad-stock-back-btn {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(0.06rem, 0.22svh, 0.16rem) !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 48%, #ffffff 18%) !important;
+  border-radius: clamp(15px, 2.15vh, 22px) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(13, 19, 44, 0.92),
+      rgba(4, 8, 24, 0.96)
+    ) !important;
+
+  color: rgba(244, 250, 255, 0.96) !important;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.32),
+    0 0 12px var(--qs-glow, rgba(0, 255, 238, 0.45)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.1) inset,
+    0 0 13px var(--qs-glow, rgba(0, 255, 238, 0.45)),
+    0 8px 18px rgba(0,0,0,0.42) !important;
+
+  overflow: hidden !important;
+}
+
+body.qs-active .qs-keypad #menu.qs-keypad-stock-back-btn .qs-preflight-back-arrow {
+  display: block !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.08rem, 3.1svh, 1.72rem) !important;
+  font-weight: 750 !important;
+  line-height: 0.82 !important;
+  letter-spacing: 0 !important;
+
+  transform: translateY(-0.02em) !important;
+}
+
+body.qs-active .qs-keypad #menu.qs-keypad-stock-back-btn .qs-preflight-back-text {
+  display: block !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.52rem, 1.38svh, 0.78rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+body.qs-active .qs-keypad #menu.qs-keypad-stock-back-btn:hover {
+  transform: none !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.14) inset,
+    0 0 18px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 9px 20px rgba(0,0,0,0.44) !important;
+}
+
+body.qs-active .qs-keypad #menu.qs-keypad-stock-back-btn:active {
+  transform: scale(0.96) !important;
+}
+
+/* ───────────────── QuickServe — In-Game Stock Back Button END ───────────────── */
+
+
+/* ───────────────── QuickServe — Keypad Option A Label Polish START ─────────────────
+   Purpose:
+   - Remove/soften visible keypad backing box.
+   - Let individual buttons be the design.
+   - Bring keypad type closer to SCMF arcade font language.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-keypad {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.qs-active .qs-keypad::before,
+body.qs-active .qs-keypad::after {
+  content: none !important;
+  display: none !important;
+}
+
+body.qs-active .qs-keypad button {
+  font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+body.qs-active .qs-keypad .btn-num {
+  font-size: clamp(1.55rem, 3.45svh, 2.45rem) !important;
+  font-weight: 700 !important;
+}
+
+body.qs-active .qs-keypad .btn-enter,
+body.qs-active .qs-keypad .btn-clear {
+  font-size: clamp(1.1rem, 2.7svh, 2.05rem) !important;
+  font-weight: 900 !important;
+}
+
+body.qs-active .qs-keypad .btn-mode {
+  font-size: clamp(1.05rem, 2.42svh, 1.88rem) !important;
+  font-weight: 900 !important;
+}
+
+body.qs-active .qs-keypad #reset {
+  font-size: clamp(1.08rem, 2.55svh, 1.92rem) !important;
+  font-weight: 900 !important;
+}
+
+body.qs-active .qs-keypad #menu.qs-keypad-stock-back-btn {
+  font-size: inherit !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-keypad .btn-num {
+    font-size: clamp(1.3rem, 3.05svh, 2.05rem) !important;
+  }
+
+  body.qs-active .qs-keypad .btn-enter,
+  body.qs-active .qs-keypad .btn-clear,
+  body.qs-active .qs-keypad .btn-mode,
+  body.qs-active .qs-keypad #reset {
+    font-size: clamp(0.92rem, 2.14svh, 1.55rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Keypad Option A Label Polish END ───────────────── */
+
+
+/* ───────────────── QuickServe — Keypad Command Fit START ─────────────────
+   Purpose:
+   - Keep number keys large/readable.
+   - Keep Easy / Med / Hard mostly as-is.
+   - Fit Enter / Clear / Mute / Reset inside their buttons.
+   - Add a slightly darker inner glass fill to reduce background bleed-through.
+   - No logic changes.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Individual buttons get a darker inner glass, while the keypad container stays transparent. */
+body.qs-active .qs-keypad button {
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.085),
+      rgba(255, 255, 255, 0.025) 38%,
+      rgba(4, 8, 24, 0.88) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(12, 18, 42, 0.88),
+      rgba(3, 7, 20, 0.96)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 -10px 18px rgba(0, 0, 0, 0.24) inset,
+    0 0 10px rgba(130, 98, 255, 0.22) !important;
+}
+
+/* Do not punish the number keys. They are working. */
+body.qs-active .qs-keypad .btn-num {
+  font-size: clamp(1.55rem, 3.45svh, 2.45rem) !important;
+  line-height: 1 !important;
+}
+
+/* Only the right-side command buttons were clipping. */
+body.qs-active .qs-keypad #enter,
+body.qs-active .qs-keypad #clear,
+body.qs-active .qs-keypad #muteBtn,
+body.qs-active .qs-keypad #reset {
+  font-size: clamp(0.88rem, 2.02svh, 1.36rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.015em !important;
+
+  padding-left: clamp(0.08rem, 0.38vw, 0.18rem) !important;
+  padding-right: clamp(0.08rem, 0.38vw, 0.18rem) !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+}
+
+/* Reset is one word now; keep it calm and centered. */
+body.qs-active .qs-keypad #reset {
+  font-size: clamp(0.9rem, 2.08svh, 1.38rem) !important;
+}
+
+/* Mute carries an emoji, so give it slightly more breathing room vertically. */
+body.qs-active .qs-keypad #muteBtn {
+  line-height: 0.98 !important;
+}
+
+/* Preserve the special stock-back look from the previous pass. */
+body.qs-active .qs-keypad #menu.qs-keypad-stock-back-btn {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(13, 19, 44, 0.92),
+      rgba(4, 8, 24, 0.96)
+    ) !important;
+}
+
+/* Short iPhones: command labels tighten just a little more. */
+@media (max-height: 740px) {
+  body.qs-active .qs-keypad #enter,
+  body.qs-active .qs-keypad #clear,
+  body.qs-active .qs-keypad #muteBtn,
+  body.qs-active .qs-keypad #reset {
+    font-size: clamp(0.78rem, 1.74svh, 1.12rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Keypad Command Fit END ───────────────── */
+
+
+/* ───────────────── QuickServe — Gameplay Shine Pass START ─────────────────
+   Purpose:
+   - Finish keypad micro-polish without redesign.
+   - Make the performer feel staged, not pasted into a box.
+   - Improve general PNG fitting for uniformly sized act PNGs.
+   - Make Score/Time feel like floating HUD readouts.
+   - Add score-tier stage energy and tiny correct/wrong reactions.
+   - Preserve math panel and six-stage performer timeline.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* 1) Keypad finish: inactive difficulty dim, Mute stacked. */
+body.qs-active .qs-keypad #plusMinus.btn-mode:not(.active-mode),
+body.qs-active .qs-keypad #multiplyDivide.btn-mode:not(.active-mode),
+body.qs-active .qs-keypad #algMode.btn-mode:not(.active-mode) {
+  opacity: 0.66 !important;
+  filter: saturate(0.74) brightness(0.82) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.035) inset,
+    0 0 7px rgba(130, 98, 255, 0.16) !important;
+}
+
+body.qs-active .qs-keypad #plusMinus.btn-mode.active-mode,
+body.qs-active .qs-keypad #multiplyDivide.btn-mode.active-mode,
+body.qs-active .qs-keypad #algMode.btn-mode.active-mode {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+body.qs-active .qs-keypad #muteBtn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(0.02rem, 0.14svh, 0.08rem) !important;
+  white-space: normal !important;
+}
+
+body.qs-active .qs-keypad #muteBtn .qs-keypad-mute-icon {
+  display: block !important;
+  font-size: clamp(0.88rem, 2.0svh, 1.32rem) !important;
+  line-height: 0.95 !important;
+  transform: translateY(0.03em) !important;
+}
+
+body.qs-active .qs-keypad #muteBtn .qs-keypad-mute-text {
+  display: block !important;
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 1.72svh, 1.08rem) !important;
+  font-weight: 900 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.015em !important;
+}
+
+/* 2) Stage foundation: keep the existing panel, but make it feel like a stage. */
+body.qs-active .qs-stage {
+  isolation: isolate !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 72%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 22%, transparent) 0%,
+      rgba(0, 0, 0, 0.16) 42%,
+      rgba(0, 0, 0, 0.54) 100%
+    ) !important;
+}
+
+/* Soft vertical spotlight behind performer. */
+body.qs-active .qs-stage::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 2% !important;
+  width: min(58%, 22rem) !important;
+  height: 96% !important;
+  transform: translateX(-50%) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 48%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 16%, transparent) 0%,
+      rgba(255, 255, 255, 0.045) 28%,
+      transparent 68%
+    ) !important;
+
+  opacity: 0.72 !important;
+  filter: blur(1px) !important;
+}
+
+/* Floor ellipse. This creates “performer on stage,” not “PNG in box.” */
+body.qs-active .phil-wrapper.in-game::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: clamp(0.05rem, 0.5svh, 0.24rem) !important;
+  width: min(82%, 14rem) !important;
+  height: clamp(1.2rem, 4.2svh, 2.4rem) !important;
+  transform: translateX(-50%) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+
+  border-radius: 999px !important;
+  background:
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 55%, rgba(255,255,255,0.18)) 0%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 20%, transparent) 42%,
+      transparent 76%
+    ) !important;
+
+  opacity: 0.46 !important;
+  filter: blur(7px) !important;
+}
+
+/* Little floor shadow keeps feet from floating. */
+body.qs-active .phil-wrapper.in-game::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: clamp(0.02rem, 0.34svh, 0.16rem) !important;
+  width: min(56%, 10rem) !important;
+  height: clamp(0.5rem, 1.8svh, 1rem) !important;
+  transform: translateX(-50%) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.54) !important;
+  filter: blur(8px) !important;
+  opacity: 0.64 !important;
+}
+
+/* 3) General PNG fitting: one rule because all performer PNGs share canvas size. */
+body.qs-active .phil-wrapper.in-game {
+  position: relative !important;
+  z-index: 2 !important;
+
+  width: min(46vw, 19rem) !important;
+  max-width: 54% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+
+  transform: translateY(2%) !important;
+  pointer-events: none !important;
+
+  animation: qsPerformerIdleBob 4.8s ease-in-out infinite !important;
+  will-change: transform;
+}
+
+body.qs-active #philSpriteInGame.phil-img.in-game {
+  position: relative !important;
+  z-index: 2 !important;
+
+  width: auto !important;
+  max-width: 118% !important;
+  height: auto !important;
+  max-height: min(96%, clamp(12.25rem, 30svh, 21rem)) !important;
+
+  object-fit: contain !important;
+  object-position: center bottom !important;
+
+  filter:
+    drop-shadow(0 0 9px rgba(255,255,255,0.34))
+    drop-shadow(0 0 18px var(--qs-faint, rgba(0,255,238,0.18)))
+    drop-shadow(0 10px 14px rgba(0,0,0,0.46)) !important;
+}
+
+/* 4) Floating HUD readouts: reduce old square-card heaviness. */
+body.qs-active .qs-stage .score-box,
+body.qs-active .qs-stage .timer-box {
+  width: auto !important;
+  min-width: clamp(4.3rem, 17vw, 7.2rem) !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+
+  top: clamp(0.58rem, 1.65svh, 0.94rem) !important;
+  z-index: 4 !important;
+}
+
+body.qs-active .qs-stage .score-box {
+  left: clamp(0.72rem, 4vw, 1.45rem) !important;
+}
+
+body.qs-active .qs-stage .timer-box {
+  right: clamp(0.72rem, 4vw, 1.45rem) !important;
+}
+
+body.qs-active .qs-stage .info-box {
+  min-width: clamp(4.25rem, 17vw, 7.1rem) !important;
+  min-height: clamp(3.0rem, 7.4svh, 4.7rem) !important;
+
+  padding: clamp(0.32rem, 0.8svh, 0.52rem) clamp(0.38rem, 1.4vw, 0.7rem) !important;
+
+  border: 0 !important;
+  border-radius: 17px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.07),
+      rgba(0,0,0,0.14)
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 7px 18px rgba(0,0,0,0.18) !important;
+
+  -webkit-backdrop-filter: blur(5px) saturate(1.08);
+  backdrop-filter: blur(5px) saturate(1.08);
+}
+
+body.qs-active .qs-stage .info-box .label {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.54rem, 1.35svh, 0.78rem) !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.02em !important;
+  color: rgba(235,245,255,0.84) !important;
+  text-shadow:
+    0 0 8px rgba(0,0,0,0.78),
+    0 0 8px var(--qs-faint, rgba(0,255,238,0.18)) !important;
+}
+
+body.qs-active .qs-stage .info-box .value {
+  margin-top: clamp(0.08rem, 0.2svh, 0.16rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.15rem, 3.6svh, 2.38rem) !important;
+  font-weight: 950 !important;
+  line-height: 0.92 !important;
+
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.36),
+    0 0 14px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 22px var(--qs-faint, rgba(0,255,238,0.18)) !important;
+}
+
+/* 5) Score-tier energy. This builds the stage as the run gets better. */
+body.qs-active .qs-grid[data-qs-energy="0"] .phil-wrapper.in-game::before { opacity: 0.36 !important; }
+body.qs-active .qs-grid[data-qs-energy="1"] .phil-wrapper.in-game::before { opacity: 0.46 !important; }
+body.qs-active .qs-grid[data-qs-energy="2"] .phil-wrapper.in-game::before { opacity: 0.56 !important; }
+body.qs-active .qs-grid[data-qs-energy="3"] .phil-wrapper.in-game::before { opacity: 0.66 !important; }
+body.qs-active .qs-grid[data-qs-energy="4"] .phil-wrapper.in-game::before { opacity: 0.78 !important; }
+body.qs-active .qs-grid[data-qs-energy="5"] .phil-wrapper.in-game::before { opacity: 0.92 !important; }
+
+body.qs-active .qs-grid[data-qs-energy="3"] .qs-stage::before,
+body.qs-active .qs-grid[data-qs-energy="4"] .qs-stage::before,
+body.qs-active .qs-grid[data-qs-energy="5"] .qs-stage::before {
+  opacity: 0.9 !important;
+}
+
+body.qs-active .qs-grid[data-qs-energy="4"] #philSpriteInGame.phil-img.in-game,
+body.qs-active .qs-grid[data-qs-energy="5"] #philSpriteInGame.phil-img.in-game {
+  filter:
+    drop-shadow(0 0 10px rgba(255,255,255,0.44))
+    drop-shadow(0 0 24px var(--qs-glow, rgba(0,255,238,0.55)))
+    drop-shadow(0 12px 16px rgba(0,0,0,0.48)) !important;
+}
+
+/* Correct/wrong micro-reactions. */
+body.qs-active .qs-grid.qs-stage-react-good .phil-wrapper.in-game {
+  animation: qsPerformerCorrectBounce 360ms ease-out both !important;
+}
+
+body.qs-active .qs-grid.qs-stage-react-good .phil-wrapper.in-game::before {
+  animation: qsStageGoodBloom 380ms ease-out both !important;
+}
+
+body.qs-active .qs-grid.qs-stage-react-bad .phil-wrapper.in-game {
+  animation: qsPerformerBadJitter 300ms ease-out both !important;
+}
+
+body.qs-active .qs-grid.qs-stage-react-bad .phil-wrapper.in-game::before {
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 68, 190, 0.58) 0%,
+      rgba(255, 68, 190, 0.18) 42%,
+      transparent 76%
+    ) !important;
+}
+
+/* Animations */
+@keyframes qsPerformerIdleBob {
+  0%, 100% { transform: translateY(2%) scale(1); }
+  50% { transform: translateY(0.5%) scale(1.006); }
+}
+
+@keyframes qsPerformerCorrectBounce {
+  0% { transform: translateY(2%) scale(1); }
+  38% { transform: translateY(-1.8%) scale(1.025); }
+  100% { transform: translateY(2%) scale(1); }
+}
+
+@keyframes qsPerformerBadJitter {
+  0% { transform: translateY(2%) translateX(0) scale(1); }
+  22% { transform: translateY(2%) translateX(-2px) scale(0.998); }
+  46% { transform: translateY(2%) translateX(2px) scale(1.002); }
+  70% { transform: translateY(2%) translateX(-1px) scale(1); }
+  100% { transform: translateY(2%) translateX(0) scale(1); }
+}
+
+@keyframes qsStageGoodBloom {
+  0% { opacity: 0.52; filter: blur(7px); transform: translateX(-50%) scale(1); }
+  42% { opacity: 0.98; filter: blur(9px); transform: translateX(-50%) scale(1.08); }
+  100% { opacity: 0.6; filter: blur(7px); transform: translateX(-50%) scale(1); }
+}
+
+/* iPad: same language, just a little more stage room. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .phil-wrapper.in-game {
+    width: min(36vw, 23rem) !important;
+    max-width: 44% !important;
+  }
+
+  body.qs-active #philSpriteInGame.phil-img.in-game {
+    max-height: min(97%, clamp(16rem, 30svh, 25rem)) !important;
+  }
+
+  body.qs-active .qs-stage .score-box,
+  body.qs-active .qs-stage .timer-box {
+    min-width: clamp(5.2rem, 12vw, 8.4rem) !important;
+  }
+}
+
+/* Short phones: protect title/HUD/math by keeping the performer contained. */
+@media (max-height: 740px) {
+  body.qs-active .phil-wrapper.in-game {
+    width: min(44vw, 16.5rem) !important;
+    max-width: 50% !important;
+  }
+
+  body.qs-active #philSpriteInGame.phil-img.in-game {
+    max-height: min(94%, clamp(10.5rem, 27svh, 17rem)) !important;
+  }
+
+  body.qs-active .qs-stage .info-box {
+    min-height: clamp(2.65rem, 6.6svh, 3.9rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .phil-wrapper.in-game,
+  body.qs-active .qs-grid.qs-stage-react-good .phil-wrapper.in-game,
+  body.qs-active .qs-grid.qs-stage-react-bad .phil-wrapper.in-game,
+  body.qs-active .qs-grid.qs-stage-react-good .phil-wrapper.in-game::before {
+    animation: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Gameplay Shine Pass END ───────────────── */
+
+
+/* ───────────────── QuickServe — Gameplay HUD Energy Title Polish START ─────────────────
+   Purpose:
+   - Make gameplay title one line and less vertically hungry.
+   - Push Score/Time closer to polished floating HUD readouts.
+   - Tune score-tier energy using color/glow/pulse, not speed clutter.
+   - Keep keypad/stage/math structure intact.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* 1) Gameplay title: one line, smaller, production HUD instead of intro billboard. */
+body.qs-active .qs-grid .qs-header {
+  min-height: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding:
+    clamp(0.06rem, 0.24svh, 0.16rem)
+    clamp(0.28rem, 1.2vw, 0.6rem) !important;
+}
+
+body.qs-active .qs-grid .qs-header h1 {
+  width: 100% !important;
+  max-width: min(94vw, 52rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  display: block !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.42rem, 7.35vw, 3.25rem) !important;
+  line-height: 0.92 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.055em !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-align: center !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%) 0%,
+      #ffffff 48%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%) 100%
+    ) !important;
+  background-size: 180% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 16px var(--qs-faint, rgba(0,255,238,0.18)),
+    0 4px 9px rgba(0,0,0,0.58) !important;
+
+  animation: none !important;
+}
+
+/* Give the now-smaller title row a little less reserved room on phones. */
+body.qs-active .qs-grid {
+  grid-template-rows:
+    minmax(4.1rem, 8.2svh)
+    minmax(0, 30fr)
+    minmax(0, 25fr)
+    minmax(0, 34fr) !important;
+}
+
+/* 2) Score/Time: floating glass HUD readouts, not old heavy boxes. */
+body.qs-active .qs-stage .score-box,
+body.qs-active .qs-stage .timer-box {
+  top: clamp(0.48rem, 1.35svh, 0.82rem) !important;
+  min-width: clamp(4.15rem, 16.5vw, 7.4rem) !important;
+  z-index: 5 !important;
+}
+
+body.qs-active .qs-stage .info-box {
+  border: 1px solid rgba(255,255,255,0.075) !important;
+  border-radius: clamp(15px, 2.3svh, 22px) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255,255,255,0.09),
+      rgba(255,255,255,0.025) 42%,
+      rgba(0,0,0,0.10) 100%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.045) inset,
+    0 8px 20px rgba(0,0,0,0.16),
+    0 0 14px color-mix(in srgb, var(--qs-accent, #00ffee) 18%, transparent) !important;
+
+  -webkit-backdrop-filter: blur(8px) saturate(1.12) !important;
+  backdrop-filter: blur(8px) saturate(1.12) !important;
+}
+
+body.qs-active .qs-stage .info-box .label {
+  opacity: 0.88 !important;
+}
+
+body.qs-active .qs-stage .info-box .value {
+  color: rgba(255,255,255,0.98) !important;
+}
+
+/* 3) Stage glass: a little cleaner/premium, still restrained. */
+body.qs-active .qs-stage {
+  border-width: 1px !important;
+  border-color: color-mix(in srgb, var(--qs-accent, #00ffee) 26%, rgba(255,255,255,0.16)) !important;
+  border-radius: clamp(18px, 2.8svh, 28px) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 10px 25px rgba(0,0,0,0.28),
+    0 0 16px color-mix(in srgb, var(--qs-accent, #00ffee) 13%, transparent) !important;
+}
+
+/* 4) Energy tuning: color and pulse, not speed. */
+body.qs-active .qs-grid {
+  --qs-energy-warm: rgba(126, 255, 96, 0.0);
+  --qs-energy-floor: color-mix(in srgb, var(--qs-accent, #00ffee) 55%, rgba(255,255,255,0.18));
+  --qs-energy-line-filter: none;
+}
+
+body.qs-active .qs-grid[data-qs-energy="0"] {
+  --qs-energy-warm: rgba(126, 255, 96, 0.0);
+  --qs-energy-floor: color-mix(in srgb, var(--qs-accent, #00ffee) 52%, rgba(255,255,255,0.12));
+}
+
+body.qs-active .qs-grid[data-qs-energy="1"],
+body.qs-active .qs-grid[data-qs-energy="2"] {
+  --qs-energy-warm: rgba(126, 255, 96, 0.06);
+  --qs-energy-floor: color-mix(in srgb, var(--qs-accent, #00ffee) 68%, #7eff60 14%);
+}
+
+body.qs-active .qs-grid[data-qs-energy="3"] {
+  --qs-energy-warm: rgba(126, 255, 96, 0.11);
+  --qs-energy-floor: color-mix(in srgb, var(--qs-accent, #00ffee) 58%, #7eff60 28%);
+  --qs-energy-line-filter: saturate(1.14) hue-rotate(8deg);
+}
+
+body.qs-active .qs-grid[data-qs-energy="4"] {
+  --qs-energy-warm: rgba(126, 255, 96, 0.16);
+  --qs-energy-floor: color-mix(in srgb, var(--qs-accent, #00ffee) 46%, #7eff60 42%);
+  --qs-energy-line-filter: saturate(1.22) hue-rotate(14deg);
+}
+
+body.qs-active .qs-grid[data-qs-energy="5"] {
+  --qs-energy-warm: rgba(255, 230, 96, 0.13);
+  --qs-energy-floor: color-mix(in srgb, var(--qs-accent, #00ffee) 38%, #7eff60 42%);
+  --qs-energy-line-filter: saturate(1.32) hue-rotate(18deg) brightness(1.08);
+}
+
+/* Warmth enters the stage very gently around 25+. */
+body.qs-active .qs-grid[data-qs-energy="3"] .qs-stage,
+body.qs-active .qs-grid[data-qs-energy="4"] .qs-stage,
+body.qs-active .qs-grid[data-qs-energy="5"] .qs-stage {
+  background:
+    radial-gradient(
+      ellipse at 50% 74%,
+      var(--qs-energy-warm) 0%,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 13%, transparent) 44%,
+      rgba(0, 0, 0, 0.55) 100%
+    ) !important;
+}
+
+/* Floor glow uses the energy color. */
+body.qs-active .phil-wrapper.in-game::before {
+  background:
+    radial-gradient(
+      ellipse at center,
+      var(--qs-energy-floor) 0%,
+      color-mix(in srgb, var(--qs-energy-floor) 38%, transparent) 40%,
+      transparent 76%
+    ) !important;
+}
+
+/* Sine-wave canvas gets a subtle color/filter shift after score 25+. */
+body.qs-active .qs-grid[data-qs-energy="3"] .qs-waves,
+body.qs-active .qs-grid[data-qs-energy="4"] .qs-waves,
+body.qs-active .qs-grid[data-qs-energy="5"] .qs-waves {
+  filter: var(--qs-energy-line-filter) !important;
+  opacity: 1 !important;
+}
+
+/* Score 50+ correct answers pulse the existing stage lines/canvas subtly. */
+body.qs-active .qs-grid[data-qs-energy="4"].qs-stage-react-good .qs-waves,
+body.qs-active .qs-grid[data-qs-energy="5"].qs-stage-react-good .qs-waves {
+  animation: qsEnergyLinePulse 420ms ease-out both !important;
+}
+
+body.qs-active .qs-grid[data-qs-energy="4"].qs-stage-react-good .qs-stage::before,
+body.qs-active .qs-grid[data-qs-energy="5"].qs-stage-react-good .qs-stage::before {
+  animation: qsStageWarmPulse 440ms ease-out both !important;
+}
+
+@keyframes qsEnergyLinePulse {
+  0% {
+    filter: var(--qs-energy-line-filter) brightness(1);
+    opacity: 1;
+  }
+  42% {
+    filter: var(--qs-energy-line-filter) brightness(1.38) saturate(1.32);
+    opacity: 1;
+  }
+  100% {
+    filter: var(--qs-energy-line-filter) brightness(1);
+    opacity: 1;
+  }
+}
+
+@keyframes qsStageWarmPulse {
+  0% {
+    opacity: 0.72;
+    transform: translateX(-50%) scale(1);
+  }
+  44% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.04);
+  }
+  100% {
+    opacity: 0.82;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* A small “festival glow” at 75+, not fireworks. */
+body.qs-active .qs-grid[data-qs-energy="5"] .qs-stage {
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.055) inset,
+    0 12px 28px rgba(0,0,0,0.30),
+    0 0 20px color-mix(in srgb, var(--qs-accent, #00ffee) 18%, transparent),
+    0 0 24px rgba(126,255,96,0.08) !important;
+}
+
+body.qs-active .qs-grid[data-qs-energy="5"] .phil-wrapper.in-game::before {
+  animation: qsFestivalFloorBreath 3.4s ease-in-out infinite !important;
+}
+
+@keyframes qsFestivalFloorBreath {
+  0%, 100% {
+    opacity: 0.78;
+    filter: blur(7px);
+  }
+  50% {
+    opacity: 0.96;
+    filter: blur(9px);
+  }
+}
+
+/* iPad: title can breathe but still stay one line. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-grid .qs-header h1 {
+    font-size: clamp(2.4rem, 5.4vw, 4.4rem) !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  body.qs-active .qs-grid {
+    grid-template-rows:
+      minmax(4.8rem, 8.6svh)
+      minmax(0, 30fr)
+      minmax(0, 25fr)
+      minmax(0, 34fr) !important;
+  }
+}
+
+/* Tight phones: protect the one-line title from wrapping. */
+@media (max-width: 390px), (max-height: 740px) {
+  body.qs-active .qs-grid .qs-header h1 {
+    font-size: clamp(1.2rem, 6.8vw, 2.35rem) !important;
+    letter-spacing: -0.06em !important;
+  }
+
+  body.qs-active .qs-grid {
+    grid-template-rows:
+      minmax(3.35rem, 7.4svh)
+      minmax(0, 30fr)
+      minmax(0, 25fr)
+      minmax(0, 35fr) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-grid[data-qs-energy="5"] .phil-wrapper.in-game::before,
+  body.qs-active .qs-grid[data-qs-energy="4"].qs-stage-react-good .qs-waves,
+  body.qs-active .qs-grid[data-qs-energy="5"].qs-stage-react-good .qs-waves,
+  body.qs-active .qs-grid[data-qs-energy="4"].qs-stage-react-good .qs-stage::before,
+  body.qs-active .qs-grid[data-qs-energy="5"].qs-stage-react-good .qs-stage::before {
+    animation: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Gameplay HUD Energy Title Polish END ───────────────── */
+
+
+/* ───────────────── QuickServe — HUD Title Final Polish START ─────────────────
+   Purpose:
+   - Remove the square-corner wrapper behind Score / Time.
+   - Preserve the rounded floating HUD readout itself.
+   - Tighten gameplay title vertical space so the field can breathe.
+   - No game logic, math, scoring, keypad, performer timeline, or audio changes.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Kill only the OUTER score/timer wrapper paint.
+   The visible rounded HUD is the nested .info-box. */
+body.qs-active .qs-stage .score-box,
+body.qs-active .qs-stage .timer-box {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+body.qs-active .qs-stage .score-box::before,
+body.qs-active .qs-stage .score-box::after,
+body.qs-active .qs-stage .timer-box::before,
+body.qs-active .qs-stage .timer-box::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Preserve the actual smooth rounded HUD chip. */
+body.qs-active .qs-stage .score-box > .info-box,
+body.qs-active .qs-stage .timer-box > .info-box {
+  overflow: hidden !important;
+  border-radius: clamp(16px, 2.45svh, 24px) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 255, 255, 0.105),
+      rgba(255, 255, 255, 0.032) 42%,
+      rgba(0, 0, 0, 0.18) 100%
+    ) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.075) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.045) inset,
+    0 8px 20px rgba(0,0,0,0.18),
+    0 0 14px color-mix(in srgb, var(--qs-accent, #00ffee) 16%, transparent) !important;
+}
+
+/* Title: keep one line, but stop reserving billboard-height space. */
+body.qs-active .qs-grid {
+  gap: clamp(0.28rem, 0.68svh, 0.46rem) !important;
+
+  grid-template-rows:
+    minmax(2.75rem, 6.15svh)
+    minmax(0, 31fr)
+    minmax(0, 25fr)
+    minmax(0, 35fr) !important;
+}
+
+body.qs-active .qs-grid .qs-header {
+  padding-top: 0 !important;
+  padding-bottom: clamp(0.02rem, 0.16svh, 0.1rem) !important;
+}
+
+body.qs-active .qs-grid .qs-header h1 {
+  font-size: clamp(1.28rem, 6.78vw, 2.92rem) !important;
+  line-height: 0.88 !important;
+  letter-spacing: -0.058em !important;
+}
+
+/* iOS gameplay pushdown was a touch too roomy after the one-line title. */
+html[data-platform="ios"] body.qs-active .qs-grid,
+.platform-ios body.qs-active .qs-grid,
+body.platform-ios.qs-active .qs-grid {
+  padding-top: max(4.6svh, env(safe-area-inset-top, 0px)) !important;
+}
+
+/* Tight phones: protect title and give stage/math/keypad a little more room. */
+@media (max-width: 390px), (max-height: 740px) {
+  body.qs-active .qs-grid {
+    gap: clamp(0.22rem, 0.55svh, 0.36rem) !important;
+
+    grid-template-rows:
+      minmax(2.28rem, 5.4svh)
+      minmax(0, 31fr)
+      minmax(0, 25fr)
+      minmax(0, 36fr) !important;
+  }
+
+  body.qs-active .qs-grid .qs-header h1 {
+    font-size: clamp(1.12rem, 6.34vw, 2.18rem) !important;
+    line-height: 0.86 !important;
+  }
+
+  html[data-platform="ios"] body.qs-active .qs-grid,
+  .platform-ios body.qs-active .qs-grid,
+  body.platform-ios.qs-active .qs-grid {
+    padding-top: max(4.0svh, env(safe-area-inset-top, 0px)) !important;
+  }
+}
+
+/* iPad: keep the nice one-line drama, just not a giant header block. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-grid {
+    grid-template-rows:
+      minmax(3.6rem, 7.15svh)
+      minmax(0, 31fr)
+      minmax(0, 25fr)
+      minmax(0, 35fr) !important;
+  }
+
+  body.qs-active .qs-grid .qs-header h1 {
+    font-size: clamp(2.15rem, 5.1vw, 4rem) !important;
+    line-height: 0.9 !important;
+    letter-spacing: -0.045em !important;
+  }
+}
+
+/* ───────────────── QuickServe — HUD Title Final Polish END ───────────────── */

@@ -1,63 +1,72 @@
 // 🍧 quickServeKeypad.js
+// QuickServe 1.5.x keypad wiring
+//
+// New law:
+// - Intro chooses math lane.
+// - Intro chooses starting difficulty.
+// - Intro chooses performer.
+// - In-game keypad may change difficulty only.
+// - In-game keypad may NOT change character or math lane.
 
-import { 
-  toggleNegative, 
-  clearAnswer, 
-  submitAnswer, 
-  appendToAnswer 
+import {
+  toggleNegative,
+  clearAnswer,
+  submitAnswer,
+  appendToAnswer,
+  stopGameLogic,
+  startGameLogic,
+  setMathDifficulty,
+  setCurrentAnswer,
 } from './quickServeGame.js';
 
-import { stopGameLogic, startGameLogic } from './quickServeGame.js';
 import {
   returnQuickServeGameToIntro,
   ensureQuickServeMusicPlaying,
-  setQuickServeModeFromInGameMathMode
-} from './quickServe.js'; // 🌟 Full QS exit + QS music guard
-import { setMathMode } from './quickServeGame.js';
-import { setCurrentAnswer } from './quickServeGame.js'; // 💥 you'll add this below
+  setQuickServeDifficultyFromInGameDifficulty,
+  updateMuteButtonLabel,
+} from './quickServe.js';
+
 import { toggleMute } from '../../managers/musicManager.js';
-import { updateMuteButtonLabel } from './quickServe.js'; // 💥 this is what we need
 
-
-export { setMathMode } from './quickServeGame.js';
-
+// Legacy re-export kept safe in case another module imports from keypad.
+export { setMathMode, setMathDifficulty } from './quickServeGame.js';
 
 export function generateKeypadHTML() {
   const rows = [
     [
-      { id: 'plusMinus', label: '+/-<br>Mode', class: 'btn-mode' },
+      { id: 'plusMinus', label: 'Easy', class: 'btn-mode' },
       { id: 'seven', label: '7', class: 'btn-num' },
       { id: 'eight', label: '8', class: 'btn-num' },
       { id: 'nine', label: '9', class: 'btn-num' },
       { id: 'enter', label: 'Enter', class: 'btn-enter' },
     ],
     [
-      { id: 'multiplyDivide', label: '×/÷<br>Mode', class: 'btn-mode' },
+      { id: 'multiplyDivide', label: 'Med', class: 'btn-mode' },
       { id: 'four', label: '4', class: 'btn-num' },
       { id: 'five', label: '5', class: 'btn-num' },
       { id: 'six', label: '6', class: 'btn-num' },
       { id: 'clear', label: 'Clear', class: 'btn-clear' },
     ],
     [
-      { id: 'algMode', label: 'Alg<br>Mode', class: 'btn-mode' },
+      { id: 'algMode', label: 'Hard', class: 'btn-mode' },
       { id: 'one', label: '1', class: 'btn-num' },
       { id: 'two', label: '2', class: 'btn-num' },
       { id: 'three', label: '3', class: 'btn-num' },
-      { id: 'muteBtn', label: '🔊 Mute', class: 'btn-mode' },
+      { id: 'muteBtn', label: '<span class="qs-keypad-mute-icon" aria-hidden="true">🔊</span><span class="qs-keypad-mute-text">Mute</span>', class: 'btn-mode' },
     ],
     [
-      { id: 'menu', label: 'Back<br>Intro', class: 'btn-menu' },
+      { id: 'menu', label: '<span class="qs-preflight-back-arrow">←</span><span class="qs-preflight-back-text">BACK</span>', class: 'btn-menu qs-keypad-stock-back-btn' },
       { id: 'decimal', label: '.', class: 'btn-num' },
       { id: 'zero', label: '0', class: 'btn-num' },
       { id: 'neg', label: '±', class: 'btn-num' },
-      { id: 'reset', label: 'Reset<br>Game', class: 'btn-menu' },
+      { id: 'reset', label: 'Reset', class: 'btn-menu' },
     ],
   ];
 
   const buttons = rows
-    .map(row =>
+    .map((row) =>
       row
-        .map(btn =>
+        .map((btn) =>
           `<button id="${btn.id}" class="${btn.class}">${btn.label}</button>`
         )
         .join('\n')
@@ -79,23 +88,34 @@ export function setupKeypad() {
     { id: 'seven', val: '7' },
     { id: 'eight', val: '8' },
     { id: 'nine', val: '9' },
-    { id: 'decimal', val: '.' }
+    { id: 'decimal', val: '.' },
   ];
 
   const safeBind = (id, handler) => {
     const btn = document.getElementById(id);
 
-    if (btn) {
-      btn.addEventListener(
-        'pointerdown',
-        (e) => {
-          e?.preventDefault?.();
-          e?.stopPropagation?.();
-          handler(e);
-        },
-        { passive: false }
-      );
-    }
+    if (!btn) return;
+
+    btn.addEventListener(
+      'pointerdown',
+      (e) => {
+        e?.preventDefault?.();
+        e?.stopPropagation?.();
+        handler(e);
+      },
+      { passive: false }
+    );
+  };
+
+  const chooseDifficulty = (difficulty) => {
+    console.log(`[QuickServe] In-game difficulty selected: ${difficulty}`);
+
+    // Change the live game difficulty.
+    setMathDifficulty(difficulty);
+
+    // Store it back into intro/preflight state.
+    // When player hits Back Intro, the same difficulty remains selected.
+    setQuickServeDifficultyFromInGameDifficulty(difficulty);
   };
 
   // ✴️ Number Keys
@@ -103,16 +123,17 @@ export function setupKeypad() {
     safeBind(id, () => appendToAnswer(val));
   });
 
+  // 🌶️ In-game difficulty buttons
+  // These do NOT change math lane anymore.
+  safeBind('plusMinus', () => chooseDifficulty('easy'));
+  safeBind('multiplyDivide', () => chooseDifficulty('medium'));
+  safeBind('algMode', () => chooseDifficulty('hard'));
+
   // 🧼 Control Buttons
   safeBind('reset', () => {
     console.log('🔁 Resetting QuickServe shift only');
 
-    // Music is still owned by quickServe.js.
-    // This reset does NOT force a new track.
-    // It only restarts music if the QS soundtrack is already dead.
-    //
-    // Important QS 1.5 rule:
-    // Reset preserves the current in-game difficulty instead of forcing Easy.
+    // Reset preserves current math lane and current difficulty.
     stopGameLogic();
     startGameLogic();
     ensureQuickServeMusicPlaying();
@@ -122,41 +143,25 @@ export function setupKeypad() {
   safeBind('clear', clearAnswer);
   safeBind('enter', submitAnswer);
 
-  safeBind('plusMinus', () => {
-    setMathMode('addSub');
-    setQuickServeModeFromInGameMathMode('addSub');
-  });
-  safeBind('multiplyDivide', () => {
-    setMathMode('multiDiv');
-    setQuickServeModeFromInGameMathMode('multiDiv');
-  });
-  safeBind('algMode', () => {
-    setMathMode('algebra');
-    setQuickServeModeFromInGameMathMode('algebra');
-  });
-
-
   safeBind('muteBtn', () => {
     toggleMute();
     updateMuteButtonLabel();
   });
 
-
-
-  // ↩️ Return to QS intro/preflight, so the player can change character or difficulty.
+  // ↩️ Return to QS intro/preflight.
+  // Player can change character or math lane there.
   safeBind('menu', returnQuickServeGameToIntro);
 }
-
 
 export function handleKeypadInput(value) {
   const display = document.getElementById('answerDisplay');
   if (!display) return;
 
-  let current = display.textContent;
+  const current = display.textContent;
 
   switch (value) {
     case 'enter':
-      submitAnswer(); // already exists?
+      submitAnswer();
       break;
 
     case 'clear':
@@ -171,7 +176,6 @@ export function handleKeypadInput(value) {
       }
       break;
 
-
     case '.':
       if (!current.includes('.')) {
         updateAnswer(current + '.');
@@ -179,7 +183,6 @@ export function handleKeypadInput(value) {
       break;
 
     default:
-      // Append digit or replace "0"
       if (current === '0') {
         updateAnswer(value);
       } else {
@@ -189,29 +192,31 @@ export function handleKeypadInput(value) {
   }
 }
 
-export function highlightModeButton(mode) {
-  const modeMap = {
-    addSub: 0,
-    multiDiv: 1,
-    algebra: 2
-  };
+// Legacy helper name kept, but it now highlights difficulty buttons.
+export function highlightModeButton(difficulty) {
+  const activeId = {
+    easy: 'plusMinus',
+    medium: 'multiplyDivide',
+    hard: 'algMode',
+  }[difficulty] || 'plusMinus';
 
-  const buttons = document.querySelectorAll('.mode-toggle');
-  buttons.forEach((btn, i) => {
-    if (i === modeMap[mode]) {
-      btn.classList.add('active-mode');
-    } else {
+  document.querySelectorAll('.btn-mode').forEach((btn) => {
+    if (btn.id === 'muteBtn') {
       btn.classList.remove('active-mode');
+      return;
     }
+
+    btn.classList.toggle('active-mode', btn.id === activeId);
   });
 }
-
 
 // Helper to set answer
 function updateAnswer(newVal) {
   const display = document.getElementById('answerDisplay');
+
   if (display) {
     display.textContent = newVal;
   }
-  setCurrentAnswer(newVal); // ✨ sync the real game variable
+
+  setCurrentAnswer(newVal);
 }
