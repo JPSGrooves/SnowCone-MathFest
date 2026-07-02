@@ -143,22 +143,22 @@ const QS_CHARACTER_ROSTER = [
 const QS_MODE_ROSTER = [
   {
     id: 'addSub',
-    label: 'Add/Sub',
+    label: 'Add/Subtract',
     mathMode: 'addSub',
   },
   {
     id: 'multiDiv',
-    label: 'Mult/Div',
+    label: 'Multiply/Divide',
     mathMode: 'multiDiv',
   },
   {
     id: 'decimals',
-    label: 'Dec/Perc',
+    label: 'Decimal/Percent',
     mathMode: 'decimals',
   },
   {
     id: 'fractions',
-    label: 'Frac/Word',
+    label: 'Fractions',
     mathMode: 'fractions',
   },
   {
@@ -1038,7 +1038,7 @@ export function renderGameUI() {
                 <div class="math-problem" id="mathProblem">-- + -- = ?</div>
               </div>
 
-              <div id="answerDisplay" class="answer-display">0</div>
+              <div id="answerDisplay" class="answer-display is-empty">?</div>
 
               <!-- 🌈 Feedback floats down here -->
               <div class="qs-xp-msg hidden" id="qsXPMsg">🍧 +3 XP</div>

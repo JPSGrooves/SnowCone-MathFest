@@ -7562,3 +7562,422 @@ body.platform-ios.qs-active .qs-grid {
 }
 
 /* ───────────────── QuickServe — HUD Title Final Polish END ───────────────── */
+
+
+/* ───────────────── QuickServe — Answer Placeholder START ─────────────────
+   Purpose:
+   - Empty answer state displays ? instead of 0.
+   - 0 remains visually and logically available as a real player answer.
+   ───────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .answer-display.is-empty {
+  color: var(--qs-accent, #00ffee) !important;
+  opacity: 0.96 !important;
+
+  text-shadow:
+    0 0 10px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 18px var(--qs-faint, rgba(0,255,238,0.18)),
+    0 3px 8px rgba(0,0,0,0.58) !important;
+}
+
+body.qs-active .answer-display:not(.is-empty) {
+  color: #ffffff !important;
+}
+
+/* ───────────────── QuickServe — Answer Placeholder END ───────────────── */
+
+
+/* ───────────────── QuickServe — Keypad Remap START ─────────────────
+   Purpose:
+   - Old Enter position is now Clear.
+   - Old Clear position is now Mute.
+   - Old Mute position is now %.
+   - Old Reset position is now /.
+   - Auto-submit comes in the next pass.
+   ───────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-keypad #enter.qs-keypad-clear-answer-btn {
+  font-size: clamp(0.82rem, 1.94svh, 1.26rem) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  white-space: nowrap !important;
+}
+
+body.qs-active .qs-keypad .qs-keypad-symbol-btn,
+body.qs-active .qs-keypad #percent,
+body.qs-active .qs-keypad #slash {
+  font-size: clamp(1.35rem, 3.1svh, 2.2rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+}
+
+body.qs-active .qs-keypad #slash {
+  color: #ffffff !important;
+}
+
+body.qs-active .qs-keypad #muteBtn.qs-keypad-mute-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(0.02rem, 0.14svh, 0.08rem) !important;
+  white-space: normal !important;
+}
+
+body.qs-active .qs-keypad #muteBtn .qs-keypad-mute-icon {
+  display: block !important;
+  font-size: clamp(0.88rem, 2.0svh, 1.32rem) !important;
+  line-height: 0.95 !important;
+}
+
+body.qs-active .qs-keypad #muteBtn .qs-keypad-mute-text {
+  display: block !important;
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 1.72svh, 1.08rem) !important;
+  font-weight: 900 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.015em !important;
+}
+
+/* ───────────────── QuickServe — Keypad Remap END ───────────────── */
+
+/* ───────────────── QuickServe Clear Feedback CSS START ───────────────── */
+
+body.qs-active #qsResultMsg.cleared,
+body.qs-active #qsXPMsg.cleared {
+  color: #ff4dff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 77, 255, 0.95),
+    0 0 18px rgba(255, 77, 255, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.75) !important;
+
+  filter:
+    drop-shadow(0 0 8px rgba(255, 77, 255, 0.62))
+    drop-shadow(0 0 18px rgba(255, 77, 255, 0.24)) !important;
+
+  animation: qsClearCornerPop 1150ms cubic-bezier(.18,.9,.22,1) both !important;
+}
+
+body.qs-active #qsResultMsg.cleared {
+  right: 0.5rem !important;
+}
+
+body.qs-active #qsXPMsg.cleared {
+  left: 0.5rem !important;
+}
+
+body.qs-active #qsXPMsg.cleared.zero {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+@keyframes qsClearCornerPop {
+  0% {
+    opacity: 0;
+    transform: translateY(0.16rem) scale(0.94);
+  }
+
+  16% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-0.18rem) scale(0.98);
+  }
+}
+
+/* ───────────────── QuickServe Clear Feedback CSS END ───────────────── */
+
+/* ───────────────── QuickServe Equation Typography START ─────────────────
+   Badge 4:
+   - Adds a compact mode/difficulty label above the equation.
+   - Smaller dollar sign inside money prompts.
+   - Smarter wrapping/scaling for iPhone/iPad WKWebView.
+   ─────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-math .center-stack {
+  gap: clamp(0.16rem, 0.62svh, 0.34rem) !important;
+}
+
+body.qs-active .qs-equation-mode-label {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 0 clamp(0.02rem, 0.22svh, 0.12rem) !important;
+  padding: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.58rem, 1.42svh, 0.82rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.075em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%) !important;
+
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 13px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 2px 7px rgba(0, 0, 0, 0.72) !important;
+
+  opacity: 0.96 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+body.qs-active .equation-row {
+  min-height: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+body.qs-active .math-problem {
+  width: 100% !important;
+  max-width: min(100%, 28rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 clamp(0.12rem, 1vw, 0.34rem) !important;
+
+  display: block !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(1.18rem, 4.15svh, 2.28rem) !important;
+  font-weight: 950 !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.015em !important;
+
+  text-align: center !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+
+  color: rgba(255, 255, 255, 0.98) !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 0 16px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+body.qs-active .math-problem .qs-money-symbol {
+  display: inline-block !important;
+  font-size: 0.68em !important;
+  line-height: 1 !important;
+  vertical-align: 0.16em !important;
+  margin-right: 0.025em !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 62%, #ffffff 38%) !important;
+  text-shadow:
+    0 0 6px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 11px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active .math-problem .qs-op,
+body.qs-active .math-problem .qs-equals,
+body.qs-active .math-problem .qs-question-mark {
+  display: inline-block !important;
+}
+
+body.qs-active .math-problem .qs-question-mark {
+  color: var(--qs-accent, #00ffee) !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+body.qs-active #answerDisplay {
+  margin-top: clamp(0.02rem, 0.18svh, 0.12rem) !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-equation-mode-label {
+    font-size: clamp(0.52rem, 1.18svh, 0.68rem) !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  body.qs-active .math-problem {
+    font-size: clamp(1.02rem, 3.65svh, 1.95rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  body.qs-active #answerDisplay {
+    font-size: clamp(1.28rem, 4.3svh, 2.24rem) !important;
+  }
+}
+
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-equation-mode-label {
+    font-size: clamp(0.72rem, 1.32svh, 1rem) !important;
+  }
+
+  body.qs-active .math-problem {
+    max-width: min(100%, 38rem) !important;
+    font-size: clamp(1.75rem, 3.1svh, 3rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe Equation Typography END ───────────────── */
+
+/* ───────────────── QuickServe Equation Color Correction START ─────────────────
+   Badge 4 color law:
+   - Mode/difficulty label = current theme color.
+   - Equation line, including operators, $, =, and ? = white.
+   - Answer display ? / typed answer = current theme color.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-equation-mode-label {
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%) !important;
+}
+
+body.qs-active .math-problem,
+body.qs-active .math-problem .qs-money-symbol,
+body.qs-active .math-problem .qs-op,
+body.qs-active .math-problem .qs-equals,
+body.qs-active .math-problem .qs-question-mark {
+  color: rgba(255, 255, 255, 0.98) !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+/* Keep the $ size from the typography pass. Only color is corrected above. */
+body.qs-active .math-problem .qs-money-symbol {
+  font-size: 0.68em !important;
+  vertical-align: 0.16em !important;
+}
+
+body.qs-active #answerDisplay,
+body.qs-active .answer-display {
+  color: var(--qs-accent, #00ffee) !important;
+
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 15px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 2px 8px rgba(0, 0, 0, 0.72) !important;
+}
+
+/* ───────────────── QuickServe Equation Color Correction END ───────────────── */
+
+/* ───────────────── QuickServe Badge 4 Symbol Color Spacing START ─────────────────
+   - % matches the smaller $ symbol.
+   - Correct + XP feedback are green.
+   - Equation line remains white.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .math-problem .qs-percent-symbol {
+  display: inline-block !important;
+  font-size: 0.68em !important;
+  line-height: 1 !important;
+  vertical-align: 0.16em !important;
+  margin-left: 0.025em !important;
+
+  color: rgba(255, 255, 255, 0.98) !important;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+body.qs-active .math-problem .qs-money-symbol {
+  color: rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Correct feedback = green, not theme cyan. */
+body.qs-active #qsResultMsg.correct,
+body.qs-active #qsXPMsg.correct,
+body.qs-active #qsXPMsg.correct:not(.zero),
+body.qs-active #qsResultMsg.correct:not(.error) {
+  color: #6fff8b !important;
+
+  text-shadow:
+    0 0 7px rgba(111, 255, 139, 0.92),
+    0 0 15px rgba(111, 255, 139, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.72) !important;
+
+  filter:
+    drop-shadow(0 0 7px rgba(111, 255, 139, 0.44)) !important;
+}
+
+/* Wrong feedback can stay red/error unless another badge changes it. */
+body.qs-active #qsResultMsg.error,
+body.qs-active #qsXPMsg.error.zero {
+  color: #ff4444 !important;
+}
+
+/* ───────────────── QuickServe Badge 4 Symbol Color Spacing END ───────────────── */
+
+/* ───────────────── QuickServe Badge 4 Operator Spacing Repair START ─────────────────
+   Do not depend on literal text spaces. Operators own their own breathing room.
+   Target:
+   2 + 2 = ?
+   $7 + $4 = ?
+   50% of 20 = ?
+   ─────────────────────────────────────────────────────────────────────────── */
+
+body.qs-active .math-problem .qs-op {
+  display: inline-block !important;
+  margin-left: 0.20em !important;
+  margin-right: 0.20em !important;
+
+  color: rgba(255, 255, 255, 0.98) !important;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+body.qs-active .math-problem .qs-equals {
+  display: inline-block !important;
+  margin-left: 0.28em !important;
+  margin-right: 0.28em !important;
+
+  color: rgba(255, 255, 255, 0.98) !important;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+body.qs-active .math-problem .qs-question-mark {
+  display: inline-block !important;
+  color: rgba(255, 255, 255, 0.98) !important;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+/* Percent stays matched to the smaller dollar-sign treatment. */
+body.qs-active .math-problem .qs-money-symbol,
+body.qs-active .math-problem .qs-percent-symbol {
+  display: inline-block !important;
+  font-size: 0.68em !important;
+  line-height: 1 !important;
+  vertical-align: 0.16em !important;
+
+  color: rgba(255, 255, 255, 0.98) !important;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+body.qs-active .math-problem .qs-money-symbol {
+  margin-right: 0.025em !important;
+}
+
+body.qs-active .math-problem .qs-percent-symbol {
+  margin-left: 0.025em !important;
+}
+
+/* ───────────────── QuickServe Badge 4 Operator Spacing Repair END ───────────────── */

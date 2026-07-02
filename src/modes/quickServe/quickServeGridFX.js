@@ -22,13 +22,22 @@ let baseAmp = 10;                       // px, scaled on resize
 let phase = 0;                          // global phase
 let bumpAmt = 0;                        // extra amplitude from bumps
 let bumpEnd = 0;                        // timestamp
-let tint = 'good';                      // 'good' or 'bad'
+let scoreValue = 0;                     // current QS score for tier color
+let tint = 'base';                      // base/tier/bad color key
+let scoreTint = 'base';                 // current score-tier color key
+let tintOverrideEnd = 0;                // bad pulse color timeout
 let pulseMs = calcPulseMs(BPM);
 
 // visuals
+const QS_BAD_TINT_MS = 3000;
+
 const COLORS = {
-  good: 'rgba(0, 255, 238, 1)',   // #00ffee
-  bad : 'rgba(255, 68, 68, 1)'    // #ff4444-ish
+  base: 'rgba(255, 255, 255, 1)',     // start/base white
+  tier25: 'rgba(255, 221, 85, 1)',    // yellow
+  tier50: 'rgba(0, 255, 238, 1)',     // cyan
+  tier75: 'rgba(178, 93, 255, 1)',    // purple
+  tier100: 'rgba(80, 255, 139, 1)',   // green
+  bad: 'rgba(255, 77, 255, 1)',       // magenta wrong/clear pulse
 };
 
 export function setGridBPM(newBPM) {
@@ -36,6 +45,36 @@ export function setGridBPM(newBPM) {
   pulseMs = calcPulseMs(BPM);
 }
 export function getGridBPM() { return BPM; }
+
+function getGridTierTint(nextScore = scoreValue) {
+  const n = Math.max(0, Number(nextScore) || 0);
+
+  if (n >= 100) return 'tier100';
+  if (n >= 75) return 'tier75';
+  if (n >= 50) return 'tier50';
+  if (n >= 25) return 'tier25';
+
+  return 'base';
+}
+
+function isBadTintOverrideActive(now = performance.now()) {
+  return tintOverrideEnd > 0 && now < tintOverrideEnd;
+}
+
+function returnToScoreTint() {
+  tintOverrideEnd = 0;
+  tint = scoreTint;
+}
+
+export function setGridScore(nextScore = 0) {
+  scoreValue = Math.max(0, Number(nextScore) || 0);
+  scoreTint = getGridTierTint(scoreValue);
+
+  if (!isBadTintOverrideActive()) {
+    tint = scoreTint;
+  }
+}
+
 
 // ── lifecycle ─────────────────────────────────────────────────
 export function initGridGlow() {
@@ -123,10 +162,14 @@ function clear() {
 }
 
 function resetGridVisualState() {
-  tint = 'good';
+  scoreValue = 0;
+  scoreTint = 'base';
+  tint = 'base';
+  tintOverrideEnd = 0;
   bumpAmt = 0;
   bumpEnd = 0;
 }
+
 
 // ── animation ─────────────────────────────────────────────────
 function frame(ts) {
@@ -144,6 +187,11 @@ function frame(ts) {
   // soft pulse on alpha based on the same beat
   const pulse = (1 + Math.sin((ts % pulseMs) / pulseMs * twoPi)) * 0.5;
   const alpha = 0.25 + pulse * 0.55; // 0.25 → 0.8
+
+  // bad/clear-wrong magenta holds briefly, then returns to score tier
+  if (tintOverrideEnd > 0 && ts >= tintOverrideEnd) {
+    returnToScoreTint();
+  }
 
   // bump decay
   if (bumpAmt > 0 && ts > bumpEnd) bumpAmt = 0;
@@ -187,15 +235,22 @@ function drawWaves(alpha, amp) {
 
 // ── feedback "bump" from game events ─────────────────────────
 export function bumpGridGlow(type = 'good') {
-  tint = type === 'bad' ? 'bad' : 'good';
+  const now = performance.now();
+  const isBad = type === 'bad';
+
+  if (isBad) {
+    tint = 'bad';
+    tintOverrideEnd = now + QS_BAD_TINT_MS;
+  } else {
+    returnToScoreTint();
+  }
 
   // amplitude pop that eases out
-  const now = performance.now();
-  const duration = 420;
-  const peak = baseAmp * (type === 'bad' ? 0.55 : 0.95);
+  const duration = isBad ? 650 : 420;
+  const peak = baseAmp * (isBad ? 0.62 : 0.95);
+
   bumpAmt = peak;
   bumpEnd = now + duration;
 
-  // ease-out via rAF instead of setTimeout: let the main loop clamp it
-  // (no-op here; frame() handles the decay using bumpEnd cutoff)
+  // Color is handled in frame(); bad/clear-wrong returns after QS_BAD_TINT_MS.
 }

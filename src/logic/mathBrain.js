@@ -114,150 +114,154 @@ function generateAddSub(difficulty = 'easy') {
 }
 
 function generateAddSubEasy() {
-  const useSubtraction = Math.random() < 0.45;
-  const a = getRandomInt(1, 20);
-  const b = getRandomInt(1, 20);
+  const style = choice(['add', 'add', 'sub']);
 
-  if (useSubtraction) {
-    const [hi, lo] = a > b ? [a, b] : [b, a];
+  if (style === 'sub') {
+    const a = getRandomInt(1, 20);
+    const b = getRandomInt(0, a);
 
     return {
-      equation: `${hi} - ${lo}`,
-      answer: hi - lo,
+      equation: `${a} - ${b}`,
+      answer: a - b,
       meta: {
-        type: 'addSub',
+        type: 'addSubEasy',
         op: '-',
-        a: hi,
-        b: lo,
+        a,
+        b,
+        law: 'easy-second-grade',
       },
     };
   }
+
+  const a = getRandomInt(0, 10);
+  const b = getRandomInt(0, 10);
 
   return {
     equation: `${a} + ${b}`,
     answer: a + b,
     meta: {
-      type: 'addSub',
+      type: 'addSubEasy',
       op: '+',
       a,
       b,
+      law: 'easy-second-grade',
     },
   };
 }
 
+
 function generateAddSubMedium() {
-  const style = choice(['twoDigitAdd', 'twoDigitSub', 'threeTerm']);
+  const style = choice(['twoDigitAdd', 'twoDigitSub', 'lightThreeTerm']);
 
   if (style === 'twoDigitAdd') {
-    const a = getRandomInt(18, 85);
-    const b = getRandomInt(12, 75);
+    const a = getRandomInt(10, 59);
+    const b = getRandomInt(5, 40);
 
     return {
       equation: `${a} + ${b}`,
       answer: a + b,
       meta: {
-        type: 'addSub',
+        type: 'addSubMedium',
         op: '+',
         a,
         b,
+        law: 'medium-fourth-grade',
       },
     };
   }
 
   if (style === 'twoDigitSub') {
-    const a = getRandomInt(30, 120);
-    const b = getRandomInt(10, a - 1);
+    const a = getRandomInt(20, 99);
+    const b = getRandomInt(1, Math.min(55, a));
 
     return {
       equation: `${a} - ${b}`,
       answer: a - b,
       meta: {
-        type: 'addSub',
+        type: 'addSubMedium',
         op: '-',
         a,
         b,
+        law: 'medium-fourth-grade',
       },
     };
   }
 
-  const a = getRandomInt(8, 35);
-  const b = getRandomInt(8, 35);
-  const c = getRandomInt(3, 25);
+  const a = getRandomInt(10, 35);
+  const b = getRandomInt(5, 25);
+  const c = getRandomInt(1, Math.min(18, a + b));
 
   return {
     equation: `${a} + ${b} - ${c}`,
     answer: a + b - c,
     meta: {
-      type: 'addSubThreeTerm',
+      type: 'addSubMediumTwoStep',
       a,
       b,
       c,
-      steps: [
-        { expr: `${a} + ${b}`, value: a + b },
-        { expr: `${a + b} - ${c}`, value: a + b - c },
-      ],
+      law: 'medium-fourth-grade',
     },
   };
 }
+
 
 function generateAddSubHard() {
-  const style = choice(['signedSub', 'largerThreeTerm', 'negativeMix']);
+  const style = choice(['negative', 'negative', 'threeTerm', 'parentheses']);
 
-  if (style === 'signedSub') {
-    const a = getRandomInt(5, 70);
-    const b = getRandomInt(a + 5, a + 75);
+  if (style === 'negative') {
+    const a = getRandomInt(-30, 60);
+    const b = getRandomInt(-25, 45);
+    const op = choice(['+', '-']);
+    const answer = op === '+' ? a + b : a - b;
 
     return {
-      equation: `${a} - ${b}`,
-      answer: a - b,
+      equation: `${a} ${op} ${b}`,
+      answer,
       meta: {
-        type: 'addSub',
-        op: '-',
+        type: 'addSubHardNegative',
+        op,
         a,
         b,
-        signed: true,
+        law: 'hard-tricky-readable',
       },
     };
   }
 
-  if (style === 'negativeMix') {
-    const a = getRandomInt(-30, 30);
-    const b = getRandomInt(-30, 30);
-    const sign = b >= 0 ? '+' : '-';
-    const shownB = Math.abs(b);
+  if (style === 'parentheses') {
+    const a = getRandomInt(8, 45);
+    const b = getRandomInt(3, 20);
+    const c = getRandomInt(1, b);
 
     return {
-      equation: `${a} ${sign} ${shownB}`,
-      answer: a + b,
+      equation: `${a} + (${b} - ${c})`,
+      answer: a + (b - c),
       meta: {
-        type: 'addSub',
-        op: sign,
+        type: 'addSubHardParentheses',
         a,
         b,
-        signed: true,
+        c,
+        law: 'hard-tricky-readable',
       },
     };
   }
 
-  const a = getRandomInt(35, 140);
-  const b = getRandomInt(20, 95);
-  const c = getRandomInt(10, 90);
+  const a = getRandomInt(40, 120);
+  const b = getRandomInt(15, 70);
+  const c = getRandomInt(10, 80);
 
   return {
     equation: `${a} + ${b} - ${c}`,
     answer: a + b - c,
     meta: {
-      type: 'addSubThreeTerm',
+      type: 'addSubHardTwoStep',
       a,
       b,
       c,
-      steps: [
-        { expr: `${a} + ${b}`, value: a + b },
-        { expr: `${a + b} - ${c}`, value: a + b - c },
-      ],
+      law: 'hard-tricky-readable',
     },
   };
 }
+
 
 //////////////////////////////
 // ✖️➗ Mult/Div Mode
@@ -277,21 +281,60 @@ function generateMultiDiv(difficulty = 'easy') {
 }
 
 function generateMultiDivEasy() {
-  const useDivision = Math.random() < 0.45;
+  const style = choice(['tinyMultiply', 'tinyMultiply', 'cleanDivide']);
 
-  if (useDivision) {
-    const b = getRandomInt(2, 9);
-    const answer = getRandomInt(2, 12);
-    const a = b * answer;
+  if (style === 'cleanDivide') {
+    const divisor = choice([2, 5, 10]);
+    const answer = getRandomInt(1, 5);
+    const product = divisor * answer;
 
     return {
-      equation: `${a} ÷ ${b}`,
+      equation: `${product} ÷ ${divisor}`,
       answer,
       meta: {
-        type: 'multiDiv',
+        type: 'multiDivEasy',
         op: '÷',
-        a,
-        b,
+        a: product,
+        b: divisor,
+        law: 'easy-second-grade',
+      },
+    };
+  }
+
+  const a = choice([0, 1, 2, 3, 4, 5, 10]);
+  const b = getRandomInt(0, 5);
+
+  return {
+    equation: `${a} × ${b}`,
+    answer: a * b,
+    meta: {
+      type: 'multiDivEasy',
+      op: '×',
+      a,
+      b,
+      law: 'easy-second-grade',
+    },
+  };
+}
+
+
+function generateMultiDivMedium() {
+  const style = choice(['cleanMultiply', 'cleanMultiply', 'cleanDivide']);
+
+  if (style === 'cleanDivide') {
+    const divisor = getRandomInt(2, 12);
+    const answer = getRandomInt(2, 12);
+    const product = divisor * answer;
+
+    return {
+      equation: `${product} ÷ ${divisor}`,
+      answer,
+      meta: {
+        type: 'multiDivMedium',
+        op: '÷',
+        a: product,
+        b: divisor,
+        law: 'medium-fourth-grade',
       },
     };
   }
@@ -303,104 +346,75 @@ function generateMultiDivEasy() {
     equation: `${a} × ${b}`,
     answer: a * b,
     meta: {
-      type: 'multiDiv',
+      type: 'multiDivMedium',
       op: '×',
       a,
       b,
+      law: 'medium-fourth-grade',
     },
   };
 }
 
-function generateMultiDivMedium() {
-  const useDivision = Math.random() < 0.5;
-
-  if (useDivision) {
-    const b = getRandomInt(3, 12);
-    const answer = getRandomInt(6, 20);
-    const a = b * answer;
-
-    return {
-      equation: `${a} ÷ ${b}`,
-      answer,
-      meta: {
-        type: 'multiDiv',
-        op: '÷',
-        a,
-        b,
-      },
-    };
-  }
-
-  const a = getRandomInt(6, 20);
-  const b = getRandomInt(3, 12);
-
-  return {
-    equation: `${a} × ${b}`,
-    answer: a * b,
-    meta: {
-      type: 'multiDiv',
-      op: '×',
-      a,
-      b,
-    },
-  };
-}
 
 function generateMultiDivHard() {
-  const style = choice(['bigMultiply', 'bigDivide', 'twoStep']);
+  const style = choice(['fairMultiply', 'cleanDivide', 'lightTwoStep']);
 
-  if (style === 'bigMultiply') {
-    const a = getRandomInt(12, 25);
-    const b = getRandomInt(6, 14);
+  if (style === 'fairMultiply') {
+    const a = Math.random() < 0.42 ? getRandomInt(13, 16) : getRandomInt(6, 12);
+    const b = Math.random() < 0.42 ? getRandomInt(2, 9) : getRandomInt(6, 12);
 
     return {
       equation: `${a} × ${b}`,
       answer: a * b,
       meta: {
-        type: 'multiDiv',
+        type: 'multiDivHard',
         op: '×',
         a,
         b,
+        law: 'hard-tricky-readable',
       },
     };
   }
 
-  if (style === 'bigDivide') {
-    const b = getRandomInt(6, 16);
-    const answer = getRandomInt(8, 25);
-    const a = b * answer;
+  if (style === 'cleanDivide') {
+    const factorA = Math.random() < 0.42 ? getRandomInt(13, 16) : getRandomInt(6, 12);
+    const factorB = getRandomInt(2, 12);
+    const product = factorA * factorB;
+    const divisor = Math.random() < 0.5 ? factorA : factorB;
 
     return {
-      equation: `${a} ÷ ${b}`,
-      answer,
+      equation: `${product} ÷ ${divisor}`,
+      answer: product / divisor,
       meta: {
-        type: 'multiDiv',
+        type: 'multiDivHard',
         op: '÷',
-        a,
-        b,
+        a: product,
+        b: divisor,
+        factorA,
+        factorB,
+        law: 'hard-tricky-readable',
       },
     };
   }
 
-  const a = getRandomInt(4, 12);
+  const a = getRandomInt(6, 12);
   const b = getRandomInt(4, 12);
-  const c = getRandomInt(2, 9);
+  const c = getRandomInt(2, 12);
 
   return {
     equation: `${a} × ${b} + ${c}`,
     answer: a * b + c,
     meta: {
-      type: 'multiDivTwoStep',
+      type: 'multiDivHardTwoStep',
       a,
       b,
       c,
-      steps: [
-        { expr: `${a} × ${b}`, value: a * b },
-        { expr: `${a * b} + ${c}`, value: a * b + c },
-      ],
+      law: 'hard-tricky-readable',
     },
   };
 }
+
+
 
 //////////////////////////////
 // 💵 Decimals / Percents / Money Mode
@@ -420,154 +434,186 @@ function generateDecimalsPercentsMoney(difficulty = 'easy') {
 }
 
 function generateDecimalEasy() {
-  const style = choice(['moneyAdd', 'moneySub', 'decimalAdd']);
+  const style = choice(['wholeMoneyAdd', 'wholeMoneyAdd', 'wholeMoneySub', 'friendlyPercent']);
 
-  if (style === 'moneyAdd') {
-    const a = centsToMoney(getRandomInt(125, 950));
-    const b = centsToMoney(getRandomInt(50, 650));
-
-    return {
-      equation: `${money(a)} + ${money(b)}`,
-      answer: round2(a + b),
-      meta: {
-        type: 'decimalMoney',
-        op: '+',
-        a,
-        b,
-      },
-    };
-  }
-
-  if (style === 'moneySub') {
-    const a = centsToMoney(getRandomInt(500, 2000));
-    const b = centsToMoney(getRandomInt(100, Math.floor(a * 100) - 25));
-
-    return {
-      equation: `${money(a)} - ${money(b)}`,
-      answer: round2(a - b),
-      meta: {
-        type: 'decimalMoney',
-        op: '-',
-        a,
-        b,
-      },
-    };
-  }
-
-  const a = round1(getRandomInt(10, 95) / 10);
-  const b = round1(getRandomInt(10, 95) / 10);
-
-  return {
-    equation: `${a.toFixed(1)} + ${b.toFixed(1)}`,
-    answer: round2(a + b),
-    meta: {
-      type: 'decimalAddSub',
-      op: '+',
-      a,
-      b,
-    },
-  };
-}
-
-function generateDecimalMedium() {
-  const style = choice(['percentFriendly', 'decimalMultiply', 'moneyChange']);
-
-  if (style === 'percentFriendly') {
-    const percent = choice([10, 20, 25, 50, 75]);
-    const whole = choice([20, 40, 60, 80, 100, 120, 200]);
+  if (style === 'friendlyPercent') {
+    const percent = choice([50, 10]);
+    const whole = percent === 50
+      ? choice([2, 4, 6, 8, 10, 12, 20])
+      : choice([10, 20, 30, 40, 50]);
 
     return {
       equation: `${percent}% of ${whole}`,
-      answer: round2((percent / 100) * whole),
+      answer: Math.round((percent / 100) * whole * 100) / 100,
       meta: {
-        type: 'percentOf',
+        type: 'decimalEasyPercent',
         percent,
         whole,
+        law: 'easy-second-grade',
       },
     };
   }
 
-  if (style === 'decimalMultiply') {
-    const a = choice([1.5, 2.5, 3.5, 4.5, 5.5]);
-    const b = getRandomInt(2, 9);
+  if (style === 'wholeMoneySub') {
+    const a = getRandomInt(2, 10);
+    const b = getRandomInt(1, a);
 
     return {
-      equation: `${a.toFixed(1)} × ${b}`,
-      answer: round2(a * b),
+      equation: `$${a} - $${b}`,
+      answer: a - b,
       meta: {
-        type: 'decimalMultiply',
+        type: 'decimalEasyMoney',
+        op: '-',
         a,
         b,
+        wholeDollarsOnly: true,
+        law: 'easy-second-grade',
       },
     };
   }
 
-  const price = centsToMoney(getRandomInt(800, 3000));
-  const paid = Math.ceil((price + getRandomInt(2, 10)) / 5) * 5;
+  const a = getRandomInt(1, 10);
+  const b = getRandomInt(1, 10);
 
   return {
-    equation: `${money(paid)} - ${money(price)}`,
-    answer: round2(paid - price),
+    equation: `$${a} + $${b}`,
+    answer: a + b,
     meta: {
-      type: 'moneyChange',
-      paid,
-      price,
-    },
-  };
-}
-
-function generateDecimalHard() {
-  const style = choice(['percentLess', 'tip', 'decimalTwoStep']);
-
-  if (style === 'percentLess') {
-    const price = choice([24, 36, 40, 48, 60, 80, 120]);
-    const percent = choice([10, 15, 20, 25, 30]);
-
-    return {
-      equation: `${percent}% off ${money(price)}`,
-      answer: round2(price * (1 - percent / 100)),
-      meta: {
-        type: 'percentOff',
-        percent,
-        price,
-      },
-    };
-  }
-
-  if (style === 'tip') {
-    const bill = choice([18, 24, 30, 36, 42, 50, 60]);
-    const percent = choice([10, 15, 20, 25]);
-
-    return {
-      equation: `${percent}% tip on ${money(bill)}`,
-      answer: round2(bill * (percent / 100)),
-      meta: {
-        type: 'percentTip',
-        percent,
-        bill,
-      },
-    };
-  }
-
-  const a = round1(getRandomInt(15, 95) / 10);
-  const b = getRandomInt(2, 8);
-  const c = round1(getRandomInt(5, 45) / 10);
-
-  return {
-    equation: `${a.toFixed(1)} × ${b} + ${c.toFixed(1)}`,
-    answer: round2(a * b + c),
-    meta: {
-      type: 'decimalTwoStep',
+      type: 'decimalEasyMoney',
+      op: '+',
       a,
       b,
-      c,
-      steps: [
-        { expr: `${a.toFixed(1)} × ${b}`, value: round2(a * b) },
-        { expr: `${round2(a * b)} + ${c.toFixed(1)}`, value: round2(a * b + c) },
-      ],
+      wholeDollarsOnly: true,
+      law: 'easy-second-grade',
     },
   };
 }
+
+
+
+function generateDecimalMedium() {
+  const style = choice(['friendlyPercent', 'friendlyPercent', 'moneyChange', 'decimalAdd', 'tipFriendly']);
+
+  if (style === 'friendlyPercent') {
+    const percent = choice([10, 25, 50, 75]);
+    const whole = choice([20, 40, 60, 80, 100, 200]);
+
+    return {
+      equation: `${percent}% of ${whole}`,
+      answer: Math.round((percent / 100) * whole * 100) / 100,
+      meta: {
+        type: 'decimalMediumPercent',
+        percent,
+        whole,
+        law: 'medium-fourth-grade',
+      },
+    };
+  }
+
+  if (style === 'moneyChange') {
+    const price = choice([5, 7.5, 8.5, 10, 12.5, 15, 17.5, 22.5]);
+    const paid = choice([20, 25, 30, 40, 50].filter((value) => value > price));
+
+    return {
+      equation: `$${paid} - $${price}`,
+      answer: Math.round((paid - price) * 100) / 100,
+      meta: {
+        type: 'decimalMediumMoney',
+        paid,
+        price,
+        law: 'medium-fourth-grade',
+      },
+    };
+  }
+
+  if (style === 'decimalAdd') {
+    const a = choice([1.5, 2.5, 3.5, 4.5, 5.5]);
+    const b = choice([0.5, 1.5, 2.5, 3.5]);
+
+    return {
+      equation: `${a} + ${b}`,
+      answer: Math.round((a + b) * 100) / 100,
+      meta: {
+        type: 'decimalMediumAdd',
+        a,
+        b,
+        law: 'medium-fourth-grade',
+      },
+    };
+  }
+
+  const percent = choice([10, 15, 20]);
+  const bill = choice([10, 15, 20, 25, 30, 40]);
+
+  return {
+    equation: `${percent}% tip $${bill}`,
+    answer: Math.round((bill * percent) / 100 * 100) / 100,
+    meta: {
+      type: 'decimalMediumTip',
+      percent,
+      bill,
+      readableTip: true,
+      law: 'medium-fourth-grade',
+    },
+  };
+}
+
+
+
+function generateDecimalHard() {
+  const style = choice(['tip', 'percentOff', 'decimalTwoStep']);
+
+  if (style === 'percentOff') {
+    const percent = choice([10, 15, 20, 25, 30]);
+    const price = choice([40, 50, 60, 80, 100, 120]);
+
+    return {
+      equation: `${percent}% off $${price}`,
+      answer: Math.round((price * (1 - percent / 100)) * 100) / 100,
+      meta: {
+        type: 'decimalHardPercentOff',
+        percent,
+        price,
+        law: 'hard-tricky-readable',
+      },
+    };
+  }
+
+  if (style === 'decimalTwoStep') {
+    const a = Math.round(getRandomInt(20, 89)) / 10;
+    const b = getRandomInt(3, 8);
+    const c = Math.round(getRandomInt(5, 39)) / 10;
+
+    return {
+      equation: `${a} × ${b} + ${c}`,
+      answer: Math.round((a * b + c) * 100) / 100,
+      meta: {
+        type: 'decimalHardTwoStep',
+        a,
+        b,
+        c,
+        law: 'hard-tricky-readable',
+      },
+    };
+  }
+
+  const percent = choice([15, 18, 20, 22, 25]);
+  const bill = choice([24, 30, 36, 40, 50, 60, 80]);
+
+  return {
+    equation: `${percent}% tip $${bill}`,
+    answer: Math.round((bill * percent) / 100 * 100) / 100,
+    meta: {
+      type: 'decimalHardTip',
+      percent,
+      bill,
+      readableTip: true,
+      law: 'hard-tricky-readable',
+    },
+  };
+}
+
+
 
 //////////////////////////////
 // 🍕 Fractions / Word Mode
@@ -587,124 +633,178 @@ function generateFractionsWords(difficulty = 'easy') {
 }
 
 function generateFractionEasy() {
-  const denom = choice([2, 3, 4]);
-  const multiplier = getRandomInt(2, 10);
-  const whole = denom * multiplier;
+  const denominator = choice([2, 2, 3, 4]);
+  const answer = getRandomInt(1, denominator === 4 ? 5 : 8);
+  const whole = denominator * answer;
 
   return {
-    equation: `1/${denom} of ${whole}`,
-    answer: whole / denom,
+    equation: `1/${denominator} of ${whole}`,
+    answer,
     meta: {
-      type: 'fractionOf',
+      type: 'fractionEasy',
       numerator: 1,
-      denominator: denom,
+      denominator,
       whole,
+      law: 'easy-second-grade',
     },
   };
 }
+
 
 function generateFractionMedium() {
-  const denom = choice([3, 4, 5, 6, 8]);
-  const numerator = getRandomInt(2, denom - 1);
-  const multiplier = getRandomInt(2, 9);
-  const whole = denom * multiplier;
+  const style = choice(['fractionOf', 'fractionOf', 'fractionAnswer']);
 
-  return {
-    equation: `${numerator}/${denom} of ${whole}`,
-    answer: round2((numerator / denom) * whole),
-    meta: {
-      type: 'fractionOf',
-      numerator,
-      denominator: denom,
-      whole,
-    },
-  };
-}
-
-function generateFractionHard() {
-  const style = choice(['fractionTwoStep', 'wordSlices']);
-
-  if (style === 'wordSlices') {
-    const boxes = getRandomInt(3, 8);
-    const perBox = choice([6, 8, 10, 12]);
-    const denom = choice([2, 3, 4]);
-    const total = boxes * perBox;
+  if (style === 'fractionAnswer') {
+    const denominator = choice([2, 3, 4, 5, 6, 8]);
+    const left = getRandomInt(1, denominator - 1);
+    const right = getRandomInt(1, Math.max(1, denominator - left));
+    const numerator = left + right;
 
     return {
-      equation: `1/${denom} of ${boxes}×${perBox} slices`,
-      answer: round2(total / denom),
+      equation: `${left}/${denominator} + ${right}/${denominator}`,
+      answer: Math.round((numerator / denominator) * 10000) / 10000,
       meta: {
-        type: 'fractionWord',
-        boxes,
-        perBox,
-        numerator: 1,
-        denominator: denom,
-        total,
+        type: 'fractionAnswer',
+        op: '+',
+        numerator,
+        denominator,
+        answerText: `${numerator}/${denominator}`,
+        law: 'medium-fourth-grade',
       },
     };
   }
 
-  const denom = choice([4, 5, 6, 8]);
-  const numerator = getRandomInt(2, denom - 1);
-  const multiplier = getRandomInt(4, 12);
-  const whole = denom * multiplier;
-  const extra = getRandomInt(3, 15);
-  const op = Math.random() < 0.5 ? '+' : '-';
-  const base = round2((numerator / denom) * whole);
-  const answer = op === '+' ? base + extra : base - extra;
+  const denominator = choice([2, 3, 4, 5, 6, 8]);
+  const numerator = getRandomInt(1, denominator - 1);
+  const unit = getRandomInt(2, 8);
+  const whole = denominator * unit;
 
   return {
-    equation: `${numerator}/${denom} of ${whole} ${op} ${extra}`,
-    answer: round2(answer),
+    equation: `${numerator}/${denominator} of ${whole}`,
+    answer: numerator * unit,
     meta: {
-      type: 'fractionTwoStep',
+      type: 'fractionMediumOf',
       numerator,
-      denominator: denom,
+      denominator,
       whole,
-      extra,
-      op,
-      steps: [
-        { expr: `${numerator}/${denom} of ${whole}`, value: base },
-        { expr: `${base} ${op} ${extra}`, value: round2(answer) },
-      ],
+      law: 'medium-fourth-grade',
     },
   };
 }
+
+
+
+function generateFractionHard() {
+  const style = choice(['fractionAnswer', 'fractionTwoStep', 'fractionProduct']);
+
+  if (style === 'fractionAnswer') {
+    const denominator = choice([4, 5, 6, 8, 10, 12]);
+    const left = getRandomInt(1, denominator - 1);
+    const right = getRandomInt(1, denominator - 1);
+    const op = choice(['+', '-']);
+
+    const top = op === '+'
+      ? left + right
+      : Math.abs(left - right) || 1;
+
+    const a = op === '-' && right > left ? right : left;
+    const b = op === '-' && right > left ? left : right;
+
+    return {
+      equation: `${a}/${denominator} ${op} ${b}/${denominator}`,
+      answer: Math.round((top / denominator) * 10000) / 10000,
+      meta: {
+        type: 'fractionAnswer',
+        op,
+        numerator: top,
+        denominator,
+        answerText: `${top}/${denominator}`,
+        law: 'hard-tricky-readable',
+      },
+    };
+  }
+
+  if (style === 'fractionProduct') {
+    const denominator = choice([2, 3, 4, 5]);
+    const numerator = getRandomInt(1, denominator - 1);
+    const a = getRandomInt(3, 9);
+    const b = denominator * getRandomInt(2, 6);
+
+    return {
+      equation: `${numerator}/${denominator} of ${a}×${b}`,
+      answer: Math.round((numerator / denominator) * a * b * 100) / 100,
+      meta: {
+        type: 'fractionHardProduct',
+        numerator,
+        denominator,
+        a,
+        b,
+        law: 'hard-tricky-readable',
+      },
+    };
+  }
+
+  const denominator = choice([3, 4, 5, 6, 8]);
+  const numerator = getRandomInt(1, denominator - 1);
+  const whole = denominator * getRandomInt(3, 10);
+  const extra = getRandomInt(2, 12);
+  const op = choice(['+', '-']);
+  const base = (numerator / denominator) * whole;
+
+  return {
+    equation: `${numerator}/${denominator} of ${whole} ${op} ${extra}`,
+    answer: Math.round((op === '+' ? base + extra : base - extra) * 100) / 100,
+    meta: {
+      type: 'fractionHardTwoStep',
+      numerator,
+      denominator,
+      whole,
+      extra,
+      op,
+      law: 'hard-tricky-readable',
+    },
+  };
+}
+
+
 
 //////////////////////////////
 // 🎲 Mixed Bag Mode
 //////////////////////////////
 function generateMixedBag(difficulty = 'easy') {
-  const sourceMode = choice(['addSub', 'multiDiv', 'decimals', 'fractions']);
   const safeDifficulty = normalizeDifficulty(difficulty);
 
-  let problem;
+  const pools = {
+    easy: [
+      generateAddSubEasy,
+      generateAddSubEasy,
+      generateMultiDivEasy,
+      generateDecimalEasy,
+      generateFractionEasy,
+    ],
+    medium: [
+      generateAddSubMedium,
+      generateMultiDivMedium,
+      generateDecimalMedium,
+      generateFractionMedium,
+    ],
+    hard: [
+      generateAddSubHard,
+      generateMultiDivHard,
+      generateDecimalHard,
+      generateFractionHard,
+    ],
+  };
 
-  switch (sourceMode) {
-    case 'multiDiv':
-      problem = generateMultiDiv(safeDifficulty);
-      break;
-
-    case 'decimals':
-      problem = generateDecimalsPercentsMoney(safeDifficulty);
-      break;
-
-    case 'fractions':
-      problem = generateFractionsWords(safeDifficulty);
-      break;
-
-    case 'addSub':
-    default:
-      problem = generateAddSub(safeDifficulty);
-      break;
-  }
+  const generator = choice(pools[safeDifficulty] || pools.easy);
+  const problem = generator();
 
   return attachRewards(problem, 'mixed', safeDifficulty, {
-    ...(problem.meta || {}),
-    requestedMode: 'mixed',
-    sourceMode,
+    mixedBag: true,
+    sourceType: problem?.meta?.type || 'mixed',
   });
 }
+
 
 //////////////////////////////
 // 🧹 Normalizers
@@ -752,8 +852,13 @@ function normalizeAnswer(value) {
 
   if (!Number.isFinite(num)) return 0;
 
-  return Number.isInteger(num) ? num : round2(num);
+  if (Number.isInteger(num)) return num;
+
+  // Keep enough precision for slash input like 1/3 or 3/8.
+  // Money/decimal generators already round themselves to 2 decimals.
+  return Math.round(num * 10000) / 10000;
 }
+
 
 //////////////////////////////
 // 🎲 Helpers

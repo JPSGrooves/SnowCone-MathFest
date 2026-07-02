@@ -1,22 +1,28 @@
 // 🍧 quickServeKeypad.js
 // QuickServe 1.5.x keypad wiring
 //
-// New law:
+// Current law:
 // - Intro chooses math lane.
 // - Intro chooses starting difficulty.
 // - Intro chooses performer.
-// - In-game keypad may change difficulty only.
-// - In-game keypad may NOT change character or math lane.
+// - In-game keypad changes difficulty only.
+// - In-game keypad does not change character or math lane.
+//
+// Current remap:
+// - Old Enter position = Clear
+// - Old Clear position = Mute
+// - Old Mute position = %
+// - Old Reset position = /
+//
+// Auto-submit and Clear-as-wrong come in the next pass.
 
 import {
   toggleNegative,
   clearAnswer,
-  submitAnswer,
+  markCurrentAnswerWrongAndClear,
   appendToAnswer,
-  stopGameLogic,
-  startGameLogic,
   setMathDifficulty,
-  setCurrentAnswer,
+  setMathMode,
 } from './quickServeGame.js';
 
 import {
@@ -38,185 +44,194 @@ export function generateKeypadHTML() {
       { id: 'seven', label: '7', class: 'btn-num' },
       { id: 'eight', label: '8', class: 'btn-num' },
       { id: 'nine', label: '9', class: 'btn-num' },
-      { id: 'enter', label: 'Enter', class: 'btn-enter' },
+      { id: 'enter', label: 'Clear', class: 'btn-clear qs-keypad-clear-answer-btn' },
     ],
     [
       { id: 'multiplyDivide', label: 'Med', class: 'btn-mode' },
       { id: 'four', label: '4', class: 'btn-num' },
       { id: 'five', label: '5', class: 'btn-num' },
       { id: 'six', label: '6', class: 'btn-num' },
-      { id: 'clear', label: 'Clear', class: 'btn-clear' },
+      {
+        id: 'muteBtn',
+        label: '<span class="qs-keypad-mute-icon" aria-hidden="true">🔊</span><span class="qs-keypad-mute-text">Mute</span>',
+        class: 'btn-mode qs-keypad-mute-btn',
+      },
     ],
     [
       { id: 'algMode', label: 'Hard', class: 'btn-mode' },
       { id: 'one', label: '1', class: 'btn-num' },
       { id: 'two', label: '2', class: 'btn-num' },
       { id: 'three', label: '3', class: 'btn-num' },
-      { id: 'muteBtn', label: '<span class="qs-keypad-mute-icon" aria-hidden="true">🔊</span><span class="qs-keypad-mute-text">Mute</span>', class: 'btn-mode' },
+      { id: 'percent', label: '%', class: 'btn-num qs-keypad-symbol-btn' },
     ],
     [
-      { id: 'menu', label: '<span class="qs-preflight-back-arrow">←</span><span class="qs-preflight-back-text">BACK</span>', class: 'btn-menu qs-keypad-stock-back-btn' },
-      { id: 'decimal', label: '.', class: 'btn-num' },
+      {
+        id: 'menu',
+        label: '<span class="qs-preflight-back-arrow">←</span><span class="qs-preflight-back-text">BACK</span>',
+        class: 'btn-menu qs-keypad-stock-back-btn',
+      },
+      { id: 'decimal', label: '.', class: 'btn-num qs-keypad-symbol-btn' },
       { id: 'zero', label: '0', class: 'btn-num' },
-      { id: 'neg', label: '±', class: 'btn-num' },
-      { id: 'reset', label: 'Reset', class: 'btn-menu' },
+      { id: 'negative', label: '±', class: 'btn-num qs-keypad-symbol-btn' },
+      { id: 'slash', label: '/', class: 'btn-num qs-keypad-symbol-btn' },
     ],
   ];
 
-  const buttons = rows
-    .map((row) =>
-      row
-        .map((btn) =>
-          `<button id="${btn.id}" class="${btn.class}">${btn.label}</button>`
-        )
-        .join('\n')
-    )
-    .join('\n');
-
-  return `<div class="qs-keypad">${buttons}</div>`;
+  return `
+    <div class="qs-keypad" aria-label="QuickServe keypad">
+      ${rows.flat().map((button) => `
+        <button id="${button.id}" class="${button.class}" type="button">
+          ${button.label}
+        </button>
+      `).join('')}
+    </div>
+  `;
 }
 
 export function setupKeypad() {
-  const keys = [
-    { id: 'zero', val: '0' },
-    { id: 'one', val: '1' },
-    { id: 'two', val: '2' },
-    { id: 'three', val: '3' },
-    { id: 'four', val: '4' },
-    { id: 'five', val: '5' },
-    { id: 'six', val: '6' },
-    { id: 'seven', val: '7' },
-    { id: 'eight', val: '8' },
-    { id: 'nine', val: '9' },
-    { id: 'decimal', val: '.' },
-  ];
+  const byId = (id) => document.getElementById(id);
 
   const safeBind = (id, handler) => {
-    const btn = document.getElementById(id);
+    const button = byId(id);
+    if (!button) {
+      console.warn(`⚠️ Missing keypad button: ${id}`);
+      return;
+    }
 
-    if (!btn) return;
-
-    btn.addEventListener(
-      'pointerdown',
-      (e) => {
-        e?.preventDefault?.();
-        e?.stopPropagation?.();
-        handler(e);
-      },
-      { passive: false }
-    );
+    button.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      handler();
+    }, { passive: false });
   };
 
   const chooseDifficulty = (difficulty) => {
     console.log(`[QuickServe] In-game difficulty selected: ${difficulty}`);
 
-    // Change the live game difficulty.
     setMathDifficulty(difficulty);
-
-    // Store it back into intro/preflight state.
-    // When player hits Back Intro, the same difficulty remains selected.
     setQuickServeDifficultyFromInGameDifficulty(difficulty);
   };
 
-  // ✴️ Number Keys
-  keys.forEach(({ id, val }) => {
-    safeBind(id, () => appendToAnswer(val));
-  });
-
-  // 🌶️ In-game difficulty buttons
-  // These do NOT change math lane anymore.
+  // Difficulty only.
   safeBind('plusMinus', () => chooseDifficulty('easy'));
   safeBind('multiplyDivide', () => chooseDifficulty('medium'));
   safeBind('algMode', () => chooseDifficulty('hard'));
 
-  // 🧼 Control Buttons
-  safeBind('reset', () => {
-    console.log('🔁 Resetting QuickServe shift only');
+  // Numbers.
+  safeBind('zero', () => appendToAnswer('0'));
+  safeBind('one', () => appendToAnswer('1'));
+  safeBind('two', () => appendToAnswer('2'));
+  safeBind('three', () => appendToAnswer('3'));
+  safeBind('four', () => appendToAnswer('4'));
+  safeBind('five', () => appendToAnswer('5'));
+  safeBind('six', () => appendToAnswer('6'));
+  safeBind('seven', () => appendToAnswer('7'));
+  safeBind('eight', () => appendToAnswer('8'));
+  safeBind('nine', () => appendToAnswer('9'));
 
-    // Reset preserves current math lane and current difficulty.
-    stopGameLogic();
-    startGameLogic();
-    ensureQuickServeMusicPlaying();
-  });
+  // Symbols.
+  safeBind('decimal', () => appendToAnswer('.'));
+  safeBind('negative', toggleNegative);
+  safeBind('percent', () => appendToAnswer('%'));
+  safeBind('slash', () => appendToAnswer('/'));
 
-  safeBind('neg', toggleNegative);
-  safeBind('clear', clearAnswer);
-  safeBind('enter', submitAnswer);
+  // Temporary behavior until auto-submit pass:
+  // Clear just clears. Next pass makes it Clear-as-wrong.
+  safeBind('enter', markCurrentAnswerWrongAndClear);
 
+  // Mute moved to the old Clear slot.
   safeBind('muteBtn', () => {
     toggleMute();
     updateMuteButtonLabel();
   });
 
-  // ↩️ Return to QS intro/preflight.
-  // Player can change character or math lane there.
+  // Back to QS intro/preflight.
   safeBind('menu', returnQuickServeGameToIntro);
+
+  // Keep music alive if setup happens after a scene rebuild.
+  ensureQuickServeMusicPlaying();
+
+  // Paint mute state after render.
+  updateMuteButtonLabel();
 }
 
-export function handleKeypadInput(value) {
-  const display = document.getElementById('answerDisplay');
-  if (!display) return;
 
-  const current = display.textContent;
+export function handleKeypadInput(key) {
+  const rawKey = String(key ?? '').trim();
 
-  switch (value) {
-    case 'enter':
-      submitAnswer();
-      break;
+  if (!rawKey) return;
 
-    case 'clear':
-      updateAnswer('0');
-      break;
+  if (/^\d$/.test(rawKey)) {
+    appendToAnswer(rawKey);
+    return;
+  }
 
-    case 'neg':
-      if (current.startsWith('-')) {
-        updateAnswer(current.slice(1));
-      } else {
-        updateAnswer(current === '0' ? '-' : '-' + current);
-      }
-      break;
+  if (rawKey === '.') {
+    appendToAnswer('.');
+    return;
+  }
 
-    case '.':
-      if (!current.includes('.')) {
-        updateAnswer(current + '.');
-      }
-      break;
+  if (rawKey === '/') {
+    appendToAnswer('/');
+    return;
+  }
 
-    default:
-      if (current === '0') {
-        updateAnswer(value);
-      } else {
-        updateAnswer(current + value);
-      }
-      break;
+  if (rawKey === '%') {
+    appendToAnswer('%');
+    return;
+  }
+
+  if (rawKey === '-' || rawKey === '±') {
+    toggleNegative();
+    return;
+  }
+
+  if (rawKey === 'Backspace' || rawKey === 'Delete') {
+    clearAnswer();
+    return;
+  }
+
+  // Current temporary keypad law:
+  // Enter position is now Clear until the auto-submit/Clear-as-wrong pass lands.
+  if (rawKey === 'Enter') {
+    markCurrentAnswerWrongAndClear();
+    return;
+  }
+
+  if (rawKey === 'Escape') {
+    returnQuickServeGameToIntro();
   }
 }
 
-// Legacy helper name kept, but it now highlights difficulty buttons.
-export function highlightModeButton(difficulty) {
-  const activeId = {
+
+export function highlightModeButton(modeOrDifficulty = 'easy') {
+  const raw = String(modeOrDifficulty || '').trim();
+
+  const aliases = {
     easy: 'plusMinus',
+    addSub: 'plusMinus',
+    plusMinus: 'plusMinus',
+
     medium: 'multiplyDivide',
+    med: 'multiplyDivide',
+    multiDiv: 'multiplyDivide',
+    multiplyDivide: 'multiplyDivide',
+
     hard: 'algMode',
-  }[difficulty] || 'plusMinus';
+    algebra: 'algMode',
+    decimals: 'algMode',
+    fractions: 'algMode',
+    mixed: 'algMode',
+    algMode: 'algMode',
+  };
 
-  document.querySelectorAll('.btn-mode').forEach((btn) => {
-    if (btn.id === 'muteBtn') {
-      btn.classList.remove('active-mode');
-      return;
-    }
+  const activeId = aliases[raw] || 'plusMinus';
 
-    btn.classList.toggle('active-mode', btn.id === activeId);
+  document.querySelectorAll('.btn-mode').forEach((button) => {
+    if (button.id === 'muteBtn') return;
+    button.classList.toggle('active-mode', button.id === activeId);
   });
 }
 
-// Helper to set answer
-function updateAnswer(newVal) {
-  const display = document.getElementById('answerDisplay');
-
-  if (display) {
-    display.textContent = newVal;
-  }
-
-  setCurrentAnswer(newVal);
+export function resetQuickServeKeypadAnswerOnly() {
+  clearAnswer();
 }

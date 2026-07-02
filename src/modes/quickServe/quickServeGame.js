@@ -28,7 +28,6 @@ import { hapticError } from '../../utils/haptics.js';
 // 🔥 Game State
 //////////////////////////////
 let score = 0;
-  updateQuickServeStageEnergy(0);
 let timeRemaining = 105;
 let timerInterval = null;
 let currentAnswer = '';
@@ -70,6 +69,7 @@ export function startGameLogic() {
 }
 
 export function stopGameLogic() {
+  clearQuickServeAutoSubmitTimer();
   clearInterval(timerInterval);
   phil.resetPhil();
   gridFX.stopGridPulse();
@@ -82,10 +82,133 @@ export function resetCurrentAnswer() {
   setCurrentAnswer(''); // ✨ keep inputManager harmony
 }
 
-export function appendToAnswer(val) {
-  currentAnswer += val;
-  updateAnswerDisplay();
+
+/* ───────────────── QuickServe Auto Submit Parser START ─────────────────
+   Purpose:
+   - Correct answers auto-submit.
+   - Clear button becomes the wrong-answer lane when input is wrong.
+   - 1/2 parses as 0.5.
+   - 25% parses as 25.
+   - Empty answer state remains empty/?; 0 is a real answer.
+   ─────────────────────────────────────────────────────────────────────── */
+let qsAutoSubmitTimer = null;
+const QS_AUTO_SUBMIT_DELAY_MS = 65;
+
+function clearQuickServeAutoSubmitTimer() {
+  if (qsAutoSubmitTimer) {
+    window.clearTimeout(qsAutoSubmitTimer);
+    qsAutoSubmitTimer = null;
+  }
 }
+
+function parseQuickServeAnswer(rawValue) {
+  const raw = String(rawValue ?? '').trim();
+
+  if (!raw || raw === '-' || raw === '.' || raw === '-.' || raw === '/' || raw === '%') {
+    return Number.NaN;
+  }
+
+  if (raw.endsWith('%')) {
+    const percentNumber = Number(raw.slice(0, -1));
+    return Number.isFinite(percentNumber) ? percentNumber : Number.NaN;
+  }
+
+  if (raw.includes('/')) {
+    const parts = raw.split('/');
+    if (parts.length !== 2) return Number.NaN;
+
+    const numerator = Number(parts[0]);
+    const denominator = Number(parts[1]);
+
+    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
+      return Number.NaN;
+    }
+
+    return numerator / denominator;
+  }
+
+  const numeric = Number(raw);
+  return Number.isFinite(numeric) ? numeric : Number.NaN;
+}
+
+function quickServeAnswersMatch(playerRaw, correctRaw) {
+  const guess = parseQuickServeAnswer(playerRaw);
+  const correct = Number(correctRaw);
+
+  if (!Number.isFinite(guess) || !Number.isFinite(correct)) {
+    return false;
+  }
+
+  return Math.abs(guess - correct) < 0.001;
+}
+
+function isCurrentQuickServeAnswerCorrect() {
+  return quickServeAnswersMatch(currentAnswer, currentCorrectAnswer);
+}
+
+function maybeAutoSubmitQuickServeAnswer() {
+  if (!gameRunning) return;
+  if (!String(currentAnswer || '').trim()) return;
+  if (!isCurrentQuickServeAnswerCorrect()) return;
+
+  clearQuickServeAutoSubmitTimer();
+
+  qsAutoSubmitTimer = window.setTimeout(() => {
+    qsAutoSubmitTimer = null;
+
+    if (!gameRunning) return;
+    if (!isCurrentQuickServeAnswerCorrect()) return;
+
+    submitAnswer();
+  }, QS_AUTO_SUBMIT_DELAY_MS);
+}
+
+function normalizeQuickServeAnswerInput(current, val) {
+  const existing = String(current ?? '');
+  const next = String(val ?? '');
+
+  if (!next) return existing;
+
+  if (/^\d$/.test(next)) {
+    if (existing === '0') return next;
+    return existing + next;
+  }
+
+  if (next === '.') {
+    if (existing.includes('%')) return existing;
+
+    const activePart = existing.includes('/')
+      ? existing.split('/').pop()
+      : existing;
+
+    if (activePart.includes('.')) return existing;
+
+    return existing ? existing + '.' : '0.';
+  }
+
+  if (next === '/') {
+    if (!existing || existing.includes('/') || existing.includes('%')) return existing;
+    if (existing === '-' || existing.endsWith('.')) return existing;
+    return existing + '/';
+  }
+
+  if (next === '%') {
+    if (!existing || existing.includes('%') || existing.includes('/')) return existing;
+    if (existing === '-' || existing.endsWith('.')) return existing;
+    return existing + '%';
+  }
+
+  return existing;
+}
+/* ───────────────── QuickServe Auto Submit Parser END ───────────────── */
+
+export function appendToAnswer(val) {
+  currentAnswer = normalizeQuickServeAnswerInput(currentAnswer, val);
+  updateAnswerDisplay();
+  setCurrentAnswer(currentAnswer);
+  maybeAutoSubmitQuickServeAnswer();
+}
+
 
 export function setMathMode(mode, difficulty = currentMathDifficulty) {
   currentMathMode = normalizeQuickServeMathMode(mode);
@@ -140,13 +263,20 @@ function getQuickServeStageEnergy(scoreValue = score) {
 }
 
 function updateQuickServeStageEnergy(scoreValue = score) {
+  const n = Math.max(0, Number(scoreValue) || 0);
+
+  if (typeof gridFX.setGridScore === 'function') {
+    gridFX.setGridScore(n);
+  }
+
   const gridEl = document.querySelector('.qs-grid');
   if (!gridEl) return;
 
-  const level = String(getQuickServeStageEnergy(scoreValue));
+  const level = String(getQuickServeStageEnergy(n));
   gridEl.dataset.qsEnergy = level;
   document.body?.setAttribute('data-qs-energy', level);
 }
+
 
 function triggerQuickServeStageReaction(type = 'good') {
   const gridEl = document.querySelector('.qs-grid');
@@ -174,6 +304,7 @@ function resetGameState() {
   timeRemaining = 105;
   currentAnswer = '';
   gameRunning = false;
+  updateQuickServeStageEnergy(0);
 
   // 🍧 per-run XP tally
   totalSessionXP = 0;
@@ -399,8 +530,14 @@ function formatTime(seconds) {
 
 function updateAnswerDisplay() {
   const display = document.getElementById('answerDisplay');
-  if (display) display.textContent = currentAnswer === '' ? '0' : currentAnswer;
+  if (!display) return;
+
+  const hasInput = String(currentAnswer || '').trim().length > 0;
+
+  display.textContent = hasInput ? currentAnswer : '?';
+  display.classList.toggle('is-empty', !hasInput);
 }
+
 
 function updateScore() {
   const scoreDisplay = document.getElementById('qsScore');
@@ -408,28 +545,18 @@ function updateScore() {
 }
 
 function submitAnswer() {
-  const problemEl = document.getElementById('mathProblem');
-  if (!problemEl) return;
+  if (!gameRunning) return;
 
-  const correct = Number(problemEl.dataset.answer);
+  clearQuickServeAutoSubmitTimer();
 
-  // 🧠 Treat empty answer as "0" ONLY if correct answer is zero.
-  const guessStr = currentAnswer.trim() === '' && correct === 0
-    ? '0'
-    : currentAnswer.trim();
-
-  const guess = Number(guessStr);
-  const isCorrect =
-    Number.isFinite(guess)
-    && Number.isFinite(correct)
-    && Math.abs(guess - correct) < 0.001;
-
-  if (isCorrect) {
+  if (quickServeAnswersMatch(currentAnswer, currentCorrectAnswer)) {
     handleCorrect();
-  } else {
-    handleIncorrect();
+    return;
   }
+
+  handleIncorrect();
 }
+
 
 function handleCorrect() {
   triggerQuickServeStageReaction('good');
@@ -515,6 +642,116 @@ function handleIncorrect() {
   updateAnswerDisplay();
 }
 
+
+function formatQuickServeProblemPrompt(rawEquation = '') {
+  return String(rawEquation || '')
+    .replace(/\s*=\s*\?\s*$/u, '')
+    .trim();
+}
+
+
+/* ───────────────── QuickServe Equation Typography START ───────────────── */
+
+function getQuickServeModeDisplayName(mode = currentMathMode) {
+  const safeMode = normalizeQuickServeMathMode(mode);
+
+  const labels = {
+    addSub: 'Add/Subtract',
+    multiDiv: 'Multiply/Divide',
+    decimals: 'Decimal/Percent',
+    fractions: 'Fractions',
+    mixed: 'Mixed Bag',
+  };
+
+  return labels[safeMode] || 'Add/Subtract';
+}
+
+
+function getQuickServeDifficultyDisplayName(difficulty = currentMathDifficulty) {
+  const safeDifficulty = normalizeQuickServeMathDifficulty(difficulty);
+
+  const labels = {
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard',
+  };
+
+  return labels[safeDifficulty] || 'Easy';
+}
+
+function getQuickServeEquationModeText() {
+  return `${getQuickServeModeDisplayName()}: ${getQuickServeDifficultyDisplayName()}`;
+}
+
+function ensureQuickServeEquationModeLabel() {
+  let label = document.getElementById('qsEquationModeLabel');
+
+  if (label) return label;
+
+  const stack = document.querySelector('.qs-math .center-stack');
+  if (!stack) return null;
+
+  label = document.createElement('div');
+  label.id = 'qsEquationModeLabel';
+  label.className = 'qs-equation-mode-label';
+  label.setAttribute('aria-live', 'polite');
+
+  stack.prepend(label);
+
+  return label;
+}
+
+function updateQuickServeEquationModeLabel() {
+  const label = ensureQuickServeEquationModeLabel();
+  if (!label) return;
+
+  label.textContent = getQuickServeEquationModeText();
+}
+
+
+function normalizeQuickServeEquationSpacing(rawEquation = '') {
+  return String(rawEquation || '')
+    // Operators that are never unary in our QS display.
+    .replace(/\s*([+×÷=])\s*/gu, ' $1 ')
+    // Only treat hyphen as a binary minus when it sits between two digits/parens.
+    // This preserves leading negative numbers like -8 + 4.
+    .replace(/(\d|\))\s*-\s*(\d|\()/gu, '$1 - $2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function escapeQuickServeEquationHTML(value = '') {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+
+    return map[char] || char;
+  });
+}
+
+function formatQuickServeEquationMarkup(rawEquation = '') {
+  const normalized = normalizeQuickServeEquationSpacing(rawEquation);
+  const escaped = escapeQuickServeEquationHTML(normalized);
+
+  return escaped
+    .replace(/\$/g, '<span class="qs-money-symbol" aria-hidden="true">$</span>')
+    .replace(/%/g, '<span class="qs-percent-symbol" aria-hidden="true">%</span>')
+    .replace(/\s*\+\s*/g, '<span class="qs-op qs-op-plus">+</span>')
+    .replace(/(\d|\))\s+-\s+(\d|\()/g, '$1<span class="qs-op qs-op-minus">-</span>$2')
+    .replace(/\s*×\s*/g, '<span class="qs-op qs-op-times">×</span>')
+    .replace(/\s*÷\s*/g, '<span class="qs-op qs-op-divide">÷</span>')
+    .trim();
+}
+
+
+
+/* ───────────────── QuickServe Equation Typography END ───────────────── */
+
 function renderProblem() {
   const {
     equation,
@@ -529,12 +766,20 @@ function renderProblem() {
   currentPoints = points;
   currentProblemMeta = meta;
 
+  updateQuickServeEquationModeLabel();
+
   const problemEl = document.getElementById('mathProblem');
   if (problemEl) {
-    problemEl.textContent = `${equation} = ?`;
+    const cleanEquation = formatQuickServeProblemPrompt(equation);
+
+    problemEl.innerHTML = `${formatQuickServeEquationMarkup(cleanEquation)}<span class="qs-equals">=</span><span class="qs-question-mark">?</span>`;
     problemEl.dataset.answer = String(answer);
+    problemEl.dataset.rawEquation = cleanEquation;
+    problemEl.dataset.modeLabel = getQuickServeEquationModeText();
   }
 }
+
+
 
 function showResultMsg(isCorrect, xp = 0) {
   const resultMsg = document.getElementById('qsResultMsg');
@@ -544,23 +789,27 @@ function showResultMsg(isCorrect, xp = 0) {
 
   // 💚 Result feedback (right side)
   resultMsg.textContent = isCorrect ? '✅ Correct!' : '❌ Nope!';
-  resultMsg.classList.remove('hidden');
+  resultMsg.classList.remove('hidden', 'cleared', 'show', 'correct', 'error');
+  resultMsg.classList.toggle('correct', isCorrect);
   resultMsg.classList.toggle('error', !isCorrect);
 
   // 🍧 XP feedback (left side)
   xpMsg.textContent = `🍧 ${xp} XP`;
-  xpMsg.classList.remove('hidden');
+  xpMsg.classList.remove('hidden', 'cleared', 'show', 'correct', 'error');
+  xpMsg.classList.toggle('correct', isCorrect);
   xpMsg.classList.toggle('zero', xp === 0);
-  xpMsg.style.color = isCorrect ? '#00ffee' : '#ff4444';
-  xpMsg.style.textShadow = isCorrect
-    ? '0 0 4px #00ffee88'
-    : '0 0 4px #ff444488';
+  xpMsg.classList.toggle('error', !isCorrect);
+
+  // Let CSS own the final Badge 4 color law.
+  xpMsg.removeAttribute('style');
+  resultMsg.removeAttribute('style');
 
   setTimeout(() => {
     resultMsg.classList.add('hidden');
     xpMsg.classList.add('hidden');
   }, 1500);
 }
+
 
 function checkBadgeUnlock() {
   const xp = Number(appState.profile?.xp) || 0;
@@ -573,20 +822,146 @@ function checkBadgeUnlock() {
 }
 
 function toggleNegative() {
-  currentAnswer = currentAnswer.startsWith('-')
-    ? currentAnswer.slice(1)
-    : '-' + currentAnswer;
+  if (!currentAnswer) {
+    currentAnswer = '-';
+  } else {
+    currentAnswer = currentAnswer.startsWith('-')
+      ? currentAnswer.slice(1)
+      : '-' + currentAnswer;
+  }
+
   updateAnswerDisplay();
+  setCurrentAnswer(currentAnswer);
+  maybeAutoSubmitQuickServeAnswer();
 }
 
+
 function clearAnswer() {
+  clearQuickServeAutoSubmitTimer();
   currentAnswer = '';
   updateAnswerDisplay();
+  setCurrentAnswer('');
 }
+
+
+
+
+
+/* ───────────────── QuickServe Clear Feedback START ───────────────── */
+let qsClearFeedbackTimer = null;
+
+function fireQuickServeClearIncorrectEffects() {
+  triggerQuickServeStageReaction('bad');
+  gridFX.bumpGridGlow('bad');
+  phil.triggerGlitch();
+  playIncorrectSfx();
+
+  try {
+    hapticError();
+  } catch (err) {
+    console.warn('[QuickServe] hapticError failed during clear feedback', err);
+  }
+}
+
+function showQuickServeClearedFeedback() {
+  const resultMsg = document.getElementById('qsResultMsg');
+  const xpMsg = document.getElementById('qsXPMsg');
+
+  if (qsClearFeedbackTimer) {
+    window.clearTimeout(qsClearFeedbackTimer);
+    qsClearFeedbackTimer = null;
+  }
+
+  if (xpMsg) {
+    xpMsg.textContent = 'Cleared';
+    xpMsg.classList.remove(
+      'hidden',
+      'zero',
+      'error',
+      'correct',
+      'incorrect',
+      'wrong',
+      'bad',
+      'good'
+    );
+    xpMsg.classList.add('cleared', 'show');
+    xpMsg.removeAttribute('style');
+  }
+
+  if (resultMsg) {
+    resultMsg.textContent = 'Cleared';
+    resultMsg.classList.remove(
+      'hidden',
+      'error',
+      'correct',
+      'incorrect',
+      'wrong',
+      'bad',
+      'good'
+    );
+    resultMsg.classList.add('cleared', 'show');
+  }
+
+  qsClearFeedbackTimer = window.setTimeout(() => {
+    if (resultMsg) {
+      resultMsg.classList.remove('show', 'cleared');
+
+      if (resultMsg.textContent === 'Cleared') {
+        resultMsg.textContent = '';
+      }
+
+      resultMsg.classList.add('hidden');
+    }
+
+    if (xpMsg) {
+      xpMsg.classList.remove('show', 'cleared');
+
+      if (xpMsg.textContent === 'Cleared') {
+        xpMsg.textContent = '';
+      }
+
+      xpMsg.classList.add('hidden');
+    }
+
+    qsClearFeedbackTimer = null;
+  }, 1150);
+}
+/* ───────────────── QuickServe Clear Feedback END ───────────────── */
+
+function markCurrentAnswerWrongAndClear() {
+  if (!gameRunning) {
+    clearAnswer();
+    return;
+  }
+
+  const hasInput = String(currentAnswer || '').trim().length > 0;
+
+  if (!hasInput) {
+    clearAnswer();
+    return;
+  }
+
+  if (isCurrentQuickServeAnswerCorrect()) {
+    submitAnswer();
+    return;
+  }
+
+  clearQuickServeAutoSubmitTimer();
+
+  // Starting finish point:
+  // Clear with an entered answer fires the incorrect-feel lane
+  // but says Cleared instead of Nope/0XP.
+  clearAnswer();
+  fireQuickServeClearIncorrectEffects();
+  showQuickServeClearedFeedback();
+}
+
+
 
 // ✅ Keypad Helpers (export for keypad use)
 export {
   toggleNegative,
   clearAnswer,
+  markCurrentAnswerWrongAndClear,
   submitAnswer
 };
