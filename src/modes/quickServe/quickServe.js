@@ -44,6 +44,7 @@ let qsPreflightDifficulty = 'easy';
 let qsSelectedModeId = 'addSub';
 let qsSelectedCharacterId = 'cosmicPhil';
 let qsPreviewCharacterId = 'cosmicPhil';
+let qsUnlockNudgeReleaseModeId = '';
 
 const QS_ACT_ART_BASE =
   `${import.meta.env.BASE_URL}assets/img/characters/quickServe/acts/`;
@@ -91,10 +92,10 @@ const QS_CHARACTER_ROSTER = [
     name: 'Kool Kat',
     shortName: 'Kat',
     displayNameLines: ['Kool', 'Kat'],
-    unlockModeId: 'addSub',
-    unlockModeLabel: 'Add/Sub',
+    unlockModeId: 'multiDiv',
+    unlockModeLabel: 'Mult/Div',
     unlockThreshold: 100,
-    unlockLabel: 'Score 100+ in Add/Sub',
+    unlockLabel: 'Score 100+ in Mult/Div',
     unlockScore: 100,
     boostLabel: '',
     boostKind: 'none',
@@ -108,10 +109,10 @@ const QS_CHARACTER_ROSTER = [
     name: 'Dr. Kenny Fields',
     shortName: 'Kenny',
     displayNameLines: ['Kenny', 'Fields'],
-    unlockModeId: 'multiDiv',
-    unlockModeLabel: 'Mult/Div',
+    unlockModeId: 'decimalMoney',
+    unlockModeLabel: 'Decimals/Money',
     unlockThreshold: 100,
-    unlockLabel: 'Score 100+ in Mult/Div',
+    unlockLabel: 'Score 100+ in Decimals/Money',
     unlockScore: 100,
     boostLabel: '',
     boostKind: 'none',
@@ -125,10 +126,10 @@ const QS_CHARACTER_ROSTER = [
     name: 'Dino Kid',
     shortName: 'Dino',
     displayNameLines: ['Dino', 'Kid'],
-    unlockModeId: 'decimals',
-    unlockModeLabel: 'Dec/Perc',
+    unlockModeId: 'percents',
+    unlockModeLabel: 'Percents',
     unlockThreshold: 100,
-    unlockLabel: 'Score 100+ in Dec/Perc',
+    unlockLabel: 'Score 100+ in Percents',
     unlockScore: 100,
     boostLabel: '',
     boostKind: 'none',
@@ -156,7 +157,6 @@ const QS_CHARACTER_ROSTER = [
   },
 ];
 
-
 const QS_MODE_ROSTER = [
   {
     id: 'addSub',
@@ -169,9 +169,14 @@ const QS_MODE_ROSTER = [
     mathMode: 'multiDiv',
   },
   {
-    id: 'decimals',
-    label: 'Decimal/Percent',
-    mathMode: 'decimals',
+    id: 'decimalMoney',
+    label: 'Decimals/Money',
+    mathMode: 'decimalMoney',
+  },
+  {
+    id: 'percents',
+    label: 'Percents',
+    mathMode: 'percents',
   },
   {
     id: 'fractions',
@@ -233,6 +238,16 @@ function normalizeQuickServeModeId(modeId = qsSelectedModeId) {
     medium: 'multiDiv',
     hard: 'mixed',
     algebra: 'mixed',
+
+    // Old combined lane becomes Decimals/Money.
+    decimal: 'decimalMoney',
+    decimals: 'decimalMoney',
+    decimalMoney: 'decimalMoney',
+    decimalsPercentsMoney: 'decimalMoney',
+
+    // New real percent lane.
+    percent: 'percents',
+    percents: 'percents',
   };
 
   if (legacyMap[id]) return legacyMap[id];
@@ -362,13 +377,31 @@ function resolveQuickServeMathMode(modeId = qsSelectedModeId) {
   return selectedMode.mathMode || 'addSub';
 }
 
+
+function getQuickServePreviewUnlockModeId() {
+  const previewCharacter =
+    typeof getQuickServePreviewCharacter === 'function'
+      ? getQuickServePreviewCharacter()
+      : getQuickServeSelectedCharacter();
+
+  if (!previewCharacter) return '';
+
+  // Only locked preview characters should nudge a mode button.
+  if (isQuickServeCharacterUnlocked(previewCharacter)) return '';
+
+  return normalizeQuickServeModeId(previewCharacter.unlockModeId || '');
+}
+
 function renderQuickServeModeButtons() {
+  const unlockNudgeModeId = getQuickServePreviewUnlockModeId();
   return QS_MODE_ROSTER.map((mode) => {
     const selected = normalizeQuickServeModeId(qsSelectedModeId) === mode.id;
     const classes = [
       'qs-mode-select-btn',
       `qs-mode-${mode.id}`,
       selected ? 'is-active' : '',
+      unlockNudgeModeId === mode.id ? 'qs-unlock-nudge' : '',
+      qsUnlockNudgeReleaseModeId === mode.id ? 'qs-unlock-nudge-release' : '',
     ].filter(Boolean).join(' ');
 
     return `
@@ -429,7 +462,9 @@ export function setQuickServeModeFromInGameMathMode(mathMode = 'addSub') {
   const map = {
     addSub: 'addSub',
     multiDiv: 'multiDiv',
-    decimals: 'decimals',
+    decimalMoney: 'decimalMoney',
+    decimals: 'decimalMoney',
+    percents: 'percents',
     fractions: 'fractions',
     mixed: 'mixed',
     algebra: 'mixed',
@@ -438,6 +473,7 @@ export function setQuickServeModeFromInGameMathMode(mathMode = 'addSub') {
   const nextModeId = map[mathMode] || normalizeQuickServeModeId(qsSelectedModeId);
   setQuickServeSelectedMode(nextModeId);
 }
+
 
 
 function isQuickServeCharacterUnlocked(character) {
@@ -677,6 +713,7 @@ function applyQuickServePreflightMathMode() {
 
 
 function selectQuickServeCharacter(characterId) {
+  const previousUnlockNudgeModeId = getQuickServePreviewUnlockModeId();
   const character = QS_CHARACTER_ROSTER.find((item) => item.id === characterId);
 
   if (!character) {
@@ -688,15 +725,36 @@ function selectQuickServeCharacter(characterId) {
 
   if (isQuickServeCharacterUnlocked(character)) {
     qsSelectedCharacterId = character.id;
+
+    // If the player was viewing a locked-character "vision" and then clicks
+    // back to a playable character, let the magenta mode hint steam away
+    // instead of simply vanishing.
+    qsUnlockNudgeReleaseModeId = previousUnlockNudgeModeId || '';
+
     console.log(`[QuickServe] Character selected: ${character.id}`);
   } else {
+    // Locked previews should show the live nudge, not the release effect.
+    qsUnlockNudgeReleaseModeId = '';
     console.log(`[QuickServe] Locked character previewed: ${character.id}`);
   }
 
   renderIntroScreen();
   applyQuickServeThemeVars(document.querySelector('.qs-intro'));
-}
 
+  if (qsUnlockNudgeReleaseModeId) {
+    const releasedModeId = qsUnlockNudgeReleaseModeId;
+
+    window.setTimeout(() => {
+      if (qsUnlockNudgeReleaseModeId !== releasedModeId) return;
+
+      qsUnlockNudgeReleaseModeId = '';
+
+      document
+        .querySelector(`[data-qs-mode="${releasedModeId}"].qs-unlock-nudge-release`)
+        ?.classList.remove('qs-unlock-nudge-release');
+    }, 760);
+  }
+}
 
 function renderQuickServeCharacterRosterRow(selectedCharacter) {
   const previewCharacter = getQuickServePreviewCharacter();
@@ -966,28 +1024,11 @@ function renderIntroScreen() {
               aria-label="QuickServe character, mode, and difficulty select"
               ${previewUnlocked ? '' : `data-locked-reason="${unlockText}"`}
             >
-              <div class="qs-setup-layout" aria-label="QuickServe setup controls">
-                <section class="qs-mode-select-panel" aria-label="Mode Select">
-                  <div class="qs-mode-select-label">Mode Select</div>
-                  <div class="qs-mode-select-row">
-                    ${renderQuickServeModeButtons()}
-                  </div>
-                </section>
-
-                <section class="qs-difficulty-select-panel" aria-label="Difficulty">
-                  <div class="qs-difficulty-select-label">Difficulty</div>
-                  <div class="qs-difficulty-select-row">
-                    ${renderQuickServeDifficultyButtons()}
-                  </div>
-                </section>
-              </div>
-
-              <div class="qs-mode-high-score" id="qsSelectedModeBest">
-                <span id="qsSelectedModeBestLabel">${selectedMode.label} High Score:</span>
-                <strong id="qsSelectedModeBestValue">${modeBestScore || '--'}</strong>
-              </div>
-
               <section class="qs-character-showcase" aria-label="Selected character">
+                <div class="qs-character-name qs-character-name-stage" id="qsSelectedCharacterName">
+                  ${previewCharacter.name}
+                </div>
+
                 <div class="qs-character-portrait-wrap qs-character-stage-wrap">
                   <img
                     id="philSpriteIntro"
@@ -997,10 +1038,6 @@ function renderIntroScreen() {
                     aria-hidden="true"
                   />
                   ${renderQuickServeCharacterUnlockOverlay(previewCharacter)}
-                </div>
-
-                <div class="qs-character-name qs-character-name-stage" id="qsSelectedCharacterName">
-                  ${previewCharacter.name}
                 </div>
               </section>
 
@@ -1013,7 +1050,29 @@ function renderIntroScreen() {
                   ${renderQuickServeCharacterRosterRow(selectedCharacter)}
                 </div>
               </section>
+
+              <div class="qs-setup-layout qs-setup-flow qs-character-first-controls" aria-label="QuickServe setup controls">
+                <section class="qs-mode-select-panel" aria-label="Mode Select">
+                  <div class="qs-mode-select-label">Mode Select</div>
+                  <div class="qs-mode-select-row">
+                    ${renderQuickServeModeButtons()}
+                  </div>
+                </section>
+
+                <div class="qs-mode-high-score" id="qsSelectedModeBest">
+                  <span id="qsSelectedModeBestLabel">${selectedMode.label} High Score:</span>
+                  <strong id="qsSelectedModeBestValue">${modeBestScore || '--'}</strong>
+                </div>
+
+                <section class="qs-difficulty-select-panel" aria-label="Difficulty">
+                  <div class="qs-difficulty-select-label">Difficulty</div>
+                  <div class="qs-difficulty-select-row">
+                    ${renderQuickServeDifficultyButtons()}
+                  </div>
+                </section>
+              </div>
             </section>
+
 
             <button
               id="startShowBtn"

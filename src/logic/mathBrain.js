@@ -26,8 +26,11 @@ export function generateProblem(mode = 'addSub', difficulty = 'easy') {
     case 'multiDiv':
       return generateMultiDiv(safeDifficulty);
 
-    case 'decimals':
-      return generateDecimalsPercentsMoney(safeDifficulty);
+    case 'decimalMoney':
+      return generateDecimalMoney(safeDifficulty);
+
+    case 'percents':
+      return generatePercents(safeDifficulty);
 
     case 'fractions':
       return generateFractionsWords(safeDifficulty);
@@ -46,6 +49,7 @@ export function generateProblem(mode = 'addSub', difficulty = 'easy') {
   }
 }
 
+
 //////////////////////////////
 // 🎚️ Rewards
 //////////////////////////////
@@ -60,7 +64,12 @@ const REWARDS = {
     medium: { xp: 6, points: 4 },
     hard:   { xp: 7, points: 5 },
   },
-  decimals: {
+  decimalMoney: {
+    easy:   { xp: 5, points: 3 },
+    medium: { xp: 7, points: 5 },
+    hard:   { xp: 9, points: 7 },
+  },
+  percents: {
     easy:   { xp: 5, points: 3 },
     medium: { xp: 7, points: 5 },
     hard:   { xp: 9, points: 7 },
@@ -416,43 +425,31 @@ function generateMultiDivHard() {
 
 
 
+
 //////////////////////////////
-// 💵 Decimals / Percents / Money Mode
+// 💵 Decimals / Money Mode
 //////////////////////////////
-function generateDecimalsPercentsMoney(difficulty = 'easy') {
+function generateDecimalMoney(difficulty = 'easy') {
   switch (normalizeDifficulty(difficulty)) {
     case 'medium':
-      return attachRewards(generateDecimalMedium(), 'decimals', 'medium');
+      return attachRewards(generateDecimalMoneyMedium(), 'decimalMoney', 'medium');
 
     case 'hard':
-      return attachRewards(generateDecimalHard(), 'decimals', 'hard');
+      return attachRewards(generateDecimalMoneyHard(), 'decimalMoney', 'hard');
 
     case 'easy':
     default:
-      return attachRewards(generateDecimalEasy(), 'decimals', 'easy');
+      return attachRewards(generateDecimalMoneyEasy(), 'decimalMoney', 'easy');
   }
 }
 
-function generateDecimalEasy() {
-  const style = choice(['wholeMoneyAdd', 'wholeMoneyAdd', 'wholeMoneySub', 'friendlyPercent']);
+// Legacy bridge for old saved/routed calls.
+function generateDecimalsPercentsMoney(difficulty = 'easy') {
+  return generateDecimalMoney(difficulty);
+}
 
-  if (style === 'friendlyPercent') {
-    const percent = choice([50, 10]);
-    const whole = percent === 50
-      ? choice([2, 4, 6, 8, 10, 12, 20])
-      : choice([10, 20, 30, 40, 50]);
-
-    return {
-      equation: `${percent}% of ${whole}`,
-      answer: Math.round((percent / 100) * whole * 100) / 100,
-      meta: {
-        type: 'decimalEasyPercent',
-        percent,
-        whole,
-        law: 'easy-second-grade',
-      },
-    };
-  }
+function generateDecimalMoneyEasy() {
+  const style = choice(['wholeMoneyAdd', 'wholeMoneyAdd', 'wholeMoneySub', 'coinAdd']);
 
   if (style === 'wholeMoneySub') {
     const a = getRandomInt(2, 10);
@@ -462,12 +459,28 @@ function generateDecimalEasy() {
       equation: `$${a} - $${b}`,
       answer: a - b,
       meta: {
-        type: 'decimalEasyMoney',
+        type: 'decimalMoneyEasy',
         op: '-',
         a,
         b,
         wholeDollarsOnly: true,
         law: 'easy-second-grade',
+      },
+    };
+  }
+
+  if (style === 'coinAdd') {
+    const a = choice([0.25, 0.5, 0.75, 1.25, 1.5, 2.5]);
+    const b = choice([0.25, 0.5, 0.75, 1.25, 1.5]);
+
+    return {
+      equation: `${money(a)} + ${money(b)}`,
+      answer: round2(a + b),
+      meta: {
+        type: 'decimalMoneyEasyCoins',
+        a,
+        b,
+        law: 'easy-money-friendly',
       },
     };
   }
@@ -479,7 +492,7 @@ function generateDecimalEasy() {
     equation: `$${a} + $${b}`,
     answer: a + b,
     meta: {
-      type: 'decimalEasyMoney',
+      type: 'decimalMoneyEasy',
       op: '+',
       a,
       b,
@@ -489,36 +502,18 @@ function generateDecimalEasy() {
   };
 }
 
-
-
-function generateDecimalMedium() {
-  const style = choice(['friendlyPercent', 'friendlyPercent', 'moneyChange', 'decimalAdd', 'tipFriendly']);
-
-  if (style === 'friendlyPercent') {
-    const percent = choice([10, 25, 50, 75]);
-    const whole = choice([20, 40, 60, 80, 100, 200]);
-
-    return {
-      equation: `${percent}% of ${whole}`,
-      answer: Math.round((percent / 100) * whole * 100) / 100,
-      meta: {
-        type: 'decimalMediumPercent',
-        percent,
-        whole,
-        law: 'medium-fourth-grade',
-      },
-    };
-  }
+function generateDecimalMoneyMedium() {
+  const style = choice(['moneyChange', 'moneyChange', 'decimalAdd', 'decimalSub']);
 
   if (style === 'moneyChange') {
     const price = choice([5, 7.5, 8.5, 10, 12.5, 15, 17.5, 22.5]);
     const paid = choice([20, 25, 30, 40, 50].filter((value) => value > price));
 
     return {
-      equation: `$${paid} - $${price}`,
-      answer: Math.round((paid - price) * 100) / 100,
+      equation: `${money(paid)} - ${money(price)}`,
+      answer: round2(paid - price),
       meta: {
-        type: 'decimalMediumMoney',
+        type: 'decimalMoneyMediumChange',
         paid,
         price,
         law: 'medium-fourth-grade',
@@ -526,42 +521,163 @@ function generateDecimalMedium() {
     };
   }
 
-  if (style === 'decimalAdd') {
-    const a = choice([1.5, 2.5, 3.5, 4.5, 5.5]);
+  if (style === 'decimalSub') {
+    const a = choice([4.5, 5.5, 6.5, 7.5, 8.5]);
     const b = choice([0.5, 1.5, 2.5, 3.5]);
 
     return {
-      equation: `${a} + ${b}`,
-      answer: Math.round((a + b) * 100) / 100,
+      equation: `${a} - ${b}`,
+      answer: round2(a - b),
       meta: {
-        type: 'decimalMediumAdd',
+        type: 'decimalMoneyMediumSub',
         a,
         b,
-        law: 'medium-fourth-grade',
+        law: 'medium-decimal-readable',
       },
     };
   }
 
-  const percent = choice([10, 15, 20]);
-  const bill = choice([10, 15, 20, 25, 30, 40]);
+  const a = choice([1.5, 2.5, 3.5, 4.5, 5.5]);
+  const b = choice([0.5, 1.5, 2.5, 3.5]);
 
   return {
-    equation: `${percent}% tip $${bill}`,
-    answer: Math.round((bill * percent) / 100 * 100) / 100,
+    equation: `${a} + ${b}`,
+    answer: round2(a + b),
     meta: {
-      type: 'decimalMediumTip',
-      percent,
-      bill,
-      readableTip: true,
+      type: 'decimalMoneyMediumAdd',
+      a,
+      b,
       law: 'medium-fourth-grade',
     },
   };
 }
 
+function generateDecimalMoneyHard() {
+  const style = choice(['decimalTwoStep', 'moneyMultiply', 'moneyChangeHard']);
 
+  if (style === 'moneyMultiply') {
+    const price = choice([1.25, 1.5, 2.25, 2.5, 3.5, 4.25]);
+    const count = getRandomInt(3, 8);
 
-function generateDecimalHard() {
-  const style = choice(['tip', 'percentOff', 'decimalTwoStep']);
+    return {
+      equation: `${money(price)} × ${count}`,
+      answer: round2(price * count),
+      meta: {
+        type: 'decimalMoneyHardMultiply',
+        price,
+        count,
+        law: 'hard-tricky-readable',
+      },
+    };
+  }
+
+  if (style === 'moneyChangeHard') {
+    const price = choice([13.75, 18.5, 22.25, 27.5, 34.75]);
+    const paid = choice([40, 50, 60].filter((value) => value > price));
+
+    return {
+      equation: `${money(paid)} - ${money(price)}`,
+      answer: round2(paid - price),
+      meta: {
+        type: 'decimalMoneyHardChange',
+        paid,
+        price,
+        law: 'hard-money-readable',
+      },
+    };
+  }
+
+  const a = round1(getRandomInt(20, 89) / 10);
+  const b = getRandomInt(3, 8);
+  const c = round1(getRandomInt(5, 39) / 10);
+
+  return {
+    equation: `${a} × ${b} + ${c}`,
+    answer: round2(a * b + c),
+    meta: {
+      type: 'decimalMoneyHardTwoStep',
+      a,
+      b,
+      c,
+      law: 'hard-tricky-readable',
+    },
+  };
+}
+
+//////////////////////////////
+// 🧮 Percents Mode
+//////////////////////////////
+function generatePercents(difficulty = 'easy') {
+  switch (normalizeDifficulty(difficulty)) {
+    case 'medium':
+      return attachRewards(generatePercentMedium(), 'percents', 'medium');
+
+    case 'hard':
+      return attachRewards(generatePercentHard(), 'percents', 'hard');
+
+    case 'easy':
+    default:
+      return attachRewards(generatePercentEasy(), 'percents', 'easy');
+  }
+}
+
+function generatePercentEasy() {
+  const percent = choice([50, 50, 10, 25]);
+  const whole = percent === 50
+    ? choice([2, 4, 6, 8, 10, 12, 20])
+    : percent === 25
+      ? choice([4, 8, 12, 16, 20, 40])
+      : choice([10, 20, 30, 40, 50]);
+
+  return {
+    equation: `${percent}% of ${whole}`,
+    answer: round2((percent / 100) * whole),
+    meta: {
+      type: 'percentEasy',
+      percent,
+      whole,
+      law: 'easy-percent-friendly',
+    },
+  };
+}
+
+function generatePercentMedium() {
+  const style = choice(['friendlyPercent', 'friendlyPercent', 'tipFriendly']);
+
+  if (style === 'tipFriendly') {
+    const percent = choice([10, 15, 20]);
+    const bill = choice([10, 15, 20, 25, 30, 40]);
+
+    return {
+      equation: `${percent}% tip $${bill}`,
+      answer: round2((bill * percent) / 100),
+      meta: {
+        type: 'percentMediumTip',
+        percent,
+        bill,
+        readableTip: true,
+        law: 'medium-fourth-grade',
+      },
+    };
+  }
+
+  const percent = choice([10, 20, 25, 50, 75]);
+  const whole = choice([20, 40, 60, 80, 100, 120, 200]);
+
+  return {
+    equation: `${percent}% of ${whole}`,
+    answer: round2((percent / 100) * whole),
+    meta: {
+      type: 'percentMediumOf',
+      percent,
+      whole,
+      law: 'medium-fourth-grade',
+    },
+  };
+}
+
+function generatePercentHard() {
+  const style = choice(['percentOff', 'tip', 'hardPercentOf']);
 
   if (style === 'percentOff') {
     const percent = choice([10, 15, 20, 25, 30]);
@@ -569,9 +685,9 @@ function generateDecimalHard() {
 
     return {
       equation: `${percent}% off $${price}`,
-      answer: Math.round((price * (1 - percent / 100)) * 100) / 100,
+      answer: round2(price * (1 - percent / 100)),
       meta: {
-        type: 'decimalHardPercentOff',
+        type: 'percentHardOff',
         percent,
         price,
         law: 'hard-tricky-readable',
@@ -579,40 +695,37 @@ function generateDecimalHard() {
     };
   }
 
-  if (style === 'decimalTwoStep') {
-    const a = Math.round(getRandomInt(20, 89)) / 10;
-    const b = getRandomInt(3, 8);
-    const c = Math.round(getRandomInt(5, 39)) / 10;
+  if (style === 'tip') {
+    const percent = choice([15, 18, 20, 22, 25]);
+    const bill = choice([24, 30, 36, 40, 50, 60, 80]);
 
     return {
-      equation: `${a} × ${b} + ${c}`,
-      answer: Math.round((a * b + c) * 100) / 100,
+      equation: `${percent}% tip $${bill}`,
+      answer: round2((bill * percent) / 100),
       meta: {
-        type: 'decimalHardTwoStep',
-        a,
-        b,
-        c,
+        type: 'percentHardTip',
+        percent,
+        bill,
+        readableTip: true,
         law: 'hard-tricky-readable',
       },
     };
   }
 
-  const percent = choice([15, 18, 20, 22, 25]);
-  const bill = choice([24, 30, 36, 40, 50, 60, 80]);
+  const percent = choice([12.5, 15, 20, 25, 37.5]);
+  const whole = choice([32, 48, 64, 80, 96, 120, 160]);
 
   return {
-    equation: `${percent}% tip $${bill}`,
-    answer: Math.round((bill * percent) / 100 * 100) / 100,
+    equation: `${percent}% of ${whole}`,
+    answer: round2((percent / 100) * whole),
     meta: {
-      type: 'decimalHardTip',
+      type: 'percentHardOf',
       percent,
-      bill,
-      readableTip: true,
-      law: 'hard-tricky-readable',
+      whole,
+      law: 'hard-percent-readable',
     },
   };
 }
-
 
 
 //////////////////////////////
@@ -779,19 +892,22 @@ function generateMixedBag(difficulty = 'easy') {
       generateAddSubEasy,
       generateAddSubEasy,
       generateMultiDivEasy,
-      generateDecimalEasy,
+      generateDecimalMoneyEasy,
+      generatePercentEasy,
       generateFractionEasy,
     ],
     medium: [
       generateAddSubMedium,
       generateMultiDivMedium,
-      generateDecimalMedium,
+      generateDecimalMoneyMedium,
+      generatePercentMedium,
       generateFractionMedium,
     ],
     hard: [
       generateAddSubHard,
       generateMultiDivHard,
-      generateDecimalHard,
+      generateDecimalMoneyHard,
+      generatePercentHard,
       generateFractionHard,
     ],
   };
@@ -806,6 +922,7 @@ function generateMixedBag(difficulty = 'easy') {
 }
 
 
+
 //////////////////////////////
 // 🧹 Normalizers
 //////////////////////////////
@@ -817,8 +934,15 @@ function normalizeMode(mode = 'addSub') {
     medium: 'multiDiv',
     hard: 'mixed',
     algebra: 'mixed',
-    decimal: 'decimals',
-    decimalsPercentsMoney: 'decimals',
+
+    decimal: 'decimalMoney',
+    decimals: 'decimalMoney',
+    decimalMoney: 'decimalMoney',
+    decimalsPercentsMoney: 'decimalMoney',
+
+    percent: 'percents',
+    percentage: 'percents',
+
     fraction: 'fractions',
     fractionsWords: 'fractions',
     mixedReview: 'mixed',
@@ -826,10 +950,11 @@ function normalizeMode(mode = 'addSub') {
 
   const normalized = aliases[raw] || raw;
 
-  return ['addSub', 'multiDiv', 'decimals', 'fractions', 'mixed'].includes(normalized)
+  return ['addSub', 'multiDiv', 'decimalMoney', 'percents', 'fractions', 'mixed'].includes(normalized)
     ? normalized
     : 'addSub';
 }
+
 
 function normalizeDifficulty(difficulty = 'easy') {
   const raw = String(difficulty || '').trim();

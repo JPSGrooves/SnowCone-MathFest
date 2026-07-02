@@ -401,16 +401,24 @@ function normalizeQuickServeMathMode(mode = 'addSub') {
   const aliases = {
     algebra: 'mixed',
     mixedReview: 'mixed',
-    decimal: 'decimals',
+
+    decimal: 'decimalMoney',
+    decimals: 'decimalMoney',
+    decimalsPercentsMoney: 'decimalMoney',
+
+    percent: 'percents',
+    percentage: 'percents',
+
     fraction: 'fractions',
   };
 
   const normalized = aliases[raw] || raw;
 
-  return ['addSub', 'multiDiv', 'decimals', 'fractions', 'mixed'].includes(normalized)
+  return ['addSub', 'multiDiv', 'decimalMoney', 'percents', 'fractions', 'mixed'].includes(normalized)
     ? normalized
     : 'addSub';
 }
+
 
 function normalizeQuickServeMathDifficulty(difficulty = 'easy') {
   const raw = String(difficulty || '').trim();
@@ -442,7 +450,12 @@ function getModeDifficultyRewards(mode = 'addSub', difficulty = 'easy') {
       medium: { xp: 6, points: 4 },
       hard:   { xp: 7, points: 5 },
     },
-    decimals: {
+    decimalMoney: {
+      easy:   { xp: 5, points: 3 },
+      medium: { xp: 7, points: 5 },
+      hard:   { xp: 9, points: 7 },
+    },
+    percents: {
       easy:   { xp: 5, points: 3 },
       medium: { xp: 7, points: 5 },
       hard:   { xp: 9, points: 7 },
@@ -461,6 +474,7 @@ function getModeDifficultyRewards(mode = 'addSub', difficulty = 'easy') {
 
   return table[safeMode]?.[safeDifficulty] || table.addSub.easy;
 }
+
 
 
 function updateQuickServeTimerProgress() {
@@ -690,10 +704,78 @@ function handleIncorrect() {
 }
 
 
-function formatQuickServeProblemPrompt(rawEquation = '') {
-  return String(rawEquation || '')
+function almostEqualQuickServeNumber(a, b, tolerance = 0.001) {
+  return Math.abs(Number(a) - Number(b)) < tolerance;
+}
+
+function clarifyQuickServeFractionOfPrompt(rawPrompt = '', answer = currentCorrectAnswer) {
+  const prompt = String(rawPrompt || '').trim();
+
+  // Example ambiguity:
+  // "1/4 of 28 - 3"
+  //
+  // Players can read this as:
+  //   1/4 of (28 - 3)
+  //
+  // But the generator may mean:
+  //   (1/4 of 28) - 3
+  //
+  // We display parentheses based on the actual stored answer so the UI
+  // tells one clean truth.
+  const match = prompt.match(
+    /^(\d+)\s*\/\s*(\d+)\s+of\s+(-?\d+(?:\.\d+)?)\s*([+-])\s*(-?\d+(?:\.\d+)?)$/u
+  );
+
+  if (!match) return prompt;
+
+  const numerator = Number(match[1]);
+  const denominator = Number(match[2]);
+  const base = Number(match[3]);
+  const op = match[4];
+  const tail = Number(match[5]);
+  const correct = Number(answer);
+
+  if (
+    !Number.isFinite(numerator)
+    || !Number.isFinite(denominator)
+    || denominator === 0
+    || !Number.isFinite(base)
+    || !Number.isFinite(tail)
+    || !Number.isFinite(correct)
+  ) {
+    return prompt;
+  }
+
+  const fraction = numerator / denominator;
+  const opSign = op === '-' ? '-' : '+';
+
+  const leftFirstValue =
+    op === '-'
+      ? (fraction * base) - tail
+      : (fraction * base) + tail;
+
+  const groupedValue =
+    op === '-'
+      ? fraction * (base - tail)
+      : fraction * (base + tail);
+
+  if (almostEqualQuickServeNumber(correct, groupedValue)) {
+    return `${numerator}/${denominator} of (${base} ${opSign} ${tail})`;
+  }
+
+  if (almostEqualQuickServeNumber(correct, leftFirstValue)) {
+    return `(${numerator}/${denominator} of ${base}) ${opSign} ${tail}`;
+  }
+
+  return prompt;
+}
+
+function formatQuickServeProblemPrompt(rawEquation = '', answer = currentCorrectAnswer) {
+  const cleanPrompt = String(rawEquation || '')
     .replace(/\s*=\s*\?\s*$/u, '')
     .trim();
+
+  return clarifyQuickServeFractionOfPrompt(cleanPrompt, answer);
 }
 
 
@@ -705,13 +787,15 @@ function getQuickServeModeDisplayName(mode = currentMathMode) {
   const labels = {
     addSub: 'Add/Subtract',
     multiDiv: 'Multiply/Divide',
-    decimals: 'Decimal/Percent',
+    decimalMoney: 'Decimals/Money',
+    percents: 'Percents',
     fractions: 'Fractions',
     mixed: 'Mixed Bag',
   };
 
   return labels[safeMode] || 'Add/Subtract';
 }
+
 
 
 function getQuickServeDifficultyDisplayName(difficulty = currentMathDifficulty) {
@@ -817,7 +901,7 @@ function renderProblem() {
 
   const problemEl = document.getElementById('mathProblem');
   if (problemEl) {
-    const cleanEquation = formatQuickServeProblemPrompt(equation);
+    const cleanEquation = formatQuickServeProblemPrompt(equation, answer);
 
     problemEl.innerHTML = `${formatQuickServeEquationMarkup(cleanEquation)}<span class="qs-equals">=</span><span class="qs-question-mark">?</span>`;
     problemEl.dataset.answer = String(answer);

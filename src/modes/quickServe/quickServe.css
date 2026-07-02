@@ -8801,3 +8801,2915 @@ body.qs-active .qs-math.qs-time-pressure::after {
 
 /* ───────────────── QuickServe — Final Ten Seconds Pressure END ───────────────── */
 
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Final Intro Setup Alignment
+   Purpose:
+   - Bigger Mode Select / Difficulty labels.
+   - Labels centered exactly over their button stacks.
+   - Mode and Difficulty columns use a symmetrical setup window.
+   - Difficulty buttons stretch taller so the 3-button stack matches
+     the 5-button Mode Select stack height.
+   - Intro only. Gameplay/result logic untouched.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  width: min(100%, 43rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  column-gap: clamp(2.05rem, 7.1vw, 4rem) !important;
+
+  padding-left: clamp(0.52rem, 2.5vw, 1.05rem) !important;
+  padding-right: clamp(0.52rem, 2.5vw, 1.05rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+  width: 100% !important;
+
+  margin: 0 0 clamp(0.34rem, 0.86svh, 0.58rem) 0 !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+  justify-self: center !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.82rem, 1.95svh, 1.08rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.13em !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+
+  display: grid !important;
+  align-content: stretch !important;
+  justify-items: stretch !important;
+
+  gap: clamp(0.32rem, 0.82svh, 0.54rem) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+  grid-template-rows: repeat(5, minmax(clamp(2.02rem, 5.15svh, 2.72rem), 1fr)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  grid-template-rows: repeat(3, 1fr) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+  font-size: clamp(0.84rem, 2.08svh, 1.16rem) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+  font-size: clamp(0.95rem, 2.35svh, 1.26rem) !important;
+}
+
+/* Short iPhones: keep the same alignment, slightly tighter. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    column-gap: clamp(1.5rem, 5.8vw, 2.7rem) !important;
+    padding-left: clamp(0.42rem, 2vw, 0.8rem) !important;
+    padding-right: clamp(0.42rem, 2vw, 0.8rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.72rem, 1.68svh, 0.92rem) !important;
+    margin-bottom: clamp(0.24rem, 0.62svh, 0.42rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+    gap: clamp(0.24rem, 0.62svh, 0.42rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+    grid-template-rows: repeat(5, minmax(clamp(1.78rem, 4.7svh, 2.28rem), 1fr)) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.74rem, 1.84svh, 0.98rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.82rem, 2.05svh, 1.08rem) !important;
+  }
+}
+
+/* iPad: same law, more breathing room. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    width: min(100%, 56rem) !important;
+    column-gap: clamp(3rem, 7vw, 6rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(1rem, 1.75vw, 1.34rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Final Intro Setup Alignment END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Intro Setup Alignment Scalpel
+   Purpose:
+   - Treat Mode Select and Difficulty as two equal centered columns.
+   - Keep both headers the same size.
+   - Reduce button text size, especially long mode names.
+   - Align Add/Subtract top exactly with Easy top.
+   - Align Mixed Bag bottom exactly with Hard bottom.
+   - CSS-only intro correction.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  --qs-setup-stack-height: clamp(12.65rem, 29.2svh, 15.35rem);
+  --qs-setup-gap: clamp(0.34rem, 0.82svh, 0.5rem);
+
+  width: min(100%, 42.5rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  column-gap: clamp(2rem, 6.5vw, 3.65rem) !important;
+
+  padding-left: clamp(0.7rem, 2.7vw, 1.08rem) !important;
+  padding-right: clamp(0.7rem, 2.7vw, 1.08rem) !important;
+
+  align-items: start !important;
+  justify-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto var(--qs-setup-stack-height) !important;
+  align-items: start !important;
+  justify-items: stretch !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Headers: same font size, centered over equal columns, no wrap. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+  width: 100% !important;
+
+  margin: 0 0 clamp(0.4rem, 0.95svh, 0.6rem) 0 !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+  justify-self: center !important;
+  align-self: end !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 1.56svh, 0.92rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.125em !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+/* Button stacks share the same total height. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  width: 100% !important;
+  height: var(--qs-setup-stack-height) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  gap: var(--qs-setup-gap) !important;
+
+  align-content: stretch !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+  grid-template-rows: repeat(5, minmax(0, 1fr)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding-left: clamp(0.42rem, 1.55vw, 0.72rem) !important;
+  padding-right: clamp(0.42rem, 1.55vw, 0.72rem) !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Mode text comes down so long names breathe again. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+  font-size: clamp(0.7rem, 1.72svh, 0.96rem) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.045em !important;
+  white-space: nowrap !important;
+}
+
+/* Difficulty text can stay a little stronger because the buttons are taller. */
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+  font-size: clamp(0.86rem, 2.05svh, 1.12rem) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  white-space: nowrap !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-setup-stack-height: clamp(11.35rem, 27.6svh, 13.6rem);
+    --qs-setup-gap: clamp(0.24rem, 0.62svh, 0.38rem);
+
+    column-gap: clamp(1.55rem, 5.4vw, 2.8rem) !important;
+    padding-left: clamp(0.55rem, 2.2vw, 0.86rem) !important;
+    padding-right: clamp(0.55rem, 2.2vw, 0.86rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.64rem, 1.38svh, 0.8rem) !important;
+    letter-spacing: 0.115em !important;
+    margin-bottom: clamp(0.3rem, 0.72svh, 0.46rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.62rem, 1.48svh, 0.8rem) !important;
+    letter-spacing: -0.055em !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.74rem, 1.76svh, 0.94rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Intro Setup Alignment Scalpel END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Intro Setup Micro Alignment Scalpel
+   Purpose:
+   - Final manual nudge pass for the two-column intro setup.
+   - Keep previous top/bottom stack alignment.
+   - Make mode button text slightly smaller and safer inside buttons.
+   - Move both columns right a hair, with Difficulty moving a little more.
+   - CSS-only. Scalpel, not rock.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  --qs-mode-col-nudge-x: clamp(0.42rem, 1.55vw, 0.72rem);
+  --qs-difficulty-col-nudge-x: clamp(0.78rem, 2.35vw, 1.16rem);
+
+  /* Button-text knobs */
+  --qs-mode-btn-font-min: 0.54rem;
+  --qs-mode-btn-font-fluid: 1.34svh;
+  --qs-mode-btn-font-max: 0.78rem;
+
+  --qs-difficulty-btn-font-min: 0.78rem;
+  --qs-difficulty-btn-font-fluid: 1.9svh;
+  --qs-difficulty-btn-font-max: 1.04rem;
+}
+
+/* Keep both columns centered inside their 50% lanes, then nudge right manually. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel {
+  justify-self: center !important;
+  transform: translateX(var(--qs-mode-col-nudge-x)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel {
+  justify-self: center !important;
+  transform: translateX(var(--qs-difficulty-col-nudge-x)) !important;
+}
+
+/* Let button text respect the box instead of bullying it. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn {
+  overflow: hidden !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+  display: block !important;
+
+  max-width: 100% !important;
+  min-width: 0 !important;
+
+  font-size: clamp(
+    var(--qs-mode-btn-font-min),
+    var(--qs-mode-btn-font-fluid),
+    var(--qs-mode-btn-font-max)
+  ) !important;
+
+  line-height: 1 !important;
+  letter-spacing: -0.075em !important;
+  white-space: nowrap !important;
+
+  overflow: hidden !important;
+  text-overflow: clip !important;
+
+  transform: translateY(0.01em) scaleX(0.97) !important;
+  transform-origin: center center !important;
+}
+
+/* Keep Difficulty strong, but not huge. */
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+  font-size: clamp(
+    var(--qs-difficulty-btn-font-min),
+    var(--qs-difficulty-btn-font-fluid),
+    var(--qs-difficulty-btn-font-max)
+  ) !important;
+
+  line-height: 1 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+}
+
+/* Smarter scaling on newer iOS WKWebView. Falls back safely if unsupported. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn {
+    container-type: inline-size !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.52rem, 8.25cqw, 0.78rem) !important;
+  }
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-mode-col-nudge-x: clamp(0.12rem, 0.58vw, 0.26rem);
+    --qs-difficulty-col-nudge-x: clamp(0.26rem, 1vw, 0.48rem);
+
+    --qs-mode-btn-font-min: 0.5rem;
+    --qs-mode-btn-font-fluid: 1.22svh;
+    --qs-mode-btn-font-max: 0.68rem;
+
+    --qs-difficulty-btn-font-min: 0.7rem;
+    --qs-difficulty-btn-font-fluid: 1.68svh;
+    --qs-difficulty-btn-font-max: 0.9rem;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.48rem, 7.65cqw, 0.68rem) !important;
+    }
+  }
+}
+
+/* ───────────────── QuickServe — Intro Setup Micro Alignment Scalpel END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Manual Column Nudge Final
+   Purpose:
+   - Move setup columns by hand.
+   - Restore readable mode button text.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  --qs-mode-col-nudge-x: clamp(0.42rem, 1.55vw, 0.72rem);
+  --qs-difficulty-col-nudge-x: clamp(0.78rem, 2.35vw, 1.16rem);
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+  font-size: clamp(0.66rem, 1.55svh, 0.86rem) !important;
+  letter-spacing: -0.055em !important;
+  transform: translateY(0.01em) scaleX(0.98) !important;
+}
+
+/* Override the cqw smart-scale experiment. It got too tiny here. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.66rem, 1.55svh, 0.86rem) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Intro Manual Column Nudge Final
+   Purpose:
+   - Manual final alignment for intro mode/difficulty columns.
+   - Both columns nudge right.
+   - Mode text gets vertical breathing room so descenders do not clip.
+   - Decimal/Percent is now shorter as Decimals/$/% from JS.
+   - CSS-only layout override.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  /* Manual steering knobs:
+     positive = right
+     negative = left
+  */
+  --qs-mode-col-nudge-x: clamp(1.18rem, 5vw, 1.92rem);
+  --qs-difficulty-col-nudge-x: clamp(1.34rem, 5.55vw, 2.18rem);
+}
+
+/* Keep the existing equal-column structure, but steer both columns right. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel {
+  transform: translateX(var(--qs-mode-col-nudge-x)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel {
+  transform: translateX(var(--qs-difficulty-col-nudge-x)) !important;
+}
+
+/* Let the text breathe inside the button window. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn {
+  overflow: hidden !important;
+  padding-top: clamp(0.12rem, 0.38svh, 0.22rem) !important;
+  padding-bottom: clamp(0.16rem, 0.46svh, 0.28rem) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+  display: block !important;
+
+  font-size: clamp(0.62rem, 1.46svh, 0.82rem) !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.058em !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+
+  padding-top: 0.03em !important;
+  padding-bottom: 0.13em !important;
+
+  transform: translateY(-0.01em) scaleX(0.985) !important;
+  transform-origin: center center !important;
+}
+
+/* Override the earlier cqw experiment. It made this screen too tiny. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.62rem, 1.46svh, 0.82rem) !important;
+  }
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-mode-col-nudge-x: clamp(0.92rem, 4.25vw, 1.42rem);
+    --qs-difficulty-col-nudge-x: clamp(1.06rem, 4.8vw, 1.66rem);
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.56rem, 1.28svh, 0.72rem) !important;
+    line-height: 1.24 !important;
+    padding-bottom: 0.16em !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.56rem, 1.28svh, 0.72rem) !important;
+    }
+  }
+}
+
+/* ───────────────── QuickServe — Intro Manual Column Nudge Final END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Locked Character Mode Nudge
+   Purpose:
+   - Give Mode Select one final small right nudge.
+   - When a locked character is previewed, softly glow the mode button
+     that unlocks that character.
+   - Tapping an unlocked character removes the nudge through JS state.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  /* Final 5%-ish push for Mode Select only. */
+  --qs-mode-col-nudge-x: clamp(1.26rem, 5.35vw, 2.04rem);
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-mode-col-nudge-x: clamp(0.98rem, 4.48vw, 1.5rem);
+  }
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge {
+  border-color: rgba(255, 82, 218, 0.9) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 82, 218, 0.16),
+      rgba(0, 0, 0, 0.5) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 0 10px rgba(255, 82, 218, 0.58),
+    0 0 18px rgba(255, 82, 218, 0.28) !important;
+
+  animation: qsLockedCharacterModeNudgePulse 980ms ease-in-out infinite alternate !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge strong {
+  color: rgba(255, 238, 255, 0.96) !important;
+  text-shadow:
+    0 0 7px rgba(255, 82, 218, 0.7),
+    0 0 14px rgba(255, 82, 218, 0.28),
+    0 2px 6px rgba(0,0,0,0.92) !important;
+}
+
+@keyframes qsLockedCharacterModeNudgePulse {
+  from {
+    filter: brightness(1);
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    filter: brightness(1.16);
+    transform: translateY(-0.015rem) scale(1.012);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge {
+    animation: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Locked Character Mode Nudge END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Normalized Intro Columns
+   Purpose:
+   - Stop the per-device nudge game.
+   - Make iPhone/iPad setup presentation use the same two-column law.
+   - Mode Select and Difficulty are equal columns.
+   - Each column owns a centered button stack.
+   - Button stacks share the same top and bottom edge.
+   - Previous translateX/cqw experiments are neutralized here.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  --qs-setup-stack-height: clamp(11.15rem, 24svh, 15rem);
+  --qs-setup-gap: clamp(0.32rem, 0.76svh, 0.52rem);
+
+  --qs-mode-stack-width: clamp(10.15rem, 39vw, 14.25rem);
+  --qs-difficulty-stack-width: clamp(8.95rem, 32vw, 12.25rem);
+
+  width: min(100%, 52rem) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  column-gap: clamp(1.7rem, 7vw, 5.25rem) !important;
+
+  padding-left: clamp(1.05rem, 4.25vw, 2.85rem) !important;
+  padding-right: clamp(1.05rem, 4.25vw, 2.85rem) !important;
+
+  align-items: start !important;
+  justify-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto var(--qs-setup-stack-height) !important;
+  align-items: start !important;
+  justify-items: center !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+
+  transform: none !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+  width: 100% !important;
+  max-width: var(--qs-mode-stack-width) !important;
+
+  margin: 0 0 clamp(0.34rem, 0.82svh, 0.58rem) 0 !important;
+  padding: 0 !important;
+
+  justify-self: center !important;
+  text-align: center !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.7rem, 1.46svh, 0.96rem) !important;
+  font-weight: 950 !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0.125em !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+  max-width: var(--qs-difficulty-stack-width) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  height: var(--qs-setup-stack-height) !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  gap: var(--qs-setup-gap) !important;
+
+  align-content: stretch !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+  width: var(--qs-mode-stack-width) !important;
+  grid-template-rows: repeat(5, minmax(0, 1fr)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  width: var(--qs-difficulty-stack-width) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding:
+    clamp(0.14rem, 0.42svh, 0.28rem)
+    clamp(0.42rem, 1.5vw, 0.78rem)
+    clamp(0.18rem, 0.5svh, 0.34rem) !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+  display: block !important;
+
+  max-width: 100% !important;
+
+  font-size: clamp(0.64rem, 1.42svh, 0.88rem) !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.052em !important;
+  white-space: nowrap !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+
+  padding-top: 0.02em !important;
+  padding-bottom: 0.12em !important;
+
+  transform: translateY(-0.01em) scaleX(0.975) !important;
+  transform-origin: center center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+  display: block !important;
+
+  max-width: 100% !important;
+
+  font-size: clamp(0.82rem, 1.86svh, 1.14rem) !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+
+  padding-bottom: 0.06em !important;
+
+  transform: none !important;
+}
+
+/* Kill the earlier cqw smart-scaling experiment completely. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.64rem, 1.42svh, 0.88rem) !important;
+  }
+}
+
+/* iPad should follow the same law, only allowed to breathe larger. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-setup-stack-height: clamp(12.35rem, 22svh, 16.5rem);
+    --qs-setup-gap: clamp(0.36rem, 0.62vw, 0.58rem);
+
+    --qs-mode-stack-width: clamp(12rem, 20vw, 16.25rem);
+    --qs-difficulty-stack-width: clamp(10.3rem, 16.5vw, 13.6rem);
+
+    width: min(100%, 58rem) !important;
+    column-gap: clamp(3rem, 8vw, 6.25rem) !important;
+
+    padding-left: clamp(2rem, 5vw, 4rem) !important;
+    padding-right: clamp(2rem, 5vw, 4rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.86rem, 1.28vw, 1.08rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.76rem, 1.12vw, 0.98rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.96rem, 1.42vw, 1.22rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.76rem, 1.12vw, 0.98rem) !important;
+    }
+  }
+}
+
+/* Short iPhones keep the same geometry, just tighter. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-setup-stack-height: clamp(10.4rem, 22.5svh, 12.85rem);
+    --qs-setup-gap: clamp(0.24rem, 0.58svh, 0.4rem);
+
+    --qs-mode-stack-width: clamp(9.7rem, 38vw, 12.2rem);
+    --qs-difficulty-stack-width: clamp(8.45rem, 31vw, 10.8rem);
+
+    column-gap: clamp(1.35rem, 5.5vw, 3.1rem) !important;
+    padding-left: clamp(0.78rem, 3.35vw, 1.65rem) !important;
+    padding-right: clamp(0.78rem, 3.35vw, 1.65rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.62rem, 1.28svh, 0.78rem) !important;
+    margin-bottom: clamp(0.26rem, 0.62svh, 0.42rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.56rem, 1.22svh, 0.72rem) !important;
+    line-height: 1.22 !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.72rem, 1.58svh, 0.92rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.56rem, 1.22svh, 0.72rem) !important;
+    }
+  }
+}
+
+/* ───────────────── QuickServe — Normalized Intro Columns END ───────────────── */
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Deterministic Two-Lane Setup Window
+   Purpose:
+   - Stop nudging columns as loose objects.
+   - Treat the setup area as two exact horizontal halves.
+   - Mode Select is centered in the left 50%.
+   - Difficulty is centered in the right 50%.
+   - iPhone and iPad follow the same geometry law.
+   - This intentionally overrides previous nudge/translate/cqw attempts.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+  --qs-setup-stack-height: clamp(11.2rem, 24svh, 15.4rem);
+  --qs-setup-gap: clamp(0.32rem, 0.75svh, 0.52rem);
+
+  --qs-mode-stack-width: clamp(10.4rem, 38vw, 14.35rem);
+  --qs-difficulty-stack-width: clamp(8.85rem, 31vw, 12.1rem);
+
+  width: calc(100% - clamp(2.35rem, 7.5vw, 4.9rem)) !important;
+  max-width: 52rem !important;
+
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  column-gap: 0 !important;
+
+  align-items: start !important;
+  justify-items: stretch !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Each panel is its own 50% lane. No transforms. No nudges. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto var(--qs-setup-stack-height) !important;
+
+  align-items: start !important;
+  justify-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Headers sit centered over their own stacks. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+  width: var(--qs-mode-stack-width) !important;
+  max-width: 100% !important;
+
+  margin: 0 0 clamp(0.34rem, 0.82svh, 0.58rem) 0 !important;
+  padding: 0 !important;
+
+  justify-self: center !important;
+  text-align: center !important;
+
+  font-size: clamp(0.7rem, 1.45svh, 0.94rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0.125em !important;
+  white-space: nowrap !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+  width: var(--qs-difficulty-stack-width) !important;
+}
+
+/* Stacks share exact top/bottom geometry. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  height: var(--qs-setup-stack-height) !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  gap: var(--qs-setup-gap) !important;
+
+  align-content: stretch !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+  width: var(--qs-mode-stack-width) !important;
+  grid-template-rows: repeat(5, minmax(0, 1fr)) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  width: var(--qs-difficulty-stack-width) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+}
+
+/* Button internals: readable, no clipped descenders. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn {
+  width: 100% !important;
+  height: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding:
+    clamp(0.14rem, 0.42svh, 0.28rem)
+    clamp(0.38rem, 1.35vw, 0.7rem)
+    clamp(0.2rem, 0.55svh, 0.36rem) !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+  max-width: 100% !important;
+
+  font-size: clamp(0.62rem, 1.38svh, 0.84rem) !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.055em !important;
+  white-space: nowrap !important;
+
+  padding-bottom: 0.12em !important;
+
+  transform: scaleX(0.985) !important;
+  transform-origin: center center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+  max-width: 100% !important;
+
+  font-size: clamp(0.82rem, 1.85svh, 1.12rem) !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+
+  padding-bottom: 0.06em !important;
+  transform: none !important;
+}
+
+/* Kill cqw experiment everywhere. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.62rem, 1.38svh, 0.84rem) !important;
+  }
+}
+
+/* iPad: same two-lane law, bigger physical controls. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-setup-stack-height: clamp(12.1rem, 21.5svh, 16.2rem);
+    --qs-setup-gap: clamp(0.34rem, 0.55vw, 0.58rem);
+
+    --qs-mode-stack-width: clamp(11.3rem, 19.5vw, 15.25rem);
+    --qs-difficulty-stack-width: clamp(9.8rem, 15.8vw, 13.05rem);
+
+    width: calc(100% - clamp(4.5rem, 9vw, 7rem)) !important;
+    max-width: 58rem !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.82rem, 1.18vw, 1.04rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.72rem, 1vw, 0.94rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.94rem, 1.32vw, 1.18rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.72rem, 1vw, 0.94rem) !important;
+    }
+  }
+}
+
+/* Short iPhones: same geometry, compacted. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout {
+    --qs-setup-stack-height: clamp(10.25rem, 22svh, 12.7rem);
+    --qs-setup-gap: clamp(0.24rem, 0.56svh, 0.38rem);
+
+    --qs-mode-stack-width: clamp(9.35rem, 37vw, 12.05rem);
+    --qs-difficulty-stack-width: clamp(8.2rem, 30vw, 10.6rem);
+
+    width: calc(100% - clamp(1.95rem, 6.4vw, 3.4rem)) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.6rem, 1.25svh, 0.76rem) !important;
+    margin-bottom: clamp(0.26rem, 0.6svh, 0.4rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.54rem, 1.18svh, 0.7rem) !important;
+    line-height: 1.24 !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.7rem, 1.54svh, 0.9rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.54rem, 1.18svh, 0.7rem) !important;
+    }
+  }
+}
+
+/* ───────────────── QuickServe — Deterministic Two-Lane Setup Window END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Six Mode Centered Flow
+   Purpose:
+   - Replace cursed two-column vertical preflight setup.
+   - Mode Select becomes centered 2-row / 3-column grid.
+   - High Score sits directly under Mode Select.
+   - Difficulty becomes centered 1-row / 3-column grid.
+   - iPhone and iPad use the same geometry law.
+   - Overrides earlier nudge / lane / cqw experiments.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-main-card {
+  display: grid !important;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.38rem, 0.9svh, 0.68rem) !important;
+  padding: clamp(0.62rem, 1.25svh, 0.94rem) clamp(0.72rem, 3vw, 1.18rem) !important;
+  box-sizing: border-box !important;
+}
+
+/* New centered setup flow. */
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout.qs-setup-flow,
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-flow {
+  width: min(100%, 45rem) !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto auto auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.34rem, 0.86svh, 0.58rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Panels are centered lanes now, not left/right columns. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Headers stay centered over their own button grids. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 0 clamp(0.22rem, 0.54svh, 0.38rem) 0 !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+  justify-self: center !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.68rem, 1.45svh, 0.98rem) !important;
+  font-weight: 950 !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 13px var(--qs-faint, rgba(0,255,238,0.18)),
+    0 2px 7px rgba(0,0,0,0.9) !important;
+}
+
+/* Mode Select: 2 rows × 3 columns. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+  width: min(100%, 42rem) !important;
+  height: auto !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(clamp(2.02rem, 4.85svh, 3.18rem), auto)) !important;
+
+  gap: clamp(0.34rem, 1.15vw, 0.72rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  align-content: center !important;
+  justify-content: center !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Difficulty: 1 row × 3 columns. */
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+  width: min(100%, 31rem) !important;
+  height: auto !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: minmax(clamp(2.24rem, 5.15svh, 3.38rem), auto) !important;
+
+  gap: clamp(0.42rem, 1.35vw, 0.78rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  align-content: center !important;
+  justify-content: center !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+
+  padding:
+    clamp(0.18rem, 0.48svh, 0.32rem)
+    clamp(0.28rem, 1.2vw, 0.62rem)
+    clamp(0.22rem, 0.58svh, 0.38rem) !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+
+  transform: none !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+  display: block !important;
+  max-width: 100% !important;
+
+  font-size: clamp(0.52rem, 1.36svh, 0.86rem) !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.055em !important;
+  white-space: nowrap !important;
+
+  padding-bottom: 0.12em !important;
+
+  transform: scaleX(0.98) !important;
+  transform-origin: center center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+  display: block !important;
+  max-width: 100% !important;
+
+  font-size: clamp(0.78rem, 1.88svh, 1.16rem) !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+
+  padding-bottom: 0.06em !important;
+  transform: none !important;
+}
+
+/* Kill the earlier cqw smart-scale experiment. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.52rem, 1.36svh, 0.86rem) !important;
+  }
+}
+
+/* High Score now belongs between mode and difficulty. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-high-score {
+  width: min(100%, 42rem) !important;
+
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  gap: clamp(0.28rem, 1vw, 0.58rem) !important;
+
+  margin: clamp(0.06rem, 0.25svh, 0.16rem) auto !important;
+  padding: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 1.68svh, 1.02rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  letter-spacing: -0.02em !important;
+
+  color: rgba(245, 253, 255, 0.95) !important;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.22),
+    0 2px 7px rgba(0,0,0,0.88) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-high-score strong {
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 14px var(--qs-faint, rgba(0,255,238,0.18)) !important;
+}
+
+/* Character section stays centered under the new flow. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-showcase {
+  width: 100% !important;
+  min-height: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.18rem, 0.48svh, 0.34rem) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+  height: clamp(6.25rem, 17svh, 10.5rem) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-name {
+  font-size: clamp(1rem, 2.28svh, 1.42rem) !important;
+}
+
+/* iPad: same layout law, just larger and calmer. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout.qs-setup-flow,
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-flow {
+    width: min(100%, 50rem) !important;
+    gap: clamp(0.42rem, 0.58vw, 0.72rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+    width: min(100%, 47rem) !important;
+    grid-template-rows: repeat(2, minmax(clamp(2.45rem, 4.1vw, 3.35rem), auto)) !important;
+    gap: clamp(0.5rem, 0.95vw, 0.82rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+    width: min(100%, 35rem) !important;
+    grid-template-rows: minmax(clamp(2.7rem, 4.5vw, 3.65rem), auto) !important;
+    gap: clamp(0.55rem, 1vw, 0.9rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.82rem, 1.16vw, 1.08rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.68rem, 0.98vw, 0.94rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.92rem, 1.28vw, 1.2rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-high-score {
+    width: min(100%, 47rem) !important;
+    font-size: clamp(0.88rem, 1.18vw, 1.12rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+    height: clamp(7.2rem, 15svh, 10.8rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.68rem, 0.98vw, 0.94rem) !important;
+    }
+  }
+}
+
+/* Short iPhones: same layout law, compressed. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-main-card {
+    gap: clamp(0.28rem, 0.68svh, 0.48rem) !important;
+    padding-top: clamp(0.48rem, 0.92svh, 0.68rem) !important;
+    padding-bottom: clamp(0.48rem, 0.92svh, 0.68rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout.qs-setup-flow,
+  body.qs-active .qs-intro.qs-character-v3 .qs-setup-flow {
+    width: min(100%, 39rem) !important;
+    gap: clamp(0.24rem, 0.58svh, 0.42rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row {
+    grid-template-rows: repeat(2, minmax(clamp(1.72rem, 4.05svh, 2.28rem), auto)) !important;
+    gap: clamp(0.24rem, 0.82vw, 0.44rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row {
+    width: min(100%, 27rem) !important;
+    grid-template-rows: minmax(clamp(1.86rem, 4.35svh, 2.45rem), auto) !important;
+    gap: clamp(0.28rem, 0.9vw, 0.48rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label {
+    font-size: clamp(0.58rem, 1.22svh, 0.76rem) !important;
+    margin-bottom: clamp(0.18rem, 0.42svh, 0.3rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+    font-size: clamp(0.46rem, 1.08svh, 0.66rem) !important;
+    line-height: 1.24 !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong {
+    font-size: clamp(0.66rem, 1.48svh, 0.88rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-high-score {
+    font-size: clamp(0.62rem, 1.42svh, 0.82rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+    height: clamp(4.7rem, 12.6svh, 6.4rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-name {
+    font-size: clamp(0.86rem, 1.9svh, 1.08rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong {
+      font-size: clamp(0.46rem, 1.08svh, 0.66rem) !important;
+    }
+  }
+}
+
+/* ───────────────── QuickServe — Six Mode Centered Flow END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Character First Centered Controls
+   Purpose:
+   - Character identity owns the top/middle of the intro card.
+   - Character Selection comes before setup controls.
+   - Mode Select becomes readable 2-row / 3-column centered grid.
+   - Difficulty becomes readable 1-row / 3-column centered grid.
+   - iPhone and iPad follow the same centered flow.
+   - CSS-only presentation override after JS reorder.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-main-card {
+  display: grid !important;
+  grid-template-rows:
+    minmax(0, 1fr)
+    auto
+    auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.34rem, 0.82svh, 0.6rem) !important;
+
+  padding:
+    clamp(0.62rem, 1.22svh, 0.92rem)
+    clamp(0.76rem, 3vw, 1.2rem)
+    clamp(0.62rem, 1.22svh, 0.92rem) !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Character showcase now starts with name, then art. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-showcase {
+  width: 100% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.22rem, 0.58svh, 0.42rem) !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-name-stage {
+  order: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: clamp(1rem, 2.28svh, 1.42rem) !important;
+  line-height: 1.05 !important;
+  text-align: center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-stage-wrap {
+  order: 1 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+  height: clamp(5.75rem, 15.2svh, 9.2rem) !important;
+  max-height: 100% !important;
+}
+
+/* Character selection stays compact but readable. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-selection-panel {
+  width: min(100%, 44rem) !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.24rem, 0.55svh, 0.4rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-unlocked-header {
+  margin: 0 !important;
+  font-size: clamp(0.62rem, 1.42svh, 0.86rem) !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-unlocked-row {
+  width: min(100%, 42rem) !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.3rem, 1.1vw, 0.58rem) !important;
+
+  margin: 0 auto !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-roster-slot {
+  min-height: clamp(3rem, 6.4svh, 4.35rem) !important;
+}
+
+/* Setup controls are now one centered flow below character selection. */
+body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout.qs-character-first-controls,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+  width: min(100%, 44rem) !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto auto auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.28rem, 0.68svh, 0.48rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-panel,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-panel {
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-label,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-label {
+  width: 100% !important;
+
+  margin: 0 0 clamp(0.2rem, 0.48svh, 0.34rem) !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+
+  font-size: clamp(0.62rem, 1.34svh, 0.86rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.14em !important;
+  white-space: nowrap !important;
+}
+
+/* Mode Select: 2 rows × 3 columns, readable. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+  width: min(100%, 42rem) !important;
+  height: auto !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(clamp(2.18rem, 4.85svh, 3rem), auto)) !important;
+
+  gap: clamp(0.36rem, 1.15vw, 0.68rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* Difficulty: 1 row × 3 columns, centered. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+  width: min(100%, 31rem) !important;
+  height: auto !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: minmax(clamp(2.2rem, 4.85svh, 3rem), auto) !important;
+
+  gap: clamp(0.42rem, 1.25vw, 0.72rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn {
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding:
+    clamp(0.18rem, 0.44svh, 0.32rem)
+    clamp(0.28rem, 1.1vw, 0.58rem)
+    clamp(0.22rem, 0.54svh, 0.38rem) !important;
+
+  margin: 0 !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+
+  transform: none !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+  display: block !important;
+
+  max-width: 100% !important;
+
+  font-size: clamp(0.56rem, 1.42svh, 0.86rem) !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.055em !important;
+  white-space: nowrap !important;
+
+  padding-bottom: 0.1em !important;
+
+  transform: scaleX(0.985) !important;
+  transform-origin: center center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+  display: block !important;
+
+  max-width: 100% !important;
+
+  font-size: clamp(0.78rem, 1.82svh, 1.12rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+
+  padding-bottom: 0.06em !important;
+
+  transform: none !important;
+}
+
+/* Kill earlier cqw scaling in this final layout. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.56rem, 1.42svh, 0.86rem) !important;
+  }
+}
+
+/* High score sits between mode buttons and difficulty. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+  width: min(100%, 42rem) !important;
+
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+
+  gap: clamp(0.26rem, 0.85vw, 0.5rem) !important;
+
+  margin: clamp(0.02rem, 0.18svh, 0.12rem) auto !important;
+  padding: 0 !important;
+
+  font-size: clamp(0.62rem, 1.38svh, 0.86rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+/* iPad: same layout, larger readable controls. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-main-card {
+    gap: clamp(0.48rem, 0.65vw, 0.78rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+    height: clamp(7rem, 14.2svh, 10.8rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-name-stage {
+    font-size: clamp(1.18rem, 1.75vw, 1.62rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+    width: min(100%, 49rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    width: min(100%, 47rem) !important;
+    grid-template-rows: repeat(2, minmax(clamp(2.55rem, 4.05vw, 3.42rem), auto)) !important;
+    gap: clamp(0.52rem, 0.9vw, 0.84rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    width: min(100%, 35rem) !important;
+    grid-template-rows: minmax(clamp(2.65rem, 4.15vw, 3.5rem), auto) !important;
+    gap: clamp(0.56rem, 0.9vw, 0.88rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-label {
+    font-size: clamp(0.82rem, 1.08vw, 1.06rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.74rem, 0.98vw, 0.98rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+    font-size: clamp(0.96rem, 1.26vw, 1.22rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+    width: min(100%, 47rem) !important;
+    font-size: clamp(0.82rem, 1.05vw, 1.02rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+      font-size: clamp(0.74rem, 0.98vw, 0.98rem) !important;
+    }
+  }
+}
+
+/* Short iPhones: compress but preserve order and readability. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-main-card {
+    gap: clamp(0.24rem, 0.58svh, 0.42rem) !important;
+    padding-top: clamp(0.48rem, 0.9svh, 0.66rem) !important;
+    padding-bottom: clamp(0.48rem, 0.9svh, 0.66rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait {
+    height: clamp(4.45rem, 11.8svh, 6.2rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-name-stage {
+    font-size: clamp(0.82rem, 1.72svh, 1.02rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-unlocked-header {
+    font-size: clamp(0.54rem, 1.18svh, 0.72rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-roster-slot {
+    min-height: clamp(2.4rem, 5.4svh, 3.1rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+    gap: clamp(0.2rem, 0.5svh, 0.34rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-label,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-label {
+    font-size: clamp(0.52rem, 1.1svh, 0.68rem) !important;
+    margin-bottom: clamp(0.14rem, 0.34svh, 0.24rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    grid-template-rows: repeat(2, minmax(clamp(1.62rem, 3.7svh, 2.12rem), auto)) !important;
+    gap: clamp(0.22rem, 0.74vw, 0.38rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    width: min(100%, 27rem) !important;
+    grid-template-rows: minmax(clamp(1.7rem, 3.85svh, 2.25rem), auto) !important;
+    gap: clamp(0.26rem, 0.8vw, 0.42rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.44rem, 1.02svh, 0.64rem) !important;
+    line-height: 1.22 !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+    font-size: clamp(0.62rem, 1.35svh, 0.82rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+    font-size: clamp(0.54rem, 1.18svh, 0.7rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+      font-size: clamp(0.44rem, 1.02svh, 0.64rem) !important;
+    }
+  }
+}
+
+/* ───────────────── QuickServe — Character First Centered Controls END ───────────────── */
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Full Width Setup Buttons FINAL
+   Purpose:
+   - Stop Mode/Difficulty buttons from staying tiny.
+   - Make Mode Select use the available horizontal space like Character Selection.
+   - Make each button fill its grid cell evenly.
+   - Kill inherited intro button max-width/min-width constraints.
+   - CSS-only. No math/gameplay/unlock logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+  width: min(100%, 46rem) !important;
+  max-width: 100% !important;
+  justify-self: center !important;
+}
+
+/* Mode and difficulty panels should be full-width centered sections. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-panel,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* Headers stay centered even though the rows stretch. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-label,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-label {
+  width: 100% !important;
+  text-align: center !important;
+  justify-self: center !important;
+}
+
+/* Mode row: full-width 3 columns x 2 rows. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, clamp(2.45rem, 5.4svh, 3.45rem)) !important;
+
+  gap: clamp(0.42rem, 1.25vw, 0.82rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Difficulty row: also stretch wide, just a little narrower than mode row. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+  width: min(100%, 38rem) !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: clamp(2.45rem, 5.4svh, 3.45rem) !important;
+
+  gap: clamp(0.46rem, 1.35vw, 0.86rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Kill inherited .qs-intro button constraints for these setup buttons. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn {
+  width: 100% !important;
+  max-width: none !important;
+
+  height: 100% !important;
+  max-height: none !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+
+  padding:
+    clamp(0.28rem, 0.62svh, 0.46rem)
+    clamp(0.34rem, 1.2vw, 0.72rem)
+    clamp(0.34rem, 0.72svh, 0.52rem) !important;
+
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Mode labels: readable, but smartly compressed for long labels. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  font-size: clamp(0.62rem, 1.55svh, 0.98rem) !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.06em !important;
+  white-space: nowrap !important;
+
+  text-align: center !important;
+
+  padding-bottom: 0.1em !important;
+
+  transform: scaleX(0.96) !important;
+  transform-origin: center center !important;
+}
+
+/* Difficulty labels can be larger because the words are short. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  font-size: clamp(0.9rem, 2.08svh, 1.26rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+
+  text-align: center !important;
+
+  padding-bottom: 0.06em !important;
+  transform: none !important;
+}
+
+/* Kill earlier cqw scaling for this final button architecture. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.62rem, 1.55svh, 0.98rem) !important;
+  }
+}
+
+/* High score stretches with the controls, centered. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* iPad: use the extra width. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+    width: min(100%, 54rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    grid-template-rows: repeat(2, clamp(2.8rem, 4.65vw, 3.9rem)) !important;
+    gap: clamp(0.58rem, 1vw, 0.95rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    width: min(100%, 43rem) !important;
+    grid-template-rows: clamp(2.85rem, 4.75vw, 4rem) !important;
+    gap: clamp(0.62rem, 1vw, 1rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.78rem, 1.16vw, 1.08rem) !important;
+    transform: scaleX(0.965) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+    font-size: clamp(1rem, 1.42vw, 1.34rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+      font-size: clamp(0.78rem, 1.16vw, 1.08rem) !important;
+    }
+  }
+}
+
+/* Short iPhones: still stretch, just compress height/text a bit. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+    width: min(100%, 42rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    grid-template-rows: repeat(2, clamp(1.9rem, 4.15svh, 2.45rem)) !important;
+    gap: clamp(0.26rem, 0.82vw, 0.48rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    width: min(100%, 31rem) !important;
+    grid-template-rows: clamp(1.9rem, 4.2svh, 2.5rem) !important;
+    gap: clamp(0.3rem, 0.9vw, 0.52rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.48rem, 1.12svh, 0.68rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+    font-size: clamp(0.66rem, 1.46svh, 0.88rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+      font-size: clamp(0.48rem, 1.12svh, 0.68rem) !important;
+    }
+  }
+}
+
+/* ───────────────── QuickServe — Full Width Setup Buttons FINAL END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Intro Rescue Final Rails
+   Purpose:
+   - Restore readable, full-width Mode Select buttons.
+   - Keep Difficulty centered.
+   - Make intro character PNG bigger again.
+   - Make locked-character mode hint pulse by using CSS scale,
+     not transform, because older important transform rules blocked animation.
+   - Keep this as the final override block.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-main-card {
+  width: min(92vw, 740px) !important;
+  max-width: min(92vw, 740px) !important;
+
+  display: grid !important;
+  grid-template-rows:
+    minmax(0, 1fr)
+    auto
+    auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.38rem, 0.82svh, 0.68rem) !important;
+
+  padding:
+    clamp(0.62rem, 1.16svh, 0.9rem)
+    clamp(0.72rem, 2.8vw, 1.2rem)
+    clamp(0.62rem, 1.16svh, 0.9rem) !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Character name + PNG: give the art its space back. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-showcase {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: clamp(13.5rem, 34svh, 22rem) !important;
+
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.22rem, 0.48svh, 0.42rem) !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 #qsSelectedCharacterName,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-name-stage {
+  font-size: clamp(1.42rem, 2.7svh, 2.18rem) !important;
+  line-height: 1.04 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-stage-wrap,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait-wrap {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait,
+body.qs-active .qs-intro.qs-character-v3 #philSpriteIntro {
+  width: auto !important;
+  height: clamp(10.4rem, 28svh, 17.2rem) !important;
+  max-height: 100% !important;
+  max-width: min(88vw, 31rem) !important;
+
+  object-fit: contain !important;
+
+  filter:
+    drop-shadow(0 0 11px var(--qs-faint, rgba(0,255,238,0.18)))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.44)) !important;
+}
+
+/* Character Selection row stays as the stable reference architecture. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-selection-panel {
+  width: min(100%, 46rem) !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  justify-items: center !important;
+  align-items: center !important;
+
+  gap: clamp(0.22rem, 0.52svh, 0.4rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-unlocked-row {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: clamp(0.32rem, 1.05vw, 0.62rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* Setup controls: one centered board, not shrink-wrapped. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+  width: min(90vw, 46rem) !important;
+  max-width: min(90vw, 46rem) !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto auto auto !important;
+
+  align-items: center !important;
+  justify-items: center !important;
+
+  gap: clamp(0.28rem, 0.64svh, 0.48rem) !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Mode Select: full centered 3×2 grid. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-panel {
+  width: min(90vw, 46rem) !important;
+  max-width: min(90vw, 46rem) !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-label {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 0 clamp(0.2rem, 0.45svh, 0.34rem) 0 !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+  justify-self: center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+  width: min(90vw, 46rem) !important;
+  max-width: min(90vw, 46rem) !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, clamp(2.42rem, 5.05svh, 3.34rem)) !important;
+
+  gap: clamp(0.4rem, 1.1vw, 0.78rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Difficulty: centered under high score. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-panel {
+  width: min(76vw, 38rem) !important;
+  max-width: min(76vw, 38rem) !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  justify-items: center !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-label {
+  width: 100% !important;
+  margin: 0 0 clamp(0.2rem, 0.45svh, 0.34rem) 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+  width: min(76vw, 38rem) !important;
+  max-width: min(76vw, 38rem) !important;
+  min-width: 0 !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: clamp(2.42rem, 5.05svh, 3.34rem) !important;
+
+  gap: clamp(0.44rem, 1.18vw, 0.82rem) !important;
+
+  align-items: stretch !important;
+  justify-items: stretch !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Actual buttons: remove global intro-button prison. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn,
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+
+  height: 100% !important;
+  max-height: none !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+
+  padding:
+    clamp(0.22rem, 0.52svh, 0.38rem)
+    clamp(0.24rem, 0.88vw, 0.56rem)
+    clamp(0.3rem, 0.68svh, 0.48rem) !important;
+
+  box-sizing: border-box !important;
+  overflow: visible !important;
+
+  transform: none !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: block !important;
+
+  font-size: clamp(0.62rem, 1.48svh, 0.98rem) !important;
+  line-height: 1.13 !important;
+  letter-spacing: -0.06em !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+
+  transform: scaleX(0.965) !important;
+  transform-origin: center center !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: block !important;
+
+  font-size: clamp(0.9rem, 2svh, 1.24rem) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+
+  transform: none !important;
+}
+
+/* Kill old smart-scale experiment at final specificity. */
+@supports (font-size: 1cqw) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.62rem, 1.48svh, 0.98rem) !important;
+  }
+}
+
+/* Mode high score centered between the two control groups. */
+body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+  width: min(90vw, 46rem) !important;
+  max-width: min(90vw, 46rem) !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: clamp(0.02rem, 0.16svh, 0.12rem) auto !important;
+}
+
+/* Locked character mode hint: size pulse that is not blocked by transform rules. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge {
+  position: relative !important;
+  overflow: visible !important;
+
+  scale: 1;
+  transform-origin: center center !important;
+
+  border-color: rgba(255, 92, 220, 0.95) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 0 11px rgba(255, 92, 220, 0.55),
+    0 0 24px rgba(255, 92, 220, 0.28) !important;
+
+  animation: qsUnlockPushHereFinal 1120ms ease-in-out infinite !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge strong {
+  color: rgba(255, 235, 253, 0.98) !important;
+
+  text-shadow:
+    0 0 7px rgba(255, 92, 220, 0.72),
+    0 0 16px rgba(255, 92, 220, 0.36),
+    0 2px 6px rgba(0,0,0,0.92) !important;
+}
+
+@keyframes qsUnlockPushHereFinal {
+  0%, 100% {
+    scale: 1;
+    filter: brightness(1) saturate(1.02);
+  }
+
+  48% {
+    scale: 1.035;
+    filter: brightness(1.18) saturate(1.16);
+  }
+}
+
+/* Steam-away when the locked vision is released. */
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release {
+  position: relative !important;
+  overflow: visible !important;
+
+  scale: 1;
+  animation: qsUnlockReleaseFinal 760ms ease-out both !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release::before,
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release::after {
+  content: "" !important;
+  position: absolute !important;
+  pointer-events: none !important;
+
+  inset: -28% 8% !important;
+  border-radius: inherit !important;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(255, 126, 232, 0.42),
+      rgba(255, 80, 215, 0.20) 46%,
+      rgba(255, 80, 215, 0.00) 74%
+    ) !important;
+
+  filter: blur(7px) !important;
+  opacity: 0 !important;
+  z-index: -1 !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release::before {
+  animation: qsUnlockSteamLeftFinal 760ms ease-out both !important;
+}
+
+body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release::after {
+  animation: qsUnlockSteamRightFinal 760ms ease-out both !important;
+}
+
+@keyframes qsUnlockReleaseFinal {
+  0% {
+    scale: 1.03;
+    filter: brightness(1.18) saturate(1.14);
+    box-shadow:
+      0 0 0 1px rgba(255, 112, 230, 0.9),
+      0 0 14px rgba(255, 90, 220, 0.58),
+      0 0 28px rgba(255, 90, 220, 0.28) !important;
+  }
+
+  100% {
+    scale: 1;
+    filter: brightness(1) saturate(1);
+  }
+}
+
+@keyframes qsUnlockSteamLeftFinal {
+  0% {
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(-0.42rem, -0.64rem, 0) scale(1.18);
+  }
+}
+
+@keyframes qsUnlockSteamRightFinal {
+  0% {
+    opacity: 0.55;
+    transform: translate3d(0, 0, 0) scale(0.96);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0.42rem, -0.56rem, 0) scale(1.14);
+  }
+}
+
+/* iPad: same law, wider and bigger. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-main-card {
+    width: min(86vw, 820px) !important;
+    max-width: min(86vw, 820px) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-showcase {
+    min-height: clamp(16rem, 33svh, 25rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait,
+  body.qs-active .qs-intro.qs-character-v3 #philSpriteIntro {
+    height: clamp(12rem, 24svh, 19.5rem) !important;
+    max-width: min(52vw, 34rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 #qsSelectedCharacterName,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-name-stage {
+    font-size: clamp(1.7rem, 2.2vw, 2.45rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-panel,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+    width: min(78vw, 56rem) !important;
+    max-width: min(78vw, 56rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-panel,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    width: min(62vw, 44rem) !important;
+    max-width: min(62vw, 44rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    grid-template-rows: repeat(2, clamp(2.86rem, 4.28vw, 4.05rem)) !important;
+    gap: clamp(0.58rem, 0.95vw, 1rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    grid-template-rows: clamp(2.86rem, 4.28vw, 4.05rem) !important;
+    gap: clamp(0.62rem, 0.95vw, 1rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.82rem, 1.12vw, 1.14rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+    font-size: clamp(1.05rem, 1.38vw, 1.38rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+      font-size: clamp(0.82rem, 1.12vw, 1.14rem) !important;
+    }
+  }
+}
+
+/* Short phones: compressed, but do not turn mode buttons into tic-tacs. */
+@media (max-height: 740px) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-showcase {
+    min-height: clamp(10.8rem, 29svh, 14.8rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait,
+  body.qs-active .qs-intro.qs-character-v3 #philSpriteIntro {
+    height: clamp(7.8rem, 22svh, 10.4rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-panel,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+    width: min(90vw, 42rem) !important;
+    max-width: min(90vw, 42rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-panel,
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    width: min(78vw, 32rem) !important;
+    max-width: min(78vw, 32rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    grid-template-rows: repeat(2, clamp(1.96rem, 4.12svh, 2.54rem)) !important;
+    gap: clamp(0.28rem, 0.78vw, 0.48rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    grid-template-rows: clamp(1.96rem, 4.12svh, 2.54rem) !important;
+  }
+
+  body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.5rem, 1.12svh, 0.72rem) !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+      font-size: clamp(0.5rem, 1.12svh, 0.72rem) !important;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge,
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release,
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release::before,
+  body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn.qs-unlock-nudge-release::after {
+    animation: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Intro Rescue Final Rails END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Setup Controls Mirror Character Row
+   Purpose:
+   - Phone repair only.
+   - Make Mode Select and Difficulty use the same boxing law as Character Selection:
+       full card-width panel
+       centered grid row
+       equal 1fr columns
+       buttons fill cells
+   - No character PNG change.
+   - No iPad change.
+   - No math/unlock/audio/gameplay changes.
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 699px) {
+  /*
+    This is the key fix:
+    the setup area must stretch to the card, not shrink to the button content.
+  */
+  html body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout.qs-setup-flow,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-setup-layout.qs-character-first-controls,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls {
+    width: min(100%, 44rem) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    justify-self: stretch !important;
+    align-self: center !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+
+    align-items: center !important;
+    justify-items: center !important;
+
+    gap: clamp(0.32rem, 0.7svh, 0.52rem) !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+
+  /*
+    Mirror character selection:
+    the panels are the rail. They know the card edges.
+  */
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-panel,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-panel,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-panel,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-panel {
+    width: min(100%, 42rem) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    justify-self: center !important;
+    align-self: center !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+
+    align-items: center !important;
+    justify-items: stretch !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-label,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-label,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-label,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-label {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    justify-self: stretch !important;
+
+    margin: 0 0 clamp(0.22rem, 0.5svh, 0.36rem) 0 !important;
+    padding: 0 !important;
+
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /*
+    Mode row = same idea as character row, but 3 columns × 2 rows.
+    This is the part that makes it stretch instead of becoming tiny circles.
+  */
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    width: min(100%, 42rem) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, clamp(2.35rem, 4.9svh, 3.05rem)) !important;
+
+    gap: clamp(0.34rem, 1.05vw, 0.58rem) !important;
+
+    align-items: stretch !important;
+    justify-items: stretch !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+
+  /*
+    Difficulty row = same rail width, one row.
+    Do not let it become a separate left-aligned mini-cluster.
+  */
+  html body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    width: min(100%, 42rem) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: clamp(2.35rem, 4.9svh, 3.05rem) !important;
+
+    gap: clamp(0.34rem, 1.05vw, 0.58rem) !important;
+
+    align-items: stretch !important;
+    justify-items: stretch !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+
+  /*
+    Kill inherited intro button constraints.
+    The grid cell owns the size. The button fills the cell.
+  */
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    inline-size: 100% !important;
+    max-inline-size: none !important;
+    min-inline-size: 0 !important;
+
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 0 !important;
+
+    block-size: 100% !important;
+    max-block-size: none !important;
+    min-block-size: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding:
+      clamp(0.24rem, 0.52svh, 0.38rem)
+      clamp(0.22rem, 0.8vw, 0.46rem)
+      clamp(0.28rem, 0.62svh, 0.44rem) !important;
+
+    border-radius: 16px !important;
+
+    aspect-ratio: auto !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    display: block !important;
+
+    font-size: clamp(0.62rem, 1.42svh, 0.84rem) !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.08em !important;
+
+    text-align: center !important;
+    white-space: nowrap !important;
+
+    transform: scaleX(0.9) !important;
+    transform-origin: center center !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    display: block !important;
+
+    font-size: clamp(0.92rem, 1.95svh, 1.18rem) !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.03em !important;
+
+    text-align: center !important;
+    white-space: nowrap !important;
+
+    transform: none !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-high-score,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-high-score {
+    width: min(100%, 42rem) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    justify-content: center !important;
+    text-align: center !important;
+
+    margin: clamp(0.08rem, 0.22svh, 0.16rem) auto !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+  }
+
+  @supports (font-size: 1cqw) {
+    html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong,
+    html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+      font-size: clamp(0.62rem, 1.42svh, 0.84rem) !important;
+    }
+  }
+}
+
+/* Short phones: same stretch law, only slightly shorter. */
+@media (max-width: 699px) and (max-height: 740px) {
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-row,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-row {
+    grid-template-rows: repeat(2, clamp(2.08rem, 4.28svh, 2.6rem)) !important;
+    gap: clamp(0.28rem, 0.86vw, 0.46rem) !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-row,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-row {
+    grid-template-rows: clamp(2.08rem, 4.28svh, 2.6rem) !important;
+    gap: clamp(0.28rem, 0.86vw, 0.46rem) !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-mode-select-btn strong,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-mode-select-btn strong {
+    font-size: clamp(0.56rem, 1.18svh, 0.72rem) !important;
+    transform: scaleX(0.88) !important;
+  }
+
+  html body.qs-active .qs-intro.qs-character-v3 .qs-difficulty-select-btn strong,
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-first-controls .qs-difficulty-select-btn strong {
+    font-size: clamp(0.78rem, 1.62svh, 0.98rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Setup Controls Mirror Character Row END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Tiny Phone Portrait Trim
+   Purpose:
+   - CHANGE NOTHING ELSE.
+   - Intro is now basically correct.
+   - Only make the character PNG on phone just a tad smaller.
+   - iPad stays untouched.
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 699px) {
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait,
+  html body.qs-active .qs-intro.qs-character-v3 #philSpriteIntro {
+    height: 94% !important;
+    max-height: 94% !important;
+  }
+}
+
+/* ───────────────── QuickServe — Tiny Phone Portrait Trim END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Final Phone Portrait Downsize
+   Purpose:
+   - CHANGE NOTHING ELSE.
+   - iPhone portrait is still too big and overlapping.
+   - iPad is already fine.
+   - Use a hard phone-only clamp on the character PNG.
+   ────────────────────────────────────────────────────────── */
+
+@media (max-width: 699px) {
+  html body.qs-active .qs-intro.qs-character-v3 .qs-character-portrait,
+  html body.qs-active .qs-intro.qs-character-v3 #philSpriteIntro {
+    height: clamp(8.2rem, 22.8svh, 11.4rem) !important;
+    max-height: clamp(8.2rem, 22.8svh, 11.4rem) !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+}
+
+/* ───────────────── QuickServe — Final Phone Portrait Downsize END ───────────────── */
