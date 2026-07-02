@@ -7981,3 +7981,823 @@ body.qs-active .math-problem .qs-percent-symbol {
 }
 
 /* ───────────────── QuickServe Badge 4 Operator Spacing Repair END ───────────────── */
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Mode-Based Character Locks
+   Purpose:
+   - Cosmic Phil starts unlocked.
+   - Other performers unlock from mode high scores.
+   - Locked roster cards show centered text only.
+   - Locked big-preview art is dimmed with a clear overlay.
+   - Play Game is disabled while previewing locked performers.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-character-main-card.qs-preview-locked {
+  border-color: color-mix(in srgb, #ff66cc 42%, rgba(255,255,255,0.18)) !important;
+}
+
+body.qs-active .qs-character-main-card.qs-preview-locked .qs-character-stage-wrap,
+body.qs-active .qs-character-main-card.qs-preview-locked .qs-character-portrait-wrap {
+  position: relative !important;
+}
+
+body.qs-active .qs-character-portrait.is-locked-preview,
+body.qs-active .qs-character-main-card.qs-preview-locked .qs-character-portrait {
+  opacity: 0.36 !important;
+  filter:
+    grayscale(0.45)
+    saturate(0.62)
+    brightness(0.54)
+    drop-shadow(0 0 8px rgba(255, 102, 204, 0.26))
+    drop-shadow(0 9px 12px rgba(0,0,0,0.48)) !important;
+}
+
+body.qs-active .qs-character-lock-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 4 !important;
+
+  display: grid !important;
+  place-content: center !important;
+  justify-items: center !important;
+  gap: clamp(0.08rem, 0.32svh, 0.18rem) !important;
+
+  padding: clamp(0.38rem, 1.1svh, 0.72rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.78rem, 1.9svh, 1.08rem) !important;
+  font-weight: 950 !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.018em !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+
+  color: rgba(255, 245, 255, 0.96) !important;
+  text-shadow:
+    0 0 8px rgba(255, 102, 204, 0.88),
+    0 0 16px rgba(255, 102, 204, 0.42),
+    0 2px 8px rgba(0,0,0,0.92) !important;
+
+  pointer-events: none !important;
+}
+
+body.qs-active .qs-character-lock-big {
+  font-size: clamp(1.25rem, 3.2svh, 1.9rem) !important;
+  line-height: 1 !important;
+  margin-bottom: clamp(0.05rem, 0.24svh, 0.14rem) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked {
+  position: relative !important;
+
+  opacity: 0.82 !important;
+  filter: saturate(0.82) brightness(0.86) !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  padding: clamp(0.22rem, 0.62svh, 0.42rem) !important;
+
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background:
+    radial-gradient(
+      circle at 50% 16%,
+      rgba(255, 102, 204, 0.10),
+      rgba(0, 0, 0, 0.46) 72%
+    ) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked.is-previewed {
+  opacity: 1 !important;
+  filter: none !important;
+  border-color: color-mix(in srgb, #ff66cc 58%, rgba(255,255,255,0.20)) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 0 12px rgba(255, 102, 204, 0.62),
+    0 0 18px rgba(255, 102, 204, 0.22) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-lock-mark {
+  display: block !important;
+  position: absolute !important;
+  top: clamp(0.18rem, 0.55svh, 0.32rem) !important;
+  right: clamp(0.2rem, 0.65svh, 0.36rem) !important;
+
+  font-size: clamp(0.56rem, 1.28svh, 0.82rem) !important;
+  line-height: 1 !important;
+  color: rgba(255, 245, 255, 0.96) !important;
+  text-shadow:
+    0 0 7px rgba(255,102,204,0.75),
+    0 1px 5px rgba(0,0,0,0.92) !important;
+}
+
+body.qs-active .qs-roster-lock-copy {
+  display: grid !important;
+  place-items: center !important;
+  gap: clamp(0.02rem, 0.14svh, 0.08rem) !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100% !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.44rem, 1.05svh, 0.64rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.04 !important;
+  letter-spacing: 0.01em !important;
+  text-align: center !important;
+  text-transform: none !important;
+
+  color: rgba(242, 248, 255, 0.92) !important;
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.16),
+    0 2px 6px rgba(0,0,0,0.92) !important;
+}
+
+body.qs-active .qs-roster-lock-copy span {
+  display: block !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+}
+
+body.qs-active .qs-preflight-start.is-disabled,
+body.qs-active .qs-preflight-start:disabled {
+  opacity: 0.46 !important;
+  filter: grayscale(0.28) saturate(0.72) brightness(0.86) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(188, 176, 214, 0.72),
+      rgba(74, 66, 102, 0.92)
+    ) !important;
+
+  color: rgba(10, 10, 18, 0.78) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08) inset,
+    0 0 10px rgba(255,255,255,0.12),
+    0 8px 18px rgba(0,0,0,0.34) !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-roster-lock-copy {
+    font-size: clamp(0.38rem, 0.95svh, 0.56rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  body.qs-active .qs-character-lock-overlay {
+    font-size: clamp(0.66rem, 1.62svh, 0.92rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Mode-Based Character Locks END ───────────────── */
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Locked Roster Icon Cards
+   Purpose:
+   - Small locked character cards should stay quiet.
+   - Big preview owns the unlock instructions.
+   - Roster cards show only dimmed character art + tiny lock corner.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-roster-slot.is-locked {
+  display: grid !important;
+  place-items: center !important;
+
+  grid-template-rows: 1fr !important;
+
+  opacity: 0.72 !important;
+  filter: saturate(0.7) brightness(0.72) !important;
+
+  padding: clamp(0.2rem, 0.58svh, 0.36rem) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(255, 255, 255, 0.08),
+      rgba(0, 0, 0, 0.48) 72%
+    ) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked.is-previewed {
+  opacity: 1 !important;
+  filter: saturate(0.92) brightness(0.86) !important;
+
+  border-color: color-mix(in srgb, #ff66cc 62%, rgba(255,255,255,0.20)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 0 12px rgba(255, 102, 204, 0.62),
+    0 0 18px rgba(255, 102, 204, 0.22) !important;
+}
+
+/* Kill old tiny-card unlock copy if an older DOM/cache still has it. */
+body.qs-active .qs-roster-slot.is-locked .qs-roster-lock-copy {
+  display: none !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-locked-preview-img {
+  display: block !important;
+
+  width: auto !important;
+  height: clamp(2rem, 5.1svh, 3.15rem) !important;
+  max-width: 94% !important;
+
+  object-fit: contain !important;
+
+  opacity: 0.52 !important;
+  filter:
+    grayscale(0.28)
+    saturate(0.72)
+    brightness(0.82)
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.10))
+    drop-shadow(0 7px 9px rgba(0, 0, 0, 0.48)) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked.is-previewed .qs-roster-locked-preview-img {
+  opacity: 0.68 !important;
+  filter:
+    grayscale(0.18)
+    saturate(0.88)
+    brightness(0.92)
+    drop-shadow(0 0 9px rgba(255, 102, 204, 0.34))
+    drop-shadow(0 7px 9px rgba(0, 0, 0, 0.50)) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-lock-mark {
+  position: absolute !important;
+  top: clamp(0.18rem, 0.55svh, 0.32rem) !important;
+  right: clamp(0.2rem, 0.65svh, 0.36rem) !important;
+
+  display: block !important;
+  z-index: 3 !important;
+
+  font-size: clamp(0.58rem, 1.35svh, 0.84rem) !important;
+  line-height: 1 !important;
+
+  color: rgba(255, 245, 255, 0.98) !important;
+  text-shadow:
+    0 0 7px rgba(255,102,204,0.78),
+    0 1px 5px rgba(0,0,0,0.94) !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-roster-slot.is-locked .qs-roster-locked-preview-img {
+    height: clamp(1.65rem, 4.35svh, 2.38rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Locked Roster Icon Cards END ───────────────── */
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Locked Roster Names
+   Purpose:
+   - Locked tiny character cards should match unlocked cards:
+     name on top, dimmed performer PNG below, lock in corner.
+   - Big preview remains responsible for unlock instructions.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-roster-slot.is-locked {
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  align-content: center !important;
+  justify-items: center !important;
+  gap: clamp(0.04rem, 0.22svh, 0.12rem) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-name {
+  display: block !important;
+  grid-row: 1 !important;
+
+  margin: 0 !important;
+  padding: 0 clamp(0.18rem, 0.5vw, 0.32rem) !important;
+
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  font-size: clamp(0.5rem, 1.18svh, 0.66rem) !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+
+  color: rgba(245, 253, 255, 0.68) !important;
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.10),
+    0 2px 6px rgba(0,0,0,0.88) !important;
+
+  max-width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked.is-previewed .qs-roster-name {
+  color: rgba(255, 245, 255, 0.86) !important;
+  text-shadow:
+    0 0 7px rgba(255, 102, 204, 0.56),
+    0 2px 6px rgba(0,0,0,0.92) !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-locked-preview-img {
+  grid-row: 2 !important;
+  align-self: center !important;
+
+  height: clamp(1.72rem, 4.35svh, 2.55rem) !important;
+  margin: 0 !important;
+}
+
+body.qs-active .qs-roster-slot.is-locked .qs-roster-lock-mark {
+  top: clamp(0.16rem, 0.48svh, 0.28rem) !important;
+  right: clamp(0.18rem, 0.58svh, 0.32rem) !important;
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-roster-slot.is-locked .qs-roster-name {
+    font-size: clamp(0.44rem, 1.02svh, 0.58rem) !important;
+  }
+
+  body.qs-active .qs-roster-slot.is-locked .qs-roster-locked-preview-img {
+    height: clamp(1.42rem, 3.7svh, 2.05rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Locked Roster Names END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Math Box Anchor Label
+   Purpose:
+   - Move the mode/difficulty label so it hugs the top of the math box.
+   - Make it read like the panel title/anchor.
+   - Keep equation and answer centered underneath.
+   - CSS-only. No math, keypad, scoring, timer, or mode logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-math {
+  position: relative !important;
+}
+
+body.qs-active .qs-math .center-stack {
+  position: relative !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  /* Reserve a clean title lane at the top of the math panel. */
+  padding-top: clamp(1.85rem, 4.05svh, 2.65rem) !important;
+  box-sizing: border-box !important;
+
+  gap: clamp(0.16rem, 0.55svh, 0.3rem) !important;
+}
+
+body.qs-active .qs-equation-mode-label {
+  position: absolute !important;
+  top: clamp(0.55rem, 1.25svh, 0.9rem) !important;
+  left: clamp(0.55rem, 2.5vw, 1rem) !important;
+  right: clamp(0.55rem, 2.5vw, 1rem) !important;
+
+  width: auto !important;
+  max-width: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.82rem, 2.05svh, 1.14rem) !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.095em !important;
+
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 76%, #ffffff 24%) !important;
+
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0, 255, 238, 0.55)),
+    0 0 16px var(--qs-faint, rgba(0, 255, 238, 0.18)),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+
+  pointer-events: none !important;
+  z-index: 3 !important;
+}
+
+body.qs-active .qs-math .equation-row {
+  margin-top: clamp(0.2rem, 0.6svh, 0.45rem) !important;
+}
+
+/* Short phones: keep the label anchored without stealing too much equation room. */
+@media (max-height: 740px) {
+  body.qs-active .qs-math .center-stack {
+    padding-top: clamp(1.55rem, 3.5svh, 2.15rem) !important;
+  }
+
+  body.qs-active .qs-equation-mode-label {
+    top: clamp(0.42rem, 1svh, 0.68rem) !important;
+    font-size: clamp(0.72rem, 1.78svh, 0.96rem) !important;
+    letter-spacing: 0.075em !important;
+  }
+}
+
+/* ───────────────── QuickServe — Math Box Anchor Label END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Unified Bottom Feedback
+   Purpose:
+   - Retire old XP-left / result-right corner feedback inside the math panel.
+   - Keep mode/difficulty as the top anchor.
+   - Keep equation white and answer/question mark theme-colored.
+   - Show Correct / Nope / Cleared as one centered bottom-row message.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-math {
+  position: relative !important;
+}
+
+body.qs-active .qs-math .center-stack {
+  position: relative !important;
+
+  /* Top lane = mode/difficulty label.
+     Bottom lane = feedback message.
+     Middle stays equation + answer. */
+  padding-top: clamp(1.85rem, 4.05svh, 2.65rem) !important;
+  padding-bottom: clamp(1.65rem, 3.45svh, 2.25rem) !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep the equation line white. */
+body.qs-active .qs-math #mathProblem,
+body.qs-active .qs-math .math-problem,
+body.qs-active .qs-math .math-problem .qs-op,
+body.qs-active .qs-math .math-problem .qs-equals,
+body.qs-active .qs-math .math-problem .qs-question-mark,
+body.qs-active .qs-math .math-problem .qs-money-symbol,
+body.qs-active .qs-math .math-problem .qs-percent-symbol {
+  color: rgba(255, 255, 255, 0.98) !important;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+}
+
+/* The entered answer / lower question mark stays theme-colored. */
+body.qs-active .qs-math #answerDisplay,
+body.qs-active .qs-math .answer-display {
+  color: var(--qs-accent, #00ffee) !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 16px var(--qs-faint, rgba(0,255,238,0.18)),
+    0 2px 8px rgba(0, 0, 0, 0.72) !important;
+}
+
+/* Old XP lane is retired from visible layout. */
+body.qs-active .qs-math #qsXPMsg,
+body.qs-active .qs-math .qs-xp-msg {
+  display: none !important;
+}
+
+/* One bottom feedback lane. */
+body.qs-active .qs-math #qsResultMsg,
+body.qs-active .qs-math .qs-result-msg {
+  position: absolute !important;
+
+  left: clamp(0.5rem, 2.5vw, 1rem) !important;
+  right: clamp(0.5rem, 2.5vw, 1rem) !important;
+  bottom: clamp(0.48rem, 1.15svh, 0.78rem) !important;
+  top: auto !important;
+
+  width: auto !important;
+  max-width: none !important;
+  min-height: clamp(1.05rem, 2.3svh, 1.5rem) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 1.72svh, 1rem) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.025em !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+
+  pointer-events: none !important;
+  z-index: 5 !important;
+}
+
+/* Hidden still means hidden, even though the feedback lane is flex when active. */
+body.qs-active .qs-math #qsResultMsg.hidden,
+body.qs-active .qs-math .qs-result-msg.hidden {
+  display: none !important;
+}
+
+/* Correct = green lane. */
+body.qs-active .qs-math #qsResultMsg.correct,
+body.qs-active .qs-math .qs-result-msg.correct {
+  color: #6dff9d !important;
+  text-shadow:
+    0 0 8px rgba(109, 255, 157, 0.92),
+    0 0 18px rgba(109, 255, 157, 0.48),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+
+  animation: qsFeedbackBottomPop 1500ms cubic-bezier(.18,.9,.22,1) both !important;
+}
+
+/* Wrong = red lane. */
+body.qs-active .qs-math #qsResultMsg.error,
+body.qs-active .qs-math .qs-result-msg.error {
+  color: #ff4d5f !important;
+  text-shadow:
+    0 0 8px rgba(255, 77, 95, 0.92),
+    0 0 18px rgba(255, 77, 95, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+
+  animation: qsFeedbackBottomPop 1500ms cubic-bezier(.18,.9,.22,1) both !important;
+}
+
+/* Cleared = magenta lane. Overrides older corner-clear rules. */
+body.qs-active .qs-math #qsResultMsg.cleared,
+body.qs-active .qs-math .qs-result-msg.cleared {
+  left: clamp(0.5rem, 2.5vw, 1rem) !important;
+  right: clamp(0.5rem, 2.5vw, 1rem) !important;
+  bottom: clamp(0.48rem, 1.15svh, 0.78rem) !important;
+  top: auto !important;
+
+  color: #ff4dff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 77, 255, 0.95),
+    0 0 18px rgba(255, 77, 255, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.78) !important;
+
+  filter:
+    drop-shadow(0 0 8px rgba(255, 77, 255, 0.62))
+    drop-shadow(0 0 18px rgba(255, 77, 255, 0.24)) !important;
+
+  animation: qsFeedbackBottomPop 1150ms cubic-bezier(.18,.9,.22,1) both !important;
+}
+
+@keyframes qsFeedbackBottomPop {
+  0% {
+    opacity: 0;
+    transform: translateY(0.16rem) scale(0.94);
+  }
+
+  16% {
+    opacity: 1;
+    transform: translateY(0) scale(1.04);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-0.14rem) scale(0.98);
+  }
+}
+
+@media (max-height: 740px) {
+  body.qs-active .qs-math .center-stack {
+    padding-bottom: clamp(1.38rem, 3.05svh, 1.9rem) !important;
+  }
+
+  body.qs-active .qs-math #qsResultMsg,
+  body.qs-active .qs-math .qs-result-msg {
+    bottom: clamp(0.34rem, 0.92svh, 0.58rem) !important;
+    font-size: clamp(0.64rem, 1.52svh, 0.88rem) !important;
+  }
+}
+
+/* ───────────────── QuickServe — Unified Bottom Feedback END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Math Box Timer Progress
+   Purpose:
+   - Add a subtle theme-colored countdown line to the bottom of the math box.
+   - Uses --qs-shift-progress from quickServeGame.js.
+   - Visual-only: timer/scoring/gameplay rules unchanged.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-math {
+  --qs-shift-progress: 100%;
+  position: relative !important;
+}
+
+/* Track */
+body.qs-active .qs-math::before {
+  content: "" !important;
+  position: absolute !important;
+
+  left: clamp(0.7rem, 3vw, 1.2rem) !important;
+  right: clamp(0.7rem, 3vw, 1.2rem) !important;
+  bottom: clamp(0.14rem, 0.42svh, 0.28rem) !important;
+
+  height: clamp(2px, 0.38svh, 4px) !important;
+  border-radius: 999px !important;
+
+  background: rgba(255, 255, 255, 0.10) !important;
+
+  box-shadow:
+    0 0 8px rgba(255, 255, 255, 0.06),
+    inset 0 0 8px rgba(0, 0, 0, 0.38) !important;
+
+  pointer-events: none !important;
+  z-index: 4 !important;
+}
+
+/* Fill */
+body.qs-active .qs-math::after {
+  content: "" !important;
+  position: absolute !important;
+
+  left: clamp(0.7rem, 3vw, 1.2rem) !important;
+  bottom: clamp(0.14rem, 0.42svh, 0.28rem) !important;
+
+  width: var(--qs-shift-progress, 100%) !important;
+  max-width: calc(100% - (clamp(0.7rem, 3vw, 1.2rem) * 2)) !important;
+
+  height: clamp(2px, 0.38svh, 4px) !important;
+  border-radius: 999px !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 70%, #ffffff 30%),
+      var(--qs-accent, #00ffee)
+    ) !important;
+
+  box-shadow:
+    0 0 8px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 16px var(--qs-faint, rgba(0,255,238,0.18)) !important;
+
+  transition: width 920ms linear !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-math::after {
+    transition: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Math Box Timer Progress END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Center-Collapse Timer Line
+   Purpose:
+   - Make the math-box timer line deplete from both sides toward center.
+   - Keeps the same subtle look, but makes the countdown feel more like
+     a stage-energy gate closing.
+   - Uses --qs-shift-progress-scale from quickServeGame.js.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active .qs-math {
+  --qs-shift-progress-scale: 1;
+}
+
+/* Keep full-width track exactly where it already felt good. */
+body.qs-active .qs-math::before {
+  left: clamp(0.7rem, 3vw, 1.2rem) !important;
+  right: clamp(0.7rem, 3vw, 1.2rem) !important;
+}
+
+/* Fill now starts full and collapses from both sides toward the center. */
+body.qs-active .qs-math::after {
+  left: 50% !important;
+  right: auto !important;
+
+  width: calc(100% - (clamp(0.7rem, 3vw, 1.2rem) * 2)) !important;
+  max-width: calc(100% - (clamp(0.7rem, 3vw, 1.2rem) * 2)) !important;
+
+  transform: translateX(-50%) scaleX(var(--qs-shift-progress-scale, 1)) !important;
+  transform-origin: center center !important;
+
+  transition: transform 920ms linear !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active .qs-math::after {
+    transition: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Center-Collapse Timer Line END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Final Ten Seconds Pressure
+   Purpose:
+   - Last 10 seconds should feel urgent without adding clutter.
+   - Timer chip flashes magenta.
+   - Center-collapse time line turns magenta and pulses.
+   - No scoring, haptic, timer length, result, or keypad logic changed.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active.qs-time-pressure .qs-stage .timer-box .info-box {
+  border-color: rgba(255, 72, 220, 0.88) !important;
+  color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 12%,
+      rgba(255, 72, 220, 0.28),
+      rgba(0, 0, 0, 0.72) 72%
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08) inset,
+    0 0 16px rgba(255, 72, 220, 0.70),
+    0 0 28px rgba(255, 72, 220, 0.32) !important;
+
+  animation: qsFinalTenTimerChipPulse 620ms ease-in-out infinite alternate !important;
+}
+
+body.qs-active.qs-time-pressure #qsTimer {
+  color: #ffffff !important;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.90),
+    0 0 16px rgba(255, 72, 220, 0.88),
+    0 0 28px rgba(255, 72, 220, 0.42) !important;
+
+  animation: qsFinalTenTimerTextPulse 620ms ease-in-out infinite alternate !important;
+}
+
+body.qs-active .qs-math.qs-time-pressure::after {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 210, 255, 0.98),
+      #ff48dc,
+      rgba(255, 210, 255, 0.98)
+    ) !important;
+
+  box-shadow:
+    0 0 10px rgba(255, 72, 220, 0.88),
+    0 0 20px rgba(255, 72, 220, 0.46),
+    0 0 30px rgba(255, 72, 220, 0.22) !important;
+
+  animation: qsFinalTenLinePulse 520ms ease-in-out infinite alternate !important;
+}
+
+@keyframes qsFinalTenTimerChipPulse {
+  from {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  to {
+    transform: scale(1.025);
+    filter: brightness(1.22);
+  }
+}
+
+@keyframes qsFinalTenTimerTextPulse {
+  from {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+
+  to {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes qsFinalTenLinePulse {
+  from {
+    opacity: 0.76;
+    filter: brightness(1);
+  }
+
+  to {
+    opacity: 1;
+    filter: brightness(1.38);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.qs-active.qs-time-pressure .qs-stage .timer-box .info-box,
+  body.qs-active.qs-time-pressure #qsTimer,
+  body.qs-active .qs-math.qs-time-pressure::after {
+    animation: none !important;
+  }
+}
+
+/* ───────────────── QuickServe — Final Ten Seconds Pressure END ───────────────── */
+

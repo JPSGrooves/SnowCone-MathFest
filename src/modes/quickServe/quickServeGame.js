@@ -15,20 +15,24 @@ import {
   getQuickServeSelectedCharacterScoreBonus,
   getQuickServeSelectedCharacterSummary,
   recordQuickServeSelectedCharacterScore,
+  setQuickServeModeFromInGameMathMode,
+  setQuickServeDifficultyFromInGameDifficulty,
 } from './quickServe.js';
 import { generateProblem } from '../../logic/mathBrain.js';
 import { launchConfetti } from '../../utils/confetti.js';
 import { maybeAwardQuickServeBadges, finalizeQuickServeRun, resetQuickServeRunMilestones } from './quickServeBadges.js';
 import { awardBadge } from '../../managers/badgeManager.js';
-import { hapticError } from '../../utils/haptics.js';
+import { hapticSuccess, hapticError } from '../../utils/haptics.js';
 
 
 
 //////////////////////////////
 // 🔥 Game State
 //////////////////////////////
+const QS_SHIFT_SECONDS = 105;
+
 let score = 0;
-let timeRemaining = 105;
+let timeRemaining = QS_SHIFT_SECONDS;
 let timerInterval = null;
 let currentAnswer = '';
 let gameRunning = false;
@@ -222,6 +226,10 @@ export function setMathMode(mode, difficulty = currentMathDifficulty) {
   renderProblem();
   highlightDifficultyButton(currentMathDifficulty);
 
+  // Keep the intro/preflight honest when the player changes lanes in-game.
+  setQuickServeModeFromInGameMathMode(currentMathMode);
+  setQuickServeDifficultyFromInGameDifficulty(currentMathDifficulty);
+
   console.log(`🌈 Mode set to: ${currentMathMode}/${currentMathDifficulty}`);
 }
 
@@ -235,6 +243,9 @@ export function setMathDifficulty(difficulty = currentMathDifficulty) {
   resetCurrentAnswer();
   renderProblem();
   highlightDifficultyButton(currentMathDifficulty);
+
+  // Keep the intro/preflight honest when the player changes difficulty in-game.
+  setQuickServeDifficultyFromInGameDifficulty(currentMathDifficulty);
 
   console.log(`🌶️ Difficulty set to: ${currentMathMode}/${currentMathDifficulty}`);
 }
@@ -301,10 +312,11 @@ function triggerQuickServeStageReaction(type = 'good') {
 //////////////////////////////
 function resetGameState() {
   score = 0;
-  timeRemaining = 105;
+  timeRemaining = QS_SHIFT_SECONDS;
   currentAnswer = '';
   gameRunning = false;
   updateQuickServeStageEnergy(0);
+  updateQuickServeTimerProgress();
 
   // 🍧 per-run XP tally
   totalSessionXP = 0;
@@ -450,15 +462,42 @@ function getModeDifficultyRewards(mode = 'addSub', difficulty = 'easy') {
   return table[safeMode]?.[safeDifficulty] || table.addSub.easy;
 }
 
+
+function updateQuickServeTimerProgress() {
+  const mathEl = document.querySelector('.qs-math');
+  if (!mathEl) return;
+
+  const total = Math.max(1, QS_SHIFT_SECONDS);
+  const remaining = Math.max(0, Math.min(total, Number(timeRemaining) || 0));
+  const pct = Math.max(0, Math.min(100, (remaining / total) * 100));
+  const scale = Math.max(0, Math.min(1, pct / 100));
+  const timePressureActive = remaining > 0 && remaining <= 10;
+
+  mathEl.style.setProperty('--qs-shift-progress', `${pct.toFixed(2)}%`);
+  mathEl.style.setProperty('--qs-shift-progress-scale', scale.toFixed(4));
+  mathEl.dataset.qsShiftProgress = String(Math.round(pct));
+  mathEl.classList.toggle('qs-time-pressure', timePressureActive);
+
+  const gridEl = document.querySelector('.qs-grid');
+  gridEl?.classList.toggle('qs-time-pressure', timePressureActive);
+
+  const timerBoxEl = document.querySelector('.qs-stage .timer-box');
+  timerBoxEl?.classList.toggle('qs-time-pressure', timePressureActive);
+
+  document.body?.classList.toggle('qs-time-pressure', timePressureActive);
+}
+
 function startTimer() {
   const timerDisplay = document.getElementById('qsTimer');
   if (!timerDisplay) return;
 
   timerDisplay.textContent = formatTime(timeRemaining);
+  updateQuickServeTimerProgress();
 
   timerInterval = setInterval(() => {
     timeRemaining--;
     timerDisplay.textContent = formatTime(timeRemaining);
+    updateQuickServeTimerProgress();
 
     if (timeRemaining <= 0) {
       // 🎯 snapshot the old high score BEFORE finalize mutates it
@@ -585,6 +624,14 @@ function handleCorrect() {
   gridFX.bumpGridGlow();
   phil.bumpJam();
   playCorrectSfx();
+
+  // 📳 Correct-answer haptic.
+  // On iPad / no-haptic devices this should safely no-op through Capacitor/native.
+  try {
+    hapticSuccess();
+  } catch (err) {
+    console.warn('[QuickServe] hapticSuccess failed', err);
+  }
 
   // (optional) keep your global XP-based cone badge
   checkBadgeUnlock();
@@ -787,28 +834,58 @@ function showResultMsg(isCorrect, xp = 0) {
 
   if (!resultMsg || !xpMsg) return;
 
-  // 💚 Result feedback (right side)
-  resultMsg.textContent = isCorrect ? '✅ Correct!' : '❌ Nope!';
-  resultMsg.classList.remove('hidden', 'cleared', 'show', 'correct', 'error');
+  // QS bottom feedback law:
+  // One centered feedback line at the bottom of the answer box.
+  // The old corner system split XP left and Correct/Nope right, which now
+  // fights the anchored mode/difficulty title. Keep XP data, but display it
+  // as one unified readable message.
+  resultMsg.textContent = isCorrect
+    ? `🍧 ${xp} XP  ✅ Correct!`
+    : '❌ Nope!';
+
+  resultMsg.classList.remove(
+    'hidden',
+    'cleared',
+    'show',
+    'correct',
+    'error',
+    'zero',
+    'incorrect',
+    'wrong',
+    'bad',
+    'good'
+  );
+
+  resultMsg.classList.add('show');
   resultMsg.classList.toggle('correct', isCorrect);
   resultMsg.classList.toggle('error', !isCorrect);
 
-  // 🍧 XP feedback (left side)
-  xpMsg.textContent = `🍧 ${xp} XP`;
-  xpMsg.classList.remove('hidden', 'cleared', 'show', 'correct', 'error');
-  xpMsg.classList.toggle('correct', isCorrect);
-  xpMsg.classList.toggle('zero', xp === 0);
-  xpMsg.classList.toggle('error', !isCorrect);
+  // Retire the old XP corner lane for the current UI.
+  xpMsg.textContent = '';
+  xpMsg.classList.remove(
+    'cleared',
+    'show',
+    'correct',
+    'error',
+    'zero',
+    'incorrect',
+    'wrong',
+    'bad',
+    'good'
+  );
+  xpMsg.classList.add('hidden');
 
-  // Let CSS own the final Badge 4 color law.
+  // Let CSS own the final color/placement law.
   xpMsg.removeAttribute('style');
   resultMsg.removeAttribute('style');
 
   setTimeout(() => {
+    resultMsg.classList.remove('show', 'correct', 'error');
     resultMsg.classList.add('hidden');
     xpMsg.classList.add('hidden');
   }, 1500);
 }
+
 
 
 function checkBadgeUnlock() {
@@ -872,10 +949,14 @@ function showQuickServeClearedFeedback() {
     qsClearFeedbackTimer = null;
   }
 
+  // QS bottom feedback law:
+  // Clear is a single centered bottom-row message.
+  // It should not duplicate into both old corner lanes.
   if (xpMsg) {
-    xpMsg.textContent = 'Cleared';
+    xpMsg.textContent = '';
     xpMsg.classList.remove(
-      'hidden',
+      'show',
+      'cleared',
       'zero',
       'error',
       'correct',
@@ -884,12 +965,12 @@ function showQuickServeClearedFeedback() {
       'bad',
       'good'
     );
-    xpMsg.classList.add('cleared', 'show');
+    xpMsg.classList.add('hidden');
     xpMsg.removeAttribute('style');
   }
 
   if (resultMsg) {
-    resultMsg.textContent = 'Cleared';
+    resultMsg.textContent = 'Cleared!';
     resultMsg.classList.remove(
       'hidden',
       'error',
@@ -897,16 +978,18 @@ function showQuickServeClearedFeedback() {
       'incorrect',
       'wrong',
       'bad',
-      'good'
+      'good',
+      'zero'
     );
     resultMsg.classList.add('cleared', 'show');
+    resultMsg.removeAttribute('style');
   }
 
   qsClearFeedbackTimer = window.setTimeout(() => {
     if (resultMsg) {
       resultMsg.classList.remove('show', 'cleared');
 
-      if (resultMsg.textContent === 'Cleared') {
+      if (resultMsg.textContent === 'Cleared!') {
         resultMsg.textContent = '';
       }
 
@@ -916,7 +999,7 @@ function showQuickServeClearedFeedback() {
     if (xpMsg) {
       xpMsg.classList.remove('show', 'cleared');
 
-      if (xpMsg.textContent === 'Cleared') {
+      if (xpMsg.textContent === 'Cleared!') {
         xpMsg.textContent = '';
       }
 
@@ -926,6 +1009,7 @@ function showQuickServeClearedFeedback() {
     qsClearFeedbackTimer = null;
   }, 1150);
 }
+
 /* ───────────────── QuickServe Clear Feedback END ───────────────── */
 
 function markCurrentAnswerWrongAndClear() {
