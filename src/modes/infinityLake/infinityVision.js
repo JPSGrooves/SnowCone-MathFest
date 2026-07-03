@@ -256,6 +256,22 @@ export function getCurrentLakeVisionShapeId() {
   return getShapeId();
 }
 
+export function setLakeVisionShapeById(shapeId, { startAtLayer = 0 } = {}) {
+  const nextIndex = VISION_SHAPES.indexOf(shapeId);
+
+  if (nextIndex === -1) {
+    return getShapeId();
+  }
+
+  shapeIndex = nextIndex;
+
+  if (stageEl) {
+    resetLakeVision({ rotateShape: false, startAtLayer });
+  }
+
+  return getShapeId();
+}
+
 export function initLakeVision() {
   stageEl = document.getElementById('lakeVisionStage');
   if (!stageEl) return;

@@ -1316,12 +1316,23 @@ export function renderGameUI() {
               Nice round. Keep the line moving.
             </p>
 
-            <div class="qs-result-buttons">
-              <button id="qsPlayAgainBtn" class="start-show-btn qs-result-primary-btn">
-                Play Again
+            <div class="qs-result-buttons qs-result-buttons-il-match">
+              <button
+                id="qsBackSetupBtn"
+                class="qs-result-secondary-btn qs-result-setup-btn"
+                aria-label="Back to Setup"
+              >
+                <span class="qs-result-btn-icon qs-result-setup-icon" aria-hidden="true">←</span>
+                <span class="qs-result-btn-label">SETUP</span>
               </button>
-              <button id="qsBackSetupBtn" class="qs-result-secondary-btn">
-                ← Back to Setup
+
+              <button
+                id="qsPlayAgainBtn"
+                class="start-show-btn qs-result-primary-btn qs-result-again-btn"
+                aria-label="Play Again"
+              >
+                <span class="qs-result-btn-icon qs-result-again-icon" aria-hidden="true">↻</span>
+                <span class="qs-result-btn-label">AGAIN</span>
               </button>
             </div>
           </div>

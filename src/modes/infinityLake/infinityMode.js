@@ -22,11 +22,12 @@ import {
   getLakeVisionTotalCount,
   getLakeVisionShapeIds,
   getCurrentLakeVisionShapeId,
-  getLakeVisionDisplayItems
+  getLakeVisionDisplayItems,
+  setLakeVisionShapeById
 } from './infinityVision.js';
 
 
-
+let selectedIntroVisionId = null;
 // 🧷 Run commit guard (prevents double-paying XP/time if player hits Results then exits)
 let didCommitThisRun = false;
 
@@ -179,6 +180,8 @@ export function loadInfinityMode() {
 
   renderIntroScreen();
   setupIntroDifficultyHandlers();
+  setupIntroVisionHandlers();
+  setupIntroStartHandler();
   document.getElementById('ilBackIntro')?.addEventListener('click', returnToMenu);
   setTimeout(() => {
     startTripletLoop('intro', 'tripletSpriteIntro', 500);
@@ -197,74 +200,8 @@ export function loadInfinityMode() {
   document.querySelector('.il-intro .back-to-menu-btn')?.addEventListener('click', returnToMenu);
 
   // 🎶 Start the Set
-  document.querySelector('.il-intro .start-show-btn')?.addEventListener('click', () => {
-    setTimeout(() => {
-      startTripletLoop('intro', 'tripletSpriteIntro', 500);
-    }, 100);
-    const introEl = document.querySelector('.il-intro');
+  setupIntroStartHandler();
 
-    if (introEl) {
-      introEl.classList.add('fade-out');
-
-      setTimeout(() => {
-        stopTripletLoop(); // 🛑 Kill strobe
-
-        renderUI(); // 🧠 Build game screen
-        updateModeButtonUI(); // 👈 this will now highlight the correct button on load
-        swapModeBackground('assets/img/modes/infinityLake/plate_infinityBG.png');
-        setupEventHandlers();
-        startGame();
-        playInfinityLoop(); // 🎶🍧💫 kick off the infinite jam session
-        
-
-        // Fade in new game grid
-        const grid = document.querySelector('.il-grid');
-        if (grid) grid.classList.add('fade-in');
-
-        // Start sprite sequence
-        // 🍧 Triplet Concert Loop v3
-        // Open set plays once, then the full jam pattern repeats.
-        // The animator keeps using each pose's normal/Lit pair:
-        // il_jam4.png ↔ il_jam4Lit.png, etc.
-        startTripletSequence([
-          { pose: 'openSet', time: 4500, once: true },
-
-          { pose: 'jam4', time: 3000 },
-          { pose: 'jam3', time: 3000 },
-          { pose: 'jam4', time: 3000 },
-          { pose: 'jam3', time: 3000 },
-          { pose: 'jam5', time: 4500 },
-          { pose: 'jam6', time: 4500 },
-          { pose: 'jam5', time: 4500 },
-          { pose: 'jam6', time: 4500 },
-          { pose: 'jam5', time: 4500 },
-          { pose: 'jam4', time: 1500 },
-          { pose: 'jam3', time: 1500 },
-          { pose: 'jam4', time: 1500 },
-          { pose: 'jam3', time: 1500 },
-
-          { pose: 'jam2', time: 5200 },
-          { pose: 'jam1', time: 5200 },
-          { pose: 'jam2', time: 5200 },
-          { pose: 'jam1', time: 5200 },
-          { pose: 'jam2', time: 5200 },
-          { pose: 'jam1', time: 5200 },
-
-          { pose: 'jam5', time: 4000 },
-          { pose: 'jam6', time: 4000 },
-          { pose: 'jam5', time: 4000 },
-          { pose: 'jam6', time: 4000 }
-        ], 'tripletSpriteGame');
-
-
-
-        // 🛸 Fade-In Candy: micro-delay before glow
-        setTimeout(() => {
-          document.getElementById('tripletSpriteGame')?.classList.add('fade-in');
-        }, 100);
-      }, 450); // allow fade-out to finish
-    }
-  });
 }
 
 export function stopInfinityMode() {
@@ -426,9 +363,202 @@ function setupIntroDifficultyHandlers() {
   setIntroDifficultyMode(readInfinityDifficultyMode());
 }
 
+function normalizeInfinityIntroVisionId(visionId, fallback = null) {
+  const ids = getInfinityVisionIds();
+
+  if (!ids.length) return null;
+  if (ids.includes(visionId)) return visionId;
+  if (fallback && ids.includes(fallback)) return fallback;
+
+  return ids[0];
+}
+
+function getDefaultInfinityIntroVisionId() {
+  const ids = getInfinityVisionIds();
+  if (!ids.length) return null;
+
+  const seenSet = new Set(readInfinityVisionSeenIds());
+
+  // First unfinished vision gets the default spotlight.
+  return ids.find((id) => !seenSet.has(id)) || ids[0];
+}
+
+function ensureSelectedIntroVisionId() {
+  selectedIntroVisionId = normalizeInfinityIntroVisionId(
+    selectedIntroVisionId,
+    getDefaultInfinityIntroVisionId()
+  );
+
+  return selectedIntroVisionId;
+}
+
+function setSelectedIntroVisionId(visionId) {
+  selectedIntroVisionId = normalizeInfinityIntroVisionId(
+    visionId,
+    getDefaultInfinityIntroVisionId()
+  );
+
+  const tracker = document.getElementById('ilIntroVisionTracker');
+  if (tracker) {
+    tracker.innerHTML = renderInfinityVisionIntroSelectionSlots(selectedIntroVisionId);
+  }
+
+  document.querySelectorAll('.il-vision-intro-btn').forEach((btn) => {
+    const selected = btn.dataset.visionId === selectedIntroVisionId;
+    btn.classList.toggle('is-selected', selected);
+    btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+
+  return selectedIntroVisionId;
+}
+
+function setupIntroVisionHandlers() {
+  const tracker = document.getElementById('ilIntroVisionTracker');
+  if (!tracker) return;
+
+  tracker.addEventListener('click', (event) => {
+    const btn = event.target.closest('.il-vision-intro-btn');
+    if (!btn) return;
+
+    setSelectedIntroVisionId(btn.dataset.visionId);
+  });
+
+  setSelectedIntroVisionId(ensureSelectedIntroVisionId());
+}
+
+function applySelectedIntroVisionFocus() {
+  const safeVisionId = ensureSelectedIntroVisionId();
+
+  if (safeVisionId) {
+    setLakeVisionShapeById(safeVisionId);
+  }
+
+  return safeVisionId;
+}
+
+
+function getInfinityResultNudge({
+  scoreValue = 0,
+  runStreakValue = 0,
+  seenVisionCount = 0,
+  runVisionCount = 0,
+} = {}) {
+  const nudges = [];
+
+  if (runVisionCount >= 2) {
+    nudges.push(`Strong lake run. You reached ${runVisionCount} visions this time.`);
+  }
+
+  if (runVisionCount === 1) {
+    nudges.push('A new vision stirred in the lake. Choose your next focus and dive again.');
+  }
+
+  if (scoreValue >= 25) {
+    nudges.push('That was a real run. Try a harder lane or go hunt a new top score.');
+  }
+
+  if (runStreakValue >= 10) {
+    nudges.push('That streak had power. One sharper run could wake the next vision.');
+  }
+
+  if (seenVisionCount <= 0) {
+    nudges.push('The next vision is waiting. Pick a focus in setup and keep the streak alive.');
+  }
+
+  nudges.push('Choose a vision focus in setup, then head back into the lake.');
+  nudges.push('A different focus can change the whole feel of the run.');
+  nudges.push('Try another pass and see what the lake reveals next.');
+
+  return nudges[Math.floor(Math.random() * nudges.length)];
+}
+
+function startInfinityFromIntro() {
+  setTimeout(() => {
+    startTripletLoop('intro', 'tripletSpriteIntro', 500);
+  }, 100);
+
+  const introEl = document.querySelector('.il-intro');
+
+  if (!introEl) return;
+
+  introEl.classList.add('fade-out');
+
+  setTimeout(() => {
+    stopTripletLoop(); // 🛑 Kill strobe
+
+    renderUI(); // 🧠 Build game screen
+    applySelectedIntroVisionFocus(); // 🌌 start on the selected vision focus
+    updateModeButtonUI(); // 👈 this will now highlight the correct button on load
+    swapModeBackground('assets/img/modes/infinityLake/plate_infinityBG.png');
+    setupEventHandlers();
+    startGame();
+    playInfinityLoop();
+
+    // Fade in new game grid
+    const grid = document.querySelector('.il-grid');
+    if (grid) grid.classList.add('fade-in');
+
+    // 🍧 Triplet Concert Loop v3
+    startTripletSequence([
+      { pose: 'openSet', time: 4500, once: true },
+
+      { pose: 'jam4', time: 3000 },
+      { pose: 'jam3', time: 3000 },
+      { pose: 'jam4', time: 3000 },
+      { pose: 'jam3', time: 3000 },
+      { pose: 'jam5', time: 4500 },
+      { pose: 'jam6', time: 4500 },
+      { pose: 'jam5', time: 4500 },
+      { pose: 'jam6', time: 4500 },
+      { pose: 'jam5', time: 4500 },
+      { pose: 'jam4', time: 1500 },
+      { pose: 'jam3', time: 1500 },
+      { pose: 'jam4', time: 1500 },
+      { pose: 'jam3', time: 1500 },
+
+      { pose: 'jam2', time: 5200 },
+      { pose: 'jam1', time: 5200 },
+      { pose: 'jam2', time: 5200 },
+      { pose: 'jam1', time: 5200 },
+      { pose: 'jam2', time: 5200 },
+      { pose: 'jam1', time: 5200 },
+
+      { pose: 'jam5', time: 4000 },
+      { pose: 'jam6', time: 4000 },
+      { pose: 'jam5', time: 4000 },
+      { pose: 'jam6', time: 4000 }
+    ], 'tripletSpriteGame');
+
+    // 🛸 Fade-In Candy: micro-delay before glow
+    setTimeout(() => {
+      document.getElementById('tripletSpriteGame')?.classList.add('fade-in');
+    }, 100);
+  }, 450); // allow fade-out to finish
+}
+
+function setupIntroStartHandler() {
+  const startBtn =
+    document.getElementById('startInfinitySet') ||
+    document.querySelector('.il-intro .start-show-btn');
+
+  if (!startBtn) return;
+
+  if (onIntroStartClick) {
+    try {
+      startBtn.removeEventListener('click', onIntroStartClick);
+    } catch {}
+  }
+
+  onIntroStartClick = startInfinityFromIntro;
+  startBtn.addEventListener('click', onIntroStartClick);
+}
+
+
 function renderIntroScreen() {
   const container = document.getElementById('game-container');
   const { bestScore, bestStreak } = getInfinityPreflightStats();
+
+  selectedIntroVisionId = ensureSelectedIntroVisionId();
 
   container.innerHTML = `
     <div class="il-aspect-wrap">
@@ -464,26 +594,36 @@ function renderIntroScreen() {
           </section>
 
           <section class="il-preflight-hud" aria-label="Infinity Lake setup">
-            <div class="il-preflight-stats il-preflight-stats-merged">
-              <div class="il-preflight-stat-col">
-                <span>Top Score</span>
-                <strong>${bestScore}</strong>
+            <div class="il-preflight-stats il-preflight-stats-merged il-preflight-stats-vision-layout">
+              <div class="il-preflight-stats-top-row">
+                <div class="il-preflight-stat-col il-preflight-top-stat">
+                  <span>Top Score</span>
+                  <strong>${bestScore}</strong>
+                </div>
+
+                <div class="il-preflight-stat-divider" aria-hidden="true"></div>
+
+                <div class="il-preflight-stat-col il-preflight-top-stat">
+                  <span>Top Streak</span>
+                  <strong>${bestStreak}</strong>
+                </div>
               </div>
 
-              <div class="il-preflight-stat-divider" aria-hidden="true"></div>
-
-              <div class="il-preflight-stat-col">
-                <span>Top Streak</span>
-                <strong>${bestStreak}</strong>
-              </div>
-
-              <div class="il-preflight-stat-divider" aria-hidden="true"></div>
-
-              <div class="il-preflight-stat-col il-preflight-stat-visions">
-                <span>Visions</span>
+              <div class="il-preflight-vision-focus-row">
+                <span class="il-preflight-vision-title">Vision Focus</span>
                 <strong id="ilIntroVisionsSeen">${renderInfinityVisionIntroSummary()}</strong>
-                <div id="ilIntroVisionTracker" class="il-vision-intro-tracker" aria-label="Infinity Lake vision tracker">${renderInfinityVisionSymbolSlots()}</div>
-                <small class="il-preflight-vision-footnote">Top Vision Run: ${readInfinityTopVisionRun()}</small>
+
+                <div
+                  id="ilIntroVisionTracker"
+                  class="il-vision-intro-tracker"
+                  aria-label="Choose your starting vision focus"
+                >
+                  ${renderInfinityVisionIntroSelectionSlots(selectedIntroVisionId)}
+                </div>
+
+                <small class="il-preflight-vision-footnote">
+                  Top Vision Run: ${readInfinityTopVisionRun()}
+                </small>
               </div>
             </div>
 
@@ -546,7 +686,6 @@ function renderIntroScreen() {
 
   applyInfinityPreflightThemeVars(container.querySelector('.il-preflight-scene'));
 }
-
 
 function switchMode(mode) {
   saveInfinityDifficultyMode(mode);
@@ -640,44 +779,54 @@ function renderUI() {
 
         <!-- ♾️ Infinity Results overlay + popup -->
         <div class="il-result-overlay hidden" id="ilResultOverlay">
-          <div class="il-result-popup il-results-card" id="ilResultPopup">
+          <div class="il-result-popup il-results-card il-results-card-flat" id="ilResultPopup">
             <div class="il-results-kicker">Infinity Lake</div>
-            <h2>Results</h2>
 
-            <div class="il-results-grid" aria-label="Infinity Lake results">
-              <section class="il-results-panel il-results-panel-score">
-                <span class="il-results-label">Score</span>
-                <strong id="ilScoreFinal">0</strong>
-                <small>Top Score: <span id="ilHighScore">0</span></small>
-              </section>
-
-              <section class="il-results-panel il-results-panel-streak">
-                <span class="il-results-label">Top Streak</span>
-                <strong id="ilStreakRun">0</strong>
-                <small>Top Streak: <span id="ilStreak">0</span></small>
-              </section>
+            <div class="il-results-hero">
+              <h2>Results</h2>
             </div>
 
-            <section class="il-vision-result-panel" aria-label="Visions reached">
-              <span class="il-results-label">Visions Reached:</span>
-              <strong id="ilVisionReached">${readInfinityVisionSeenIds().length} of ${getInfinityVisionTotal()}</strong>
-              <div id="ilVisionResultTracker" class="il-vision-result-tracker" aria-label="Infinity Lake vision tracker">${renderInfinityVisionSymbolSlots()}</div>
-              <small>This Run: <span id="ilVisionRunCount">0</span></small>
-              <small>Top Vision Run: <span id="ilTopVisionRun">0</span></small>
+            <section class="il-results-summary" aria-label="Infinity Lake results">
+              <div class="il-results-topline">
+                <div class="il-results-stat">
+                  <span class="il-results-label">Score</span>
+                  <strong id="ilScoreFinal">0</strong>
+                  <small>Top Score: <span id="ilHighScore">0</span></small>
+                </div>
+
+                <div class="il-results-top-divider" aria-hidden="true"></div>
+
+                <div class="il-results-stat">
+                  <span class="il-results-label">Best Streak</span>
+                  <strong id="ilStreakRun">0</strong>
+                  <small>Top Streak: <span id="ilStreak">0</span></small>
+                </div>
+              </div>
+
+              <section class="il-results-vision-strip" aria-label="Visions reached">
+                <span class="il-results-label">Visions Reached</span>
+                <strong id="ilVisionReached">${readInfinityVisionSeenIds().length} of ${getInfinityVisionTotal()}</strong>
+                <div id="ilVisionResultTracker" class="il-vision-result-tracker" aria-label="Infinity Lake vision tracker">${renderInfinityVisionSymbolSlots()}</div>
+                <div class="il-results-vision-meta">
+                  <small>This Run: <span id="ilVisionRunCount">0</span></small>
+                  <small>Top Vision Run: <span id="ilTopVisionRun">0</span></small>
+                </div>
+              </section>
             </section>
 
             <p class="il-result-flavor" id="ilResultFlavor">
-              The lake is warming up.
+              The next vision is waiting.
             </p>
 
             <div class="il-result-buttons">
+              <button id="ilSetupBtn" class="il-results-secondary il-results-setup-btn" aria-label="Back to Setup">
+                <span class="il-util-arrow" aria-hidden="true">←</span>
+                <span class="il-util-label">SETUP</span>
+              </button>
+
               <button id="ilPlayAgainBtn" class="start-show-btn il-results-primary" aria-label="Play Again">
                 <span class="il-util-arrow" aria-hidden="true">↻</span>
-                <span class="il-util-label">Again</span>
-              </button>
-              <button id="ilBackBtn" class="il-results-secondary" aria-label="Main Menu">
-                <span class="il-util-arrow" aria-hidden="true">←</span>
-                <span class="il-util-label">Menu</span>
+                <span class="il-util-label">AGAIN</span>
               </button>
             </div>
           </div>
@@ -788,12 +937,11 @@ function setupEventHandlers() {
     playAgain.addEventListener('click', onPlayAgainClick);
   }
 
-  const popupBack = document.getElementById('ilBackBtn');
+  const popupBack = document.getElementById('ilSetupBtn');
   if (popupBack) {
     if (onPopupBackClick) popupBack.removeEventListener('click', onPopupBackClick);
     onPopupBackClick = () => {
-      closeResultPopup();
-      returnToMenu();
+      returnToInfinitySetup();
     };
     popupBack.addEventListener('click', onPopupBackClick);
   }
@@ -839,7 +987,7 @@ function cleanupEventHandlers() {
     playAgain.removeEventListener('click', onPlayAgainClick);
   }
 
-  const popupBack = document.getElementById('ilBackBtn');
+  const popupBack = document.getElementById('ilSetupBtn');
   if (popupBack && onPopupBackClick) {
     popupBack.removeEventListener('click', onPopupBackClick);
   }
@@ -849,6 +997,30 @@ function cleanupEventHandlers() {
   onMuteClick = null;
   onPlayAgainClick = null;
   onPopupBackClick = null;
+}
+
+
+function returnToInfinitySetup() {
+  closeResultPopup();
+
+  document.body.classList.remove('il-result-open');
+  hideInfinityViewportResultDimmer({ remove: false });
+
+  cleanupEventHandlers();
+  stopInfinityLoop();
+  stopTripletLoop();
+
+  renderIntroScreen();
+  setupIntroDifficultyHandlers();
+  setupIntroVisionHandlers();
+  setupIntroStartHandler();
+  document.getElementById('ilBackIntro')?.addEventListener('click', returnToMenu);
+
+  swapModeBackground('assets/img/modes/infinityLake/plate_infinityBG.png');
+
+  setTimeout(() => {
+    startTripletLoop('intro', 'tripletSpriteIntro', 500);
+  }, 100);
 }
 
 
@@ -1445,6 +1617,41 @@ function renderInfinityVisionSymbolSlots() {
       }
 
       return `<span class="il-vision-symbol is-locked" title="${label} locked" aria-label="${label} locked"><img class="il-vision-locked-cone" src="${lockedConeSrc}" alt="" /></span>`;
+    })
+    .join('');
+}
+
+function renderInfinityVisionIntroSelectionSlots(selectedId = ensureSelectedIntroVisionId()) {
+  const seenSet = new Set(readInfinityVisionSeenIds());
+  const lockedConeSrc = getInfinityVisionLockedConeSrc();
+
+  return getLakeVisionDisplayItems()
+    .map((item, index) => {
+      const isUnlocked = seenSet.has(item.id);
+      const isSelected = item.id === selectedId;
+      const slotNumber = index + 1;
+      const label = `Vision ${slotNumber}: ${item.id}`;
+
+      return `
+        <button
+          type="button"
+          class="il-vision-intro-btn ${isUnlocked ? 'is-unlocked' : 'is-locked'} ${isSelected ? 'is-selected' : ''}"
+          data-vision-id="${item.id}"
+          aria-pressed="${isSelected ? 'true' : 'false'}"
+          aria-label="${isUnlocked ? `${label}, completed` : `${label}, locked focus option`}"
+          title="${label}"
+        >
+          <span class="il-vision-intro-ring" aria-hidden="true"></span>
+
+          <span class="il-vision-intro-core" aria-hidden="true">
+            ${
+              isUnlocked
+                ? `<span class="il-vision-intro-symbol">${item.symbol}</span>`
+                : `<img class="il-vision-intro-locked-cone" src="${lockedConeSrc}" alt="" />`
+            }
+          </span>
+        </button>
+      `;
     })
     .join('');
 }

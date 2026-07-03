@@ -7245,3 +7245,918 @@ body.il-active .lake-vision-stage.vision-no-alpha-crash::after {
   }
 }
 
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Intro Vision Focus Pass
+   Purpose:
+   - Top row: score / streak
+   - Second row: Vision Focus
+   - All 10 focus icons tappable
+   - Completed = glowing + checked
+   - Locked = cone mystery styling
+   - Selected = ring / glow / pulse
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-preflight-stats-vision-layout {
+  grid-template-columns: 1fr !important;
+  gap: clamp(10px, 1.2svh, 16px) !important;
+  padding: clamp(10px, 1.2svh, 14px) clamp(12px, 2.1vw, 18px) !important;
+}
+
+body.il-active .il-preflight-stats-top-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(10px, 1.8vw, 16px);
+}
+
+body.il-active .il-preflight-top-stat {
+  text-align: center;
+}
+
+body.il-active .il-preflight-vision-focus-row {
+  display: grid;
+  justify-items: center;
+  gap: clamp(6px, 0.8svh, 10px);
+  padding-top: clamp(8px, 1svh, 12px);
+  border-top: 1px solid color-mix(in srgb, var(--il-pref-accent) 38%, transparent);
+}
+
+body.il-active .il-preflight-vision-title {
+  display: block;
+  color: rgba(230, 255, 255, 0.92);
+  font-size: clamp(0.72rem, 1.45svh, 0.9rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+body.il-active .il-vision-intro-tracker {
+  width: min(100%, 420px);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(8px, 1.5vw, 12px);
+}
+
+body.il-active .il-vision-intro-btn {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+
+  display: grid;
+  place-items: center;
+
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+
+  border-radius: 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 10, 28, 0.82),
+      rgba(1, 5, 18, 0.94)
+    );
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 8px 16px rgba(0, 0, 0, 0.24);
+
+  transition:
+    transform 120ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease,
+    filter 180ms ease;
+}
+
+body.il-active .il-vision-intro-btn:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+body.il-active .il-vision-intro-btn .il-vision-intro-ring {
+  position: absolute;
+  inset: 4px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  pointer-events: none;
+}
+
+body.il-active .il-vision-intro-btn .il-vision-intro-core {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+body.il-active .il-vision-intro-btn .il-vision-intro-symbol {
+  font-size: clamp(1.1rem, 2.4svh, 1.7rem);
+  line-height: 1;
+}
+
+body.il-active .il-vision-intro-btn .il-vision-intro-locked-cone {
+  width: clamp(24px, 4svh, 34px);
+  height: auto;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.18))
+    saturate(0.7)
+    brightness(0.92);
+  opacity: 0.9;
+}
+
+body.il-active .il-vision-intro-btn .il-vision-intro-check,
+body.il-active .il-vision-intro-btn .il-vision-intro-mystery {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  z-index: 3;
+
+  display: grid;
+  place-items: center;
+
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+body.il-active .il-vision-intro-btn .il-vision-intro-check {
+  color: #07151a;
+  background: #9dffb0;
+  box-shadow:
+    0 0 10px rgba(157, 255, 176, 0.75),
+    0 0 18px rgba(157, 255, 176, 0.34);
+}
+
+body.il-active .il-vision-intro-btn .il-vision-intro-mystery {
+  color: #fff6c8;
+  background: rgba(255, 204, 72, 0.16);
+  border: 1px solid rgba(255, 210, 98, 0.44);
+  box-shadow:
+    0 0 8px rgba(255, 214, 110, 0.22);
+}
+
+body.il-active .il-vision-intro-btn.is-unlocked {
+  border-color: rgba(140, 255, 226, 0.34);
+  box-shadow:
+    0 0 10px rgba(0, 255, 238, 0.12),
+    inset 0 0 10px rgba(0, 255, 238, 0.05);
+}
+
+body.il-active .il-vision-intro-btn.is-unlocked .il-vision-intro-symbol {
+  color: #ffffff;
+  text-shadow:
+    0 0 7px rgba(255, 255, 255, 0.58),
+    0 0 14px rgba(0, 255, 238, 0.28);
+}
+
+body.il-active .il-vision-intro-btn.is-locked {
+  opacity: 0.88;
+  border-color: rgba(255, 255, 255, 0.14);
+  filter: saturate(0.78);
+}
+
+body.il-active .il-vision-intro-btn.is-selected {
+  transform: translateY(-1px);
+  border-color: var(--il-pref-accent);
+  box-shadow:
+    0 0 14px var(--il-pref-glow),
+    0 0 26px color-mix(in srgb, var(--il-pref-accent) 26%, transparent),
+    inset 0 0 14px color-mix(in srgb, var(--il-pref-accent) 14%, transparent);
+}
+
+body.il-active .il-vision-intro-btn.is-selected .il-vision-intro-ring {
+  border-color: color-mix(in srgb, var(--il-pref-accent) 80%, white 14%);
+  box-shadow:
+    0 0 10px var(--il-pref-glow),
+    inset 0 0 8px color-mix(in srgb, var(--il-pref-accent) 24%, transparent);
+  animation: il-vision-focus-pulse 1.9s ease-in-out infinite;
+}
+
+body.il-active .il-vision-intro-btn.is-selected.is-unlocked .il-vision-intro-symbol,
+body.il-active .il-vision-intro-btn.is-selected.is-locked .il-vision-intro-locked-cone {
+  filter:
+    drop-shadow(0 0 10px color-mix(in srgb, var(--il-pref-accent) 58%, white 12%))
+    brightness(1.06);
+}
+
+@keyframes il-vision-focus-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active .il-vision-intro-tracker {
+    gap: 8px;
+  }
+
+  body.il-active .il-vision-intro-btn {
+    border-radius: 14px;
+  }
+
+  body.il-active .il-vision-intro-btn .il-vision-intro-symbol {
+    font-size: clamp(1rem, 2.1svh, 1.4rem);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Intro Vision Focus Tighten Pass 02
+   Purpose:
+   - Prevent title/subtitle/triplet overlap.
+   - Scale triplets uniformly across iPhone/iPad.
+   - Make Vision Focus theme-colored.
+   - Make “0 of 10” white.
+   - Spread all 10 vision buttons across the available card width.
+   - Remove extra check / mystery bubbles because icon art does the job.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-intro.il-preflight-scene {
+  grid-template-rows: auto minmax(0, 0.82fr) auto auto !important;
+  gap: clamp(5px, 0.82svh, 10px) !important;
+}
+
+/* Header: keep the same look, just give the stage room to breathe. */
+body.il-active .il-preflight-header {
+  padding-top: clamp(0px, 0.24svh, 5px) !important;
+  padding-bottom: clamp(4px, 0.7svh, 10px) !important;
+  margin-bottom: 0 !important;
+}
+
+body.il-active .il-preflight-header h1 {
+  font-size: clamp(1.86rem, 4.45svh, 3.45rem) !important;
+  line-height: 1.08 !important;
+  margin-bottom: clamp(2px, 0.36svh, 6px) !important;
+}
+
+body.il-active .il-preflight-header p {
+  margin-top: clamp(2px, 0.36svh, 6px) !important;
+  padding: 0 !important;
+  max-width: 17ch !important;
+
+  font-size: clamp(0.78rem, 1.82svh, 1.12rem) !important;
+  line-height: 1.09 !important;
+  letter-spacing: 0.018em !important;
+}
+
+/* Stage/triplets: scale, don't distort. No overlap, no clipping. */
+body.il-active .il-preflight-stage {
+  min-height: 0 !important;
+  margin-top: 0 !important;
+  align-items: end !important;
+  overflow: visible !important;
+}
+
+body.il-active .il-preflight-triplets {
+  width: clamp(196px, 36svh, 390px) !important;
+  max-width: min(82vw, 430px) !important;
+  max-height: min(28.5svh, 342px) !important;
+
+  object-fit: contain !important;
+  transform: translateY(0) !important;
+}
+
+/* Keep the HUD compact enough for the new 2-row card. */
+body.il-active .il-preflight-hud {
+  gap: clamp(6px, 0.78svh, 10px) !important;
+}
+
+body.il-active .il-preflight-stats-vision-layout {
+  width: min(92vw, 720px) !important;
+  gap: clamp(7px, 0.82svh, 11px) !important;
+  padding: clamp(8px, 0.92svh, 12px) clamp(12px, 2vw, 18px) !important;
+}
+
+body.il-active .il-preflight-vision-focus-row {
+  gap: clamp(4px, 0.58svh, 7px) !important;
+  padding-top: clamp(6px, 0.82svh, 10px) !important;
+}
+
+body.il-active .il-preflight-vision-title {
+  color: var(--il-pref-accent, #00ffee) !important;
+  text-shadow:
+    0 0 8px var(--il-pref-glow, rgba(0, 255, 238, 0.34)),
+    0 0 16px var(--il-pref-faint, rgba(0, 255, 238, 0.18)) !important;
+}
+
+/* “0 of 10” should read as the value, not disappear into the panel. */
+body.il-active #ilIntroVisionsSeen {
+  display: block !important;
+  color: #ffffff !important;
+  font-size: clamp(1.03rem, 2.32svh, 1.45rem) !important;
+  line-height: 1 !important;
+  text-shadow:
+    0 0 9px rgba(255, 255, 255, 0.46),
+    0 0 16px var(--il-pref-glow, rgba(0, 255, 238, 0.28)) !important;
+}
+
+/* Use the full panel width. Ten small buttons should feel intentional, not bunched. */
+body.il-active .il-vision-intro-tracker {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  gap: clamp(3px, 0.9vw, 8px) !important;
+
+  margin-top: clamp(2px, 0.32svh, 5px) !important;
+}
+
+body.il-active .il-vision-intro-btn {
+  min-width: 0 !important;
+  border-radius: clamp(10px, 2.4vw, 15px) !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* The selected state remains obvious, but does not need a giant pill/bubble. */
+body.il-active .il-vision-intro-btn .il-vision-intro-ring {
+  inset: 3px !important;
+  border-radius: clamp(8px, 2vw, 12px) !important;
+}
+
+body.il-active .il-vision-intro-btn.is-selected {
+  transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Locked cone already has the mystery mark. Let it do the job. */
+body.il-active .il-vision-intro-btn .il-vision-intro-locked-cone {
+  width: clamp(20px, 3.35svh, 31px) !important;
+  max-width: 78% !important;
+  opacity: 0.92 !important;
+}
+
+/* Completed vision symbol does the job. No extra check bubble. */
+body.il-active .il-vision-intro-btn .il-vision-intro-symbol {
+  font-size: clamp(0.96rem, 2.05svh, 1.48rem) !important;
+}
+
+/* Belt and suspenders if old DOM is cached during a hot reload. */
+body.il-active .il-vision-intro-check,
+body.il-active .il-vision-intro-mystery {
+  display: none !important;
+}
+
+/* Difficulty row still gets room and stays visually similar. */
+body.il-active .il-preflight-flow-label {
+  margin-top: clamp(0px, 0.25svh, 4px) !important;
+}
+
+body.il-active .il-preflight-difficulty {
+  width: min(92vw, 720px) !important;
+}
+
+/* Short iPhones: compress without changing the design language. */
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active .il-intro.il-preflight-scene {
+    grid-template-rows: auto minmax(0, 0.74fr) auto auto !important;
+    gap: clamp(4px, 0.62svh, 8px) !important;
+  }
+
+  body.il-active .il-preflight-header h1 {
+    font-size: clamp(1.62rem, 7.5vw, 2.62rem) !important;
+  }
+
+  body.il-active .il-preflight-header p {
+    font-size: clamp(0.74rem, 3.35vw, 0.98rem) !important;
+    line-height: 1.07 !important;
+  }
+
+  body.il-active .il-preflight-triplets {
+    width: clamp(182px, 31svh, 330px) !important;
+    max-height: min(26svh, 300px) !important;
+  }
+
+  body.il-active .il-preflight-stats-vision-layout {
+    padding: 8px 12px !important;
+  }
+
+  body.il-active .il-vision-intro-tracker {
+    gap: clamp(2px, 0.72vw, 5px) !important;
+  }
+
+  body.il-active .il-vision-intro-btn .il-vision-intro-locked-cone {
+    width: clamp(18px, 2.85svh, 27px) !important;
+  }
+
+  body.il-active .il-vision-intro-btn .il-vision-intro-symbol {
+    font-size: clamp(0.86rem, 1.72svh, 1.18rem) !important;
+  }
+}
+
+/* iPad: keep it close to iPhone proportions instead of becoming a giant poster. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.il-active .il-preflight-header h1 {
+    font-size: clamp(2.35rem, 3.85svh, 3.65rem) !important;
+  }
+
+  body.il-active .il-preflight-header p {
+    font-size: clamp(0.98rem, 1.75svh, 1.24rem) !important;
+  }
+
+  body.il-active .il-preflight-triplets {
+    width: clamp(255px, 31svh, 410px) !important;
+    max-height: 30svh !important;
+  }
+
+  body.il-active .il-preflight-stats-vision-layout,
+  body.il-active .il-preflight-difficulty {
+    width: min(74vw, 720px) !important;
+  }
+
+  body.il-active .il-vision-intro-tracker {
+    gap: clamp(5px, 0.9vw, 10px) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Final Intro/Results Polish Pass
+   Purpose:
+   - Lighter locked cone card BG on intro
+   - Results popup less box-in-box
+   - Full-width visions reached row
+   - Small triplet PNG in results
+   - Setup + Again buttons
+   - Keep iPhone/iPad presentation similar
+   ────────────────────────────────────────────────────────── */
+
+/* Intro — locked cone cards need more contrast */
+body.il-active .il-vision-intro-btn.is-locked {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(78, 87, 104, 0.42),
+      rgba(38, 45, 59, 0.74)
+    ) !important;
+  border-color: rgba(180, 196, 220, 0.22) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 8px 16px rgba(0, 0, 0, 0.22),
+    inset 0 0 8px rgba(255, 255, 255, 0.04) !important;
+  filter: saturate(0.9) !important;
+}
+
+body.il-active .il-vision-intro-btn.is-locked .il-vision-intro-locked-cone {
+  filter:
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.18))
+    brightness(1.08)
+    contrast(1.03) !important;
+  opacity: 0.98 !important;
+}
+
+/* Results — overall shell stays, inner nesting gets flatter */
+body.il-active .il-results-card-flat {
+  padding: clamp(18px, 2.8svh, 28px) clamp(18px, 4.5vw, 34px) clamp(18px, 2.8svh, 28px) !important;
+}
+
+body.il-active .il-results-hero {
+  display: grid;
+  justify-items: center;
+  gap: clamp(2px, 0.55svh, 8px);
+  margin-bottom: clamp(10px, 1.5svh, 14px);
+}
+
+body.il-active .il-results-triplets {
+  width: clamp(92px, 14svh, 146px);
+  max-width: 30%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(0,255,238,0.18));
+}
+
+body.il-active .il-result-popup h2 {
+  font-size: clamp(1.7rem, 3.9svh, 2.65rem) !important;
+  line-height: 1.04 !important;
+  margin: 0 !important;
+}
+
+body.il-active .il-results-summary {
+  display: grid;
+  gap: clamp(12px, 1.5svh, 18px);
+  margin-top: clamp(4px, 0.45svh, 8px);
+}
+
+body.il-active .il-results-topline {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(10px, 2vw, 18px);
+  padding: clamp(10px, 1.25svh, 15px) 0;
+}
+
+body.il-active .il-results-stat {
+  display: grid;
+  justify-items: center;
+  gap: clamp(4px, 0.45svh, 6px);
+  text-align: center;
+}
+
+body.il-active .il-results-top-divider {
+  width: 1px;
+  height: clamp(54px, 7.2svh, 84px);
+  background: color-mix(in srgb, var(--il-pref-accent) 45%, transparent);
+  box-shadow: 0 0 12px var(--il-pref-glow);
+}
+
+body.il-active .il-results-topline .il-results-stat,
+body.il-active .il-results-vision-strip {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+body.il-active .il-results-vision-strip {
+  display: grid;
+  justify-items: center;
+  gap: clamp(6px, 0.8svh, 10px);
+  width: 100%;
+  padding-top: clamp(10px, 1.25svh, 15px);
+  border-top: 1px solid color-mix(in srgb, var(--il-pref-accent) 34%, transparent) !important;
+}
+
+body.il-active .il-results-vision-strip > .il-results-label {
+  color: var(--il-pref-accent, #00ffee) !important;
+}
+
+body.il-active .il-results-vision-strip #ilVisionReached {
+  color: #ffffff;
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.42),
+    0 0 14px var(--il-pref-glow, rgba(0,255,238,0.24));
+}
+
+body.il-active .il-vision-result-tracker {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  gap: clamp(6px, 1vw, 10px);
+  flex-wrap: nowrap;
+}
+
+body.il-active .il-results-vision-meta {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(14px, 4vw, 30px);
+  flex-wrap: wrap;
+}
+
+body.il-active .il-result-flavor {
+  margin-top: clamp(12px, 1.7svh, 18px) !important;
+  margin-bottom: clamp(12px, 1.7svh, 18px) !important;
+  font-size: clamp(0.98rem, 2.05svh, 1.5rem) !important;
+  line-height: 1.16 !important;
+  text-align: center;
+}
+
+body.il-active .il-result-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 3vw, 20px);
+  align-items: stretch;
+}
+
+body.il-active .il-results-setup-btn,
+body.il-active .il-results-primary {
+  min-height: clamp(64px, 8.2svh, 88px);
+}
+
+body.il-active .il-results-setup-btn .il-util-label,
+body.il-active .il-results-primary .il-util-label {
+  letter-spacing: 0.06em;
+}
+
+/* Preserve arrow-over-label stack feel on setup button */
+body.il-active .il-results-setup-btn {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+}
+
+body.il-active .il-results-setup-btn .il-util-arrow {
+  display: block;
+  font-size: clamp(1.5rem, 2.6svh, 1.95rem);
+  line-height: 1;
+}
+
+body.il-active .il-results-setup-btn .il-util-label {
+  display: block;
+  font-size: clamp(0.9rem, 1.55svh, 1.1rem);
+  line-height: 1;
+}
+
+/* Small phones */
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active .il-results-triplets {
+    width: clamp(82px, 12svh, 118px);
+  }
+
+  body.il-active .il-result-popup h2 {
+    font-size: clamp(1.48rem, 7vw, 2.18rem) !important;
+  }
+
+  body.il-active .il-result-flavor {
+    font-size: clamp(0.92rem, 4vw, 1.22rem) !important;
+  }
+
+  body.il-active .il-result-buttons {
+    gap: 10px;
+  }
+}
+
+/* iPad: stay close in feel, don’t let the popup get goofy huge */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.il-active .il-results-card-flat {
+    width: min(76vw, 760px);
+  }
+
+  body.il-active .il-results-triplets {
+    width: clamp(100px, 10svh, 150px);
+  }
+
+  body.il-active .il-result-popup h2 {
+    font-size: clamp(1.8rem, 3.2svh, 2.5rem) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Results Final Freeze Pass
+   Purpose:
+   - Fix Results → Setup → Play Game dead button via JS above.
+   - Remove tiny character PNG from visual results.
+   - Lower Results title size.
+   - Make score/streak numbers white.
+   - Make results vision tracker use intro-style lighter gray cards.
+   - Stack arrow above SETUP.
+   ────────────────────────────────────────────────────────── */
+
+/* The character PNG is removed in JS; this protects hot reload / stale DOM too. */
+body.il-active #ilResultPopup .il-results-triplets {
+  display: none !important;
+}
+
+/* Pull the hero tighter now that the tiny PNG is gone. */
+body.il-active #ilResultPopup .il-results-hero {
+  gap: clamp(2px, 0.35svh, 5px) !important;
+  margin-bottom: clamp(8px, 1.15svh, 13px) !important;
+}
+
+/* Results title: still important, less shouty. */
+body.il-active #ilResultPopup h2 {
+  font-size: clamp(1.34rem, 3.05svh, 2.08rem) !important;
+  line-height: 1.03 !important;
+  margin: 0 !important;
+}
+
+/* Score / streak values must read white, not black-on-dark. */
+body.il-active #ilResultPopup #ilScoreFinal,
+body.il-active #ilResultPopup #ilStreakRun,
+body.il-active #ilResultPopup #ilVisionReached {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow:
+    0 0 9px rgba(255, 255, 255, 0.48),
+    0 0 16px var(--il-pref-glow, rgba(0, 255, 238, 0.26)) !important;
+}
+
+/* Secondary result copy was reading too dark in the popup. */
+body.il-active #ilResultPopup .il-results-stat small,
+body.il-active #ilResultPopup .il-results-stat small span,
+body.il-active #ilResultPopup .il-results-vision-meta small,
+body.il-active #ilResultPopup .il-results-vision-meta span {
+  color: rgba(235, 246, 255, 0.86) !important;
+  -webkit-text-fill-color: rgba(235, 246, 255, 0.86) !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Visions reached row stretches cleanly across the popup. */
+body.il-active #ilResultPopup .il-results-vision-strip {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-top: clamp(10px, 1.25svh, 15px) !important;
+}
+
+/* Results tracker gets the same readable card logic as intro. */
+body.il-active #ilResultPopup #ilVisionResultTracker.il-vision-result-tracker {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+
+  gap: clamp(4px, 1vw, 8px) !important;
+  margin-top: clamp(4px, 0.65svh, 8px) !important;
+  margin-bottom: clamp(4px, 0.65svh, 8px) !important;
+}
+
+/* Each result vision slot becomes a real tiny card. */
+body.il-active #ilResultPopup #ilVisionResultTracker .il-vision-symbol {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  border-radius: clamp(8px, 2vw, 13px) !important;
+  border: 1.25px solid rgba(180, 196, 220, 0.20) !important;
+
+  font-size: clamp(0.78rem, 1.75svh, 1.18rem) !important;
+  line-height: 1 !important;
+
+  overflow: hidden !important;
+}
+
+/* Locked visions: lighter gray card so the cone PNG can actually read. */
+body.il-active #ilResultPopup #ilVisionResultTracker .il-vision-symbol.is-locked {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(78, 87, 104, 0.42),
+      rgba(38, 45, 59, 0.74)
+    ) !important;
+
+  border-color: rgba(180, 196, 220, 0.22) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 7px 14px rgba(0, 0, 0, 0.20),
+    inset 0 0 8px rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Cone mystery PNG does the work. No extra visual noise needed. */
+body.il-active #ilResultPopup #ilVisionResultTracker .il-vision-locked-cone {
+  width: clamp(15px, 2.75svh, 27px) !important;
+  max-width: 78% !important;
+  height: auto !important;
+
+  object-fit: contain !important;
+  opacity: 0.98 !important;
+
+  filter:
+    drop-shadow(0 0 6px rgba(255, 255, 255, 0.18))
+    brightness(1.08)
+    contrast(1.03) !important;
+}
+
+/* Completed visions: symbol itself becomes the reward. */
+body.il-active #ilResultPopup #ilVisionResultTracker .il-vision-symbol.is-unlocked {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      color-mix(in srgb, var(--il-pref-accent, #00ffee) 24%, transparent),
+      rgba(4, 12, 28, 0.74) 72%
+    ) !important;
+
+  border-color: color-mix(in srgb, var(--il-pref-accent, #00ffee) 54%, rgba(255,255,255,0.18)) !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.55),
+    0 0 15px var(--il-pref-glow, rgba(0, 255, 238, 0.32)) !important;
+
+  box-shadow:
+    0 0 10px var(--il-pref-faint, rgba(0, 255, 238, 0.18)),
+    inset 0 0 10px var(--il-pref-faint, rgba(0, 255, 238, 0.12)) !important;
+}
+
+/* Setup button: arrow stacked above SETUP, matching the language you liked. */
+body.il-active #ilResultPopup #ilSetupBtn.il-results-setup-btn {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: clamp(3px, 0.45svh, 5px) !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+body.il-active #ilResultPopup #ilSetupBtn.il-results-setup-btn .il-util-arrow {
+  display: block !important;
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: clamp(1.35rem, 2.45svh, 1.78rem) !important;
+  line-height: 0.86 !important;
+  text-align: center !important;
+}
+
+body.il-active #ilResultPopup #ilSetupBtn.il-results-setup-btn .il-util-label {
+  display: block !important;
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: clamp(0.78rem, 1.45svh, 1rem) !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* Keep the nudge readable but not giant. */
+body.il-active #ilResultPopup .il-result-flavor {
+  font-size: clamp(0.94rem, 1.9svh, 1.34rem) !important;
+  line-height: 1.15 !important;
+}
+
+/* Short iPhones: compress the vision cards without losing readability. */
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active #ilResultPopup h2 {
+    font-size: clamp(1.24rem, 6vw, 1.86rem) !important;
+  }
+
+  body.il-active #ilResultPopup #ilVisionResultTracker.il-vision-result-tracker {
+    gap: clamp(3px, 0.72vw, 5px) !important;
+  }
+
+  body.il-active #ilResultPopup #ilVisionResultTracker .il-vision-locked-cone {
+    width: clamp(13px, 2.35svh, 23px) !important;
+  }
+
+  body.il-active #ilResultPopup .il-result-flavor {
+    font-size: clamp(0.88rem, 3.7vw, 1.14rem) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Final Math Header Pin
+   Purpose:
+   - Move ADD & SUB / MULT & DIV / ALGEBRA header to top of math panel.
+   - Keep reasonable top buffer like QS.
+   - Stop the header from hovering directly over the equation.
+   - CSS-only: no gameplay/math/audio logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active .il-math {
+  position: relative !important;
+
+  /* Keep the equation/answers centered, but reserve top air for the header. */
+  justify-content: center !important;
+  padding-top: clamp(3.1rem, 5.2svh, 4.45rem) !important;
+  padding-bottom: clamp(1rem, 2svh, 1.45rem) !important;
+}
+
+body.il-active .il-math #mathProblem {
+  width: 100% !important;
+  margin-top: clamp(0.2rem, 0.7svh, 0.75rem) !important;
+}
+
+/* The mode header becomes a small top label, not part of the equation stack. */
+body.il-active .il-math .il-problem-head {
+  position: absolute !important;
+  top: clamp(0.8rem, 1.45svh, 1.2rem) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  display: block !important;
+  width: calc(100% - clamp(2rem, 8vw, 4rem)) !important;
+  max-width: 520px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  text-align: center !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+/* The old artificial break is no longer needed once the header is pinned. */
+body.il-active .il-math .il-problem-break {
+  display: none !important;
+}
+
+/* Short iPhones: preserve fit without losing the top-label feeling. */
+@media (max-width: 430px), (max-height: 740px) {
+  body.il-active .il-math {
+    padding-top: clamp(2.75rem, 4.7svh, 3.75rem) !important;
+    padding-bottom: clamp(0.8rem, 1.55svh, 1.15rem) !important;
+  }
+
+  body.il-active .il-math .il-problem-head {
+    top: clamp(0.68rem, 1.22svh, 0.95rem) !important;
+  }
+}

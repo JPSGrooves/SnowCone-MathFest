@@ -12356,3 +12356,153 @@ body.qs-active #qsResultPopup #qsPlayAgainBtn {
 }
 
 /* ───────────────── QuickServe — Results Flatten Inner Boxes END ───────────────── */
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Results IL Button Match
+   Purpose:
+   - Match Infinity Lake results button language.
+   - Left: stacked arrow over SETUP.
+   - Right: stacked replay symbol over AGAIN.
+   - Preserve existing button IDs/handlers.
+   - CSS/markup only; no scoring, audio, timer, or result logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active #qsResultPopup .qs-result-buttons.qs-result-buttons-il-match {
+  width: 100% !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: clamp(0.72rem, 3vw, 1.25rem) !important;
+
+  align-items: stretch !important;
+  margin-top: clamp(0.25rem, 0.8svh, 0.55rem) !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-setup-btn {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-again-btn {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-setup-btn,
+body.qs-active #qsResultPopup .qs-result-again-btn {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: clamp(4rem, 8.2svh, 5.6rem) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(0.14rem, 0.42svh, 0.28rem) !important;
+
+  margin: 0 !important;
+  padding: clamp(0.54rem, 1.25svh, 0.82rem) clamp(0.6rem, 2vw, 0.95rem) !important;
+
+  border-radius: 18px !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  touch-action: manipulation !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-setup-btn {
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 46%, rgba(255,255,255,0.18)) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 24, 42, 0.82),
+      rgba(0, 0, 0, 0.76)
+    ) !important;
+
+  color: rgba(244, 253, 255, 0.95) !important;
+  text-shadow: 0 0 8px rgba(255,255,255,0.16) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 10px 24px rgba(0,0,0,0.34),
+    0 0 14px var(--qs-faint, rgba(0,255,238,0.18)) !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-again-btn {
+  border: 1.5px solid color-mix(in srgb, var(--qs-accent, #00ffee) 48%, #ffffff 16%) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--qs-accent, #00ffee) 64%, #ffffff 36%),
+      color-mix(in srgb, var(--qs-accent, #00ffee) 92%, #000000 8%)
+    ) !important;
+
+  color: rgba(0, 10, 16, 0.96) !important;
+  text-shadow: none !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.12) inset,
+    0 0 16px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 12px 24px rgba(0,0,0,0.32) !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-btn-icon {
+  display: block !important;
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-weight: 950 !important;
+  line-height: 0.9 !important;
+  text-align: center !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-setup-icon {
+  font-size: clamp(1.35rem, 2.55svh, 1.9rem) !important;
+  color: rgba(232, 248, 255, 0.96) !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-again-icon {
+  font-size: clamp(1.35rem, 2.55svh, 1.9rem) !important;
+  color: rgba(0, 10, 16, 0.96) !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-btn-label {
+  display: block !important;
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: clamp(0.78rem, 1.45svh, 1rem) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.1em !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+/* Short iPhones: keep the row strong without bloating the popup. */
+@media (max-width: 430px), (max-height: 740px) {
+  body.qs-active #qsResultPopup .qs-result-buttons.qs-result-buttons-il-match {
+    gap: clamp(0.55rem, 2.4vw, 0.85rem) !important;
+  }
+
+  body.qs-active #qsResultPopup .qs-result-setup-btn,
+  body.qs-active #qsResultPopup .qs-result-again-btn {
+    min-height: clamp(3.55rem, 7.25svh, 4.65rem) !important;
+    border-radius: 16px !important;
+  }
+
+  body.qs-active #qsResultPopup .qs-result-btn-icon {
+    font-size: clamp(1.18rem, 2.3svh, 1.56rem) !important;
+  }
+
+  body.qs-active #qsResultPopup .qs-result-btn-label {
+    font-size: clamp(0.72rem, 1.32svh, 0.9rem) !important;
+  }
+}
