@@ -89,7 +89,102 @@ let hit250ThisRun = false;
 
 
 // last problem we *served*
+
 let lastProblemMeta = null;
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Soft Math Fairness Wrapper v1
+   Purpose:
+   - Preserve the existing IL generator.
+   - Avoid exact-repeat stink during a streak run.
+   - Keep Easy / Medium / Hard identities intact.
+   - Keep Hard algebra spicy, but avoid same-form clumping.
+   - Do not touch score, XP, visions, SFX, haptics, or Game Center.
+   ────────────────────────────────────────────────────────── */
+
+const IL_RECENT_PROBLEM_KEYS = [];
+const IL_RECENT_FORM_KEYS = [];
+const IL_RECENT_PROBLEM_LIMIT = 12;
+const IL_REROLL_LIMIT = 8;
+
+function normalizeInfinityMathModeForFairness(mode = 'addsub') {
+  return ['addsub', 'multdiv', 'alg'].includes(mode) ? mode : 'addsub';
+}
+
+function buildInfinityProblemFairnessKey(meta = {}) {
+  const safeMode = normalizeInfinityMathModeForFairness(meta.mode || currentMode || appState.getGameMode?.());
+
+  return [
+    safeMode,
+    meta.form || '',
+    meta.op || '',
+    meta.a ?? '',
+    meta.b ?? '',
+    meta.result ?? '',
+    meta.correct ?? '',
+    meta.coefficient ?? '',
+  ].join('|');
+}
+
+function buildInfinityFormFairnessKey(meta = {}) {
+  const safeMode = normalizeInfinityMathModeForFairness(meta.mode || currentMode || appState.getGameMode?.());
+
+  return [
+    safeMode,
+    meta.form || meta.op || '',
+  ].join('|');
+}
+
+function shouldAcceptInfinityProblemForFairness(meta = {}, attempt = 0) {
+  if (!meta || typeof meta !== 'object') return true;
+
+  // Always stop rerolling eventually. Fairness, not accidental infinite loop.
+  if (attempt >= IL_REROLL_LIMIT) return true;
+
+  const safeMode = normalizeInfinityMathModeForFairness(meta.mode || currentMode || appState.getGameMode?.());
+  const key = buildInfinityProblemFairnessKey(meta);
+  const formKey = buildInfinityFormFairnessKey(meta);
+
+  // Main rule: exact same generated problem should not appear too soon.
+  if (IL_RECENT_PROBLEM_KEYS.includes(key)) {
+    return false;
+  }
+
+  // Hard algebra rule: avoid clumping the exact same algebra form three times in a row.
+  // Example: x + b, x + b, x + b gets stale even if the numbers differ.
+  if (safeMode === 'alg') {
+    const recentForms = IL_RECENT_FORM_KEYS.slice(-2);
+    if (recentForms.length === 2 && recentForms.every((recent) => recent === formKey)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function rememberInfinityProblemForFairness(meta = {}) {
+  if (!meta || typeof meta !== 'object') return;
+
+  const key = buildInfinityProblemFairnessKey(meta);
+  const formKey = buildInfinityFormFairnessKey(meta);
+
+  IL_RECENT_PROBLEM_KEYS.push(key);
+  IL_RECENT_FORM_KEYS.push(formKey);
+
+  while (IL_RECENT_PROBLEM_KEYS.length > IL_RECENT_PROBLEM_LIMIT) {
+    IL_RECENT_PROBLEM_KEYS.shift();
+  }
+
+  while (IL_RECENT_FORM_KEYS.length > IL_RECENT_PROBLEM_LIMIT) {
+    IL_RECENT_FORM_KEYS.shift();
+  }
+}
+
+function resetInfinityRecentProblemMemory() {
+  IL_RECENT_PROBLEM_KEYS.length = 0;
+  IL_RECENT_FORM_KEYS.length = 0;
+}
+
 
 // last problem we *missed*, by mode (so we can pick the hardest lane)
 const lastMissByMode = {
@@ -1069,6 +1164,7 @@ function startGame() {
   modeMisses.multdiv = 0;
   modeMisses.alg = 0;
   lastProblemMeta = null;
+  resetInfinityRecentProblemMemory();
   lastMissByMode.addsub = null;
   lastMissByMode.multdiv = null;
   lastMissByMode.alg = null;
@@ -1308,7 +1404,7 @@ function generateAnswerOptions(correctAnswer, mode, meta = {}) {
   return shuffleInfinityOptions(options.slice(0, 3));
 }
 
-function newProblem() {
+function newProblemCore() {
   const mode = appState.getGameMode();
   let a = randomInt(1, 20);
   let b = randomInt(1, 20);
@@ -1466,6 +1562,27 @@ function newProblem() {
     btn.textContent = options[i];
     btn.dataset.value = options[i];
   });
+}
+
+
+
+function newProblem() {
+  let accepted = false;
+
+  for (let attempt = 0; attempt <= IL_REROLL_LIMIT; attempt += 1) {
+    newProblemCore();
+
+    if (shouldAcceptInfinityProblemForFairness(lastProblemMeta, attempt)) {
+      accepted = true;
+      break;
+    }
+  }
+
+  rememberInfinityProblemForFairness(lastProblemMeta);
+
+  if (!accepted) {
+    console.debug?.('[Infinity] accepted problem after fairness reroll limit:', lastProblemMeta);
+  }
 }
 
 

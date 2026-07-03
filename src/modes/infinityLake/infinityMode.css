@@ -8160,3 +8160,46 @@ body.il-active .il-math .il-problem-break {
     top: clamp(0.68rem, 1.22svh, 0.95rem) !important;
   }
 }
+
+
+/* ──────────────────────────────────────────────────────────
+   Infinity Lake — Results Button Exact Match V2
+   Purpose:
+   - Make SETUP and AGAIN buttons match exactly.
+   - Same icon size: ← and ↻
+   - Same label size: SETUP and AGAIN
+   - CSS-only; no setup/replay/result logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.il-active #ilResultPopup .il-result-buttons #ilSetupBtn,
+body.il-active #ilResultPopup .il-result-buttons #ilPlayAgainBtn {
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  line-height: 1 !important;
+}
+
+body.il-active #ilResultPopup .il-result-buttons #ilSetupBtn .il-util-arrow,
+body.il-active #ilResultPopup .il-result-buttons #ilPlayAgainBtn .il-util-arrow {
+  font-size: clamp(1.18rem, 2.22svh, 1.52rem) !important;
+  line-height: 0.92 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.il-active #ilResultPopup .il-result-buttons #ilSetupBtn .il-util-label,
+body.il-active #ilResultPopup .il-result-buttons #ilPlayAgainBtn .il-util-label {
+  font-size: clamp(0.66rem, 1.18svh, 0.78rem) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.1em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Keep the vertical stack identical in both buttons. */
+body.il-active #ilResultPopup .il-result-buttons #ilSetupBtn,
+body.il-active #ilResultPopup .il-result-buttons #ilPlayAgainBtn {
+  gap: clamp(3px, 0.45svh, 5px) !important;
+}
+

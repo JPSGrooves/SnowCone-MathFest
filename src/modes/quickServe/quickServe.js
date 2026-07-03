@@ -1284,7 +1284,11 @@ export function renderGameUI() {
         <!-- 🎯 QS result overlay + reward panel -->
         <div class="qs-result-overlay hidden" id="qsResultOverlay">
           <div class="qs-result-popup qs-reward-panel" id="qsResultPopup">
-            <h2 class="qs-result-title">Round Complete</h2>
+            <div class="qs-results-kicker">QuickServe Pavilion</div>
+
+            <div class="qs-results-hero">
+              <h2 class="qs-result-title">Results</h2>
+            </div>
 
             <section class="qs-result-character" aria-label="Selected character">
               <div class="qs-result-character-glow" aria-hidden="true"></div>

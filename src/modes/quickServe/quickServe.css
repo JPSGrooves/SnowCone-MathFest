@@ -12506,3 +12506,210 @@ body.qs-active #qsResultPopup .qs-result-btn-label {
     font-size: clamp(0.72rem, 1.32svh, 0.9rem) !important;
   }
 }
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Results Button IL Size Match V2
+   Purpose:
+   - Make QS result buttons obnoxiously similar to IL result buttons.
+   - Especially reduce iPad button bulk.
+   - Preserve existing IDs/handlers: qsBackSetupBtn + qsPlayAgainBtn.
+   - CSS-only; no scoring, timer, audio, character, setup, or replay logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active #qsResultPopup .qs-result-buttons.qs-result-buttons-il-match {
+  width: min(100%, 30rem) !important;
+  max-width: 30rem !important;
+  align-self: center !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(0.55rem, 1.8vw, 0.82rem) !important;
+
+  margin-top: clamp(0.28rem, 0.72svh, 0.5rem) !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-setup-btn,
+body.qs-active #qsResultPopup .qs-result-again-btn {
+  min-height: clamp(3.15rem, 5.35svh, 4.15rem) !important;
+
+  padding:
+    clamp(0.42rem, 0.86svh, 0.58rem)
+    clamp(0.52rem, 1.55vw, 0.82rem) !important;
+
+  border-radius: 16px !important;
+  gap: clamp(3px, 0.42svh, 5px) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  line-height: 1 !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-setup-btn .qs-result-btn-icon,
+body.qs-active #qsResultPopup .qs-result-again-btn .qs-result-btn-icon {
+  font-size: clamp(1.18rem, 2.22svh, 1.52rem) !important;
+  line-height: 0.92 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-setup-btn .qs-result-btn-label,
+body.qs-active #qsResultPopup .qs-result-again-btn .qs-result-btn-label {
+  font-size: clamp(0.66rem, 1.18svh, 0.78rem) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.1em !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* iPad/tablet: prevent the QS popup from inflating the action buttons. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active #qsResultPopup .qs-result-buttons.qs-result-buttons-il-match {
+    width: min(82%, 28.5rem) !important;
+    max-width: 28.5rem !important;
+  }
+
+  body.qs-active #qsResultPopup .qs-result-setup-btn,
+  body.qs-active #qsResultPopup .qs-result-again-btn {
+    min-height: clamp(3.05rem, 4.8svh, 3.85rem) !important;
+    border-radius: 15px !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Results IL Title Hierarchy
+   Purpose:
+   - Match Infinity Lake result title hierarchy:
+     small mode title / big Results.
+   - Keep QS character reward identity below it.
+   - Scale down cleanly on iPhone.
+   - CSS/markup only; no scoring, timer, audio, Game Center, setup, or replay logic touched.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active #qsResultPopup .qs-results-kicker {
+  margin: 0 0 clamp(0.08rem, 0.35svh, 0.18rem) !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(0.72rem, 1.45svh, 0.98rem) !important;
+  font-weight: 650 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  color: color-mix(in srgb, var(--qs-accent, #00ffee) 72%, #ffffff 28%) !important;
+  text-shadow:
+    0 0 7px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 14px var(--qs-faint, rgba(0,255,238,0.18)) !important;
+}
+
+body.qs-active #qsResultPopup .qs-results-hero {
+  width: 100% !important;
+  margin: 0 0 clamp(0.18rem, 0.7svh, 0.42rem) !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+body.qs-active #qsResultPopup .qs-results-hero .qs-result-title,
+body.qs-active #qsResultPopup h2.qs-result-title {
+  margin: 0 !important;
+
+  font-family: 'Orbitron', system-ui, sans-serif !important;
+  font-size: clamp(2.05rem, 5.35svh, 3.25rem) !important;
+  font-weight: 950 !important;
+  line-height: 0.92 !important;
+  letter-spacing: -0.035em !important;
+  text-align: center !important;
+
+  color: var(--qs-accent, #00ffee) !important;
+  text-shadow:
+    0 0 8px var(--qs-glow, rgba(0,255,238,0.55)),
+    0 0 18px var(--qs-faint, rgba(0,255,238,0.18)),
+    0 3px 8px rgba(0,0,0,0.58) !important;
+}
+
+/* Let the new title breathe without making the popup tall/chunky. */
+body.qs-active #qsResultPopup.qs-result-popup,
+body.qs-active #qsResultPopup.qs-reward-panel {
+  gap: clamp(0.34rem, 0.95svh, 0.72rem) !important;
+}
+
+/* Pull the character section a hair closer to the Results title. */
+body.qs-active #qsResultPopup .qs-result-character {
+  margin-top: clamp(-0.04rem, -0.18svh, 0rem) !important;
+}
+
+/* iPhone / short viewport: preserve the hierarchy but compress vertically. */
+@media (max-width: 430px), (max-height: 740px) {
+  body.qs-active #qsResultPopup .qs-results-kicker {
+    font-size: clamp(0.62rem, 1.18svh, 0.76rem) !important;
+    letter-spacing: 0.14em !important;
+  }
+
+  body.qs-active #qsResultPopup .qs-results-hero .qs-result-title,
+  body.qs-active #qsResultPopup h2.qs-result-title {
+    font-size: clamp(1.78rem, 4.45svh, 2.42rem) !important;
+    line-height: 0.92 !important;
+  }
+
+  body.qs-active #qsResultPopup.qs-result-popup,
+  body.qs-active #qsResultPopup.qs-reward-panel {
+    gap: clamp(0.28rem, 0.74svh, 0.52rem) !important;
+  }
+}
+
+/* iPad/tablet: keep it pro, not carnival-huge. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.qs-active #qsResultPopup .qs-results-kicker {
+    font-size: clamp(0.76rem, 1.05svh, 0.95rem) !important;
+  }
+
+  body.qs-active #qsResultPopup .qs-results-hero .qs-result-title,
+  body.qs-active #qsResultPopup h2.qs-result-title {
+    font-size: clamp(2.15rem, 3.85svh, 3rem) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe — Results Character PNG Clean Cut
+   Purpose:
+   - Remove faint square/backplate around result character PNG.
+   - CSS-only first attempt.
+   - If square remains, the artifact is baked into the PNG asset.
+   ────────────────────────────────────────────────────────── */
+
+body.qs-active #qsResultPopup .qs-result-character,
+body.qs-active #qsResultPopup .qs-result-character-wrap,
+body.qs-active #qsResultPopup .qs-result-character-card,
+body.qs-active #qsResultPopup .qs-result-character-image-wrap,
+body.qs-active #qsResultPopup .qs-result-character-img-wrap,
+body.qs-active #qsResultPopup .qs-character-result-wrap {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+body.qs-active #qsResultPopup .qs-result-character img,
+body.qs-active #qsResultPopup img.qs-result-character-img,
+body.qs-active #qsResultPopup img.qs-result-character-image,
+body.qs-active #qsResultPopup img.qs-character-img,
+body.qs-active #qsResultPopup img.qs-character-art {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+
+  -webkit-box-shadow: none !important;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 238, 0.42)) !important;
+
+  object-fit: contain !important;
+  mix-blend-mode: normal !important;
+}
+

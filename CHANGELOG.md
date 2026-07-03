@@ -1,3 +1,147 @@
+<!-- SCMF 1.5.0 TOP CHANGELOG ENTRY START -->
+# [1.5.0] — 2026-07-03 — QuickServe Pavilion Flagship + Infinity Lake Alignment RC 🍧⚡♾️
+
+## Release Focus
+
+Version **1.5.0** turns QuickServe Pavilion into a true flagship attraction beside Infinity Lake.
+
+This release focuses on:
+
+**QuickServe mode clarity, character selection, math lane structure, result-screen polish, scoring balance, and final Infinity Lake alignment.**
+
+The build is now considered a strong iOS release candidate pending final human playtesting, native smoke testing, and App Store packaging.
+
+---
+
+## Added / Improved
+
+### 🍧 QuickServe Pavilion Flagship Pass
+
+- Rebuilt QuickServe into a clearer arcade math attraction.
+- Added a stronger setup / preflight flow with:
+  - character presentation
+  - character selection
+  - six math lanes
+  - Easy / Medium / Hard difficulty entry
+  - clearer Play Game path
+  - cleaner Back control
+- Added playable math lanes:
+  - Add/Subtract
+  - Multiply/Divide
+  - Decimals/Money
+  - Percents
+  - Fractions
+  - Mixed Bag
+- Improved QuickServe character unlock presentation.
+- Updated locked character cards to feel cleaner and easier to read.
+- Reduced visual clutter while preserving the loud arcade-pavilion identity.
+
+### 🧮 QuickServe MathBrain Pass
+
+- Updated QuickServe math generation around the new lane + difficulty system.
+- Confirmed broad terminal audit coverage across:
+  - all six math modes
+  - Easy / Medium / Hard
+  - repeat behavior
+  - decimal / money / percent / fraction readability
+  - hard-mode friction
+- Added soft repeat-prevention thinking for future tuning.
+- Preserved spicy Hard math while watching for keypad friction.
+- Kept money questions as an intentional adult-friendly math feature.
+- Standardized QuickServe scoring direction:
+  - Standard modes:
+    - Easy = 3 points
+    - Medium = 5 points
+    - Hard = 7 points
+  - Mixed Bag:
+    - Easy = 4 points
+    - Medium = 6 points
+    - Hard = 8 points
+- XP economy review started but intentionally left for a later balancing pass.
+
+### 🏆 QuickServe Results Screen Redesign
+
+- Reworked QuickServe results to better match the polished Infinity Lake result language.
+- Replaced the old “Round Complete” feel with a clearer hierarchy:
+  - small mode title
+  - large Results title
+  - character
+  - mode name
+  - score / high score
+  - feedback line
+  - Setup / Again buttons
+- Updated Setup and Again buttons into stacked icon-label controls:
+  - ← / SETUP
+  - ↻ / AGAIN
+- Tuned iPad result-screen sizing so QuickServe feels closer to Infinity Lake while keeping its arcade personality.
+- Added first-pass cleanup for faint character PNG backplate artifacts.
+
+### ♾️ Infinity Lake Final Alignment Pass
+
+- Performed a restrained final Infinity Lake polish pass based on what QuickServe taught us.
+- Improved Infinity Lake result-screen button consistency.
+- Matched Setup / Again button label sizing more cleanly.
+- Preserved Infinity Lake’s calmer, more professional cosmic identity.
+- Kept the Infinity Lake result screen stable instead of over-polishing it.
+- Confirmed Infinity Lake remains shippable as the first flagship attraction.
+
+### 👁️ Infinity Lake Vision Flow Polish
+
+- Improved Vision result flow and readability.
+- Clarified completed vision tracking on results.
+- Preserved the Setup → Play Again flow.
+- Protected existing vision logic, scoring, and streak behavior.
+
+### 📱 iOS-First Presentation Polish
+
+- Continued iPhone / iPad layout tuning through the Capacitor iOS lane.
+- Improved result screens for native iPad presentation.
+- Noted tiny iPhone rounded-corner safe-area edge risk for later review.
+- Confirmed real-device testing remains the source of truth over simulator-only presentation quirks.
+- Preserved the current working layouts instead of chasing risky late visual rewrites.
+
+---
+
+## Fixed
+
+- Fixed QuickServe result-screen hierarchy feeling disconnected from Infinity Lake.
+- Fixed QuickServe result buttons being oversized compared to Infinity Lake on iPad.
+- Fixed Infinity Lake Setup / Again result-button typography mismatch.
+- Fixed Add/Sub scoring direction so it no longer feels underpaid compared to other QuickServe modes.
+- Fixed ugly math display cases such as plus-negative formatting in generated prompts.
+- Reduced exact-repeat pressure in QuickServe math testing direction.
+- Rolled back an over-aggressive result typography pass that damaged the current visual balance.
+
+---
+
+## Dev Notes
+
+> *1.5.0 is the QuickServe attraction release.*
+>
+> QuickServe now feels like a real SnowCone MathFest pavilion instead of an older arcade mode with polish layered on top.
+>
+> Infinity Lake remains the calm cosmic flagship.
+>
+> QuickServe becomes the loud neon math booth.
+>
+> The two modes are not identical, but they now speak the same design language:
+>
+> **small mode title, big result moment, clean stats, unified buttons, native iOS confidence.**
+>
+> The math system is also clearer now:
+>
+> **Easy = I can play.  
+> Medium = I can grow.  
+> Hard = I can chase.**
+>
+> The next major balance question is XP-per-minute across modes, but that belongs to a future progression pass.
+>
+> For now: QuickServe and Infinity Lake are both shippable, playable, musical, strange, and much more professional. 🍧⚡♾️✨
+
+---
+
+<!-- SCMF 1.5.0 TOP CHANGELOG ENTRY END -->
+
 <!-- SCMF 1.4.0 TOP CHANGELOG ENTRY START -->
 # [1.4.0] — 2026-06-24 — Infinity Lake Flagship + HUD Glass Release Candidate ♾️🍧
 

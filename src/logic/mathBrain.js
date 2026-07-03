@@ -30,7 +30,7 @@ function formatQuickServeMoney(value) {
 //////////////////////////////
 // 📦 Problem Generator Entry
 //////////////////////////////
-export function generateProblem(mode = 'addSub', difficulty = 'easy') {
+function generateProblemCore(mode = 'addSub', difficulty = 'easy') {
   const safeMode = normalizeMode(mode);
   const safeDifficulty = normalizeDifficulty(difficulty);
 
@@ -70,14 +70,14 @@ export function generateProblem(mode = 'addSub', difficulty = 'easy') {
 //////////////////////////////
 const REWARDS = {
   addSub: {
-    easy:   { xp: 3, points: 1 },
-    medium: { xp: 4, points: 2 },
-    hard:   { xp: 5, points: 3 },
+    easy:   { xp: 3, points: 3 },
+    medium: { xp: 4, points: 5 },
+    hard:   { xp: 5, points: 7 },
   },
   multiDiv: {
     easy:   { xp: 5, points: 3 },
-    medium: { xp: 6, points: 4 },
-    hard:   { xp: 7, points: 5 },
+    medium: { xp: 6, points: 5 },
+    hard:   { xp: 7, points: 7 },
   },
   decimalMoney: {
     easy:   { xp: 5, points: 3 },
@@ -1026,3 +1026,247 @@ function centsToMoney(cents) {
 function money(value) {
   return `${formatQuickServeMoney(round2(value))}`;
 }
+
+
+/* ──────────────────────────────────────────────────────────
+   QuickServe Math Fairness Wrapper
+   Purpose:
+   - Preserve the existing mathBrain generators.
+   - Add tiny QS balancing polish at the final output layer.
+   - Avoid exact-repeat spam without making the game feel scripted.
+   - Fix ugly display strings like "53 + -13".
+   - Keep Hard spicy, but reduce clusters of fussy decimal answers.
+   - Keep money questions alive.
+   ────────────────────────────────────────────────────────── */
+
+const SCMF_QS_RECENT_PROBLEMS = new Map();
+const SCMF_QS_RECENT_LIMIT = 12;
+const SCMF_QS_REROLL_LIMIT = 10;
+
+function scmfNormalizeQSModeForFairness(mode = 'addSub') {
+  const raw = String(mode || '').trim();
+
+  const aliases = {
+    algebra: 'mixed',
+    mixedReview: 'mixed',
+
+    decimal: 'decimalMoney',
+    decimals: 'decimalMoney',
+    decimalsPercentsMoney: 'decimalMoney',
+
+    percent: 'percents',
+    percentage: 'percents',
+
+    fraction: 'fractions',
+  };
+
+  const normalized = aliases[raw] || raw;
+
+  return ['addSub', 'multiDiv', 'decimalMoney', 'percents', 'fractions', 'mixed'].includes(normalized)
+    ? normalized
+    : 'addSub';
+}
+
+function scmfNormalizeQSDifficultyForFairness(difficulty = 'easy') {
+  const raw = String(difficulty || '').trim();
+
+  const aliases = {
+    med: 'medium',
+    normal: 'medium',
+  };
+
+  const normalized = aliases[raw] || raw;
+
+  return ['easy', 'medium', 'hard'].includes(normalized)
+    ? normalized
+    : 'easy';
+}
+
+function scmfPolishQSEquationDisplay(equation = '') {
+  return String(equation ?? '')
+    // Cosmetic fix only:
+    // 53 + -13 should read as 53 - 13.
+    .replace(/\+\s*-\s*/g, '- ')
+    // 53 - -13 should read as 53 + 13.
+    .replace(/-\s*-\s*/g, '+ ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function scmfDecimalPlaces(value) {
+  const text = String(value ?? '').trim();
+
+  if (!/^-?\d+(?:\.\d+)?$/.test(text)) return 0;
+
+  const dot = text.indexOf('.');
+  return dot === -1 ? 0 : text.length - dot - 1;
+}
+
+function scmfDecimalRemainder(value) {
+  const n = Number(value);
+
+  if (!Number.isFinite(n)) return 0;
+
+  const abs = Math.abs(n);
+  return Math.round((abs - Math.floor(abs)) * 10000) / 10000;
+}
+
+function scmfIsFriendlyDecimalAnswer(answer) {
+  const rem = scmfDecimalRemainder(answer);
+
+  if (rem === 0) return true;
+
+  // Jeremy likes money/fraction spice, but these are the friendly lanes:
+  // halves, quarters, and three-quarters.
+  return [0.25, 0.5, 0.75].some((target) => Math.abs(rem - target) < 0.0001);
+}
+
+function scmfClassifyQSProblem(problem = {}) {
+  const equation = String(problem.equation ?? problem.prompt ?? problem.question ?? '');
+  const answer = String(problem.answer ?? problem.correctAnswer ?? problem.correct ?? '').trim();
+
+  const decimalPlaces = scmfDecimalPlaces(answer);
+  const decimalAnswer = decimalPlaces > 0;
+  const friendlyDecimal = scmfIsFriendlyDecimalAnswer(answer);
+  const fussyDecimal = decimalAnswer && !friendlyDecimal;
+
+  const fractionPrompt = /\d+\s*\/\s*\d+|half|third|quarter|fraction/i.test(equation);
+  const moneyPrompt = /\$/.test(equation);
+  const percentPrompt = /%|percent/i.test(equation);
+  const negativeAnswer = /^-/.test(answer);
+  const negativePrompt = /(^|\s)-\d/.test(equation);
+
+  return {
+    equation,
+    answer,
+    key: `${equation} => ${answer}`,
+    decimalAnswer,
+    decimalPlaces,
+    friendlyDecimal,
+    fussyDecimal,
+    fractionPrompt,
+    moneyPrompt,
+    percentPrompt,
+    negativeAnswer,
+    negativePrompt,
+    highFriction:
+      fussyDecimal
+      || (fractionPrompt && decimalAnswer && !friendlyDecimal)
+      || (percentPrompt && moneyPrompt && fussyDecimal)
+      || negativeAnswer,
+  };
+}
+
+function scmfGetQSRecentBucket(mode, difficulty) {
+  const safeMode = scmfNormalizeQSModeForFairness(mode);
+  const safeDifficulty = scmfNormalizeQSDifficultyForFairness(difficulty);
+  const bucketKey = `${safeMode}:${safeDifficulty}`;
+
+  if (!SCMF_QS_RECENT_PROBLEMS.has(bucketKey)) {
+    SCMF_QS_RECENT_PROBLEMS.set(bucketKey, []);
+  }
+
+  return SCMF_QS_RECENT_PROBLEMS.get(bucketKey);
+}
+
+function scmfCountRecent(recent, predicate) {
+  return recent.reduce((count, item) => count + (predicate(item) ? 1 : 0), 0);
+}
+
+function scmfShouldAcceptQSProblem(problem, mode, difficulty, attempt = 0) {
+  const safeMode = scmfNormalizeQSModeForFairness(mode);
+  const safeDifficulty = scmfNormalizeQSDifficultyForFairness(difficulty);
+  const recent = scmfGetQSRecentBucket(safeMode, safeDifficulty);
+  const current = scmfClassifyQSProblem(problem);
+
+  // Always stop rerolling eventually. We want fairness, not an accidental loop.
+  if (attempt >= SCMF_QS_REROLL_LIMIT) return true;
+
+  const exactRecent = recent.some((item) => item.key === current.key);
+
+  // Main rule:
+  // exact repeats too soon feel cheap, especially in Easy.
+  if (exactRecent) return false;
+
+  const recentWindow = recent.slice(-6);
+  const recentFussyDecimals = scmfCountRecent(recentWindow, (item) => item.fussyDecimal);
+  const recentHighFriction = scmfCountRecent(recentWindow, (item) => item.highFriction);
+
+  // Hard should stay spicy. We only prevent clusters of annoying answers.
+  if (safeDifficulty === 'hard') {
+    if (safeMode === 'fractions' && current.fussyDecimal && recentFussyDecimals >= 2) {
+      return false;
+    }
+
+    if (safeMode === 'decimalMoney' && current.fussyDecimal && recentFussyDecimals >= 2) {
+      return false;
+    }
+
+    if (safeMode === 'mixed') {
+      if (current.fussyDecimal && recentFussyDecimals >= 2) return false;
+      if (current.highFriction && recentHighFriction >= 3) return false;
+    }
+  }
+
+  // Medium should feel fair and not repetitive, but do not over-filter it.
+  if (safeDifficulty === 'medium') {
+    if ((safeMode === 'fractions' || safeMode === 'decimalMoney') && current.fussyDecimal && recentFussyDecimals >= 3) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function scmfRecordQSProblem(problem, mode, difficulty) {
+  const recent = scmfGetQSRecentBucket(mode, difficulty);
+  const classified = scmfClassifyQSProblem(problem);
+
+  recent.push(classified);
+
+  while (recent.length > SCMF_QS_RECENT_LIMIT) {
+    recent.shift();
+  }
+}
+
+function scmfPolishQSProblem(problem = {}) {
+  if (!problem || typeof problem !== 'object') return problem;
+
+  if (!Object.prototype.hasOwnProperty.call(problem, 'equation')) {
+    return problem;
+  }
+
+  const polishedEquation = scmfPolishQSEquationDisplay(problem.equation);
+
+  if (polishedEquation === problem.equation) {
+    return problem;
+  }
+
+  return {
+    ...problem,
+    equation: polishedEquation,
+  };
+}
+
+export function generateProblem(mode = 'addSub', difficulty = 'easy') {
+  let chosen = null;
+
+  for (let attempt = 0; attempt <= SCMF_QS_REROLL_LIMIT; attempt += 1) {
+    const rawProblem = generateProblemCore(mode, difficulty);
+    const polishedProblem = scmfPolishQSProblem(rawProblem);
+
+    if (scmfShouldAcceptQSProblem(polishedProblem, mode, difficulty, attempt)) {
+      chosen = polishedProblem;
+      break;
+    }
+
+    chosen = polishedProblem;
+  }
+
+  scmfRecordQSProblem(chosen, mode, difficulty);
+
+  return chosen;
+}
+
+/* ───────────────── QuickServe Math Fairness Wrapper END ───────────────── */
+
