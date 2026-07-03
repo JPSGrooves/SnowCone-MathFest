@@ -39,6 +39,8 @@ import { hapticSuccess } from '../../utils/haptics.js';
 
 const QS_TRACK_IDS = ['quikserve', 'kktribute', 'softdown'];
 let _qsMusicScopeOn = false;
+let qsScoreFeedbackObserver = null;
+let qsFeedbackBurstSequence = 0;
 let qsIntroStartInFlight = false;
 let qsPreflightDifficulty = 'easy';
 let qsSelectedModeId = 'addSub';
@@ -648,12 +650,20 @@ function getQuickServeCharacterBestScore(characterOrId) {
 }
 
 export function recordQuickServeSelectedCharacterScore(scoreValue = 0) {
-  recordQuickServeSelectedModeScore(scoreValue);
+  const modeResult = recordQuickServeSelectedModeScore(scoreValue);
 
   const selectedCharacter = getQuickServeSelectedCharacter();
   const id = normalizeQuickServeCharacterId(selectedCharacter);
   const score = Math.max(0, Math.floor(Number(scoreValue) || 0));
   const previousBest = getQuickServeCharacterBestScore(id);
+
+  const baseResult = {
+    modeResult,
+    modeId: modeResult?.modeId || normalizeQuickServeModeId(qsSelectedModeId),
+    modePreviousBest: Number(modeResult?.previousBest || 0),
+    modeBestScore: Number(modeResult?.bestScore || 0),
+    didBeatModeHighScore: Boolean(modeResult?.didBeatModeHighScore),
+  };
 
   if (score <= previousBest) {
     return {
@@ -662,6 +672,7 @@ export function recordQuickServeSelectedCharacterScore(scoreValue = 0) {
       previousBest,
       bestScore: previousBest,
       didBeatCharacterHighScore: false,
+      ...baseResult,
     };
   }
 
@@ -675,6 +686,7 @@ export function recordQuickServeSelectedCharacterScore(scoreValue = 0) {
     previousBest,
     bestScore: score,
     didBeatCharacterHighScore: true,
+    ...baseResult,
   };
 }
 
@@ -1014,7 +1026,7 @@ function renderIntroScreen() {
             <header class="qs-preflight-header qs-character-header">
               <h1>QuickServe Pavilion</h1>
               <p class="qs-character-subtitle">
-                <span>Choose your character!</span>
+                <span>Setup your game!</span>
                 <span>Solve equations fast!</span>
               </p>
             </header>
@@ -1251,8 +1263,16 @@ export function renderGameUI() {
               <div id="answerDisplay" class="answer-display is-empty">?</div>
 
               <!-- 🌈 Feedback floats down here -->
-              <div class="qs-xp-msg hidden" id="qsXPMsg">🍧 +3 XP</div>
-              <div class="qs-result-msg hidden" id="qsResultMsg">✅ Correct!</div>
+              <div
+                class="qs-feedback-layer"
+                id="qsFeedbackLayer"
+                aria-live="polite"
+                aria-atomic="false"
+              ></div>
+
+              <!-- Legacy nodes remain for wrong/clear fallback, but correct now spawns bursts. -->
+              <div class="qs-xp-msg qs-feedback-legacy hidden" id="qsXPMsg" aria-hidden="true">🍧 +3 XP</div>
+              <div class="qs-result-msg qs-feedback-legacy hidden" id="qsResultMsg" aria-hidden="true">✅ Correct!</div>
             </div>
           </div>
 
@@ -1261,23 +1281,48 @@ export function renderGameUI() {
 
         </div>
 
-        <!-- 🎯 QS result overlay + popup -->
+        <!-- 🎯 QS result overlay + reward panel -->
         <div class="qs-result-overlay hidden" id="qsResultOverlay">
-          <div class="qs-result-popup" id="qsResultPopup">
-            <h2>Shift Complete!</h2>
+          <div class="qs-result-popup qs-reward-panel" id="qsResultPopup">
+            <h2 class="qs-result-title">Round Complete</h2>
 
-            <p><strong>Score:</strong> <span id="qsScoreFinal">0</span></p>
-            <p><strong>High score:</strong> <span id="qsHighScore">0</span></p>
-            <p><strong>Cones served:</strong> <span id="qsServedCount">0</span></p>
-            <p><strong>Missed orders:</strong> <span id="qsMissCount">0</span></p>
+            <section class="qs-result-character" aria-label="Selected character">
+              <div class="qs-result-character-glow" aria-hidden="true"></div>
+              <img
+                id="qsResultCharacterImg"
+                class="qs-result-character-img qs-character-art"
+                src=""
+                alt=""
+                aria-hidden="true"
+              />
+              <div class="qs-result-character-name" id="qsResultCharacterName">Cosmic Phil</div>
+            </section>
 
-            <p class="qs-tip-line">
-              <strong>Phil’s tip:</strong>
-              <span id="qsTipText"></span>
+            <div class="qs-result-mode-line" id="qsResultModeLine">Add/Subtract</div>
+
+            <section class="qs-result-score-grid" aria-label="Round score">
+              <div class="qs-result-stat-card qs-result-score-card">
+                <span>Score</span>
+                <strong id="qsScoreFinal">0</strong>
+              </div>
+
+              <div class="qs-result-stat-card qs-result-high-card">
+                <span>High Score</span>
+                <strong id="qsHighScore">0</strong>
+              </div>
+            </section>
+
+            <p class="qs-result-nudge" id="qsResultNudge">
+              Nice round. Keep the line moving.
             </p>
 
             <div class="qs-result-buttons">
-              <button id="qsPlayAgainBtn" class="start-show-btn">🔁 Run another shift</button>
+              <button id="qsPlayAgainBtn" class="start-show-btn qs-result-primary-btn">
+                Play Again
+              </button>
+              <button id="qsBackSetupBtn" class="qs-result-secondary-btn">
+                ← Back to Setup
+              </button>
             </div>
           </div>
         </div>
@@ -1313,6 +1358,7 @@ export function returnQuickServeGameToIntro() {
   qsIntroStartInFlight = false;
 
   // Stop the active shift without leaving QuickServe.
+  disconnectQuickServeScoreFeedbackBridge();
   stopGameLogic();
   resetCurrentAnswer();
   gridFX.stopGridPulse();
@@ -1380,6 +1426,7 @@ function cleanUpQuickServe() {
 
   document.body.classList.remove('qs-active');
 
+  disconnectQuickServeScoreFeedbackBridge();
   stopGameLogic();
   gridFX.stopGridPulse();
   phil.resetPhil();
@@ -1438,9 +1485,116 @@ function getGameContainer() {
 }
 
 
+function parseQuickServeScoreValue(value = '0') {
+  const parsed = Number.parseInt(String(value || '0').replace(/[^\d-]/g, ''), 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+export function spawnQuickServeFloatingFeedback(options = {}) {
+  const layer =
+    document.getElementById('qsFeedbackLayer')
+    || document.querySelector('.qs-math .center-stack');
+
+  if (!layer) return null;
+
+  const kind = String(options.kind || 'correct').trim() || 'correct';
+  const earnedPoints = Number(options.earnedPoints || 0);
+  const resultText = String(options.resultText ?? '✅ Correct!').trim();
+  const xpText = String(
+    options.xpText
+    ?? (earnedPoints > 0 ? `🍧 +${earnedPoints} XP` : '')
+  ).trim();
+
+  qsFeedbackBurstSequence += 1;
+
+  const drift = ((qsFeedbackBurstSequence % 5) - 2) * 0.18;
+
+  const burst = document.createElement('div');
+  burst.className = `qs-floating-feedback qs-floating-feedback-${kind}`;
+  burst.setAttribute('aria-hidden', 'true');
+  burst.style.setProperty('--qs-feedback-drift', `${drift.toFixed(2)}rem`);
+
+  if (xpText) {
+    const xpEl = document.createElement('span');
+    xpEl.className = 'qs-floating-feedback-xp';
+    xpEl.textContent = xpText;
+    burst.appendChild(xpEl);
+  }
+
+  if (resultText) {
+    const resultEl = document.createElement('span');
+    resultEl.className = 'qs-floating-feedback-result';
+    resultEl.textContent = resultText;
+    burst.appendChild(resultEl);
+  }
+
+  layer.appendChild(burst);
+
+  const cleanup = () => {
+    burst.remove();
+  };
+
+  burst.addEventListener('animationend', cleanup, { once: true });
+  window.setTimeout(cleanup, 940);
+
+  return burst;
+}
+
+function hideQuickServeLegacyCorrectFeedback() {
+  document.getElementById('qsXPMsg')?.classList.add('hidden');
+  document.getElementById('qsResultMsg')?.classList.add('hidden');
+}
+
+function disconnectQuickServeScoreFeedbackBridge() {
+  if (qsScoreFeedbackObserver) {
+    qsScoreFeedbackObserver.disconnect();
+    qsScoreFeedbackObserver = null;
+  }
+}
+
+function installQuickServeScoreFeedbackBridge() {
+  disconnectQuickServeScoreFeedbackBridge();
+
+  const scoreEl = document.getElementById('qsScore');
+  if (!scoreEl) return;
+
+  const startingScore = parseQuickServeScoreValue(scoreEl.textContent);
+  scoreEl.dataset.qsLastFeedbackScore = String(startingScore);
+
+  qsScoreFeedbackObserver = new MutationObserver(() => {
+    const previousScore = parseQuickServeScoreValue(scoreEl.dataset.qsLastFeedbackScore);
+    const nextScore = parseQuickServeScoreValue(scoreEl.textContent);
+
+    scoreEl.dataset.qsLastFeedbackScore = String(nextScore);
+
+    if (nextScore <= previousScore) return;
+
+    const earnedPoints = nextScore - previousScore;
+
+    spawnQuickServeFloatingFeedback({
+      kind: 'correct',
+      earnedPoints,
+      xpText: `🍧 +${earnedPoints} XP`,
+      resultText: '✅ Correct!',
+    });
+
+    // Correct now uses burst feedback. Keep old nodes available for wrong/clear,
+    // but hide them during correct bursts so there is no duplicate visual.
+    hideQuickServeLegacyCorrectFeedback();
+  });
+
+  qsScoreFeedbackObserver.observe(scoreEl, {
+    characterData: true,
+    childList: true,
+    subtree: true,
+  });
+}
+
+
 function clearFeedback() {
   document.getElementById('qsXPMsg')?.classList.add('hidden');
   document.getElementById('qsResultMsg')?.classList.add('hidden');
+  document.getElementById('qsFeedbackLayer')?.replaceChildren();
 }
 
 //////////////////////////////
@@ -1453,27 +1607,23 @@ export { startGameLogic as startQuickServeGame } from './quickServeGame.js';
 //////////////////////////////
 function setupQuickServeResultButtons() {
   const playAgainBtn = document.getElementById('qsPlayAgainBtn');
-  const backBtn      = document.getElementById('qsBackBtn');
+  const backSetupBtn = document.getElementById('qsBackSetupBtn');
 
-  // 🔁 Stay in QuickServe, so restore QS keyboard handler
+  // 🔁 Stay in the same QuickServe lane and run another round.
   playAgainBtn?.addEventListener('click', () => {
     hideQuickServeResultPopup('quickServe');
 
-    // 🧼 Clean the completed run
     stopGameLogic();
     resetCurrentAnswer();
 
-    // 🎧 Completed shift = fresh DJ lane request
     restartQuickServeMusicFresh();
-
-    // 🍧 New run starts clean
     startGameLogic();
   });
 
-  // 🔙 Heading back to menu; let the menu/system own the keys again
-  backBtn?.addEventListener('click', () => {
-    hideQuickServeResultPopup('menu');
-    returnToMenu();
+  // ↩️ Return to QS setup/preflight, not the main menu.
+  backSetupBtn?.addEventListener('click', () => {
+    hideQuickServeResultPopup(null);
+    returnQuickServeGameToIntro();
   });
 }
 
@@ -1493,121 +1643,356 @@ function hideQuickServeResultPopup(nextMode = 'quickServe') {
 // 📊 Public: show QS results
 //////////////////////////////
 export function showQuickServeResults(rawStats = {}) {
-  // 🧴 normalize a couple of expected fields
+  const resultMeta = getQuickServeResultMeta(rawStats);
+
   const stats = {
-    score:        rawStats.score        ?? 0,
-    served:       rawStats.served       ?? rawStats.totalServed ?? 0,
-    missed:       rawStats.missed       ?? rawStats.totalMissed ?? 0,
-    easyMisses:   rawStats.easyMisses   ?? 0,
-    mediumMisses: rawStats.mediumMisses ?? 0,
-    hardMisses:   rawStats.hardMisses   ?? 0,
-    highScore:    rawStats.highScore    ?? (appState.profile?.qsHighScore ?? 0),
-    lastMissed:   rawStats.lastMissed   ?? null,   // 👈 we’ll use this in the tip
+    score: Number(rawStats.score ?? 0),
+    served: Number(rawStats.served ?? rawStats.totalServed ?? 0),
+    missed: Number(rawStats.missed ?? rawStats.totalMissed ?? 0),
+    easyMisses: Number(rawStats.easyMisses ?? 0),
+    mediumMisses: Number(rawStats.mediumMisses ?? 0),
+    hardMisses: Number(rawStats.hardMisses ?? 0),
+    highScore: Number(
+      rawStats.highScore
+      ?? getQuickServeModeBestScore(resultMeta.mode.id)
+      ?? appState.profile?.qsHighScore
+      ?? 0
+    ),
+    modePreviousBest: Number(
+      rawStats.modePreviousBest
+      ?? rawStats.previousModeBest
+      ?? rawStats.modeResult?.previousBest
+      ?? 0
+    ),
+    modeBestScore: Number(
+      rawStats.modeBestScore
+      ?? rawStats.modeResult?.bestScore
+      ?? rawStats.highScore
+      ?? getQuickServeModeBestScore(resultMeta.mode.id)
+      ?? 0
+    ),
+    didBeatModeHighScore: Boolean(
+      rawStats.didBeatModeHighScore
+      ?? rawStats.modeResult?.didBeatModeHighScore
+      ?? false
+    ),
+    lastMissed: rawStats.lastMissed ?? null,
   };
 
   const overlay = document.getElementById('qsResultOverlay');
-  const popup   = document.getElementById('qsResultPopup');
+  const popup = document.getElementById('qsResultPopup');
+
   if (!overlay || !popup) return;
 
-  const scoreEl   = document.getElementById('qsScoreFinal');
-  const hiEl      = document.getElementById('qsHighScore');
-  const servedEl  = document.getElementById('qsServedCount');
-  const missEl    = document.getElementById('qsMissCount');
-  const tipEl     = document.getElementById('qsTipText');
+  const characterImgEl = document.getElementById('qsResultCharacterImg');
+  const characterNameEl = document.getElementById('qsResultCharacterName');
+  const modeLineEl = document.getElementById('qsResultModeLine');
+  const scoreEl = document.getElementById('qsScoreFinal');
+  const highScoreEl = document.getElementById('qsHighScore');
+  const nudgeEl = document.getElementById('qsResultNudge');
 
-  if (scoreEl)  scoreEl.textContent  = stats.score;
-  if (hiEl)     hiEl.textContent     = stats.highScore;
-  if (servedEl) servedEl.textContent = stats.served;
-  if (missEl)   missEl.textContent   = stats.missed;
-
-  if (tipEl) {
-    tipEl.textContent = buildQuickServeTip(stats);
+  if (characterImgEl) {
+    characterImgEl.src = resultMeta.characterSrc;
+    characterImgEl.className = [
+      'qs-result-character-img',
+      'qs-character-art',
+      resultMeta.character?.artClass ? `qs-character-art-${resultMeta.character.artClass}` : '',
+    ].filter(Boolean).join(' ');
   }
 
-  // 🛑 Pause hotkeys while modal is up
-  activateInputHandler(null);
+  if (characterNameEl) {
+    characterNameEl.textContent = resultMeta.character?.name || 'Cosmic Phil';
+  }
 
-  // 📺 Show overlay
+  if (modeLineEl) {
+    modeLineEl.textContent = resultMeta.mode.label;
+  }
+
+  if (scoreEl) {
+    scoreEl.textContent = String(stats.score);
+  }
+
+  if (highScoreEl) {
+    highScoreEl.textContent = String(stats.highScore);
+  }
+
+  if (nudgeEl) {
+    nudgeEl.textContent = buildQuickServeResultNudge(stats, resultMeta);
+  }
+
+  activateInputHandler(null);
   overlay.classList.remove('hidden');
 
-  // 📳 Soft “shift complete” buzz
   try {
     hapticSuccess();
-  } catch (e) {
-    console.warn('[QuickServe] hapticSuccess failed:', e);
+  } catch (err) {
+    console.warn('[QuickServe] hapticSuccess failed:', err);
   }
 }
 
+function getQuickServeResultMeta(rawStats = {}) {
+  const modeId = normalizeQuickServeModeId(
+    rawStats.modeId
+    || rawStats.qsMode
+    || rawStats.mathMode
+    || qsSelectedModeId
+  );
 
-function buildQuickServeTip(stats) {
-  const score        = Number(stats.score        ?? 0);
-  const served       = Number(stats.served       ?? 0);
-  const missed       = Number(stats.missed       ?? 0);
-  const easyMisses   = Number(stats.easyMisses   ?? 0);
-  const mediumMisses = Number(stats.mediumMisses ?? 0);
-  const hardMisses   = Number(stats.hardMisses   ?? 0);
-  const lastMissed   = stats.lastMissed || null;
+  const mode = getQuickServeSelectedMode(modeId);
 
-  let tipText = '';
+  const difficultyId = ['easy', 'medium', 'hard'].includes(rawStats.difficulty)
+    ? rawStats.difficulty
+    : qsPreflightDifficulty;
 
-  // 🎚️ How “spicy” were the cones overall? (1 = easy, 3 = medium, 5 = hard)
-  const avgPoints = served > 0 ? score / served : 0;
+  const difficulty =
+    QS_DIFFICULTY_ROSTER.find((item) => item.id === difficultyId)
+    || QS_DIFFICULTY_ROSTER[0];
 
-  // 🌱 No real run yet
-  if (served === 0 && score === 0) {
-    tipText = 'Try a few warm-up cones first. Once you get a flow going, the big streaks start to show up.';
+  const character = getQuickServeSelectedCharacter();
+  const characterSrc =
+    character?.frames?.correct
+    || character?.frames?.idle
+    || character?.introSrc
+    || '';
+
+  return {
+    mode,
+    difficultyId,
+    difficultyLabel: difficulty.label,
+    character,
+    characterSrc,
+  };
+}
+
+function getQuickServeResultPlayerName() {
+  const candidates = [
+    appState?.profile?.name,
+    appState?.profile?.playerName,
+    appState?.profile?.displayName,
+    appState?.profile?.festivalName,
+    appState?.profile?.nickname,
+    appState?.profile?.username,
+  ];
+
+  const found = candidates
+    .map((value) => String(value || '').trim())
+    .find((value) => value && !/^player$/i.test(value));
+
+  return found || '';
+}
+
+function formatQuickServeResultLine(line = '', context = {}) {
+  const raw = String(line || '').trim();
+  if (!raw) return '';
+
+  const playerName = String(context.playerName || getQuickServeResultPlayerName() || '').trim();
+
+  if (raw.includes('[playerName]') && !playerName) {
+    return '';
   }
-  // 💯 Perfect shift (use avgPoints to talk about difficulty)
-  else if (missed === 0 && served > 0) {
-    if (avgPoints <= 1.6) {
-      // mostly add/sub lane
-      tipText =
-        'Perfect shift! You didn’t miss a single cone in the basics lane. Next run, try mixing in some ×/÷ or Algebra mode to challenge yourself a little more.';
-    } else if (avgPoints <= 3.6) {
-      // mix of add/sub + multi/div
-      tipText =
-        'Perfect shift! You kept every ticket clean across the main lanes. If that felt comfy, lean a bit harder into the spicier cones next time and see how high you can push your score.';
-    } else {
-      // mostly algebra / high-difficulty cones
-      tipText =
-        'Perfect shift on the hardest cones — no misses at all. That’s festival-legend territory. Next round is all about chasing an even wilder high score.';
+
+  return raw
+    .replaceAll('[playerName]', playerName)
+    .replaceAll('[modeName]', String(context.modeName || '').trim())
+    .replaceAll('[characterName]', String(context.characterName || '').trim())
+    .replaceAll('[gap]', String(context.gap ?? '').trim());
+}
+
+function pickQuickServeResultLine(lines = [], seed = 0, context = {}) {
+  const pool = lines
+    .map((line) => formatQuickServeResultLine(line, context))
+    .filter(Boolean);
+
+  if (!pool.length) return 'Nice round. Keep the line moving.';
+
+  const safeSeed = Math.abs(Math.floor(Number(seed) || 0));
+  return pool[safeSeed % pool.length];
+}
+
+function getQuickServeNextLockedCharacter() {
+  return QS_CHARACTER_ROSTER.find((character) => !isQuickServeCharacterUnlocked(character)) || null;
+}
+
+function getQuickServeNewlyUnlockedCharacterFromRound(stats = {}, meta = {}) {
+  const score = Math.max(0, Math.floor(Number(stats.score) || 0));
+  const previousBest = Math.max(
+    0,
+    Math.floor(
+      Number(
+        stats.modePreviousBest
+        ?? stats.previousModeBest
+        ?? stats.previousBest
+        ?? 0
+      ) || 0
+    )
+  );
+
+  const modeId = normalizeQuickServeModeId(
+    meta?.mode?.id
+    || stats.modeId
+    || qsSelectedModeId
+  );
+
+  return QS_CHARACTER_ROSTER.find((character) => {
+    const threshold = Math.max(
+      0,
+      Number(character.unlockThreshold || character.unlockScore || 0)
+    );
+
+    if (!threshold) return false;
+
+    const unlockModeId = normalizeQuickServeModeId(character.unlockModeId || '');
+
+    return (
+      unlockModeId === modeId
+      && previousBest < threshold
+      && score >= threshold
+    );
+  }) || null;
+}
+
+function buildQuickServeResultNudge(stats, meta) {
+  const score = Math.max(0, Math.floor(Number(stats.score) || 0));
+  const highScore = Math.max(0, Math.floor(Number(stats.highScore) || 0));
+  const missed = Math.max(0, Math.floor(Number(stats.missed) || 0));
+  const modeLabel = meta?.mode?.label || 'QuickServe';
+  const characterName = meta?.character?.shortName || meta?.character?.name || 'Phil';
+  const playerName = getQuickServeResultPlayerName();
+  const newlyUnlockedCharacter = getQuickServeNewlyUnlockedCharacterFromRound(stats, meta);
+  const nextLockedCharacter = getQuickServeNextLockedCharacter();
+
+  const context = {
+    playerName,
+    modeName: modeLabel,
+    characterName,
+  };
+
+  const seed =
+    score
+    + highScore
+    + missed
+    + modeLabel.length
+    + characterName.length
+    + playerName.length;
+
+  if (score <= 0) {
+    return pickQuickServeResultLine([
+      'Warm-up round logged. One more round?',
+      'No worries — first round is just waking up the pavilion.',
+      'Slow start...Next cone gets the engine going!',
+      'Tiny round, useful data. One more try?',
+      'That was a [playerName] test scoop. Now serve one for real.',
+    ], seed, context);
+  }
+
+  if (newlyUnlockedCharacter) {
+    const unlockName = newlyUnlockedCharacter.name || newlyUnlockedCharacter.shortName || 'New character';
+
+    const specificUnlockLines = {
+      drKennyFields: [
+        'Dr. Kenny Fields unlocked. New act on deck!',
+      ],
+      koolKat: [
+        'Kool Kat unlocked. The pavilion just got louder!',
+      ],
+      dinoKid: [
+        'Dino Kid unlocked. Trouble has entered the chat!',
+      ],
+      grampyP: [
+        'Grampy P unlocked. Wisdom cone acquired!',
+      ],
+    };
+
+    return pickQuickServeResultLine([
+      ...(specificUnlockLines[newlyUnlockedCharacter.id] || []),
+      'New character unlocked. [playerName], that round mattered!',
+      'Character unlocked. Go check the setup screen!',
+      'New performer joined the festival!',
+      `${unlockName} unlocked. New act on deck!`,
+    ], seed, context);
+  }
+
+  if (stats.didBeatModeHighScore || (highScore > 0 && score >= highScore)) {
+    return pickQuickServeResultLine([
+      'New high score. That round counts!',
+      'Festival record updated!',
+      'That one goes on the board!',
+      'New [playerName] record alert!',
+      'New number to chase. Good work!',
+      'That score just became the new target.',
+    ], seed, context);
+  }
+
+  if (nextLockedCharacter) {
+    const unlockModeId = normalizeQuickServeModeId(nextLockedCharacter.unlockModeId);
+    const unlockMode = getQuickServeSelectedMode(unlockModeId);
+    const threshold = Math.max(
+      1,
+      Number(nextLockedCharacter.unlockThreshold || nextLockedCharacter.unlockScore || 100)
+    );
+
+    const nextName = nextLockedCharacter.shortName || nextLockedCharacter.name;
+
+    if (meta?.mode?.id === unlockModeId) {
+      return pickQuickServeResultLine([
+        `Stay here — ${threshold}+ in this mode unlocks the next act.`,
+        `Close one. Push this mode to ${threshold}+ for the unlock.`,
+        'This is the right lane. One stronger round opens the next character.',
+        'Keep grinding this mode. The next performer is close.',
+        `[playerName], this mode is the key. Break ${threshold}!`,
+      ], seed, context);
     }
-  }
-  else {
-    // 🎯 Non-perfect run: keep your existing lane-based coaching
-    let hardestLane = null;
-    if (hardMisses > 0 && hardMisses >= mediumMisses && hardMisses >= easyMisses) {
-      hardestLane = 'hard';
-    } else if (mediumMisses > 0 && mediumMisses >= easyMisses) {
-      hardestLane = 'medium';
-    } else if (easyMisses > 0) {
-      hardestLane = 'easy';
-    }
 
-    if (hardestLane === 'hard') {
-      tipText =
-        'Nice work — the spiciest cones were the ones causing trouble. Try slowing down just a little on the big multi-step problems and double-checking before you hit serve.';
-    } else if (hardestLane === 'medium') {
-      tipText =
-        'Solid shift! Most of the bumps were on the middle-tier cones. Try glancing at the whole problem first, then working it piece by piece instead of rushing the answer.';
-    } else if (hardestLane === 'easy') {
-      tipText =
-        'You actually lost a few orders on the simpler cones. That usually means your brain is in high gear — take half a second to check the small ones before you slam serve.';
-    } else if (missed <= 3) {
-      tipText =
-        'Good run — just a few cones slipped through. A tiny slowdown on the last few seconds of the timer can turn near-misses into extra points.';
-    } else {
-      tipText =
-        'This one was more of a practice shift, which is exactly how your brain levels up. Watch the whole problem before you start typing, and your next run will already feel smoother.';
-    }
+    return pickQuickServeResultLine([
+      `Next unlock is waiting in ${unlockMode.label}.`,
+      `Try ${unlockMode.label} next — ${threshold}+ opens ${nextName}.`,
+      `${unlockMode.label} has the next character waiting.`,
+      `${unlockMode.label} is hiding the next act.`,
+      '[playerName], switch modes if you want the next unlock.',
+      `Next character path: ${threshold}+ in ${unlockMode.label}.`,
+    ], seed, {
+      ...context,
+      modeName: unlockMode.label,
+    });
   }
 
-  // 🧩 Add a concrete “here’s how to do THAT cone” if we have meta from mathBrain
-  if (lastMissed && lastMissed.eq && lastMissed.answer != null) {
-    tipText += ' ' + buildSpecificConeLesson(lastMissed);
+  if (highScore > score) {
+    const gap = highScore - score;
+
+    return pickQuickServeResultLine([
+      `Good round — ${gap} more beats your high score.`,
+      `Only ${gap} away from the record.`,
+      `[playerName], ${gap} more and that record falls.`,
+      `Close enough to chase. ${gap} points to go.`,
+      `The mountain is ${gap} points higher.`,
+    ], seed, {
+      ...context,
+      gap,
+    });
   }
 
-  return tipText;
+  if (missed === 0) {
+    return pickQuickServeResultLine([
+      'Perfect round. No misses, clean hands.',
+      'No missed orders. That’s pavilion control.',
+      'Clean round. Every cone landed.',
+      '[playerName], perfect service.',
+      'Nothing dropped. That’s the good stuff.',
+      'Perfect run through the stand.',
+    ], seed, context);
+  }
+
+  return pickQuickServeResultLine([
+    'Good round. The high score is still standing.',
+    'Solid run. Now chase the record.',
+    'That one moved clean. Next one is better?',
+    'Nice work — you’re building rhythm!',
+    '[playerName], apply more effort!',
+    'Score is climbing. Keep the stand open!',
+    `Nice round — ${modeLabel} is getting sharper.`,
+    'Good work. One cleaner burst and that score jumps.',
+    `${characterName} says run it back. The next one can climb.`,
+  ], seed, context);
 }
 
 // 🧠 Break down the exact problem they missed

@@ -565,6 +565,14 @@ function endGame(didBeatHighScore = false) {
     // 🌟 pass this through for the popup to show a little line
     perfectRun,
 
+    // 🎛️ Mode/result metadata for concise result nudges.
+    modeId: currentMathMode,
+    difficulty: currentMathDifficulty,
+    modeResult: characterResult.modeResult || null,
+    modePreviousBest: Number(characterResult.modePreviousBest || 0),
+    modeBestScore: Number(characterResult.modeBestScore || score),
+    didBeatModeHighScore: Boolean(characterResult.didBeatModeHighScore),
+
     // 🎸 Character-result metadata for the QS results rebuild.
     character: selectedCharacter,
     characterHighScore: characterResult.bestScore,
@@ -635,6 +643,7 @@ function handleCorrect() {
 
   // ✨ feedback + juice
   showResultMsg(true, currentXP);
+  spawnQuickServeCorrectToast(currentXP);
   gridFX.bumpGridGlow();
   phil.bumpJam();
   playCorrectSfx();
@@ -912,20 +921,192 @@ function renderProblem() {
 
 
 
+let qsCorrectFeedbackBurstId = 0;
+
+function spawnQuickServeCorrectFeedback(xp = 0) {
+  const layer =
+    document.getElementById('qsFeedbackLayer')
+    || document.querySelector('.qs-math .center-stack');
+
+  if (!layer) return false;
+
+  qsCorrectFeedbackBurstId += 1;
+
+  const safeXP = Math.max(0, Math.floor(Number(xp) || 0));
+  const drift = ((qsCorrectFeedbackBurstId % 5) - 2) * 0.18;
+
+  const burst = document.createElement('div');
+  burst.className = 'qs-floating-feedback qs-floating-feedback-correct';
+  burst.style.setProperty('--qs-feedback-drift', `${drift.toFixed(2)}rem`);
+  burst.setAttribute('aria-hidden', 'true');
+
+  const xpEl = document.createElement('span');
+  xpEl.className = 'qs-floating-feedback-xp';
+  xpEl.textContent = `🍧 ${safeXP} XP`;
+
+  const resultEl = document.createElement('span');
+  resultEl.className = 'qs-floating-feedback-result';
+  resultEl.textContent = '✅ Correct!';
+
+  burst.append(xpEl, resultEl);
+  layer.appendChild(burst);
+
+  const cleanup = () => burst.remove();
+
+  burst.addEventListener('animationend', cleanup, { once: true });
+  window.setTimeout(cleanup, 940);
+
+  return true;
+}
+
+/* ───────────────── QuickServe Correct Toast Caveman START ─────────────────
+   Purpose:
+   - Correct feedback must fire every time, even on fast answers.
+   - No observer.
+   - No reused node.
+   - No CSS-tail dependency.
+   - Each correct answer creates one absolute-positioned inline toast.
+   ──────────────────────────────────────────────────────────────────────── */
+let qsCorrectToastId = 0;
+
+function spawnQuickServeCorrectToast(xp = 0) {
+  const host =
+    document.querySelector('.qs-math')
+    || document.querySelector('.center-stack')
+    || document.querySelector('.qs-grid');
+
+  if (!host) {
+    console.warn('[QuickServe] Correct toast host missing.');
+    return;
+  }
+
+  qsCorrectToastId += 1;
+
+  const safeXP = Math.max(0, Math.floor(Number(xp) || 0));
+  const drift = ((qsCorrectToastId % 5) - 2) * 4;
+
+  const toast = document.createElement('div');
+  toast.className = 'qs-correct-toast-caveman';
+  toast.textContent = `🍧 ${safeXP} XP  ✅ Correct!`;
+  toast.setAttribute('aria-hidden', 'true');
+
+  Object.assign(toast.style, {
+    position: 'absolute',
+    left: '50%',
+    bottom: 'clamp(1.18rem, 2.4svh, 1.65rem)',
+    zIndex: '9999',
+    pointerEvents: 'none',
+
+    display: 'block',
+    width: 'max-content',
+    maxWidth: '92%',
+
+    fontFamily: 'Orbitron, system-ui, sans-serif',
+    fontWeight: '950',
+    fontSize: 'clamp(0.78rem, 1.85svh, 1.12rem)',
+    lineHeight: '1',
+    letterSpacing: '-0.02em',
+    whiteSpace: 'nowrap',
+    textAlign: 'center',
+
+    color: '#76ff9d',
+    textShadow:
+      '0 0 8px rgba(118,255,157,0.9), 0 0 18px rgba(118,255,157,0.42), 0 2px 7px rgba(0,0,0,0.95)',
+
+    opacity: '0',
+    transform: `translate3d(calc(-50% + ${drift}px), 0.36rem, 0) scale(0.96)`,
+    filter: 'brightness(1.12)',
+    transition:
+      'opacity 160ms ease-out, transform 620ms ease-out, filter 620ms ease-out',
+    willChange: 'opacity, transform, filter',
+  });
+
+  host.appendChild(toast);
+
+  // Force layout so WKWebView actually applies the transition.
+  void toast.offsetWidth;
+
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = `translate3d(calc(-50% + ${drift}px), -0.28rem, 0) scale(1)`;
+    toast.style.filter = 'brightness(1.22)';
+  });
+
+  window.setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = `translate3d(calc(-50% + ${drift}px), -1.15rem, 0) scale(0.985)`;
+    toast.style.filter = 'brightness(0.94) blur(1px)';
+  }, 430);
+
+  window.setTimeout(() => {
+    toast.remove();
+  }, 980);
+
+  console.log(`[QuickServe] Correct toast spawned: ${safeXP} XP`);
+}
+/* ───────────────── QuickServe Correct Toast Caveman END ───────────────── */
+
 function showResultMsg(isCorrect, xp = 0) {
   const resultMsg = document.getElementById('qsResultMsg');
   const xpMsg = document.getElementById('qsXPMsg');
 
   if (!resultMsg || !xpMsg) return;
 
-  // QS bottom feedback law:
-  // One centered feedback line at the bottom of the answer box.
-  // The old corner system split XP left and Correct/Nope right, which now
-  // fights the anchored mode/difficulty title. Keep XP data, but display it
-  // as one unified readable message.
-  resultMsg.textContent = isCorrect
-    ? `🍧 ${xp} XP  ✅ Correct!`
-    : '❌ Nope!';
+  // Correct-answer law:
+  // Spawn a fresh independent burst every time.
+  // Do NOT reuse/restart the old single message node.
+  if (isCorrect) {
+    resultMsg.textContent = '';
+    resultMsg.classList.remove(
+      'show',
+      'correct',
+      'error',
+      'cleared',
+      'zero',
+      'incorrect',
+      'wrong',
+      'bad',
+      'good'
+    );
+    resultMsg.classList.add('hidden');
+    resultMsg.removeAttribute('style');
+
+    xpMsg.textContent = '';
+    xpMsg.classList.remove(
+      'show',
+      'correct',
+      'error',
+      'cleared',
+      'zero',
+      'incorrect',
+      'wrong',
+      'bad',
+      'good'
+    );
+    xpMsg.classList.add('hidden');
+    xpMsg.removeAttribute('style');
+
+    const didSpawn = spawnQuickServeCorrectFeedback(xp);
+
+    // Tiny fallback: if the burst layer is missing for any reason,
+    // show the old message once instead of showing nothing.
+    if (!didSpawn) {
+      resultMsg.textContent = `🍧 ${xp} XP  ✅ Correct!`;
+      resultMsg.classList.remove('hidden');
+      resultMsg.classList.add('show', 'correct');
+
+      window.setTimeout(() => {
+        resultMsg.classList.remove('show', 'correct', 'error');
+        resultMsg.classList.add('hidden');
+      }, 900);
+    }
+
+    return;
+  }
+
+  // Incorrect keeps the existing single-message behavior.
+  // Clear feedback is handled by showQuickServeClearedFeedback(), untouched.
+  resultMsg.textContent = '❌ Nope!';
 
   resultMsg.classList.remove(
     'hidden',
@@ -940,11 +1121,8 @@ function showResultMsg(isCorrect, xp = 0) {
     'good'
   );
 
-  resultMsg.classList.add('show');
-  resultMsg.classList.toggle('correct', isCorrect);
-  resultMsg.classList.toggle('error', !isCorrect);
+  resultMsg.classList.add('show', 'error');
 
-  // Retire the old XP corner lane for the current UI.
   xpMsg.textContent = '';
   xpMsg.classList.remove(
     'cleared',
@@ -959,17 +1137,15 @@ function showResultMsg(isCorrect, xp = 0) {
   );
   xpMsg.classList.add('hidden');
 
-  // Let CSS own the final color/placement law.
   xpMsg.removeAttribute('style');
   resultMsg.removeAttribute('style');
 
-  setTimeout(() => {
+  window.setTimeout(() => {
     resultMsg.classList.remove('show', 'correct', 'error');
     resultMsg.classList.add('hidden');
     xpMsg.classList.add('hidden');
   }, 1500);
 }
-
 
 
 function checkBadgeUnlock() {

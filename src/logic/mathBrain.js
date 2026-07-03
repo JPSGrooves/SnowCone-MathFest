@@ -1,3 +1,18 @@
+function formatQuickServeMoney(value) {
+  const amount = Number(value);
+
+  if (!Number.isFinite(amount)) {
+    return '$0';
+  }
+
+  const fixed = amount.toFixed(2);
+
+  // Display law:
+  // $30.00 → $30
+  // $22.50 → $22.50
+  return `$${fixed.replace(/\.00$/, '')}`;
+}
+
 // 🧠 mathBrain.js — Universal Math Engine
 // SCMF QuickServe 1.5.x
 //
@@ -1009,5 +1024,5 @@ function centsToMoney(cents) {
 }
 
 function money(value) {
-  return `$${round2(value).toFixed(2)}`;
+  return `${formatQuickServeMoney(round2(value))}`;
 }
