@@ -2632,3 +2632,76 @@ body.neon-progress #cosmicModal #trackTimer {
 
 /* ───────────────── SCMF Options Final Controls Polish — END ───────────────── */
 
+/* ──────────────────────────────────────────────────────────
+   SCMF Options — Profile Avatar Carousel Centering
+   Purpose:
+   - Fix Profile avatar selector spacing on iPad.
+   - Real markup:
+       .profile-avatar-picker
+         arrow | display-wrap/avatar+count | arrow
+   - Scope: Profile avatar picker only.
+   - No modal shell, tabs, Data, Radio, Cones, Themes, or JS behavior changes.
+   ────────────────────────────────────────────────────────── */
+
+html[data-platform="ios"] #cosmicModal .profile-avatar-picker,
+.platform-ios #cosmicModal .profile-avatar-picker {
+  display: grid !important;
+  grid-template-columns:
+    clamp(42px, 9vw, 52px)
+    clamp(82px, 18vw, 108px)
+    clamp(42px, 9vw, 52px) !important;
+  column-gap: clamp(0.42rem, 2.4vw, 0.8rem) !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+  justify-items: center !important;
+
+  width: max-content !important;
+  max-width: 100% !important;
+  margin-inline: auto !important;
+}
+
+html[data-platform="ios"] #cosmicModal .profile-avatar-display-wrap,
+.platform-ios #cosmicModal .profile-avatar-display-wrap {
+  display: grid !important;
+  justify-items: center !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  margin-inline: 0 !important;
+}
+
+html[data-platform="ios"] #cosmicModal .profile-avatar-arrow,
+.platform-ios #cosmicModal .profile-avatar-arrow {
+  width: clamp(42px, 9vw, 52px) !important;
+  min-width: clamp(42px, 9vw, 52px) !important;
+  height: clamp(42px, 9vw, 52px) !important;
+  min-height: clamp(42px, 9vw, 52px) !important;
+
+  margin: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+html[data-platform="ios"] #cosmicModal .profile-avatar-big,
+.platform-ios #cosmicModal .profile-avatar-big {
+  margin-inline: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+/* iPad: keep the selector compact and centered, not stretched wide. */
+@media (min-width: 700px) and (min-height: 700px) {
+  html[data-platform="ios"] #cosmicModal .profile-avatar-picker,
+  .platform-ios #cosmicModal .profile-avatar-picker {
+    grid-template-columns: 44px 96px 44px !important;
+    column-gap: 0.65rem !important;
+  }
+
+  html[data-platform="ios"] #cosmicModal .profile-avatar-arrow,
+  .platform-ios #cosmicModal .profile-avatar-arrow {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+}
+
+/* ───────────────── SCMF Options — Profile Avatar Carousel Centering END ───────────────── */
