@@ -1,7 +1,7 @@
 // /src/modes/kidsCamping/kidsCamping.js
 import './kidsCamping.css';
 import { applyBackgroundTheme } from '../../managers/backgroundManager.js';
-import { playTransition } from '../../managers/transitionManager.js';
+import { playModeReturnTransition } from '../../managers/transitionManager.js';
 import { appState } from '../../data/appState.js';
 import { hookReturnButton } from '../../utils/returnToMenu.js';
 import { createTentLineGame, initGameLine, cleanupTentLineGame } from './kidsCampingTentLineGame.js';
@@ -20,6 +20,7 @@ import { initMosquitoGame } from './mosquitoGame.js';
 import { enableGestureCage, disableGestureCage } from '../../utils/gestureCage.js';
 import { enableIosLoupeKiller, disableIosLoupeKiller } from '../../utils/iosLoupeKiller.js';
 import { awardBadge } from '../../managers/badgeManager.js';
+import { getThemeAccent } from '../../data/themeAccentLaw.js';
 
 
 
@@ -28,6 +29,49 @@ import { awardBadge } from '../../managers/badgeManager.js';
 let mosquitoCtrl = null;
 let xpDisposer   = null;
 let lastScoreBucket = 0;
+
+let selectedCampingActivity = 'parking';
+
+const KC_ACTIVITY_HIGH_SCORE_KEY = 'scmf.kidsCamping.activityHighScores.v1';
+
+let kcSessionActive = false;
+let kcSessionActivityId = null;
+let kcSessionScoreBaseline = 0;
+
+const KC_ACTIVITY_CONFIG = Object.freeze({
+  ant: {
+    id: 'ant',
+    title: 'Ant Attack',
+    shortTitle: 'ANTS',
+    subtitle: 'Save snacks!',
+    img: 'ant2.png',
+    alt: 'Ant Attack'
+  },
+  tent: {
+    id: 'tent',
+    title: 'Tent Line',
+    shortTitle: 'TENTS',
+    subtitle: 'Light tents!',
+    img: 'tentLit.png',
+    alt: 'Tent Line'
+  },
+  parking: {
+    id: 'parking',
+    title: 'Parking',
+    shortTitle: 'CARS',
+    subtitle: 'Park cars!',
+    img: 'golfCart.png',
+    alt: 'Parking'
+  },
+  mosquito: {
+    id: 'mosquito',
+    title: 'Mosquito',
+    shortTitle: 'BUGS',
+    subtitle: 'Swat bugs!',
+    img: 'mosquito.png',
+    alt: 'Mosquito'
+  }
+});
 
 // ✅ local once-only guards (awardBadge is idempotent, this just avoids noise)
 const _awarded = {
@@ -176,6 +220,231 @@ function emitCampScore() {
     document.dispatchEvent(new CustomEvent('campScoreUpdated', { detail: appState.popCount }));
   } catch {}
 }
+function getCampingActivityConfig(activityId = selectedCampingActivity) {
+  return KC_ACTIVITY_CONFIG[activityId] || KC_ACTIVITY_CONFIG.parking;
+}
+
+function getKidsAssetUrl(filename) {
+  return `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/${filename}`;
+}
+
+function getKidsCampingTotalScore() {
+  return Number(appState?.popCount) || 0;
+}
+
+function readKidsActivityHighScores() {
+  try {
+    const raw = localStorage.getItem(KC_ACTIVITY_HIGH_SCORE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (err) {
+    console.warn('[kc] failed to read activity high scores:', err);
+    return {};
+  }
+}
+
+function writeKidsActivityHighScores(scores) {
+  try {
+    localStorage.setItem(KC_ACTIVITY_HIGH_SCORE_KEY, JSON.stringify(scores || {}));
+  } catch (err) {
+    console.warn('[kc] failed to write activity high scores:', err);
+  }
+}
+
+function getKidsActivityHighScore(activityId) {
+  const scores = readKidsActivityHighScores();
+  const score = Number(scores?.[activityId]) || 0;
+  return Math.max(0, score);
+}
+
+function getKidsActivityHighScoreText(activityId) {
+  const score = getKidsActivityHighScore(activityId);
+  return score > 0 ? String(score) : '--';
+}
+
+function beginKidsActivityScoreSession(activityId) {
+  kcSessionActive = true;
+  kcSessionActivityId = KC_ACTIVITY_CONFIG[activityId] ? activityId : 'parking';
+  kcSessionScoreBaseline = getKidsCampingTotalScore();
+
+  console.log(
+    `🏕️ [KC] Score session started for ${kcSessionActivityId} at baseline ${kcSessionScoreBaseline}.`
+  );
+}
+
+function getKidsActivitySessionScore() {
+  if (!kcSessionActive) return 0;
+
+  const current = getKidsCampingTotalScore();
+  return Math.max(0, current - kcSessionScoreBaseline);
+}
+
+function finishKidsActivityScoreSession() {
+  if (!kcSessionActive || !kcSessionActivityId) return 0;
+
+  const activityId = kcSessionActivityId;
+  const sessionScore = getKidsActivitySessionScore();
+
+  if (sessionScore > 0) {
+    const scores = readKidsActivityHighScores();
+    const previousBest = Number(scores?.[activityId]) || 0;
+
+    if (sessionScore > previousBest) {
+      scores[activityId] = sessionScore;
+      writeKidsActivityHighScores(scores);
+      console.log(`🏕️ [KC] New ${activityId} high score: ${sessionScore}`);
+    }
+  }
+
+  kcSessionActive = false;
+  kcSessionActivityId = null;
+  kcSessionScoreBaseline = 0;
+
+  return sessionScore;
+}
+
+function applyKidsCampingThemeVars(scopeEl) {
+  let accent = '#00ffee';
+  let glow = 'rgba(0, 255, 238, 0.55)';
+  let faint = 'rgba(0, 255, 238, 0.16)';
+
+  try {
+    const themeAccent = getThemeAccent(appState?.settings?.theme);
+    accent = themeAccent?.accent || accent;
+    glow = themeAccent?.glow || glow;
+    faint = themeAccent?.faint || faint;
+  } catch (err) {
+    console.warn('[kc] theme accent fallback used:', err);
+  }
+
+  [document.body, scopeEl].filter(Boolean).forEach((target) => {
+    target.style.setProperty('--kc-theme-accent', accent);
+    target.style.setProperty('--kc-theme-glow', glow);
+    target.style.setProperty('--kc-theme-faint', faint);
+  });
+}
+
+function renderCampingActivityCards() {
+  return Object.values(KC_ACTIVITY_CONFIG).map((activity) => {
+    const selected = activity.id === selectedCampingActivity;
+
+    return `
+      <button
+        type="button"
+        class="kc-activity-card ${selected ? 'selected' : ''}"
+        data-kc-activity="${activity.id}"
+        aria-pressed="${selected ? 'true' : 'false'}"
+      >
+        <span class="kc-activity-art-wrap">
+          <img
+            class="kc-activity-art"
+            src="${getKidsAssetUrl(activity.img)}"
+            alt="${activity.alt}"
+            draggable="false"
+          />
+        </span>
+        <span class="kc-activity-title">${activity.title}</span>
+        <span class="kc-activity-subtitle">${activity.subtitle}</span>
+        <span class="kc-activity-high-score">High Score: ${getKidsActivityHighScoreText(activity.id)}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function setSelectedCampingActivity(activityId) {
+  selectedCampingActivity = KC_ACTIVITY_CONFIG[activityId] ? activityId : 'parking';
+
+  document.querySelectorAll('.kc-activity-card').forEach((card) => {
+    const selected = card.dataset.kcActivity === selectedCampingActivity;
+    card.classList.toggle('selected', selected);
+    card.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+
+  const playBtn = document.getElementById('startCamping');
+  const activity = getCampingActivityConfig();
+
+  if (playBtn) {
+    playBtn.dataset.kcActivity = activity.id;
+    playBtn.setAttribute('aria-label', `Play ${activity.title}`);
+  }
+}
+
+function wireCampingActivityCards() {
+  document.querySelectorAll('.kc-activity-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      setSelectedCampingActivity(card.dataset.kcActivity);
+    });
+  });
+
+  setSelectedCampingActivity(selectedCampingActivity);
+}
+
+function getCampingActivityZoneMarkup(activityId = selectedCampingActivity) {
+  const activity = getCampingActivityConfig(activityId);
+
+  if (activity.id === 'ant') {
+    return `<div class="kc-ant-attack-zone kc-full-activity-zone" id="antZone"></div>`;
+  }
+
+  if (activity.id === 'tent') {
+    return `<div class="kc-tent-zone kc-full-activity-zone"></div>`;
+  }
+
+  if (activity.id === 'mosquito') {
+    return `
+      <div class="kc-mosquito-zone kc-full-activity-zone" id="mosquitoZone">
+        <div class="kc-mosquito-prompt">
+          <span class="kc-mosquito-big">🦟</span>
+          <strong>Tap the tiny sky demon!</strong>
+          <small>Swat bugs to grow your Camping Score.</small>
+        </div>
+      </div>
+    `;
+  }
+
+  return `<div class="kc-slider-cell kc-full-activity-zone" id="parkingZone"></div>`;
+}
+
+async function cleanupActiveCampingActivity() {
+  try { cleanupTentLineGame(); } catch {}
+
+  try {
+    const container = document.querySelector(SELECTORS.container);
+    const antMod = await import('./antAttack.js');
+    const antZone = container?.querySelector('#antZone');
+    if (antZone && typeof antMod.destroyAntAttackGame === 'function') {
+      antMod.destroyAntAttackGame(antZone);
+    }
+    antMod.forceKillAntAttack?.();
+  } catch {}
+
+  try { mosquitoCtrl?.disable?.(); } catch {}
+  try { mosquitoCtrl?.cleanup?.(); } catch {}
+  mosquitoCtrl = null;
+}
+
+async function returnToKidsSetupFromActivity() {
+  console.log('🏕️ [KC] Activity Back pressed — returning to Camping setup.');
+
+  finishKidsActivityScoreSession();
+  stopKidsCampingMusic();
+
+  try { unwireMainHandlers(); } catch {}
+  await cleanupActiveCampingActivity();
+
+  globalThis.__KC_BOOT_LOCK__ = false;
+  if (globalThis.__KC_RUNTIME__) {
+    globalThis.__KC_RUNTIME__.booting = false;
+    globalThis.__KC_RUNTIME__.booted = false;
+  }
+
+  renderIntroScreen();
+  wireIntroHandlers();
+  wireAudioUnlockOnce();
+  updatePopUI();
+}
+
+
 // ────────────────────────────────────────────────────────────────────────────────
 // Public API
 // ────────────────────────────────────────────────────────────────────────────────
@@ -298,32 +567,59 @@ function startXPWatcher() {
 function renderIntroScreen() {
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
+
+  applyKidsCampingThemeVars(container);
+
   container.innerHTML = `
     <div class="kc-aspect-wrap">
       <div class="kc-game-frame">
         <img id="modeBackground" class="background-fill kc-bg-img"
              src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/plate_kidsBG.png"
              alt="Kids Camping Background" />
-        <div class="kc-intro">
-          <div class="kc-intro-stack">
-            <div class="kc-speech">
-              Heyo! We're the Dino Dividers! Let's chill out and play: Ant Attack, Tent Line, Parking Panic, and Mosquito Mash!<br/>
+
+        <div class="kc-intro kc-setup-screen">
+          <div class="kc-setup-stack">
+            <header class="kc-setup-header">
+              <h1 class="kc-setup-title">Camping Games</h1>
+              <p class="kc-setup-subtitle">Pick a camp activity.</p>
+            </header>
+
+            <div class="kc-setup-directors" aria-hidden="true">
+              <img
+                id="directorSpriteIntro"
+                class="director-img kc-setup-director-img"
+                src="${getKidsAssetUrl('directors_intro.png')}"
+                alt=""
+                draggable="false"
+              />
             </div>
-            <div class="director-wrapper">
-              <img id="directorSpriteIntro" class="director-img"
-                   src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/directors_intro.png" />
+
+            <div class="kc-activity-picker" aria-label="Choose a Camping activity">
+              ${renderCampingActivityCards()}
             </div>
-            <button id="startCamping" class="kc-intro-btn kc-btn-large start-camp-btn">⛺ Get to Camping! ⛺</button>
+
+
+            <button
+              id="startCamping"
+              class="kc-intro-btn kc-btn-large start-camp-btn kc-setup-play-btn"
+              type="button"
+            >
+              Play Game
+            </button>
           </div>
         </div>
 
-        <!-- 🍧 KC bottom bar (Story-style) -->
-        <div class="kc-bottom-bar">
-          <button id="kcBackIntro" class="kc-square-btn kc-left">🔙</button>
+        <div class="kc-bottom-bar kc-setup-bottom-bar">
+          <button id="kcBackIntro" class="kc-square-btn kc-left" aria-label="Back to menu">
+            <span class="kc-util-arrow" aria-hidden="true">←</span>
+            <span class="kc-util-label">Back</span>
+          </button>
         </div>
       </div>
     </div>
   `;
+
+  wireCampingActivityCards();
 }
 
 
@@ -339,14 +635,25 @@ function wireIntroHandlers() {
   HANDLERS.onStartCamping = async () => {
     if (globalThis.__KC_BOOT_LOCK__) return;
     globalThis.__KC_BOOT_LOCK__ = true;
+
+    const activity = getCampingActivityConfig(selectedCampingActivity);
     const introEl = document.querySelector('.kc-intro');
-    if (!introEl) return;
+
+    if (!introEl) {
+      globalThis.__KC_BOOT_LOCK__ = false;
+      return;
+    }
+
     introEl.classList.add('fade-out');
+
     setTimeout(async () => {
-      renderMainUI();
+      renderMainUI(activity.id);
       wireMainHandlers();
-      await bootGames();
-      requestAnimationFrame(() => requestAnimationFrame(initGameLine));
+      await bootGames(activity.id);
+
+      if (activity.id === 'tent') {
+        requestAnimationFrame(() => requestAnimationFrame(initGameLine));
+      }
     }, 450);
   };
 
@@ -408,11 +715,16 @@ function unwireAudioUnlock() {
 // ────────────────────────────────────────────────────────────────────────────────
 // Main UI + handlers
 // ────────────────────────────────────────────────────────────────────────────────
-function renderMainUI() {
+function renderMainUI(activityId = selectedCampingActivity) {
   startKidsCampingMusic();
 
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
+
+  const activity = getCampingActivityConfig(activityId);
+  selectedCampingActivity = activity.id;
+  applyKidsCampingThemeVars(container);
+  beginKidsActivityScoreSession(activity.id);
 
   container.innerHTML = `
     <div class="kc-aspect-wrap">
@@ -420,25 +732,24 @@ function renderMainUI() {
         <img id="modeBackground" class="background-fill"
              src="${import.meta.env.BASE_URL}assets/img/modes/kidsCamping/plate_kidsBG.png"
              alt="Kids Camping Background" />
-        <div class="kc-grid">
+
+        <div class="kc-grid kc-activity-grid" data-kc-activity="${activity.id}">
           <div class="kc-title">
-            <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/rexVider.png" class="kc-icon kc-left-title" />
-            <span class="kc-title-text">Camping Games</span>
-            <img src="${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/triceriVider.png" class="kc-icon kc-right-title" />
+            <img src="${getKidsAssetUrl('rexVider.png')}" class="kc-icon kc-left-title" alt="" />
+            <span class="kc-title-text">${activity.title}</span>
+            <img src="${getKidsAssetUrl('triceriVider.png')}" class="kc-icon kc-right-title" alt="" />
           </div>
 
-          <div class="kc-ant-attack-zone" id="antZone"></div>
-          <div class="kc-tent-zone"></div>
-          <div class="kc-slider-cell" id="parkingZone"></div>
-
-          <!-- Score moved to the real bottom dock in 1.3.1d.
-               Keep this cell as a harmless grid-area placeholder only. -->
-          <div class="kc-popper-cell" aria-hidden="true"></div>
+          <section class="kc-activity-stage kc-activity-stage-${activity.id}" aria-label="${activity.title}">
+            ${getCampingActivityZoneMarkup(activity.id)}
+          </section>
         </div>
 
-        <!-- 🍧 KC bottom dock: Back | Camping Score | Mute -->
         <div class="kc-bottom-bar">
-          <button id="kcBack" class="kc-square-btn kc-left" aria-label="Back to Menu">🔙</button>
+          <button id="kcBack" class="kc-square-btn kc-left" aria-label="Back to Camping setup">
+            <span class="kc-util-arrow" aria-hidden="true">←</span>
+            <span class="kc-util-label">Back</span>
+          </button>
 
           <div class="kc-dock-score" aria-live="polite">
             <div class="kc-score-label">Camping Score</div>
@@ -451,11 +762,11 @@ function renderMainUI() {
     </div>
   `;
 
-  // return hook now targets the square back button
-  // local zoom shield
   document
     .querySelectorAll('.kc-aspect-wrap, .kc-game-frame, .kc-grid')
     .forEach(preventDoubleTapZoom);
+
+  updatePopUI();
 }
 
 
@@ -471,12 +782,11 @@ function onTentsAll() {
 
 
 function wireMainHandlers() {
-  // 🔙 Back button – go through our local returnToMenu, which calls stopKidsMode()
+  // 🔙 Back button – return to Camping setup, not the main menu
   const backBtn = document.getElementById('kcBack');
   if (backBtn) {
     HANDLERS.onBackFromMain = () => {
-      stopKidsCampingMusic();
-      returnToMenu();              // 👈 this already awaits stopKidsMode + forceKillAntAttack
+      returnToKidsSetupFromActivity();
     };
     backBtn.addEventListener('click', HANDLERS.onBackFromMain);
   }
@@ -543,7 +853,7 @@ function unwireMainHandlers() {
 // ────────────────────────────────────────────────────────────────────────────────
 // Boot games (mosquito confined to #game-container)
 // ────────────────────────────────────────────────────────────────────────────────
-async function bootGames() {
+async function bootGames(activityId = selectedCampingActivity) {
   // local guard (survives HMR via global)
   const R = (globalThis.__KC_RUNTIME__ ||= { booting:false, booted:false });
 
@@ -561,59 +871,72 @@ async function bootGames() {
       antMod.forceKillAntAttack?.();
     } catch {}
 
+    const activity = getCampingActivityConfig(activityId);
+
     // 1) Tent Line
-    const tentZone = document.querySelector('.kc-tent-zone');
-    if (tentZone) {
-      tentZone.innerHTML = '';
-      const tentGameEl = createTentLineGame((score) => {
-        appState.incrementPopCount(score);
-        updatePopUI();
-        animatePopCount();
-      });
-      tentZone.appendChild(tentGameEl);
-    }
-
-    // 2) Parking
-    const parkingZone = document.getElementById('parkingZone');
-    if (parkingZone) {
-      initParkingGame(parkingZone);
-    }
-
-    // 3) Ant Attack — build UI once
-    const antZone = document.getElementById('antZone');
-    if (antZone) {
-      try {
-        const { initAntAttackGame } = await import('./antAttack.js');
-        if (!antZone.dataset.kcAntInit) {
-          antZone.dataset.kcAntInit = '1';
-          initAntAttackGame(antZone, updatePopUI);
-        }
-      } catch (err) {
-        console.error('[kc] bootGames: antAttack init failed', err);
+    if (activity.id === 'tent') {
+      const tentZone = document.querySelector('.kc-tent-zone');
+      if (tentZone) {
+        tentZone.innerHTML = '';
+        const tentGameEl = createTentLineGame((score) => {
+          appState.incrementPopCount(score);
+          updatePopUI();
+          animatePopCount();
+        });
+        tentZone.appendChild(tentGameEl);
       }
     }
 
-    // 4) Mosquito — confined to the game container
-    const host = document.querySelector(SELECTORS.container);
-    if (host) {
-      try { mosquitoCtrl?.disable?.(); } catch {}
-      try { mosquitoCtrl?.cleanup?.(); } catch {}
-      mosquitoCtrl = initMosquitoGame({
-        zoneEl: host,
-        spawnDelayMs: 7000,
-        respawnDelayMs: 7000,
-        baseSpeed: 80,
-        onSwat() {
-          appState.incrementPopCount(50);
-          updatePopUI();
-          animatePopCount();
-          if (!_awarded.mosquito) {
-            _awarded.mosquito = true;
-            awardBadge('kids_mosquito');
+    // 2) Parking
+    if (activity.id === 'parking') {
+      const parkingZone = document.getElementById('parkingZone');
+      if (parkingZone) {
+        initParkingGame(parkingZone);
+      }
+    }
+
+    // 3) Ant Attack
+    if (activity.id === 'ant') {
+      const antZone = document.getElementById('antZone');
+      if (antZone) {
+        try {
+          const { initAntAttackGame } = await import('./antAttack.js');
+          if (!antZone.dataset.kcAntInit) {
+            antZone.dataset.kcAntInit = '1';
+            initAntAttackGame(antZone, updatePopUI);
           }
+        } catch (err) {
+          console.error('[kc] bootGames: antAttack init failed', err);
         }
-      });
-      mosquitoCtrl.enable();
+      }
+    }
+
+    // 4) Mosquito — selected activity only
+    if (activity.id === 'mosquito') {
+      const host = document.querySelector(SELECTORS.container);
+      if (host) {
+        try { mosquitoCtrl?.disable?.(); } catch {}
+        try { mosquitoCtrl?.cleanup?.(); } catch {}
+
+        mosquitoCtrl = initMosquitoGame({
+          zoneEl: host,
+          spawnDelayMs: 900,
+          respawnDelayMs: 1400,
+          baseSpeed: 92,
+          onSwat() {
+            appState.incrementPopCount(50);
+            updatePopUI();
+            animatePopCount();
+
+            if (!_awarded.mosquito) {
+              _awarded.mosquito = true;
+              awardBadge('kids_mosquito');
+            }
+          }
+        });
+
+        mosquitoCtrl.enable();
+      }
     }
 
     console.log('[kc] bootGames: done');
@@ -650,7 +973,7 @@ function updateCampingHighScore(currentScore) {
 // ────────────────────────────────────────────────────────────────────────────────
 export function updatePopUI() {
   const popSpan = document.getElementById('popCount');
-  const current = Number(appState.popCount) || 0;
+  const current = kcSessionActive ? getKidsActivitySessionScore() : getKidsCampingTotalScore();
 
   if (popSpan) popSpan.textContent = current;
 
@@ -717,7 +1040,7 @@ function restartMenuTitleNeonAfterKidsReturn() {
 }
 
 function returnToMenu() {
-  playTransition(async () => {
+  playModeReturnTransition(async () => {
     try {
       await stopKidsMode();
       // extra hard stop in case anything was mid-tick

@@ -855,9 +855,9 @@ function renderUI() {
               </button>
             </div>
             <div class="utility-buttons">
-              <button id="backToMenu" aria-label="Main Menu">
+              <button id="backToMenu" aria-label="Back to Infinity Lake setup">
                 <span class="il-util-arrow" aria-hidden="true">←</span>
-                <span class="il-util-label">Menu</span>
+                <span class="il-util-label">Back</span>
               </button>
               <button id="endGame" aria-label="Show Results">
                 <span class="il-results-symbol" aria-hidden="true">∞</span>
@@ -957,11 +957,11 @@ function renderUI() {
 }
 
 function setupEventHandlers() {
-  // 🔙 Main Menu
+  // 🔙 Back to Infinity setup/preflight
   const backBtn = document.getElementById('backToMenu');
   if (backBtn) {
     if (onBackToMenuClick) backBtn.removeEventListener('click', onBackToMenuClick);
-    onBackToMenuClick = returnToMenu;
+    onBackToMenuClick = returnToInfinitySetupFromGameplay;
     backBtn.addEventListener('click', onBackToMenuClick);
   }
 
@@ -1092,6 +1092,19 @@ function cleanupEventHandlers() {
   onMuteClick = null;
   onPlayAgainClick = null;
   onPopupBackClick = null;
+}
+
+
+function returnToInfinitySetupFromGameplay() {
+  console.log('♾️ [Infinity] Gameplay Back pressed — returning to setup.');
+
+  // Back is navigation, not Results.
+  // Reset run commit state so this abandoned active run cannot ghost-commit later
+  // if the player leaves from the setup screen.
+  startTime = 0;
+  didCommitThisRun = false;
+
+  returnToInfinitySetup();
 }
 
 
