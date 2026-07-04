@@ -4094,3 +4094,560 @@ body.kc-active .kc-setup-bottom-bar .kc-square-btn {
     letter-spacing: 0.02em;
   }
 }
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Kids Camping Setup Visual Tune v1.2
+   Purpose:
+   - Default setup choice is now Ant Attack via JS.
+   - Shrink director group a little on iPhone.
+   - Let director group scale intentionally on iPad.
+   - Shrink activity tile grid 5–10% for breathing room.
+   - Increase tile text slightly.
+   - Leave Play Game and Back button untouched.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .kc-setup-subtitle {
+  color: #ffffff !important;
+}
+
+/* Slightly smaller on phone, still friendly. */
+body.kc-active .kc-setup-director-img {
+  max-width: min(68vw, 390px) !important;
+  max-height: clamp(92px, 18svh, 165px) !important;
+}
+
+/* Shrink the whole tile field a little so the screen breathes. */
+body.kc-active .kc-activity-picker {
+  width: min(86vw, 610px) !important;
+  gap: clamp(10px, 2.15vw, 17px) !important;
+}
+
+/* Text inside tiles was reading a little tiny. Slight bump only. */
+body.kc-active .kc-activity-title {
+  font-size: clamp(0.94rem, 2.55vw, 1.36rem) !important;
+  line-height: 1.03 !important;
+}
+
+body.kc-active .kc-activity-subtitle {
+  font-size: clamp(0.72rem, 1.95vw, 1rem) !important;
+  line-height: 1.08 !important;
+}
+
+body.kc-active .kc-activity-high-score {
+  font-size: clamp(0.6rem, 1.58vw, 0.82rem) !important;
+}
+
+/* Phone: preserve margin/buffer and prevent the card grid from feeling slammed. */
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-setup-director-img {
+    max-width: min(62vw, 330px) !important;
+    max-height: clamp(82px, 15.5svh, 132px) !important;
+  }
+
+  body.kc-active .kc-activity-picker {
+    width: min(84vw, 390px) !important;
+    gap: clamp(9px, 2.3vw, 12px) !important;
+  }
+
+  body.kc-active .kc-activity-card {
+    padding: clamp(7px, 0.95svh, 10px) clamp(7px, 1.7vw, 11px) !important;
+  }
+
+  body.kc-active .kc-activity-title {
+    font-size: clamp(0.86rem, 3.35vw, 1.08rem) !important;
+  }
+
+  body.kc-active .kc-activity-subtitle {
+    font-size: clamp(0.64rem, 2.55vw, 0.84rem) !important;
+  }
+
+  body.kc-active .kc-activity-high-score {
+    font-size: clamp(0.55rem, 2.15vw, 0.7rem) !important;
+  }
+}
+
+/* iPad/tablet: let the directors grow again without becoming the whole screen. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.kc-active .kc-setup-director-img {
+    max-width: min(48vw, 520px) !important;
+    max-height: min(22svh, 230px) !important;
+  }
+
+  body.kc-active .kc-activity-picker {
+    width: min(72vw, 680px) !important;
+    gap: clamp(14px, 2vw, 22px) !important;
+  }
+
+  body.kc-active .kc-activity-title {
+    font-size: clamp(1.05rem, 1.85svh, 1.42rem) !important;
+  }
+
+  body.kc-active .kc-activity-subtitle {
+    font-size: clamp(0.78rem, 1.35svh, 1.02rem) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Kids Camping Setup iPad Frame + Director Glow v1.3
+   Purpose:
+   - Setup screen should use the full iPhone/iPad viewport, not the old 11:16 shell shadow.
+   - Intro background plate fills the full viewport on setup only.
+   - Director PNG gets unclipped breathing room.
+   - Director setup glow becomes clean white.
+   - No activity/gameplay layout changes.
+   ────────────────────────────────────────────────────────── */
+
+/* The setup bg image has class kc-bg-img in JS.
+   Make that specific intro plate own the full device viewport. */
+:root[data-platform="ios"] body.kc-active .kc-game-frame > .background-fill.kc-bg-img,
+body.kc-active .kc-game-frame > .background-fill.kc-bg-img {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100vw !important;
+  height: 100svh !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  object-fit: cover !important;
+  object-position: center center !important;
+
+  z-index: 0 !important;
+}
+
+/* Setup overlay also owns the full viewport.
+   This removes the 11:16-looking shadow/wash on iPad. */
+:root[data-platform="ios"] body.kc-active .kc-intro.kc-setup-screen,
+body.kc-active .kc-intro.kc-setup-screen {
+  position: fixed !important;
+  inset: 0 !important;
+
+  width: 100vw !important;
+  height: 100svh !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  z-index: 20 !important;
+  isolation: isolate !important;
+
+  overflow: hidden !important;
+
+  background:
+    radial-gradient(
+      ellipse 118% 86% at 50% 34%,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(0, 0, 0, 0.02) 40%,
+      rgba(0, 0, 0, 0.16) 72%,
+      rgba(0, 0, 0, 0.34) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.05) 0%,
+      rgba(0, 0, 0, 0.01) 44%,
+      rgba(0, 0, 0, 0.28) 100%
+    ) !important;
+}
+
+/* Keep setup content above the full-viewport plate/wash. */
+body.kc-active .kc-setup-stack {
+  position: relative !important;
+  z-index: 2 !important;
+  overflow: visible !important;
+}
+
+/* Bottom Back belongs to the full setup viewport too, not the old 11:16 frame. */
+:root[data-platform="ios"] body.kc-active .kc-setup-bottom-bar,
+body.kc-active .kc-setup-bottom-bar {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: max(1.2vh, env(safe-area-inset-bottom, 0px)) !important;
+
+  width: 100vw !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-items: end !important;
+
+  padding: 0 1.2vh !important;
+  pointer-events: none !important;
+  z-index: 40 !important;
+}
+
+body.kc-active .kc-setup-bottom-bar .kc-square-btn {
+  pointer-events: auto !important;
+}
+
+/* Director lane:
+   Give the PNG and glow room to breathe so iPad does not crop the aura. */
+body.kc-active .kc-setup-directors {
+  position: relative !important;
+  overflow: visible !important;
+
+  padding:
+    clamp(8px, 1.25svh, 18px)
+    clamp(18px, 4vw, 56px)
+    clamp(10px, 1.55svh, 22px) !important;
+
+  isolation: isolate !important;
+}
+
+/* White glow lives behind the PNG.
+   This avoids relying entirely on PNG baked glow or Safari filter overflow. */
+body.kc-active .kc-setup-directors::before {
+  content: "" !important;
+  position: absolute !important;
+
+  left: 50% !important;
+  top: 50% !important;
+
+  width: min(78vw, 620px) !important;
+  height: min(24svh, 260px) !important;
+
+  transform: translate(-50%, -47%) !important;
+
+  border-radius: 999px !important;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0.20) 34%,
+      rgba(255, 255, 255, 0.08) 58%,
+      rgba(255, 255, 255, 0.00) 78%
+    ) !important;
+
+  filter: blur(16px) !important;
+  opacity: 0.72 !important;
+
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+/* White director glow. Keep shadow soft and non-theme-colored. */
+body.kc-active .kc-setup-director-img {
+  position: relative !important;
+  z-index: 1 !important;
+
+  filter:
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.50))
+    drop-shadow(0 0 22px rgba(255, 255, 255, 0.20))
+    drop-shadow(0 12px 18px rgba(0, 0, 0, 0.32)) !important;
+}
+
+/* iPhone: keep the directors smaller and avoid touching title/cards. */
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-setup-directors {
+    padding:
+      clamp(5px, 0.8svh, 10px)
+      clamp(16px, 4vw, 28px)
+      clamp(6px, 0.95svh, 12px) !important;
+  }
+
+  body.kc-active .kc-setup-directors::before {
+    width: min(70vw, 360px) !important;
+    height: min(18svh, 150px) !important;
+    opacity: 0.62 !important;
+    filter: blur(12px) !important;
+  }
+
+  body.kc-active .kc-setup-director-img {
+    max-width: min(60vw, 320px) !important;
+    max-height: clamp(80px, 14.8svh, 126px) !important;
+  }
+}
+
+/* iPad/tablet:
+   Let the director art scale intentionally but keep clear air between subtitle and tiles. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.kc-active .kc-setup-stack {
+    grid-template-rows:
+      auto
+      minmax(190px, 0.58fr)
+      minmax(560px, 1.48fr)
+      auto !important;
+
+    gap: clamp(10px, 1.1svh, 18px) !important;
+  }
+
+  body.kc-active .kc-setup-directors {
+    padding:
+      clamp(12px, 1.2svh, 22px)
+      clamp(44px, 6vw, 88px)
+      clamp(14px, 1.45svh, 26px) !important;
+  }
+
+  body.kc-active .kc-setup-directors::before {
+    width: min(58vw, 640px) !important;
+    height: min(22svh, 270px) !important;
+    opacity: 0.74 !important;
+    filter: blur(18px) !important;
+  }
+
+  body.kc-active .kc-setup-director-img {
+    max-width: min(45vw, 520px) !important;
+    max-height: min(20svh, 245px) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Kids Camping Setup Director Stable v1.6
+   Purpose:
+   - Replace the stacked v1.4/v1.5 director experiments with one rule.
+   - Preserve the accepted iPad full-screen setup look.
+   - Let director glow breathe on iPhone and iPad.
+   - Avoid reintroducing the old 11:16 dark shell.
+   - Keep setup title/subtitle/cards/play/back layout stable.
+   Notes:
+   - If directors_intro.png has a baked rectangular glow/alpha box,
+     CSS cannot fully erase that asset problem.
+   - This rule prevents parent clipping and supplies a soft glow layer.
+   ────────────────────────────────────────────────────────── */
+
+/* Setup stage should not clip the director glow. */
+body.kc-active .kc-intro.kc-setup-screen,
+body.kc-active .kc-setup-stack,
+body.kc-active .kc-setup-directors {
+  overflow: visible !important;
+}
+
+/* Keep the setup itself calm and full-screen. */
+body.kc-active .kc-intro.kc-setup-screen {
+  background:
+    radial-gradient(
+      ellipse 116% 88% at 50% 34%,
+      rgba(255, 255, 255, 0.035) 0%,
+      rgba(0, 0, 0, 0.00) 46%,
+      rgba(0, 0, 0, 0.14) 78%,
+      rgba(0, 0, 0, 0.26) 100%
+    ) !important;
+}
+
+/* Director row gets its own breathing lane. */
+body.kc-active .kc-setup-directors {
+  position: relative !important;
+  isolation: isolate !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: clamp(116px, 17svh, 190px) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding:
+    clamp(8px, 1.1svh, 18px)
+    clamp(28px, 6vw, 72px)
+    clamp(12px, 1.4svh, 22px) !important;
+
+  pointer-events: none !important;
+}
+
+/* Soft white glow behind directors, not tied to image alpha edges. */
+body.kc-active .kc-setup-directors::before {
+  content: "" !important;
+  position: absolute !important;
+
+  left: 50% !important;
+  top: 52% !important;
+
+  width: min(76vw, 620px) !important;
+  height: min(22svh, 250px) !important;
+
+  transform: translate(-50%, -50%) !important;
+  border-radius: 999px !important;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.34) 0%,
+      rgba(255, 255, 255, 0.18) 34%,
+      rgba(255, 255, 255, 0.07) 62%,
+      rgba(255, 255, 255, 0.00) 84%
+    ) !important;
+
+  filter: blur(16px) !important;
+  opacity: 0.72 !important;
+
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Image above the glow. Keep this light; future PNG should carry the final art. */
+body.kc-active .kc-setup-director-img {
+  position: relative !important;
+  z-index: 2 !important;
+
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+
+  object-fit: contain !important;
+  background: transparent !important;
+
+  filter:
+    drop-shadow(0 10px 16px rgba(0, 0, 0, 0.26)) !important;
+
+  -webkit-user-drag: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  pointer-events: none !important;
+}
+
+/* iPhone portrait: a little more director lane height, but no tile collision. */
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-setup-stack {
+    grid-template-rows:
+      auto
+      minmax(128px, 0.48fr)
+      minmax(258px, 1.48fr)
+      auto !important;
+
+    gap: clamp(7px, 0.95svh, 11px) !important;
+  }
+
+  body.kc-active .kc-setup-directors {
+    min-height: clamp(128px, 18.2svh, 160px) !important;
+
+    padding:
+      clamp(7px, 0.9svh, 12px)
+      clamp(32px, 8vw, 54px)
+      clamp(12px, 1.3svh, 18px) !important;
+  }
+
+  body.kc-active .kc-setup-directors::before {
+    width: min(82vw, 420px) !important;
+    height: clamp(122px, 18.8svh, 172px) !important;
+
+    opacity: 0.72 !important;
+    filter: blur(16px) !important;
+  }
+
+  body.kc-active .kc-setup-director-img {
+    max-width: min(62vw, 328px) !important;
+    max-height: clamp(92px, 15.2svh, 136px) !important;
+  }
+
+  body.kc-active .kc-setup-title,
+  body.kc-active .kc-setup-subtitle {
+    position: relative !important;
+    z-index: 5 !important;
+  }
+
+  body.kc-active .kc-activity-picker {
+    position: relative !important;
+    z-index: 4 !important;
+    margin-top: clamp(0px, 0.25svh, 4px) !important;
+  }
+}
+
+/* iPad/tablet: keep the accepted clean 3:4 look, with unclipped director glow. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.kc-active .kc-setup-stack {
+    grid-template-rows:
+      auto
+      minmax(210px, 0.62fr)
+      minmax(540px, 1.42fr)
+      auto !important;
+
+    gap: clamp(10px, 1.05svh, 18px) !important;
+  }
+
+  body.kc-active .kc-setup-directors {
+    min-height: min(24svh, 275px) !important;
+
+    padding:
+      clamp(16px, 1.35svh, 28px)
+      clamp(52px, 6vw, 96px)
+      clamp(18px, 1.55svh, 30px) !important;
+  }
+
+  body.kc-active .kc-setup-directors::before {
+    width: min(58vw, 660px) !important;
+    height: min(24svh, 285px) !important;
+
+    opacity: 0.76 !important;
+    filter: blur(18px) !important;
+  }
+
+  body.kc-active .kc-setup-director-img {
+    max-width: min(45vw, 530px) !important;
+    max-height: min(20.5svh, 250px) !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Kids Camping Setup Director NO GLOW v1.7
+   Purpose:
+   - Diagnostic + production-safe visual simplification.
+   - Kill all setup director glow effects.
+   - Preserve director PNG size/placement.
+   - Preserve accepted iPhone/iPad setup layout.
+   - If a rectangle remains after this, it is coming from the PNG/canvas itself.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .kc-setup-directors,
+body.kc-active .kc-setup-directors::before,
+body.kc-active .kc-setup-directors::after,
+body.kc-active .kc-setup-director-img {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Kill the CSS-created halo/oval completely. */
+body.kc-active .kc-setup-directors::before,
+body.kc-active .kc-setup-directors::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: none !important;
+  filter: none !important;
+}
+
+/* Director lane stays transparent and unclipped. */
+body.kc-active .kc-setup-directors {
+  background: transparent !important;
+  filter: none !important;
+  overflow: visible !important;
+}
+
+/* The image itself gets no glow, no drop shadow, no alpha-amplifying filter. */
+body.kc-active .kc-setup-director-img {
+  background: transparent !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Keep the current device-aware sizing, but without any glow behavior. */
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-setup-directors {
+    overflow: visible !important;
+  }
+
+  body.kc-active .kc-setup-director-img {
+    max-width: min(62vw, 328px) !important;
+    max-height: clamp(92px, 15.2svh, 136px) !important;
+    filter: none !important;
+  }
+}
+
+@media (min-width: 700px) and (min-height: 700px) {
+  body.kc-active .kc-setup-directors {
+    overflow: visible !important;
+  }
+
+  body.kc-active .kc-setup-director-img {
+    max-width: min(45vw, 530px) !important;
+    max-height: min(20.5svh, 250px) !important;
+    filter: none !important;
+  }
+}

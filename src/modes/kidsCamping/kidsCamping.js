@@ -30,7 +30,7 @@ let mosquitoCtrl = null;
 let xpDisposer   = null;
 let lastScoreBucket = 0;
 
-let selectedCampingActivity = 'parking';
+let selectedCampingActivity = 'ant';
 
 const KC_ACTIVITY_HIGH_SCORE_KEY = 'scmf.kidsCamping.activityHighScores.v1';
 
@@ -221,7 +221,7 @@ function emitCampScore() {
   } catch {}
 }
 function getCampingActivityConfig(activityId = selectedCampingActivity) {
-  return KC_ACTIVITY_CONFIG[activityId] || KC_ACTIVITY_CONFIG.parking;
+  return KC_ACTIVITY_CONFIG[activityId] || KC_ACTIVITY_CONFIG.ant;
 }
 
 function getKidsAssetUrl(filename) {
@@ -352,7 +352,7 @@ function renderCampingActivityCards() {
 }
 
 function setSelectedCampingActivity(activityId) {
-  selectedCampingActivity = KC_ACTIVITY_CONFIG[activityId] ? activityId : 'parking';
+  selectedCampingActivity = KC_ACTIVITY_CONFIG[activityId] ? activityId : 'ant';
 
   document.querySelectorAll('.kc-activity-card').forEach((card) => {
     const selected = card.dataset.kcActivity === selectedCampingActivity;
@@ -581,7 +581,7 @@ function renderIntroScreen() {
           <div class="kc-setup-stack">
             <header class="kc-setup-header">
               <h1 class="kc-setup-title">Camping Games</h1>
-              <p class="kc-setup-subtitle">Pick a camp activity.</p>
+              <p class="kc-setup-subtitle">Pick a game to play!</p>
             </header>
 
             <div class="kc-setup-directors" aria-hidden="true">
