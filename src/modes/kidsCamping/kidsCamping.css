@@ -5721,3 +5721,944 @@ body.kc-active .aa-ant-root .aa-selected-ant-img {
 
 /* SCMF 1.6.0 - Ant Attack iPhone Fixed Panel END */
 
+/* ───────────────── SCMF 1.6.0 — Ant Attack Last Played + NEW Glow START ─────────────────
+   Purpose:
+   - NEW badge for unlocked ants the player has not played yet.
+   - iPad choose screen uses more of the available vertical space.
+   - iPhone fixed-panel behavior remains protected.
+   - No battle scoring, music, badge, or Game Center logic touched.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-choose-card.has-new {
+  border-color: color-mix(in srgb, var(--kc-theme-accent, #00ffee) 74%, #ffee00 26%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    0 12px 30px rgba(0, 0, 0, 0.46),
+    0 0 18px var(--kc-theme-glow, rgba(0, 255, 238, 0.44)),
+    0 0 28px rgba(255, 238, 0, 0.22) !important;
+}
+
+body.kc-active .aa-new-badge {
+  position: absolute;
+  top: clamp(5px, 0.8svh, 10px);
+  left: clamp(5px, 0.8svh, 10px);
+
+  z-index: 4;
+  display: grid;
+  place-items: center;
+
+  min-width: clamp(42px, 6.2svh, 62px);
+  min-height: clamp(24px, 3.3svh, 34px);
+
+  padding: 0 0.55em;
+  border-radius: 999px;
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(0.58rem, 1.35svh, 0.82rem);
+  font-weight: 1000;
+  letter-spacing: 0.08em;
+  line-height: 1;
+
+  color: #071014;
+  background:
+    linear-gradient(
+      180deg,
+      #fff47a,
+      #ffee00 46%,
+      #ffb300
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.58);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 10px rgba(255, 238, 0, 0.78),
+    0 0 18px rgba(255, 238, 0, 0.42),
+    0 6px 12px rgba(0, 0, 0, 0.34);
+
+  animation: aaNewGlowPulse 1.35s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes aaNewGlowPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+    filter: brightness(1.15);
+  }
+}
+
+/* Make locked + new badges coexist safely if future UI ever allows both. */
+body.kc-active .aa-lock-badge + .aa-new-badge,
+body.kc-active .aa-new-badge + .aa-lock-badge {
+  top: clamp(5px, 0.8svh, 10px);
+}
+
+/* iPad / tablet choose-screen parity:
+   The iPhone version already uses vertical space well.
+   This lets iPad breathe upward instead of looking like a small phone card floating in a field. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active .aa-ant-stage-root {
+    min-height: clamp(650px, 73svh, 860px) !important;
+    height: clamp(650px, 73svh, 860px) !important;
+    max-height: calc(100svh - clamp(170px, 18svh, 230px)) !important;
+
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    width: min(88vw, 760px) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-screen {
+    height: 100% !important;
+    min-height: 0 !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    width: min(100%, 760px) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+
+    grid-template-rows:
+      auto
+      minmax(360px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+
+    gap: clamp(8px, 1.05svh, 14px) !important;
+    padding:
+      clamp(16px, 1.6svh, 24px)
+      clamp(24px, 3vw, 42px)
+      clamp(18px, 1.8svh, 28px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-carousel,
+  body.kc-active .aa-ant-root .aa-ant-preview {
+    min-height: 0 !important;
+    height: 100% !important;
+    align-self: stretch !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(340px, 43svh, 520px) !important;
+    max-width: min(58vw, 520px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(2rem, 4.4svh, 3.35rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-meta h3 {
+    font-size: clamp(1.35rem, 2.6svh, 2rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-wave-line {
+    font-size: clamp(0.96rem, 1.75svh, 1.25rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-btn {
+    min-height: clamp(58px, 6.4svh, 84px) !important;
+  }
+}
+
+/* Reduced motion: badge still reads NEW, just stops pulsing. */
+@media (prefers-reduced-motion: reduce) {
+  body.kc-active .aa-new-badge {
+    animation: none !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Last Played + NEW Glow END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Choose Final Fit START ─────────────────
+   Purpose:
+   - Remove redundant inner "ANT ATTACK" kicker from the Choose Ant card.
+   - Pull iPhone Ant chooser closer to the Ant Attack header.
+   - Preserve the now-good iPad/tablet chooser sizing.
+   - Keep this scoped to Ant Attack only.
+   - No gameplay, scoring, unlock, badge, music, or Game Center logic touched.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* The outer activity header already says Ant Attack.
+   Inside the card, the player only needs to know what to do: Choose Your Ant. */
+body.kc-active .aa-kicker {
+  display: none !important;
+}
+
+/* Tighten the header now that the redundant kicker is gone. */
+body.kc-active .aa-ant-root .aa-choose-header {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.kc-active .aa-ant-root .aa-choose-header h2 {
+  margin: 0 !important;
+}
+
+/* iPhone only:
+   The previous fixed panel preserved the card shape, but started too low.
+   This lifts the whole Ant setup card into the visual lane under the dino title. */
+@media (max-width: 520px) and (orientation: portrait) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(82px, 10.8svh, 108px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(104px, 11.2svh, 132px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    grid-template-rows:
+      auto
+      minmax(205px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+
+    gap: clamp(5px, 0.8svh, 9px) !important;
+
+    padding:
+      clamp(12px, 1.35svh, 16px)
+      clamp(10px, 2.6vw, 16px)
+      clamp(13px, 1.55svh, 18px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(1.72rem, 8vw, 2.34rem) !important;
+    line-height: 0.96 !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(198px, 28svh, 270px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-carousel {
+    grid-template-columns:
+      clamp(42px, 12vw, 58px)
+      minmax(0, 1fr)
+      clamp(42px, 12vw, 58px) !important;
+  }
+}
+
+/* Shorter iPhones:
+   Lift less aggressively and shrink the hero ant slightly so the buttons stay safe. */
+@media (max-width: 520px) and (max-height: 760px) and (orientation: portrait) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(74px, 10.4svh, 96px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(88px, 10svh, 112px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    grid-template-rows:
+      auto
+      minmax(158px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+
+    gap: clamp(4px, 0.64svh, 7px) !important;
+
+    padding:
+      clamp(9px, 1.1svh, 13px)
+      clamp(9px, 2.2vw, 13px)
+      clamp(10px, 1.2svh, 14px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(158px, 24.5svh, 222px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(1.48rem, 7.2vw, 2rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-btn {
+    min-height: clamp(44px, 5.8svh, 56px) !important;
+  }
+}
+
+/* iPad/tablet:
+   Explicitly do not pull the panel upward there; the current iPad choose screen is approved. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active .aa-kicker {
+    display: none !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    margin-top: 0 !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Choose Final Fit END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPhone Final Micro Nudge START ─────────────────
+   Purpose:
+   - iPhone chooser was good, but the card sat a hair too low.
+   - Pull only the iPhone Ant chooser slightly closer to the Ant Attack title.
+   - Increase "Choose Your Ant" just a touch.
+   - Leave the approved iPad/tablet chooser untouched.
+   - CSS-only. No battle, score, save, badge, music, or Game Center changes.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 520px) and (orientation: portrait) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(72px, 9.4svh, 96px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(104px, 11.2svh, 132px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(1.84rem, 8.45vw, 2.48rem) !important;
+    line-height: 0.95 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    padding-top: clamp(13px, 1.48svh, 18px) !important;
+  }
+}
+
+/* Shorter phones get the same idea, but less aggressive so buttons stay clear. */
+@media (max-width: 520px) and (max-height: 760px) and (orientation: portrait) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(68px, 9.6svh, 88px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(88px, 10svh, 112px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(1.58rem, 7.55vw, 2.12rem) !important;
+  }
+}
+
+/* iPad/tablet guard: explicitly preserve the approved chooser. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPhone Final Micro Nudge END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPhone Final Micro Nudge START ─────────────────
+   Purpose:
+   - Correct the previous micro-nudge:
+     "Choose Your Ant" was already fine and should NOT be enlarged here.
+   - Make the outer Ant Attack title stronger on iPhone instead.
+   - Keep the iPhone card a tad closer to the title.
+   - Preserve approved iPad/tablet chooser.
+   - CSS-only. No battle, score, save, badge, music, or Game Center changes.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 520px) and (orientation: portrait) {
+  /* Lift the Ant chooser card slightly closer to the outer Ant Attack header. */
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(72px, 9.4svh, 96px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(104px, 11.2svh, 132px)) !important;
+  }
+
+  /*
+    Jeremy correction:
+    Do NOT boost "Choose Your Ant" here.
+    Let the earlier accepted Choose-card sizing win.
+  */
+
+  /* Boost the OUTER Ant Attack mode title instead. */
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title {
+    font-size: clamp(1.62rem, 5.65svw, 2.34rem) !important;
+    line-height: 1 !important;
+    gap: clamp(0.3rem, 1.35vw, 0.62rem) !important;
+    text-shadow:
+      0 0 5px #ffee00dd,
+      0 0 10px #ffee00bb,
+      0 0 18px #ffaa0090,
+      0 3px 10px rgba(0, 0, 0, 0.55) !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title img.kc-icon {
+    width: clamp(30px, 8.2svw, 46px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    padding-top: clamp(12px, 1.35svh, 16px) !important;
+  }
+}
+
+/* Shorter phones get the same idea, but less aggressive so buttons stay clear. */
+@media (max-width: 520px) and (max-height: 760px) and (orientation: portrait) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(68px, 9.6svh, 88px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(88px, 10svh, 112px)) !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title {
+    font-size: clamp(1.5rem, 5.25svw, 2.12rem) !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title img.kc-icon {
+    width: clamp(28px, 7.6svw, 42px) !important;
+  }
+}
+
+/* iPad/tablet guard: preserve the approved chooser and title behavior. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPhone Final Micro Nudge END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iOS Window Protocol START ─────────────────
+   Purpose:
+   - Treat the Ant Attack card/window as the defacto iOS gamefield.
+   - Choose screen, battle screen, and later story/results should fill this same window.
+   - Pull the iPhone window closer to the outer Ant Attack title.
+   - Preserve the approved iPad chooser proportions.
+   - Fix iPad battle-field collapse by forcing battle to fill the same window.
+   - CSS-only. No score, save, unlock, badge, music, or Game Center changes.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* The Ant root is the official Ant Attack viewport now. */
+body.kc-active #antZone.aa-ant-root,
+body.kc-active .aa-ant-root {
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+
+/* The outer Ant Attack title gets the iPhone strength.
+   Choose Your Ant stays at its accepted size from earlier rules. */
+@media (max-width: 520px) and (orientation: portrait) {
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title {
+    font-size: clamp(1.62rem, 5.65svw, 2.34rem) !important;
+    line-height: 1 !important;
+    gap: clamp(0.3rem, 1.35vw, 0.62rem) !important;
+    text-shadow:
+      0 0 5px #ffee00dd,
+      0 0 10px #ffee00bb,
+      0 0 18px #ffaa0090,
+      0 3px 10px rgba(0, 0, 0, 0.55) !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title img.kc-icon {
+    width: clamp(30px, 8.2svw, 46px) !important;
+  }
+
+  /*
+    iPhone Ant window:
+    Pull closer to the title than the prior pass.
+    This window becomes the shared Choose/Battle/Results lane.
+  */
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    position: fixed !important;
+
+    left: clamp(16px, 4.2vw, 24px) !important;
+    right: clamp(16px, 4.2vw, 24px) !important;
+
+    top: calc(env(safe-area-inset-top) + clamp(54px, 7.45svh, 78px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(104px, 11.2svh, 132px)) !important;
+
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    overflow: visible !important;
+    z-index: 55 !important;
+    pointer-events: auto !important;
+    transform: translateZ(0) !important;
+  }
+}
+
+/* Shorter phones: still closer, but less aggressive so the buttons clear the dock. */
+@media (max-width: 520px) and (max-height: 760px) and (orientation: portrait) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(58px, 8.2svh, 78px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(88px, 10svh, 112px)) !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title {
+    font-size: clamp(1.5rem, 5.25svw, 2.12rem) !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title img.kc-icon {
+    width: clamp(28px, 7.6svw, 42px) !important;
+  }
+}
+
+/* iPad/tablet:
+   Preserve the approved chooser window proportions.
+   The key change is that battle will now fill this same window instead of collapsing. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active .aa-ant-stage-root {
+    min-height: clamp(650px, 73svh, 860px) !important;
+    height: clamp(650px, 73svh, 860px) !important;
+    max-height: calc(100svh - clamp(170px, 18svh, 230px)) !important;
+
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    overflow: visible !important;
+  }
+
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+
+    width: min(88vw, 760px) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 auto !important;
+    overflow: visible !important;
+  }
+}
+
+/* Shared rule:
+   Anything inside Ant Attack should fill the Ant window.
+   This is what keeps Choose/Battle/Results using one visual stage. */
+body.kc-active .aa-ant-root .aa-choose-screen,
+body.kc-active .aa-ant-root .aa-battle-wrapper {
+  position: absolute !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Choose screen keeps its card layout inside the official window. */
+body.kc-active .aa-ant-root .aa-choose-screen {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+body.kc-active .aa-ant-root .aa-choose-card {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Battle screen now uses the SAME Ant window.
+   This is the iPad battlefield anti-squish rule. */
+body.kc-active .aa-ant-root .aa-battle-wrapper {
+  display: block !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+body.kc-active .aa-ant-root .aa-battle-wrapper .kc-ant-zone {
+  position: absolute !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+  padding: clamp(8px, 1.2svh, 16px) !important;
+  box-sizing: border-box !important;
+
+  border-radius: 18px !important;
+  overflow: hidden !important;
+
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+}
+
+/* Keep the battle UI elements attached to the real window, not content height. */
+body.kc-active .aa-ant-root .score-overlay {
+  bottom: clamp(6px, 1.2svh, 14px) !important;
+  left: clamp(6px, 1.2svh, 14px) !important;
+}
+
+body.kc-active .aa-ant-root .ant-btn {
+  bottom: clamp(6px, 1.2svh, 14px) !important;
+  right: clamp(6px, 1.2svh, 14px) !important;
+}
+
+/* Phone battle uses the same fixed Ant window as the chooser. */
+@media (max-width: 520px) and (orientation: portrait) {
+  body.kc-active .aa-ant-root .aa-battle-wrapper,
+  body.kc-active .aa-ant-root .aa-battle-wrapper .kc-ant-zone {
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+}
+
+/* iPad battle uses the approved iPad chooser window dimensions. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active .aa-ant-root .aa-battle-wrapper,
+  body.kc-active .aa-ant-root .aa-battle-wrapper .kc-ant-zone {
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper .food-plate-img {
+    max-height: clamp(120px, 18svh, 190px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper .ant-btn img {
+    width: clamp(62px, 7.2svh, 92px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper .ant2-img {
+    width: clamp(70px, 8.2svh, 105px) !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iOS Window Protocol END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPad Fixed Window Lock START ─────────────────
+   Purpose:
+   - iPhone Ant Attack window is approved. Do not touch phone.
+   - iPad was still collapsing because the relative parent height chain is unreliable.
+   - Give iPad/tablet its own fixed Ant Attack window, same concept as iPhone,
+     but with approved iPad-style proportions.
+   - Choose, battle, and later results all fill this one tablet window.
+   - CSS-only. No save, score, unlock, badge, music, or Game Center changes.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 700px) and (min-height: 700px) {
+  /*
+    Let the activity shell exist, but do not trust it to size Ant Attack.
+    The Ant window below becomes the real tablet playfield.
+  */
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"],
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-activity-stage,
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-ant-attack-zone,
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .ant-attack-wrapper,
+  body.kc-active .aa-ant-stage-root {
+    overflow: visible !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title {
+    position: relative !important;
+    z-index: 76 !important;
+  }
+
+  /*
+    Tablet Ant Attack window:
+    fixed = no more collapsed parent chain.
+    top/bottom are tuned for the title and bottom dock.
+  */
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    position: fixed !important;
+
+    left: 50% !important;
+    right: auto !important;
+
+    top: calc(env(safe-area-inset-top) + clamp(128px, 11.6svh, 172px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(178px, 15.6svh, 236px)) !important;
+
+    width: min(86vw, 820px) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    display: block !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    overflow: visible !important;
+    z-index: 56 !important;
+    pointer-events: auto !important;
+
+    transform: translateX(-50%) translateZ(0) !important;
+    box-sizing: border-box !important;
+  }
+
+  /*
+    Every Ant Attack screen fills the fixed tablet window.
+  */
+  body.kc-active .aa-ant-root .aa-choose-screen,
+  body.kc-active .aa-ant-root .aa-battle-wrapper {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-screen {
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    display: grid !important;
+    grid-template-rows:
+      auto
+      minmax(350px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+
+    align-content: stretch !important;
+    align-items: center !important;
+    justify-items: center !important;
+
+    gap: clamp(8px, 1.05svh, 14px) !important;
+
+    padding:
+      clamp(16px, 1.45svh, 24px)
+      clamp(24px, 3vw, 42px)
+      clamp(18px, 1.7svh, 28px) !important;
+
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-carousel {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+
+    grid-template-columns:
+      clamp(60px, 6.4svh, 88px)
+      minmax(0, 1fr)
+      clamp(60px, 6.4svh, 88px) !important;
+
+    align-self: stretch !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-preview {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(330px, 40svh, 500px) !important;
+    max-width: min(56vw, 500px) !important;
+
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(2.05rem, 4svh, 3.15rem) !important;
+    line-height: 0.96 !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-meta h3 {
+    font-size: clamp(1.34rem, 2.3svh, 1.9rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-wave-line {
+    font-size: clamp(0.98rem, 1.55svh, 1.24rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-snack-panel {
+    width: min(100%, 520px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-buttons {
+    width: min(100%, 540px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-btn {
+    min-height: clamp(58px, 5.9svh, 82px) !important;
+  }
+
+  /*
+    Battle uses the same fixed tablet window.
+    This is the blanket anti-strip rule.
+  */
+  body.kc-active .aa-ant-root .aa-battle-wrapper {
+    display: block !important;
+    border-radius: 22px !important;
+    overflow: hidden !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper .kc-ant-zone {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: clamp(10px, 1.2svh, 18px) !important;
+
+    border-radius: 22px !important;
+    overflow: hidden !important;
+
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+
+    box-sizing: border-box !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper .food-plate-img {
+    max-height: clamp(120px, 17svh, 190px) !important;
+    height: auto !important;
+    width: auto !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper .ant-btn img {
+    width: clamp(62px, 7svh, 92px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper .ant2-img {
+    width: clamp(70px, 8svh, 105px) !important;
+  }
+
+  body.kc-active .aa-ant-root .score-overlay {
+    bottom: clamp(8px, 1.1svh, 16px) !important;
+    left: clamp(8px, 1.1svh, 16px) !important;
+  }
+
+  body.kc-active .aa-ant-root .ant-btn {
+    bottom: clamp(8px, 1.1svh, 16px) !important;
+    right: clamp(8px, 1.1svh, 16px) !important;
+  }
+}
+
+/* Big iPad / iPad Pro: same fixed window, just a little more generous. */
+@media (min-width: 900px) and (min-height: 1100px) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    width: min(84vw, 860px) !important;
+
+    top: calc(env(safe-area-inset-top) + clamp(136px, 11.2svh, 176px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(190px, 15.2svh, 246px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(360px, 40svh, 540px) !important;
+    max-width: min(54vw, 540px) !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPad Fixed Window Lock END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPad Bottom Hug START ─────────────────
+   Purpose:
+   - iPhone Ant Attack window is approved. Do not touch phone.
+   - iPad/tablet Ant window is now uncollapsed and working.
+   - Let the tablet window sit closer to Back / Camping Score / Mute,
+     matching the iPhone visual relationship better.
+   - Slightly increases usable vertical gamefield space.
+   - CSS-only. No battle, score, save, unlock, badge, music, or Game Center changes.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 700px) and (min-height: 700px) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    /*
+      Previous tablet fixed lock left too much empty grass above the dock.
+      Smaller bottom offset = window drops lower / grows taller.
+    */
+    bottom: calc(env(safe-area-inset-bottom) + clamp(140px, 12.8svh, 194px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    grid-template-rows:
+      auto
+      minmax(365px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(340px, 41svh, 515px) !important;
+  }
+}
+
+/* Larger iPad / iPad Pro:
+   Same dock-hug idea, still leaving clear air above the physical bottom controls. */
+@media (min-width: 900px) and (min-height: 1100px) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    bottom: calc(env(safe-area-inset-bottom) + clamp(150px, 12.4svh, 205px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(370px, 41svh, 555px) !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPad Bottom Hug END ───────────────── */
+

@@ -175,42 +175,110 @@ function getAntById(id) {
   return ANT_ROSTER.find((ant) => ant.id === id) || ANT_ROSTER[0];
 }
 
-function readAntAttackSave() {
-  const fallback = {
+function createDefaultAntAttackSave() {
+  return {
+    // selectedAntId is kept for backward compatibility with earlier Ant Attack saves.
     selectedAntId: 'black',
+
+    // This is the important new field:
+    // the chooser opens on the ant the player actually played, not the ant they only previewed.
+    lastPlayedAntId: 'black',
+
     unlockedAnts: { black: true },
+
+    // Ants can be marked new when unlocked later.
+    // They stop being "new" only when the player starts a battle with them.
+    newAntIds: {},
+
     story: {
       nextRivalId: 'blue',
       complete: false,
+
+      // Future-safe lane for per-ant tiny stories/endings.
+      // We are not building those yet, but this prevents another save migration later.
+      antStories: {},
     },
   };
+}
 
+function isKnownAntId(antId) {
+  return ANT_ROSTER.some((ant) => ant.id === antId);
+}
+
+function isAntUnlockedInSave(save, antId) {
+  return antId === 'black' || !!save?.unlockedAnts?.[antId];
+}
+
+function normalizeAntAttackSave(rawSave = {}) {
+  const fallback = createDefaultAntAttackSave();
+  const parsed = rawSave && typeof rawSave === 'object' ? rawSave : {};
+
+  const unlockedAnts = {
+    ...fallback.unlockedAnts,
+    ...(parsed.unlockedAnts || {}),
+  };
+  unlockedAnts.black = true;
+
+  const newAntIds = {
+    ...(parsed.newAntIds || {}),
+  };
+  delete newAntIds.black;
+
+  // Remove stale NEW flags for unknown or locked ants.
+  Object.keys(newAntIds).forEach((antId) => {
+    if (!isKnownAntId(antId) || !isAntUnlockedInSave({ unlockedAnts }, antId)) {
+      delete newAntIds[antId];
+    }
+  });
+
+  const legacySelected = isKnownAntId(parsed.selectedAntId) ? parsed.selectedAntId : 'black';
+  const lastPlayedCandidate =
+    isKnownAntId(parsed.lastPlayedAntId) ? parsed.lastPlayedAntId : legacySelected;
+
+  const lastPlayedAntId = isAntUnlockedInSave({ unlockedAnts }, lastPlayedCandidate)
+    ? lastPlayedCandidate
+    : 'black';
+
+  const selectedCandidate = isKnownAntId(parsed.selectedAntId)
+    ? parsed.selectedAntId
+    : lastPlayedAntId;
+
+  return {
+    ...fallback,
+    ...parsed,
+    selectedAntId: selectedCandidate,
+    lastPlayedAntId,
+    unlockedAnts,
+    newAntIds,
+    story: {
+      ...fallback.story,
+      ...(parsed.story || {}),
+      antStories: {
+        ...fallback.story.antStories,
+        ...(parsed.story?.antStories || {}),
+      },
+    },
+  };
+}
+
+function readAntAttackSave() {
   try {
     const raw = localStorage.getItem(ANT_ATTACK_SAVE_KEY);
-    if (!raw) return fallback;
+    if (!raw) return createDefaultAntAttackSave();
 
-    const parsed = JSON.parse(raw);
-    return {
-      ...fallback,
-      ...parsed,
-      unlockedAnts: {
-        ...fallback.unlockedAnts,
-        ...(parsed?.unlockedAnts || {}),
-      },
-      story: {
-        ...fallback.story,
-        ...(parsed?.story || {}),
-      },
-    };
+    return normalizeAntAttackSave(JSON.parse(raw));
   } catch (err) {
     console.warn('[antAttack] failed to read save:', err);
-    return fallback;
+    return createDefaultAntAttackSave();
   }
 }
 
 function writeAntAttackSave(nextSave) {
   try {
-    localStorage.setItem(ANT_ATTACK_SAVE_KEY, JSON.stringify(nextSave || readAntAttackSave()));
+    localStorage.setItem(
+      ANT_ATTACK_SAVE_KEY,
+      JSON.stringify(normalizeAntAttackSave(nextSave || readAntAttackSave()))
+    );
   } catch (err) {
     console.warn('[antAttack] failed to write save:', err);
   }
@@ -218,20 +286,60 @@ function writeAntAttackSave(nextSave) {
 
 function isAntUnlocked(antId) {
   const save = readAntAttackSave();
-  return antId === 'black' || !!save.unlockedAnts?.[antId];
+  return isAntUnlockedInSave(save, antId);
 }
 
-function setSelectedAntId(antId) {
-  selectedAntId = getAntById(antId).id;
+function isAntNew(antId) {
+  const save = readAntAttackSave();
+  return isAntUnlockedInSave(save, antId) && !!save.newAntIds?.[antId];
+}
+
+function markAntNewlyUnlocked(antId) {
+  if (!isKnownAntId(antId) || antId === 'black') return;
 
   const save = readAntAttackSave();
-  save.selectedAntId = selectedAntId;
+  save.unlockedAnts[antId] = true;
+  save.newAntIds[antId] = true;
   writeAntAttackSave(save);
+}
+
+function previewAntId(antId) {
+  // Browsing the carousel is not the same as playing the ant.
+  // This intentionally does NOT write to localStorage.
+  selectedAntId = getAntById(antId).id;
+}
+
+function markAntPlayed(antId) {
+  const id = getAntById(antId).id;
+  selectedAntId = id;
+
+  const save = readAntAttackSave();
+  save.selectedAntId = id;
+  save.lastPlayedAntId = id;
+
+  if (save.newAntIds?.[id]) {
+    delete save.newAntIds[id];
+  }
+
+  writeAntAttackSave(save);
+}
+
+function resolveInitialAntIdFromSave(save = readAntAttackSave()) {
+  const candidate = isKnownAntId(save.lastPlayedAntId)
+    ? save.lastPlayedAntId
+    : save.selectedAntId;
+
+  return isAntUnlockedInSave(save, candidate) ? candidate : 'black';
 }
 
 function getSelectedRosterIndex() {
   return Math.max(0, ANT_ROSTER.findIndex((ant) => ant.id === selectedAntId));
 }
+
+// Dev/debug helper for later unlock testing from Safari/Xcode console.
+// Example:
+// window.__SCMF_unlockAntAttackAnt?.('blue')
+globalThis.__SCMF_unlockAntAttackAnt = markAntNewlyUnlocked;
 
 function getNextStoryRival() {
   const save = readAntAttackSave();
@@ -401,12 +509,7 @@ export function initAntAttackGame(container, updatePopUICallbackParam) {
   markAntAttackShell(container);
 
   const save = readAntAttackSave();
-  selectedAntId = save.selectedAntId || 'black';
-
-  // If saved selected ant somehow does not exist, repair it.
-  if (!ANT_ROSTER.some((ant) => ant.id === selectedAntId)) {
-    selectedAntId = 'black';
-  }
+  selectedAntId = resolveInitialAntIdFromSave(save);
 
   resetBattleRuntimeCounters();
   wireBackCapture(container);
@@ -489,13 +592,13 @@ function renderChooseScreen(container) {
 
   const selectedAnt = getAntById(selectedAntId);
   const unlocked = isAntUnlocked(selectedAnt.id);
+  const isNew = unlocked && isAntNew(selectedAnt.id);
   const nextRival = getNextStoryRival();
 
   container.innerHTML = `
     <div class="aa-choose-screen">
-      <section class="aa-choose-card ${unlocked ? '' : 'is-locked'}" aria-label="Choose your Ant Attack character">
+      <section class="aa-choose-card ${unlocked ? '' : 'is-locked'} ${isNew ? 'has-new' : ''}" aria-label="Choose your Ant Attack character">
         <header class="aa-choose-header">
-          <p class="aa-kicker">ANT ATTACK</p>
           <h2>Choose Your Ant</h2>
         </header>
 
@@ -503,6 +606,7 @@ function renderChooseScreen(container) {
           <button id="aaPrevAnt" class="aa-arrow-btn" type="button" aria-label="Previous ant">←</button>
 
           <div class="aa-ant-preview">
+            ${unlocked && isNew ? '<span class="aa-new-badge" aria-label="New ant">NEW</span>' : ''}
             ${unlocked ? '' : '<span class="aa-lock-badge" aria-label="Locked">🔒</span>'}
             <img
               id="aaSelectedAntImg"
@@ -570,20 +674,23 @@ function wireChooseScreen(container) {
   prev?.addEventListener('click', () => {
     const current = getSelectedRosterIndex();
     const nextIndex = (current - 1 + ANT_ROSTER.length) % ANT_ROSTER.length;
-    setSelectedAntId(ANT_ROSTER[nextIndex].id);
+    previewAntId(ANT_ROSTER[nextIndex].id);
     renderChooseScreen(container);
   });
 
   next?.addEventListener('click', () => {
     const current = getSelectedRosterIndex();
     const nextIndex = (current + 1) % ANT_ROSTER.length;
-    setSelectedAntId(ANT_ROSTER[nextIndex].id);
+    previewAntId(ANT_ROSTER[nextIndex].id);
     renderChooseScreen(container);
   });
 
   story?.addEventListener('click', () => {
     const player = getAntById(selectedAntId);
     if (!isAntUnlocked(player.id)) return;
+
+    markAntPlayed(player.id);
+
     startBattle(container, {
       mode: 'story',
       playerAntId: player.id,
@@ -594,6 +701,9 @@ function wireChooseScreen(container) {
   arcade?.addEventListener('click', () => {
     const player = getAntById(selectedAntId);
     if (!isAntUnlocked(player.id)) return;
+
+    markAntPlayed(player.id);
+
     startBattle(container, {
       mode: 'arcade',
       playerAntId: player.id,
