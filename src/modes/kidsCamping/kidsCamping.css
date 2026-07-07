@@ -4651,3 +4651,1073 @@ body.kc-active .kc-setup-director-img {
     filter: none !important;
   }
 }
+
+/* ───────────────── SCMF 1.6.0 — Kids Camping Setup Copy/Stack Lock START ─────────────────
+   Purpose:
+   - Keep setup card shadows behind the Play Game button.
+   - Increase activity title/subtitle/high-score readability with iPhone/iPad-safe clamp().
+   - Stay scoped to Kids Camping setup only.
+   - No gameplay, score, badge, audio, or activity logic touched.
+   ──────────────────────────────────────────────────────────────────────── */
+
+body.kc-active .kc-intro.kc-setup-screen,
+body.kc-active .kc-setup-stack {
+  isolation: isolate !important;
+}
+
+/* Keep the tile layer below the Play Game layer. */
+body.kc-active .kc-activity-grid,
+body.kc-active .kc-activity-cards,
+body.kc-active .kc-activity-list,
+body.kc-active .kc-activity-card-grid {
+  position: relative !important;
+  z-index: 6 !important;
+}
+
+body.kc-active .kc-activity-card {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+body.kc-active .kc-activity-card.selected {
+  z-index: 3 !important;
+}
+
+/* Play button must visually sit ABOVE the bottom tile shadows. */
+body.kc-active .kc-setup-play-btn {
+  position: relative !important;
+  z-index: 40 !important;
+  isolation: isolate !important;
+  transform: translateZ(0);
+}
+
+/* Bottom back button should stay safely above the setup scene too. */
+body.kc-active .kc-setup-bottom-bar,
+body.kc-active .kc-setup-bottom-bar .kc-square-btn {
+  position: relative !important;
+  z-index: 45 !important;
+}
+
+/* Activity title: bigger, still controlled across iPhone/iPad. */
+body.kc-active .kc-activity-title,
+body.kc-active .kc-activity-card-title,
+body.kc-active .kc-activity-card h2,
+body.kc-active .kc-activity-card h3 {
+  font-size: clamp(1.06rem, 2.08svh, 1.58rem) !important;
+  line-height: 1.04 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+/* Activity subtitle: clearer for kid-readability without eating the card. */
+body.kc-active .kc-activity-subtitle,
+body.kc-active .kc-activity-card-subtitle,
+body.kc-active .kc-activity-card p {
+  font-size: clamp(0.82rem, 1.5svh, 1.12rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* High score: readable but still secondary. */
+body.kc-active .kc-activity-high-score {
+  font-size: clamp(0.78rem, 1.38svh, 1.04rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0.025em !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+/* Small-phone guard: prevent four cards from becoming text bricks. */
+@media (max-height: 740px) {
+  body.kc-active .kc-activity-title,
+  body.kc-active .kc-activity-card-title,
+  body.kc-active .kc-activity-card h2,
+  body.kc-active .kc-activity-card h3 {
+    font-size: clamp(0.96rem, 1.86svh, 1.24rem) !important;
+  }
+
+  body.kc-active .kc-activity-subtitle,
+  body.kc-active .kc-activity-card-subtitle,
+  body.kc-active .kc-activity-card p {
+    font-size: clamp(0.74rem, 1.32svh, 0.96rem) !important;
+  }
+
+  body.kc-active .kc-activity-high-score {
+    font-size: clamp(0.68rem, 1.18svh, 0.86rem) !important;
+  }
+}
+
+/* iPad gets a little more confident text scale. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active .kc-activity-title,
+  body.kc-active .kc-activity-card-title,
+  body.kc-active .kc-activity-card h2,
+  body.kc-active .kc-activity-card h3 {
+    font-size: clamp(1.26rem, 1.72svh, 1.72rem) !important;
+  }
+
+  body.kc-active .kc-activity-subtitle,
+  body.kc-active .kc-activity-card-subtitle,
+  body.kc-active .kc-activity-card p {
+    font-size: clamp(0.98rem, 1.26svh, 1.22rem) !important;
+  }
+
+  body.kc-active .kc-activity-high-score {
+    font-size: clamp(0.9rem, 1.08svh, 1.08rem) !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Kids Camping Setup Copy/Stack Lock END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Choose/Battle Bridge START ─────────────────
+   Purpose:
+   - Ant Attack internal setup screen: Choose Ant → Story/Arcade → battle.
+   - Keep locked ants visible/dimmed.
+   - Stretch Ant Attack playfield on iPhone/iPad.
+   - Keep this scoped to Kids Camping Ant Attack only.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-activity-stage {
+  min-height: 0 !important;
+  height: 100% !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-ant-attack-zone {
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .ant-attack-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-ant-zone {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+
+  padding: clamp(8px, 1.2svh, 16px) !important;
+  box-sizing: border-box !important;
+
+  background-image: var(--kc-ant-bg) !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-color: rgba(0, 0, 0, 0.10) !important;
+
+  border-radius: 18px !important;
+  overflow: hidden !important;
+
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.34)) !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-ant-zone::before {
+  inset: 0 !important;
+  border-radius: inherit !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.20),
+    inset 0 0 22px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Choose screen */
+body.kc-active .aa-choose-screen {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: clamp(8px, 1.2svh, 16px);
+  box-sizing: border-box;
+}
+
+body.kc-active .aa-choose-card {
+  width: min(100%, 640px);
+  height: 100%;
+  min-height: 0;
+
+  display: grid;
+  grid-template-rows:
+    auto
+    minmax(118px, 1fr)
+    auto
+    auto
+    auto
+    auto;
+  align-items: center;
+  justify-items: center;
+
+  gap: clamp(6px, 1svh, 12px);
+  padding: clamp(10px, 1.6svh, 20px) clamp(12px, 2.2vw, 24px);
+  box-sizing: border-box;
+
+  border-radius: 22px;
+  border: 2px solid var(--kc-theme-accent, #00ffee);
+
+  background:
+    radial-gradient(circle at 50% 12%,
+      rgba(255, 255, 255, 0.16),
+      rgba(10, 18, 26, 0.70) 45%,
+      rgba(7, 12, 18, 0.86) 100%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 10px 26px rgba(0, 0, 0, 0.44),
+    0 0 22px var(--kc-theme-glow, rgba(0, 255, 238, 0.44));
+
+  overflow: hidden;
+}
+
+body.kc-active .aa-choose-card.is-locked {
+  border-color: rgba(255, 255, 255, 0.30);
+}
+
+body.kc-active .aa-choose-header {
+  text-align: center;
+}
+
+body.kc-active .aa-kicker {
+  margin: 0 0 0.2rem;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(0.58rem, 1.4svh, 0.86rem);
+  letter-spacing: 0.16em;
+  color: var(--kc-theme-accent, #00ffee);
+  text-shadow: 0 0 8px var(--kc-theme-glow, rgba(0, 255, 238, 0.55));
+}
+
+body.kc-active .aa-choose-header h2 {
+  margin: 0;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(1.25rem, 3.2svh, 2.25rem);
+  line-height: 1;
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.20),
+    0 3px 10px rgba(0,0,0,0.75);
+}
+
+body.kc-active .aa-ant-carousel {
+  width: 100%;
+  min-height: 0;
+
+  display: grid;
+  grid-template-columns: clamp(44px, 7svh, 70px) minmax(0, 1fr) clamp(44px, 7svh, 70px);
+  align-items: center;
+  gap: clamp(8px, 2vw, 18px);
+}
+
+body.kc-active .aa-arrow-btn {
+  width: clamp(42px, 6.2svh, 68px);
+  height: clamp(42px, 6.2svh, 68px);
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.34);
+  background: rgba(7, 16, 28, 0.72);
+  color: #fff;
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3.8svh, 2.5rem);
+  line-height: 1;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    0 8px 18px rgba(0,0,0,0.38);
+
+  touch-action: manipulation;
+}
+
+body.kc-active .aa-arrow-btn:active {
+  transform: translateY(1px) scale(0.96);
+}
+
+body.kc-active .aa-ant-preview {
+  position: relative;
+
+  min-height: 0;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 1;
+}
+
+body.kc-active .aa-choose-card.is-locked .aa-ant-preview {
+  opacity: 0.52;
+  filter: grayscale(0.28) brightness(0.72);
+}
+
+body.kc-active .aa-selected-ant-img {
+  max-width: 100%;
+  max-height: min(28svh, 260px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+
+  filter:
+    drop-shadow(0 0 8px rgba(255,255,255,0.26))
+    drop-shadow(0 12px 18px rgba(0,0,0,0.42));
+}
+
+body.kc-active .aa-lock-badge {
+  position: absolute;
+  top: clamp(4px, 0.7svh, 9px);
+  right: clamp(4px, 0.7svh, 9px);
+
+  z-index: 3;
+  width: clamp(30px, 4.5svh, 44px);
+  height: clamp(30px, 4.5svh, 44px);
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 999px;
+  background: rgba(0,0,0,0.74);
+  border: 1px solid rgba(255,255,255,0.28);
+
+  font-size: clamp(1rem, 2.3svh, 1.45rem);
+}
+
+body.kc-active .aa-ant-meta {
+  text-align: center;
+}
+
+body.kc-active .aa-ant-meta h3 {
+  margin: 0;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(1rem, 2.35svh, 1.62rem);
+  line-height: 1.05;
+  color: #ffee00;
+  text-shadow:
+    0 0 7px rgba(255, 238, 0, 0.55),
+    0 2px 6px rgba(0,0,0,0.72);
+}
+
+body.kc-active .aa-wave-line,
+body.kc-active .aa-lock-line,
+body.kc-active .aa-rule-line {
+  margin: clamp(3px, 0.45svh, 6px) 0 0;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  line-height: 1.1;
+  text-align: center;
+}
+
+body.kc-active .aa-wave-line {
+  font-size: clamp(0.78rem, 1.75svh, 1.1rem);
+  color: #fff;
+}
+
+body.kc-active .aa-lock-line {
+  font-size: clamp(0.68rem, 1.45svh, 0.92rem);
+}
+
+body.kc-active .aa-lock-line.unlocked {
+  color: #8cff8c;
+}
+
+body.kc-active .aa-lock-line.locked {
+  color: #ffd36d;
+}
+
+body.kc-active .aa-snack-panel {
+  width: min(100%, 410px);
+  padding: clamp(6px, 0.9svh, 10px) clamp(8px, 1.6vw, 14px);
+
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.34);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    0 6px 14px rgba(0,0,0,0.28);
+}
+
+body.kc-active .aa-snack-title {
+  display: block;
+  margin-bottom: clamp(4px, 0.55svh, 8px);
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(0.66rem, 1.35svh, 0.86rem);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88);
+}
+
+body.kc-active .aa-snack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(4px, 0.7svh, 8px) clamp(6px, 1.3vw, 12px);
+}
+
+body.kc-active .aa-snack-cost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em;
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(0.78rem, 1.7svh, 1.08rem);
+  color: #fff;
+  white-space: nowrap;
+}
+
+body.kc-active .aa-snack-cost strong {
+  color: #00ff44;
+  text-shadow: 0 0 6px rgba(0,255,68,0.58);
+}
+
+body.kc-active .aa-rule-line {
+  font-size: clamp(0.76rem, 1.6svh, 1rem);
+  color: rgba(255,255,255,0.92);
+}
+
+body.kc-active .aa-mode-buttons {
+  width: min(100%, 430px);
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 1.5vw, 14px);
+}
+
+body.kc-active .aa-mode-btn {
+  min-height: clamp(48px, 6.2svh, 70px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.14rem;
+
+  border-radius: 16px;
+  border: 2px solid var(--kc-theme-accent, #00ffee);
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--kc-theme-accent, #00ffee) 82%, white 10%),
+      color-mix(in srgb, var(--kc-theme-accent, #00ffee) 62%, black 18%)
+    );
+
+  color: #071014;
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(0.78rem, 1.8svh, 1.12rem);
+  font-weight: 900;
+  line-height: 1.05;
+  text-align: center;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 0 14px var(--kc-theme-glow, rgba(0,255,238,0.44)),
+    0 8px 16px rgba(0,0,0,0.34);
+
+  touch-action: manipulation;
+}
+
+body.kc-active .aa-mode-btn small {
+  font-size: 0.58em;
+  font-weight: 800;
+  opacity: 0.78;
+}
+
+body.kc-active .aa-mode-btn:disabled {
+  opacity: 0.48;
+  filter: grayscale(0.4);
+  box-shadow: none;
+}
+
+body.kc-active .aa-mode-btn:not(:disabled):active {
+  transform: translateY(1px) scale(0.985);
+}
+
+/* Battle screen asset refinements */
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .food-plate-img {
+  max-height: clamp(74px, 16svh, 150px) !important;
+  height: auto !important;
+  width: auto !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .ant-sprite {
+  width: clamp(22px, 2.7svh, 34px) !important;
+  height: auto !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .ant2-img {
+  width: clamp(58px, 9.5svh, 92px) !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .ant-btn img {
+  width: clamp(48px, 7.8svh, 76px) !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .ant-hill-img {
+  width: clamp(46px, 8svh, 76px) !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .player-ant-soldier {
+  transform-origin: center center !important;
+}
+
+body.kc-active .kc-activity-grid[data-kc-activity="ant"] .rival-ant-soldier {
+  transform-origin: center center !important;
+}
+
+/* iPhone: make Ant Attack use the whole intended field, not a short inner slice. */
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] {
+    padding:
+      calc(env(safe-area-inset-top) + clamp(16px, 2.4svh, 30px))
+      clamp(6px, 1.7vw, 12px)
+      calc(env(safe-area-inset-bottom) + clamp(78px, 8.2svh, 104px))
+      clamp(6px, 1.7vw, 12px) !important;
+
+    gap: clamp(5px, 0.8svh, 9px) !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title {
+    font-size: clamp(1.42rem, 4.8svw, 2.05rem) !important;
+    line-height: 1 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-activity-stage {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-ant-zone {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: clamp(6px, 1svh, 10px) !important;
+    background-size: cover !important;
+    background-position: center center !important;
+  }
+
+  body.kc-active .aa-choose-card {
+    grid-template-rows:
+      auto
+      minmax(96px, 1fr)
+      auto
+      auto
+      auto
+      auto;
+
+    gap: clamp(4px, 0.72svh, 8px);
+    padding: clamp(8px, 1.2svh, 13px) clamp(9px, 2.2vw, 14px);
+  }
+
+  body.kc-active .aa-selected-ant-img {
+    max-height: min(24svh, 210px);
+  }
+
+  body.kc-active .aa-mode-buttons {
+    gap: clamp(6px, 1.5vw, 10px);
+  }
+
+  body.kc-active .aa-mode-btn {
+    min-height: clamp(46px, 5.8svh, 62px);
+  }
+}
+
+/* iPad gets bigger character art, while keeping the battle field stable. */
+@media (min-width: 760px) and (min-height: 900px) {
+  body.kc-active .aa-selected-ant-img {
+    max-height: min(30svh, 310px);
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .ant-sprite {
+    width: clamp(28px, 2.7svh, 42px) !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Choose/Battle Bridge END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPhone Stage Stretch START ─────────────────
+   Purpose:
+   - The Ant Attack choose screen was rendering, but iPhone still compressed it vertically.
+   - Force the Ant Attack inner setup/battle lane to use the intended portrait stage height.
+   - CSS-only. No gameplay, save, score, trophy, or asset logic touched.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 520px) and (orientation: portrait) {
+  body.kc-active .aa-choose-screen {
+    width: 100% !important;
+    height: auto !important;
+    min-height: clamp(500px, 64svh, 650px) !important;
+
+    align-items: stretch !important;
+    justify-content: center !important;
+
+    padding:
+      clamp(6px, 1svh, 10px)
+      clamp(8px, 2vw, 14px) !important;
+
+    box-sizing: border-box !important;
+  }
+
+  body.kc-active .aa-choose-card {
+    width: 100% !important;
+    height: auto !important;
+    min-height: clamp(490px, 63svh, 635px) !important;
+
+    grid-template-rows:
+      auto
+      minmax(230px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+
+    gap: clamp(5px, 0.9svh, 10px) !important;
+    padding:
+      clamp(10px, 1.45svh, 16px)
+      clamp(10px, 2.4vw, 18px) !important;
+
+    align-content: stretch !important;
+  }
+
+  body.kc-active .aa-ant-carousel {
+    min-height: clamp(230px, 31svh, 320px) !important;
+    align-self: stretch !important;
+  }
+
+  body.kc-active .aa-ant-preview {
+    min-height: clamp(225px, 30svh, 315px) !important;
+    align-self: stretch !important;
+  }
+
+  body.kc-active .aa-selected-ant-img {
+    max-height: clamp(225px, 31svh, 320px) !important;
+  }
+
+  body.kc-active .aa-choose-header h2 {
+    font-size: clamp(1.55rem, 7.2vw, 2.45rem) !important;
+  }
+
+  body.kc-active .aa-ant-meta h3 {
+    font-size: clamp(1.1rem, 4.4vw, 1.58rem) !important;
+  }
+
+  body.kc-active .aa-wave-line {
+    font-size: clamp(0.86rem, 3.4vw, 1.08rem) !important;
+  }
+
+  body.kc-active .aa-lock-line {
+    font-size: clamp(0.76rem, 3vw, 0.96rem) !important;
+  }
+
+  body.kc-active .aa-snack-panel {
+    width: min(100%, 430px) !important;
+  }
+
+  body.kc-active .aa-mode-btn {
+    min-height: clamp(52px, 6.5svh, 72px) !important;
+  }
+
+  /* Battle screen gets the same portrait height respect once Story/Arcade starts. */
+  body.kc-active .aa-battle-wrapper,
+  body.kc-active .aa-battle-wrapper .kc-ant-zone {
+    min-height: clamp(500px, 66svh, 690px) !important;
+  }
+}
+
+/* Slightly taller modern iPhones can breathe more. */
+@media (max-width: 520px) and (min-height: 820px) and (orientation: portrait) {
+  body.kc-active .aa-choose-screen {
+    min-height: clamp(560px, 68svh, 720px) !important;
+  }
+
+  body.kc-active .aa-choose-card {
+    min-height: clamp(545px, 67svh, 700px) !important;
+  }
+
+  body.kc-active .aa-ant-carousel,
+  body.kc-active .aa-ant-preview {
+    min-height: clamp(260px, 33svh, 355px) !important;
+  }
+
+  body.kc-active .aa-selected-ant-img {
+    max-height: clamp(260px, 34svh, 360px) !important;
+  }
+
+  body.kc-active .aa-battle-wrapper,
+  body.kc-active .aa-battle-wrapper .kc-ant-zone {
+    min-height: clamp(560px, 70svh, 740px) !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPhone Stage Stretch END ───────────────── */
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Parent Shell Stretch START ─────────────────
+   Purpose:
+   - iPhone was clipping the Ant Attack choose card because the parent activity shell
+     stayed short even after the inner choose card was stretched.
+   - JS adds aa-ant-grid-root / aa-ant-stage-root to the real current shell.
+   - CSS stretches the actual parent, then lets the choose/battle UI fill it.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-ant-grid-root {
+  min-height: 0 !important;
+  height: 100% !important;
+  align-content: stretch !important;
+}
+
+body.kc-active .aa-ant-stage-root {
+  min-height: clamp(560px, 70svh, 760px) !important;
+  height: clamp(560px, 70svh, 760px) !important;
+  max-height: calc(100svh - 230px) !important;
+
+  align-items: stretch !important;
+  justify-content: stretch !important;
+
+  overflow: visible !important;
+}
+
+body.kc-active #antZone.aa-ant-root,
+body.kc-active .aa-ant-root {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+body.kc-active .aa-ant-root .aa-choose-screen {
+  height: 100% !important;
+  min-height: 0 !important;
+  align-items: stretch !important;
+}
+
+body.kc-active .aa-ant-root .aa-choose-card {
+  height: 100% !important;
+  min-height: 0 !important;
+
+  grid-template-rows:
+    auto
+    minmax(260px, 1fr)
+    auto
+    auto
+    auto
+    auto !important;
+
+  overflow: hidden !important;
+}
+
+body.kc-active .aa-ant-root .aa-ant-carousel,
+body.kc-active .aa-ant-root .aa-ant-preview {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+body.kc-active .aa-ant-root .aa-selected-ant-img {
+  max-height: clamp(240px, 34svh, 360px) !important;
+}
+
+/* iPhone-specific parent shell lock. */
+@media (max-width: 520px) and (orientation: portrait) {
+  body.kc-active .aa-ant-stage-root {
+    min-height: clamp(585px, 72svh, 760px) !important;
+    height: clamp(585px, 72svh, 760px) !important;
+    max-height: calc(100svh - 220px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    grid-template-rows:
+      auto
+      minmax(285px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(265px, 36svh, 380px) !important;
+  }
+}
+
+/* Shorter iPhones get a tighter but still complete card. */
+@media (max-width: 520px) and (max-height: 760px) and (orientation: portrait) {
+  body.kc-active .aa-ant-stage-root {
+    min-height: clamp(500px, 68svh, 610px) !important;
+    height: clamp(500px, 68svh, 610px) !important;
+    max-height: calc(100svh - 205px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    grid-template-rows:
+      auto
+      minmax(210px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(210px, 32svh, 310px) !important;
+  }
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Parent Shell Stretch END ───────────────── */
+
+/* SCMF 1.6.0 - Ant Attack iPhone Fixed Panel START
+   iPhone-only: give Ant Attack its own fixed viewport lane.
+   Leaves iPad/tablet chooser behavior alone.
+*/
+
+@media (max-width: 520px) and (orientation: portrait) {
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] {
+    overflow: visible !important;
+  }
+
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-title {
+    position: relative !important;
+    z-index: 74 !important;
+  }
+
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    position: fixed !important;
+
+    left: clamp(16px, 4.2vw, 24px) !important;
+    right: clamp(16px, 4.2vw, 24px) !important;
+    top: calc(env(safe-area-inset-top) + clamp(112px, 14.2svh, 136px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(104px, 11.2svh, 132px)) !important;
+
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    overflow: visible !important;
+    z-index: 55 !important;
+    pointer-events: auto !important;
+    transform: translateZ(0) !important;
+  }
+
+  body.kc-active .aa-ant-stage-root,
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-activity-stage,
+  body.kc-active .kc-activity-grid[data-kc-activity="ant"] .kc-ant-attack-zone {
+    overflow: visible !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-screen {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    display: grid !important;
+    grid-template-rows:
+      auto
+      minmax(188px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+
+    align-content: stretch !important;
+    align-items: center !important;
+    justify-items: center !important;
+
+    gap: clamp(5px, 0.82svh, 9px) !important;
+    padding:
+      clamp(12px, 1.45svh, 17px)
+      clamp(10px, 2.6vw, 16px)
+      clamp(13px, 1.55svh, 18px) !important;
+
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-kicker {
+    font-size: clamp(0.58rem, 1.55svh, 0.78rem) !important;
+    margin-bottom: clamp(2px, 0.3svh, 4px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(1.72rem, 8vw, 2.34rem) !important;
+    line-height: 0.96 !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-carousel {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-template-columns:
+      clamp(42px, 12vw, 58px)
+      minmax(0, 1fr)
+      clamp(42px, 12vw, 58px) !important;
+    gap: clamp(5px, 1.5vw, 9px) !important;
+    align-self: stretch !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-preview {
+    height: 100% !important;
+    min-height: 0 !important;
+    align-self: stretch !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(188px, 27svh, 255px) !important;
+    max-width: min(72vw, 280px) !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-arrow-btn {
+    width: clamp(44px, 11.2vw, 58px) !important;
+    height: clamp(44px, 11.2vw, 58px) !important;
+    font-size: clamp(1.55rem, 7vw, 2.15rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-ant-meta h3 {
+    font-size: clamp(1.02rem, 4.8vw, 1.38rem) !important;
+    line-height: 1 !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-wave-line {
+    font-size: clamp(0.78rem, 3.45vw, 0.98rem) !important;
+    line-height: 1.04 !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-lock-line {
+    font-size: clamp(0.72rem, 3.05vw, 0.9rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-snack-panel {
+    width: min(100%, 340px) !important;
+    padding:
+      clamp(5px, 0.72svh, 8px)
+      clamp(7px, 1.8vw, 11px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-snack-title {
+    font-size: clamp(0.58rem, 2.45vw, 0.72rem) !important;
+    margin-bottom: clamp(3px, 0.42svh, 5px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-snack-cost {
+    font-size: clamp(0.72rem, 3.25vw, 0.92rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-rule-line {
+    font-size: clamp(0.76rem, 3.25vw, 0.94rem) !important;
+    line-height: 1.05 !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-buttons {
+    width: min(100%, 350px) !important;
+    gap: clamp(7px, 2vw, 10px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-btn {
+    min-height: clamp(50px, 6.4svh, 62px) !important;
+    font-size: clamp(0.74rem, 3.25vw, 0.96rem) !important;
+    border-radius: 14px !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-btn small {
+    font-size: 0.55em !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-battle-wrapper,
+  body.kc-active .aa-ant-root .aa-battle-wrapper .kc-ant-zone {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+}
+
+@media (max-width: 520px) and (max-height: 760px) and (orientation: portrait) {
+  body.kc-active #antZone.aa-ant-root,
+  body.kc-active .aa-ant-root {
+    top: calc(env(safe-area-inset-top) + clamp(96px, 13svh, 118px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + clamp(88px, 10svh, 112px)) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-card {
+    grid-template-rows:
+      auto
+      minmax(154px, 1fr)
+      auto
+      auto
+      auto
+      auto !important;
+
+    gap: clamp(4px, 0.65svh, 7px) !important;
+    padding:
+      clamp(9px, 1.1svh, 13px)
+      clamp(9px, 2.2vw, 13px)
+      clamp(10px, 1.2svh, 14px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-selected-ant-img {
+    max-height: clamp(154px, 24svh, 216px) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-choose-header h2 {
+    font-size: clamp(1.48rem, 7.2vw, 2rem) !important;
+  }
+
+  body.kc-active .aa-ant-root .aa-mode-btn {
+    min-height: clamp(44px, 5.8svh, 56px) !important;
+  }
+}
+
+/* SCMF 1.6.0 - Ant Attack iPhone Fixed Panel END */
+

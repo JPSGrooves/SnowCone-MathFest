@@ -43,33 +43,33 @@ const KC_ACTIVITY_CONFIG = Object.freeze({
     id: 'ant',
     title: 'Ant Attack',
     shortTitle: 'ANTS',
-    subtitle: 'Save snacks!',
+    subtitle: 'Battle for Snacks!',
     img: 'ant2.png',
     alt: 'Ant Attack'
   },
   tent: {
     id: 'tent',
-    title: 'Tent Line',
+    title: 'Tent Lines',
     shortTitle: 'TENTS',
-    subtitle: 'Light tents!',
+    subtitle: 'Light Up the Tents!',
     img: 'tentLit.png',
-    alt: 'Tent Line'
+    alt: 'Tent Lines'
   },
   parking: {
     id: 'parking',
-    title: 'Parking',
+    title: 'Go & Park',
     shortTitle: 'CARS',
-    subtitle: 'Park cars!',
+    subtitle: 'Park Cars in Order',
     img: 'golfCart.png',
-    alt: 'Parking'
+    alt: 'Go & Park'
   },
   mosquito: {
     id: 'mosquito',
-    title: 'Mosquito',
+    title: 'Squito Swat',
     shortTitle: 'BUGS',
-    subtitle: 'Swat bugs!',
+    subtitle: 'Swat the Skeeters!',
     img: 'mosquito.png',
-    alt: 'Mosquito'
+    alt: 'Squito Swat'
   }
 });
 

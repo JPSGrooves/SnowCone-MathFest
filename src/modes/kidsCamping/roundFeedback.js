@@ -9,8 +9,8 @@ export function showRoundMessage(resultType) {
     good: 'Good Save! +4',
     great: 'Great Save! +5',
     perfect: 'Perfect Pull! +6',
-    loss: 'Food Lost! +3',
-    snowcone: 'You got the EGG! +10' // 🍧 new special message
+    loss: 'Snack Lost! +3',
+    snowcone: 'SnowCone Recharge! +10' // 🍧 new special message
   };
 
   msg.textContent = messages[resultType] || 'Unknown Result';
