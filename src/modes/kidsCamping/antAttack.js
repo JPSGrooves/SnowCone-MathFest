@@ -2354,6 +2354,35 @@ function getFoodCenterCoords(container) {
   return { centerX, centerY };
 }
 
+function getAntFormationMetrics(ant, index, team = 'player') {
+  const antRect = ant?.getBoundingClientRect?.();
+  const antSize = Math.max(24, antRect?.width || 32);
+  const step = Math.max(24, antSize * 0.82);
+  const row = Math.floor(index / 5);
+  const col = index % 5;
+
+  return {
+    antSize,
+    offsetX: (col - 2) * step,
+    offsetY: (team === 'player' ? 1 : -1) * row * step,
+  };
+}
+
+function positionAntAtFood(ant, centerX, centerY) {
+  const antSize = Math.max(
+    24,
+    ant?.getBoundingClientRect?.().width || 32
+  );
+
+  const offsetX = parseFloat(ant?.dataset?.offsetX) || 0;
+  const offsetY = parseFloat(ant?.dataset?.offsetY) || 0;
+
+  gsap.set(ant, {
+    left: centerX + offsetX - (antSize / 2),
+    top: centerY + offsetY - (antSize / 2),
+  });
+}
+
 // regen rules (win bonus refill)
 function getPlayerRegenBonus(foodName, requiredAnts, usedAnts) {
   if (foodName === 'snowcone') return 10;
@@ -3234,11 +3263,23 @@ function startBattle(container, { mode = 'story', playerAntId = 'black', rivalAn
 
 function renderBattleScreen(container) {
   container.innerHTML = `
-    <div class="ant-attack-wrapper aa-battle-wrapper" data-aa-mode="${currentBattleMode}">
+    <div
+      class="ant-attack-wrapper aa-battle-wrapper"
+      data-aa-mode="${currentBattleMode}"
+      data-aa-player="${currentPlayerAnt.id}"
+      data-aa-rival="${currentRivalAnt.id}"
+    >
       <div class="kc-ant-zone">
-        <div class="score-overlay aa-score-overlay" style="position:absolute;bottom:-10px;left:-10px;">
-          <span id="aaRivalScoreLabel">${currentRivalAnt.shortName}</span>: <span id="aiScore">0</span><br/>
-          <span id="aaPlayerScoreLabel">${currentPlayerAnt.shortName}</span>: <span id="playerScore">0</span>
+        <div class="aa-snack-score aa-snack-score-rival" data-ant="${currentRivalAnt.id}" aria-label="${currentRivalAnt.shortName} snack score">
+          <span id="aaRivalScoreLabel" class="aa-snack-score-name">${currentRivalAnt.shortName}</span>
+          <strong class="aa-snack-score-value"><span id="aiScore">0</span><span aria-hidden="true">/</span><span>${getBattleTargetScore()}</span></strong>
+          <small>SNACKS</small>
+        </div>
+
+        <div class="aa-snack-score aa-snack-score-player" data-ant="${currentPlayerAnt.id}" aria-label="${currentPlayerAnt.shortName} snack score">
+          <span id="aaPlayerScoreLabel" class="aa-snack-score-name">${currentPlayerAnt.shortName}</span>
+          <strong class="aa-snack-score-value"><span id="playerScore">0</span><span aria-hidden="true">/</span><span>${getBattleTargetScore()}</span></strong>
+          <small>SNACKS</small>
         </div>
 
         <div class="ant-base red">
@@ -3289,9 +3330,7 @@ function renderBattleScreen(container) {
   }
   _boundHandlers.set(container, { ...existing, onPointerDown });
 
-  // simple glows
-  antButton?.querySelector('img')?.classList.add('glow-white');
-  container.querySelector('.ant2-img')?.classList.add('ant-glow-pink');
+  // Element glows are controlled by battle-wrapper data attributes.
 
   // initial UI
   updateScores(container);
@@ -3303,10 +3342,8 @@ function renderBattleScreen(container) {
     if (!aliveGuard(container) || currentPhase !== 'battle') return;
 
     const { centerX, centerY } = getFoodCenterCoords(container);
-    activeAnts.forEach(ant => {
-      const offsetX = parseFloat(ant.dataset.offsetX) || 0;
-      const offsetY = parseFloat(ant.dataset.offsetY) || 0;
-      gsap.set(ant, { left: centerX + offsetX - 16, top: centerY + offsetY - 16 });
+    activeAnts.forEach((ant) => {
+      positionAntAtFood(ant, centerX, centerY);
     });
   });
   _resizeObs.observe(document.body);
@@ -3347,6 +3384,7 @@ function startNewRound(container) {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'food-with-overlay';
+  wrapper.dataset.food = currentFood.name;
   wrapper.appendChild(foodEl);
   wrapper.appendChild(overlay);
   foodContainer.appendChild(wrapper);
@@ -3370,14 +3408,17 @@ function deployPlayerAnt(container) {
 
   const ant = document.createElement('img');
   ant.src = assetUrl(currentPlayerAnt.soldierPng);
-  ant.className = `ant-sprite player-ant-soldier ${currentPlayerAnt.id}-ant ant-glow-white`;
+  ant.className = `ant-sprite player-ant-soldier ${currentPlayerAnt.id}-ant`;
   ant.dataset.team = 'player';
   zone.appendChild(ant);
 
   const i = playerAntsAttached;
-  const row = Math.floor(i / 5), col = i % 5;
-  const offsetX = (col - 2) * 20;
-  const offsetY = row * 20;
+  const {
+    antSize,
+    offsetX,
+    offsetY,
+  } = getAntFormationMetrics(ant, i, 'player');
+
   ant.dataset.offsetX = offsetX;
   ant.dataset.offsetY = offsetY;
 
@@ -3394,8 +3435,8 @@ function deployPlayerAnt(container) {
     container?.dispatchEvent(new CustomEvent('kcAntsFull', { bubbles: true }));
   }
 
-  const targetX = centerX + offsetX - 16;
-  const targetY = centerY + offsetY - 16;
+  const targetX = centerX + offsetX - (antSize / 2);
+  const targetY = centerY + offsetY - (antSize / 2);
   startCrawlWiggle(ant, spawnX, spawnY, targetX, targetY);
 
   gsap.to(ant, {
@@ -3438,23 +3479,26 @@ function spawnRedAntLoop(container, requiredWeight) {
     const ant = document.createElement('img');
     const primarySoldier = currentRivalAnt.soldierPng || 'aa_redAnt.png';
     const fallbackSoldier = currentRivalAnt.fallbackSoldierPng || 'aa_redAnt.png';
-    ant.className = `ant-sprite rival-ant-soldier ${currentRivalAnt.id}-ant ant-glow-pink`;
+    ant.className = `ant-sprite rival-ant-soldier ${currentRivalAnt.id}-ant`;
     ant.dataset.team = 'rival';
     ant.style.position = 'absolute';
     ant.style.zIndex = '10';
     setImgSrcWithFallback(ant, primarySoldier, fallbackSoldier);
     zone.appendChild(ant);
 
-    const row = Math.floor(i / 5), col = i % 5;
-    const offsetX = (col - 2) * 20;
-    const offsetY = -row * 20;
+    const {
+      antSize,
+      offsetX,
+      offsetY,
+    } = getAntFormationMetrics(ant, i, 'rival');
+
     ant.dataset.offsetX = offsetX;
     ant.dataset.offsetY = offsetY;
 
     gsap.set(ant, { left: spawnX, top: spawnY });
 
-    const targetX = centerX + offsetX - 16;
-    const targetY = centerY + offsetY - 16;
+    const targetX = centerX + offsetX - (antSize / 2);
+    const targetY = centerY + offsetY - (antSize / 2);
 
     startCrawlWiggle(ant, spawnX, spawnY, targetX, targetY);
 

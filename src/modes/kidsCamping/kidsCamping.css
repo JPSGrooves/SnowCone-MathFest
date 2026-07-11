@@ -8479,3 +8479,812 @@ body.kc-active .aa-prologue-card .aa-prologue-character {
     --aa-prologue-art-lift: clamp(-104px, -4.6svh, -56px);
   }
 }
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Battlefield Readability Pass v1
+   Purpose:
+   - Center both anthills on the vertical tug lane.
+   - Replace the debug score box with two base-aligned snack counters.
+   - Enlarge soldier ants and keep their formation spacing proportional.
+   - Normalize food presence, especially the smaller SnowCone art.
+   - Presentation only. Battle scoring and round rules remain unchanged.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-ant-root .aa-battle-wrapper {
+  --aa-battle-edge: clamp(8px, 1.2svh, 16px);
+
+  --aa-score-glass:
+    linear-gradient(
+      180deg,
+      rgba(4, 16, 20, 0.88),
+      rgba(0, 0, 0, 0.82)
+    );
+}
+
+
+/* Both bases now point at the same center tug lane. */
+body.kc-active .aa-ant-root .ant-base.red,
+body.kc-active .aa-ant-root .ant-base.black {
+  left: 0 !important;
+  right: auto !important;
+
+  width: 100% !important;
+}
+
+
+body.kc-active .aa-ant-root .ant-base.red .ant-hill-img {
+  left: 50% !important;
+  right: auto !important;
+
+  transform:
+    translate(-50%, -50%) !important;
+}
+
+
+body.kc-active .aa-ant-root .ant-base.black .ant-hill-img {
+  left: 50% !important;
+  right: auto !important;
+
+  transform:
+    translate(-50%, 40%) !important;
+}
+
+
+/* Two clear snack counters replace the old debug readout. */
+body.kc-active .aa-ant-root .aa-snack-score {
+  position: absolute !important;
+  z-index: 24 !important;
+
+  min-width:
+    clamp(86px, 20vw, 132px) !important;
+
+  padding:
+    clamp(7px, 0.9svh, 11px)
+    clamp(9px, 1.8vw, 14px) !important;
+
+  display: grid !important;
+  justify-items: center !important;
+  align-content: center !important;
+
+  gap: 1px !important;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--kc-theme-accent, #00ffee) 62%,
+      rgba(255, 255, 255, 0.24)
+    ) !important;
+
+  border-radius: 14px !important;
+
+  background:
+    var(--aa-score-glass) !important;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 8px 18px rgba(0, 0, 0, 0.38),
+    0 0 13px
+      var(
+        --kc-theme-glow,
+        rgba(0, 255, 238, 0.42)
+      ) !important;
+
+  color: #ffffff !important;
+
+  font-family:
+    'Orbitron',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif !important;
+
+  text-align: center !important;
+
+  pointer-events: none !important;
+
+  -webkit-backdrop-filter:
+    blur(8px)
+    saturate(1.1);
+
+  backdrop-filter:
+    blur(8px)
+    saturate(1.1);
+}
+
+
+body.kc-active .aa-ant-root .aa-snack-score-rival {
+  top:
+    var(--aa-battle-edge) !important;
+
+  right:
+    var(--aa-battle-edge) !important;
+}
+
+
+body.kc-active .aa-ant-root .aa-snack-score-player {
+  bottom:
+    var(--aa-battle-edge) !important;
+
+  left:
+    var(--aa-battle-edge) !important;
+}
+
+
+body.kc-active .aa-ant-root .aa-snack-score-name {
+  max-width: 12ch !important;
+
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  color:
+    rgba(255, 255, 255, 0.92) !important;
+
+  font-size:
+    clamp(
+      0.58rem,
+      1.3svh,
+      0.82rem
+    ) !important;
+
+  font-weight: 850 !important;
+  letter-spacing: 0.045em !important;
+  line-height: 1 !important;
+
+  text-transform: uppercase !important;
+}
+
+
+body.kc-active .aa-ant-root .aa-snack-score-value {
+  color: #eaff62 !important;
+
+  font-size:
+    clamp(
+      1.12rem,
+      2.8svh,
+      1.72rem
+    ) !important;
+
+  font-weight: 950 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.025em !important;
+
+  text-shadow:
+    0 0 6px rgba(219, 255, 54, 0.78),
+    0 2px 5px rgba(0, 0, 0, 0.88) !important;
+}
+
+
+body.kc-active .aa-ant-root .aa-snack-score small {
+  color:
+    rgba(255, 255, 255, 0.68) !important;
+
+  font-size:
+    clamp(
+      0.46rem,
+      0.95svh,
+      0.62rem
+    ) !important;
+
+  font-weight: 800 !important;
+  letter-spacing: 0.11em !important;
+  line-height: 1 !important;
+}
+
+
+/*
+  Bigger minions.
+
+  The JS formation code now derives spacing from the
+  rendered sprite size, so larger ants do not pile up.
+*/
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.ant-sprite {
+  width:
+    clamp(
+      27px,
+      3.2svh,
+      40px
+    ) !important;
+
+  height: auto !important;
+}
+
+
+/*
+  Give every snack a stronger visual footprint.
+
+  This does not touch tug duration, snack weight,
+  win boundaries, scoring, or round timing.
+*/
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.food-plate-img {
+  max-height:
+    clamp(
+      92px,
+      18svh,
+      170px
+    ) !important;
+
+  max-width:
+    min(
+      46vw,
+      230px
+    ) !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  object-fit: contain !important;
+
+  transform-origin:
+    center center !important;
+}
+
+
+/*
+  Theme cone art carries more transparent breathing room
+  than the other foods, so its perceived size needs a
+  dedicated correction.
+*/
+body.kc-active
+.aa-ant-root
+.food-with-overlay[data-food="snowcone"]
+.food-plate-img {
+  transform:
+    scale(1.52) !important;
+}
+
+
+body.kc-active
+.aa-ant-root
+.food-with-overlay[data-food="snowcone"]
+.food-weight-overlay {
+  transform:
+    translate(-50%, -118%) !important;
+}
+
+
+/* Keep deploy control above the player score card. */
+body.kc-active
+.aa-ant-root
+.aa-send-ant-btn {
+  z-index: 25 !important;
+}
+
+
+/*
+  Tablet gets slightly more character presence while
+  retaining the already-approved fixed Ant window.
+*/
+@media
+  (min-width: 760px)
+  and (min-height: 900px) {
+
+  body.kc-active
+  .aa-ant-root
+  .aa-battle-wrapper
+  .ant-sprite {
+    width:
+      clamp(
+        34px,
+        3.2svh,
+        46px
+      ) !important;
+  }
+
+
+  body.kc-active
+  .aa-ant-root
+  .aa-battle-wrapper
+  .food-plate-img {
+    max-height:
+      clamp(
+        132px,
+        18svh,
+        205px
+      ) !important;
+
+    max-width:
+      min(
+        34vw,
+        270px
+      ) !important;
+  }
+
+
+  body.kc-active
+  .aa-ant-root
+  .aa-snack-score {
+    min-width:
+      clamp(
+        108px,
+        14vw,
+        150px
+      ) !important;
+  }
+}
+
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Battlefield Readability Pass v1 END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Element Score + Hill Nudge v1
+   Purpose:
+   - Give each snack score card its ant-element color.
+   - Move rival hill slightly down inside the field.
+   - Move player hill slightly up inside the field.
+   - Preserve all battle timing, scoring, saves, and layout.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score {
+  --aa-score-accent: #eaff62;
+  --aa-score-glow: rgba(218, 255, 98, 0.64);
+
+  border-color:
+    var(--aa-score-accent) !important;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.055),
+    0 8px 18px rgba(0, 0, 0, 0.40),
+    0 0 15px var(--aa-score-glow) !important;
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score[data-ant="black"] {
+  --aa-score-accent: #f1f5ff;
+  --aa-score-glow: rgba(190, 207, 255, 0.68);
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score[data-ant="blue"] {
+  --aa-score-accent: #46d7ff;
+  --aa-score-glow: rgba(37, 193, 255, 0.72);
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score[data-ant="pink"] {
+  --aa-score-accent: #ff72d8;
+  --aa-score-glow: rgba(255, 64, 196, 0.72);
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score[data-ant="white"] {
+  --aa-score-accent: #dfffff;
+  --aa-score-glow: rgba(157, 246, 255, 0.72);
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score[data-ant="yellow"] {
+  --aa-score-accent: #ffe654;
+  --aa-score-glow: rgba(255, 219, 45, 0.72);
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score[data-ant="red"] {
+  --aa-score-accent: #ff7045;
+  --aa-score-glow: rgba(255, 73, 38, 0.74);
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score[data-ant="queen"] {
+  --aa-score-accent: #d58cff;
+  --aa-score-glow: rgba(185, 86, 255, 0.76);
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score-value {
+  color:
+    var(--aa-score-accent) !important;
+
+  text-shadow:
+    0 0 6px var(--aa-score-glow),
+    0 0 13px var(--aa-score-glow),
+    0 2px 5px rgba(0, 0, 0, 0.90) !important;
+}
+
+
+body.kc-active
+.aa-ant-root
+.aa-snack-score-name {
+  text-shadow:
+    0 0 7px var(--aa-score-glow),
+    0 2px 4px rgba(0, 0, 0, 0.82) !important;
+}
+
+
+/*
+  Rival base was translated halfway beyond the top edge.
+  Bring it down enough to show the complete hill without
+  making it float away from the rival side.
+*/
+body.kc-active
+.aa-ant-root
+.ant-base.red
+.ant-hill-img {
+  top:
+    clamp(
+      6px,
+      0.9svh,
+      13px
+    ) !important;
+
+  transform:
+    translate(-50%, -18%) !important;
+}
+
+
+/*
+  Player base was hanging below the field.
+  Raise it just enough to preserve the full PNG on iPhone.
+*/
+body.kc-active
+.aa-ant-root
+.ant-base.black
+.ant-hill-img {
+  bottom:
+    clamp(
+      7px,
+      1svh,
+      15px
+    ) !important;
+
+  transform:
+    translate(-50%, 8%) !important;
+}
+
+
+/*
+  Slight tablet restraint: keep the same composition
+  without making the hill corrections feel exaggerated.
+*/
+@media
+  (min-width: 760px)
+  and (min-height: 900px) {
+
+  body.kc-active
+  .aa-ant-root
+  .ant-base.red
+  .ant-hill-img {
+    top:
+      clamp(
+        8px,
+        0.8svh,
+        16px
+      ) !important;
+  }
+
+
+  body.kc-active
+  .aa-ant-root
+  .ant-base.black
+  .ant-hill-img {
+    bottom:
+      clamp(
+        9px,
+        0.9svh,
+        17px
+      ) !important;
+  }
+}
+
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Element Score + Hill Nudge v1 END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Full Element Glow Language v1
+   Purpose:
+   - Match player portrait, minions, and hill to player element.
+   - Match rival portrait, minions, and hill to rival element.
+   - Preserve universal green ant-inventory count.
+   - Move rival portrait slightly down to avoid iPhone clipping.
+   - No scoring, timing, save, route, or battle-math changes.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-ant-root .aa-battle-wrapper {
+  --aa-player-accent: #c9cbd4;
+  --aa-player-glow: rgba(201, 203, 212, 0.70);
+
+  --aa-rival-accent: #c9cbd4;
+  --aa-rival-glow: rgba(201, 203, 212, 0.70);
+}
+
+
+/* Player element colors */
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="black"] {
+  --aa-player-accent: #c9cbd4;
+  --aa-player-glow: rgba(201, 203, 212, 0.72);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="blue"] {
+  --aa-player-accent: #63c9ff;
+  --aa-player-glow: rgba(99, 201, 255, 0.76);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="pink"] {
+  --aa-player-accent: #ff8de8;
+  --aa-player-glow: rgba(255, 141, 232, 0.76);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="white"] {
+  --aa-player-accent: #ffffff;
+  --aa-player-glow: rgba(169, 246, 255, 0.80);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="yellow"] {
+  --aa-player-accent: #fff1a1;
+  --aa-player-glow: rgba(255, 241, 161, 0.80);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="red"] {
+  --aa-player-accent: #ff5a42;
+  --aa-player-glow: rgba(255, 90, 66, 0.78);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="queen"] {
+  --aa-player-accent: #ffe24a;
+  --aa-player-glow: rgba(255, 226, 74, 0.82);
+}
+
+
+/* Rival element colors */
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="black"] {
+  --aa-rival-accent: #c9cbd4;
+  --aa-rival-glow: rgba(201, 203, 212, 0.72);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="blue"] {
+  --aa-rival-accent: #63c9ff;
+  --aa-rival-glow: rgba(99, 201, 255, 0.76);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="pink"] {
+  --aa-rival-accent: #ff8de8;
+  --aa-rival-glow: rgba(255, 141, 232, 0.76);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="white"] {
+  --aa-rival-accent: #ffffff;
+  --aa-rival-glow: rgba(169, 246, 255, 0.80);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="yellow"] {
+  --aa-rival-accent: #fff1a1;
+  --aa-rival-glow: rgba(255, 241, 161, 0.80);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="red"] {
+  --aa-rival-accent: #ff5a42;
+  --aa-rival-glow: rgba(255, 90, 66, 0.78);
+}
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="queen"] {
+  --aa-rival-accent: #ffe24a;
+  --aa-rival-glow: rgba(255, 226, 74, 0.82);
+}
+
+
+/* Rival portrait + rival minions + rival hill */
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.ant2-img,
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.rival-ant-soldier,
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.ant-base.red
+.ant-hill-img {
+  filter:
+    drop-shadow(0 0 1px var(--aa-rival-accent))
+    drop-shadow(0 0 4px var(--aa-rival-glow))
+    drop-shadow(0 0 10px var(--aa-rival-glow)) !important;
+}
+
+
+/* Player deploy portrait + player minions + player hill */
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.aa-send-ant-btn
+img,
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.player-ant-soldier,
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.ant-base.black
+.ant-hill-img {
+  filter:
+    drop-shadow(0 0 1px var(--aa-player-accent))
+    drop-shadow(0 0 4px var(--aa-player-glow))
+    drop-shadow(0 0 10px var(--aa-player-glow)) !important;
+}
+
+
+/*
+  Preserve the accepted deploy-button structure.
+  Only its outside glow now responds to the chosen ant.
+*/
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.aa-send-ant-btn {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 10px 24px rgba(0, 0, 0, 0.42),
+    0 0 15px var(--aa-player-glow) !important;
+}
+
+
+/*
+  Keep ant inventory green.
+  This is resource information, not elemental identity.
+*/
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.aa-send-ant-btn
+.ant-count {
+  color: #00ff36 !important;
+
+  text-shadow:
+    0 0 5px rgba(0, 255, 54, 0.88),
+    0 0 11px rgba(0, 255, 54, 0.54),
+    0 2px 4px rgba(0, 0, 0, 0.92) !important;
+}
+
+
+/*
+  Rival portrait iPhone correction.
+  Existing art was slightly above the visible battlefield.
+*/
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper
+.ant2-img {
+  top:
+    clamp(
+      6px,
+      0.8svh,
+      12px
+    ) !important;
+
+  transform:
+    translate(-30%, -4%) !important;
+}
+
+
+/*
+  Cloud artwork is mostly white, so its glow needs a
+  cool outer halo to remain readable over pale squares.
+*/
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="white"]
+.player-ant-soldier,
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-player="white"]
+.aa-send-ant-btn
+img,
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="white"]
+.rival-ant-soldier,
+
+body.kc-active
+.aa-ant-root
+.aa-battle-wrapper[data-aa-rival="white"]
+.ant2-img {
+  filter:
+    drop-shadow(0 0 1px #ffffff)
+    drop-shadow(0 0 5px rgba(134, 239, 255, 0.90))
+    drop-shadow(0 0 12px rgba(64, 196, 255, 0.68)) !important;
+}
+
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Full Element Glow Language v1 END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack iPad Result Art Restraint v1
+
+   Purpose:
+   - Reduce winner PNG only on iPad/tablet result screens.
+   - Prevent powered character art from overlapping scoreline.
+   - Preserve the accepted iPhone result-screen sizing.
+   - No JS, story, score, save, or battle changes.
+   ────────────────────────────────────────────────────────── */
+
+@media
+  (min-width: 700px)
+  and (min-height: 700px) {
+
+  body.kc-active
+  .aa-ant-root
+  .aa-results-card
+  .aa-results-winner
+  img {
+    max-height:
+      clamp(
+        290px,
+        35svh,
+        455px
+      ) !important;
+
+    max-width:
+      min(
+        52vw,
+        475px
+      ) !important;
+  }
+}
+
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPad Result Art Restraint v1 END ───────────────── */
