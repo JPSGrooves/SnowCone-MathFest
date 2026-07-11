@@ -7806,3 +7806,676 @@ body.kc-active .aa-results-card .aa-results-copy {
 
 /* ───────────────── SCMF 1.6.0 — Ant Attack Results iOS Polish END ───────────────── */
 
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Story Script Text v1
+   Purpose:
+   - Element-colored story haiku.
+   - Preserve line breaks.
+   - Keep iPhone/iPad dialogue readable without blowing up the stage.
+   - No battle math changes.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-script-dialogue {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body.kc-active .aa-script-poem {
+  width: 100%;
+  max-width: min(100%, 34em);
+
+  display: grid;
+  gap: clamp(2px, 0.42svh, 5px);
+
+  margin: 0 auto;
+  padding: clamp(6px, 0.9svh, 10px) clamp(8px, 1.6vw, 14px);
+
+  text-align: center;
+
+  font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: clamp(0.78rem, 1.82svh, 1.08rem);
+  line-height: 1.16;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.28),
+      rgba(0, 0, 0, 0.12)
+    );
+
+  text-shadow:
+    0 0 8px currentColor,
+    0 2px 6px rgba(0, 0, 0, 0.82);
+}
+
+body.kc-active .aa-script-speaker {
+  display: block;
+
+  margin-bottom: clamp(2px, 0.35svh, 5px);
+
+  font-size: 0.74em;
+  line-height: 1;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.84);
+  text-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.86),
+    0 0 8px currentColor;
+}
+
+body.kc-active .aa-script-line {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+body.kc-active .aa-faceoff-dialogue {
+  display: grid;
+  gap: clamp(5px, 0.8svh, 10px);
+}
+
+body.kc-active .aa-rival-reply-poem {
+  font-size: clamp(0.72rem, 1.68svh, 1rem);
+  opacity: 0.96;
+}
+
+body.kc-active .aa-script-mission-line {
+  display: block;
+
+  margin-top: clamp(1px, 0.3svh, 4px);
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(0.58rem, 1.25svh, 0.78rem);
+  line-height: 1.1;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.88);
+}
+
+body.kc-active .aa-results-copy.aa-script-dialogue,
+body.kc-active .aa-ending-copy.aa-script-dialogue {
+  display: grid;
+  gap: clamp(5px, 0.85svh, 10px);
+  align-items: center;
+  justify-items: center;
+}
+
+body.kc-active .aa-results-status {
+  display: block;
+
+  font-family: 'Orbitron', system-ui, sans-serif;
+  font-size: clamp(0.72rem, 1.7svh, 1rem);
+  line-height: 1.1;
+  text-align: center;
+  color: #ffffff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.86);
+}
+
+body.kc-active .aa-results-plain {
+  display: block;
+  text-align: center;
+}
+
+/* Element text colors */
+body.kc-active .aa-tone-night {
+  color: #c9cbd4;
+}
+
+body.kc-active .aa-tone-water {
+  color: #63c9ff;
+}
+
+body.kc-active .aa-tone-flower {
+  color: #ff8de8;
+}
+
+body.kc-active .aa-tone-cloud {
+  color: #ffffff;
+}
+
+body.kc-active .aa-tone-sun {
+  color: #fff1a1;
+}
+
+body.kc-active .aa-tone-fire {
+  color: #ff5a42;
+}
+
+body.kc-active .aa-tone-queen {
+  color: #ffe24a;
+}
+
+/* Queen prologue: she gets the stage to herself. */
+body.kc-active .aa-prologue-stage-queen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.kc-active .aa-prologue-stage-queen .aa-prologue-character {
+  max-width: min(72%, 310px);
+}
+
+/* iPhone guardrail: preserve jokes, but don't crush the cinematic card. */
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .aa-script-poem {
+    font-size: clamp(0.68rem, 1.52svh, 0.88rem);
+    line-height: 1.11;
+    gap: clamp(1px, 0.25svh, 3px);
+    padding: clamp(5px, 0.65svh, 8px) clamp(6px, 1.2vw, 10px);
+  }
+
+  body.kc-active .aa-rival-reply-poem {
+    font-size: clamp(0.64rem, 1.42svh, 0.82rem);
+  }
+
+  body.kc-active .aa-script-speaker {
+    font-size: 0.68em;
+    margin-bottom: clamp(1px, 0.24svh, 3px);
+  }
+
+  body.kc-active .aa-script-mission-line {
+    font-size: clamp(0.52rem, 1.08svh, 0.68rem);
+  }
+
+  body.kc-active .aa-dialogue-box.aa-script-dialogue {
+    max-height: clamp(118px, 25svh, 190px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Short iPhones / cramped WKWebView: make dialogue scroll rather than burst layout. */
+@media (max-height: 700px) {
+  body.kc-active .aa-dialogue-box.aa-script-dialogue {
+    max-height: clamp(104px, 24svh, 168px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body.kc-active .aa-script-poem {
+    font-size: clamp(0.62rem, 1.42svh, 0.84rem);
+    line-height: 1.09;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Story Dialogue Above Art v1
+   Purpose:
+   - Move story dialogue above character PNGs.
+   - Color character names under PNGs by element.
+   - Keep iPhone/iPad cinematic cards readable.
+   - No gameplay, save, route, or battle math changes.
+   ────────────────────────────────────────────────────────── */
+
+/* Element color variables for the active player ant. */
+body.kc-active .aa-cinematic-screen[data-aa-player="night"] {
+  --aa-player-text: #c9cbd4;
+  --aa-player-glow: rgba(201, 203, 212, 0.58);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-player="water"] {
+  --aa-player-text: #63c9ff;
+  --aa-player-glow: rgba(99, 201, 255, 0.62);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-player="flower"] {
+  --aa-player-text: #ff8de8;
+  --aa-player-glow: rgba(255, 141, 232, 0.64);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-player="cloud"] {
+  --aa-player-text: #ffffff;
+  --aa-player-glow: rgba(255, 255, 255, 0.62);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-player="sun"] {
+  --aa-player-text: #fff1a1;
+  --aa-player-glow: rgba(255, 241, 161, 0.66);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-player="fire"] {
+  --aa-player-text: #ff5a42;
+  --aa-player-glow: rgba(255, 90, 66, 0.64);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-player="queen"] {
+  --aa-player-text: #ffe24a;
+  --aa-player-glow: rgba(255, 226, 74, 0.68);
+}
+
+/* Element color variables for the active rival ant. */
+body.kc-active .aa-cinematic-screen[data-aa-rival="night"] {
+  --aa-rival-text: #c9cbd4;
+  --aa-rival-glow: rgba(201, 203, 212, 0.58);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-rival="water"] {
+  --aa-rival-text: #63c9ff;
+  --aa-rival-glow: rgba(99, 201, 255, 0.62);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-rival="flower"] {
+  --aa-rival-text: #ff8de8;
+  --aa-rival-glow: rgba(255, 141, 232, 0.64);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-rival="cloud"] {
+  --aa-rival-text: #ffffff;
+  --aa-rival-glow: rgba(255, 255, 255, 0.62);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-rival="sun"] {
+  --aa-rival-text: #fff1a1;
+  --aa-rival-glow: rgba(255, 241, 161, 0.66);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-rival="fire"] {
+  --aa-rival-text: #ff5a42;
+  --aa-rival-glow: rgba(255, 90, 66, 0.64);
+}
+
+body.kc-active .aa-cinematic-screen[data-aa-rival="queen"] {
+  --aa-rival-text: #ffe24a;
+  --aa-rival-glow: rgba(255, 226, 74, 0.68);
+}
+
+/*
+  Re-stack the story cards:
+  Header
+  Dialogue
+  Character art / name captions
+  Button
+*/
+body.kc-active .aa-prologue-card,
+body.kc-active .aa-mission-card,
+body.kc-active .aa-story-card {
+  display: grid !important;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: center !important;
+  align-content: center !important;
+
+  gap: clamp(7px, 1svh, 13px) !important;
+}
+
+body.kc-active .aa-prologue-card .aa-cinematic-header,
+body.kc-active .aa-mission-card .aa-cinematic-header,
+body.kc-active .aa-story-card .aa-cinematic-header {
+  grid-row: 1 !important;
+}
+
+body.kc-active .aa-prologue-card .aa-script-dialogue,
+body.kc-active .aa-mission-card .aa-script-dialogue,
+body.kc-active .aa-story-card .aa-script-dialogue {
+  grid-row: 2 !important;
+  align-self: center !important;
+  justify-self: center !important;
+
+  width: min(100%, 36em) !important;
+  margin: 0 auto !important;
+
+  transform: none !important;
+}
+
+body.kc-active .aa-prologue-stage,
+body.kc-active .aa-mission-royal,
+body.kc-active .aa-story-stage {
+  grid-row: 3 !important;
+  align-self: center !important;
+  justify-self: center !important;
+
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  transform: none !important;
+}
+
+body.kc-active .aa-prologue-card > .aa-cinematic-btn,
+body.kc-active .aa-mission-card > .aa-cinematic-btn,
+body.kc-active .aa-story-card > .aa-cinematic-btn {
+  grid-row: 4 !important;
+  align-self: end !important;
+  justify-self: center !important;
+}
+
+/* Character name labels under PNGs. */
+body.kc-active .aa-prologue-character figcaption,
+body.kc-active .aa-mission-royal figcaption,
+body.kc-active .aa-story-character figcaption,
+body.kc-active .aa-versus-fighter strong {
+  font-family: 'Orbitron', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.035em !important;
+  line-height: 1.05 !important;
+  text-align: center !important;
+}
+
+/* Prologue uses the player ant element for both royal/base captions. */
+body.kc-active .aa-prologue-character figcaption {
+  color: var(--aa-player-text, #ffffff) !important;
+  text-shadow:
+    0 0 8px var(--aa-player-glow, rgba(255, 255, 255, 0.45)),
+    0 2px 6px rgba(0, 0, 0, 0.86) !important;
+}
+
+/* Mission screen is the rival royal. */
+body.kc-active .aa-mission-royal figcaption {
+  color: var(--aa-rival-text, #ffffff) !important;
+  text-shadow:
+    0 0 8px var(--aa-rival-glow, rgba(255, 255, 255, 0.45)),
+    0 2px 6px rgba(0, 0, 0, 0.86) !important;
+}
+
+/* Face-off and VS: player/rival names get their own element colors. */
+body.kc-active .aa-story-player figcaption,
+body.kc-active .aa-versus-player strong {
+  color: var(--aa-player-text, #ffffff) !important;
+  text-shadow:
+    0 0 8px var(--aa-player-glow, rgba(255, 255, 255, 0.45)),
+    0 2px 6px rgba(0, 0, 0, 0.86) !important;
+}
+
+body.kc-active .aa-story-rival figcaption,
+body.kc-active .aa-versus-rival strong {
+  color: var(--aa-rival-text, #ffffff) !important;
+  text-shadow:
+    0 0 8px var(--aa-rival-glow, rgba(255, 255, 255, 0.45)),
+    0 2px 6px rgba(0, 0, 0, 0.86) !important;
+}
+
+/* Keep artwork strong after moving dialogue upward. */
+body.kc-active .aa-prologue-stage img,
+body.kc-active .aa-mission-royal img,
+body.kc-active .aa-story-stage img {
+  object-fit: contain !important;
+}
+
+/* iPhone tightening: dialogue stays above art, but cannot steal the whole card. */
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .aa-prologue-card,
+  body.kc-active .aa-mission-card,
+  body.kc-active .aa-story-card {
+    grid-template-rows:
+      auto
+      auto
+      minmax(130px, 1fr)
+      auto !important;
+
+    gap: clamp(5px, 0.75svh, 9px) !important;
+  }
+
+  body.kc-active .aa-prologue-card .aa-script-dialogue,
+  body.kc-active .aa-mission-card .aa-script-dialogue,
+  body.kc-active .aa-story-card .aa-script-dialogue {
+    max-height: clamp(104px, 22svh, 164px) !important;
+  }
+
+  body.kc-active .aa-prologue-character figcaption,
+  body.kc-active .aa-mission-royal figcaption,
+  body.kc-active .aa-story-character figcaption,
+  body.kc-active .aa-versus-fighter strong {
+    font-size: clamp(0.68rem, 1.55svh, 0.92rem) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Results Dialogue Above Art v1
+   Purpose:
+   - Move results / ending haiku above the winner or ending PNG.
+   - Keep scoreline below winner art.
+   - CSS-only presentation pass.
+   - No route, save, script, or battle changes.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-results-card {
+  display: grid !important;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto
+    auto !important;
+
+  align-items: center !important;
+  align-content: center !important;
+  gap: clamp(7px, 1svh, 13px) !important;
+}
+
+body.kc-active .aa-results-card .aa-cinematic-header {
+  grid-row: 1 !important;
+}
+
+body.kc-active .aa-results-card .aa-results-copy {
+  grid-row: 2 !important;
+  justify-self: center !important;
+  align-self: center !important;
+
+  width: min(100%, 36em) !important;
+  margin: 0 auto !important;
+}
+
+body.kc-active .aa-results-card .aa-results-winner {
+  grid-row: 3 !important;
+  justify-self: center !important;
+  align-self: center !important;
+
+  min-height: 0 !important;
+  margin: 0 auto !important;
+}
+
+body.kc-active .aa-results-card .aa-results-scoreline {
+  grid-row: 4 !important;
+  justify-self: center !important;
+  align-self: center !important;
+}
+
+body.kc-active .aa-results-card .aa-results-actions {
+  grid-row: 5 !important;
+  justify-self: center !important;
+  align-self: end !important;
+}
+
+/* Ending screen gets the same story rhythm:
+   header → haiku → ending art → button */
+body.kc-active .aa-ending-card {
+  display: grid !important;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items: center !important;
+  align-content: center !important;
+  gap: clamp(7px, 1svh, 13px) !important;
+}
+
+body.kc-active .aa-ending-card .aa-cinematic-header {
+  grid-row: 1 !important;
+}
+
+body.kc-active .aa-ending-card .aa-ending-copy {
+  grid-row: 2 !important;
+  justify-self: center !important;
+  align-self: center !important;
+
+  width: min(100%, 36em) !important;
+  margin: 0 auto !important;
+}
+
+body.kc-active .aa-ending-card .aa-ending-art {
+  grid-row: 3 !important;
+  justify-self: center !important;
+  align-self: center !important;
+
+  min-height: 0 !important;
+  margin: 0 auto !important;
+}
+
+body.kc-active .aa-ending-card > .aa-cinematic-btn {
+  grid-row: 4 !important;
+  justify-self: center !important;
+  align-self: end !important;
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .aa-results-card {
+    grid-template-rows:
+      auto
+      auto
+      minmax(120px, 1fr)
+      auto
+      auto !important;
+
+    gap: clamp(5px, 0.75svh, 9px) !important;
+  }
+
+  body.kc-active .aa-ending-card {
+    grid-template-rows:
+      auto
+      auto
+      minmax(140px, 1fr)
+      auto !important;
+
+    gap: clamp(5px, 0.75svh, 9px) !important;
+  }
+
+  body.kc-active .aa-results-card .aa-results-copy,
+  body.kc-active .aa-ending-card .aa-ending-copy {
+    max-height: clamp(96px, 20svh, 148px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Results Status Below Score v1
+   Purpose:
+   - Keep result haiku above winner PNG.
+   - Move unlock/story-complete status below scoreline.
+   - CSS-only layout refinement after tiny markup split.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-results-card {
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto !important;
+}
+
+body.kc-active .aa-results-card .aa-results-copy {
+  grid-row: 2 !important;
+}
+
+body.kc-active .aa-results-card .aa-results-winner {
+  grid-row: 3 !important;
+}
+
+body.kc-active .aa-results-card .aa-results-scoreline {
+  grid-row: 4 !important;
+}
+
+body.kc-active .aa-results-status-wrap {
+  grid-row: 5 !important;
+
+  justify-self: center !important;
+  align-self: center !important;
+
+  width: min(100%, 32em) !important;
+  margin: 0 auto !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  text-align: center !important;
+}
+
+body.kc-active .aa-results-status-wrap.is-empty {
+  display: none !important;
+}
+
+body.kc-active .aa-results-card .aa-results-actions {
+  grid-row: 6 !important;
+}
+
+body.kc-active .aa-results-status-wrap .aa-results-status {
+  color: #ffffff !important;
+  font-size: clamp(0.74rem, 1.72svh, 1.04rem) !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.035em !important;
+  text-transform: uppercase !important;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.34),
+    0 0 12px var(--kc-theme-glow, rgba(0, 255, 238, 0.42)),
+    0 2px 6px rgba(0, 0, 0, 0.86) !important;
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+  body.kc-active .aa-results-card {
+    grid-template-rows:
+      auto
+      auto
+      minmax(112px, 1fr)
+      auto
+      auto
+      auto !important;
+  }
+
+  body.kc-active .aa-results-status-wrap .aa-results-status {
+    font-size: clamp(0.64rem, 1.42svh, 0.88rem) !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Prologue Art Lift v1
+   Purpose:
+   - One-time Royal Mission prologue PNGs were sitting too low.
+   - Snack Mission placement is closer to target.
+   - Lift only the prologue character stage.
+   - CSS-only. No story, save, route, dialogue, or battle changes.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active .aa-prologue-card {
+  --aa-prologue-art-lift: clamp(-88px, -5svh, -40px);
+}
+
+/* Lift the royal/base selected-ant PNG pair without touching Snack Mission. */
+body.kc-active .aa-prologue-card .aa-prologue-stage {
+  align-self: start !important;
+  transform: translateY(var(--aa-prologue-art-lift)) !important;
+}
+
+/* Keep the names attached to the art after the lift. */
+body.kc-active .aa-prologue-card .aa-prologue-character {
+  align-self: end !important;
+}
+
+/* Short iPhones need the same correction, but a hair less aggressive. */
+@media (max-height: 740px) and (orientation: portrait) {
+  body.kc-active .aa-prologue-card {
+    --aa-prologue-art-lift: clamp(-68px, -4.2svh, -30px);
+  }
+}
+
+/* iPad can handle a slightly stronger lift because the art had more empty air. */
+@media (min-width: 700px) and (min-height: 700px) {
+  body.kc-active .aa-prologue-card {
+    --aa-prologue-art-lift: clamp(-104px, -4.6svh, -56px);
+  }
+}

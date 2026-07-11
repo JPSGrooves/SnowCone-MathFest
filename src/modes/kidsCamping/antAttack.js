@@ -12,14 +12,15 @@ import { showRoundMessage } from './roundFeedback.js';
 const ANT = (globalThis.__KC_ANT__ ||= { session: 0, alive: false, root: null });
 
 const ASSET_BASE = `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/`;
+const MENU_PACKAGE_ASSET_BASE = `${import.meta.env.BASE_URL}assets/img/menu/packages/`;
 
 const ANT_ATTACK_SAVE_KEY = 'scmf.kidsCamping.antAttack.v1';
 
 const ANT_ROSTER = Object.freeze([
   {
     id: 'black',
-    name: 'Black Ant',
-    shortName: 'Black',
+    name: 'Night Ant',
+    shortName: 'Night',
     waveName: 'Night Wave',
     wavePower: 3,
     unlockText: 'Starter ant',
@@ -30,11 +31,11 @@ const ANT_ROSTER = Object.freeze([
   },
   {
     id: 'blue',
-    name: 'Blue Water Ant',
-    shortName: 'Blue',
+    name: 'Water Ant',
+    shortName: 'Water',
     waveName: 'Water Wave',
     wavePower: 4,
-    unlockText: 'Beat Blue Ant',
+    unlockText: 'Beat Water Ant',
     basePng: 'aa_ant_blue_base.png',
     poweredPng: 'aa_ant_blue_powered.png',
     royalPng: 'aa_ant_blue_royal.png',
@@ -42,11 +43,11 @@ const ANT_ROSTER = Object.freeze([
   },
   {
     id: 'pink',
-    name: 'Pink Flower Ant',
-    shortName: 'Pink',
+    name: 'Flower Ant',
+    shortName: 'Flower',
     waveName: 'Flower Wave',
     wavePower: 5,
-    unlockText: 'Beat Pink Ant',
+    unlockText: 'Beat Flower Ant',
     basePng: 'aa_ant_pink_base.png',
     poweredPng: 'aa_ant_pink_powered.png',
     royalPng: 'aa_ant_pink_royal.png',
@@ -54,11 +55,11 @@ const ANT_ROSTER = Object.freeze([
   },
   {
     id: 'white',
-    name: 'White Cloud Ant',
-    shortName: 'White',
+    name: 'Cloud Ant',
+    shortName: 'Cloud',
     waveName: 'Cloud Wave',
     wavePower: 6,
-    unlockText: 'Beat White Ant',
+    unlockText: 'Beat Cloud Ant',
     basePng: 'aa_ant_white_base.png',
     poweredPng: 'aa_ant_white_powered.png',
     royalPng: 'aa_ant_white_royal.png',
@@ -66,11 +67,11 @@ const ANT_ROSTER = Object.freeze([
   },
   {
     id: 'yellow',
-    name: 'Yellow Sun Ant',
-    shortName: 'Yellow',
+    name: 'Sun Ant',
+    shortName: 'Sun',
     waveName: 'Sun Wave',
     wavePower: 7,
-    unlockText: 'Beat Yellow Ant',
+    unlockText: 'Beat Sun Ant',
     basePng: 'aa_ant_yellow_base.png',
     poweredPng: 'aa_ant_yellow_powered.png',
     royalPng: 'aa_ant_yellow_royal.png',
@@ -78,11 +79,11 @@ const ANT_ROSTER = Object.freeze([
   },
   {
     id: 'red',
-    name: 'Red Fire Ant',
-    shortName: 'Red',
+    name: 'Fire Ant',
+    shortName: 'Fire',
     waveName: 'Fire Wave',
     wavePower: 8,
-    unlockText: 'Beat Red Ant',
+    unlockText: 'Beat Fire Ant',
     basePng: 'aa_ant_red_base.png',
     poweredPng: 'aa_ant_red_powered.png',
     royalPng: 'aa_ant_red_royal.png',
@@ -98,17 +99,1012 @@ const QUEEN_SNACKJACKET = Object.freeze({
   wavePower: 9,
   basePng: 'aa_ant_queen_snackjacket_base.png',
   poweredPng: 'aa_ant_queen_snackjacket_powered.png',
-  soldierPng: 'aa_yellowJacket.png',
+  soldierPng: 'aa_yellowjacket.png',
   fallbackSoldierPng: 'aa_yellowAnt.png',
 });
 
 const STORY_RIVAL_ORDER = Object.freeze(['blue', 'pink', 'white', 'yellow', 'red', 'queen']);
 const STORY_UNLOCK_CHAIN = Object.freeze(['black', 'blue', 'pink', 'white', 'yellow', 'red', 'queen']);
 
+const STORY_ROUTE_BY_ANT = Object.freeze({
+  black: ['blue', 'pink', 'white', 'yellow', 'red', 'queen'],
+  blue: ['black', 'pink', 'white', 'yellow', 'red', 'queen'],
+  pink: ['black', 'blue', 'white', 'yellow', 'red', 'queen'],
+  white: ['black', 'blue', 'pink', 'yellow', 'red', 'queen'],
+  yellow: ['black', 'blue', 'pink', 'white', 'red', 'queen'],
+  red: ['black', 'blue', 'pink', 'white', 'yellow', 'queen'],
+  queen: ['black', 'blue', 'pink', 'white', 'yellow', 'red'],
+});
+
 const BATTLE_TARGET_SCORE = 10;
 const BOSS_BATTLE_TARGET_SCORE = 20;
 // Kept as a future fallback knob if we want optional auto-start again.
 const VS_AUTO_START_MS = 4700;
+
+// ─────────────────────────────────────────────────────────────
+// Ant Attack Story Script v1
+// Source: Jeremy edited haiku pass.
+// Structure:
+// - prologue[playerAntId] -> one-time royal/base intro
+// - battles[playerAntId][rivalAntId] -> mission/player/reply/result
+// - ending[playerAntId] -> story ending
+// ─────────────────────────────────────────────────────────────
+const ANT_STORY_SCRIPT = Object.freeze({
+  "prologue": {
+    "black": [
+      "SnowCones feed the nest.",
+      "Bring tasty snacks back home safe.",
+      "We can’t sleep hungry!"
+    ],
+    "blue": [
+      "Streams feed our halls.",
+      "Carry snacks through strong currents.",
+      "Leave no grapes behind!"
+    ],
+    "pink": [
+      "The petals are young.",
+      "Steal snacks for our larvae.",
+      "Pizza with pollen!"
+    ],
+    "white": [
+      "Carry the Orange.",
+      "Lift the snacks above the grass.",
+      "May clouds shade your path!"
+    ],
+    "yellow": [
+      "Sun warms the picnic.",
+      "Bring burgers before dusk falls.",
+      "Feed the colony!"
+    ],
+    "red": [
+      "Embers need to feast.",
+      "Spark the trail and haul snacks home.",
+      "No burnt eggs this time!"
+    ],
+    "queen": [
+      "Crowns need tasty things.",
+      "I will swarm through every plate",
+      "To get my SnowCone!"
+    ]
+  },
+  "ending": {
+    "black": [
+      "Food fills every hall.",
+      "The moon pats its belly full.",
+      "Stars aligned for snacks!"
+    ],
+    "blue": [
+      "Currents brought snacks home.",
+      "Grapes bob in happy rivers.",
+      "Smiles ‘round the bend!"
+    ],
+    "pink": [
+      "Flowers fed the hive",
+      "With more than beauty today.",
+      "Pizza crust for lunch!"
+    ],
+    "white": [
+      "Happy Puffy Clouds",
+      "Rolled in to reward us snacks,",
+      "And stayed for a while!"
+    ],
+    "yellow": [
+      "Warm up every plate;",
+      "Golden snacks shine so bright,",
+      "The hive needs shades!"
+    ],
+    "red": [
+      "Hungry elements",
+      "Get the most snacks by design.",
+      "Fire consumed all!"
+    ],
+    "queen": [
+      "Queens count every crumb.",
+      "Royal snacks are everywhere.",
+      "Let’s begin the feast!"
+    ]
+  },
+  "battles": {
+    "black": {
+      "blue": {
+        "mission": [
+          "Water guards the grapes",
+          "Moonshine slips from the lake’s edge",
+          "Snacks drift down the stream"
+        ],
+        "player": [
+          "The Snack moon rises!",
+          "Ants of the night, raid the plate",
+          "And eat every crumb!"
+        ],
+        "reply": [
+          "Water rolls straight through the night.",
+          "Your snacks will float to my queen!"
+        ],
+        "result": [
+          "Tides reflect the moon.",
+          "The night places the disc there",
+          "As a plate for snacks."
+        ]
+      },
+      "pink": {
+        "mission": [
+          "Flowers work at night",
+          "To obscure the picnic trail.",
+          "Snacks prefer perfume!"
+        ],
+        "player": [
+          "Petals fear the night.",
+          "My shadows push back the bloom",
+          "And snatch every bite!"
+        ],
+        "reply": [
+          "Flowers grow where darkness naps.",
+          "Night will sneeze from the pollen!"
+        ],
+        "result": [
+          "Night folds every bloom",
+          "And naps under stars and crumbs.",
+          "Flowers lost the snacks!"
+        ]
+      },
+      "white": {
+        "mission": [
+          "Clouds cover the plate",
+          "Moonlight fades in cotton mist",
+          "Snacks vanish below"
+        ],
+        "player": [
+          "Clouds can’t hide pizza!",
+          "We can smell it through the mist,",
+          "Crumbs lead us like stars!"
+        ],
+        "reply": [
+          "Fog can swallow every trail,",
+          "Leaving night with empty hands!"
+        ],
+        "result": [
+          "Night snuck through the clouds.",
+          "Moonlight found the hidden feast.",
+          "Cloud lost every crumb!"
+        ]
+      },
+      "yellow": {
+        "mission": [
+          "The night starts to sweat.",
+          "Bright ants march with morning heat.",
+          "Sun burns through the shade!"
+        ],
+        "player": [
+          "Sun, your plate is high,",
+          "But night waits for you to fall,",
+          "Then steals all your lunch!"
+        ],
+        "reply": [
+          "Sunlight will burn sneaky feet",
+          "And rays will melt the shadows!"
+        ],
+        "result": [
+          "Night cools down the sun",
+          "And crumbs rest in moonlit bags.",
+          "Sun blinked…snackless now."
+        ]
+      },
+      "red": {
+        "mission": [
+          "Fire sparks the Night",
+          "Smoke curls over picnic cloths",
+          "Night must dodge the heat"
+        ],
+        "player": [
+          "Fire fades by night,",
+          "And we’ll snack between the sparks.",
+          "A blaze won’t stop lunch!"
+        ],
+        "reply": [
+          "Fire shines through midnight trails.",
+          "Your moon boots will smell like toast!"
+        ],
+        "result": [
+          "Night smothered the flames.",
+          "The cool crumbs settle back down",
+          "On the moon’s cool plate."
+        ]
+      },
+      "queen": {
+        "mission": [
+          "Stars shake at the point",
+          "Of Queen SnackJacket’s stinger.",
+          "Bow! Puny Night Ant!"
+        ],
+        "player": [
+          "Your stinger is sharp!",
+          "Watch us tiptoe past your swarm",
+          "To steal royal snacks!"
+        ],
+        "reply": [
+          "My crown buzzes over all!",
+          "My worker wasps don’t sleep!"
+        ],
+        "result": [
+          "Queen checks empty plates",
+          "And curses the ants that won.",
+          "We stole all her snacks!"
+        ]
+      }
+    },
+    "blue": {
+      "black": {
+        "mission": [
+          "Night pulls on your tide.",
+          "Moonlight prepares all the snacks.",
+          "Like thieves in the night!"
+        ],
+        "player": [
+          "Moonlight cannot swim.",
+          "Rivers steal reflected plates.",
+          "Ants drift home laughing!"
+        ],
+        "reply": [
+          "Night is the true horizon.",
+          "Lunchtime is set in the stars!"
+        ],
+        "result": [
+          "Water will survive",
+          "Night and day and find a way",
+          "Every single time."
+        ]
+      },
+      "pink": {
+        "mission": [
+          "Flowers drink the stream.",
+          "Roots can sense the planned attack.",
+          "Water forms a moat!"
+        ],
+        "player": [
+          "Petals feel the flood.",
+          "The rivers rise to the plate.",
+          "Grapes will float with me!"
+        ],
+        "reply": [
+          "Seeds are planted by your waves.",
+          "We will spread like pretty weeds!"
+        ],
+        "result": [
+          "Blooms overwatered",
+          "Learned to bow beside the stream.",
+          "Grapes, sail safely home!"
+        ]
+      },
+      "white": {
+        "mission": [
+          "Clouds blanket the lake.",
+          "Ants can’t find their tasty snacks",
+          "And march somewhere else!"
+        ],
+        "player": [
+          "Water blankets the globe.",
+          "Lakes stay when clouds fade away,",
+          "Give me back my grapes!"
+        ],
+        "reply": [
+          "Clouds pick you up and slam you",
+          "Back down before you can eat!"
+        ],
+        "result": [
+          "Water outweighed clouds.",
+          "Tides rose to claim tasty snacks,",
+          "Especially grapes!"
+        ]
+      },
+      "yellow": {
+        "mission": [
+          "Sun dries every drop.",
+          "The rivers yield to the sun.",
+          "Turn grapes to raisins!"
+        ],
+        "player": [
+          "Sun, you thirsty lamp.",
+          "My river cools every vine.",
+          "Snacks float past your heat!"
+        ],
+        "reply": [
+          "Sunbeams invade the cool stream.",
+          "Your grapes boil in the light!"
+        ],
+        "result": [
+          "Water cooled the sun.",
+          "Steam curls off the picnic cloth,",
+          "Lunch floats home laughing."
+        ]
+      },
+      "red": {
+        "mission": [
+          "Hear fire sizzle,",
+          "As steam puffs above the plate,",
+          "Stealing the burgers!"
+        ],
+        "player": [
+          "Fire, take a bath!",
+          "My waves carry the burgers.",
+          "Give your sparks a nap!"
+        ],
+        "reply": [
+          "Fire boils your brave little wave.",
+          "You will be soup by sundown!"
+        ],
+        "result": [
+          "Water snuffed fire.",
+          "Embers fade beside the grapes.",
+          "Steam signs the scorecard!"
+        ]
+      },
+      "queen": {
+        "mission": [
+          "The Queen dams the stream.",
+          "Yellow jackets drink the shore",
+          "SnackJacket arrives!"
+        ],
+        "player": [
+          "Queen, your crown will float.",
+          "Water ants flood every moat.",
+          "Jackets drift away!"
+        ],
+        "reply": [
+          "My jackets do not fear rain.",
+          "We drink tribute through a straw!"
+        ],
+        "result": [
+          "Water rose above.",
+          "Queen SnackJacket checks her snacks,",
+          "Crying out for grapes!"
+        ]
+      }
+    },
+    "pink": {
+      "black": {
+        "mission": [
+          "Night folds petals shut.",
+          "If you get your beauty sleep,",
+          "We can have the snacks!"
+        ],
+        "player": [
+          "Night smells every bloom",
+          "And the pollen makes you sneeze.",
+          "The we steal the eggs!"
+        ],
+        "reply": [
+          "Darkness keeps the garden still.",
+          "Your flowers will rest in peace!"
+        ],
+        "result": [
+          "Flowers beat the night",
+          "And woke early to sweet snacks.",
+          "Spring lasts all season!"
+        ]
+      },
+      "blue": {
+        "mission": [
+          "Streams flood through pink roots.",
+          "Petals slip on river rocks.",
+          "Flowers have no flow!"
+        ],
+        "player": [
+          "Water, watch us bloom.",
+          "Our flow drinks up your best",
+          "Soldiers for the win!"
+        ],
+        "reply": [
+          "Water feeds your hungry roots.",
+          "Now experience a drought!"
+        ],
+        "result": [
+          "Flowers drank the flood.",
+          "Roots curled tight around the grapes",
+          "And water lost lunch!"
+        ]
+      },
+      "white": {
+        "mission": [
+          "Clouds block morning blooms.",
+          "Petals cry for borrowed light.",
+          "Snacks snatched in the shade!"
+        ],
+        "player": [
+          "Move your puffy face!",
+          "Flowers cower in the shade.",
+          "We will have pizza!"
+        ],
+        "reply": [
+          "Clouds will blanket every bloom.",
+          "Petals power through the mist!"
+        ],
+        "result": [
+          "Flowers fanned the clouds.",
+          "Petals gleam with stolen snacks;",
+          "It smells like pollen…"
+        ]
+      },
+      "yellow": {
+        "mission": [
+          "Sun dries every bloom.",
+          "Petals curl around the crumbs.",
+          "The flowers will roast!"
+        ],
+        "player": [
+          "Your lunch is too burnt.",
+          "Flower ants shade every snack",
+          "Under their beauty."
+        ],
+        "reply": [
+          "Sunlight controls all that blooms.",
+          "Your petals bow to my heat!"
+        ],
+        "result": [
+          "Flowers tamed the sun.",
+          "Pink Beauties saved every snack",
+          "And crumbs smell like spring!"
+        ]
+      },
+      "red": {
+        "mission": [
+          "Fire licks the weeds.",
+          "Ants guarding the picnic edge.",
+          "Flowers don’t bloom here!"
+        ],
+        "player": [
+          "You with your hot breath,",
+          "Fire is suffocated",
+          "By bright pink pollen!"
+        ],
+        "reply": [
+          "Fire roasts your tiny garden",
+          "While your petals curl to chips!"
+        ],
+        "result": [
+          "Flowers smothered smoke!",
+          "Petals waved through the cooled ash",
+          "And we stole the grapes!"
+        ]
+      },
+      "queen": {
+        "mission": [
+          "The Queen raids the bloom.",
+          "Yellow jackets shake the roots",
+          "Of all the SnowCones!"
+        ],
+        "player": [
+          "Queen, buzz somewhere else.",
+          "Pollen is what feeds the crown!",
+          "Snacks belong to us!"
+        ],
+        "reply": [
+          "My swarm owns the picnic field.",
+          "I pollinate the flowers!"
+        ],
+        "result": [
+          "Flowers swarmed the crown.",
+          "Queen SnackJacket sneezed two times;",
+          "Petals kept the snacks!"
+        ]
+      }
+    },
+    "white": {
+      "black": {
+        "mission": [
+          "Night swallows the sky.",
+          "We hide crumbs beneath your fog.",
+          "Clouds, pass by the snacks!"
+        ],
+        "player": [
+          "The moon gives us light",
+          "And it lets us shine at night.",
+          "Clouds see all the snacks!"
+        ],
+        "reply": [
+          "Night crawls higher than your mist.",
+          "Stars poke holes in all your clouds!"
+        ],
+        "result": [
+          "Clouds blanket the night.",
+          "No one notices stolen snacks.",
+          "Stars ask where lunch went!"
+        ]
+      },
+      "blue": {
+        "mission": [
+          "Water calls clouds down.",
+          "Rain returns to hungry streams.",
+          "Snacks sink as you fall!"
+        ],
+        "player": [
+          "Water, look up now.",
+          "Clouds lift the snacks from rivers.",
+          "Now you’ll have no lunch!"
+        ],
+        "reply": [
+          "Water surfs below your fluff.",
+          "Every cloud becomes my stream!"
+        ],
+        "result": [
+          "Clouds rose from the stream.",
+          "Snacks rode mist to puffy heights.",
+          "Water is washed up!"
+        ]
+      },
+      "pink": {
+        "mission": [
+          "Flowers trap the mist.",
+          "Petals drink up cloudy snacks.",
+          "Roots never let go!"
+        ],
+        "player": [
+          "Flowers, chase my shade",
+          "As snacks bloom above your reach.",
+          "Cloudy with meatballs!"
+        ],
+        "reply": [
+          "Petals climb through cloudy air.",
+          "Your mist smells like flower food!"
+        ],
+        "result": [
+          "Clouds crowded the bloom.",
+          "Petals waved for stolen snacks.",
+          "Flowers missed the plate!"
+        ]
+      },
+      "yellow": {
+        "mission": [
+          "Sun beams through the mist",
+          "While clouds guard tasty snacks.",
+          "Forecast calls for sun!"
+        ],
+        "player": [
+          "We’ll cover you up",
+          "While snacks dance around your plate.",
+          "We reflect your heat!"
+        ],
+        "reply": [
+          "Sunlight cuts through every cloud.",
+          "Your puffy clouds cannot hide!"
+        ],
+        "result": [
+          "Clouds covered the sun.",
+          "Shady crumbs were found above",
+          "But not on his plate."
+        ]
+      },
+      "red": {
+        "mission": [
+          "We make our own clouds.",
+          "You’ll cough over and over",
+          "At the clouds of smoke!"
+        ],
+        "player": [
+          "Fire, you are burnt out!",
+          "Smoke still comes before fire",
+          "And we own that too!"
+        ],
+        "reply": [
+          "You will see the smoke signals",
+          "Before mist can hide the snacks!"
+        ],
+        "result": [
+          "Clouds overcame flames.",
+          "Smoke fades from their puffy paws.",
+          "Fire lost the bun!"
+        ]
+      },
+      "queen": {
+        "mission": [
+          "The Queen rules the sky.",
+          "Yellow jackets buzz through mist.",
+          "Make way for the Queen!"
+        ],
+        "player": [
+          "Queen, your wings are loud.",
+          "Under the cover of clouds",
+          "We will steal the snacks!"
+        ],
+        "reply": [
+          "My swarm cuts through puffy skies.",
+          "Misty clouds will pay tribute!"
+        ],
+        "result": [
+          "Clouds covered the snacks.",
+          "The Queen is still lost the fog",
+          "Buzz with empty hands!"
+        ]
+      }
+    },
+    "yellow": {
+      "black": {
+        "mission": [
+          "Night cools every trail.",
+          "The moon waits for daylight’s fall,",
+          "Then we steal the snacks!"
+        ],
+        "player": [
+          "Night, wake up and squint.",
+          "Solar beams light every crumb.",
+          "Snacks shine for my hive!"
+        ],
+        "reply": [
+          "Night eats lunch when daylight fades.",
+          "Your bright crumbs burn out by dusk!"
+        ],
+        "result": [
+          "Light cracked open night.",
+          "Moon snacks glowed like tiny grills.",
+          "Darkness dropped the plate!"
+        ]
+      },
+      "blue": {
+        "mission": [
+          "Water chills in sun.",
+          "Streams hide grapes from summer months",
+          "To keep all the snacks fresh!"
+        ],
+        "player": [
+          "Water, steam away.",
+          "The sun brings a drought on you",
+          "Until snacks are won!"
+        ],
+        "reply": [
+          "Water laughs with a loud splash.",
+          "Your beams slip on river stones!"
+        ],
+        "result": [
+          "Sun boiled water.",
+          "Snacks turned sweet at the picnic.",
+          "Water lost the shine!"
+        ]
+      },
+      "pink": {
+        "mission": [
+          "Flowers chase the sun",
+          "And lay claim to golden snacks.",
+          "Heat feeds hungry blooms!"
+        ],
+        "player": [
+          "Flowers, thank my light.",
+          "The sun gives you snacks for lunch.",
+          "But I want SnowCones!"
+        ],
+        "reply": [
+          "Petals block your golden beams,",
+          "While ants march in the shade!"
+        ],
+        "result": [
+          "Sun fed, then outshined.",
+          "Petals bowed beside warm snacks",
+          "And offered them up!"
+        ]
+      },
+      "white": {
+        "mission": [
+          "Storms provide cover",
+          "And forecast no sun today.",
+          "Clouds will fill the sky!"
+        ],
+        "player": [
+          "Clouds, stop blocking lunch.",
+          "Solar beams burn through your fluff.",
+          "Snacks shine in my rays!"
+        ],
+        "reply": [
+          "Clouds siesta during noon.",
+          "Your sunlight will stay hungry!"
+        ],
+        "result": [
+          "Sun splits every cloud.",
+          "Memories of stolen snacks.",
+          "Clouds lost their cover!"
+        ]
+      },
+      "red": {
+        "mission": [
+          "Fire is hotter",
+          "Now that you are near the blaze.",
+          "Sun will feel the heat!"
+        ],
+        "player": [
+          "You are crumbs to me.",
+          "Solar beams are the real blaze",
+          "That cooks all the snacks!"
+        ],
+        "reply": [
+          "Fire dances without daylight;",
+          "Your sun clocks out at dinner!"
+        ],
+        "result": [
+          "Sol outshined the blaze.",
+          "Fire is stuck with hunger",
+          "For snacks that they lost!"
+        ]
+      },
+      "queen": {
+        "mission": [
+          "Wings hiding the sun!",
+          "Together, Yellow jackets",
+          "Can steal all the snacks!"
+        ],
+        "player": [
+          "Queen, face the daylight.",
+          "Solar beams melt every wing",
+          "Like summer SnowCones!"
+        ],
+        "reply": [
+          "My crown shines brighter than noon.",
+          "You will pay a royal toll!"
+        ],
+        "result": [
+          "The sun blinds the crown.",
+          "Queen SnackJacket drops her fork",
+          "And cries for her snacks!"
+        ]
+      }
+    },
+    "red": {
+      "black": {
+        "mission": [
+          "Night smothers the spark.",
+          "Midnight chills the smoky grill",
+          "And Fire loses!"
+        ],
+        "player": [
+          "Night, fear my red glow.",
+          "Fire ants light the snack road",
+          "And can’t lose their way!"
+        ],
+        "reply": [
+          "Night wraps fire in velvet dark.",
+          "Flames get tired and burn out!"
+        ],
+        "result": [
+          "Fire lit up night.",
+          "The grill smoked through the twilight,",
+          "Now we’ll have burgers!"
+        ]
+      },
+      "blue": {
+        "mission": [
+          "Water hunts the flame.",
+          "Waves hiss over burger grease.",
+          "Fires get flooded!"
+        ],
+        "player": [
+          "Water, pull back your tides.",
+          "Hot fire steams every grape.",
+          "For lunch we’ll have jam!"
+        ],
+        "reply": [
+          "Water makes your hot feet hiss.",
+          "Your coals will be put to rest!"
+        ],
+        "result": [
+          "Fire boiled the tide.",
+          "Steam bowed out beside the snacks.",
+          "Water left hungry!"
+        ]
+      },
+      "pink": {
+        "mission": [
+          "Flowers use the grill,",
+          "Creating aromatic",
+          "Dinners for the bloom!"
+        ],
+        "player": [
+          "Flowers, toast with me.",
+          "Fire ants roast your pollen shields.",
+          "You’ll make us pizza!"
+        ],
+        "reply": [
+          "Petals repel your sparks.",
+          "Your flames are just a big sneeze!"
+        ],
+        "result": [
+          "Fire scorched the blooms.",
+          "Petals melted like SnowCones.",
+          "Flowers dropped the snacks!"
+        ]
+      },
+      "white": {
+        "mission": [
+          "Clouds rise above flames,",
+          "Going back to the heavens.",
+          "Stay here with burnt snacks!"
+        ],
+        "player": [
+          "My smoke reaches you",
+          "Like messages in the sky.",
+          "I like crispy snacks!"
+        ],
+        "reply": [
+          "Clouds will outgrow your fire",
+          "And save themselves from burnt snacks!"
+        ],
+        "result": [
+          "Fire in the sky.",
+          "We brought coals to the feast",
+          "It’s a job well done!"
+        ]
+      },
+      "yellow": {
+        "mission": [
+          "Sun power is more",
+          "Hot than any earthly blaze.",
+          "SunBeams for the win!"
+        ],
+        "player": [
+          "Sun, you clock out soon.",
+          "My sparks dance after sundown.",
+          "Snacks roast in my hands!"
+        ],
+        "reply": [
+          "Sun made fire’s first orange spark.",
+          "Your flames beg noon for power!"
+        ],
+        "result": [
+          "Fire beat the sun.",
+          "Gold crumbs turned extra crispy.",
+          "Noon spilled the ketchup!"
+        ]
+      },
+      "queen": {
+        "mission": [
+          "The queen hoards the heat.",
+          "Yellow jackets guard the grill",
+          "That fire calls home!"
+        ],
+        "player": [
+          "Queen, your grill is mine.",
+          "Fire ants circle ‘round like",
+          "Great balls of fire!"
+        ],
+        "reply": [
+          "My crown invented cookouts;",
+          "Your flames need a permit first!"
+        ],
+        "result": [
+          "Fire lit the grill!",
+          "Queen SnackJacket fans her cape,",
+          "Now, with crispy wings."
+        ]
+      }
+    },
+    "queen": {
+      "black": {
+        "mission": [
+          "Your hive will not see",
+          "The light of day before the night",
+          "Steals food from your plate!"
+        ],
+        "player": [
+          "Night hides from the crown.",
+          "We fly higher than the moon",
+          "We’ll eat stars as crumbs!"
+        ],
+        "reply": [
+          "We don’t kneel to buzzing crowns.",
+          "Under the veil, we’ll leave full."
+        ],
+        "result": [
+          "Queen stung through the night.",
+          "Yellow Jackets fly with snacks.",
+          "Stars file complaints."
+        ]
+      },
+      "blue": {
+        "mission": [
+          "Water guards the shores.",
+          "Royal wings can’t fly in rain.",
+          "Queens are forbidden!"
+        ],
+        "player": [
+          "Water, bring tribute.",
+          "My royal swarm drinks the stream.",
+          "Cone taxes are due!"
+        ],
+        "reply": [
+          "Water does not pay your toll.",
+          "Your crown floats like soggy toast!"
+        ],
+        "result": [
+          "With rivers parted,",
+          "Water coughs up hidden grapes.",
+          "Tribute tastes like juice!"
+        ]
+      },
+      "pink": {
+        "mission": [
+          "Flowers guard our sweets.",
+          "Petals crowd the royal path.",
+          "Off-limits bouquet"
+        ],
+        "player": [
+          "Flowers, bloom for me!",
+          "We will wear pollen like gold",
+          "And fill up on snacks."
+        ],
+        "reply": [
+          "Flowers don’t bow to buzzing.",
+          "Your crown makes the roses sneeze"
+        ],
+        "result": [
+          "Wings shake every bloom.",
+          "Petals drop their hidden snacks.",
+          "Food tax has been paid."
+        ]
+      },
+      "white": {
+        "mission": [
+          "Clouds hide royal snacks.",
+          "Your wings falter in the mist.",
+          "The crown stays hungry!"
+        ],
+        "player": [
+          "Clear the royal skies.",
+          "My jackets buzz through your fluff.",
+          "Deliver snacks now!"
+        ],
+        "reply": [
+          "We hide a thousand crumbs when",
+          "Calling for cloudy weather!"
+        ],
+        "result": [
+          "I parted the clouds!",
+          "Mist covered snacks on my cape",
+          "Breathing in clear air."
+        ]
+      },
+      "yellow": {
+        "mission": [
+          "Sun guards golden goods.",
+          "Royal wings melt in the heat.",
+          "Queen won’t snack today!"
+        ],
+        "player": [
+          "Dim for they ruler!",
+          "My crown reflects light your way",
+          "And remains untouched!"
+        ],
+        "reply": [
+          "Sunlight creates all the snacks",
+          "And thus we will take them back!"
+        ],
+        "result": [
+          "The sun was no match",
+          "For Yellow Jacket fury!",
+          "The Queen rules the sky!"
+        ]
+      },
+      "red": {
+        "mission": [
+          "Fire guards the grill.",
+          "Royal wings face smoky ants.",
+          "No fly zone here!"
+        ],
+        "player": [
+          "Fire, hand me lunch!",
+          "My royal cape fears no smoke.",
+          "Burgers know my name."
+        ],
+        "reply": [
+          "Fire does not serve your jacket",
+          "Your crown smells like burnt mustard"
+        ],
+        "result": [
+          "Queen controlled cinder.",
+          "Fire dropped the final burger.",
+          "We have all the snacks!"
+        ]
+      }
+    }
+  }
+});
+// End Ant Attack Story Script v1
+
 
 
 const foodCatalog = Object.freeze([
@@ -116,7 +1112,7 @@ const foodCatalog = Object.freeze([
   { name: 'orange',   label: 'Orange',   emoji: '🍊', weight: 3, src: 'aa_orange.png',   fallback: 'orange.png' },
   { name: 'egg',      label: 'Egg',      emoji: '🥚', weight: 4, src: 'aa_egg.png',      fallback: 'egg.png' },
   { name: 'pizza',    label: 'Pizza',    emoji: '🍕', weight: 5, src: 'aa_pizza.png',    fallback: 'pizza.png' },
-  { name: 'snowcone', label: 'SnowCone', emoji: '🍧', weight: 6, src: 'aa_snowcone.png', fallback: 'snowcone.png' },
+  { name: 'snowcone', label: 'SnowCone', emoji: '🍧', weight: 6, src: () => getThemeSnowConeFoodPng(), fallback: ['aa_snowcone.png', 'snowcone.png'] },
   { name: 'burger',   label: 'Burger',   emoji: '🍔', weight: 7, src: 'aa_burger.png',   fallback: 'burger.png' },
 ]);
 
@@ -138,6 +1134,7 @@ let selectedAntId = 'black';
 let currentBattleMode = 'story';
 let currentPlayerAnt = ANT_ROSTER[0];
 let currentRivalAnt = ANT_ROSTER[1];
+let currentStoryRunWasReplay = false;
 
 const activeAnts = [];
 let redAntTimeouts = [];
@@ -153,6 +1150,139 @@ const _boundHandlers = new WeakMap(); // container -> { onPointerDown, onBackCap
 // ────────────────────────────────────────────────────────────────────────────────
 function assetUrl(filename) {
   return `${ASSET_BASE}${filename}`;
+}
+
+function isResolvedAssetUrl(value) {
+  const src = typeof value === 'function' ? value() : value;
+  if (!src) return false;
+
+  const text = String(src);
+  return (
+    text.startsWith('/') ||
+    text.startsWith('http://') ||
+    text.startsWith('https://') ||
+    text.startsWith('capacitor://') ||
+    text.startsWith('file://') ||
+    text.startsWith('data:')
+  );
+}
+
+function resolveAssetUrl(value, baseUrl = ASSET_BASE) {
+  const raw = typeof value === 'function' ? value() : value;
+  if (!raw) return '';
+
+  const text = String(raw).trim();
+  if (!text) return '';
+
+  return isResolvedAssetUrl(text) ? text : `${baseUrl}${text}`;
+}
+
+function normalizeThemePackageId(rawTheme = 'default') {
+  const raw = String(rawTheme || 'default').trim();
+  const theme = raw
+    .toLowerCase()
+    .replaceAll(' ', '_')
+    .replaceAll('-', '_');
+
+  const aliases = {
+    menubackground: 'default',
+    menu_background: 'default',
+    default_theme: 'default',
+    standard: 'default',
+
+    xmas: 'christmas',
+    christmas_01: 'christmas',
+
+    new_year: 'newyear',
+    newyears: 'newyear',
+    new_years: 'newyear',
+
+    valentines: 'valentine',
+    valentine_day: 'valentine',
+
+    fourth: 'freedom',
+    fourth_of_july: 'freedom',
+    july4: 'freedom',
+    july_4: 'freedom',
+
+    autumn: 'fall',
+  };
+
+  if (aliases[theme]) return aliases[theme];
+
+  const cosmicMatch = theme.match(/^cosmic_?0?([1-7])$/);
+  if (cosmicMatch) return `cosmic_0${cosmicMatch[1]}`;
+
+  const allowed = new Set([
+    'default',
+    'spring',
+    'summer',
+    'fall',
+    'winter',
+    'halloween',
+    'harvest',
+    'christmas',
+    'freedom',
+    'newyear',
+    'valentine',
+    'cosmic_01',
+    'cosmic_02',
+    'cosmic_03',
+    'cosmic_04',
+    'cosmic_05',
+    'cosmic_06',
+    'cosmic_07',
+  ]);
+
+  return allowed.has(theme) ? theme : 'default';
+}
+
+function getActiveThemePackageId() {
+  const candidates = [
+    appState?.settings?.theme,
+    appState?.settings?.menuTheme,
+    appState?.settings?.themeId,
+    appState?.settings?.selectedTheme,
+    appState?.settings?.visualPackage,
+    appState?.settings?.visualTheme,
+    appState?.profile?.theme,
+    appState?.profile?.selectedTheme,
+    appState?.theme,
+    appState?.selectedTheme,
+    globalThis.__SCMF_ACTIVE_THEME_ID,
+    document?.documentElement?.dataset?.theme,
+    document?.body?.dataset?.theme,
+  ];
+
+  const found = candidates.find((value) => {
+    return typeof value === 'string' && value.trim().length > 0;
+  });
+
+  return normalizeThemePackageId(found || 'default');
+}
+
+function menuPackageAssetUrl(packageId, filename = 'centerCone.png') {
+  return `${MENU_PACKAGE_ASSET_BASE}${normalizeThemePackageId(packageId)}/${filename}`;
+}
+
+function getThemeSnowConeFoodPng() {
+  return menuPackageAssetUrl(getActiveThemePackageId(), 'centerCone.png');
+}
+
+function getFoodPrimarySrc(food) {
+  if (food?.name === 'snowcone') {
+    return getThemeSnowConeFoodPng();
+  }
+
+  return food?.src || '';
+}
+
+function getFoodFallbackSrc(food) {
+  if (food?.name === 'snowcone') {
+    return ['aa_snowcone.png', food?.fallback || 'snowcone.png'];
+  }
+
+  return food?.fallback || null;
 }
 
 function escapeHtml(value = '') {
@@ -189,6 +1319,53 @@ function unmarkAntAttackShell(container) {
 }
 
 
+
+function getAntElementKey(antOrId) {
+  const id = typeof antOrId === 'string'
+    ? getAntById(antOrId).id
+    : getAntById(antOrId?.id).id;
+
+  const map = {
+    black: 'night',
+    blue: 'water',
+    pink: 'flower',
+    white: 'cloud',
+    yellow: 'sun',
+    red: 'fire',
+    queen: 'queen',
+  };
+
+  return map[id] || 'night';
+}
+
+function getAntRoyalName(antOrId) {
+  const ant = typeof antOrId === 'string'
+    ? getAntById(antOrId)
+    : getAntById(antOrId?.id);
+
+  if (ant.id === 'queen') return 'Queen SnackJacket';
+
+  return `Royal ${ant.name}`;
+}
+
+function getAntEndingPng(antOrId) {
+  const ant = typeof antOrId === 'string'
+    ? getAntById(antOrId)
+    : getAntById(antOrId?.id);
+
+  const endingMap = {
+    black: 'aa_night_ending.png',
+    blue: 'aa_blue_ending.png',
+    pink: 'aa_pink_ending.png',
+    white: 'aa_white_ending.png',
+    yellow: 'aa_yellow_ending.png',
+    red: 'aa_fire_ending.png',
+    queen: 'aa_queen_ending.png',
+  };
+
+  return endingMap[ant.id] || endingMap.black;
+}
+
 function getAntById(id) {
   if (id === QUEEN_SNACKJACKET.id) return QUEEN_SNACKJACKET;
   return ANT_ROSTER.find((ant) => ant.id === id) || ANT_ROSTER[0];
@@ -220,16 +1397,13 @@ function getChooserRoster() {
 
 function getStoryRouteForAnt(antId) {
   const id = getAntById(antId).id;
+  const route = STORY_ROUTE_BY_ANT[id] || STORY_ROUTE_BY_ANT.black;
 
-  if (id === QUEEN_SNACKJACKET.id) {
-    return ['black', 'blue', 'pink', 'white', 'yellow', 'red'];
-  }
-
-  const startIndex = Math.max(0, STORY_RIVAL_ORDER.indexOf(id) + 1);
-  const route = STORY_RIVAL_ORDER.slice(startIndex).filter((rivalId) => rivalId !== id);
-
-  return route.length ? route : ['queen'];
+  return route.filter((rivalId) => {
+    return isKnownAntId(rivalId) && rivalId !== id;
+  });
 }
+
 
 function getFirstStoryRivalId(antId) {
   return getStoryRouteForAnt(antId)[0] || null;
@@ -261,11 +1435,14 @@ function createAntStoryState(antId, existing = {}) {
     ? Math.max(0, +existing.wins)
     : inferredWins;
 
+  const hasCompletedRoute = route.length > 0 && wins >= route.length;
+  const complete = !!existing?.complete || hasCompletedRoute;
+
   return {
     started: !!existing?.started,
     prologueSeen: !!existing?.prologueSeen,
     missionSeen: !!existing?.missionSeen,
-    complete: !!existing?.complete,
+    complete,
     nextRivalId,
     wins,
   };
@@ -302,6 +1479,161 @@ function normalizeStorySave(parsedStory = {}, fallbackStory = {}) {
     complete: !!storyByAnt.black.complete,
     antStories: storyByAnt,
     storyByAnt,
+  };
+}
+
+
+function createReplayStoryState(antId, existing = {}) {
+  const id = getAntById(antId).id;
+  const route = getStoryRouteForAnt(id);
+  const firstRivalId = route[0] || null;
+
+  const nextCandidate = existing?.nextRivalId;
+  const nextRivalId = isStoryRivalValidForAnt(id, nextCandidate)
+    ? nextCandidate
+    : firstRivalId;
+
+  const wins = Number.isFinite(+existing?.wins)
+    ? Math.max(0, +existing.wins)
+    : 0;
+
+  const active = !!existing?.active && !!nextRivalId;
+  const complete = !!existing?.complete;
+
+  return {
+    active: complete ? false : active,
+    complete,
+    prologueSeen: !!existing?.prologueSeen,
+    missionSeen: !!existing?.missionSeen,
+    nextRivalId,
+    wins,
+  };
+}
+
+function ensureReplayStoryBucket(save) {
+  if (!save.replayStoryByAnt || typeof save.replayStoryByAnt !== 'object') {
+    save.replayStoryByAnt = {};
+  }
+
+  return save.replayStoryByAnt;
+}
+
+function getReplayStoryState(antId, save = readAntAttackSave()) {
+  const id = getAntById(antId).id;
+  const bucket = save?.replayStoryByAnt || {};
+
+  return createReplayStoryState(id, bucket[id]);
+}
+
+function hasActiveReplayStory(antId, save = readAntAttackSave()) {
+  const replay = getReplayStoryState(antId, save);
+  return !!replay.active && !replay.complete;
+}
+
+function writeReplayStoryState(antId, nextState) {
+  const id = getAntById(antId).id;
+  const save = readAntAttackSave();
+  const bucket = ensureReplayStoryBucket(save);
+
+  bucket[id] = createReplayStoryState(id, nextState);
+  writeAntAttackSave(save);
+}
+
+function startReplayStoryProgress(antId) {
+  const id = getAntById(antId).id;
+
+  writeReplayStoryState(id, {
+    active: true,
+    complete: false,
+    prologueSeen: false,
+    missionSeen: false,
+    nextRivalId: getFirstStoryRivalId(id),
+    wins: 0,
+  });
+}
+
+function clearReplayStoryProgress(antId, save = null) {
+  const id = getAntById(antId).id;
+  const targetSave = save || readAntAttackSave();
+  const bucket = ensureReplayStoryBucket(targetSave);
+
+  delete bucket[id];
+
+  if (!save) {
+    writeAntAttackSave(targetSave);
+  }
+
+  return targetSave;
+}
+
+function markReplayPrologueSeen(antId) {
+  const id = getAntById(antId).id;
+  const replay = getReplayStoryState(id);
+
+  if (!replay.active) return;
+
+  writeReplayStoryState(id, {
+    ...replay,
+    prologueSeen: true,
+  });
+}
+
+function markReplayMissionSeen(antId) {
+  const id = getAntById(antId).id;
+  const replay = getReplayStoryState(id);
+
+  if (!replay.active) return;
+
+  writeReplayStoryState(id, {
+    ...replay,
+    missionSeen: true,
+  });
+}
+
+function advanceReplayStoryProgressInSave(save, playerAntId, defeatedRivalId) {
+  const playerId = getAntById(playerAntId).id;
+  const rivalId = getAnyAntById(defeatedRivalId).id;
+  const route = getStoryRouteForAnt(playerId);
+  const currentIndex = route.indexOf(rivalId);
+
+  if (currentIndex < 0) {
+    return {
+      advanced: false,
+      replayComplete: false,
+      nextRivalId: getFirstStoryRivalId(playerId),
+      wins: 0,
+    };
+  }
+
+  const nextRivalId = route[currentIndex + 1] || null;
+  const replayComplete = !nextRivalId;
+  const bucket = ensureReplayStoryBucket(save);
+
+  if (replayComplete) {
+    delete bucket[playerId];
+
+    return {
+      advanced: true,
+      replayComplete: true,
+      nextRivalId: getFirstStoryRivalId(playerId),
+      wins: route.length,
+    };
+  }
+
+  bucket[playerId] = createReplayStoryState(playerId, {
+    active: true,
+    complete: false,
+    prologueSeen: true,
+    missionSeen: true,
+    nextRivalId,
+    wins: currentIndex + 1,
+  });
+
+  return {
+    advanced: true,
+    replayComplete: false,
+    nextRivalId,
+    wins: currentIndex + 1,
   };
 }
 
@@ -373,25 +1705,42 @@ function canPlayArcade(antId) {
 function getStoryButtonText(antId = selectedAntId) {
   if (!canPlayStory(antId)) return 'Story Mode';
 
-  const state = getAntStoryState(antId);
+  const save = readAntAttackSave();
+  const state = getAntStoryState(antId, save);
 
-  if (state.complete) return 'Replay Story';
-  if (isStoryFresh(antId)) return 'Start Story';
+  if (state.complete) {
+    return hasActiveReplayStory(antId, save) ? 'Continue Replay' : 'Replay Story';
+  }
+
+  if (isStoryFresh(antId, save)) return 'Start Story';
 
   return 'Continue Story';
 }
+
 
 function getStoryButtonSubtitle(antId = selectedAntId) {
   if (!canPlayStory(antId)) {
     return getStoryUnlockTextForAnt(antId);
   }
 
-  const state = getAntStoryState(antId);
-  const nextRival = getNextStoryRival(antId);
+  const save = readAntAttackSave();
+  const state = getAntStoryState(antId, save);
 
-  if (state.complete) return 'Story complete';
+  if (state.complete) {
+    const replay = getReplayStoryState(antId, save);
+
+    if (replay.active && !replay.complete) {
+      const nextReplayRival = getAnyAntById(replay.nextRivalId || getFirstStoryRivalId(antId));
+      return `Replay Next: ${nextReplayRival.name}`;
+    }
+
+    return 'Story complete';
+  }
+
+  const nextRival = getNextStoryRival(antId);
   return nextRival ? `Next: ${nextRival.name}` : 'Final snack path';
 }
+
 
 function getArcadeButtonSubtitle(antId = selectedAntId) {
   const ant = getAntById(antId);
@@ -425,6 +1774,12 @@ function getNextUnlockAntId(completedAntId) {
 
 function markStoryPrologueSeen(antId) {
   const id = getAntById(antId).id;
+
+  if (currentStoryRunWasReplay) {
+    markReplayPrologueSeen(id);
+    return;
+  }
+
   const state = getAntStoryState(id);
 
   writeAntStoryState(id, {
@@ -434,18 +1789,27 @@ function markStoryPrologueSeen(antId) {
   });
 }
 
-function shouldShowStoryPrologue(antId) {
-  const state = getAntStoryState(antId);
-  const wins = Number(state.wins) || 0;
 
-  // Show the selected-ant prologue until the first actual story win.
-  // After that, Continue Story should resume directly at the next rival mission.
-  return !state.complete && wins === 0;
+function shouldShowStoryPrologue(antId) {
+  if (currentStoryRunWasReplay) {
+    const replay = getReplayStoryState(antId);
+    return replay.active && !replay.prologueSeen;
+  }
+
+  return isStoryFresh(antId);
 }
+
+
 
 
 function markStoryMissionSeen(antId) {
   const id = getAntById(antId).id;
+
+  if (currentStoryRunWasReplay) {
+    markReplayMissionSeen(id);
+    return;
+  }
+
   const state = getAntStoryState(id);
 
   writeAntStoryState(id, {
@@ -454,6 +1818,7 @@ function markStoryMissionSeen(antId) {
     missionSeen: true,
   });
 }
+
 
 function markAntNewlyUnlocked(antId) {
   if (!isKnownAntId(antId) || antId === 'black') return;
@@ -492,12 +1857,52 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
       nextRivalId: state.nextRivalId,
       unlockedAntId: null,
       unlockedAntName: '',
+      replay: currentStoryRunWasReplay,
+    };
+  }
+
+  if (currentStoryRunWasReplay || state.complete) {
+    const replayResult = advanceReplayStoryProgressInSave(save, playerId, rivalId);
+
+    // Protect original story completion and Arcade access forever.
+    save.story.storyByAnt[playerId] = createAntStoryState(playerId, {
+      ...state,
+      started: true,
+      prologueSeen: true,
+      missionSeen: true,
+      complete: true,
+      nextRivalId: getFirstStoryRivalId(playerId),
+      wins: Math.max(Number(state.wins) || 0, route.length),
+    });
+    save.story.antStories = { ...save.story.storyByAnt };
+
+    if (playerId === 'black') {
+      save.story.nextRivalId = save.story.storyByAnt.black.nextRivalId;
+      save.story.complete = true;
+    }
+
+    writeAntAttackSave(save);
+
+    console.log('[antAttack] replay story victory saved', {
+      playerId,
+      defeatedRivalId: rivalId,
+      replayComplete: replayResult.replayComplete,
+      nextRivalId: replayResult.nextRivalId,
+      wins: replayResult.wins,
+    });
+
+    return {
+      advanced: true,
+      storyComplete: replayResult.replayComplete,
+      nextRivalId: replayResult.nextRivalId,
+      unlockedAntId: null,
+      unlockedAntName: '',
+      replay: true,
     };
   }
 
   const nextRivalId = route[currentIndex + 1] || null;
   const storyComplete = !nextRivalId;
-
   const nextWins = Math.max(Number(state.wins) || 0, currentIndex + 1);
 
   save.story.storyByAnt[playerId] = createAntStoryState(playerId, {
@@ -551,8 +1956,11 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
     nextRivalId,
     unlockedAntId,
     unlockedAntName,
+    replay: false,
   };
 }
+
+
 
 function getBattleTargetScore(mode = currentBattleMode, rivalId = currentRivalAnt?.id) {
   return mode === 'story' && rivalId === 'queen'
@@ -578,24 +1986,90 @@ function getAntPortraitPng(ant, variant = 'base') {
   return ant.basePng || 'aa_ant_black_base.png';
 }
 
-function getStoryIntroCopy(playerAnt, rivalAnt) {
-  const playerName = playerAnt?.shortName || 'Ant';
-  const rivalName = rivalAnt?.shortName || 'Rival';
+function getStoryBattleScript(playerAnt, rivalAnt) {
+  const playerId = getAntById(playerAnt?.id || playerAnt).id;
+  const rivalId = getAnyAntById(rivalAnt?.id || rivalAnt).id;
+  const battle = ANT_STORY_SCRIPT?.battles?.[playerId]?.[rivalId];
 
-  if (rivalAnt?.id === 'queen') {
-    return {
-      royalLine: 'Queen SnackJacket guards the final snack.',
-      playerLine: `${playerName} marches in. First to twenty wins the crown.`,
-      missionLine: 'Boss snack battle incoming.',
-    };
-  }
+  if (battle) return battle;
+
+  console.warn('[antAttack] missing story script; fallback used', {
+    playerId,
+    rivalId,
+  });
 
   return {
-    royalLine: `${rivalName} blocks the blanket road.`,
-    playerLine: `${playerName} takes the mission. First to ten snacks wins.`,
-    missionLine: 'Pull hard. Save snacks. Keep marching.',
+    mission: [`${getAnyAntById(rivalId).name} blocks the blanket road.`, 'Snacks wait beyond the challenge.', 'First to snacks wins.'],
+    player: [`${getAntById(playerId).name} marches forward.`, 'Snack courage fills the tiny paws.', 'The colony waits.'],
+    reply: ['The rival guards the picnic line.', 'No snack passes without a fight!'],
+    result: ['Snack route secured.', 'The picnic path opens again.', 'The nest cheers loudly!'],
   };
 }
+
+function getStoryPrologueLines(playerAnt) {
+  const id = getAntById(playerAnt?.id || playerAnt).id;
+  return ANT_STORY_SCRIPT?.prologue?.[id] || [
+    'The colony waits.',
+    'Bring tasty snacks back home safe.',
+    'The nest needs dinner!',
+  ];
+}
+
+function getStoryMissionLines(playerAnt, rivalAnt) {
+  return getStoryBattleScript(playerAnt, rivalAnt).mission;
+}
+
+function getStoryPlayerLines(playerAnt, rivalAnt) {
+  return getStoryBattleScript(playerAnt, rivalAnt).player;
+}
+
+function getStoryRivalReplyLines(playerAnt, rivalAnt) {
+  return getStoryBattleScript(playerAnt, rivalAnt).reply;
+}
+
+function getStoryResultLines(playerAnt, rivalAnt) {
+  return getStoryBattleScript(playerAnt, rivalAnt).result;
+}
+
+function getStoryEndingLines(playerAnt) {
+  const id = getAntById(playerAnt?.id || playerAnt).id;
+  return ANT_STORY_SCRIPT?.ending?.[id] || [
+    'Snacks fill the halls.',
+    'The colony laughs and feasts.',
+    'Victory tastes sweet!',
+  ];
+}
+
+function getAntTextToneClass(antOrId) {
+  return `aa-tone-${getAntElementKey(antOrId)}`;
+}
+
+function renderStoryPoem(lines, { className = '', speaker = '', antId = selectedAntId } = {}) {
+  const safeLines = Array.isArray(lines) ? lines : [lines];
+  const toneClass = getAntTextToneClass(antId);
+  const speakerMarkup = speaker
+    ? `<strong class="aa-script-speaker">${escapeHtml(speaker)}</strong>`
+    : '';
+
+  return `
+    <div class="aa-script-poem ${className} ${toneClass}" data-aa-tone="${escapeHtml(getAntElementKey(antId))}">
+      ${speakerMarkup}
+      ${safeLines.map((line) => `<span class="aa-script-line">${escapeHtml(line)}</span>`).join('')}
+    </div>
+  `;
+}
+
+function getStoryIntroCopy(playerAnt, rivalAnt) {
+  const battle = getStoryBattleScript(playerAnt, rivalAnt);
+
+  return {
+    royalLines: battle.mission,
+    playerLines: battle.player,
+    rivalReplyLines: battle.reply,
+    missionLine: `First to ${getBattleTargetScore('story', rivalAnt?.id)} snacks wins.`,
+  };
+}
+
 
 function getArcadeRival(playerId) {
   const player = getAntById(playerId);
@@ -762,6 +2236,18 @@ function getSelectedRosterIndex() {
 // Example:
 // window.__SCMF_unlockAntAttackAnt?.('blue')
 globalThis.__SCMF_unlockAntAttackAnt = markAntNewlyUnlocked;
+
+globalThis.__SCMF_getAntAttackStoryRoute = (antId = selectedAntId) => {
+  const id = getAntById(antId).id;
+
+  return getStoryRouteForAnt(id).map((rivalId) => {
+    const ant = getAnyAntById(rivalId);
+    return {
+      id: ant.id,
+      name: ant.name,
+    };
+  });
+};
 globalThis.__SCMF_readAntAttackSave = readAntAttackSave;
 globalThis.__SCMF_resetAntAttackSave = () => {
   try {
@@ -780,18 +2266,33 @@ globalThis.__SCMF_resetAntAttackSave = () => {
 function setImgSrcWithFallback(img, primaryName, fallbackName = null) {
   if (!img || !primaryName) return;
 
-  const primary = assetUrl(primaryName);
-  const fallback = fallbackName ? assetUrl(fallbackName) : '';
+  const fallbackList = Array.isArray(fallbackName)
+    ? fallbackName
+    : [fallbackName];
+
+  const sources = [primaryName, ...fallbackList]
+    .filter(Boolean)
+    .map((src) => resolveAssetUrl(src))
+    .filter(Boolean);
+
+  if (!sources.length) return;
+
+  let sourceIndex = 0;
 
   img.onerror = () => {
-    if (fallback && img.src !== fallback) {
-      img.onerror = null;
-      img.src = fallback;
+    sourceIndex += 1;
+
+    if (sourceIndex < sources.length) {
+      img.src = sources[sourceIndex];
+      return;
     }
+
+    img.onerror = null;
   };
 
-  img.src = primary;
+  img.src = sources[sourceIndex];
 }
+
 
 function clearAllRedTimeouts() {
   try { redAntTimeouts.forEach(clearTimeout); } catch {}
@@ -992,6 +2493,7 @@ export function destroyAntAttackGame(container) {
   playerAntsAttached = aiAntsAttached = 0;
   currentDirection = null;
   currentPhase = 'choose';
+  currentStoryRunWasReplay = false;
 }
 
 export function resetAntAttackGame(container) {
@@ -1010,6 +2512,7 @@ export function forceKillAntAttack() {
   activeAnts.length = 0;
   roundInProgress = false;
   currentPhase = 'choose';
+  currentStoryRunWasReplay = false;
   ANT.session++;   // invalidate any scheduled timeouts
   ANT.alive   = false;
   ANT.root    = null;
@@ -1025,6 +2528,7 @@ function renderChooseScreen(container) {
   if (!aliveGuard(container)) return;
 
   currentPhase = 'choose';
+  currentStoryRunWasReplay = false;
   resetBattleRuntimeCounters();
 
   const selectedAnt = getAntById(selectedAntId);
@@ -1135,6 +2639,36 @@ function wireChooseScreen(container) {
 
     markAntPlayed(player.id);
 
+    const save = readAntAttackSave();
+    const completedStory = isAntStoryComplete(player.id, save);
+
+    currentStoryRunWasReplay = completedStory;
+
+    if (completedStory) {
+      const existingReplay = getReplayStoryState(player.id, save);
+
+      if (!existingReplay.active || existingReplay.complete) {
+        startReplayStoryProgress(player.id);
+      }
+
+      const replay = getReplayStoryState(player.id);
+      const rival = getAnyAntById(replay.nextRivalId || getFirstStoryRivalId(player.id));
+
+      if (shouldShowStoryPrologue(player.id)) {
+        renderStoryPrologueScreen(container, {
+          playerAntId: player.id,
+          rivalAntId: rival.id,
+        });
+        return;
+      }
+
+      renderStoryMissionScreen(container, {
+        playerAntId: player.id,
+        rivalAntId: rival.id,
+      });
+      return;
+    }
+
     const rival = getNextStoryRival(player.id);
 
     if (shouldShowStoryPrologue(player.id)) {
@@ -1153,6 +2687,7 @@ function wireChooseScreen(container) {
 
   arcade?.addEventListener('click', () => {
     const player = getAntById(selectedAntId);
+    currentStoryRunWasReplay = false;
     if (!canPlayArcade(player.id)) return;
 
     markAntPlayed(player.id);
@@ -1180,45 +2715,59 @@ function renderStoryPrologueScreen(container, { playerAntId = selectedAntId, riv
 
   const royalPng = getAntPortraitPng(currentPlayerAnt, 'royal');
   const basePng = getAntPortraitPng(currentPlayerAnt, 'base');
+  const isQueenStory = currentPlayerAnt.id === 'queen';
+
+  const prologueStageMarkup = isQueenStory
+    ? `
+      <div class="aa-prologue-stage aa-prologue-stage-queen">
+        <figure class="aa-prologue-character aa-prologue-queen">
+          <img
+            src="${assetUrl(getAntPortraitPng(currentPlayerAnt, 'powered'))}"
+            alt="${escapeHtml(currentPlayerAnt.name)}"
+            draggable="false"
+          />
+          <figcaption>${escapeHtml(currentPlayerAnt.name)}</figcaption>
+        </figure>
+      </div>
+    `
+    : `
+      <div class="aa-prologue-stage">
+        <figure class="aa-prologue-character aa-prologue-royal">
+          <img
+            src="${assetUrl(royalPng)}"
+            alt="${escapeHtml(getAntRoyalName(currentPlayerAnt))}"
+            draggable="false"
+          />
+          <figcaption>${escapeHtml(getAntRoyalName(currentPlayerAnt))}</figcaption>
+        </figure>
+
+        <figure class="aa-prologue-character aa-prologue-player">
+          <img
+            src="${assetUrl(basePng)}"
+            alt="${escapeHtml(currentPlayerAnt.name)}"
+            draggable="false"
+          />
+          <figcaption>${escapeHtml(currentPlayerAnt.name)}</figcaption>
+        </figure>
+      </div>
+    `;
 
   container.innerHTML = `
-    <div class="aa-prologue-screen aa-cinematic-screen">
+    <div class="aa-prologue-screen aa-cinematic-screen" data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}">
       <section class="aa-cinematic-card aa-prologue-card" aria-label="Ant Attack story prologue">
         <header class="aa-cinematic-header">
           <span class="aa-cinematic-kicker">Story Mode</span>
           <h2>Royal Mission</h2>
         </header>
 
-        <div class="aa-prologue-stage">
-          <figure class="aa-prologue-character aa-prologue-royal">
-            <img
-              src="${assetUrl(royalPng)}"
-              alt="Royal Ant"
-              draggable="false"
-            />
-            <figcaption>Royal Ant</figcaption>
-          </figure>
+        ${prologueStageMarkup}
 
-          <figure class="aa-prologue-character aa-prologue-player">
-            <img
-              src="${assetUrl(basePng)}"
-              alt="${escapeHtml(currentPlayerAnt.name)}"
-              draggable="false"
-            />
-            <figcaption>${escapeHtml(currentPlayerAnt.name)}</figcaption>
-          </figure>
-        </div>
-
-        <div class="aa-dialogue-box aa-prologue-dialogue" aria-live="polite">
-          <p class="aa-dialogue-line aa-speaker-royal">
-            The blanket has fallen into snack chaos.
-          </p>
-          <p class="aa-dialogue-line aa-speaker-player">
-            Collect every snack and prove your story.
-          </p>
-          <p class="aa-dialogue-mission">
-            Win each battle to unlock the next ant.
-          </p>
+        <div class="aa-dialogue-box aa-script-dialogue aa-prologue-dialogue" aria-live="polite">
+          ${renderStoryPoem(getStoryPrologueLines(currentPlayerAnt), {
+            className: 'aa-prologue-poem',
+            speaker: isQueenStory ? currentPlayerAnt.name : getAntRoyalName(currentPlayerAnt),
+            antId: currentPlayerAnt.id,
+          })}
         </div>
 
         <button id="aaPrologueContinueBtn" class="aa-cinematic-btn" type="button">
@@ -1249,18 +2798,22 @@ function renderStoryMissionScreen(container, { playerAntId = selectedAntId, riva
 
   resetBattleRuntimeCounters();
 
-  const guideLabel = currentRivalAnt?.id === 'queen' ? currentRivalAnt.name : 'Royal Ant';
+  const guideLabel = currentRivalAnt?.id === 'queen' ? currentRivalAnt.name : getAntRoyalName(currentRivalAnt);
   const guidePng = getAntPortraitPng(
     currentRivalAnt,
     currentRivalAnt?.id === 'queen' ? 'base' : 'royal'
   );
 
   container.innerHTML = `
-    <div class="aa-mission-screen aa-cinematic-screen">
+    <div
+      class="aa-mission-screen aa-cinematic-screen"
+      data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
+      data-aa-rival="${escapeHtml(getAntElementKey(currentRivalAnt))}"
+    >
       <section class="aa-cinematic-card aa-mission-card" aria-label="Ant Attack rival royal briefing">
         <header class="aa-cinematic-header">
           <span class="aa-cinematic-kicker">Story Mode</span>
-          <h2>Royal Mission</h2>
+          <h2>Royal Rival</h2>
         </header>
 
         <figure class="aa-mission-royal">
@@ -1272,16 +2825,12 @@ function renderStoryMissionScreen(container, { playerAntId = selectedAntId, riva
           <figcaption>${escapeHtml(guideLabel)}</figcaption>
         </figure>
 
-        <div class="aa-dialogue-box aa-mission-dialogue" aria-live="polite">
-          <p class="aa-dialogue-line aa-speaker-royal">
-            My worker guards the next snack road.
-          </p>
-          <p class="aa-dialogue-line aa-speaker-player">
-            Face the challenge and keep marching.
-          </p>
-          <p class="aa-dialogue-mission">
-            First to ${getBattleTargetScore('story', currentRivalAnt.id)} snacks wins.
-          </p>
+        <div class="aa-dialogue-box aa-script-dialogue aa-mission-dialogue" aria-live="polite">
+          ${renderStoryPoem(getStoryMissionLines(currentPlayerAnt, currentRivalAnt), {
+            className: 'aa-mission-poem',
+            speaker: guideLabel,
+            antId: currentRivalAnt.id,
+          })}
         </div>
 
         <button id="aaMissionContinueBtn" class="aa-cinematic-btn" type="button">
@@ -1316,7 +2865,11 @@ function renderStoryIntroScreen(container, { playerAntId = selectedAntId, rivalA
   const rivalPng = getAntPortraitPng(currentRivalAnt);
 
   container.innerHTML = `
-    <div class="aa-story-screen aa-cinematic-screen">
+    <div
+      class="aa-story-screen aa-cinematic-screen"
+      data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
+      data-aa-rival="${escapeHtml(getAntElementKey(currentRivalAnt))}"
+    >
       <section class="aa-cinematic-card aa-story-card" aria-label="Ant Attack story battle">
         <header class="aa-cinematic-header">
           <span class="aa-cinematic-kicker">Story Mode</span>
@@ -1343,10 +2896,20 @@ function renderStoryIntroScreen(container, { playerAntId = selectedAntId, rivalA
           </figure>
         </div>
 
-        <div class="aa-dialogue-box" aria-live="polite">
-          <p class="aa-dialogue-line aa-speaker-royal">${escapeHtml(copy.royalLine)}</p>
-          <p class="aa-dialogue-line aa-speaker-player">${escapeHtml(copy.playerLine)}</p>
-          <p class="aa-dialogue-mission">${escapeHtml(copy.missionLine)}</p>
+        <div class="aa-dialogue-box aa-script-dialogue aa-faceoff-dialogue" aria-live="polite">
+          ${renderStoryPoem(copy.playerLines, {
+            className: 'aa-player-poem',
+            speaker: currentPlayerAnt.name,
+            antId: currentPlayerAnt.id,
+          })}
+
+          ${renderStoryPoem(copy.rivalReplyLines, {
+            className: 'aa-rival-reply-poem',
+            speaker: currentRivalAnt.name,
+            antId: currentRivalAnt.id,
+          })}
+
+          <small class="aa-script-mission-line">${escapeHtml(copy.missionLine)}</small>
         </div>
 
         <button id="aaStoryToVersusBtn" class="aa-cinematic-btn" type="button">
@@ -1379,7 +2942,12 @@ function renderVersusScreen(container, { mode = 'story', playerAntId = selectedA
   const targetScore = getBattleTargetScore(mode, currentRivalAnt.id);
 
   container.innerHTML = `
-    <div class="aa-versus-screen aa-cinematic-screen" data-aa-mode="${escapeHtml(mode)}">
+    <div
+      class="aa-versus-screen aa-cinematic-screen"
+      data-aa-mode="${escapeHtml(mode)}"
+      data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
+      data-aa-rival="${escapeHtml(getAntElementKey(currentRivalAnt))}"
+    >
       <section class="aa-cinematic-card aa-versus-card" aria-label="Ant Attack versus screen">
         <div class="aa-versus-fighter aa-versus-rival">
           <img
@@ -1462,8 +3030,24 @@ function renderResultsScreen(container, { winnerKind = getBattleWinnerKind() } =
       ? (storyResult?.storyComplete ? 'Ending' : 'Continue')
       : 'Try Again';
 
+  const storyResultMarkup = currentBattleMode === 'story' && playerWon
+    ? renderStoryPoem(getStoryResultLines(currentPlayerAnt, currentRivalAnt), {
+        className: 'aa-results-haiku',
+        speaker: currentPlayerAnt.name,
+        antId: currentPlayerAnt.id,
+      })
+    : `<span class="aa-results-plain">${playerWon ? 'Snack route secured. The picnic path opens.' : 'The rival held the snack line. Run it back.'}</span>`;
+
+  const statusMarkup = unlockLine || storyCompleteLine
+    ? `<strong class="aa-results-status">${escapeHtml(unlockLine || storyCompleteLine)}</strong>`
+    : '';
+
   container.innerHTML = `
-    <div class="aa-results-screen aa-cinematic-screen">
+    <div
+      class="aa-results-screen aa-cinematic-screen"
+      data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
+      data-aa-rival="${escapeHtml(getAntElementKey(currentRivalAnt))}"
+    >
       <section class="aa-cinematic-card aa-results-card" aria-label="Ant Attack results">
         <header class="aa-cinematic-header">
           <span class="aa-cinematic-kicker">${currentBattleMode === 'story' ? 'Story Result' : 'Arcade Result'}</span>
@@ -1483,17 +3067,13 @@ function renderResultsScreen(container, { winnerKind = getBattleWinnerKind() } =
           <span>${escapeHtml(currentRivalAnt.shortName)}: <strong>${aiScore}</strong></span>
         </div>
 
-        <p class="aa-results-copy">
-          ${
-            unlockLine
-              ? escapeHtml(unlockLine)
-              : storyCompleteLine
-                ? escapeHtml(storyCompleteLine)
-                : playerWon
-                  ? 'Snack route secured. The picnic path opens.'
-                  : 'The rival held the snack line. Run it back.'
-          }
-        </p>
+        <div class="aa-results-copy aa-script-dialogue">
+          ${storyResultMarkup}
+        </div>
+
+        <div class="aa-results-status-wrap ${statusMarkup ? '' : 'is-empty'}">
+          ${statusMarkup}
+        </div>
 
         <div class="aa-results-actions">
           <button id="aaResultsBackBtn" class="aa-cinematic-btn aa-secondary-btn" type="button">Back</button>
@@ -1504,6 +3084,7 @@ function renderResultsScreen(container, { winnerKind = getBattleWinnerKind() } =
   `;
 
   container.querySelector('#aaResultsBackBtn')?.addEventListener('click', () => {
+    currentStoryRunWasReplay = false;
     renderChooseScreen(container);
   });
 
@@ -1546,27 +3127,36 @@ function renderEndingScreen(container) {
   clearPhaseTimeouts();
   currentPhase = 'ending';
 
-  const heroPng = getAntPortraitPng(currentPlayerAnt, 'powered');
+  const endingPng = getAntEndingPng(currentPlayerAnt);
+  const endingAlt = `${currentPlayerAnt.name} ending celebration`;
 
   container.innerHTML = `
-    <div class="aa-ending-screen aa-cinematic-screen">
+    <div
+      class="aa-ending-screen aa-cinematic-screen"
+      data-aa-ending="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
+      data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
+    >
       <section class="aa-cinematic-card aa-ending-card" aria-label="Ant Attack ending">
         <header class="aa-cinematic-header">
           <span class="aa-cinematic-kicker">Victory Snack</span>
-          <h2>${escapeHtml(currentPlayerAnt.name)} Finished the Story!</h2>
+          <h2>${escapeHtml(currentPlayerAnt.name)} Story Complete!</h2>
         </header>
 
         <div class="aa-ending-art">
           <img
-            src="${assetUrl(heroPng)}"
-            alt="${escapeHtml(currentPlayerAnt.name)} powered up"
+            src="${assetUrl(endingPng)}"
+            alt="${escapeHtml(endingAlt)}"
             draggable="false"
           />
         </div>
 
-        <p class="aa-results-copy">
-          The blanket is quiet. The snack crown glows. Final art goes here later.
-        </p>
+        <div class="aa-results-copy aa-script-dialogue aa-ending-copy">
+          ${renderStoryPoem(getStoryEndingLines(currentPlayerAnt), {
+            className: 'aa-ending-haiku',
+            speaker: currentPlayerAnt.name,
+            antId: currentPlayerAnt.id,
+          })}
+        </div>
 
         <button id="aaEndingBackBtn" class="aa-cinematic-btn" type="button">Back to Ants</button>
       </section>
@@ -1574,9 +3164,11 @@ function renderEndingScreen(container) {
   `;
 
   container.querySelector('#aaEndingBackBtn')?.addEventListener('click', () => {
+    currentStoryRunWasReplay = false;
     renderChooseScreen(container);
   });
 }
+
 
 
 function wireBackCapture(container) {
@@ -1745,7 +3337,7 @@ function startNewRound(container) {
   foodEl.className = 'food-plate-img';
   foodEl.id = 'antFood';
   foodEl.alt = currentFood.label;
-  setImgSrcWithFallback(foodEl, currentFood.src, currentFood.fallback);
+  setImgSrcWithFallback(foodEl, getFoodPrimarySrc(currentFood), getFoodFallbackSrc(currentFood));
 
   if (currentFood.name === 'snowcone') foodEl.classList.add('big-snowcone');
 
