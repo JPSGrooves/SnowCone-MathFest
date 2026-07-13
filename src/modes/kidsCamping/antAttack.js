@@ -26,6 +26,7 @@ const ANT_ROSTER = Object.freeze([
     unlockText: 'Starter ant',
     basePng: 'aa_ant_black_base.png',
     poweredPng: 'aa_ant_black_powered.png',
+    wavePng: 'aa_wave_night.png',
     royalPng: 'aa_ant_black_royal.png',
     soldierPng: 'aa_blackAnt.png',
   },
@@ -38,6 +39,7 @@ const ANT_ROSTER = Object.freeze([
     unlockText: 'Beat Water Ant',
     basePng: 'aa_ant_blue_base.png',
     poweredPng: 'aa_ant_blue_powered.png',
+    wavePng: 'aa_wave_water.png',
     royalPng: 'aa_ant_blue_royal.png',
     soldierPng: 'aa_blueAnt.png',
   },
@@ -50,6 +52,7 @@ const ANT_ROSTER = Object.freeze([
     unlockText: 'Beat Flower Ant',
     basePng: 'aa_ant_pink_base.png',
     poweredPng: 'aa_ant_pink_powered.png',
+    wavePng: 'aa_wave_flower.png',
     royalPng: 'aa_ant_pink_royal.png',
     soldierPng: 'aa_pinkAnt.png',
   },
@@ -62,6 +65,7 @@ const ANT_ROSTER = Object.freeze([
     unlockText: 'Beat Cloud Ant',
     basePng: 'aa_ant_white_base.png',
     poweredPng: 'aa_ant_white_powered.png',
+    wavePng: 'aa_wave_cloud.png',
     royalPng: 'aa_ant_white_royal.png',
     soldierPng: 'aa_whiteAnt.png',
   },
@@ -74,6 +78,7 @@ const ANT_ROSTER = Object.freeze([
     unlockText: 'Beat Sun Ant',
     basePng: 'aa_ant_yellow_base.png',
     poweredPng: 'aa_ant_yellow_powered.png',
+    wavePng: 'aa_wave_sun.png',
     royalPng: 'aa_ant_yellow_royal.png',
     soldierPng: 'aa_yellowAnt.png',
   },
@@ -86,6 +91,7 @@ const ANT_ROSTER = Object.freeze([
     unlockText: 'Beat Fire Ant',
     basePng: 'aa_ant_red_base.png',
     poweredPng: 'aa_ant_red_powered.png',
+    wavePng: 'aa_wave_fire.png',
     royalPng: 'aa_ant_red_royal.png',
     soldierPng: 'aa_redAnt.png',
   },
@@ -99,6 +105,7 @@ const QUEEN_SNACKJACKET = Object.freeze({
   wavePower: 9,
   basePng: 'aa_ant_queen_snackjacket_base.png',
   poweredPng: 'aa_ant_queen_snackjacket_powered.png',
+  wavePng: 'aa_wave_pollen.png',
   soldierPng: 'aa_yellowjacket.png',
   fallbackSoldierPng: 'aa_yellowAnt.png',
 });
@@ -118,6 +125,7 @@ const STORY_ROUTE_BY_ANT = Object.freeze({
 
 const BATTLE_TARGET_SCORE = 10;
 const BOSS_BATTLE_TARGET_SCORE = 20;
+const WAVE_CHARGE_MAX = 3;
 // Kept as a future fallback knob if we want optional auto-start again.
 const VS_AUTO_START_MS = 4700;
 
@@ -1136,6 +1144,17 @@ let currentPlayerAnt = ANT_ROSTER[0];
 let currentRivalAnt = ANT_ROSTER[1];
 let currentStoryRunWasReplay = false;
 
+let arcadeWaveRun = {
+  active: false,
+  playerAntId: null,
+  charge: 0,
+};
+
+let waveInProgress = false;
+let waveTimeline = null;
+let waveStageEl = null;
+let waveAnimationToken = 0;
+
 const activeAnts = [];
 let redAntTimeouts = [];
 let phaseTimeouts = [];
@@ -1420,6 +1439,16 @@ function inferWinsFromNextRival(antId, nextRivalId) {
   return index > 0 ? index : 0;
 }
 
+function clampWaveCharge(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+
+  return Math.max(
+    0,
+    Math.min(WAVE_CHARGE_MAX, Math.floor(numeric))
+  );
+}
+
 function createAntStoryState(antId, existing = {}) {
   const id = getAntById(antId).id;
   const route = getStoryRouteForAnt(id);
@@ -1445,6 +1474,9 @@ function createAntStoryState(antId, existing = {}) {
     complete,
     nextRivalId,
     wins,
+    waveCharge: complete
+      ? 0
+      : clampWaveCharge(existing?.waveCharge),
   };
 }
 
@@ -1507,6 +1539,9 @@ function createReplayStoryState(antId, existing = {}) {
     missionSeen: !!existing?.missionSeen,
     nextRivalId,
     wins,
+    waveCharge: complete
+      ? 0
+      : clampWaveCharge(existing?.waveCharge),
   };
 }
 
@@ -1549,6 +1584,7 @@ function startReplayStoryProgress(antId) {
     missionSeen: false,
     nextRivalId: getFirstStoryRivalId(id),
     wins: 0,
+    waveCharge: 0,
   });
 }
 
@@ -1608,6 +1644,7 @@ function advanceReplayStoryProgressInSave(save, playerAntId, defeatedRivalId) {
   const nextRivalId = route[currentIndex + 1] || null;
   const replayComplete = !nextRivalId;
   const bucket = ensureReplayStoryBucket(save);
+  const replayState = createReplayStoryState(playerId, bucket[playerId]);
 
   if (replayComplete) {
     delete bucket[playerId];
@@ -1627,6 +1664,7 @@ function advanceReplayStoryProgressInSave(save, playerAntId, defeatedRivalId) {
     missionSeen: true,
     nextRivalId,
     wins: currentIndex + 1,
+    waveCharge: replayState.waveCharge,
   });
 
   return {
@@ -1658,6 +1696,971 @@ function writeAntStoryState(antId, nextState) {
   }
 
   writeAntAttackSave(save);
+}
+
+function startArcadeWaveRun(playerAntId) {
+  arcadeWaveRun = {
+    active: true,
+    playerAntId: getAntById(playerAntId).id,
+    charge: 0,
+  };
+}
+
+function endArcadeWaveRun() {
+  arcadeWaveRun = {
+    active: false,
+    playerAntId: null,
+    charge: 0,
+  };
+}
+
+function getCurrentWaveCharge() {
+  const playerId = getAntById(currentPlayerAnt?.id).id;
+
+  if (currentBattleMode === 'story') {
+    if (currentStoryRunWasReplay) {
+      return getReplayStoryState(playerId).waveCharge;
+    }
+
+    return getAntStoryState(playerId).waveCharge;
+  }
+
+  if (
+    currentBattleMode === 'arcade' &&
+    arcadeWaveRun.active &&
+    arcadeWaveRun.playerAntId === playerId
+  ) {
+    return clampWaveCharge(arcadeWaveRun.charge);
+  }
+
+  return 0;
+}
+
+function setCurrentWaveCharge(nextCharge) {
+  const playerId = getAntById(currentPlayerAnt?.id).id;
+  const charge = clampWaveCharge(nextCharge);
+
+  if (currentBattleMode === 'story') {
+    if (currentStoryRunWasReplay) {
+      const replay = getReplayStoryState(playerId);
+
+      writeReplayStoryState(playerId, {
+        ...replay,
+        waveCharge: charge,
+      });
+
+      return charge;
+    }
+
+    const story = getAntStoryState(playerId);
+
+    writeAntStoryState(playerId, {
+      ...story,
+      waveCharge: charge,
+    });
+
+    return charge;
+  }
+
+  if (
+    currentBattleMode === 'arcade' &&
+    arcadeWaveRun.active &&
+    arcadeWaveRun.playerAntId === playerId
+  ) {
+    arcadeWaveRun.charge = charge;
+  }
+
+  return charge;
+}
+
+function updateWaveButton(container) {
+  const button = container?.querySelector?.('#aa-wave-button');
+  if (!button) return;
+
+  const charge = getCurrentWaveCharge();
+  const isReady = charge >= WAVE_CHARGE_MAX;
+
+  const canFire =
+    isReady &&
+    roundInProgress &&
+    !waveInProgress &&
+    currentPhase === 'battle';
+
+  button.dataset.waveCharge = String(charge);
+  button.classList.toggle('is-empty', charge === 0);
+  button.classList.toggle('is-charging', charge > 0 && !isReady);
+  button.classList.toggle('is-ready', isReady);
+  button.classList.toggle('is-firing', waveInProgress);
+
+  button.style.setProperty(
+    '--aa-wave-angle',
+    `${charge * (360 / WAVE_CHARGE_MAX)}deg`
+  );
+
+  const count = button.querySelector('.aa-wave-count');
+
+  if (count) {
+    count.textContent = `${charge}/${WAVE_CHARGE_MAX}`;
+  }
+
+  button.setAttribute(
+    'aria-label',
+    waveInProgress
+      ? `${currentPlayerAnt.waveName} active`
+      : isReady
+        ? `${currentPlayerAnt.waveName} ready`
+        : `${currentPlayerAnt.waveName} charge ${charge} of ${WAVE_CHARGE_MAX}`
+  );
+
+  button.disabled = !canFire;
+}
+
+function flashWaveChargeButton(container, becameReady = false) {
+  const button = container?.querySelector?.('#aa-wave-button');
+  if (!button) return;
+
+  button.classList.remove(
+    'just-charged',
+    'just-became-ready'
+  );
+
+  void button.offsetWidth;
+
+  button.classList.add(
+    becameReady
+      ? 'just-became-ready'
+      : 'just-charged'
+  );
+
+  setPhaseTimeout(() => {
+    button.classList.remove(
+      'just-charged',
+      'just-became-ready'
+    );
+  }, becameReady ? 900 : 620);
+}
+
+function awardWaveChargeForRound(container, {
+  result,
+  foodName,
+  usedAnts,
+  requiredAnts,
+}) {
+  if (result !== 'win') return false;
+
+  const snowConeSaved = foodName === 'snowcone';
+
+  const exactNonSnowCone =
+    !snowConeSaved &&
+    usedAnts === requiredAnts;
+
+  /*
+    SnowCone is one category.
+    An exact SnowCone does not double-dip.
+  */
+  if (!snowConeSaved && !exactNonSnowCone) {
+    return false;
+  }
+
+  const before = getCurrentWaveCharge();
+  const after = setCurrentWaveCharge(before + 1);
+
+  updateWaveButton(container);
+
+  if (after > before) {
+    flashWaveChargeButton(
+      container,
+      before < WAVE_CHARGE_MAX &&
+      after === WAVE_CHARGE_MAX
+    );
+  }
+
+  return after > before;
+}
+
+function setWaveFiringState(container, firing) {
+  waveInProgress = !!firing;
+
+  container
+    ?.querySelector?.('.aa-battle-wrapper')
+    ?.classList?.toggle(
+      'is-wave-firing',
+      waveInProgress
+    );
+
+  updateAntCount(container);
+  updateWaveButton(container);
+}
+
+function getAllDeployedAnts(container) {
+  return Array.from(
+    container
+      ?.querySelectorAll?.('.kc-ant-zone .ant-sprite') || []
+  );
+}
+
+function freezeCurrentTugForWave(container) {
+  killFoodTween();
+
+  const foodWrapper =
+    container?.querySelector?.('.food-with-overlay');
+
+  try {
+    gsap.killTweensOf(foodWrapper);
+  } catch {}
+
+  const attachedAnts =
+    getAllDeployedAnts(container);
+
+  attachedAnts.forEach((ant) => {
+    try {
+      gsap.killTweensOf(ant);
+    } catch {}
+
+    stopCrawlWiggle(ant);
+  });
+}
+
+function cleanupWaveRoundDom(container) {
+  const deployedAnts =
+    getAllDeployedAnts(container);
+
+  deployedAnts.forEach((ant) => {
+    try {
+      gsap.killTweensOf(ant);
+    } catch {}
+
+    stopCrawlWiggle(ant);
+
+    try {
+      ant.remove();
+    } catch {}
+  });
+
+  activeAnts.length = 0;
+  playerAntsAttached = 0;
+  aiAntsAttached = 0;
+
+  const foodContainer =
+    container?.querySelector?.('.food-container');
+
+  if (foodContainer) {
+    foodContainer.innerHTML = '';
+
+    gsap.set(
+      foodContainer,
+      {
+        opacity: 1,
+      }
+    );
+  }
+}
+
+/*
+  SCMF 1.6.0 — Wave Recovery Message v1
+
+  Reuses the existing green Camping round-message presentation.
+  This stays local to Ant Attack so other Camping games and their
+  shared round-feedback helper remain untouched.
+*/
+function showWaveRecoveryMessage(
+  container,
+  antsRecovered
+) {
+  const zone =
+    container?.querySelector?.(
+      '.kc-ant-zone'
+    );
+
+  if (!zone) return;
+
+  zone
+    .querySelectorAll(
+      '.aa-wave-recovery-message'
+    )
+    .forEach((existing) => {
+      try {
+        existing.remove();
+      } catch {}
+    });
+
+  const message =
+    document.createElement('div');
+
+  message.className =
+    'kc-round-msg aa-wave-recovery-message';
+
+  message.setAttribute(
+    'role',
+    'status'
+  );
+
+  message.setAttribute(
+    'aria-live',
+    'polite'
+  );
+
+  const antName =
+    currentPlayerAnt?.shortName ||
+    currentPlayerAnt?.name ||
+    'Ant';
+
+  message.textContent =
+    `${antName}\nWave\n+${antsRecovered}`;
+
+  /*
+    Existing .kc-round-msg supplies:
+    - green color
+    - center position
+    - Orbitron font
+    - scale/fade transition
+
+    These inline values only make its three lines readable.
+  */
+  message.style.whiteSpace =
+    'pre-line';
+
+  message.style.textAlign =
+    'center';
+
+  // SCMF 1.6.0 — Wave Micro Polish v3
+  // Push the Wave recovery confirmation a little larger so it
+  // hangs with the size/energy of the other round update text.
+  message.style.lineHeight =
+    '0.9';
+
+  message.style.fontSize =
+    'clamp(1.62rem, 3.85svh, 2.7rem)';
+
+  message.style.fontWeight =
+    '900';
+
+  message.style.letterSpacing =
+    '0.04em';
+
+  message.style.padding =
+    '0.5em 0.78em';
+
+  message.style.color =
+    'var(--aa-player-accent)';
+
+  message.style.textShadow =
+    '0 0 10px var(--aa-player-glow), 0 2px 6px rgba(0, 0, 0, 0.9)';
+
+  message.style.filter =
+    'drop-shadow(0 0 10px var(--aa-player-glow))';
+
+  message.style.pointerEvents =
+    'none';
+
+  zone.appendChild(message);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      message.classList.add(
+        'visible'
+      );
+    });
+  });
+
+  setPhaseTimeout(() => {
+    message.classList.remove(
+      'visible'
+    );
+
+    setPhaseTimeout(() => {
+      try {
+        message.remove();
+      } catch {}
+    }, 320);
+  }, 720);
+}
+
+function finishWaveRoundWin(
+  container,
+  {
+    waveToken,
+    antSession,
+  }
+) {
+  if (
+    waveToken !== waveAnimationToken ||
+    antSession !== ANT.session ||
+    !aliveGuard(container) ||
+    currentPhase !== 'battle'
+  ) {
+    return;
+  }
+
+  roundInProgress = false;
+
+  clearAllRedTimeouts();
+  killFoodTween();
+
+  playerScore += 1;
+
+  // SCMF 1.6.0 — Wave Tier Recovery v1
+  //
+  // The Wave wins the current snack immediately, but all ants that
+  // were already deployed remain spent. The selected character then
+  // restores its own Wave tier:
+  //
+  // Night  +3
+  // Water  +4
+  // Flower +5
+  // Cloud  +6
+  // Sun    +7
+  // Fire   +8
+  // Queen  +9
+  //
+  // Recovery cannot raise the usable ant pool above 10.
+  const waveRecovery = Math.max(
+    0,
+    Number(currentPlayerAnt?.wavePower) || 0
+  );
+
+  const antPoolBeforeRecovery =
+    playerAntPool;
+
+  playerAntPool = Math.min(
+    TOTAL_ANT_POOL,
+    playerAntPool + waveRecovery
+  );
+
+  const antsActuallyRecovered =
+    playerAntPool -
+    antPoolBeforeRecovery;
+
+  console.log(
+    '[antAttack] Wave tier recovery awarded',
+    {
+      playerId:
+        currentPlayerAnt?.id,
+      waveName:
+        currentPlayerAnt?.waveName,
+      waveRecovery,
+      antsActuallyRecovered,
+      antPoolBeforeRecovery,
+      antPoolAfterRecovery:
+        playerAntPool,
+    }
+  );
+
+  /*
+    Wave is an emergency instant-win move:
+    - one snack for the player
+    - attached ants remain spent
+    - character-specific ants are restored
+    - no Perfect / SnowCone recharge from this snack
+    - flat standard Camping reward
+  */
+  appState.incrementPopCount(100);
+  updatePopUICallback?.();
+
+  try {
+    const margin =
+      playerScore - aiScore;
+
+    document.dispatchEvent(
+      new CustomEvent(
+        'kcAntRoundResult',
+        {
+          detail: {
+            result: 'win',
+            viaWave: true,
+            waveRecovery,
+            antsActuallyRecovered,
+            playerAntPool,
+            playerWins: playerScore,
+            aiWins: aiScore,
+            margin,
+          },
+        }
+      )
+    );
+  } catch {}
+
+  cleanupWaveRoundDom(container);
+
+  try {
+    waveStageEl?.remove?.();
+  } catch {}
+
+  waveStageEl = null;
+  waveTimeline = null;
+
+  setWaveFiringState(
+    container,
+    false
+  );
+
+  restoreDeployPortrait(container);
+
+  updateScores(container);
+  updateAntCount(container);
+  updateWaveButton(container);
+
+  // SCMF 1.6.0 — Wave Grab Polish v4
+  //
+  // Display the character's advertised Wave tier, not merely
+  // the amount that physically fit beneath the 10-ant cap.
+  //
+  // Example:
+  // Night at 10/10 still announces +3,
+  // while the actual pool correctly remains 10/10.
+  showWaveRecoveryMessage(
+    container,
+    waveRecovery
+  );
+
+  const battleWinnerKind =
+    getBattleWinnerKind();
+
+  const delayMs =
+    battleWinnerKind
+      ? 950
+      : 950;
+
+  setPhaseTimeout(() => {
+    if (
+      antSession !== ANT.session ||
+      !aliveGuard(container) ||
+      currentPhase !== 'battle'
+    ) {
+      return;
+    }
+
+    if (battleWinnerKind) {
+      renderResultsScreen(
+        container,
+        {
+          winnerKind:
+            battleWinnerKind,
+        }
+      );
+
+      return;
+    }
+
+    startNewRound(container);
+  }, delayMs);
+}
+
+function sweepWaveRoundOffscreen(
+  container,
+  {
+    shell,
+    foodWrapper,
+    zoneHeight,
+    waveHeight,
+    waveToken,
+    antSession,
+  }
+) {
+  if (
+    waveToken !== waveAnimationToken ||
+    antSession !== ANT.session ||
+    !aliveGuard(container) ||
+    currentPhase !== 'battle' ||
+    !waveInProgress
+  ) {
+    return;
+  }
+
+  /*
+    Rival ants continue arriving while the Wave rises.
+    When the crest reaches the snack, deployment stops and
+    every ant currently visible gets swept away.
+  */
+  roundInProgress = false;
+
+  clearAllRedTimeouts();
+  killFoodTween();
+
+  const deployedAnts =
+    getAllDeployedAnts(container);
+
+  deployedAnts.forEach((ant) => {
+    try {
+      gsap.killTweensOf(ant);
+    } catch {}
+
+    stopCrawlWiggle(ant);
+  });
+
+  try {
+    gsap.killTweensOf(foodWrapper);
+  } catch {}
+
+  const currentWaveY =
+    Number(
+      gsap.getProperty(
+        shell,
+        'y'
+      )
+    ) || 0;
+
+  const exitY =
+    zoneHeight +
+    waveHeight +
+    56;
+
+  const exitDistance =
+    Math.max(
+      zoneHeight * 0.70,
+      exitY - currentWaveY
+    );
+
+  waveTimeline =
+    gsap.timeline({
+      onComplete: () => {
+        finishWaveRoundWin(
+          container,
+          {
+            waveToken,
+            antSession,
+          }
+        );
+      },
+    });
+
+  waveTimeline.to(
+    shell,
+    {
+      y: exitY,
+      duration: 1.70,
+      ease: 'power1.in',
+    },
+    0
+  );
+
+  waveTimeline.to(
+    foodWrapper,
+    {
+      y: `+=${exitDistance}`,
+      duration: 1.70,
+      ease: 'power1.in',
+    },
+    0
+  );
+
+  if (deployedAnts.length) {
+    waveTimeline.to(
+      deployedAnts,
+      {
+        top:
+          `+=${exitDistance}`,
+        duration: 1.70,
+        ease: 'power1.in',
+      },
+      0
+    );
+  }
+}
+
+function beginWaveRise(
+  container,
+  {
+    shell,
+    waveArt,
+    foodWrapper,
+    waveToken,
+    antSession,
+  }
+) {
+  if (
+    waveToken !== waveAnimationToken ||
+    antSession !== ANT.session ||
+    !aliveGuard(container) ||
+    currentPhase !== 'battle' ||
+    !waveInProgress
+  ) {
+    return;
+  }
+
+  const zone =
+    container.querySelector(
+      '.kc-ant-zone'
+    );
+
+  if (!zone) {
+    killWaveAnimation(container);
+    updateAntCount(container);
+    updateWaveButton(container);
+    return;
+  }
+
+  const zoneRect =
+    zone.getBoundingClientRect();
+
+  const foodRect =
+    foodWrapper.getBoundingClientRect();
+
+  const waveRect =
+    waveArt.getBoundingClientRect();
+
+  const zoneHeight =
+    Math.max(
+      1,
+      zoneRect.height
+    );
+
+  const waveHeight =
+    Math.max(
+      zoneHeight * 0.42,
+      waveRect.height || 0
+    );
+
+  const foodCenterY =
+    foodRect.top -
+    zoneRect.top +
+    (foodRect.height / 2);
+
+  const startY =
+    zoneHeight + 28;
+
+  /*
+    The Wave begins fully below the blanket.
+    The crest rolls upward until it reaches the snack.
+  */
+  // SCMF 1.6.0 — Wave Grab Polish v4
+  //
+  // Bring the widened Wave up by a meaningful amount.
+  // Its visible crest should now reach and slightly underlap
+  // the current snack before the entire cluster is swept down.
+  const crestY =
+    Math.max(
+      -waveHeight * 0.12,
+      foodCenterY -
+      (waveHeight * 0.24)
+    );
+
+  gsap.set(
+    shell,
+    {
+      xPercent: -50,
+      y: startY,
+      opacity: 1,
+    }
+  );
+
+  waveTimeline =
+    gsap.timeline({
+      onComplete: () => {
+        sweepWaveRoundOffscreen(
+          container,
+          {
+            shell,
+            foodWrapper,
+            zoneHeight,
+            waveHeight,
+            waveToken,
+            antSession,
+          }
+        );
+      },
+    });
+
+  waveTimeline.to(
+    shell,
+    {
+      y: crestY,
+      duration: 1.65,
+      ease: 'power1.out',
+    },
+    0
+  );
+
+  /*
+    Tiny crest hold so the player can see the Wave catch
+    the food before the downward sweep begins.
+  */
+  waveTimeline.to(
+    {},
+    {
+      duration: 0.25,
+    }
+  );
+}
+
+function activatePlayerWave(container) {
+  if (
+    !aliveGuard(container) ||
+    currentPhase !== 'battle' ||
+    !roundInProgress ||
+    waveInProgress ||
+    getCurrentWaveCharge() <
+      WAVE_CHARGE_MAX
+  ) {
+    return;
+  }
+
+  const zone =
+    container.querySelector(
+      '.kc-ant-zone'
+    );
+
+  const foodWrapper =
+    container.querySelector(
+      '.food-with-overlay'
+    );
+
+  if (
+    !zone ||
+    !foodWrapper
+  ) {
+    return;
+  }
+
+  killWaveAnimation(
+    container,
+    {
+      restorePortrait: false,
+    }
+  );
+
+  const antSession =
+    ANT.session;
+
+  const waveToken =
+    waveAnimationToken;
+
+  /*
+    Spend the resource immediately.
+    Story persistence is updated here too.
+  */
+  setCurrentWaveCharge(0);
+
+  setWaveFiringState(
+    container,
+    true
+  );
+
+  showPoweredDeployPortrait(container);
+  freezeCurrentTugForWave(container);
+
+  const stage =
+    document.createElement('div');
+
+  stage.className =
+    'aa-wave-stage';
+
+  stage.setAttribute(
+    'aria-hidden',
+    'true'
+  );
+
+  const shell =
+    document.createElement('div');
+
+  shell.className =
+    'aa-wave-shell';
+
+  const waveArt =
+    document.createElement('img');
+
+  waveArt.className =
+    `aa-wave-art aa-wave-art-${getAntElementKey(currentPlayerAnt)}`;
+
+  waveArt.alt = '';
+  waveArt.draggable = false;
+
+  shell.appendChild(waveArt);
+  stage.appendChild(shell);
+  zone.appendChild(stage);
+
+  /*
+    Park the Wave below the visible blanket before its image
+    finishes loading. This prevents a one-frame pop-in.
+  */
+  gsap.set(
+    shell,
+    {
+      xPercent: -50,
+      y:
+        Math.max(
+          1,
+          zone
+            .getBoundingClientRect()
+            .height
+        ) + 40,
+      opacity: 1,
+    }
+  );
+
+  waveStageEl = stage;
+
+  let animationStarted = false;
+
+  const startAnimation = () => {
+    if (animationStarted) return;
+
+    animationStarted = true;
+
+    beginWaveRise(
+      container,
+      {
+        shell,
+        waveArt,
+        foodWrapper,
+        waveToken,
+        antSession,
+      }
+    );
+  };
+
+  waveArt.addEventListener(
+    'load',
+    startAnimation,
+    {
+      once: true,
+    }
+  );
+
+  waveArt.addEventListener(
+    'error',
+    () => {
+      waveArt.removeAttribute('src');
+      waveArt.classList.add('is-fallback');
+      startAnimation();
+    },
+    {
+      once: true,
+    }
+  );
+
+  waveArt.src =
+    assetUrl(
+      currentPlayerAnt.wavePng ||
+      'aa_wave_night.png'
+    );
+
+  requestAnimationFrame(() => {
+    if (
+      waveArt.complete &&
+      waveArt.naturalWidth > 0
+    ) {
+      startAnimation();
+    }
+  });
+
+  /*
+    Protect native play from stalling if an asset becomes
+    damaged or unexpectedly unavailable.
+  */
+  setPhaseTimeout(() => {
+    if (animationStarted) return;
+
+    if (
+      !waveArt.complete ||
+      waveArt.naturalWidth <= 0
+    ) {
+      waveArt.removeAttribute('src');
+      waveArt.classList.add('is-fallback');
+    }
+
+    startAnimation();
+  }, 420);
 }
 
 function isStoryFresh(antId, save = readAntAttackSave()) {
@@ -1913,6 +2916,7 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
     complete: storyComplete,
     nextRivalId: storyComplete ? getFirstStoryRivalId(playerId) : nextRivalId,
     wins: nextWins,
+    waveCharge: storyComplete ? 0 : state.waveCharge,
   });
   save.story.antStories = { ...save.story.storyByAnt };
 
@@ -2319,6 +3323,107 @@ function killFoodTween() {
   foodTween = null;
 }
 
+function getDeployPortrait(container = ANT.root) {
+  return container?.querySelector?.(
+    '#kc-ant-button .aa-deploy-portrait'
+  ) || null;
+}
+
+function showPoweredDeployPortrait(container = ANT.root) {
+  const image =
+    getDeployPortrait(container);
+
+  const button =
+    container?.querySelector?.(
+      '#kc-ant-button'
+    );
+
+  if (image) {
+    setImgSrcWithFallback(
+      image,
+      currentPlayerAnt.poweredPng,
+      currentPlayerAnt.basePng
+    );
+
+    image.alt =
+      `${currentPlayerAnt.name} powered`;
+  }
+
+  button?.classList?.add(
+    'is-powered'
+  );
+}
+
+function restoreDeployPortrait(container = ANT.root) {
+  const image =
+    getDeployPortrait(container);
+
+  const button =
+    container?.querySelector?.(
+      '#kc-ant-button'
+    );
+
+  if (image) {
+    setImgSrcWithFallback(
+      image,
+      currentPlayerAnt.basePng
+    );
+
+    image.alt =
+      `Deploy ${currentPlayerAnt.name}`;
+  }
+
+  button?.classList?.remove(
+    'is-powered'
+  );
+}
+
+function killWaveAnimation(
+  container = ANT.root,
+  {
+    restorePortrait = true,
+  } = {}
+) {
+  waveAnimationToken += 1;
+
+  try {
+    waveTimeline?.kill?.();
+  } catch {}
+
+  waveTimeline = null;
+
+  try {
+    gsap.killTweensOf(waveStageEl);
+  } catch {}
+
+  try {
+    gsap.killTweensOf(
+      waveStageEl
+        ?.querySelectorAll?.('*') ||
+      []
+    );
+  } catch {}
+
+  try {
+    waveStageEl?.remove?.();
+  } catch {}
+
+  waveStageEl = null;
+  waveInProgress = false;
+
+  container
+    ?.querySelector?.(
+      '.aa-battle-wrapper'
+    )
+    ?.classList?.remove(
+      'is-wave-firing'
+    );
+
+  if (restorePortrait) {
+    restoreDeployPortrait(container);
+  }
+}
+
 function resetBattleRuntimeCounters() {
   clearPhaseTimeouts();
 
@@ -2332,6 +3437,7 @@ function resetBattleRuntimeCounters() {
   roundInProgress = false;
   currentDirection = null;
   killFoodTween();
+  killWaveAnimation(ANT.root);
   clearAllRedTimeouts();
   try { gsap.killTweensOf(activeAnts); } catch {}
   activeAnts.forEach((ant) => {
@@ -2440,10 +3546,32 @@ function updateScores(container) {
 }
 
 function updateAntCount(container) {
-  const el = container.querySelector('.ant-count');
-  const btn = container.querySelector('#kc-ant-button');
-  if (el)  el.textContent = `${playerAntPool}/10`;
-  if (btn) btn.classList.toggle('disabled', playerAntPool <= 0);
+  const el =
+    container.querySelector('.ant-count');
+
+  const btn =
+    container.querySelector('#kc-ant-button');
+
+  const unavailable =
+    playerAntPool <= 0 ||
+    !roundInProgress ||
+    waveInProgress ||
+    playerAntsAttached >=
+      MAX_ANTS_PER_SIDE;
+
+  if (el) {
+    el.textContent =
+      `${playerAntPool}/10`;
+  }
+
+  if (btn) {
+    btn.disabled = unavailable;
+
+    btn.classList.toggle(
+      'disabled',
+      unavailable
+    );
+  }
 }
 
 function renderSnackCostGrid() {
@@ -2489,6 +3617,7 @@ export function destroyAntAttackGame(container) {
   // stop spawns / tweens
   roundInProgress = false;
   killFoodTween();
+  killWaveAnimation(container);
   clearAllRedTimeouts();
 
   // kill GSAP + DOM ants
@@ -2501,11 +3630,39 @@ export function destroyAntAttackGame(container) {
   if (_domObs)    { try { _domObs.disconnect(); } catch {} _domObs = null;   }
 
   // button / back capture
-  const antButton = container?.querySelector?.('#kc-ant-button');
-  const bound = _boundHandlers.get(container);
-  if (antButton && bound?.onPointerDown) {
-    antButton.removeEventListener('pointerdown', bound.onPointerDown);
+  const antButton =
+    container?.querySelector?.(
+      '#kc-ant-button'
+    );
+
+  const waveButton =
+    container?.querySelector?.(
+      '#aa-wave-button'
+    );
+
+  const bound =
+    _boundHandlers.get(container);
+
+  if (
+    antButton &&
+    bound?.onPointerDown
+  ) {
+    antButton.removeEventListener(
+      'pointerdown',
+      bound.onPointerDown
+    );
   }
+
+  if (
+    waveButton &&
+    bound?.onWavePointerDown
+  ) {
+    waveButton.removeEventListener(
+      'pointerdown',
+      bound.onWavePointerDown
+    );
+  }
+
   if (bound?.onBackCapture) {
     document.removeEventListener('click', bound.onBackCapture, true);
   }
@@ -2523,6 +3680,7 @@ export function destroyAntAttackGame(container) {
   currentDirection = null;
   currentPhase = 'choose';
   currentStoryRunWasReplay = false;
+  endArcadeWaveRun();
 }
 
 export function resetAntAttackGame(container) {
@@ -2535,6 +3693,7 @@ export function forceKillAntAttack() {
   // global hard stop (no container required)
   clearPhaseTimeouts();
   killFoodTween();
+  killWaveAnimation();
   clearAllRedTimeouts();
   try { gsap.killTweensOf(activeAnts); } catch {}
   activeAnts.forEach(stopCrawlWiggle);
@@ -2542,6 +3701,7 @@ export function forceKillAntAttack() {
   roundInProgress = false;
   currentPhase = 'choose';
   currentStoryRunWasReplay = false;
+  endArcadeWaveRun();
   ANT.session++;   // invalidate any scheduled timeouts
   ANT.alive   = false;
   ANT.root    = null;
@@ -2558,6 +3718,7 @@ function renderChooseScreen(container) {
 
   currentPhase = 'choose';
   currentStoryRunWasReplay = false;
+  endArcadeWaveRun();
   resetBattleRuntimeCounters();
 
   const selectedAnt = getAntById(selectedAntId);
@@ -2720,6 +3881,7 @@ function wireChooseScreen(container) {
     if (!canPlayArcade(player.id)) return;
 
     markAntPlayed(player.id);
+    startArcadeWaveRun(player.id);
 
     renderVersusScreen(container, {
       mode: 'arcade',
@@ -3293,10 +4455,27 @@ function renderBattleScreen(container) {
           <img class="ant-hill-img" src="${assetUrl('aa_antBase.png')}" alt="${currentPlayerAnt.name} base"/>
         </div>
 
-        <button id="kc-ant-button" class="ant-btn aa-send-ant-btn" type="button" aria-label="Send ant">
-          <img src="${assetUrl(currentPlayerAnt.basePng)}" alt="Deploy ${currentPlayerAnt.name}"/>
-          <span class="ant-count">10/10</span>
-        </button>
+        <div class="aa-player-control-stack" aria-label="${currentPlayerAnt.name} battle controls">
+          <button
+            id="aa-wave-button"
+            class="aa-wave-btn is-empty"
+            type="button"
+            disabled
+            aria-label="${currentPlayerAnt.waveName} charge 0 of ${WAVE_CHARGE_MAX}"
+          >
+            <span class="aa-wave-label">WAVE</span>
+            <span class="aa-wave-count">0/${WAVE_CHARGE_MAX}</span>
+          </button>
+
+          <button id="kc-ant-button" class="ant-btn aa-send-ant-btn" type="button" aria-label="Send ant">
+            <img
+              class="aa-deploy-portrait"
+              src="${assetUrl(currentPlayerAnt.basePng)}"
+              alt="Deploy ${currentPlayerAnt.name}"
+            />
+            <span class="ant-count">10/10</span>
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -3315,26 +4494,81 @@ function renderBattleScreen(container) {
   };
   img.src = picnic;
 
-  // Button handler (pointerdown for mobile snappiness)
-  const antButton = container.querySelector('#kc-ant-button');
-  const onPointerDown = (e) => {
-    e.preventDefault();
+  // Button handlers use pointerdown for native iOS snappiness.
+  const antButton =
+    container.querySelector(
+      '#kc-ant-button'
+    );
+
+  const waveButton =
+    container.querySelector(
+      '#aa-wave-button'
+    );
+
+  const onPointerDown = (event) => {
+    event.preventDefault();
     deployPlayerAnt(container);
   };
 
-  antButton?.addEventListener('pointerdown', onPointerDown);
+  const onWavePointerDown = (event) => {
+    event.preventDefault();
+    activatePlayerWave(container);
+  };
 
-  const existing = _boundHandlers.get(container) || {};
-  if (existing.onPointerDown && existing.onPointerDown !== onPointerDown) {
-    try { antButton?.removeEventListener('pointerdown', existing.onPointerDown); } catch {}
+  antButton?.addEventListener(
+    'pointerdown',
+    onPointerDown
+  );
+
+  waveButton?.addEventListener(
+    'pointerdown',
+    onWavePointerDown
+  );
+
+  const existing =
+    _boundHandlers.get(container) || {};
+
+  if (
+    existing.onPointerDown &&
+    existing.onPointerDown !==
+      onPointerDown
+  ) {
+    try {
+      antButton?.removeEventListener(
+        'pointerdown',
+        existing.onPointerDown
+      );
+    } catch {}
   }
-  _boundHandlers.set(container, { ...existing, onPointerDown });
+
+  if (
+    existing.onWavePointerDown &&
+    existing.onWavePointerDown !==
+      onWavePointerDown
+  ) {
+    try {
+      waveButton?.removeEventListener(
+        'pointerdown',
+        existing.onWavePointerDown
+      );
+    } catch {}
+  }
+
+  _boundHandlers.set(
+    container,
+    {
+      ...existing,
+      onPointerDown,
+      onWavePointerDown,
+    }
+  );
 
   // Element glows are controlled by battle-wrapper data attributes.
 
   // initial UI
   updateScores(container);
   updateAntCount(container);
+  updateWaveButton(container);
 
   // Resize observer keeps ants anchored to food on layout change
   if (_resizeObs) { try { _resizeObs.disconnect(); } catch {} }
@@ -3352,6 +4586,9 @@ function renderBattleScreen(container) {
 function startNewRound(container) {
   if (!aliveGuard(container) || currentPhase !== 'battle') return;
 
+  killWaveAnimation(container);
+  waveInProgress = false;
+
   // wipe ants
   try { gsap.killTweensOf(activeAnts); } catch {}
   activeAnts.forEach(a => { stopCrawlWiggle(a); try { a.remove(); } catch {} });
@@ -3363,6 +4600,7 @@ function startNewRound(container) {
   currentDirection = null;
 
   updateAntCount(container);
+  updateWaveButton(container);
 
   const foodContainer = container.querySelector('.food-container');
   if (!foodContainer) return;
@@ -3396,7 +4634,15 @@ function startNewRound(container) {
 
 function deployPlayerAnt(container) {
   if (!aliveGuard(container) || currentPhase !== 'battle') return;
-  if (playerAntPool <= 0 || !roundInProgress || playerAntsAttached >= MAX_ANTS_PER_SIDE) return;
+  if (
+    playerAntPool <= 0 ||
+    !roundInProgress ||
+    waveInProgress ||
+    playerAntsAttached >=
+      MAX_ANTS_PER_SIDE
+  ) {
+    return;
+  }
 
   const zone = container.querySelector('.kc-ant-zone');
   const { centerX, centerY } = getFoodCenterCoords(container);
@@ -3526,6 +4772,7 @@ function spawnRedAntLoop(container, requiredWeight) {
 
 function triggerFoodMotion(foodEl, container, forcedDirection = null) {
   if (!aliveGuard(container) || currentPhase !== 'battle') return;
+  if (waveInProgress) return;
   const foodWrapper = foodEl?.parentElement;
   if (!foodEl || !foodWrapper || !roundInProgress) return;
 
@@ -3574,6 +4821,7 @@ function triggerFoodMotion(foodEl, container, forcedDirection = null) {
 
 function checkEndOfPlayWinner(container) {
   if (!aliveGuard(container) || currentPhase !== 'battle') return;
+  if (waveInProgress) return;
   const foodEl = container.querySelector('#antFood');
   if (!foodEl || !roundInProgress || foodTween) return;
 
@@ -3610,6 +4858,13 @@ function endRound(container, result, foodWrapper) {
       scoreBonus = 100; showRoundMessage('good');
     }
 
+    awardWaveChargeForRound(container, {
+      result,
+      foodName: currentFood.name,
+      usedAnts: playerAnts,
+      requiredAnts: required,
+    });
+
     const regen = getPlayerRegenBonus(currentFood.name, required, playerAnts);
     playerAntPool = Math.min(playerAntPool + regen, TOTAL_ANT_POOL);
 
@@ -3636,6 +4891,7 @@ function endRound(container, result, foodWrapper) {
 
   updateScores(container);
   updateAntCount(container);
+  updateWaveButton(container);
 
   const battleWinnerKind = getBattleWinnerKind();
 
