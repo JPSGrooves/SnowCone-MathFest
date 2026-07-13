@@ -1131,9 +1131,47 @@ let aiScore        = 0;
 let playerAntsAttached = 0;
 let aiAntsAttached     = 0;
 let currentFood        = null;
+let previousFoodName   = null;
 let roundInProgress    = false;
 let currentDirection   = null; // 'player' | 'ai'
 let foodTween          = null;
+
+/*
+  SCMF 1.6.0 — Food Rotation + Round Telemetry v1
+
+  Food remains random, but the immediately previous food is
+  excluded from the next draw.
+
+  This prevents:
+  - SnowCone followed by SnowCone
+  - Burger followed by Burger
+  - any other immediate duplicate
+
+  Every other food keeps equal odds during that draw.
+*/
+function selectNextFoodForRound() {
+  const eligibleFoods =
+    previousFoodName
+      ? foodCatalog.filter((food) => {
+          return food.name === previousFoodName
+            ? false
+            : true;
+        })
+      : foodCatalog;
+
+  const selectedFood =
+    eligibleFoods[
+      Math.floor(
+        Math.random() *
+        eligibleFoods.length
+      )
+    ] || foodCatalog[0];
+
+  previousFoodName =
+    selectedFood.name;
+
+  return selectedFood;
+}
 
 let updatePopUICallback = null;
 
@@ -1840,42 +1878,50 @@ function flashWaveChargeButton(container, becameReady = false) {
   }, becameReady ? 900 : 620);
 }
 
-function awardWaveChargeForRound(container, {
-  result,
-  foodName,
-  usedAnts,
-  requiredAnts,
-}) {
-  if (result !== 'win') return false;
-
-  const snowConeSaved = foodName === 'snowcone';
-
-  const exactNonSnowCone =
-    !snowConeSaved &&
-    usedAnts === requiredAnts;
-
+function awardWaveChargeForRound(
+  container,
+  {
+    result,
+  } = {}
+) {
   /*
-    SnowCone is one category.
-    An exact SnowCone does not double-dip.
+    SCMF 1.6.0 — Rival Speed + Three-Win Wave v1
+
+    Every ordinary snack win earns exactly one wedge.
+
+    Save quality still controls:
+    - ant recovery
+    - Camping Score
+    - Perfect / Great / Good feedback
+
+    It no longer controls access to the Wave.
+
+    Wave-assisted wins never call this function, so firing a
+    Wave cannot immediately recharge itself.
   */
-  if (!snowConeSaved && !exactNonSnowCone) {
-    return false;
+  if (result === 'win') {
+    const before =
+      getCurrentWaveCharge();
+
+    const after =
+      setCurrentWaveCharge(
+        before + 1
+      );
+
+    updateWaveButton(container);
+
+    if (after > before) {
+      flashWaveChargeButton(
+        container,
+        before < WAVE_CHARGE_MAX &&
+        after === WAVE_CHARGE_MAX
+      );
+    }
+
+    return after > before;
   }
 
-  const before = getCurrentWaveCharge();
-  const after = setCurrentWaveCharge(before + 1);
-
-  updateWaveButton(container);
-
-  if (after > before) {
-    flashWaveChargeButton(
-      container,
-      before < WAVE_CHARGE_MAX &&
-      after === WAVE_CHARGE_MAX
-    );
-  }
-
-  return after > before;
+  return false;
 }
 
 function setWaveFiringState(container, firing) {
@@ -2114,10 +2160,22 @@ function finishWaveRoundWin(
   // Queen  +9
   //
   // Recovery cannot raise the usable ant pool above 10.
-  const waveRecovery = Math.max(
-    0,
-    Number(currentPlayerAnt?.wavePower) || 0
-  );
+  // SCMF 1.6.0 — SnowCone Wave Plus Ten and iPhone Nudge v1
+  //
+  // SnowCone always restores the full ten-ant amount,
+  // including when the snack is captured with a Wave.
+  //
+  // Other foods continue using the selected ant's Wave tier.
+  const isSnowConeWave =
+    currentFood?.name === 'snowcone';
+
+  const waveRecovery =
+    isSnowConeWave
+      ? TOTAL_ANT_POOL
+      : Math.max(
+          0,
+          Number(currentPlayerAnt?.wavePower) || 0
+        );
 
   const antPoolBeforeRecovery =
     playerAntPool;
@@ -2138,6 +2196,9 @@ function finishWaveRoundWin(
         currentPlayerAnt?.id,
       waveName:
         currentPlayerAnt?.waveName,
+      foodName:
+        currentFood?.name || null,
+      isSnowConeWave,
       waveRecovery,
       antsActuallyRecovered,
       antPoolBeforeRecovery,
@@ -2145,6 +2206,24 @@ function finishWaveRoundWin(
         playerAntPool,
     }
   );
+
+  logAntAttackRoundData({
+    result: 'win',
+    food:
+      currentFood,
+    antsUsed:
+      playerAntsAttached,
+    regen:
+      waveRecovery,
+    viaWave:
+      true,
+    actualRecovered:
+      antsActuallyRecovered,
+    saveQuality:
+      isSnowConeWave
+        ? 'SnowCone Wave'
+        : 'Wave',
+  });
 
   /*
     Wave is an emergency instant-win move:
@@ -2168,6 +2247,9 @@ function finishWaveRoundWin(
           detail: {
             result: 'win',
             viaWave: true,
+            foodName:
+              currentFood?.name || null,
+            isSnowConeWave,
             waveRecovery,
             antsActuallyRecovered,
             playerAntPool,
@@ -3434,6 +3516,7 @@ function resetBattleRuntimeCounters() {
   playerAntsAttached = 0;
   aiAntsAttached = 0;
   currentFood = null;
+  previousFoodName = null;
   roundInProgress = false;
   currentDirection = null;
   killFoodTween();
@@ -3495,6 +3578,78 @@ function getPlayerRegenBonus(foodName, requiredAnts, usedAnts) {
   if (usedAnts === requiredAnts) return 6;
   if (usedAnts === requiredAnts + 1) return 5;
   return 4;
+}
+
+/*
+  SCMF 1.6.0 — Food Rotation + Round Telemetry v1
+
+  One consistent log shape for ordinary wins, losses,
+  SnowCone saves, and Wave-assisted captures.
+*/
+function logAntAttackRoundData({
+  result,
+  food = currentFood,
+  antsUsed = playerAntsAttached,
+  regen = 0,
+  viaWave = false,
+  actualRecovered = null,
+  saveQuality = null,
+} = {}) {
+  const payload = {
+    food:
+      food?.name || null,
+
+    weight:
+      Number(food?.weight) || 0,
+
+    result:
+      result || 'unknown',
+
+    antsUsed:
+      Number(antsUsed) || 0,
+
+    regen:
+      Number(regen) || 0,
+
+    viaWave:
+      Boolean(viaWave),
+
+    mode:
+      currentBattleMode,
+
+    playerId:
+      currentPlayerAnt?.id || null,
+
+    rivalId:
+      currentRivalAnt?.id || null,
+
+    playerScore,
+
+    rivalScore:
+      aiScore,
+
+    waveCharge:
+      getCurrentWaveCharge(),
+  };
+
+  if (
+    Number.isFinite(
+      actualRecovered
+    )
+  ) {
+    payload.actualRecovered =
+      actualRecovered;
+  }
+
+  if (saveQuality) {
+    payload.saveQuality =
+      saveQuality;
+  }
+
+  console.log(
+    '[antAttack] round data',
+    payload
+  );
 }
 
 // wiggle helpers
@@ -4404,9 +4559,41 @@ function wireContainerDeathWatcher(container) {
 // ────────────────────────────────────────────────────────────────────────────────
 // Battle render / core loop
 // ────────────────────────────────────────────────────────────────────────────────
-const MAX_ANTS_PER_SIDE     = 10;
-const TOTAL_ANT_POOL        = 10;
-const RED_SPAWN_INTERVAL_MS = 1000;
+const MAX_ANTS_PER_SIDE = 10;
+const TOTAL_ANT_POOL = 10;
+
+/*
+  SCMF 1.6.0 — Rival Speed + Three-Win Wave v1
+
+  Rival difficulty is expressed through release timing.
+
+  The first rival ant still deploys immediately. Each later
+  rival ant waits for the previous crawl to finish, then waits
+  this interval before beginning its own crawl.
+*/
+const RIVAL_RELEASE_INTERVAL_MS = Object.freeze({
+  black: 1100,
+  blue: 1000,
+  pink: 900,
+  white: 800,
+  yellow: 700,
+  red: 600,
+  queen: 500,
+});
+
+function getRivalReleaseIntervalMs(
+  rivalAnt = currentRivalAnt
+) {
+  const rivalId =
+    getAnyAntById(
+      rivalAnt?.id || rivalAnt
+    ).id;
+
+  return (
+    RIVAL_RELEASE_INTERVAL_MS[rivalId] ||
+    1000
+  );
+}
 
 function startBattle(container, { mode = 'story', playerAntId = 'black', rivalAntId = 'blue' } = {}) {
   if (!aliveGuard(container)) return;
@@ -4415,7 +4602,24 @@ function startBattle(container, { mode = 'story', playerAntId = 'black', rivalAn
   currentPhase = 'battle';
   currentBattleMode = mode;
   currentPlayerAnt = getAntById(playerAntId);
-  currentRivalAnt = rivalAntId === 'queen' ? QUEEN_SNACKJACKET : getAntById(rivalAntId);
+  currentRivalAnt =
+    rivalAntId === 'queen'
+      ? QUEEN_SNACKJACKET
+      : getAntById(rivalAntId);
+
+  console.log(
+    '[antAttack] rival release timing',
+    {
+      rivalId:
+        currentRivalAnt.id,
+      rivalName:
+        currentRivalAnt.name,
+      releaseIntervalMs:
+        getRivalReleaseIntervalMs(
+          currentRivalAnt
+        ),
+    }
+  );
 
   resetBattleRuntimeCounters();
 
@@ -4606,7 +4810,8 @@ function startNewRound(container) {
   if (!foodContainer) return;
   foodContainer.innerHTML = '';
 
-  currentFood = foodCatalog[Math.floor(Math.random() * foodCatalog.length)];
+  currentFood =
+    selectNextFoodForRound();
 
   const foodEl = document.createElement('img');
   foodEl.className = 'food-plate-img';
@@ -4711,11 +4916,27 @@ function spawnRedAntLoop(container, requiredWeight) {
   const spawnY = baseRect.top  - zoneRect.top  + baseRect.height / 2;
 
   let i = 0;
-  const maxRedAnts = Math.min(requiredWeight + Math.floor(Math.random() * 3) + 1, MAX_ANTS_PER_SIDE);
+
+  const maxRedAnts =
+    Math.min(
+      requiredWeight +
+      Math.floor(Math.random() * 3) +
+      1,
+      MAX_ANTS_PER_SIDE
+    );
+
+  const releaseIntervalMs =
+    getRivalReleaseIntervalMs(
+      currentRivalAnt
+    );
 
   function scheduleNext() {
     if (!aliveGuard(container) || session !== ANT.session || !roundInProgress || currentPhase !== 'battle' || i >= maxRedAnts) return;
-    const tid = setTimeout(deployOneRedAnt, RED_SPAWN_INTERVAL_MS);
+    const tid =
+      setTimeout(
+        deployOneRedAnt,
+        releaseIntervalMs
+      );
     redAntTimeouts.push(tid);
   }
 
@@ -4766,7 +4987,8 @@ function spawnRedAntLoop(container, requiredWeight) {
     });
   }
 
-  // start now, then schedule 1/sec
+  // First rival ant starts immediately.
+  // Later ants use the selected rival's release interval.
   deployOneRedAnt();
 }
 
@@ -4834,66 +5056,267 @@ function checkEndOfPlayWinner(container) {
   triggerFoodMotion(foodEl, container, direction);
 }
 
+/*
+  SCMF 1.6.0 — Ant Attack Stacked Round Results v1
+
+  Keep each save result on three intentional lines instead
+  of letting WKWebView/browser width choose the wrapping:
+
+  Perfect  / Save / +6
+  Great    / Save / +5
+  Good     / Save / +4
+  SnowCone / Save / +10
+*/
+function showAntSaveResultMessage(
+  container,
+  resultLabel,
+  regenAmount
+) {
+  const zone =
+    container?.querySelector?.(
+      '.kc-ant-zone'
+    );
+
+  if (!zone) return;
+
+  zone
+    .querySelectorAll(
+      '.aa-round-stack-message'
+    )
+    .forEach((existing) => {
+      try {
+        existing.remove();
+      } catch {}
+    });
+
+  const message =
+    document.createElement('div');
+
+  message.className =
+    'kc-round-msg aa-round-stack-message';
+
+  message.setAttribute(
+    'role',
+    'status'
+  );
+
+  message.setAttribute(
+    'aria-live',
+    'polite'
+  );
+
+  message.setAttribute(
+    'aria-label',
+    `${resultLabel} Save plus ${regenAmount} ants`
+  );
+
+  [
+    resultLabel,
+    'Save',
+    `+${regenAmount}`,
+  ].forEach((lineText) => {
+    const line =
+      document.createElement('span');
+
+    line.className =
+      'aa-round-stack-line';
+
+    line.textContent =
+      lineText;
+
+    message.appendChild(line);
+  });
+
+  zone.appendChild(message);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      message.classList.add(
+        'visible'
+      );
+    });
+  });
+
+  setPhaseTimeout(() => {
+    message.classList.remove(
+      'visible'
+    );
+
+    setPhaseTimeout(() => {
+      try {
+        message.remove();
+      } catch {}
+    }, 320);
+  }, 900);
+}
+
 function endRound(container, result, foodWrapper) {
-  if (!aliveGuard(container) || currentPhase !== 'battle') return;
+  if (
+    !aliveGuard(container) ||
+    currentPhase !== 'battle'
+  ) {
+    return;
+  }
 
   roundInProgress = false;
   killFoodTween();
   clearAllRedTimeouts();
 
-  const playerAnts = playerAntsAttached;
-  const required   = currentFood.weight;
+  const playerAnts =
+    playerAntsAttached;
+
+  const required =
+    currentFood.weight;
 
   if (result === 'win') {
-    playerScore++;
+    playerScore += 1;
+
     let scoreBonus = 0;
+    let resultLabel = 'Good';
+
     if (currentFood.name === 'snowcone') {
-      scoreBonus = (playerAnts === required) ? 300 : (playerAnts === required + 1) ? 200 : 100;
-      showRoundMessage('snowcone');
+      resultLabel = 'SnowCone';
+
+      scoreBonus =
+        playerAnts === required
+          ? 300
+          : playerAnts === required + 1
+            ? 200
+            : 100;
     } else if (playerAnts === required) {
-      scoreBonus = 300; showRoundMessage('perfect');
-    } else if (playerAnts === required + 1) {
-      scoreBonus = 200; showRoundMessage('great');
+      resultLabel = 'Perfect';
+      scoreBonus = 300;
+    } else if (
+      playerAnts === required + 1
+    ) {
+      resultLabel = 'Great';
+      scoreBonus = 200;
     } else {
-      scoreBonus = 100; showRoundMessage('good');
+      resultLabel = 'Good';
+      scoreBonus = 100;
     }
 
-    awardWaveChargeForRound(container, {
-      result,
-      foodName: currentFood.name,
-      usedAnts: playerAnts,
-      requiredAnts: required,
+    awardWaveChargeForRound(
+      container,
+      {
+        result,
+      }
+    );
+
+    const regen =
+      getPlayerRegenBonus(
+        currentFood.name,
+        required,
+        playerAnts
+      );
+
+    const antPoolBeforeRecovery =
+      playerAntPool;
+
+    playerAntPool = Math.min(
+      playerAntPool + regen,
+      TOTAL_ANT_POOL
+    );
+
+    const antsActuallyRecovered =
+      playerAntPool -
+      antPoolBeforeRecovery;
+
+    logAntAttackRoundData({
+      result: 'win',
+      food:
+        currentFood,
+      antsUsed:
+        playerAnts,
+      regen,
+      viaWave:
+        false,
+      actualRecovered:
+        antsActuallyRecovered,
+      saveQuality:
+        resultLabel,
     });
 
-    const regen = getPlayerRegenBonus(currentFood.name, required, playerAnts);
-    playerAntPool = Math.min(playerAntPool + regen, TOTAL_ANT_POOL);
+    /*
+      Show the full earned tier even when the pool cap means
+      fewer ants physically fit beneath 10/10.
+    */
+    showAntSaveResultMessage(
+      container,
+      resultLabel,
+      regen
+    );
 
-    appState.incrementPopCount(scoreBonus);
+    appState.incrementPopCount(
+      scoreBonus
+    );
+
     updatePopUICallback?.();
   } else {
-    aiScore++;
-    playerAntPool = Math.min(playerAntPool + 3, TOTAL_ANT_POOL);
+    aiScore += 1;
+
+    const lossRegen = 3;
+
+    const antPoolBeforeRecovery =
+      playerAntPool;
+
+    playerAntPool = Math.min(
+      playerAntPool + lossRegen,
+      TOTAL_ANT_POOL
+    );
+
+    const antsActuallyRecovered =
+      playerAntPool -
+      antPoolBeforeRecovery;
+
+    logAntAttackRoundData({
+      result: 'loss',
+      food:
+        currentFood,
+      antsUsed:
+        playerAnts,
+      regen:
+        lossRegen,
+      viaWave:
+        false,
+      actualRecovered:
+        antsActuallyRecovered,
+      saveQuality:
+        'Loss',
+    });
+
+    // Preserve the existing loss message system.
     showRoundMessage('loss');
   }
 
   // 🔔 Broadcast round result & running margin.
   try {
-    const margin = playerScore - aiScore;
-    document.dispatchEvent(new CustomEvent('kcAntRoundResult', {
-      detail: {
-        result,
-        playerWins: playerScore,
-        aiWins: aiScore,
-        margin
-      }
-    }));
+    const margin =
+      playerScore - aiScore;
+
+    document.dispatchEvent(
+      new CustomEvent(
+        'kcAntRoundResult',
+        {
+          detail: {
+            result,
+            playerWins:
+              playerScore,
+            aiWins:
+              aiScore,
+            margin,
+          },
+        }
+      )
+    );
   } catch {}
 
   updateScores(container);
   updateAntCount(container);
   updateWaveButton(container);
 
-  const battleWinnerKind = getBattleWinnerKind();
+  const battleWinnerKind =
+    getBattleWinnerKind();
 
   if (battleWinnerKind) {
     clearAllRedTimeouts();
@@ -4903,26 +5326,62 @@ function endRound(container, result, foodWrapper) {
   gsap.to(activeAnts, {
     opacity: 0,
     duration: 0.5,
+
     onComplete: () => {
-      activeAnts.forEach(a => { stopCrawlWiggle(a); try { a.remove(); } catch {} });
+      activeAnts.forEach((ant) => {
+        stopCrawlWiggle(ant);
+
+        try {
+          ant.remove();
+        } catch {}
+      });
+
       activeAnts.length = 0;
-    }
+    },
   });
 
   gsap.to(foodWrapper, {
     opacity: 0,
     duration: 0.5,
-    onComplete: () => {
-      const fc = container.querySelector('.food-container');
-      if (fc) { fc.innerHTML = ''; gsap.set(fc, { opacity: 1 }); }
 
-      const session = ANT.session;
+    onComplete: () => {
+      const foodContainer =
+        container.querySelector(
+          '.food-container'
+        );
+
+      if (foodContainer) {
+        foodContainer.innerHTML = '';
+
+        gsap.set(
+          foodContainer,
+          {
+            opacity: 1,
+          }
+        );
+      }
+
+      const session =
+        ANT.session;
 
       setTimeout(() => {
-        if (session !== ANT.session || !aliveGuard(container) || currentPhase !== 'battle') return;
+        if (
+          session !== ANT.session ||
+          !aliveGuard(container) ||
+          currentPhase !== 'battle'
+        ) {
+          return;
+        }
 
         if (battleWinnerKind) {
-          renderResultsScreen(container, { winnerKind: battleWinnerKind });
+          renderResultsScreen(
+            container,
+            {
+              winnerKind:
+                battleWinnerKind,
+            }
+          );
+
           return;
         }
 
@@ -4930,7 +5389,7 @@ function endRound(container, result, foodWrapper) {
           startNewRound(container);
         }
       }, battleWinnerKind ? 700 : 1000);
-    }
+    },
   });
 }
 

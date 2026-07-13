@@ -9953,3 +9953,159 @@ body.kc-active
 
 
 /* ───────────────── SCMF 1.6.0 — Ant Attack Instant-Win Wave Activation v1 END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Stacked Round Results v1
+
+   Purpose:
+   - Force Perfect / Save / +6 style result messages.
+   - Prevent WKWebView width from deciding the line breaks.
+   - Keep the existing Camping round-message animation.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active
+.aa-ant-root
+.kc-ant-zone
+.aa-round-stack-message {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: 88% !important;
+
+  gap: 0.01em !important;
+
+  padding:
+    0.42em
+    0.76em !important;
+
+  white-space: nowrap !important;
+  overflow: visible !important;
+
+  text-align: center !important;
+
+  font-size:
+    clamp(
+      1.85rem,
+      4.45svh,
+      3.15rem
+    ) !important;
+
+  line-height: 0.88 !important;
+  letter-spacing: 0.025em !important;
+}
+
+
+body.kc-active
+.aa-ant-root
+.kc-ant-zone
+.aa-round-stack-message
+.aa-round-stack-line {
+  display: block !important;
+
+  width: auto !important;
+  max-width: none !important;
+
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Stacked Round Results v1 END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack iPad Wave Controls Balance v1
+
+   Purpose:
+   - Preserve the approved iPhone presentation.
+   - Move the iPad Wave and Deploy stack inward and upward.
+   - Prevent circular controls from clipping the battle frame.
+   - Slightly reduce the tablet Wave PNG proportionally.
+   - No Ant Attack gameplay or animation logic changes.
+   ────────────────────────────────────────────────────────── */
+
+/*
+  Tablet control safety.
+
+  The whole stack moves as one unit, preserving the accepted
+  Wave-above-Deploy relationship.
+*/
+@media
+  (min-width: 700px)
+  and (min-height: 700px) {
+
+  body.kc-active
+  .aa-ant-root
+  .aa-battle-wrapper
+  .aa-player-control-stack {
+    right:
+      clamp(
+        18px,
+        2.2vw,
+        28px
+      ) !important;
+
+    bottom:
+      clamp(
+        20px,
+        1.8svh,
+        30px
+      ) !important;
+  }
+}
+
+
+/*
+  Tablet Wave remains cinematic, but is slightly smaller
+  than the current 130 percent presentation.
+
+  Width scaling preserves the PNG aspect ratio.
+  The approved iPhone 146 percent rule remains untouched.
+*/
+@media
+  (min-width: 760px)
+  and (min-height: 900px) {
+
+  body.kc-active
+  .aa-ant-root
+  .aa-battle-wrapper
+  .aa-wave-shell {
+    width: 124% !important;
+  }
+}
+
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack iPad Wave Controls Balance v1 END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — SnowCone Wave Plus Ten and iPhone Nudge v1
+
+   Purpose:
+   - Give Wave-captured SnowCones the full +10 recovery.
+   - Give the iPhone Wave + Deploy stack a tiny inward nudge.
+   - Preserve the approved iPad positioning and Wave sizing.
+   ────────────────────────────────────────────────────────── */
+
+@media
+  (max-width: 480px)
+  and (orientation: portrait) {
+
+  body.kc-active
+  .aa-ant-root
+  .aa-battle-wrapper
+  .aa-player-control-stack {
+    right:
+      clamp(
+        12px,
+        3.1vw,
+        16px
+      ) !important;
+  }
+}
+
+
+/* ───────────────── SCMF 1.6.0 — SnowCone Wave Plus Ten and iPhone Nudge v1 END ───────────────── */
