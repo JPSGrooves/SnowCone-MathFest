@@ -10109,3 +10109,29 @@ body.kc-active
 
 
 /* ───────────────── SCMF 1.6.0 — SnowCone Wave Plus Ten and iPhone Nudge v1 END ───────────────── */
+
+/* ──────────────────────────────────────────────────────────
+   SCMF 1.6.0 — Ant Attack Snack Lost Stack v1
+   Purpose:
+   - Use the same intentional three-line result system as saves.
+   - Render Snack / Lost / +3 without WKWebView wrapping decisions.
+   - Give the loss update a small size boost for readability.
+   ────────────────────────────────────────────────────────── */
+
+body.kc-active
+.aa-ant-root
+.kc-ant-zone
+.aa-round-stack-message.aa-round-stack-loss {
+  font-size:
+    clamp(
+      2.05rem,
+      4.8svh,
+      3.4rem
+    ) !important;
+
+  line-height: 0.86 !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ───────────────── SCMF 1.6.0 — Ant Attack Snack Lost Stack v1 END ───────────────── */
+

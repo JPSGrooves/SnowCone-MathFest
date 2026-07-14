@@ -129,6 +129,36 @@ const WAVE_CHARGE_MAX = 3;
 // Kept as a future fallback knob if we want optional auto-start again.
 const VS_AUTO_START_MS = 4700;
 
+/*
+  SCMF 1.6.0 — Ant Attack Arcade Escalation v1
+
+  Arcade uses one global match ladder, regardless of rival identity:
+
+  Match 1  = 1000 ms
+  Match 2  =  900 ms
+  ...
+  Match 10 =  100 ms
+
+  Runs can continue past Match 10; 100 ms remains the safety floor so
+  the timer never reaches zero or a negative interval.
+*/
+const ARCADE_FIRST_RELEASE_INTERVAL_MS = 1000;
+const ARCADE_RELEASE_STEP_MS = 100;
+const ARCADE_MIN_RELEASE_INTERVAL_MS = 100;
+
+// Story+ keeps the original campaign, food economy, wave rules, and score targets.
+// The only first-pass difficulty lever is rival deployment speed.
+const STORY_PLUS_RIVAL_SPEED_MULTIPLIER = 0.80;
+const STORY_PLUS_REQUIRED_ANT_IDS = Object.freeze([
+  'black',
+  'blue',
+  'pink',
+  'white',
+  'yellow',
+  'red',
+  'queen',
+]);
+
 // ─────────────────────────────────────────────────────────────
 // Ant Attack Story Script v1
 // Source: Jeremy edited haiku pass.
@@ -1180,12 +1210,13 @@ let selectedAntId = 'black';
 let currentBattleMode = 'story';
 let currentPlayerAnt = ANT_ROSTER[0];
 let currentRivalAnt = ANT_ROSTER[1];
-let currentStoryRunWasReplay = false;
+let currentStoryRunIsPlus = false;
 
 let arcadeWaveRun = {
   active: false,
   playerAntId: null,
   charge: 0,
+  wins: 0,
 };
 
 let waveInProgress = false;
@@ -1553,7 +1584,7 @@ function normalizeStorySave(parsedStory = {}, fallbackStory = {}) {
 }
 
 
-function createReplayStoryState(antId, existing = {}) {
+function createStoryPlusState(antId, existing = {}) {
   const id = getAntById(antId).id;
   const route = getStoryRouteForAnt(id);
   const firstRivalId = route[0] || null;
@@ -1567,57 +1598,74 @@ function createReplayStoryState(antId, existing = {}) {
     ? Math.max(0, +existing.wins)
     : 0;
 
-  const active = !!existing?.active && !!nextRivalId;
-  const complete = !!existing?.complete;
+  const routeComplete =
+    route.length > 0 &&
+    wins >= route.length;
 
   return {
-    active: complete ? false : active,
-    complete,
-    prologueSeen: !!existing?.prologueSeen,
-    missionSeen: !!existing?.missionSeen,
+    active:
+      !!existing?.active &&
+      !!nextRivalId,
+
+    // "complete" means this ant's Story+ has been cleared at least once.
+    // It stays true if the player later begins another Story+ replay.
+    complete:
+      !!existing?.complete ||
+      routeComplete,
+
+    prologueSeen:
+      !!existing?.prologueSeen,
+
+    missionSeen:
+      !!existing?.missionSeen,
+
     nextRivalId,
+
     wins,
-    waveCharge: complete
-      ? 0
-      : clampWaveCharge(existing?.waveCharge),
+
+    waveCharge:
+      !!existing?.active
+        ? clampWaveCharge(existing?.waveCharge)
+        : 0,
   };
 }
 
-function ensureReplayStoryBucket(save) {
-  if (!save.replayStoryByAnt || typeof save.replayStoryByAnt !== 'object') {
-    save.replayStoryByAnt = {};
+function ensureStoryPlusBucket(save) {
+  if (!save.storyPlusByAnt || typeof save.storyPlusByAnt !== 'object') {
+    save.storyPlusByAnt = {};
   }
 
-  return save.replayStoryByAnt;
+  return save.storyPlusByAnt;
 }
 
-function getReplayStoryState(antId, save = readAntAttackSave()) {
+function getStoryPlusState(antId, save = readAntAttackSave()) {
   const id = getAntById(antId).id;
-  const bucket = save?.replayStoryByAnt || {};
+  const bucket = save?.storyPlusByAnt || {};
 
-  return createReplayStoryState(id, bucket[id]);
+  return createStoryPlusState(id, bucket[id]);
 }
 
-function hasActiveReplayStory(antId, save = readAntAttackSave()) {
-  const replay = getReplayStoryState(antId, save);
-  return !!replay.active && !replay.complete;
+function hasActiveStoryPlus(antId, save = readAntAttackSave()) {
+  const storyPlus = getStoryPlusState(antId, save);
+  return !!storyPlus.active;
 }
 
-function writeReplayStoryState(antId, nextState) {
+function writeStoryPlusState(antId, nextState) {
   const id = getAntById(antId).id;
   const save = readAntAttackSave();
-  const bucket = ensureReplayStoryBucket(save);
+  const bucket = ensureStoryPlusBucket(save);
 
-  bucket[id] = createReplayStoryState(id, nextState);
+  bucket[id] = createStoryPlusState(id, nextState);
   writeAntAttackSave(save);
 }
 
-function startReplayStoryProgress(antId) {
+function startStoryPlusProgress(antId) {
   const id = getAntById(antId).id;
+  const previous = getStoryPlusState(id);
 
-  writeReplayStoryState(id, {
+  writeStoryPlusState(id, {
     active: true,
-    complete: false,
+    complete: !!previous.complete,
     prologueSeen: false,
     missionSeen: false,
     nextRivalId: getFirstStoryRivalId(id),
@@ -1626,12 +1674,21 @@ function startReplayStoryProgress(antId) {
   });
 }
 
-function clearReplayStoryProgress(antId, save = null) {
+function clearStoryPlusProgress(antId, save = null) {
   const id = getAntById(antId).id;
   const targetSave = save || readAntAttackSave();
-  const bucket = ensureReplayStoryBucket(targetSave);
+  const bucket = ensureStoryPlusBucket(targetSave);
+  const previous = createStoryPlusState(id, bucket[id]);
 
-  delete bucket[id];
+  bucket[id] = createStoryPlusState(id, {
+    ...previous,
+    active: false,
+    nextRivalId: getFirstStoryRivalId(id),
+    wins: previous.complete
+      ? getStoryRouteForAnt(id).length
+      : 0,
+    waveCharge: 0,
+  });
 
   if (!save) {
     writeAntAttackSave(targetSave);
@@ -1640,76 +1697,97 @@ function clearReplayStoryProgress(antId, save = null) {
   return targetSave;
 }
 
-function markReplayPrologueSeen(antId) {
+function markStoryPlusPrologueSeen(antId) {
   const id = getAntById(antId).id;
-  const replay = getReplayStoryState(id);
+  const storyPlus = getStoryPlusState(id);
 
-  if (!replay.active) return;
+  if (!storyPlus.active) return;
 
-  writeReplayStoryState(id, {
-    ...replay,
+  writeStoryPlusState(id, {
+    ...storyPlus,
     prologueSeen: true,
   });
 }
 
-function markReplayMissionSeen(antId) {
+function markStoryPlusMissionSeen(antId) {
   const id = getAntById(antId).id;
-  const replay = getReplayStoryState(id);
+  const storyPlus = getStoryPlusState(id);
 
-  if (!replay.active) return;
+  if (!storyPlus.active) return;
 
-  writeReplayStoryState(id, {
-    ...replay,
+  writeStoryPlusState(id, {
+    ...storyPlus,
     missionSeen: true,
   });
 }
 
-function advanceReplayStoryProgressInSave(save, playerAntId, defeatedRivalId) {
+function getStoryPlusCompletionCount(save = readAntAttackSave()) {
+  return STORY_PLUS_REQUIRED_ANT_IDS.reduce((count, antId) => {
+    return count + (getStoryPlusState(antId, save).complete ? 1 : 0);
+  }, 0);
+}
+
+function areAllStoryPlusCampaignsComplete(save = readAntAttackSave()) {
+  return getStoryPlusCompletionCount(save) >= STORY_PLUS_REQUIRED_ANT_IDS.length;
+}
+
+function advanceStoryPlusProgressInSave(save, playerAntId, defeatedRivalId) {
   const playerId = getAntById(playerAntId).id;
   const rivalId = getAnyAntById(defeatedRivalId).id;
   const route = getStoryRouteForAnt(playerId);
   const currentIndex = route.indexOf(rivalId);
+  const bucket = ensureStoryPlusBucket(save);
+  const storyPlusState = createStoryPlusState(playerId, bucket[playerId]);
 
   if (currentIndex < 0) {
     return {
       advanced: false,
-      replayComplete: false,
-      nextRivalId: getFirstStoryRivalId(playerId),
-      wins: 0,
+      storyPlusRunComplete: false,
+      storyPlusComplete: !!storyPlusState.complete,
+      allStoryPlusComplete: areAllStoryPlusCampaignsComplete(save),
+      nextRivalId: storyPlusState.nextRivalId || getFirstStoryRivalId(playerId),
+      wins: storyPlusState.wins,
     };
   }
 
   const nextRivalId = route[currentIndex + 1] || null;
-  const replayComplete = !nextRivalId;
-  const bucket = ensureReplayStoryBucket(save);
-  const replayState = createReplayStoryState(playerId, bucket[playerId]);
+  const storyPlusRunComplete = !nextRivalId;
 
-  if (replayComplete) {
-    delete bucket[playerId];
-
-    return {
-      advanced: true,
-      replayComplete: true,
-      nextRivalId: getFirstStoryRivalId(playerId),
-      wins: route.length,
-    };
-  }
-
-  bucket[playerId] = createReplayStoryState(playerId, {
-    active: true,
-    complete: false,
+  bucket[playerId] = createStoryPlusState(playerId, {
+    ...storyPlusState,
+    active: !storyPlusRunComplete,
+    complete: storyPlusState.complete || storyPlusRunComplete,
     prologueSeen: true,
     missionSeen: true,
-    nextRivalId,
-    wins: currentIndex + 1,
-    waveCharge: replayState.waveCharge,
+    nextRivalId: storyPlusRunComplete
+      ? getFirstStoryRivalId(playerId)
+      : nextRivalId,
+    wins: storyPlusRunComplete
+      ? route.length
+      : currentIndex + 1,
+    waveCharge: storyPlusRunComplete
+      ? 0
+      : storyPlusState.waveCharge,
   });
+
+  const allStoryPlusComplete =
+    areAllStoryPlusCampaignsComplete(save);
+
+  if (allStoryPlusComplete) {
+    // Placeholder only. No roster entry or missing art is introduced yet.
+    // A future Super Ant / Queen Ant patch can consume this flag.
+    save.superAntEarned = true;
+  }
 
   return {
     advanced: true,
-    replayComplete: false,
-    nextRivalId,
-    wins: currentIndex + 1,
+    storyPlusRunComplete,
+    storyPlusComplete: !!bucket[playerId].complete,
+    allStoryPlusComplete,
+    nextRivalId: storyPlusRunComplete
+      ? getFirstStoryRivalId(playerId)
+      : nextRivalId,
+    wins: bucket[playerId].wins,
   };
 }
 
@@ -1741,6 +1819,7 @@ function startArcadeWaveRun(playerAntId) {
     active: true,
     playerAntId: getAntById(playerAntId).id,
     charge: 0,
+    wins: 0,
   };
 }
 
@@ -1749,6 +1828,107 @@ function endArcadeWaveRun() {
     active: false,
     playerAntId: null,
     charge: 0,
+    wins: 0,
+  };
+}
+
+function getArcadeRunWins() {
+  if (!arcadeWaveRun.active) return 0;
+
+  const wins =
+    Number(arcadeWaveRun.wins);
+
+  return Number.isFinite(wins)
+    ? Math.max(0, Math.floor(wins))
+    : 0;
+}
+
+function getArcadeMatchNumber() {
+  return getArcadeRunWins() + 1;
+}
+
+function getArcadeReleaseIntervalMs(
+  matchNumber = getArcadeMatchNumber()
+) {
+  const safeMatchNumber = Math.max(
+    1,
+    Math.floor(Number(matchNumber) || 1)
+  );
+
+  return Math.max(
+    ARCADE_MIN_RELEASE_INTERVAL_MS,
+    ARCADE_FIRST_RELEASE_INTERVAL_MS -
+      ((safeMatchNumber - 1) * ARCADE_RELEASE_STEP_MS)
+  );
+}
+
+function getArcadeHighScoreWins(
+  save = readAntAttackSave()
+) {
+  const wins =
+    Number(save?.arcadeHighScoreWins);
+
+  return Number.isFinite(wins)
+    ? Math.max(0, Math.floor(wins))
+    : 0;
+}
+
+function recordArcadeVictory() {
+  if (!arcadeWaveRun.active) {
+    startArcadeWaveRun(
+      currentPlayerAnt?.id || selectedAntId
+    );
+  }
+
+  arcadeWaveRun.wins =
+    getArcadeRunWins() + 1;
+
+  const runWins =
+    getArcadeRunWins();
+
+  const save =
+    readAntAttackSave();
+
+  const previousHighScore =
+    getArcadeHighScoreWins(save);
+
+  const isNewHighScore =
+    runWins > previousHighScore;
+
+  if (isNewHighScore) {
+    save.arcadeHighScoreWins =
+      runWins;
+
+    writeAntAttackSave(save);
+  }
+
+  const highScoreWins =
+    Math.max(
+      previousHighScore,
+      runWins
+    );
+
+  console.log(
+    '[antAttack] arcade victory saved',
+    {
+      playerId:
+        currentPlayerAnt?.id || null,
+      runWins,
+      nextMatchNumber:
+        runWins + 1,
+      nextReleaseIntervalMs:
+        getArcadeReleaseIntervalMs(
+          runWins + 1
+        ),
+      highScoreWins,
+      isNewHighScore,
+    }
+  );
+
+  return {
+    runWins,
+    highScoreWins,
+    isNewHighScore,
   };
 }
 
@@ -1756,8 +1936,8 @@ function getCurrentWaveCharge() {
   const playerId = getAntById(currentPlayerAnt?.id).id;
 
   if (currentBattleMode === 'story') {
-    if (currentStoryRunWasReplay) {
-      return getReplayStoryState(playerId).waveCharge;
+    if (currentStoryRunIsPlus) {
+      return getStoryPlusState(playerId).waveCharge;
     }
 
     return getAntStoryState(playerId).waveCharge;
@@ -1779,11 +1959,12 @@ function setCurrentWaveCharge(nextCharge) {
   const charge = clampWaveCharge(nextCharge);
 
   if (currentBattleMode === 'story') {
-    if (currentStoryRunWasReplay) {
-      const replay = getReplayStoryState(playerId);
+    if (currentStoryRunIsPlus) {
+      const storyPlus =
+        getStoryPlusState(playerId);
 
-      writeReplayStoryState(playerId, {
-        ...replay,
+      writeStoryPlusState(playerId, {
+        ...storyPlus,
         waveCharge: charge,
       });
 
@@ -2793,14 +2974,24 @@ function getStoryButtonText(antId = selectedAntId) {
   const save = readAntAttackSave();
   const state = getAntStoryState(antId, save);
 
-  if (state.complete) {
-    return hasActiveReplayStory(antId, save) ? 'Continue Replay' : 'Replay Story';
+  if (!state.complete) {
+    return isStoryFresh(antId, save)
+      ? 'Start Story'
+      : 'Continue Story';
   }
 
-  if (isStoryFresh(antId, save)) return 'Start Story';
+  const storyPlus =
+    getStoryPlusState(antId, save);
 
-  return 'Continue Story';
+  if (storyPlus.active) {
+    return 'Continue Story+';
+  }
+
+  return storyPlus.complete
+    ? 'Replay Story+'
+    : 'Start Story+';
 }
+
 
 
 function getStoryButtonSubtitle(antId = selectedAntId) {
@@ -2812,19 +3003,37 @@ function getStoryButtonSubtitle(antId = selectedAntId) {
   const state = getAntStoryState(antId, save);
 
   if (state.complete) {
-    const replay = getReplayStoryState(antId, save);
+    const storyPlus =
+      getStoryPlusState(antId, save);
 
-    if (replay.active && !replay.complete) {
-      const nextReplayRival = getAnyAntById(replay.nextRivalId || getFirstStoryRivalId(antId));
-      return `Replay Next: ${nextReplayRival.name}`;
+    const completedCount =
+      getStoryPlusCompletionCount(save);
+
+    if (storyPlus.active) {
+      const nextStoryPlusRival =
+        getAnyAntById(
+          storyPlus.nextRivalId ||
+          getFirstStoryRivalId(antId)
+        );
+
+      return `Story+ Next: ${nextStoryPlusRival.name}`;
     }
 
-    return 'Story complete';
+    if (storyPlus.complete) {
+      return `Story+ complete • ${completedCount}/${STORY_PLUS_REQUIRED_ANT_IDS.length} mastered`;
+    }
+
+    return `Harder rematch • ${completedCount}/${STORY_PLUS_REQUIRED_ANT_IDS.length} mastered`;
   }
 
-  const nextRival = getNextStoryRival(antId);
-  return nextRival ? `Next: ${nextRival.name}` : 'Final snack path';
+  const nextRival =
+    getNextStoryRival(antId);
+
+  return nextRival
+    ? `Next: ${nextRival.name}`
+    : 'Final snack path';
 }
+
 
 
 function getArcadeButtonSubtitle(antId = selectedAntId) {
@@ -2838,7 +3047,14 @@ function getArcadeButtonSubtitle(antId = selectedAntId) {
     return `Complete ${ant.name} Story`;
   }
 
-  return ant.id === 'queen' ? 'Royal rivals' : 'Random rival';
+  const highScoreWins =
+    getArcadeHighScoreWins();
+
+  return `Hi Score: ${
+    highScoreWins > 0
+      ? highScoreWins
+      : '--'
+  } Wins`;
 }
 
 function getNextStoryRival(playerAntId = selectedAntId) {
@@ -2860,8 +3076,8 @@ function getNextUnlockAntId(completedAntId) {
 function markStoryPrologueSeen(antId) {
   const id = getAntById(antId).id;
 
-  if (currentStoryRunWasReplay) {
-    markReplayPrologueSeen(id);
+  if (currentStoryRunIsPlus) {
+    markStoryPlusPrologueSeen(id);
     return;
   }
 
@@ -2876,9 +3092,14 @@ function markStoryPrologueSeen(antId) {
 
 
 function shouldShowStoryPrologue(antId) {
-  if (currentStoryRunWasReplay) {
-    const replay = getReplayStoryState(antId);
-    return replay.active && !replay.prologueSeen;
+  if (currentStoryRunIsPlus) {
+    const storyPlus =
+      getStoryPlusState(antId);
+
+    return (
+      storyPlus.active &&
+      !storyPlus.prologueSeen
+    );
   }
 
   return isStoryFresh(antId);
@@ -2890,8 +3111,8 @@ function shouldShowStoryPrologue(antId) {
 function markStoryMissionSeen(antId) {
   const id = getAntById(antId).id;
 
-  if (currentStoryRunWasReplay) {
-    markReplayMissionSeen(id);
+  if (currentStoryRunIsPlus) {
+    markStoryPlusMissionSeen(id);
     return;
   }
 
@@ -2934,22 +3155,44 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
       playerId,
       rivalId,
       route,
+      storyTier:
+        currentStoryRunIsPlus
+          ? 'plus'
+          : 'normal',
     });
 
     return {
       advanced: false,
-      storyComplete: !!state.complete,
-      nextRivalId: state.nextRivalId,
+      storyComplete:
+        currentStoryRunIsPlus
+          ? false
+          : !!state.complete,
+      nextRivalId:
+        currentStoryRunIsPlus
+          ? getStoryPlusState(playerId, save).nextRivalId
+          : state.nextRivalId,
       unlockedAntId: null,
       unlockedAntName: '',
-      replay: currentStoryRunWasReplay,
+      storyPlus: currentStoryRunIsPlus,
+      allStoryPlusComplete:
+        areAllStoryPlusCampaignsComplete(save),
+      superAntEarned:
+        !!save.superAntEarned,
     };
   }
 
-  if (currentStoryRunWasReplay || state.complete) {
-    const replayResult = advanceReplayStoryProgressInSave(save, playerId, rivalId);
+  if (currentStoryRunIsPlus) {
+    const wasSuperAntEarned =
+      !!save.superAntEarned;
 
-    // Protect original story completion and Arcade access forever.
+    const storyPlusResult =
+      advanceStoryPlusProgressInSave(
+        save,
+        playerId,
+        rivalId
+      );
+
+    // Protect original Story completion and Arcade access forever.
     save.story.storyByAnt[playerId] = createAntStoryState(playerId, {
       ...state,
       started: true,
@@ -2957,38 +3200,86 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
       missionSeen: true,
       complete: true,
       nextRivalId: getFirstStoryRivalId(playerId),
-      wins: Math.max(Number(state.wins) || 0, route.length),
+      wins: Math.max(
+        Number(state.wins) || 0,
+        route.length
+      ),
     });
-    save.story.antStories = { ...save.story.storyByAnt };
+
+    save.story.antStories = {
+      ...save.story.storyByAnt,
+    };
 
     if (playerId === 'black') {
-      save.story.nextRivalId = save.story.storyByAnt.black.nextRivalId;
+      save.story.nextRivalId =
+        save.story.storyByAnt.black.nextRivalId;
+
       save.story.complete = true;
     }
 
     writeAntAttackSave(save);
 
-    console.log('[antAttack] replay story victory saved', {
+    console.log('[antAttack] story+ victory saved', {
       playerId,
       defeatedRivalId: rivalId,
-      replayComplete: replayResult.replayComplete,
-      nextRivalId: replayResult.nextRivalId,
-      wins: replayResult.wins,
+      storyPlusRunComplete:
+        storyPlusResult.storyPlusRunComplete,
+      storyPlusComplete:
+        storyPlusResult.storyPlusComplete,
+      nextRivalId:
+        storyPlusResult.nextRivalId,
+      wins:
+        storyPlusResult.wins,
+      storyPlusCompletedCount:
+        getStoryPlusCompletionCount(save),
+      storyPlusRequiredCount:
+        STORY_PLUS_REQUIRED_ANT_IDS.length,
+      allStoryPlusComplete:
+        storyPlusResult.allStoryPlusComplete,
+      superAntEarned:
+        !!save.superAntEarned,
     });
+
+    if (
+      !wasSuperAntEarned &&
+      save.superAntEarned
+    ) {
+      console.log(
+        '[antAttack] all Story+ campaigns complete; future Super Ant unlock earned',
+        {
+          requiredAntIds:
+            STORY_PLUS_REQUIRED_ANT_IDS,
+        }
+      );
+    }
 
     return {
       advanced: true,
-      storyComplete: replayResult.replayComplete,
-      nextRivalId: replayResult.nextRivalId,
+      storyComplete:
+        storyPlusResult.storyPlusRunComplete,
+      nextRivalId:
+        storyPlusResult.nextRivalId,
       unlockedAntId: null,
       unlockedAntName: '',
-      replay: true,
+      storyPlus: true,
+      allStoryPlusComplete:
+        storyPlusResult.allStoryPlusComplete,
+      superAntEarned:
+        !!save.superAntEarned,
     };
   }
 
-  const nextRivalId = route[currentIndex + 1] || null;
-  const storyComplete = !nextRivalId;
-  const nextWins = Math.max(Number(state.wins) || 0, currentIndex + 1);
+  const nextRivalId =
+    route[currentIndex + 1] || null;
+
+  const storyComplete =
+    !nextRivalId;
+
+  const nextWins =
+    Math.max(
+      Number(state.wins) || 0,
+      currentIndex + 1
+    );
 
   save.story.storyByAnt[playerId] = createAntStoryState(playerId, {
     ...state,
@@ -2996,32 +3287,54 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
     prologueSeen: true,
     missionSeen: true,
     complete: storyComplete,
-    nextRivalId: storyComplete ? getFirstStoryRivalId(playerId) : nextRivalId,
+    nextRivalId:
+      storyComplete
+        ? getFirstStoryRivalId(playerId)
+        : nextRivalId,
     wins: nextWins,
-    waveCharge: storyComplete ? 0 : state.waveCharge,
+    waveCharge:
+      storyComplete
+        ? 0
+        : state.waveCharge,
   });
-  save.story.antStories = { ...save.story.storyByAnt };
+
+  save.story.antStories = {
+    ...save.story.storyByAnt,
+  };
 
   if (playerId === 'black') {
-    save.story.nextRivalId = save.story.storyByAnt.black.nextRivalId;
-    save.story.complete = !!save.story.storyByAnt.black.complete;
+    save.story.nextRivalId =
+      save.story.storyByAnt.black.nextRivalId;
+
+    save.story.complete =
+      !!save.story.storyByAnt.black.complete;
   }
 
   let unlockedAntId = null;
   let unlockedAntName = '';
 
   if (storyComplete) {
-    unlockedAntId = getNextUnlockAntId(playerId);
+    unlockedAntId =
+      getNextUnlockAntId(playerId);
 
-    if (unlockedAntId && !save.unlockedAnts?.[unlockedAntId]) {
+    if (
+      unlockedAntId &&
+      !save.unlockedAnts?.[unlockedAntId]
+    ) {
       save.unlockedAnts[unlockedAntId] = true;
       save.newAntIds[unlockedAntId] = true;
+
       save.story.storyByAnt[unlockedAntId] = createAntStoryState(
         unlockedAntId,
         save.story.storyByAnt?.[unlockedAntId]
       );
-      save.story.antStories = { ...save.story.storyByAnt };
-      unlockedAntName = getAntById(unlockedAntId).name;
+
+      save.story.antStories = {
+        ...save.story.storyByAnt,
+      };
+
+      unlockedAntName =
+        getAntById(unlockedAntId).name;
     }
   }
 
@@ -3034,6 +3347,7 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
     storyComplete,
     unlockedAntId,
     wins: nextWins,
+    storyTier: 'normal',
   });
 
   return {
@@ -3042,9 +3356,14 @@ function applyStoryVictoryProgress(playerAntId, defeatedRivalId) {
     nextRivalId,
     unlockedAntId,
     unlockedAntName,
-    replay: false,
+    storyPlus: false,
+    allStoryPlusComplete:
+      areAllStoryPlusCampaignsComplete(save),
+    superAntEarned:
+      !!save.superAntEarned,
   };
 }
+
 
 
 
@@ -3180,72 +3499,168 @@ function getArcadeRival(playerId) {
 
 function createDefaultAntAttackSave() {
   const storyByAnt = {};
+  const storyPlusByAnt = {};
+
   getKnownAntIds().forEach((antId) => {
-    storyByAnt[antId] = createAntStoryState(antId);
+    storyByAnt[antId] =
+      createAntStoryState(antId);
+
+    storyPlusByAnt[antId] =
+      createStoryPlusState(antId);
   });
 
   return {
     selectedAntId: 'black',
     lastPlayedAntId: 'black',
-    unlockedAnts: { black: true },
+    unlockedAnts: {
+      black: true,
+    },
     newAntIds: {},
 
+    // One global Arcade record shared by every playable ant.
+    arcadeHighScoreWins: 0,
+
     story: {
-      nextRivalId: storyByAnt.black.nextRivalId,
+      nextRivalId:
+        storyByAnt.black.nextRivalId,
       complete: false,
       antStories: storyByAnt,
       storyByAnt,
     },
+
+    storyPlusByAnt,
+
+    // Placeholder progression flag only.
+    // No Super Ant roster entry or asset dependency exists yet.
+    superAntEarned: false,
   };
 }
 
 
+
 function normalizeAntAttackSave(rawSave = {}) {
-  const fallback = createDefaultAntAttackSave();
-  const parsed = rawSave && typeof rawSave === 'object' ? rawSave : {};
+  const fallback =
+    createDefaultAntAttackSave();
+
+  const parsed =
+    rawSave &&
+    typeof rawSave === 'object'
+      ? rawSave
+      : {};
 
   const unlockedAnts = {
     ...fallback.unlockedAnts,
     ...(parsed.unlockedAnts || {}),
   };
+
   unlockedAnts.black = true;
 
   const newAntIds = {
     ...(parsed.newAntIds || {}),
   };
+
   delete newAntIds.black;
 
   Object.keys(newAntIds).forEach((antId) => {
-    if (!isKnownAntId(antId) || !isAntUnlockedInSave({ unlockedAnts }, antId)) {
+    if (
+      !isKnownAntId(antId) ||
+      !isAntUnlockedInSave(
+        {
+          unlockedAnts,
+        },
+        antId
+      )
+    ) {
       delete newAntIds[antId];
     }
   });
 
-  const legacySelected = isKnownAntId(parsed.selectedAntId) ? parsed.selectedAntId : 'black';
-  const lastPlayedCandidate = isKnownAntId(parsed.lastPlayedAntId)
-    ? parsed.lastPlayedAntId
-    : legacySelected;
+  const legacySelected =
+    isKnownAntId(parsed.selectedAntId)
+      ? parsed.selectedAntId
+      : 'black';
 
-  const lastPlayedAntId = isAntUnlockedInSave({ unlockedAnts }, lastPlayedCandidate)
-    ? lastPlayedCandidate
-    : 'black';
+  const lastPlayedCandidate =
+    isKnownAntId(parsed.lastPlayedAntId)
+      ? parsed.lastPlayedAntId
+      : legacySelected;
 
-  const selectedCandidate = isKnownAntId(parsed.selectedAntId)
-    ? parsed.selectedAntId
-    : lastPlayedAntId;
+  const lastPlayedAntId =
+    isAntUnlockedInSave(
+      {
+        unlockedAnts,
+      },
+      lastPlayedCandidate
+    )
+      ? lastPlayedCandidate
+      : 'black';
 
-  const story = normalizeStorySave(parsed.story, fallback.story);
+  const selectedCandidate =
+    isKnownAntId(parsed.selectedAntId)
+      ? parsed.selectedAntId
+      : lastPlayedAntId;
+
+  const story =
+    normalizeStorySave(
+      parsed.story,
+      fallback.story
+    );
+
+  // Migration:
+  // Existing in-progress Replay Story saves become Story+ progress.
+  // They are not auto-completed; the player still has to finish the route.
+  const legacyReplayBucket =
+    parsed.replayStoryByAnt &&
+    typeof parsed.replayStoryByAnt === 'object'
+      ? parsed.replayStoryByAnt
+      : {};
+
+  const parsedStoryPlusBucket =
+    parsed.storyPlusByAnt &&
+    typeof parsed.storyPlusByAnt === 'object'
+      ? parsed.storyPlusByAnt
+      : {};
+
+  const storyPlusByAnt = {};
+
+  STORY_PLUS_REQUIRED_ANT_IDS.forEach((antId) => {
+    storyPlusByAnt[antId] =
+      createStoryPlusState(
+        antId,
+        parsedStoryPlusBucket[antId] ||
+        legacyReplayBucket[antId] ||
+        fallback.storyPlusByAnt[antId]
+      );
+  });
+
+  const allStoryPlusComplete =
+    STORY_PLUS_REQUIRED_ANT_IDS.every((antId) => {
+      return !!storyPlusByAnt[antId]?.complete;
+    });
 
   return {
     ...fallback,
     ...parsed,
-    selectedAntId: selectedCandidate,
+    selectedAntId:
+      selectedCandidate,
     lastPlayedAntId,
     unlockedAnts,
     newAntIds,
+    arcadeHighScoreWins:
+      Math.max(
+        0,
+        Math.floor(
+          Number(parsed.arcadeHighScoreWins) || 0
+        )
+      ),
     story,
+    storyPlusByAnt,
+    superAntEarned:
+      !!parsed.superAntEarned ||
+      allStoryPlusComplete,
   };
 }
+
 
 
 function readAntAttackSave() {
@@ -3335,6 +3750,29 @@ globalThis.__SCMF_getAntAttackStoryRoute = (antId = selectedAntId) => {
   });
 };
 globalThis.__SCMF_readAntAttackSave = readAntAttackSave;
+globalThis.__SCMF_getAntAttackStoryPlusProgress = () => {
+  const save = readAntAttackSave();
+
+  return {
+    completed:
+      getStoryPlusCompletionCount(save),
+    required:
+      STORY_PLUS_REQUIRED_ANT_IDS.length,
+    allComplete:
+      areAllStoryPlusCampaignsComplete(save),
+    superAntEarned:
+      !!save.superAntEarned,
+    byAnt:
+      Object.fromEntries(
+        STORY_PLUS_REQUIRED_ANT_IDS.map((antId) => {
+          return [
+            antId,
+            getStoryPlusState(antId, save),
+          ];
+        })
+      ),
+  };
+};
 globalThis.__SCMF_resetAntAttackSave = () => {
   try {
     localStorage.removeItem(ANT_ATTACK_SAVE_KEY);
@@ -3617,6 +4055,30 @@ function logAntAttackRoundData({
     mode:
       currentBattleMode,
 
+    storyTier:
+      currentBattleMode === 'story'
+        ? (
+            currentStoryRunIsPlus
+              ? 'plus'
+              : 'normal'
+          )
+        : null,
+
+    arcadeRunWins:
+      currentBattleMode === 'arcade'
+        ? getArcadeRunWins()
+        : null,
+
+    arcadeMatchNumber:
+      currentBattleMode === 'arcade'
+        ? getArcadeMatchNumber()
+        : null,
+
+    arcadeHighScoreWins:
+      currentBattleMode === 'arcade'
+        ? getArcadeHighScoreWins()
+        : null,
+
     playerId:
       currentPlayerAnt?.id || null,
 
@@ -3651,6 +4113,7 @@ function logAntAttackRoundData({
     payload
   );
 }
+
 
 // wiggle helpers
 function getAntBaseRotation(ant) {
@@ -3834,7 +4297,7 @@ export function destroyAntAttackGame(container) {
   playerAntsAttached = aiAntsAttached = 0;
   currentDirection = null;
   currentPhase = 'choose';
-  currentStoryRunWasReplay = false;
+  currentStoryRunIsPlus = false;
   endArcadeWaveRun();
 }
 
@@ -3855,7 +4318,7 @@ export function forceKillAntAttack() {
   activeAnts.length = 0;
   roundInProgress = false;
   currentPhase = 'choose';
-  currentStoryRunWasReplay = false;
+  currentStoryRunIsPlus = false;
   endArcadeWaveRun();
   ANT.session++;   // invalidate any scheduled timeouts
   ANT.alive   = false;
@@ -3872,7 +4335,7 @@ function renderChooseScreen(container) {
   if (!aliveGuard(container)) return;
 
   currentPhase = 'choose';
-  currentStoryRunWasReplay = false;
+  currentStoryRunIsPlus = false;
   endArcadeWaveRun();
   resetBattleRuntimeCounters();
 
@@ -3957,94 +4420,191 @@ function renderChooseScreen(container) {
 
 
 function wireChooseScreen(container) {
-  const prev = container.querySelector('#aaPrevAnt');
-  const next = container.querySelector('#aaNextAnt');
-  const story = container.querySelector('#aaStoryModeBtn');
-  const arcade = container.querySelector('#aaArcadeModeBtn');
+  const prev =
+    container.querySelector('#aaPrevAnt');
+
+  const next =
+    container.querySelector('#aaNextAnt');
+
+  const story =
+    container.querySelector('#aaStoryModeBtn');
+
+  const arcade =
+    container.querySelector('#aaArcadeModeBtn');
 
   prev?.addEventListener('click', () => {
-    const roster = getChooserRoster();
-    const current = getSelectedRosterIndex();
-    const nextIndex = (current - 1 + roster.length) % roster.length;
-    previewAntId(roster[nextIndex].id);
+    const roster =
+      getChooserRoster();
+
+    const current =
+      getSelectedRosterIndex();
+
+    const nextIndex =
+      (current - 1 + roster.length) %
+      roster.length;
+
+    previewAntId(
+      roster[nextIndex].id
+    );
+
     renderChooseScreen(container);
   });
 
   next?.addEventListener('click', () => {
-    const roster = getChooserRoster();
-    const current = getSelectedRosterIndex();
-    const nextIndex = (current + 1) % roster.length;
-    previewAntId(roster[nextIndex].id);
+    const roster =
+      getChooserRoster();
+
+    const current =
+      getSelectedRosterIndex();
+
+    const nextIndex =
+      (current + 1) %
+      roster.length;
+
+    previewAntId(
+      roster[nextIndex].id
+    );
+
     renderChooseScreen(container);
   });
 
   story?.addEventListener('click', () => {
-    const player = getAntById(selectedAntId);
+    const player =
+      getAntById(selectedAntId);
+
     if (!canPlayStory(player.id)) return;
 
     markAntPlayed(player.id);
 
-    const save = readAntAttackSave();
-    const completedStory = isAntStoryComplete(player.id, save);
+    const save =
+      readAntAttackSave();
 
-    currentStoryRunWasReplay = completedStory;
+    const completedStory =
+      isAntStoryComplete(
+        player.id,
+        save
+      );
+
+    currentStoryRunIsPlus =
+      completedStory;
 
     if (completedStory) {
-      const existingReplay = getReplayStoryState(player.id, save);
+      let storyPlus =
+        getStoryPlusState(
+          player.id,
+          save
+        );
 
-      if (!existingReplay.active || existingReplay.complete) {
-        startReplayStoryProgress(player.id);
+      if (!storyPlus.active) {
+        startStoryPlusProgress(
+          player.id
+        );
+
+        storyPlus =
+          getStoryPlusState(
+            player.id
+          );
       }
 
-      const replay = getReplayStoryState(player.id);
-      const rival = getAnyAntById(replay.nextRivalId || getFirstStoryRivalId(player.id));
+      const rival =
+        getAnyAntById(
+          storyPlus.nextRivalId ||
+          getFirstStoryRivalId(
+            player.id
+          )
+        );
 
-      if (shouldShowStoryPrologue(player.id)) {
-        renderStoryPrologueScreen(container, {
-          playerAntId: player.id,
-          rivalAntId: rival.id,
-        });
+      if (
+        shouldShowStoryPrologue(
+          player.id
+        )
+      ) {
+        renderStoryPrologueScreen(
+          container,
+          {
+            playerAntId:
+              player.id,
+            rivalAntId:
+              rival.id,
+          }
+        );
+
         return;
       }
 
-      renderStoryMissionScreen(container, {
-        playerAntId: player.id,
-        rivalAntId: rival.id,
-      });
+      renderStoryMissionScreen(
+        container,
+        {
+          playerAntId:
+            player.id,
+          rivalAntId:
+            rival.id,
+        }
+      );
+
       return;
     }
 
-    const rival = getNextStoryRival(player.id);
+    const rival =
+      getNextStoryRival(
+        player.id
+      );
 
-    if (shouldShowStoryPrologue(player.id)) {
-      renderStoryPrologueScreen(container, {
-        playerAntId: player.id,
-        rivalAntId: rival.id,
-      });
+    if (
+      shouldShowStoryPrologue(
+        player.id
+      )
+    ) {
+      renderStoryPrologueScreen(
+        container,
+        {
+          playerAntId:
+            player.id,
+          rivalAntId:
+            rival.id,
+        }
+      );
+
       return;
     }
 
-    renderStoryMissionScreen(container, {
-      playerAntId: player.id,
-      rivalAntId: rival.id,
-    });
+    renderStoryMissionScreen(
+      container,
+      {
+        playerAntId:
+          player.id,
+        rivalAntId:
+          rival.id,
+      }
+    );
   });
 
   arcade?.addEventListener('click', () => {
-    const player = getAntById(selectedAntId);
-    currentStoryRunWasReplay = false;
+    const player =
+      getAntById(selectedAntId);
+
+    currentStoryRunIsPlus = false;
+
     if (!canPlayArcade(player.id)) return;
 
     markAntPlayed(player.id);
     startArcadeWaveRun(player.id);
 
-    renderVersusScreen(container, {
-      mode: 'arcade',
-      playerAntId: player.id,
-      rivalAntId: getArcadeRival(player.id).id,
-    });
+    renderVersusScreen(
+      container,
+      {
+        mode: 'arcade',
+        playerAntId:
+          player.id,
+        rivalAntId:
+          getArcadeRival(
+            player.id
+          ).id,
+      }
+    );
   });
 }
+
 
 
 
@@ -4102,7 +4662,7 @@ function renderStoryPrologueScreen(container, { playerAntId = selectedAntId, riv
     <div class="aa-prologue-screen aa-cinematic-screen" data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}">
       <section class="aa-cinematic-card aa-prologue-card" aria-label="Ant Attack story prologue">
         <header class="aa-cinematic-header">
-          <span class="aa-cinematic-kicker">Story Mode</span>
+          <span class="aa-cinematic-kicker">${currentStoryRunIsPlus ? 'Story+' : 'Story Mode'}</span>
           <h2>Royal Mission</h2>
         </header>
 
@@ -4158,7 +4718,7 @@ function renderStoryMissionScreen(container, { playerAntId = selectedAntId, riva
     >
       <section class="aa-cinematic-card aa-mission-card" aria-label="Ant Attack rival royal briefing">
         <header class="aa-cinematic-header">
-          <span class="aa-cinematic-kicker">Story Mode</span>
+          <span class="aa-cinematic-kicker">${currentStoryRunIsPlus ? 'Story+' : 'Story Mode'}</span>
           <h2>Royal Rival</h2>
         </header>
 
@@ -4218,7 +4778,7 @@ function renderStoryIntroScreen(container, { playerAntId = selectedAntId, rivalA
     >
       <section class="aa-cinematic-card aa-story-card" aria-label="Ant Attack story battle">
         <header class="aa-cinematic-header">
-          <span class="aa-cinematic-kicker">Story Mode</span>
+          <span class="aa-cinematic-kicker">${currentStoryRunIsPlus ? 'Story+' : 'Story Mode'}</span>
           <h2>Snack Mission</h2>
         </header>
 
@@ -4291,6 +4851,7 @@ function renderVersusScreen(container, { mode = 'story', playerAntId = selectedA
     <div
       class="aa-versus-screen aa-cinematic-screen"
       data-aa-mode="${escapeHtml(mode)}"
+      data-aa-story-tier="${escapeHtml(mode === 'story' ? (currentStoryRunIsPlus ? 'plus' : 'normal') : 'arcade')}"
       data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
       data-aa-rival="${escapeHtml(getAntElementKey(currentRivalAnt))}"
     >
@@ -4345,58 +4906,153 @@ function renderVersusScreen(container, { mode = 'story', playerAntId = selectedA
   container.querySelector('#aaVersusStartBtn')?.addEventListener('click', startBattleFromVersus);
 }
 
-function renderResultsScreen(container, { winnerKind = getBattleWinnerKind() } = {}) {
+function renderResultsScreen(
+  container,
+  {
+    winnerKind =
+      getBattleWinnerKind(),
+  } = {}
+) {
   if (!aliveGuard(container)) return;
 
   clearPhaseTimeouts();
+
   currentPhase = 'results';
   roundInProgress = false;
+
   killFoodTween();
   clearAllRedTimeouts();
 
-  const playerWon = winnerKind === 'player';
-  const storyResult = currentBattleMode === 'story' && playerWon
-    ? applyStoryVictoryProgress(currentPlayerAnt.id, currentRivalAnt.id)
-    : null;
+  const playerWon =
+    winnerKind === 'player';
 
-  const winnerAnt = playerWon ? currentPlayerAnt : currentRivalAnt;
-  const title = `${winnerAnt.name} Wins!`;
+  const storyResult =
+    currentBattleMode === 'story' &&
+    playerWon
+      ? applyStoryVictoryProgress(
+          currentPlayerAnt.id,
+          currentRivalAnt.id
+        )
+      : null;
 
-  const unlockLine = storyResult?.unlockedAntName
-    ? `${storyResult.unlockedAntName} Unlocked!`
-    : '';
+  if (
+    currentBattleMode === 'arcade' &&
+    playerWon
+  ) {
+    recordArcadeVictory();
+  }
 
-  const storyCompleteLine = storyResult?.storyComplete
-    ? `${currentPlayerAnt.name} Story Complete!`
-    : '';
+  const winnerAnt =
+    playerWon
+      ? currentPlayerAnt
+      : currentRivalAnt;
 
-  const primaryLabel = currentBattleMode === 'arcade'
-    ? 'Again'
-    : playerWon
-      ? (storyResult?.storyComplete ? 'Ending' : 'Continue')
-      : 'Try Again';
+  const title =
+    `${winnerAnt.name} Wins!`;
 
-  const storyResultMarkup = currentBattleMode === 'story' && playerWon
-    ? renderStoryPoem(getStoryResultLines(currentPlayerAnt, currentRivalAnt), {
-        className: 'aa-results-haiku',
-        speaker: currentPlayerAnt.name,
-        antId: currentPlayerAnt.id,
-      })
-    : `<span class="aa-results-plain">${playerWon ? 'Snack route secured. The picnic path opens.' : 'The rival held the snack line. Run it back.'}</span>`;
+  const unlockLine =
+    storyResult?.unlockedAntName
+      ? `${storyResult.unlockedAntName} Unlocked!`
+      : '';
 
-  const statusMarkup = unlockLine || storyCompleteLine
-    ? `<strong class="aa-results-status">${escapeHtml(unlockLine || storyCompleteLine)}</strong>`
-    : '';
+  const storyCompleteLine =
+    storyResult?.storyComplete
+      ? (
+          currentStoryRunIsPlus
+            ? `${currentPlayerAnt.name} Story+ Complete!`
+            : `${currentPlayerAnt.name} Story Complete!`
+        )
+      : '';
+
+  const allStoryPlusLine =
+    storyResult?.allStoryPlusComplete &&
+    currentStoryRunIsPlus
+      ? 'All Story+ paths complete!'
+      : '';
+
+  const primaryLabel =
+    currentBattleMode === 'arcade'
+      ? (
+          playerWon
+            ? 'Next'
+            : 'Try Again'
+        )
+      : playerWon
+        ? (
+            storyResult?.storyComplete
+              ? 'Ending'
+              : 'Continue'
+          )
+        : 'Try Again';
+
+  const storyResultMarkup =
+    currentBattleMode === 'story' &&
+    playerWon
+      ? renderStoryPoem(
+          getStoryResultLines(
+            currentPlayerAnt,
+            currentRivalAnt
+          ),
+          {
+            className:
+              'aa-results-haiku',
+            speaker:
+              currentPlayerAnt.name,
+            antId:
+              currentPlayerAnt.id,
+          }
+        )
+      : `
+        <span class="aa-results-plain">
+          ${
+            playerWon
+              ? 'Snack route secured. The picnic path opens.'
+              : 'The rival held the snack line. Run it back.'
+          }
+        </span>
+      `;
+
+  const statusText =
+    allStoryPlusLine ||
+    unlockLine ||
+    storyCompleteLine;
+
+  const statusMarkup =
+    statusText
+      ? `
+        <strong class="aa-results-status">
+          ${escapeHtml(statusText)}
+        </strong>
+      `
+      : '';
+
+  const resultKicker =
+    currentBattleMode === 'story'
+      ? (
+          currentStoryRunIsPlus
+            ? 'Story+ Result'
+            : 'Story Result'
+        )
+      : 'Arcade Result';
 
   container.innerHTML = `
     <div
       class="aa-results-screen aa-cinematic-screen"
+      data-aa-story-tier="${
+        currentBattleMode === 'story'
+          ? (
+              currentStoryRunIsPlus
+                ? 'plus'
+                : 'normal'
+            )
+          : 'arcade'
+      }"
       data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
       data-aa-rival="${escapeHtml(getAntElementKey(currentRivalAnt))}"
     >
       <section class="aa-cinematic-card aa-results-card" aria-label="Ant Attack results">
         <header class="aa-cinematic-header">
-          <span class="aa-cinematic-kicker">${currentBattleMode === 'story' ? 'Story Result' : 'Arcade Result'}</span>
+          <span class="aa-cinematic-kicker">${resultKicker}</span>
           <h2>${escapeHtml(title)}</h2>
         </header>
 
@@ -4429,43 +5085,88 @@ function renderResultsScreen(container, { winnerKind = getBattleWinnerKind() } =
     </div>
   `;
 
-  container.querySelector('#aaResultsBackBtn')?.addEventListener('click', () => {
-    currentStoryRunWasReplay = false;
-    renderChooseScreen(container);
-  });
+  container
+    .querySelector(
+      '#aaResultsBackBtn'
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        currentStoryRunIsPlus = false;
+        renderChooseScreen(container);
+      }
+    );
 
-  container.querySelector('#aaResultsPrimaryBtn')?.addEventListener('click', () => {
-    if (currentBattleMode === 'arcade') {
-      renderVersusScreen(container, {
-        mode: 'arcade',
-        playerAntId: currentPlayerAnt.id,
-        rivalAntId: getArcadeRival(currentPlayerAnt.id).id,
-      });
-      return;
-    }
+  container
+    .querySelector(
+      '#aaResultsPrimaryBtn'
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        if (
+          currentBattleMode === 'arcade'
+        ) {
+          renderVersusScreen(
+            container,
+            {
+              mode: 'arcade',
+              playerAntId:
+                currentPlayerAnt.id,
+              rivalAntId:
+                getArcadeRival(
+                  currentPlayerAnt.id
+                ).id,
+            }
+          );
 
-    if (!playerWon) {
-      renderVersusScreen(container, {
-        mode: 'story',
-        playerAntId: currentPlayerAnt.id,
-        rivalAntId: currentRivalAnt.id,
-      });
-      return;
-    }
+          return;
+        }
 
-    if (storyResult?.storyComplete) {
-      renderEndingScreen(container);
-      return;
-    }
+        if (!playerWon) {
+          renderVersusScreen(
+            container,
+            {
+              mode: 'story',
+              playerAntId:
+                currentPlayerAnt.id,
+              rivalAntId:
+                currentRivalAnt.id,
+            }
+          );
 
-    const nextRivalId = storyResult?.nextRivalId || getNextStoryRival(currentPlayerAnt.id).id;
+          return;
+        }
 
-    renderStoryMissionScreen(container, {
-      playerAntId: currentPlayerAnt.id,
-      rivalAntId: nextRivalId,
-    });
-  });
+        if (
+          storyResult?.storyComplete
+        ) {
+          renderEndingScreen(
+            container
+          );
+
+          return;
+        }
+
+        const nextRivalId =
+          storyResult?.nextRivalId ||
+          getNextStoryRival(
+            currentPlayerAnt.id
+          ).id;
+
+        renderStoryMissionScreen(
+          container,
+          {
+            playerAntId:
+              currentPlayerAnt.id,
+            rivalAntId:
+              nextRivalId,
+          }
+        );
+      }
+    );
 }
+
 
 function renderEndingScreen(container) {
   if (!aliveGuard(container)) return;
@@ -4473,19 +5174,63 @@ function renderEndingScreen(container) {
   clearPhaseTimeouts();
   currentPhase = 'ending';
 
-  const endingPng = getAntEndingPng(currentPlayerAnt);
-  const endingAlt = `${currentPlayerAnt.name} ending celebration`;
+  const endingPng =
+    getAntEndingPng(
+      currentPlayerAnt
+    );
+
+  const endingAlt =
+    `${currentPlayerAnt.name} ending celebration`;
+
+  const save =
+    readAntAttackSave();
+
+  const completedCount =
+    getStoryPlusCompletionCount(
+      save
+    );
+
+  const allStoryPlusComplete =
+    areAllStoryPlusCampaignsComplete(
+      save
+    );
+
+  const endingKicker =
+    currentStoryRunIsPlus
+      ? 'Story+ Victory'
+      : 'Victory Snack';
+
+  const endingTitle =
+    currentStoryRunIsPlus
+      ? `${currentPlayerAnt.name} Story+ Complete!`
+      : `${currentPlayerAnt.name} Story Complete!`;
+
+  const masteryMarkup =
+    currentStoryRunIsPlus
+      ? `
+        <div class="aa-results-status-wrap">
+          <strong class="aa-results-status">
+            ${
+              allStoryPlusComplete
+                ? 'All Story+ paths complete!'
+                : `Story+ Mastery: ${completedCount}/${STORY_PLUS_REQUIRED_ANT_IDS.length}`
+            }
+          </strong>
+        </div>
+      `
+      : '';
 
   container.innerHTML = `
     <div
       class="aa-ending-screen aa-cinematic-screen"
       data-aa-ending="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
+      data-aa-story-tier="${currentStoryRunIsPlus ? 'plus' : 'normal'}"
       data-aa-player="${escapeHtml(getAntElementKey(currentPlayerAnt))}"
     >
       <section class="aa-cinematic-card aa-ending-card" aria-label="Ant Attack ending">
         <header class="aa-cinematic-header">
-          <span class="aa-cinematic-kicker">Victory Snack</span>
-          <h2>${escapeHtml(currentPlayerAnt.name)} Story Complete!</h2>
+          <span class="aa-cinematic-kicker">${endingKicker}</span>
+          <h2>${escapeHtml(endingTitle)}</h2>
         </header>
 
         <div class="aa-ending-art">
@@ -4504,16 +5249,26 @@ function renderEndingScreen(container) {
           })}
         </div>
 
+        ${masteryMarkup}
+
         <button id="aaEndingBackBtn" class="aa-cinematic-btn" type="button">Back to Ants</button>
       </section>
     </div>
   `;
 
-  container.querySelector('#aaEndingBackBtn')?.addEventListener('click', () => {
-    currentStoryRunWasReplay = false;
-    renderChooseScreen(container);
-  });
+  container
+    .querySelector(
+      '#aaEndingBackBtn'
+    )
+    ?.addEventListener(
+      'click',
+      () => {
+        currentStoryRunIsPlus = false;
+        renderChooseScreen(container);
+      }
+    );
 }
+
 
 
 
@@ -4589,19 +5344,48 @@ function getRivalReleaseIntervalMs(
       rivalAnt?.id || rivalAnt
     ).id;
 
-  return (
+  const baseIntervalMs =
     RIVAL_RELEASE_INTERVAL_MS[rivalId] ||
-    1000
-  );
+    1000;
+
+  if (currentBattleMode === 'arcade') {
+    return getArcadeReleaseIntervalMs();
+  }
+
+  if (
+    currentBattleMode === 'story' &&
+    currentStoryRunIsPlus
+  ) {
+    return Math.max(
+      250,
+      Math.round(
+        baseIntervalMs *
+        STORY_PLUS_RIVAL_SPEED_MULTIPLIER
+      )
+    );
+  }
+
+  return baseIntervalMs;
 }
 
-function startBattle(container, { mode = 'story', playerAntId = 'black', rivalAntId = 'blue' } = {}) {
+
+function startBattle(
+  container,
+  {
+    mode = 'story',
+    playerAntId = 'black',
+    rivalAntId = 'blue',
+  } = {}
+) {
   if (!aliveGuard(container)) return;
 
   clearPhaseTimeouts();
+
   currentPhase = 'battle';
   currentBattleMode = mode;
-  currentPlayerAnt = getAntById(playerAntId);
+  currentPlayerAnt =
+    getAntById(playerAntId);
+
   currentRivalAnt =
     rivalAntId === 'queen'
       ? QUEEN_SNACKJACKET
@@ -4614,10 +5398,41 @@ function startBattle(container, { mode = 'story', playerAntId = 'black', rivalAn
         currentRivalAnt.id,
       rivalName:
         currentRivalAnt.name,
+      mode:
+        currentBattleMode,
+      storyTier:
+        currentBattleMode === 'story'
+          ? (
+              currentStoryRunIsPlus
+                ? 'plus'
+                : 'normal'
+            )
+          : null,
+      arcadeRunWins:
+        currentBattleMode === 'arcade'
+          ? getArcadeRunWins()
+          : null,
+      arcadeMatchNumber:
+        currentBattleMode === 'arcade'
+          ? getArcadeMatchNumber()
+          : null,
+      arcadeHighScoreWins:
+        currentBattleMode === 'arcade'
+          ? getArcadeHighScoreWins()
+          : null,
+      baseReleaseIntervalMs:
+        RIVAL_RELEASE_INTERVAL_MS[
+          currentRivalAnt.id
+        ] || 1000,
       releaseIntervalMs:
         getRivalReleaseIntervalMs(
           currentRivalAnt
         ),
+      storyPlusMultiplier:
+        currentBattleMode === 'story' &&
+        currentStoryRunIsPlus
+          ? STORY_PLUS_RIVAL_SPEED_MULTIPLIER
+          : 1,
     }
   );
 
@@ -4627,11 +5442,13 @@ function startBattle(container, { mode = 'story', playerAntId = 'black', rivalAn
   startNewRound(container);
 }
 
+
 function renderBattleScreen(container) {
   container.innerHTML = `
     <div
       class="ant-attack-wrapper aa-battle-wrapper"
       data-aa-mode="${currentBattleMode}"
+      data-aa-story-tier="${currentBattleMode === 'story' ? (currentStoryRunIsPlus ? 'plus' : 'normal') : 'arcade'}"
       data-aa-player="${currentPlayerAnt.id}"
       data-aa-rival="${currentRivalAnt.id}"
     >
@@ -5067,10 +5884,12 @@ function checkEndOfPlayWinner(container) {
   Good     / Save / +4
   SnowCone / Save / +10
 */
-function showAntSaveResultMessage(
+function showAntRoundResultMessage(
   container,
-  resultLabel,
-  regenAmount
+  firstLine,
+  secondLine,
+  regenAmount,
+  variant = 'save'
 ) {
   const zone =
     container?.querySelector?.(
@@ -5093,7 +5912,7 @@ function showAntSaveResultMessage(
     document.createElement('div');
 
   message.className =
-    'kc-round-msg aa-round-stack-message';
+    `kc-round-msg aa-round-stack-message aa-round-stack-${variant}`;
 
   message.setAttribute(
     'role',
@@ -5107,12 +5926,12 @@ function showAntSaveResultMessage(
 
   message.setAttribute(
     'aria-label',
-    `${resultLabel} Save plus ${regenAmount} ants`
+    `${firstLine} ${secondLine} plus ${regenAmount} ants`
   );
 
   [
-    resultLabel,
-    'Save',
+    firstLine,
+    secondLine,
     `+${regenAmount}`,
   ].forEach((lineText) => {
     const line =
@@ -5241,10 +6060,12 @@ function endRound(container, result, foodWrapper) {
       Show the full earned tier even when the pool cap means
       fewer ants physically fit beneath 10/10.
     */
-    showAntSaveResultMessage(
+    showAntRoundResultMessage(
       container,
       resultLabel,
-      regen
+      'Save',
+      regen,
+      'save'
     );
 
     appState.incrementPopCount(
@@ -5285,8 +6106,13 @@ function endRound(container, result, foodWrapper) {
         'Loss',
     });
 
-    // Preserve the existing loss message system.
-    showRoundMessage('loss');
+    showAntRoundResultMessage(
+      container,
+      'Snack',
+      'Lost',
+      lossRegen,
+      'loss'
+    );
   }
 
   // 🔔 Broadcast round result & running margin.
