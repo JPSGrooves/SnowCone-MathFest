@@ -1,6 +1,94 @@
 // versionTab.js — robust download + import/reset helpers
 import { appState } from '../data/appState.js';
 
+
+// ──────────────────────────────────────────────────────────
+// SCMF 1.6.0 — Unified Save Bundle v2
+// One downloadable JSON now carries:
+// - the normal SnowCone MathFest appState save
+// - Ant Attack's independent localStorage save
+//
+// Legacy pre-v2 save files still import normally.
+// ──────────────────────────────────────────────────────────
+const SCMF_SAVE_BUNDLE_FORMAT = 'snowcone-mathfest-save';
+const SCMF_SAVE_BUNDLE_VERSION = 2;
+const ANT_ATTACK_SAVE_KEY = 'scmf.kidsCamping.antAttack.v1';
+
+function readJSONStorageValue(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (err) {
+    console.warn(`[Save] Could not parse localStorage key "${key}" for export.`, err);
+    return null;
+  }
+}
+
+function exportFullSaveBundle() {
+  return {
+    format: SCMF_SAVE_BUNDLE_FORMAT,
+    version: SCMF_SAVE_BUNDLE_VERSION,
+    exportedAt: new Date().toISOString(),
+
+    appState: exportSaveSnapshot(),
+
+    modeSaves: {
+      antAttack: readJSONStorageValue(ANT_ATTACK_SAVE_KEY),
+    },
+  };
+}
+
+function unpackIncomingSave(incoming) {
+  const isBundle = !!(
+    incoming &&
+    typeof incoming === 'object' &&
+    !Array.isArray(incoming) &&
+    incoming.format === SCMF_SAVE_BUNDLE_FORMAT &&
+    Number(incoming.version) >= SCMF_SAVE_BUNDLE_VERSION &&
+    incoming.appState &&
+    typeof incoming.appState === 'object'
+  );
+
+  return {
+    isBundle,
+    appStateData: isBundle
+      ? incoming.appState
+      : incoming,
+    modeSaves: isBundle
+      ? (incoming.modeSaves || {})
+      : null,
+  };
+}
+
+function restoreBundledModeSaves(modeSaves) {
+  if (
+    !modeSaves ||
+    typeof modeSaves !== 'object' ||
+    !Object.prototype.hasOwnProperty.call(modeSaves, 'antAttack')
+  ) {
+    return;
+  }
+
+  const antAttackSave = modeSaves.antAttack;
+
+  // An explicit null means the exported device had no Ant Attack save.
+  // Remove an older local copy so restore behaves like a true restore.
+  if (antAttackSave == null) {
+    localStorage.removeItem(ANT_ATTACK_SAVE_KEY);
+    return;
+  }
+
+  if (typeof antAttackSave !== 'object' || Array.isArray(antAttackSave)) {
+    throw new Error('Invalid Ant Attack save payload.');
+  }
+
+  localStorage.setItem(
+    ANT_ATTACK_SAVE_KEY,
+    JSON.stringify(antAttackSave)
+  );
+}
+
 // ──────────────────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────────────────
@@ -216,12 +304,12 @@ export function setupVersionTabUI() {
   if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
       try {
-        const snapshot = exportSaveSnapshot();
-        await downloadJSON('snowcone_save_data.json', snapshot);
+        const bundle = exportFullSaveBundle();
+        await downloadJSON('snowcone_save_data.json', bundle);
       } catch (err) {
         console.warn('[Save] Download failed, falling back to copy dialog.', err);
         try {
-          const raw = JSON.stringify(exportSaveSnapshot(), null, 2);
+          const raw = JSON.stringify(exportFullSaveBundle(), null, 2);
           // Friendly fallback: copy to clipboard as a last resort.
           await navigator.clipboard?.writeText(raw);
           alert(
@@ -269,12 +357,32 @@ export function setupVersionTabUI() {
               ? event.target.result
               : new TextDecoder().decode(event.target.result);
           const incoming = JSON.parse(text);
+          const {
+            isBundle,
+            appStateData,
+            modeSaves,
+          } = unpackIncomingSave(incoming);
 
-          // Cautious merge: prefer your appState helpers if they exist.
+          if (
+            !appStateData ||
+            typeof appStateData !== 'object' ||
+            Array.isArray(appStateData)
+          ) {
+            throw new Error('Invalid SnowCone save payload.');
+          }
+
+          // Cautious restore: use the AppState importer so MobX maps/classes
+          // remain real runtime objects instead of becoming plain JSON.
           if (typeof appState.importFromJSON === 'function') {
-            appState.importFromJSON(incoming);
+            appState.importFromJSON(appStateData);
           } else {
-            Object.assign(appState, incoming);
+            Object.assign(appState, appStateData);
+          }
+
+          // Only v2 bundled saves touch independent mode storage.
+          // Legacy saves continue to import exactly as before.
+          if (isBundle) {
+            restoreBundledModeSaves(modeSaves);
           }
 
           sessionStorage.setItem('forceWelcomeReload', 'true');

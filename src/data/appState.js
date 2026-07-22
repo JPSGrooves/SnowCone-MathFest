@@ -396,6 +396,156 @@ class AppState {
   spendCurrency(n) { return this.purse.spend(n); }
   getCurrency() { return this.purse.amount; }
 
+  // ────────────────────────────────────────────────────────────────────────────
+  // SCMF 1.6.0 — Portable Save Bundle v2
+  // Public JSON export/import helpers used by the Data tab.
+  //
+  // Why these live here:
+  // - preserve MobX objects instead of replacing them with plain JSON
+  // - preserve Inventory's observable Map shape
+  // - preserve CurrencyPurse as a real class instance
+  // - accept both the current public backup shape and older storage-style saves
+  // ────────────────────────────────────────────────────────────────────────────
+  toJSON() {
+    return {
+      profile:       toJS(this.profile),
+      settings:      toJS(this.settings),
+      stats:         toJS(this.stats),
+      storyProgress: toJS(this.storyProgress),
+      progress:      toJS(this.progress),
+      uiState:       toJS(this.uiState),
+      storyMemory:   toJS(this.storyMemory),
+      chatLogs:      toJS(this.chatLogs),
+      flags:         toJS(this.flags),
+      popCount:      this.popCount,
+
+      // Keep the same portable shape current exported saves already use.
+      inventory: Array.from(this.inventory.entries()).map(([id, entry]) => [
+        id,
+        toJS(entry),
+      ]),
+
+      purse: {
+        amount: this.purse.amount,
+      },
+    };
+  }
+
+  importFromJSON(incoming) {
+    if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) {
+      throw new Error('Invalid SnowCone app-state save payload.');
+    }
+
+    runInAction(() => {
+      if (incoming.profile && typeof incoming.profile === 'object') {
+        Object.assign(this.profile, incoming.profile);
+      }
+
+      if (incoming.settings && typeof incoming.settings === 'object') {
+        Object.assign(this.settings, incoming.settings);
+      }
+
+      if (incoming.stats && typeof incoming.stats === 'object') {
+        Object.assign(this.stats, incoming.stats);
+      }
+
+      if (incoming.storyProgress && typeof incoming.storyProgress === 'object') {
+        Object.assign(this.storyProgress, incoming.storyProgress);
+      }
+
+      if (incoming.storyMemory && typeof incoming.storyMemory === 'object') {
+        Object.assign(this.storyMemory, incoming.storyMemory);
+      }
+
+      if (incoming.uiState && typeof incoming.uiState === 'object') {
+        Object.assign(this.uiState, incoming.uiState);
+      }
+
+      if (Array.isArray(incoming.chatLogs)) {
+        this.chatLogs = incoming.chatLogs;
+      }
+
+      if (incoming.flags && typeof incoming.flags === 'object') {
+        Object.keys(this.flags).forEach((key) => {
+          delete this.flags[key];
+        });
+        Object.assign(this.flags, incoming.flags);
+      }
+
+      if (incoming.progress && typeof incoming.progress === 'object') {
+        this.progress.story = {
+          xp: 0,
+          ...(incoming.progress.story || {}),
+        };
+
+        this.progress.kidsCamping = {
+          xp: 0,
+          ...(incoming.progress.kidsCamping || {}),
+        };
+
+        this.progress.quickServe = {
+          xp: 0,
+          ...(incoming.progress.quickServe || {}),
+        };
+
+        this.progress.infinity = {
+          xp: 0,
+          ...(incoming.progress.infinity || {}),
+        };
+      }
+
+      if (Number.isFinite(Number(incoming.popCount))) {
+        this.popCount = Math.max(0, Number(incoming.popCount));
+      }
+
+      // Current public backups use an array of [id, object] pairs.
+      // Older storage-shaped saves may use { id: object } instead.
+      if (incoming.inventory != null) {
+        const inventoryEntries = Array.isArray(incoming.inventory)
+          ? incoming.inventory
+          : (
+              typeof incoming.inventory === 'object'
+                ? Object.entries(incoming.inventory)
+                : []
+            );
+
+        this.inventory.clear();
+
+        for (const entry of inventoryEntries) {
+          if (!Array.isArray(entry) || entry.length < 2) continue;
+
+          const [id, obj] = entry;
+          if (!id || !obj || typeof obj !== 'object') continue;
+
+          this.inventory.set(
+            id,
+            new InventoryEntry(
+              id,
+              obj.name ?? id,
+              obj.qty ?? 1,
+              obj.meta ?? {}
+            )
+          );
+        }
+      }
+
+      // Current public backups use purse.amount.
+      // Older local-storage-shaped saves may use currency.
+      const incomingCurrency = Number.isFinite(Number(incoming?.purse?.amount))
+        ? Number(incoming.purse.amount)
+        : Number.isFinite(Number(incoming.currency))
+          ? Number(incoming.currency)
+          : null;
+
+      if (incomingCurrency != null) {
+        this.purse.amount = Math.max(0, Math.floor(incomingCurrency));
+      }
+    });
+
+    this.saveToStorage();
+    return true;
+  }
+
   // ── Storage ─────────────────────────────────────────────────────────────────
   saveToStorage() {
     try {

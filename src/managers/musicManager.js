@@ -440,6 +440,12 @@ const allTracks = [
   { id: 'softdown',       name: 'Soft Down Math Vibes', file: 'softDownMathVibes.mp3' },
   { id: 'infadd',         name: 'Infinity Addition',    file: 'InfinityAddition.mp3' },
   { id: 'sc90',           name: 'SnowCone 90',          file: 'sc_90.mp3' },
+
+  // 🏕️ Kids Camping signature tracks
+  { id: 'kcParkingVibes', name: 'Parking Vibes',         file: 'parkingVibes.mp3' },
+  { id: 'kcMosquito',     name: 'Squito Swat',           file: 'mosquito.mp3' },
+  { id: 'kcTentLines',    name: 'Tent Lines',            file: 'tentLines.mp3' },
+
   { id: 'nothingorg',     name: 'Nothing Organic',      file: 'nothing_organic.mp3' },
   { id: 'secrets',        name: 'Secrets of Math',      file: 'secretsOfMath.mp3' },
   { id: 'stoopidelectro', name: 'Stoopid Electro',      file: 'stoopidElectro.mp3' },

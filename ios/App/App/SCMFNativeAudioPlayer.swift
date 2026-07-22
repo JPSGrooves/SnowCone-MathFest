@@ -97,6 +97,21 @@ final class SCMFNativeAudioPlayer: NSObject, AVAudioPlayerDelegate {
             id: "lastRun",
             name: "Last Run",
             file: "lastRun.mp3"
+        ),
+        "kcParkingVibes": AudioAsset(
+            id: "kcParkingVibes",
+            name: "Parking Vibes",
+            file: "parkingVibes.mp3"
+        ),
+        "kcMosquito": AudioAsset(
+            id: "kcMosquito",
+            name: "Squito Swat",
+            file: "mosquito.mp3"
+        ),
+        "kcTentLines": AudioAsset(
+            id: "kcTentLines",
+            name: "Tent Lines",
+            file: "tentLines.mp3"
         )
     ]
 

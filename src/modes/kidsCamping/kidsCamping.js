@@ -85,7 +85,12 @@ const _awarded = {
 const PARKING_FAST_MS = 60_000; // 60s target
 
 
-const KC_FIRST_TRACK_ID = 'sc90';
+const KC_FIRST_TRACK_BY_ACTIVITY = Object.freeze({
+  ant: 'sc90',
+  parking: 'kcParkingVibes',
+  mosquito: 'kcMosquito',
+  tent: 'kcTentLines',
+});
 
 // After SnowCone 90 plays once, Kids Camping enters the full festival rotation.
 // setMusicPool() filters iOS-exclusive tracks automatically when not visible.
@@ -114,24 +119,31 @@ function activateKidsCampingMusicScope() {
     // Start on SnowCone 90, then native ended handler advances into this pool.
     poolIds: KC_ROTATION_TRACK_IDS,
 
-    // Once sc90 ends, musicManager.handleNativeTrackEnded()
-    // sees shuffling=true and calls playRandomTrack().
-    shuffling: false,
+    // Signature track plays once.
+    // When it naturally ends, existing musicManager ended handling
+    // advances into the shuffled Camping pool.
+    shuffling: true,
 
-    // Important: false here.
-    // If true, native ended handler returns early and sc90 loops forever.
-    looping: true
+    // Never loop the signature track forever.
+    looping: false
   });
 
   _kcMusicScopeOn = true;
 }
 
-function startKidsCampingMusic() {
+function startKidsCampingMusic(
+  activityId = selectedCampingActivity
+) {
   activateKidsCampingMusicScope();
 
-  // First Camping song is always SnowCone 90.
-  // After it ends, the active shuffled pool takes over.
-  playTrack(KC_FIRST_TRACK_ID);
+  const firstTrackId =
+    KC_FIRST_TRACK_BY_ACTIVITY[activityId]
+    || KC_FIRST_TRACK_BY_ACTIVITY.ant;
+
+  playTrack(
+    firstTrackId,
+    { fadeMs: 0 }
+  );
 }
 
 function stopKidsCampingMusic() {
@@ -359,24 +371,52 @@ function setSelectedCampingActivity(activityId) {
     card.classList.toggle('selected', selected);
     card.setAttribute('aria-pressed', selected ? 'true' : 'false');
   });
+}
 
-  const playBtn = document.getElementById('startCamping');
-  const activity = getCampingActivityConfig();
+async function launchCampingActivity(activityId) {
+  if (globalThis.__KC_BOOT_LOCK__) return;
 
-  if (playBtn) {
-    playBtn.dataset.kcActivity = activity.id;
-    playBtn.setAttribute('aria-label', `Play ${activity.title}`);
+  const activity = getCampingActivityConfig(activityId);
+
+  // Remember the most recently played Camping game.
+  setSelectedCampingActivity(activity.id);
+
+  const introEl = document.querySelector('.kc-intro');
+
+  if (!introEl) {
+    return;
   }
+
+  globalThis.__KC_BOOT_LOCK__ = true;
+
+  introEl.classList.add('fade-out');
+
+  setTimeout(async () => {
+    renderMainUI(activity.id);
+    wireMainHandlers();
+
+    await bootGames(activity.id);
+
+    if (activity.id === 'tent') {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(initGameLine);
+      });
+    }
+  }, 180);
 }
 
 function wireCampingActivityCards() {
   document.querySelectorAll('.kc-activity-card').forEach((card) => {
     card.addEventListener('click', () => {
-      setSelectedCampingActivity(card.dataset.kcActivity);
+      launchCampingActivity(
+        card.dataset.kcActivity
+      );
     });
   });
 
-  setSelectedCampingActivity(selectedCampingActivity);
+  setSelectedCampingActivity(
+    selectedCampingActivity
+  );
 }
 
 function getCampingActivityZoneMarkup(activityId = selectedCampingActivity) {
@@ -598,14 +638,6 @@ function renderIntroScreen() {
               ${renderCampingActivityCards()}
             </div>
 
-
-            <button
-              id="startCamping"
-              class="kc-intro-btn kc-btn-large start-camp-btn kc-setup-play-btn"
-              type="button"
-            >
-              Play Game
-            </button>
           </div>
         </div>
 
@@ -624,59 +656,54 @@ function renderIntroScreen() {
 
 
 function wireIntroHandlers() {
-  const start = document.querySelector('#startCamping');
-  const back  = document.querySelector('#kcBackIntro');
-  const mute  = document.querySelector('#kcMuteIntro');
+  const back = document.querySelector('#kcBackIntro');
+  const mute = document.querySelector('#kcMuteIntro');
+
+  // Activity cards now launch directly.
+  HANDLERS.onStartCamping = null;
 
   HANDLERS.onBackToMenuIntro = () => {
     stopKidsCampingMusic();
     returnToMenu();
   };
-  HANDLERS.onStartCamping = async () => {
-    if (globalThis.__KC_BOOT_LOCK__) return;
-    globalThis.__KC_BOOT_LOCK__ = true;
-
-    const activity = getCampingActivityConfig(selectedCampingActivity);
-    const introEl = document.querySelector('.kc-intro');
-
-    if (!introEl) {
-      globalThis.__KC_BOOT_LOCK__ = false;
-      return;
-    }
-
-    introEl.classList.add('fade-out');
-
-    setTimeout(async () => {
-      renderMainUI(activity.id);
-      wireMainHandlers();
-      await bootGames(activity.id);
-
-      if (activity.id === 'tent') {
-        requestAnimationFrame(() => requestAnimationFrame(initGameLine));
-      }
-    }, 450);
-  };
 
   HANDLERS.onMuteClickIntro = () => {
     const nextMuted = !safeCampingMuted();
+
     toggleMute(nextMuted);
     applyMuteVisual(mute);
   };
 
-  back?.addEventListener('click', HANDLERS.onBackToMenuIntro);
-  start?.addEventListener('click', HANDLERS.onStartCamping);
-  mute?.addEventListener('click', HANDLERS.onMuteClickIntro);
+  back?.addEventListener(
+    'click',
+    HANDLERS.onBackToMenuIntro
+  );
+
+  mute?.addEventListener(
+    'click',
+    HANDLERS.onMuteClickIntro
+  );
+
   applyMuteVisual(mute);
 }
 
 function unwireIntroHandlers() {
   const back = document.querySelector('#kcBackIntro');
-  const start = document.querySelector('#startCamping');
   const mute = document.querySelector('#kcMuteIntro');
 
-  if (back && HANDLERS.onBackToMenuIntro) back.removeEventListener('click', HANDLERS.onBackToMenuIntro);
-  if (start && HANDLERS.onStartCamping)   start.removeEventListener('click', HANDLERS.onStartCamping);
-  if (mute && HANDLERS.onMuteClickIntro)  mute.removeEventListener('click', HANDLERS.onMuteClickIntro);
+  if (back && HANDLERS.onBackToMenuIntro) {
+    back.removeEventListener(
+      'click',
+      HANDLERS.onBackToMenuIntro
+    );
+  }
+
+  if (mute && HANDLERS.onMuteClickIntro) {
+    mute.removeEventListener(
+      'click',
+      HANDLERS.onMuteClickIntro
+    );
+  }
 
   HANDLERS.onBackToMenuIntro = null;
   HANDLERS.onStartCamping = null;
@@ -716,12 +743,15 @@ function unwireAudioUnlock() {
 // Main UI + handlers
 // ────────────────────────────────────────────────────────────────────────────────
 function renderMainUI(activityId = selectedCampingActivity) {
-  startKidsCampingMusic();
-
   const container = document.querySelector(SELECTORS.container);
   if (!container) return;
 
   const activity = getCampingActivityConfig(activityId);
+
+  startKidsCampingMusic(
+    activity.id
+  );
+
   selectedCampingActivity = activity.id;
   applyKidsCampingThemeVars(container);
   beginKidsActivityScoreSession(activity.id);
