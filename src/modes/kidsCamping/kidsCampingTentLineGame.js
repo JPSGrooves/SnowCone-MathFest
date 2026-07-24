@@ -1,4 +1,5 @@
 import { Howl } from 'howler';
+import { appState } from '../../data/appState.js';
 import { isMuted } from '../../managers/musicManager.js';
 import { hapticSuccess } from '../../utils/haptics.js';
 
@@ -38,6 +39,298 @@ let bigLotActive = false;
 
 let gridEls = [];
 let onScoreCallback = null;
+
+
+// ============================================================
+// SCMF_TENT_FRENZY_ART_A
+//
+// Dedicated Tent Frenzy art assets.
+// Pure visual substitution:
+// - no route logic
+// - no scoring
+// - no solvability changes
+// - no scheduler changes
+// ============================================================
+
+const TENT_FRENZY_ART_BASE =
+  `${import.meta.env.BASE_URL}assets/img/characters/kidsCamping/`;
+
+const TENT_FRENZY_ART = Object.freeze({
+  dino1: 'tf_tentDino1.png',
+  dino2: 'tf_tentDino2.png',
+  goblin1: 'tf_tentGoblin1.png',
+  goblin2: 'tf_tentGoblin2.png',
+  fire: 'tf_tentFire.png',
+  log: 'tf_tentLog.png',
+});
+
+
+function tentFrenzyArtUrl(filename) {
+  return `${TENT_FRENZY_ART_BASE}${filename}`;
+}
+
+
+function createTentFrenzyArtImage(
+  filename,
+  className
+) {
+  const image =
+    document.createElement('img');
+
+  image.className =
+    className;
+
+  image.src =
+    tentFrenzyArtUrl(filename);
+
+  image.alt = '';
+  image.draggable = false;
+
+  return image;
+}
+
+
+function getActiveDinoFrenzyArt() {
+  const chapter =
+    Math.max(
+      1,
+      Number(dinoChapterNumber) || 1
+    );
+
+  return (
+    chapter % 2 === 0
+      ? TENT_FRENZY_ART.dino2
+      : TENT_FRENZY_ART.dino1
+  );
+}
+
+
+// ============================================================
+// SCMF_TENT_FRENZY_SNACKS_V1
+//
+// Dino Frenzy goal destinations now use the same snack world
+// as Ant Attack:
+//
+// Grapes
+// Orange
+// Egg
+// Pizza
+// themed SnowCone
+// Burger
+//
+// Immediate duplicate goals are blocked.
+// ============================================================
+
+const TENT_FRENZY_SNACKS =
+  Object.freeze([
+
+    Object.freeze({
+      id: 'grapes',
+      src: 'aa_grapes.png'
+    }),
+
+    Object.freeze({
+      id: 'orange',
+      src: 'aa_orange.png'
+    }),
+
+    Object.freeze({
+      id: 'egg',
+      src: 'aa_egg.png'
+    }),
+
+    Object.freeze({
+      id: 'pizza',
+      src: 'aa_pizza.png'
+    }),
+
+    Object.freeze({
+      id: 'snowcone',
+      src: null
+    }),
+
+    Object.freeze({
+      id: 'burger',
+      src: 'aa_burger.png'
+    }),
+  ]);
+
+let previousTentGoalSnackId = null;
+let activeTentGoalSnack = null;
+
+
+function normalizeTentThemeId(
+  rawTheme = 'default'
+) {
+  const raw =
+    String(
+      rawTheme || 'default'
+    )
+      .trim()
+      .toLowerCase()
+      .replaceAll(' ', '_')
+      .replaceAll('-', '_');
+
+  const aliases = {
+    menubackground: 'default',
+    menu_background: 'default',
+    default_theme: 'default',
+    standard: 'default',
+
+    xmas: 'christmas',
+    christmas_01: 'christmas',
+
+    new_year: 'newyear',
+    newyears: 'newyear',
+    new_years: 'newyear',
+
+    valentines: 'valentine',
+    valentine_day: 'valentine',
+
+    fourth: 'freedom',
+    fourth_of_july: 'freedom',
+    july4: 'freedom',
+    july_4: 'freedom',
+
+    autumn: 'fall',
+  };
+
+  if (aliases[raw]) {
+    return aliases[raw];
+  }
+
+  const cosmicMatch =
+    raw.match(
+      /^cosmic_?0?([1-7])$/
+    );
+
+  if (cosmicMatch) {
+    return `cosmic_0${cosmicMatch[1]}`;
+  }
+
+  const allowed =
+    new Set([
+      'default',
+      'spring',
+      'summer',
+      'fall',
+      'winter',
+      'halloween',
+      'harvest',
+      'christmas',
+      'freedom',
+      'newyear',
+      'valentine',
+      'cosmic_01',
+      'cosmic_02',
+      'cosmic_03',
+      'cosmic_04',
+      'cosmic_05',
+      'cosmic_06',
+      'cosmic_07',
+    ]);
+
+  return (
+    allowed.has(raw)
+      ? raw
+      : 'default'
+  );
+}
+
+
+function getTentActiveThemeId() {
+  const candidates = [
+    appState?.settings?.theme,
+    appState?.settings?.menuTheme,
+    appState?.settings?.themeId,
+    appState?.settings?.selectedTheme,
+    appState?.settings?.visualPackage,
+    appState?.settings?.visualTheme,
+    appState?.profile?.theme,
+    appState?.profile?.selectedTheme,
+    appState?.theme,
+    appState?.selectedTheme,
+    globalThis.__SCMF_ACTIVE_THEME_ID,
+    document?.documentElement?.dataset?.theme,
+    document?.body?.dataset?.theme,
+  ];
+
+  const found =
+    candidates.find(
+      value =>
+        typeof value === 'string'
+        &&
+        value.trim().length > 0
+    );
+
+  return normalizeTentThemeId(
+    found || 'default'
+  );
+}
+
+
+function getTentThemeSnowConeUrl() {
+  return (
+    `${import.meta.env.BASE_URL}` +
+    `assets/img/menu/packages/` +
+    `${getTentActiveThemeId()}/` +
+    `centerCone.png`
+  );
+}
+
+
+function chooseTentGoalSnack() {
+  const eligible =
+    previousTentGoalSnackId
+
+      ? TENT_FRENZY_SNACKS.filter(
+          snack =>
+            snack.id !==
+            previousTentGoalSnackId
+        )
+
+      : TENT_FRENZY_SNACKS;
+
+  const chosen =
+    eligible[
+      Math.floor(
+        Math.random() *
+        eligible.length
+      )
+    ]
+    ??
+    TENT_FRENZY_SNACKS[0];
+
+  previousTentGoalSnackId =
+    chosen.id;
+
+  activeTentGoalSnack =
+    chosen;
+
+  return chosen;
+}
+
+
+function getTentGoalSnackUrl(
+  snack
+) {
+  if (!snack) {
+    return tentFrenzyArtUrl(
+      'aa_grapes.png'
+    );
+  }
+
+  if (
+    snack.id ===
+    'snowcone'
+  ) {
+    return getTentThemeSnowConeUrl();
+  }
+
+  return tentFrenzyArtUrl(
+    snack.src
+  );
+}
 
 // keep strong refs so cleanup actually works
 let refs = {
@@ -1391,6 +1684,19 @@ let tentDjRecentVisuals = [];
 let tentDjRecentContourIds = [];
 let tentDjLastMode = null;
 
+/*
+  SCMF_TENT_FRENZY_DJ_V2
+
+  Remember the actual final deck entry across set boundaries,
+  not merely "follow / mystery / frenzy".
+
+  This lets the DJ avoid:
+    SHAPE -> SHAPE
+  even when the two rounds cross from one 10-round set
+  into the next.
+*/
+let tentDjLastEntry = null;
+
 let connectStartIndex = -1;
 let connectGoalIndex = -1;
 let connectGoalIcon = '🍓';
@@ -1410,6 +1716,50 @@ let dinoPatrolCreatureIndex = -1;
 let dinoPatrolSpeedMs = 900;
 let dinoPatrolBossActive = false;
 let dinoPatrolCreatureEl = null;
+
+
+// ============================================================
+// SCMF_TENT_DUAL_GOBLINS_D2
+//
+// Primary patrol:
+//   existing proven patrol architecture
+//
+// Secondary patrol:
+//   appears only on designated later rounds
+//
+// HARD CEILING:
+//   two moving Goblins maximum
+// ============================================================
+
+let dinoPatrolSecondaryTimerId = 0;
+let dinoPatrolSecondaryPath = [];
+let dinoPatrolSecondaryCursor = 0;
+let dinoPatrolSecondaryDirection = 1;
+let dinoPatrolSecondaryCreatureIndex = -1;
+let dinoPatrolSecondarySpeedMs = 900;
+let dinoPatrolSecondaryCreatureEl = null;
+
+
+// ============================================================
+// SCMF_TENT_GOBLIN_MERCY_D3
+//
+// Three Goblin trail collisions on the SAME Dino board:
+//
+//   collision 1 -> normal trail reset
+//   collision 2 -> normal trail reset
+//   collision 3 -> normal reset + 1.5s patrol pause
+//
+// Both moving Goblins use the same pause clock.
+//
+// Fire collisions do NOT count.
+// New Dino board resets the counter.
+// ============================================================
+
+const DINO_PATROL_GRACE_COLLISIONS = 3;
+const DINO_PATROL_GRACE_MS = 1500;
+
+let dinoPatrolCollisionCount = 0;
+let dinoPatrolPausedUntil = 0;
 
 let frenzyTargetIndex = -1;
 let frenzyHits = 0;
@@ -2834,7 +3184,8 @@ function clearTentVarietyPresentation() {
 
   connectStartIndex = -1;
   connectGoalIndex = -1;
-  connectGoalIcon = '🍓';
+  connectGoalIcon = 'grapes';
+  activeTentGoalSnack = null;
   connectPath = [];
   blockedTentIndexes = new Set();
   hazardTentIndexes = new Set();
@@ -2861,6 +3212,7 @@ function resetTentVarietyState() {
   tentDjRecentVisuals = [];
   tentDjRecentContourIds = [];
   tentDjLastMode = null;
+  tentDjLastEntry = null;
   tentStageTransitionActive = false;
 }
 
@@ -2945,187 +3297,933 @@ function getTentFrenzyPhaseForLine(
   };
 }
 
-function chooseTentSurpriseContourId() {
-  const ids = [
-    'big-contour-tent',
-    'big-contour-arrow-up',
-    'big-contour-diamond',
-    'big-contour-tree',
-    'big-contour-snowcone',
-    'big-contour-crown',
-    'big-contour-lightning'
-  ];
+const TENT_FRENZY_CURATED_SHAPE_IDS =
+  Object.freeze([
 
-  const cooled = ids.filter(
-    id =>
-      !tentDjRecentContourIds
-        .slice(-3)
-        .includes(id)
+    'big-contour-heart-up',
+
+    'big-contour-castle',
+
+    'big-contour-tent',
+
+    'big-contour-snowcone',
+
+    'big-contour-crown',
+
+    'big-contour-tree',
+
+    'big-contour-fish',
+
+    'big-contour-rocket',
+
+    'big-contour-mushroom',
+
+    'big-contour-house',
+
+    'big-contour-lightning',
+
+    'big-contour-music-note',
+  ]);
+
+
+/*
+  Only transformations that preserve the recognizable idea.
+
+  Castle upside-down?
+  No.
+
+  SnowCone upside-down?
+  Absolutely not.
+
+  Fish facing the other direction?
+  Excellent.
+
+  Lightning mirrored?
+  Excellent.
+*/
+const TENT_FRENZY_SHAPE_TRANSFORMS =
+  Object.freeze({
+
+    'big-contour-heart-up':
+      Object.freeze([
+        'identity'
+      ]),
+
+    'big-contour-castle':
+      Object.freeze([
+        'identity'
+      ]),
+
+    'big-contour-tent':
+      Object.freeze([
+        'identity',
+        'flipX'
+      ]),
+
+    'big-contour-snowcone':
+      Object.freeze([
+        'identity'
+      ]),
+
+    'big-contour-crown':
+      Object.freeze([
+        'identity'
+      ]),
+
+    'big-contour-tree':
+      Object.freeze([
+        'identity',
+        'flipX'
+      ]),
+
+    'big-contour-fish':
+      Object.freeze([
+        'identity',
+        'flipX'
+      ]),
+
+    'big-contour-rocket':
+      Object.freeze([
+        'identity',
+        'flipX'
+      ]),
+
+    'big-contour-mushroom':
+      Object.freeze([
+        'identity',
+        'flipX'
+      ]),
+
+    'big-contour-house':
+      Object.freeze([
+        'identity',
+        'flipX'
+      ]),
+
+    'big-contour-lightning':
+      Object.freeze([
+        'identity',
+        'flipX',
+        'flipY',
+        'rotate180'
+      ]),
+
+    'big-contour-music-note':
+      Object.freeze([
+        'identity',
+        'flipX'
+      ]),
+  });
+
+
+function getTentShapeRecentBaseId(
+  recentKey
+) {
+
+  return (
+    String(
+      recentKey || ''
+    )
+      .split('@')[0]
   );
+}
+
+
+function chooseTentShapeTransform(
+  shapeId,
+  recentKeys
+) {
+
+  const options =
+    TENT_FRENZY_SHAPE_TRANSFORMS[
+      shapeId
+    ]
+
+    ??
+
+    ['identity'];
+
+
+  const cooled =
+    options.filter(
+      transform =>
+
+        !recentKeys.includes(
+          `${shapeId}@${transform}`
+        )
+    );
+
 
   const pool =
-    cooled.length
-      ? cooled
-      : ids;
+    cooled.length > 0
 
-  const chosen =
+      ?
+
+      cooled
+
+      :
+
+      options;
+
+
+  return (
     pool[
       Math.floor(
         Math.random() *
         pool.length
       )
-    ];
+    ]
 
-  tentDjRecentContourIds.push(chosen);
+    ??
 
-  if (tentDjRecentContourIds.length > 6) {
+    'identity'
+  );
+}
+
+
+function chooseTentShapeEntriesForSet(
+  count = 4
+) {
+
+  const recentKeys =
+    tentDjRecentContourIds
+      .slice(
+        -8
+      );
+
+
+  const recentBaseIds =
+    recentKeys.map(
+      getTentShapeRecentBaseId
+    );
+
+
+  const shuffledIds =
+    shuffledTentModes(
+      TENT_FRENZY_CURATED_SHAPE_IDS
+    );
+
+
+  /*
+    Prefer shapes that have NOT appeared recently.
+
+    With twelve curated concepts and four per set,
+    this naturally creates a broad rotation instead
+    of repeatedly shoving Heart into every ten rounds.
+  */
+  const cooled =
+    shuffledIds.filter(
+      id =>
+
+        !recentBaseIds.includes(
+          id
+        )
+    );
+
+
+  const warming =
+    shuffledIds.filter(
+      id =>
+
+        recentBaseIds.includes(
+          id
+        )
+    );
+
+
+  const candidates = [
+    ...cooled,
+    ...warming
+  ];
+
+
+  const chosen = [];
+
+
+  for (
+    const shapeId
+    of candidates
+  ) {
+
+    if (
+      chosen.length >=
+      count
+    ) {
+      break;
+    }
+
+
+    const shapeTransform =
+      chooseTentShapeTransform(
+        shapeId,
+        recentKeys
+      );
+
+
+    chosen.push({
+
+      shapeId,
+
+      shapeTransform
+    });
+  }
+
+
+  /*
+    Defensive fallback.
+
+    The curated roster is intentionally much larger
+    than the requested four shapes, so this should
+    never normally be needed.
+  */
+  while (
+    chosen.length <
+    count
+  ) {
+
+    const shapeId =
+      TENT_FRENZY_CURATED_SHAPE_IDS[
+        chosen.length %
+        TENT_FRENZY_CURATED_SHAPE_IDS.length
+      ];
+
+
+    chosen.push({
+
+      shapeId,
+
+      shapeTransform:
+        'identity'
+    });
+  }
+
+
+  chosen.forEach(
+    entry => {
+
+      tentDjRecentContourIds.push(
+        (
+          `${entry.shapeId}` +
+          `@${entry.shapeTransform}`
+        )
+      );
+    }
+  );
+
+
+  /*
+    Remember enough history to cool two full shape sets.
+  */
+  while (
+    tentDjRecentContourIds.length >
+    12
+  ) {
+
     tentDjRecentContourIds.shift();
   }
+
 
   return chosen;
 }
 
-function scoreTentSetDeck(deck) {
+
+function transformBigLotContourPattern(
+  pattern,
+  transform = 'identity'
+) {
+
+  if (
+    !pattern ||
+    transform ===
+      'identity'
+  ) {
+
+    return pattern;
+  }
+
+
+  const transformedPath =
+    pattern.path.map(
+      index => {
+
+        let row =
+          Math.floor(
+            index /
+            BIG_LOT_COLS
+          );
+
+
+        let col =
+          index %
+          BIG_LOT_COLS;
+
+
+        if (
+          transform ===
+          'flipX'
+        ) {
+
+          col =
+            BIG_LOT_COLS -
+            1 -
+            col;
+        }
+
+
+        else if (
+          transform ===
+          'flipY'
+        ) {
+
+          row =
+            BIG_LOT_ROWS -
+            1 -
+            row;
+        }
+
+
+        else if (
+          transform ===
+          'rotate180'
+        ) {
+
+          row =
+            BIG_LOT_ROWS -
+            1 -
+            row;
+
+
+          col =
+            BIG_LOT_COLS -
+            1 -
+            col;
+        }
+
+
+        return (
+          row *
+          BIG_LOT_COLS
+          +
+          col
+        );
+      }
+    );
+
+
+  return makeRoutePattern(
+
+    (
+      `${pattern.id}` +
+      `-${transform}`
+    ),
+
+    pattern.family,
+
+    pattern.label,
+
+    transformedPath
+  );
+}
+
+
+function scoreTentSetDeck(
+  deck
+) {
+
   let score = 0;
 
-  for (let index = 0; index < deck.length; index += 1) {
-    const current = deck[index];
-    const previous = deck[index - 1];
 
-    if (!previous) {
+  for (
+    let index = 0;
+    index < deck.length;
+    index += 1
+  ) {
+
+    const current =
+      deck[
+        index
+      ];
+
+
+    const previous =
+      deck[
+        index -
+        1
+      ];
+
+
+    /*
+      Cross-set boundary.
+
+      Treat the final entry of the previous set
+      like the round immediately before this one.
+    */
+    if (
+      !previous
+    ) {
+
       if (
-        tentDjLastMode &&
-        current.mode === tentDjLastMode
+        tentDjLastEntry
       ) {
-        score -= 5;
+
+        if (
+          current.mode ===
+          tentDjLastEntry.mode
+        ) {
+
+          score -= 4;
+        }
+
+
+        if (
+          current.followKind ===
+            'shape'
+
+          &&
+
+          tentDjLastEntry.followKind ===
+            'shape'
+        ) {
+
+          return -Infinity;
+        }
+
+
+        if (
+          current.mode ===
+            'mystery'
+
+          &&
+
+          tentDjLastEntry.mode ===
+            'mystery'
+        ) {
+
+          return -Infinity;
+        }
       }
+
 
       continue;
     }
 
+
     if (
-      current.mode === 'frenzy' &&
-      previous.mode === 'frenzy'
+      current.mode ===
+        'frenzy'
+
+      &&
+
+      previous.mode ===
+        'frenzy'
     ) {
+
       return -Infinity;
     }
 
+
     if (
-      current.mode === 'mystery' &&
-      previous.mode === 'mystery'
+      current.mode ===
+        'mystery'
+
+      &&
+
+      previous.mode ===
+        'mystery'
     ) {
+
       return -Infinity;
     }
 
-    if (
-      current.mode !== 'follow' &&
-      previous.mode !== 'follow'
-    ) {
-      score -= 2;
-    }
 
     if (
-      current.followKind === 'shape' &&
-      previous.followKind === 'shape'
+      current.followKind ===
+        'shape'
+
+      &&
+
+      previous.followKind ===
+        'shape'
     ) {
+
       return -Infinity;
     }
 
+
+    /*
+      Mystery -> Tent Tap or Tent Tap -> Mystery
+      is legal, but not ideal.
+
+      Give breathing room to the faster/special modes.
+    */
     if (
-      index >= 2 &&
-      deck[index - 1].mode === 'follow' &&
-      deck[index - 2].mode === 'follow' &&
-      current.mode === 'follow'
+      current.mode !==
+        'follow'
+
+      &&
+
+      previous.mode !==
+        'follow'
     ) {
+
+      score -= 5;
+    }
+
+
+    /*
+      Three visible route/shape rounds in a row is allowed,
+      but prefer mixing the special modes through the set.
+    */
+    if (
+      index >= 2
+
+      &&
+
+      deck[
+        index -
+        1
+      ]
+        .mode ===
+        'follow'
+
+      &&
+
+      deck[
+        index -
+        2
+      ]
+        .mode ===
+        'follow'
+
+      &&
+
+      current.mode ===
+        'follow'
+    ) {
+
       score -= 4;
     }
 
-    if (current.mode !== previous.mode) {
+
+    /*
+      LINE -> SHAPE or SHAPE -> LINE is visually excellent.
+    */
+    if (
+      current.mode ===
+        'follow'
+
+      &&
+
+      previous.mode ===
+        'follow'
+
+      &&
+
+      current.followKind !==
+        previous.followKind
+    ) {
+
+      score += 4;
+    }
+
+
+    if (
+      current.mode !==
+      previous.mode
+    ) {
+
       score += 1;
     }
   }
 
+
   return score;
 }
 
-function buildTentFrenzySetDeck(setIndex) {
-  const shapeEntries = [
+
+function buildTentFrenzySetDeck(
+  setIndex
+) {
+
+  /*
+    FINAL NORMAL TENT FRENZY SET LAW
+
+      1 x Tent Tap
+      2 x Mystery / Number
+      3 x LINE / Route
+      4 x Recognizable Shape
+
+    The four recognizable shapes come from the
+    cooldown-driven curated shape roster.
+  */
+
+  const shapeEntries =
+    chooseTentShapeEntriesForSet(
+      4
+    )
+      .map(
+        entry => ({
+
+          mode:
+            'follow',
+
+          followKind:
+            'shape',
+
+          shapeId:
+            entry.shapeId,
+
+          shapeTransform:
+            entry.shapeTransform
+        })
+      );
+
+
+  const routeEntries = [
+
     {
-      mode: 'follow',
-      followKind: 'shape',
-      shapeId: 'big-contour-heart-up'
+      mode:
+        'follow',
+
+      followKind:
+        'route'
     },
+
     {
-      mode: 'follow',
-      followKind: 'shape',
-      shapeId: 'big-contour-castle'
+      mode:
+        'follow',
+
+      followKind:
+        'route'
     },
+
     {
-      mode: 'follow',
-      followKind: 'shape',
-      shapeId: chooseTentSurpriseContourId()
+      mode:
+        'follow',
+
+      followKind:
+        'route'
     }
   ];
 
-  const routeEntries = [
-    { mode: 'follow', followKind: 'route' },
-    { mode: 'follow', followKind: 'route' },
-    { mode: 'follow', followKind: 'route' }
-  ];
 
   const base = [
+
     ...shapeEntries,
+
     ...routeEntries,
-    { mode: 'mystery' },
-    { mode: 'mystery' },
-    { mode: 'frenzy' },
-    { mode: 'frenzy' }
+
+    {
+      mode:
+        'mystery'
+    },
+
+    {
+      mode:
+        'mystery'
+    },
+
+    {
+      mode:
+        'frenzy'
+    }
   ];
 
-  let best = null;
-  let bestScore = -Infinity;
 
-  for (let attempt = 0; attempt < 500; attempt += 1) {
+  let best =
+    null;
+
+
+  let bestScore =
+    -Infinity;
+
+
+  /*
+    Search many legal schedules.
+
+    Ten rounds is tiny, so this is extremely cheap
+    while giving the DJ enough chances to find
+    a pleasant rhythm.
+  */
+  for (
+    let attempt = 0;
+    attempt < 900;
+    attempt += 1
+  ) {
+
     const candidate =
-      shuffledTentModes(base);
+      shuffledTentModes(
+        base
+      );
+
 
     const score =
-      scoreTentSetDeck(candidate) +
-      Math.random() * 0.15;
+      scoreTentSetDeck(
+        candidate
+      )
 
-    if (score > bestScore) {
-      bestScore = score;
-      best = candidate;
+      +
+
+      Math.random() *
+      0.15;
+
+
+    if (
+      score >
+      bestScore
+    ) {
+
+      bestScore =
+        score;
+
+
+      best =
+        candidate;
     }
   }
 
+
   const deck =
-    (best ?? base).map(
-      (entry, index) => ({
+    (
+      best
+      ??
+      base
+
+    ).map(
+      (
+        entry,
+        index
+      ) => ({
+
         ...entry,
+
         setIndex,
-        round: index + 1
+
+        round:
+          index +
+          1
       })
     );
 
+
+  const finalEntry =
+    deck[
+      deck.length -
+      1
+    ]
+
+    ??
+
+    null;
+
+
   tentDjLastMode =
-    deck[deck.length - 1]?.mode ??
+    finalEntry
+      ?.mode
+
+    ??
+
     tentDjLastMode;
+
+
+  tentDjLastEntry =
+    finalEntry
+
+      ?
+
+      {
+        mode:
+          finalEntry.mode,
+
+        followKind:
+          finalEntry.followKind
+          ??
+          null
+      }
+
+      :
+
+      tentDjLastEntry;
+
 
   dbg(
     'tent frenzy DJ deck',
+
     {
       setIndex,
-      deck: deck.map(entry => ({
-        mode: entry.mode,
-        followKind: entry.followKind ?? null,
-        shapeId: entry.shapeId ?? null
-      }))
+
+      counts: {
+
+        tentTap:
+          deck.filter(
+            entry =>
+
+              entry.mode ===
+              'frenzy'
+          )
+            .length,
+
+        mystery:
+          deck.filter(
+            entry =>
+
+              entry.mode ===
+              'mystery'
+          )
+            .length,
+
+        line:
+          deck.filter(
+            entry =>
+
+              entry.followKind ===
+              'route'
+          )
+            .length,
+
+        shape:
+          deck.filter(
+            entry =>
+
+              entry.followKind ===
+              'shape'
+          )
+            .length
+      },
+
+      deck:
+        deck.map(
+          entry => ({
+
+            round:
+              entry.round,
+
+            mode:
+              entry.mode,
+
+            followKind:
+              entry.followKind
+              ??
+              null,
+
+            shapeId:
+              entry.shapeId
+              ??
+              null,
+
+            shapeTransform:
+              entry.shapeTransform
+              ??
+              null
+          })
+        )
     }
   );
 
+
   return deck;
 }
+
 
 function ensureTentFrenzySetDeck(setIndex) {
   if (!tentFrenzySetDecks.has(setIndex)) {
@@ -3212,32 +4310,272 @@ function getDinoChapterForLine(
   );
 }
 
+
+// ============================================================
+// SCMF_TENT_GOBLIN_LADDER_D1
+//
+// Single-Goblin progression pass.
+//
+// DINO I:
+//   no Goblins
+//
+// DINO II:
+//   R1–3  obstacle warm-up
+//   R4    Goblin 1 DEBUT
+//   R5–10 Goblin 1 continues
+//
+// DINO III:
+//   R1–7  Goblin 1
+//   R8    Goblin 2 DEBUT
+//   R9–10 Goblin 2 for this D1 pass
+//
+// D2 will upgrade:
+//   Dino III R9–10
+//   Dino IV+ R5–9
+//
+// into dual-Goblin boards.
+// ============================================================
+
 function getDinoModeForChapterRound(
   chapter,
   round
 ) {
-  if (chapter <= 1) {
-    if (round <= 3) return 'dino-connect';
-    if (round <= 6) return 'dino-wall';
+
+  /*
+    DINO FRENZY I
+
+      1–3  Dino → snack
+      4–6  logs
+      7–10 logs + fire
+
+    No patrol creature yet.
+  */
+  if (
+    chapter <= 1
+  ) {
+
+    if (
+      round <= 3
+    ) {
+      return 'dino-connect';
+    }
+
+    if (
+      round <= 6
+    ) {
+      return 'dino-wall';
+    }
+
     return 'dino-danger';
   }
 
-  if (chapter === 2) {
-    if (round <= 3) return 'dino-wall';
-    if (round <= 6) return 'dino-danger';
-    if (round <= 8) return 'dino-patrol';
+
+  /*
+    DINO FRENZY II
+
+      1–3  obstacle warm-up
+      4–6  Goblin 1
+      7–10 Goblin 1 + danger
+  */
+  if (
+    chapter === 2
+  ) {
+
+    if (
+      round <= 3
+    ) {
+      return 'dino-wall';
+    }
+
+    if (
+      round <= 6
+    ) {
+      return 'dino-patrol';
+    }
+
     return 'dino-danger-patrol';
   }
 
-  if (chapter === 3) {
-    if (round <= 3) return 'dino-danger';
-    if (round <= 6) return 'dino-patrol';
+
+  /*
+    DINO FRENZY III
+
+    Patrol is now a permanent part of the adventure.
+
+      1–3  patrol
+      4–10 patrol + danger
+
+    Goblin identity is handled separately below.
+  */
+  if (
+    chapter === 3
+  ) {
+
+    if (
+      round <= 3
+    ) {
+      return 'dino-patrol';
+    }
+
     return 'dino-danger-patrol';
   }
 
-  if (round <= 5) return 'dino-patrol';
-  if (round <= 9) return 'dino-danger-patrol';
+
+  /*
+    DINO FRENZY IV+
+
+      1–4  patrol
+      5–9  patrol + danger
+      10   boss
+  */
+  if (
+    round <= 4
+  ) {
+    return 'dino-patrol';
+  }
+
+  if (
+    round <= 9
+  ) {
+    return 'dino-danger-patrol';
+  }
+
   return 'dino-boss';
+}
+
+
+/*
+  Goblin identity is deliberately separate from mode.
+
+  That means:
+    obstacle generation
+    patrol generation
+    character progression
+
+  do not become one giant conditional soup.
+*/
+
+function getDinoPrimaryGoblinId(
+  chapter,
+  round,
+  boss = false
+) {
+
+  if (
+    boss
+  ) {
+    return 2;
+  }
+
+
+  if (
+    chapter <= 1
+  ) {
+    return null;
+  }
+
+
+  /*
+    Dino II:
+    Goblin 1 only.
+  */
+  if (
+    chapter === 2
+  ) {
+    return 1;
+  }
+
+
+  /*
+    Dino III:
+
+      R1–7   Goblin 1
+      R8     Goblin 2 SOLO debut
+      R9–10  Goblin 1 primary
+              + Goblin 2 secondary
+  */
+  if (
+    chapter === 3
+  ) {
+
+    if (
+      round === 8
+    ) {
+      return 2;
+    }
+
+    return 1;
+  }
+
+
+  /*
+    Dino IV+:
+
+      R1–2   Goblin 1
+      R3–4   Goblin 2
+      R5–9   Goblin 1 primary
+              + Goblin 2 secondary
+      R10    Goblin 2 boss
+  */
+  if (
+    round <= 2
+  ) {
+    return 1;
+  }
+
+
+  if (
+    round <= 4
+  ) {
+    return 2;
+  }
+
+
+  return 1;
+}
+
+
+/*
+  Exactly when Goblin 2 becomes a SECOND moving actor.
+
+  Never more than one secondary actor exists.
+*/
+function shouldUseSecondDinoGoblin(
+  chapter,
+  round,
+  boss = false
+) {
+
+  if (
+    boss
+  ) {
+    return false;
+  }
+
+
+  if (
+    chapter === 3
+  ) {
+
+    return (
+      round >= 9
+    );
+  }
+
+
+  if (
+    chapter >= 4
+  ) {
+
+    return (
+      round >= 5
+      &&
+      round <= 9
+    );
+  }
+
+
+  return false;
 }
 
 function chooseTentTrailMode() {
@@ -3598,7 +4936,8 @@ function buildDinoPatrolPath({
   start,
   goal,
   horizontalTravel,
-  boss = false
+  boss = false,
+  extraForbidden = new Set()
 }) {
   const { rows, cols } =
     getActiveTentGridDimensions();
@@ -3628,6 +4967,7 @@ function buildDinoPatrolPath({
     new Set([
       ...blockers,
       ...hazards,
+      ...extraForbidden,
       start,
       goal
     ]);
@@ -3719,6 +5059,7 @@ function validateDinoFrenzyLayout({
   blockers,
   hazards,
   patrolPath = [],
+  secondaryPatrolPath = [],
   boss = false
 }) {
 
@@ -3806,7 +5147,8 @@ function validateDinoFrenzyLayout({
     const permanentBlocked =
       new Set([
         ...staticBlocked,
-        ...patrolPath
+        ...patrolPath,
+        ...secondaryPatrolPath
       ]);
 
 
@@ -3841,7 +5183,14 @@ function buildDinoFrenzyLayout(
   const boss =
     mode === 'dino-boss';
 
-  for (let attempt = 0; attempt < 140; attempt += 1) {
+  const dualPatrolNeeded =
+    shouldUseSecondDinoGoblin(
+      chapterNumber,
+      adventureRound,
+      boss
+    );
+
+  for (let attempt = 0; attempt < 180; attempt += 1) {
     const {
       start,
       goal,
@@ -3999,6 +5348,39 @@ function buildDinoFrenzyLayout(
     }
 
 
+    /*
+      Goblin 2 gets a completely separate patrol lane.
+
+      Its lane cannot overlap Goblin 1's lane.
+    */
+    const secondaryPatrolPath =
+      dualPatrolNeeded
+
+        ? buildDinoPatrolPath({
+            blockers,
+            hazards,
+            start,
+            goal,
+            horizontalTravel,
+            boss: false,
+
+            extraForbidden:
+              new Set(
+                patrolPath
+              )
+          })
+
+        : [];
+
+
+    if (
+      dualPatrolNeeded &&
+      secondaryPatrolPath.length < 3
+    ) {
+      continue;
+    }
+
+
     const validatedSafePath =
       validateDinoFrenzyLayout({
         start,
@@ -4006,6 +5388,7 @@ function buildDinoFrenzyLayout(
         blockers,
         hazards,
         patrolPath,
+        secondaryPatrolPath,
         boss
       });
 
@@ -4032,6 +5415,7 @@ function buildDinoFrenzyLayout(
       hazards,
       safePath,
       patrolPath,
+      secondaryPatrolPath,
       boss
     };
   }
@@ -4054,15 +5438,10 @@ function renderDinoFrenzyObstacles() {
       );
 
       const blocker =
-        document.createElement(
-          'span'
+        createTentFrenzyArtImage(
+          TENT_FRENZY_ART.log,
+          'kc-trail-blocker kc-dino-wall kc-tent-log-art'
         );
-
-      blocker.className =
-        'kc-trail-blocker kc-dino-wall';
-
-      blocker.textContent =
-        '🪵';
 
       cell.appendChild(
         blocker
@@ -4084,15 +5463,10 @@ function renderDinoFrenzyObstacles() {
       );
 
       const fire =
-        document.createElement(
-          'span'
+        createTentFrenzyArtImage(
+          TENT_FRENZY_ART.fire,
+          'kc-dino-fire kc-tent-fire-art'
         );
-
-      fire.className =
-        'kc-dino-fire';
-
-      fire.textContent =
-        '🔥';
 
       cell.appendChild(
         fire
@@ -4120,6 +5494,12 @@ function configureDinoFrenzyMode(
 
   dinoAdventureRound =
     adventureRound;
+
+  /*
+    New Dino board = fresh Goblin mercy count.
+  */
+  dinoPatrolCollisionCount = 0;
+  dinoPatrolPausedUntil = 0;
 
   connectStartIndex =
     layout.start;
@@ -4180,6 +5560,21 @@ function configureDinoFrenzyMode(
           dinoChapterNumber
       }
     );
+
+
+    if (
+      layout.secondaryPatrolPath
+        ?.length >= 2
+    ) {
+
+      startSecondaryDinoPatrol(
+        layout.secondaryPatrolPath,
+        {
+          chapterNumber:
+            dinoChapterNumber
+        }
+      );
+    }
   }
 
   if (refs.wrapper) {
@@ -4206,6 +5601,8 @@ function configureDinoFrenzyMode(
       walls: [...blockedTentIndexes],
       fires: [...hazardTentIndexes],
       patrolPath: layout.patrolPath,
+      secondaryPatrolPath:
+        layout.secondaryPatrolPath,
       boss: layout.boss,
       safePath: layout.safePath
     }
@@ -4282,27 +5679,57 @@ function resetDinoTrailAfterFire(
   );
 }
 
+
 function stopDinoPatrol() {
-  if (dinoPatrolTimerId) {
-    clearInterval(dinoPatrolTimerId);
+
+  if (
+    dinoPatrolTimerId
+  ) {
+    clearInterval(
+      dinoPatrolTimerId
+    );
+
     dinoPatrolTimerId = 0;
   }
+
+
+  if (
+    dinoPatrolSecondaryTimerId
+  ) {
+    clearInterval(
+      dinoPatrolSecondaryTimerId
+    );
+
+    dinoPatrolSecondaryTimerId = 0;
+  }
+
 
   dinoPatrolCreatureEl?.remove();
   dinoPatrolCreatureEl = null;
 
+
+  dinoPatrolSecondaryCreatureEl?.remove();
+  dinoPatrolSecondaryCreatureEl = null;
+
+
   refs.wrapper?.querySelectorAll(
     '.kc-dino-patrol-mark'
-  ).forEach(el => el.remove());
+  ).forEach(
+    el => el.remove()
+  );
+
 
   refs.wrapper?.querySelectorAll(
     '.kc-dino-patrol-cell, .kc-dino-boss-lane'
-  ).forEach(el => {
-    el.classList.remove(
-      'kc-dino-patrol-cell',
-      'kc-dino-boss-lane'
-    );
-  });
+  ).forEach(
+    el => {
+      el.classList.remove(
+        'kc-dino-patrol-cell',
+        'kc-dino-boss-lane'
+      );
+    }
+  );
+
 
   dinoPatrolPath = [];
   dinoPatrolCursor = 0;
@@ -4310,9 +5737,20 @@ function stopDinoPatrol() {
   dinoPatrolCreatureIndex = -1;
   dinoPatrolSpeedMs = 900;
   dinoPatrolBossActive = false;
+
+
+  dinoPatrolSecondaryPath = [];
+  dinoPatrolSecondaryCursor = 0;
+  dinoPatrolSecondaryDirection = 1;
+  dinoPatrolSecondaryCreatureIndex = -1;
+  dinoPatrolSecondarySpeedMs = 900;
+
+  dinoPatrolCollisionCount = 0;
+  dinoPatrolPausedUntil = 0;
 }
 
 function renderDinoPatrolCreature() {
+
   if (
     dinoPatrolCreatureIndex < 0 ||
     !gridEls[dinoPatrolCreatureIndex]?.cell
@@ -4320,75 +5758,232 @@ function renderDinoPatrolCreature() {
     return;
   }
 
-  if (!dinoPatrolCreatureEl) {
-    dinoPatrolCreatureEl =
-      document.createElement('span');
 
-    dinoPatrolCreatureEl.className =
-      'kc-dino-patrol-creature';
+  const desiredGoblinId =
+    getDinoPrimaryGoblinId(
+      dinoChapterNumber,
+      dinoAdventureRound,
+      dinoPatrolBossActive
+    )
+    ??
+    1;
+
+
+  const desiredFilename =
+    desiredGoblinId === 2
+
+      ?
+
+      TENT_FRENZY_ART.goblin2
+
+      :
+
+      TENT_FRENZY_ART.goblin1;
+
+
+  const desiredSrc =
+    tentFrenzyArtUrl(
+      desiredFilename
+    );
+
+
+  if (
+    !dinoPatrolCreatureEl
+  ) {
+
+    dinoPatrolCreatureEl =
+      createTentFrenzyArtImage(
+        desiredFilename,
+        'kc-dino-patrol-creature'
+      );
   }
 
-  dinoPatrolCreatureEl.textContent =
-    dinoPatrolBossActive
-      ? '👹'
-      : '👾';
 
-  dinoPatrolCreatureEl.classList.toggle(
-    'is-boss',
-    dinoPatrolBossActive
-  );
+  /*
+    A single patrol DOM node survives between movement steps.
 
-  gridEls[dinoPatrolCreatureIndex]
+    Update its image when progression changes from
+    Goblin 1 → Goblin 2.
+  */
+  if (
+    dinoPatrolCreatureEl.src !==
+    new URL(
+      desiredSrc,
+      window.location.href
+    ).href
+  ) {
+
+    dinoPatrolCreatureEl.src =
+      desiredSrc;
+  }
+
+
+  dinoPatrolCreatureEl
+    .classList
+    .toggle(
+      'is-boss',
+      dinoPatrolBossActive
+    );
+
+
+  dinoPatrolCreatureEl.dataset.goblin =
+    String(
+      desiredGoblinId
+    );
+
+
+  gridEls[
+    dinoPatrolCreatureIndex
+  ]
     .cell
     .appendChild(
       dinoPatrolCreatureEl
     );
 }
 
+
+function isDinoPatrolPaused() {
+
+  return (
+    Date.now() <
+    dinoPatrolPausedUntil
+  );
+}
+
+
 function resetDinoTrailAfterPatrol(
   collisionIndex
 ) {
+
   const collisionCell =
-    gridEls[collisionIndex]?.cell;
+    gridEls[
+      collisionIndex
+    ]?.cell;
+
 
   collisionCell?.classList.add(
     'kc-dino-patrol-hit'
   );
 
+
   burstTentSparks(
     collisionIndex,
+
     dinoPatrolBossActive
       ? 2.1
       : 1.45
   );
 
-  connectPath.forEach(index => {
-    setTentLitForVariety(index, false);
-  });
+
+  /*
+    Existing gameplay law remains untouched:
+
+    Goblin collision clears ONLY the route currently
+    being drawn.
+
+    Dino, snack, logs, fire and the board stay put.
+  */
+  connectPath.forEach(
+    index => {
+
+      setTentLitForVariety(
+        index,
+        false
+      );
+    }
+  );
+
 
   connectPath = [];
   selectedTents.clear();
   activeLine = [];
   activeTargets = [];
 
-  guidePath?.setAttribute('d', '');
+
+  guidePath?.setAttribute(
+    'd',
+    ''
+  );
+
+
+  /*
+    GOBLIN MERCY
+
+    Fire uses resetDinoTrailAfterFire(),
+    so fire can never increment this counter.
+  */
+  dinoPatrolCollisionCount += 1;
+
+
+  const graceTriggered =
+    dinoPatrolCollisionCount >=
+    DINO_PATROL_GRACE_COLLISIONS;
+
+
+  if (
+    graceTriggered
+  ) {
+
+    /*
+      Earn another recovery beat after every
+      three additional Goblin collisions
+      on the same board.
+    */
+    dinoPatrolCollisionCount = 0;
+
+
+    dinoPatrolPausedUntil =
+      Date.now()
+      +
+      DINO_PATROL_GRACE_MS;
+
+
+    dbg(
+      'dino patrol mercy pause',
+      {
+        chapter:
+          dinoChapterNumber,
+
+        round:
+          dinoAdventureRound,
+
+        pauseMs:
+          DINO_PATROL_GRACE_MS
+      }
+    );
+  }
+
 
   window.setTimeout(
     () => {
+
       collisionCell?.classList.remove(
         'kc-dino-patrol-hit'
       );
+
     },
     420
   );
 
+
   dbg(
     'dino patrol reset',
     {
-      chapter: dinoChapterNumber,
-      round: dinoAdventureRound,
-      boss: dinoPatrolBossActive,
-      collisionIndex
+      chapter:
+        dinoChapterNumber,
+
+      round:
+        dinoAdventureRound,
+
+      boss:
+        dinoPatrolBossActive,
+
+      collisionIndex,
+
+      collisionCount:
+        dinoPatrolCollisionCount,
+
+      graceTriggered
     }
   );
 }
@@ -4397,6 +5992,7 @@ function advanceDinoPatrol() {
   if (
     !isDinoPatrolMode() ||
     isResolving ||
+    isDinoPatrolPaused() ||
     dinoPatrolPath.length < 2
   ) {
     return;
@@ -4537,6 +6133,274 @@ function startDinoPatrol(
 
 
 
+
+// ============================================================
+// SECONDARY GOBLIN 2 PATROL
+// ============================================================
+
+function renderSecondaryDinoPatrolCreature() {
+
+  if (
+    dinoPatrolSecondaryCreatureIndex < 0
+    ||
+    !gridEls[
+      dinoPatrolSecondaryCreatureIndex
+    ]?.cell
+  ) {
+    return;
+  }
+
+
+  if (
+    !dinoPatrolSecondaryCreatureEl
+  ) {
+
+    dinoPatrolSecondaryCreatureEl =
+      createTentFrenzyArtImage(
+        TENT_FRENZY_ART.goblin2,
+        'kc-dino-patrol-creature kc-dino-patrol-secondary'
+      );
+  }
+
+
+  dinoPatrolSecondaryCreatureEl
+    .classList
+    .remove(
+      'is-boss'
+    );
+
+
+  dinoPatrolSecondaryCreatureEl
+    .dataset
+    .goblin =
+      '2';
+
+
+  gridEls[
+    dinoPatrolSecondaryCreatureIndex
+  ]
+    .cell
+    .appendChild(
+      dinoPatrolSecondaryCreatureEl
+    );
+}
+
+
+function advanceSecondaryDinoPatrol() {
+
+  if (
+    !isDinoPatrolMode()
+    ||
+    isResolving
+    ||
+    isDinoPatrolPaused()
+    ||
+    dinoPatrolSecondaryPath.length < 2
+  ) {
+    return;
+  }
+
+
+  let nextCursor =
+    dinoPatrolSecondaryCursor
+    +
+    dinoPatrolSecondaryDirection;
+
+
+  if (
+    nextCursor >=
+      dinoPatrolSecondaryPath.length
+    ||
+    nextCursor < 0
+  ) {
+
+    dinoPatrolSecondaryDirection *= -1;
+
+    nextCursor =
+      dinoPatrolSecondaryCursor
+      +
+      dinoPatrolSecondaryDirection;
+  }
+
+
+  dinoPatrolSecondaryCursor =
+    Math.max(
+      0,
+      Math.min(
+        dinoPatrolSecondaryPath.length - 1,
+        nextCursor
+      )
+    );
+
+
+  dinoPatrolSecondaryCreatureIndex =
+    dinoPatrolSecondaryPath[
+      dinoPatrolSecondaryCursor
+    ];
+
+
+  renderSecondaryDinoPatrolCreature();
+
+
+  if (
+    connectPath.length > 0
+    &&
+    connectPath.includes(
+      dinoPatrolSecondaryCreatureIndex
+    )
+  ) {
+
+    resetDinoTrailAfterPatrol(
+      dinoPatrolSecondaryCreatureIndex
+    );
+  }
+}
+
+
+function startSecondaryDinoPatrol(
+  path,
+  {
+    chapterNumber = 3
+  } = {}
+) {
+
+  if (
+    !Array.isArray(path)
+    ||
+    path.length < 2
+  ) {
+    return;
+  }
+
+
+  dinoPatrolSecondaryPath =
+    [...path];
+
+
+  dinoPatrolSecondaryCursor =
+    Math.floor(
+      dinoPatrolSecondaryPath.length / 2
+    );
+
+
+  /*
+    Start opposite the primary patrol direction.
+
+    Slightly different interval speed keeps them
+    from moving like synchronized clones.
+  */
+  dinoPatrolSecondaryDirection =
+    dinoPatrolDirection === 1
+      ? -1
+      : 1;
+
+
+  dinoPatrolSecondaryCreatureIndex =
+    dinoPatrolSecondaryPath[
+      dinoPatrolSecondaryCursor
+    ];
+
+
+  dinoPatrolSecondarySpeedMs =
+    Math.max(
+      430,
+
+      815
+      -
+      Math.max(
+        0,
+        chapterNumber - 3
+      )
+      *
+      45
+    );
+
+
+  dinoPatrolSecondaryPath.forEach(
+    index => {
+
+      const cell =
+        gridEls[index]?.cell;
+
+      if (!cell) {
+        return;
+      }
+
+
+      cell.classList.add(
+        'kc-dino-patrol-cell'
+      );
+
+
+      const mark =
+        document.createElement(
+          'span'
+        );
+
+      mark.className =
+        'kc-dino-patrol-mark';
+
+      mark.textContent =
+        '•';
+
+      cell.appendChild(
+        mark
+      );
+    }
+  );
+
+
+  renderSecondaryDinoPatrolCreature();
+
+
+  dinoPatrolSecondaryTimerId =
+    window.setInterval(
+      advanceSecondaryDinoPatrol,
+      dinoPatrolSecondarySpeedMs
+    );
+
+
+  dbg(
+    'dino patrol start',
+    {
+      actor:
+        'secondary',
+
+      chapterNumber,
+
+      goblinId:
+        2,
+
+      speedMs:
+        dinoPatrolSecondarySpeedMs,
+
+      path:
+        dinoPatrolSecondaryPath
+    }
+  );
+}
+
+
+/*
+  Input collision helper.
+
+  One tap/drag law covers either moving Goblin.
+*/
+function isDinoPatrolOccupiedIndex(
+  index
+) {
+
+  return (
+    index ===
+      dinoPatrolCreatureIndex
+
+    ||
+
+    index ===
+      dinoPatrolSecondaryCreatureIndex
+  );
+}
+
 function buildConnectLayout(withBlockers) {
   for (let attempt = 0; attempt < 60; attempt += 1) {
     const { start, goal } =
@@ -4599,28 +6463,72 @@ function renderConnectEndpoints() {
     startCell.classList.add('kc-connect-start-cell');
 
     const startBadge =
-      document.createElement('span');
+      createTentFrenzyArtImage(
+        getActiveDinoFrenzyArt(),
+        'kc-connect-endpoint kc-connect-start kc-tent-dino-art'
+      );
 
-    startBadge.className =
-      'kc-connect-endpoint kc-connect-start';
-
-    startBadge.textContent = '🦖';
     startCell.appendChild(startBadge);
   }
 
   if (goalCell) {
     goalCell.classList.add('kc-connect-goal-cell');
 
+    const snack =
+      activeTentGoalSnack
+      ??
+      chooseTentGoalSnack();
+
     const goalBadge =
-      document.createElement('span');
+      createTentFrenzyArtImage(
+        (
+          snack.id === 'snowcone'
+            ? TENT_FRENZY_ART.dino1
+            : snack.src
+        ),
+        'kc-connect-endpoint kc-connect-goal kc-tent-snack-art'
+      );
 
-    goalBadge.className =
-      'kc-connect-endpoint kc-connect-goal';
+    /*
+      SnowCone is special:
+      overwrite the temporary source with the current
+      theme package centerCone.png.
 
-    goalBadge.textContent =
-      connectGoalIcon;
+      Existing Ant Attack art is used for all other snacks.
+    */
+    goalBadge.src =
+      getTentGoalSnackUrl(
+        snack
+      );
 
-    goalCell.appendChild(goalBadge);
+    goalBadge.dataset.snackId =
+      snack.id;
+
+    /*
+      Theme package failure safety:
+      fall back to Ant Attack's normal SnowCone asset.
+    */
+    if (
+      snack.id ===
+      'snowcone'
+    ) {
+      goalBadge.addEventListener(
+        'error',
+        () => {
+          goalBadge.src =
+            tentFrenzyArtUrl(
+              'aa_snowcone.png'
+            );
+        },
+        {
+          once: true
+        }
+      );
+    }
+
+    goalCell.appendChild(
+      goalBadge
+    );
   }
 }
 
@@ -4667,23 +6575,17 @@ function configureConnectTrailMode(withBlockers) {
   hazardTentIndexes =
     new Set();
 
-  const fruitGoals =
-    [
-      '🍓',
-      '🍎',
-      '🍊',
-      '🍌',
-      '🍇',
-      '🍉'
-    ];
+  const goalSnack =
+    chooseTentGoalSnack();
 
+  /*
+    Keep connectGoalIcon populated only as harmless
+    compatibility/debug state.
+
+    Rendering now uses goalSnack PNG art.
+  */
   connectGoalIcon =
-    fruitGoals[
-      Math.floor(
-        Math.random() *
-        fruitGoals.length
-      )
-    ];
+    goalSnack.id;
 
   connectPath = [];
   selectedTents.clear();
@@ -4725,7 +6627,7 @@ function handleConnectTrailTap(index) {
 
   if (
     isDinoPatrolMode() &&
-    index === dinoPatrolCreatureIndex
+    isDinoPatrolOccupiedIndex(index)
   ) {
     if (connectPath.length > 0) {
       resetDinoTrailAfterPatrol(index);
@@ -6788,63 +8690,480 @@ function remapPatternToBigLot(pattern) {
 // These routes are intentionally recognizable silhouettes.
 // They remain normal Tent Frenzy routes: follow, light, celebrate.
 // ============================================================
-const BIG_LOT_CONTOUR_PATTERNS = Object.freeze([
-  makeRoutePattern(
-    'big-contour-heart-up',
-    'contour',
-    'HEART',
-    [44,37,30,24,18,12,7,1,8,15,10,4,11,17,23,29,34,39,44]
-  ),
+const BIG_LOT_CONTOUR_PATTERNS =
+  Object.freeze([
 
-  makeRoutePattern(
-    'big-contour-tent',
-    'contour',
-    'TENT',
-    [44,37,30,24,18,13,8,3,10,17,23,29,35,41,47,46,45,44]
-  ),
+    /*
+      HEART
 
-  makeRoutePattern(
-    'big-contour-arrow-up',
-    'contour',
-    'ARROW',
-    [2,7,12,13,19,25,31,37,43,44,38,32,26,20,14,15,16,11]
-  ),
+      Big rounded lobes at the top,
+      narrowing to one bottom point.
+    */
+    makeRoutePattern(
+      'big-contour-heart-up',
+      'contour',
+      'HEART',
+      [
+        44,
+        37,
+        30,
+        24,
+        18,
+        12,
+        7,
+        1,
+        8,
+        15,
+        10,
+        4,
+        11,
+        17,
+        23,
+        29,
+        34,
+        39,
+        44
+      ]
+    ),
 
-  makeRoutePattern(
-    'big-contour-diamond',
-    'contour',
-    'DIAMOND',
-    [2,9,16,23,28,33,38,43,36,31,24,19,12,7,2]
-  ),
 
-  makeRoutePattern(
-    'big-contour-tree',
-    'contour',
-    'TREE',
-    [2,7,12,13,8,14,19,24,25,20,26,31,36,37,38,39,40,34,28,29,23,17,11,10,5]
-  ),
+    /*
+      CASTLE
 
-  makeRoutePattern(
-    'big-contour-snowcone',
-    'contour',
-    'SNOWCONE',
-    [1,2,3,4,10,16,22,28,34,39,44,37,30,24,18,12,6,1]
-  ),
+      Two outer towers with visible crenellations.
+    */
+    makeRoutePattern(
+      'big-contour-castle',
+      'contour',
+      'CASTLE',
+      [
+        42,
+        36,
+        30,
+        24,
+        18,
+        12,
+        6,
+        7,
+        13,
+        14,
+        8,
+        9,
+        15,
+        16,
+        10,
+        11,
+        17,
+        23,
+        29,
+        35,
+        41,
+        47,
+        46,
+        45,
+        44,
+        43,
+        42
+      ]
+    ),
 
-  makeRoutePattern(
-    'big-contour-crown',
-    'contour',
-    'CROWN',
-    [42,36,30,24,18,12,6,1,8,3,10,5,11,17,23,29,35,41,47,46,45,44,43,42]
-  ),
 
-  makeRoutePattern(
-    'big-contour-lightning',
-    'contour',
-    'LIGHTNING',
-    [1,8,14,20,26,32,27,34,40,46,39,33,28,22,16,10,4]
-  )
-]);
+    /*
+      CAMP TENT
+
+      Wide floor and peaked roof.
+    */
+    makeRoutePattern(
+      'big-contour-tent',
+      'contour',
+      'TENT',
+      [
+        44,
+        37,
+        30,
+        24,
+        18,
+        13,
+        8,
+        3,
+        10,
+        17,
+        23,
+        29,
+        35,
+        41,
+        47,
+        46,
+        45,
+        44
+      ]
+    ),
+
+
+    /*
+      SNOWCONE
+
+      Rounded ice crown narrowing into the cone.
+    */
+    makeRoutePattern(
+      'big-contour-snowcone',
+      'contour',
+      'SNOWCONE',
+      [
+        18,
+        12,
+        7,
+        2,
+        3,
+        10,
+        17,
+        23,
+        28,
+        33,
+        38,
+        44,
+        37,
+        30,
+        25,
+        19,
+        18
+      ]
+    ),
+
+
+    /*
+      CROWN
+
+      Three raised crown points over a broad base.
+    */
+    makeRoutePattern(
+      'big-contour-crown',
+      'contour',
+      'CROWN',
+      [
+        42,
+        36,
+        30,
+        24,
+        18,
+        12,
+        6,
+        1,
+        8,
+        3,
+        10,
+        5,
+        11,
+        17,
+        23,
+        29,
+        35,
+        41,
+        47,
+        46,
+        45,
+        44,
+        43,
+        42
+      ]
+    ),
+
+
+    /*
+      TREE
+
+      Layered evergreen body with a trunk/base.
+    */
+    makeRoutePattern(
+      'big-contour-tree',
+      'contour',
+      'TREE',
+      [
+        2,
+        7,
+        12,
+        13,
+        8,
+        14,
+        19,
+        24,
+        25,
+        20,
+        26,
+        31,
+        36,
+        37,
+        38,
+        39,
+        40,
+        34,
+        28,
+        29,
+        23,
+        17,
+        11,
+        10,
+        5
+      ]
+    ),
+
+
+    /*
+      FISH
+
+      Diamond-ish body plus two visible tail fins.
+      Horizontal flip gives the opposite swimming direction.
+    */
+    makeRoutePattern(
+      'big-contour-fish',
+      'contour',
+      'FISH',
+      [
+        18,
+        13,
+        8,
+        9,
+        16,
+        23,
+        17,
+        23,
+        29,
+        23,
+        28,
+        33,
+        32,
+        25,
+        18
+      ]
+    ),
+
+
+    /*
+      ROCKET
+
+      Pointed top, long body, lower fins.
+    */
+    makeRoutePattern(
+      'big-contour-rocket',
+      'contour',
+      'ROCKET',
+      [
+        2,
+        7,
+        12,
+        18,
+        24,
+        30,
+        37,
+        36,
+        43,
+        44,
+        39,
+        46,
+        47,
+        40,
+        41,
+        34,
+        28,
+        22,
+        16,
+        10,
+        4,
+        3,
+        2
+      ]
+    ),
+
+
+    /*
+      MUSHROOM
+
+      Rounded cap with a smaller stem.
+    */
+    makeRoutePattern(
+      'big-contour-mushroom',
+      'contour',
+      'MUSHROOM',
+      [
+        18,
+        12,
+        7,
+        2,
+        3,
+        10,
+        17,
+        23,
+        22,
+        21,
+        20,
+        19,
+        18,
+        25,
+        31,
+        37,
+        38,
+        32,
+        26,
+        19,
+        18
+      ]
+    ),
+
+
+    /*
+      HOUSE
+
+      Simple roof peak over a wide rectangular body.
+    */
+    makeRoutePattern(
+      'big-contour-house',
+      'contour',
+      'HOUSE',
+      [
+        42,
+        36,
+        30,
+        24,
+        18,
+        12,
+        7,
+        2,
+        9,
+        16,
+        23,
+        29,
+        35,
+        41,
+        47,
+        46,
+        45,
+        44,
+        43,
+        42
+      ]
+    ),
+
+
+    /*
+      LIGHTNING
+
+      Strong diagonal zig-zag.
+      This one can safely use every flip.
+    */
+    makeRoutePattern(
+      'big-contour-lightning',
+      'contour',
+      'LIGHTNING',
+      [
+        1,
+        8,
+        14,
+        20,
+        26,
+        32,
+        27,
+        34,
+        40,
+        46,
+        39,
+        33,
+        28,
+        22,
+        16,
+        10,
+        4
+      ]
+    ),
+
+
+    /*
+      MUSIC NOTE
+
+      Tall note stem with a rounded lower head.
+    */
+    makeRoutePattern(
+      'big-contour-music-note',
+      'contour',
+      'MUSIC',
+      [
+        4,
+        3,
+        9,
+        15,
+        21,
+        27,
+        33,
+        39,
+        45,
+        44,
+        43,
+        37,
+        31,
+        25,
+        26,
+        32,
+        38,
+        39
+      ]
+    ),
+
+
+    /*
+      BONUS GEOMETRIC CONTOURS
+
+      These stay available to the general contour library,
+      but the curated 4-shape DJ does not rely on them.
+    */
+    makeRoutePattern(
+      'big-contour-arrow-up',
+      'contour',
+      'ARROW',
+      [
+        2,
+        7,
+        12,
+        13,
+        19,
+        25,
+        31,
+        37,
+        43,
+        44,
+        38,
+        32,
+        26,
+        20,
+        14,
+        15,
+        16,
+        11
+      ]
+    ),
+
+
+    makeRoutePattern(
+      'big-contour-diamond',
+      'contour',
+      'DIAMOND',
+      [
+        2,
+        9,
+        16,
+        23,
+        28,
+        33,
+        38,
+        43,
+        36,
+        31,
+        24,
+        19,
+        12,
+        7,
+        2
+      ]
+    )
+  ]);
 
 function chooseBigLotContourPattern() {
   return chooseRoutePattern(
@@ -7005,62 +9324,147 @@ function chooseSmartBigLotRoutePattern() {
 }
 
 function chooseBigLotPattern() {
+
   const phase =
     getTentFrenzyPhaseForLine(
-      linesWalked + 1
+      linesWalked +
+      1
     );
 
-  if (phase.kind === 'tent-set') {
+
+  if (
+    phase.kind ===
+    'tent-set'
+  ) {
+
     const entry =
       getTentFrenzySetEntryForLine(
-        linesWalked + 1
+        linesWalked +
+        1
       );
 
+
     if (
-      entry?.mode === 'follow' &&
-      entry.followKind === 'shape'
+      entry?.mode ===
+        'follow'
+
+      &&
+
+      entry.followKind ===
+        'shape'
     ) {
-      const shape =
+
+      const baseShape =
         getBigLotContourPatternById(
           entry.shapeId
-        ) ??
+        )
+
+        ??
+
         chooseBigLotContourPattern();
 
-      rememberTentDjPattern(shape);
+
+      const shape =
+        transformBigLotContourPattern(
+
+          baseShape,
+
+          entry.shapeTransform
+          ??
+          'identity'
+        );
+
+
+      rememberTentDjPattern(
+        shape
+      );
+
+
       return shape;
     }
 
+
     if (
-      entry?.mode === 'follow' ||
-      entry?.mode === 'mystery'
+      entry?.mode ===
+        'follow'
+
+      ||
+
+      entry?.mode ===
+        'mystery'
     ) {
+
       const route =
         chooseSmartBigLotRoutePattern();
 
-      rememberTentDjPattern(route);
+
+      rememberTentDjPattern(
+        route
+      );
+
+
       return route;
     }
 
-    // Frenzy does not expose a guide route, so do not pollute
-    // the DJ memory with an invisible pattern.
-    return makeRandomBigLotRouteCandidate();
+
+    /*
+      Tent Tap does not expose a guide route.
+
+      Do not pollute DJ memory with an invisible shape.
+    */
+    return (
+      makeRandomBigLotRouteCandidate()
+    );
   }
 
-  // Dino rounds replace the guide route entirely.
-  if (phase.kind === 'dino') {
-    return makeRandomBigLotRouteCandidate();
+
+  /*
+    Dino rounds replace the guide route entirely.
+  */
+  if (
+    phase.kind ===
+    'dino'
+  ) {
+
+    return (
+      makeRandomBigLotRouteCandidate()
+    );
   }
 
-  if (Math.random() < TENT_CONTOUR_CHANCE) {
-    const shape = chooseBigLotContourPattern();
-    rememberTentDjPattern(shape);
+
+  /*
+    Legacy/general big-lot fallback.
+  */
+  if (
+    Math.random() <
+    TENT_CONTOUR_CHANCE
+  ) {
+
+    const shape =
+      chooseBigLotContourPattern();
+
+
+    rememberTentDjPattern(
+      shape
+    );
+
+
     return shape;
   }
 
-  const route = chooseSmartBigLotRoutePattern();
-  rememberTentDjPattern(route);
+
+  const route =
+    chooseSmartBigLotRoutePattern();
+
+
+  rememberTentDjPattern(
+    route
+  );
+
+
   return route;
 }
+
 
 function expandTentLinesLot() {
   if (bigLotActive || !refs.grid) return;

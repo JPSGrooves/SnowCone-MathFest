@@ -16979,3 +16979,281 @@ body.kc-active
   opacity: 1 !important;
 }
 
+
+
+/* ============================================================
+   SCMF_TENT_FRENZY_ART_A_CSS
+
+   Real PNG presentation for Dino Frenzy.
+   Logic and hitboxes remain owned by the existing tent cells.
+   ============================================================ */
+
+
+/* Dino endpoint */
+
+body.kc-active
+.kc-activity-grid[data-kc-activity="tent"]
+img.kc-tent-dino-art {
+  width:
+    clamp(
+      50px,
+      11vw,
+      82px
+    ) !important;
+
+  height:
+    auto !important;
+
+  max-width:
+    145% !important;
+
+  max-height:
+    145% !important;
+
+  object-fit:
+    contain !important;
+
+  padding:
+    0 !important;
+
+  pointer-events:
+    none !important;
+}
+
+
+/* Log obstacle */
+
+body.kc-active
+.kc-activity-grid[data-kc-activity="tent"]
+img.kc-tent-log-art {
+  width:
+    clamp(
+      36px,
+      8vw,
+      60px
+    ) !important;
+
+  height:
+    auto !important;
+
+  max-width:
+    120% !important;
+
+  max-height:
+    120% !important;
+
+  object-fit:
+    contain !important;
+
+  padding:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  border:
+    none !important;
+
+  box-shadow:
+    none !important;
+
+  pointer-events:
+    none !important;
+
+  filter:
+    drop-shadow(
+      0 3px 4px
+      rgba(0,0,0,0.48)
+    ) !important;
+}
+
+
+/* Fire hazard */
+
+body.kc-active
+.kc-activity-grid[data-kc-activity="tent"]
+img.kc-tent-fire-art {
+  width:
+    clamp(
+      36px,
+      8.5vw,
+      62px
+    ) !important;
+
+  height:
+    auto !important;
+
+  max-width:
+    125% !important;
+
+  max-height:
+    125% !important;
+
+  object-fit:
+    contain !important;
+
+  pointer-events:
+    none !important;
+
+  filter:
+    drop-shadow(
+      0 0 6px
+      rgba(255,170,40,0.88)
+    )
+
+    drop-shadow(
+      0 0 12px
+      rgba(255,70,20,0.58)
+    ) !important;
+}
+
+
+/* Moving Goblin */
+
+body.kc-active
+.kc-activity-grid[data-kc-activity="tent"]
+img.kc-dino-patrol-creature {
+  width:
+    clamp(
+      46px,
+      10vw,
+      72px
+    ) !important;
+
+  height:
+    auto !important;
+
+  max-width:
+    145% !important;
+
+  max-height:
+    145% !important;
+
+  object-fit:
+    contain !important;
+
+  font-size:
+    0 !important;
+
+  pointer-events:
+    none !important;
+}
+
+
+/* Boss-sized Goblin */
+
+body.kc-active
+.kc-activity-grid[data-kc-activity="tent"]
+img.kc-dino-patrol-creature.is-boss {
+  width:
+    clamp(
+      82px,
+      18vw,
+      132px
+    ) !important;
+
+  height:
+    auto !important;
+
+  max-width:
+    220% !important;
+
+  max-height:
+    220% !important;
+
+  font-size:
+    0 !important;
+}
+
+
+/* ───────── SCMF_TENT_FRENZY_ART_A_CSS END ───────── */
+
+
+/* ============================================================
+   SCMF_TENT_FRENZY_SNACKS_V1_CSS
+
+   Goal destinations now use Ant Attack snack PNGs.
+   Theme SnowCone uses the active theme's centerCone.png.
+   ============================================================ */
+
+body.kc-active
+.kc-activity-grid[data-kc-activity="tent"]
+img.kc-tent-snack-art {
+  width:
+    clamp(
+      44px,
+      9.8vw,
+      76px
+    ) !important;
+
+  height:
+    clamp(
+      44px,
+      9.8vw,
+      76px
+    ) !important;
+
+  max-width:
+    132% !important;
+
+  max-height:
+    132% !important;
+
+  object-fit:
+    contain !important;
+
+  padding:
+    0 !important;
+
+  pointer-events:
+    none !important;
+
+  user-select:
+    none !important;
+
+  -webkit-user-drag:
+    none !important;
+
+  filter:
+    drop-shadow(
+      0 0 5px
+      rgba(255,255,255,0.86)
+    )
+
+    drop-shadow(
+      0 0 12px
+      rgba(255,79,216,0.58)
+    ) !important;
+}
+
+
+/*
+  Theme centerCone art sometimes has extra transparent canvas,
+  so SnowCone gets a small presentation bump.
+*/
+
+body.kc-active
+.kc-activity-grid[data-kc-activity="tent"]
+img.kc-tent-snack-art[data-snack-id="snowcone"] {
+  width:
+    clamp(
+      52px,
+      11.5vw,
+      90px
+    ) !important;
+
+  height:
+    clamp(
+      52px,
+      11.5vw,
+      90px
+    ) !important;
+
+  max-width:
+    150% !important;
+
+  max-height:
+    150% !important;
+}
+
+/* ───────── SCMF_TENT_FRENZY_SNACKS_V1_CSS END ───────── */
