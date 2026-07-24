@@ -49,11 +49,11 @@ const KC_ACTIVITY_CONFIG = Object.freeze({
   },
   tent: {
     id: 'tent',
-    title: 'Tent Lines',
+    title: 'Tent Frenzy',
     shortTitle: 'TENTS',
     subtitle: 'Light Up the Tents!',
     img: 'tentLit.png',
-    alt: 'Tent Lines'
+    alt: 'Tent Frenzy'
   },
   parking: {
     id: 'parking',
@@ -95,19 +95,10 @@ const KC_FIRST_TRACK_BY_ACTIVITY = Object.freeze({
 // After SnowCone 90 plays once, Kids Camping enters the full festival rotation.
 // setMusicPool() filters iOS-exclusive tracks automatically when not visible.
 const KC_ROTATION_TRACK_IDS = [
-  'quikserve',
-  'kktribute',
-  'softdown',
-  'infadd',
   'sc90',
-  'nothingorg',
-  'secrets',
-  'stoopidelectro',
-  'prologue',
-  'kittyPaws',
-  'patchrelaxes',
-  'bonusTime',
-  'lastRun'
+  'kcParkingVibes',
+  'kcTentLines',
+  'kcMosquito'
 ];
 let _kcMusicScopeOn = false;
 
@@ -122,9 +113,9 @@ function activateKidsCampingMusicScope() {
     // Signature track plays once.
     // When it naturally ends, existing musicManager ended handling
     // advances into the shuffled Camping pool.
-    shuffling: true,
+    shuffling: false,
 
-    // Never loop the signature track forever.
+    // Cycle through only the four Camping songs.
     looping: false
   });
 
